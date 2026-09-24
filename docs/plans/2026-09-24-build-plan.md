@@ -139,7 +139,7 @@ variable "cluster_name" {
 }
 
 variable "node_count" {
-  type    = int
+  type    = number
   default = 3
   validation {
     condition     = var.node_count >= 3 && var.node_count % 2 == 1
@@ -171,16 +171,15 @@ variable "hetzner_robot_password" {
 `terraform.tfvars.example`:
 
 ```hcl
-home_cidr           = "203.0.113.10/32"
-hetzner_robot_user  = "not-in-git"
-hetzner_robot_password = "not-in-git"
+home_cidr               = "203.0.113.10/32"
+hetzner_robot_user      = "not-in-git"
+hetzner_robot_password  = "not-in-git"
 ```
 
 `.gitignore`:
 
 ```
 .terraform/
-.terraform.lock.hcl
 *.tfstate
 *.tfstate.*
 terraform.tfvars
@@ -190,6 +189,8 @@ talos/controlplane.yaml
 talos/worker.yaml
 talos/talosconfig
 ```
+
+The provider lock file `.terraform.lock.hcl` stays committable: it pins provider versions, which the immutable re-seed constraint wants in Git. It appears with the first provider in Stage 1.
 
 - [ ] **Step 2: Install OpenTofu if missing and validate**
 
