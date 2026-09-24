@@ -151,7 +151,9 @@ Three Hetzner Cloud cax31 servers (Ampere ARM, eight shared vCPU, 16 GB,
 keeps honest quorum, with three etcd votes and three Postgres members. Talos
 Linux 1.14 on all three, officially supported on Hetzner Cloud: the machine
 config reaches each node as server user-data and the node boots straight into
-Talos. Node-to-node traffic rides a private Hetzner network that costs
+Talos. Nodes boot from a project snapshot of the factory-built Talos image,
+and the Kubernetes API endpoint is a reserved public IPv4 that survives node
+replacement. Node-to-node traffic rides a private Hetzner network that costs
 nothing. Cilium as the network layer: network policies with default deny, and
 Gateway API for ingress. OpenTofu, the MPL fork of Terraform, creates the
 servers with the official hetznercloud/hcloud provider. Flux deploys

@@ -647,12 +647,12 @@ In the Hetzner Cloud Console, project settings: create a cost alert that emails 
 - Create: `infra/outputs.tf`
 
 **Interfaces:**
-- Consumes: `hcloud_token`, `home_cidr` from Task 5, the Talos machine config file that Task 7 generates (`infra/talos/controlplane.yaml`, referenced as a file, generated before apply).
-- Produces: tofu definitions for three cax31 servers, a private network and an outer firewall, plus their IP outputs, used by Tasks 7 and 8.
+- Consumes: `hcloud_token`, `home_cidr` from Task 5, the per-node Talos machine config files that Task 7 generates (`infra/talos/controlplane-<N>.yaml`, referenced as files, generated before the full apply).
+- Produces: tofu definitions for three cax31 servers, a private network, reserved public IPv4 addresses and an outer firewall, plus their IP outputs, used by Tasks 7 and 8.
 
 - [ ] **Step 1: Pin the provider and fix the variables**
 
-In `versions.tf` add the required provider `hetznercloud/hcloud` pinned to the current version from registry.opentofu.org, and run `tofu init` so the lock file records it. In `variables.tf` replace the two Robot credential variables with one `hcloud_token` (string, sensitive), set `server_type` default to `cax31`, and add `location` (string, default `fsn1`). Update `terraform.tfvars.example` to match. In `docs/seed-bundle.md` change the Robot API slot to "Hetzner Cloud API token". In `README.md` change "OpenTofu for Hetzner Robot servers" to "OpenTofu for Hetzner Cloud servers".
+In `versions.tf` add the required provider `hetznercloud/hcloud` pinned to 1.69.0 (current release, verified 2026-09-24), and run `tofu init` so the lock file records it. In `variables.tf` replace the two Robot credential variables with one `hcloud_token` (string, sensitive), set `server_type` default to `cax31`, and add `location` (string, default `fsn1`). Update `terraform.tfvars.example` to match. In `docs/seed-bundle.md` change the Robot API slot to "Hetzner Cloud API token". In `README.md` change "OpenTofu for Hetzner Robot servers" to "OpenTofu for Hetzner Cloud servers".
 
 - [ ] **Step 2: Write main.tf**
 
@@ -703,34 +703,55 @@ resource "hcloud_firewall" "cluster" {
   }
 }
 
+resource "hcloud_primary_ip" "node" {
+  count         = var.node_count
+  name          = "${var.cluster_name}-${count.index}"
+  location      = var.location
+  type          = "ipv4"
+  assignee_type = "server"
+  auto_delete   = false
+}
+
 resource "hcloud_server" "node" {
   count        = var.node_count
   name         = "${var.cluster_name}-${count.index}"
   server_type  = var.server_type
   location     = var.location
-  image        = "<Talos image id or label from Task 7's research>"
-  user_data    = file("${path.module}/talos/controlplane.yaml")
+  image        = data.hcloud_image.talos.id
+  user_data    = file("${path.module}/talos/controlplane-${count.index}.yaml")
   firewall_ids = [hcloud_firewall.cluster.id]
 
   public_net {
-    ipv4_enabled = true
-    ipv6_enabled = true
+    ipv4 = hcloud_primary_ip.node[count.index].id
   }
+}
 
-  network {
-    network_id = hcloud_network.cluster.id
-    ip         = cidrhost(hcloud_network_subnet.nodes.ip_range, 10 + count.index)
-  }
+resource "hcloud_server_network" "node" {
+  count     = var.node_count
+  server_id = hcloud_server.node[count.index].id
+  subnet_id = hcloud_network_subnet.nodes.id
+  ip        = cidrhost(hcloud_network_subnet.nodes.ip_range, 10 + count.index)
+}
+
+data "hcloud_image" "talos" {
+  with_selector     = "os=talos,version=1.14.1,arch=arm64"
+  with_architecture = "arm"
+  most_recent       = true
 }
 ```
 
-The same `controlplane.yaml` serves all three nodes: Talos reads its own addresses at boot. Node-to-node traffic stays inside `10.0.1.0/24`, which the cloud firewall does not filter. The outer firewall mirrors the home allowlist so a lockout stays fixable from the console.
+Four decisions live here. The reserved primary IPv4 addresses exist before the servers do, so Task 7 can generate configs against a known endpoint address, and a node replacement or a full re-seed keeps the same addresses (`auto_delete = false` so a server deletion never releases one). The server-to-network attachment is a separate `hcloud_server_network` resource because the provider's inline `network` block has a detach and reattach bug. The machine config ships as user-data through the metadata service, which keeps the cluster secrets off the public wire: `apply-config --insecure` would send them as plaintext HTTP. The Talos image lookup goes through labels, not name, because snapshot images carry no name; Task 8's snapshot build sets the labels this selector matches, and `with_architecture` spells ARM as `arm`.
 
 - [ ] **Step 3: Write outputs.tf**
 
 `infra/outputs.tf`:
 
 ```hcl
+output "api_endpoint_ip" {
+  description = "Reserved public IPv4 of node 0, the Kubernetes API endpoint"
+  value       = hcloud_primary_ip.node[0].ip_address
+}
+
 output "node_public_ips" {
   description = "Public IPv4 addresses of the three nodes"
   value       = hcloud_server.node[*].ipv4_address
@@ -738,7 +759,7 @@ output "node_public_ips" {
 
 output "node_private_ips" {
   description = "Private network addresses of the three nodes"
-  value       = [for nic in hcloud_server.node[*].network : nic.ip]
+  value       = hcloud_server_network.node[*].ip
 }
 ```
 
@@ -772,11 +793,14 @@ git push
 
 **Files:**
 - Create: `infra/talos/patches.yaml`
+- Create: `infra/talos/node-0.yaml`, `infra/talos/node-1.yaml`, `infra/talos/node-2.yaml`
 - Create: `infra/talos/README.md`
+- Edit: `infra/.gitignore` (widen `talos/controlplane.yaml` to `talos/controlplane*.yaml`, the per-node generated files embed secrets too)
+- Edit: `infra/docs/seed-bundle.md` (tick the Talos secrets slot)
 
 **Interfaces:**
-- Consumes: node IPs from Task 6, home CIDR from Task 5.
-- Produces: validated machine configs and the rule list Task 8 applies.
+- Consumes: the reserved endpoint IP from Task 6's primary addresses, the private node addresses from Task 6's deterministic `cidrhost` allocation, home CIDR from Task 5.
+- Produces: validated per-node machine configs and the rule list Task 8 applies.
 
 - [ ] **Step 1: Install talosctl 1.14**
 
@@ -796,29 +820,21 @@ talosctl gen secrets -o secrets.yaml
 
 `secrets.yaml` is the cluster root: etcd, kubelet and OpenBao-adjacent trust all derive from it. Move it to the seed bundle, tick the slot in `infra/docs/seed-bundle.md`, never commit it. The infra `.gitignore` already excludes it.
 
-- [ ] **Step 3: Generate the base configs**
+- [ ] **Step 3: Write the patches**
 
-```bash
-IP0=<node0-public-ip>
-talosctl gen config sf https://$IP0:6443 \
-  --with-secrets secrets.yaml \
-  --config-patch-control-plane @patches.yaml \
-  --output-dir .
-```
-
-All three nodes run control-plane and workloads, so one control-plane config serves every node: it ships as user-data at server creation and Talos reads its own addresses at boot. The node addresses for the firewall rules are the private ones from `tofu output node_private_ips`.
-
-- [ ] **Step 4: Write the firewall patch**
-
-`infra/talos/patches.yaml`, using the 1.14 typed documents (the install section as `UnattendedInstallConfig` with a disk selector that matches the cax31's 160 GB virtio disk rather than a device name):
+`infra/talos/patches.yaml` is one multi-document file: an untyped cluster patch pinning etcd to the private network, then 1.14 typed documents (the install section as `UnattendedInstallConfig` with a disk selector that matches the cax31's 160 GB virtio disk rather than a device name):
 
 ```yaml
+cluster:
+  etcd:
+    advertiseSubnet: 10.0.1.0/24
+---
 apiVersion: v1alpha1
 kind: UnattendedInstallConfig
 name: unattended-install
 provisioning:
   diskSelector:
-    size: 160GB
+    size: 100GB
 ---
 apiVersion: v1alpha1
 kind: NetworkRuleConfig
@@ -853,6 +869,7 @@ portSelector:
   ports:
     - 8472
     - 6081
+    - 51820
   protocol: udp
 ingress:
   - subnet: 10.0.1.0/24
@@ -873,6 +890,18 @@ kind: NetworkDefaultActionConfig
 ingress: block
 ```
 
+Then `infra/talos/node-0.yaml` (node-1 and node-2 take `.11` and `.12`), forcing the kubelet onto the private address that Task 6's `hcloud_server_network` assigns the node:
+
+```yaml
+apiVersion: v1alpha1
+kind: KubeletConfig
+name: node-ip
+kubelet:
+  nodeIP:
+    validSubnets:
+      - 10.0.1.10/32
+```
+
 The port list, with the reason each is open:
 
 - 6443, 50000: Kubernetes and Talos APIs, from home only.
@@ -880,17 +909,40 @@ The port list, with the reason each is open:
 - 10250: kubelet, node to node.
 - 4240: Cilium health checks, node to node.
 - 8472, 6081: Cilium VXLAN and Geneve, node to node, UDP.
+- 51820: Cilium wireguard, node to node, UDP. Task 9 turns encryption on.
 - 80, 443: Gateway endpoints for Let's Encrypt HTTP-01 and the public services from Stage 2 on.
 
-Node-to-node traffic rides the private network `10.0.1.0/24`. Fill the home CIDR with the tfvars value verbatim, it already carries the `/32`. Verify the document names and field spellings against the Talos 1.14 docs pages for the ingress firewall and the install config before validating, this plan was written against 1.8-era schema names and the typed-document restructure of 1.14.
+Node-to-node traffic rides the private network `10.0.1.0/24`. The etcd patch and the kubelet patches keep etcd and the node addresses on that network: the hcloud platform configures both NICs and the defaults pick the public side. The disk selector asks for at least 100 GB because the cax31's nominal 160 GB disk reports about 155 GiB, and a `160GB` match could fail. Fill the home CIDR with the tfvars value verbatim, it already carries the `/32`. Verify the document names and field spellings against the Talos 1.14 docs pages for the ingress firewall and the install config before validating, this plan was written against 1.8-era schema names and the typed-document restructure of 1.14.
+
+- [ ] **Step 4: Reserve the endpoint IP, then generate the configs**
+
+```bash
+cd ~/repos/ai-software-factory-infra
+tofu apply -target=hcloud_primary_ip.node
+ENDPOINT=$(tofu output -raw api_endpoint_ip)
+cd talos
+talosctl gen config sf https://$ENDPOINT:6443 \
+  --with-secrets secrets.yaml \
+  --with-docs=false --with-examples=false \
+  --config-patch-control-plane @patches.yaml \
+  --output-dir .
+for i in 0 1 2; do
+  talosctl machineconfig patch controlplane.yaml \
+    --patch @node-$i.yaml -o controlplane-$i.yaml
+done
+```
+
+The targeted apply reserves the three public IPv4 addresses (about 1.50 EUR per month, part of the 65) and reveals the endpoint address the configs need. It is the first write operation against the cloud account, so a token with read-only scope fails here. The stripped generation flags keep the config under the 32 KiB user-data limit. All three nodes run control-plane and workloads, so one base config plus one per-node kubelet patch serves every node: each config ships as that node's user-data at server creation.
 
 - [ ] **Step 5: Validate the configs**
 
 ```bash
-talosctl validate --config controlplane.yaml --mode <mode from the Talos hcloud guide>
+for i in 0 1 2; do
+  talosctl validate --config controlplane-$i.yaml --mode cloud
+done
 ```
 
-Expected: valid. Fix and revalidate until it is.
+Expected: `valid` for all three. `cloud` is the mode the hcloud platform reports for itself. Fix and revalidate until they are.
 
 - [ ] **Step 6: Document and commit**
 
@@ -900,23 +952,23 @@ Expected: valid. Fix and revalidate until it is.
 # Talos configs
 
 secrets.yaml is generated per cluster and lives in the seed bundle,
-never here. The generated controlplane.yaml and worker.yaml embed the
-cluster secrets too, so they are gitignored and regenerated on demand
-from secrets.yaml with the command in the build plan
-docs/plans/2026-09-24-build-plan.md Task 7 Step 3.
+never here. The generated controlplane-<N>.yaml files, worker.yaml and
+talosconfig embed the cluster secrets too, so they are gitignored and
+regenerated on demand from secrets.yaml, patches.yaml and node-<N>.yaml
+with the commands in docs/plans/2026-09-24-build-plan.md Task 7 Step 4.
 ```
 
 ```bash
-git add patches.yaml README.md
-git commit -m "Talos machine config patch with nftables ingress rules"
+git add patches.yaml node-0.yaml node-1.yaml node-2.yaml README.md ../.gitignore ../docs/seed-bundle.md
+git commit -m "Talos patches: nftables ingress, private etcd and kubelet node IP"
 git push
 ```
 
-Commit only the patch and the README. The generated configs and talosconfig stay untracked and out of Git, they embed the cluster secrets.
+Commit the patches, the README, the widened gitignore and the seed-bundle tick. The generated configs and talosconfig stay untracked and out of Git, they embed the cluster secrets.
 
 ### Task 8: Create the nodes and form the cluster
 
-**Files:** none in Git. This task spends money: three cax31 cost about 0.09 EUR per hour together. Tell Sebastian the moment the servers are created.
+**Files:** none in Git. This task spends money: the throwaway cax11 in Step 1 costs about 0.01 EUR once, the three cax31 cost about 0.09 EUR per hour together. Tell Sebastian the moment the servers are created.
 
 **Interfaces:**
 - Consumes: the substrate from Task 6, the machine config from Task 7.
@@ -924,7 +976,49 @@ Commit only the patch and the README. The generated configs and talosconfig stay
 
 Rescue paths, read first: nodes are disposable. A broken node is `tofu destroy`/`tofu apply` away from a clean replacement, and Stage 3 re-seeds the whole cluster anyway. If the seed machine is locked out by a mis-typed home CIDR, fix the cloud firewall in the Hetzner console first: it is editable without node access and mirrors the same allowlist.
 
-- [ ] **Step 1: Create the servers**
+- [ ] **Step 1: Build the Talos snapshot**
+
+Hetzner Cloud has no Talos machine image to create servers from, only a public ISO that attaches after creation and has no tofu-clean path. Build one instead: boot a throwaway cax11 into the rescue system, write the Talos factory image to its disk, snapshot it. The nodes then boot that snapshot, ARM to ARM. The token comes from `.env.tools`, never echoed.
+
+```bash
+set -a; source ~/repos/ai-software-factory/.env.tools; set +a
+HC="Authorization: Bearer $HETZNER_KEY"
+ssh-keygen -t ed25519 -N '' -f /tmp/snap-key
+KEY=$(curl -s -H "$HC" -H "Content-Type: application/json" -X POST \
+  https://api.hetzner.cloud/v1/ssh_keys \
+  -d "{\"name\":\"snapshot-build\",\"public_key\":\"$(cat /tmp/snap-key.pub)\"}" | jq -r .ssh_key.id)
+FW=$(curl -s -H "$HC" -H "Content-Type: application/json" -X POST \
+  https://api.hetzner.cloud/v1/firewalls \
+  -d "{\"name\":\"snapshot-build\",\"rules\":[{\"direction\":\"in\",\"protocol\":\"tcp\",\"port\":\"22\",\"source_ips\":[\"<home-cidr>\"]}]}" | jq -r .firewall.id)
+SRV=$(curl -s -H "$HC" -H "Content-Type: application/json" -X POST \
+  https://api.hetzner.cloud/v1/servers \
+  -d "{\"name\":\"snapshot-build\",\"server_type\":\"cax11\",\"image\":\"ubuntu-24.04\",\"location\":\"fsn1\",\"ssh_keys\":[$KEY],\"firewalls\":[{\"firewall\":$FW}],\"public_net\":{\"enable_ipv4\":true,\"enable_ipv6\":false}}" | jq -r .server.id)
+curl -s -H "$HC" -X POST https://api.hetzner.cloud/v1/servers/$SRV/actions/enable_rescue -d "{\"ssh_keys\":[$KEY]}" >/dev/null
+curl -s -H "$HC" -X POST https://api.hetzner.cloud/v1/servers/$SRV/actions/power_reset >/dev/null
+IP=$(curl -s -H "$HC" https://api.hetzner.cloud/v1/servers/$SRV | jq -r .server.public_net.ipv4.ip)
+```
+
+Wait about a minute for the rescue boot, then write the image and power off. The shutdown before the snapshot is the order the Talos guide uses, for a consistent disk:
+
+```bash
+ssh -i /tmp/snap-key -o StrictHostKeyChecking=no root@$IP \
+  'wget -qO /tmp/talos.raw.xz https://factory.talos.dev/image/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba/v1.14.1/hcloud-arm64.raw.xz && xz -d -c /tmp/talos.raw.xz | dd of=/dev/sda && sync && shutdown -h now'
+until [ "$(curl -s -H "$HC" https://api.hetzner.cloud/v1/servers/$SRV | jq -r .server.status)" = off ]; do sleep 5; done
+curl -s -H "$HC" -H "Content-Type: application/json" -X POST \
+  https://api.hetzner.cloud/v1/servers/$SRV/actions/create_image \
+  -d '{"description":"talos-1.14.1-arm64","type":"snapshot","labels":{"os":"talos","version":"1.14.1","arch":"arm64"}}' >/dev/null
+```
+
+Wait for the image to report `available` (GET `/v1/images?type=snapshot`, the one labelled `os=talos`). If the API rejects labels on create, set them with PATCH on the image, the selector lookup in Task 6 depends on them. Then delete the throwaway pieces:
+
+```bash
+curl -s -H "$HC" -X DELETE https://api.hetzner.cloud/v1/servers/$SRV
+curl -s -H "$HC" -X DELETE https://api.hetzner.cloud/v1/firewalls/$FW
+curl -s -H "$HC" -X DELETE https://api.hetzner.cloud/v1/ssh_keys/$KEY
+rm -f /tmp/snap-key /tmp/snap-key.pub
+```
+
+- [ ] **Step 2: Create the servers**
 
 ```bash
 cd ~/repos/ai-software-factory-infra
@@ -934,7 +1028,7 @@ tofu apply
 
 Expected: three servers created from the Talos image, each booting straight into Talos with the machine config from user-data. `tofu output node_public_ips` and `node_private_ips` print the addresses.
 
-- [ ] **Step 2: Wait for the Talos API on each node**
+- [ ] **Step 3: Wait for the Talos API on each node**
 
 ```bash
 talosctl --nodes <node0-ip> status
@@ -942,13 +1036,13 @@ talosctl --nodes <node0-ip> status
 
 Repeat per node. Expected: each node answers with its Talos version. The first boot installs Talos to disk and reboots once, give it a few minutes.
 
-- [ ] **Step 3: Bootstrap etcd on the first node**
+- [ ] **Step 4: Bootstrap etcd on the first node**
 
 ```bash
 talosctl bootstrap --nodes <node0-ip> --endpoints <node0-ip>
 ```
 
-- [ ] **Step 4: Install kubectl and the Cilium CLI if missing**
+- [ ] **Step 5: Install kubectl and the Cilium CLI if missing**
 
 The seed machine is x86; the node architecture does not change these downloads.
 
@@ -965,7 +1059,7 @@ command -v cilium >/dev/null || {
 }
 ```
 
-- [ ] **Step 5: Get the kubeconfig**
+- [ ] **Step 6: Get the kubeconfig**
 
 ```bash
 talosctl kubeconfig -n <node0-ip> -e <node0-ip> sf
