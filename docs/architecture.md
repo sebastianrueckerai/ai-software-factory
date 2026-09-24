@@ -167,11 +167,18 @@ The re-seed drill, run once before Phase 1 ends:
 1. `terraform destroy` the three nodes.
 2. `terraform apply`: new nodes, same Talos configs from Git.
 3. Flux reinstalls every workload from Git.
-4. Restore Postgres from the S3 backups, restore OpenBao from its S3 snapshot
-   using the unseal keys from the seed bundle (3.3), and point services at the
-   object storage buckets.
+4. Restore Postgres from the S3 backups, restore Forgejo from its repository
+   dump in S3, restore OpenBao from its S3 snapshot using the unseal keys
+   from the seed bundle (3.3), and point services at the object storage
+   buckets.
 
 No node holds state that Git, S3 and the seed bundle do not describe.
+
+Bootstrap breaks one circular dependency: Flux deploys everything from Git,
+but the Git server, Forgejo, is itself deployed by Flux. Step zero, run once
+from the seed machine: apply the bootstrap slice, CNPG plus Forgejo, by hand,
+restore Forgejo's repositories from the S3 dump, then let Flux take over
+everything else.
 
 Management access: the Hetzner firewall allowlists your home IP for the
 Kubernetes and Talos API ports. Nothing else reaches the nodes. A self-hosted
@@ -195,9 +202,13 @@ volume claim) and gets a disk that outlives the pod. A "local" PV is a disk
 physically inside one node. It is fast (no network hop) but bound to that node:
 if the node dies, that disk is unreachable until the node returns.
 
-The only services on this cluster whose loss of data matters are the Postgres
-databases (tasks, sessions, keys, audit). Everything else is either stateless
-and rebuilt from Git, or blob-shaped and already on S3-class storage.
+The services on this cluster whose loss of data matters are the Postgres
+databases (tasks, sessions, keys, audit) and Forgejo's git repositories, which
+are plain files on a local PV. Postgres is covered by CNPG's S3 backups,
+Forgejo by a nightly dump of its repositories to S3, and OpenBao by its
+snapshots: one backup path per data service, no cluster-wide backup tool.
+Everything else is either stateless and rebuilt from Git, or blob-shaped and
+already on S3-class storage. SigNoz's local history is the one accepted loss.
 
 CloudNativePG is an operator for Postgres. You write a Kubernetes object that
 says "Postgres, three replicas, this much disk, backups to this S3 bucket". The
@@ -391,6 +402,11 @@ Decision (confirmed 2026-09-24): OpenBao, because licence risk on the secrets ba
 place this project should not carry it. The API being identical means the swap
 to Vault is a configuration change if OpenBao ever disappoints.
 
+One operational cost, named: auto-unseal needs a KMS we do not run, so
+unsealing after a full restart is manual, with the seed bundle's keys. Node
+reboots are rare on Talos, and a few minutes of human time is the accepted
+price.
+
 ### 4.4 Model and tool providers
 
 The seed bundle holds keys for DeepSeek, Alibaba (Qwen via DashScope), z.ai
@@ -565,9 +581,15 @@ kubelet rotates, and harnesses have no mechanism to attach it to requests. So
 the adapter listens on localhost. The harness's provider configuration points
 at the adapter, and its tool servers route through it too. On each request the
 adapter re-reads the current token file, attaches the fresh JWT, and forwards
-to `factory-gateway`. The only credential that ever exists inside the sandbox
-is the rotating task identity, and the gateway keeps a single authentication
-mechanism.
+to `factory-gateway`. Model and tool calls stay entirely on that identity
+path.
+
+Git is the one deliberate exception, because harnesses run git as a shell
+command. The sandbox holds a per-task Forgejo token, minted by factoryd
+through Forgejo's API at task start, scoped to branch write on the task's
+repository, revoked at task end. Everything an agent exchanges with the world
+is still attributable: model and tool calls by the task identity, git pushes
+by the task token.
 
 ### 6.4 Sandbox hardening
 
