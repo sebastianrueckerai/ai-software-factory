@@ -246,7 +246,7 @@ third source is a small offline bundle holding what Git and S3 cannot hold:
 
 - the Hetzner API token,
 - the S3 access keys,
-- DNS registrar credentials,
+- the Cloudflare DNS token for the `aisoftwarefactory.world` zone,
 - the model provider API keys,
 - the OpenBao unseal keys.
 
@@ -267,7 +267,29 @@ OpenBao from the seed by hand. No secret the seed holds ever enters Git.
 | Object storage | Hetzner Object Storage | Fork below |
 | Observability | SigNoz | Fork history below, decided |
 | Telemetry pipeline | OpenTelemetry Collector | Agents and services emit OTel; the collector routes |
-| TLS certificates | cert-manager with Let's Encrypt | One certificate per public endpoint, issued via Gateway API |
+| TLS certificates | cert-manager with Let's Encrypt | Wildcard via DNS-01, see 3.4 |
+
+### 3.4 Public DNS and TLS
+
+The domain is `aisoftwarefactory.world`, registered at Namecheap. DNS hosting
+moves to Cloudflare's free tier. The registrar stays Namecheap, so switching
+DNS hosting again later is a nameserver change, nothing else.
+
+The reason is automation. Namecheap's API has no first-class support in
+cert-manager, certbot or Terraform. Cloudflare's DNS API is the one every ACME
+tool speaks, and a free zone is all we need from it.
+
+cert-manager (already in the platform table) is the in-cluster equivalent of
+certbot: same job, ACME against Let's Encrypt, but as a Kubernetes operator.
+It issues one wildcard certificate for the zone via the DNS-01 challenge,
+using a Cloudflare API token scoped to DNS edits on this one zone. The token
+lives in OpenBao and in the seed bundle.
+
+Two details that matter. Records stay "DNS only", the unproxied mode: the
+cluster's own Gateway terminates TLS, Cloudflare answers DNS and nothing else.
+And the Hetzner firewall opens ports 80 and 443 to the world for the Gateway
+endpoints, while the Talos and Kubernetes API ports stay allowlisted to the
+home IP. One firewall, two rules per audience.
 
 ### 4.1 Object storage: Hetzner Object Storage versus running S3 ourselves
 
@@ -607,6 +629,7 @@ runner on real jobs.
 | Node hardware | 3x Hetzner AX41 (6 cores, 64 GB, NVMe), about 39 EUR per month each | Decided |
 | Management access | Hetzner firewall allowlisting your home IP, headscale VPN later | Decided |
 | Repository layout | `infra` and `factory` now, `demo-app` in Phase 3 | Decided |
+| Public DNS | Cloudflare-hosted zone for `aisoftwarefactory.world`, registrar Namecheap | Proposed, nameserver switch pending |
 | Demo app | Small real product with real telemetry | Open, chosen in Phase 3 |
 
 ## 11. Build order
