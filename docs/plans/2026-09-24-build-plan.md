@@ -994,9 +994,11 @@ SRV=$(curl -s -H "$HC" -H "Content-Type: application/json" -X POST \
   https://api.hetzner.cloud/v1/servers \
   -d "{\"name\":\"snapshot-build\",\"server_type\":\"cx23\",\"image\":\"ubuntu-24.04\",\"location\":\"fsn1\",\"ssh_keys\":[$KEY],\"firewalls\":[{\"firewall\":$FW}],\"public_net\":{\"enable_ipv4\":true,\"enable_ipv6\":false}}" | jq -r .server.id)
 curl -s -H "$HC" -X POST https://api.hetzner.cloud/v1/servers/$SRV/actions/enable_rescue -d "{\"ssh_keys\":[$KEY]}" >/dev/null
-curl -s -H "$HC" -X POST https://api.hetzner.cloud/v1/servers/$SRV/actions/power_reset >/dev/null
+curl -s -H "$HC" -X POST https://api.hetzner.cloud/v1/servers/$SRV/actions/reset >/dev/null
 IP=$(curl -s -H "$HC" https://api.hetzner.cloud/v1/servers/$SRV | jq -r .server.public_net.ipv4.ip)
 ```
+
+`enable_rescue` fails silently (returns a null action) while the server is still `initializing`, and rescue boot needs the reset after the enable. Poll `GET /v1/servers/$SRV` until `status` is `running`, then run the two actions in the order shown (`/actions/reset`, not `power_reset`, which is not a route).
 
 Wait about a minute for the rescue boot, then write the image and power off. The shutdown before the snapshot is the order the Talos guide uses, for a consistent disk:
 
@@ -1028,6 +1030,8 @@ tofu apply
 
 Expected: three servers created from the Talos image, each booting straight into Talos with the machine config from user-data. `tofu output node_public_ips` and `node_private_ips` print the addresses.
 
+If the project hits the shared-vCPU core limit (the default allows 16 shared cores; three cpx42 need 24), the apply fails for the last server with `resource_limit_exceeded` on every retry. Sebastian can raise the limit in the Cloud Console under Limits. Stage 1 may proceed on two nodes: etcd keeps quorum at 2 of 3, and the pending third server joins later with one `tofu apply` once the limit rises. When the attachments of the blocked server are created by hand (API `attach_to_network` plus `tofu import`), patch the imported state's `subnet_id` with `tofu state pull`/edit/`tofu state push -force`; the import leaves it null and any plan then wants to replace the attachment.
+
 - [ ] **Step 3: Wait for the Talos API on each node**
 
 ```bash
@@ -1044,7 +1048,7 @@ talosctl bootstrap --nodes <node0-ip> --endpoints <node0-ip>
 
 - [ ] **Step 5: Install kubectl and the Cilium CLI if missing**
 
-The seed machine is x86; the node architecture does not change these downloads.
+The seed machine is x86; the node architecture does not change these downloads. The `releases/latest/bin/...` download URL 404s, the published checksum file has no parseable SHA256 line, and sudo needs a password on the seed machine, so the cilium CLI comes from the GitHub API asset URL into `~/.local/bin` (on PATH).
 
 ```bash
 command -v kubectl >/dev/null || {
@@ -1052,21 +1056,25 @@ command -v kubectl >/dev/null || {
   sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 }
 command -v cilium >/dev/null || {
-  curl -L --remote-name-all https://github.com/cilium/cilium-cli/releases/latest/bin/cilium-linux-amd64.tar.gz{,.sha256sum}
-  sha256sum --check cilium-linux-amd64.tar.gz.sha256sum
-  sudo tar xzf cilium-linux-amd64.tar.gz -C /usr/local/bin cilium
-  rm cilium-linux-amd64.tar.gz*
+  U=$(curl -s https://api.github.com/repos/cilium/cilium-cli/releases/latest \
+    | jq -r '.assets[] | select(.name=="cilium-linux-amd64.tar.gz").browser_download_url')
+  curl -L -o /tmp/cilium.tar.gz "$U"
+  tar xzf /tmp/cilium.tar.gz -C ~/.local/bin cilium
+  rm /tmp/cilium.tar.gz
 }
 ```
 
 - [ ] **Step 6: Get the kubeconfig**
 
 ```bash
-talosctl kubeconfig -n <node0-ip> -e <node0-ip> sf
+talosctl kubeconfig -n <node0-ip> -e <node0-ip> ~/.kube/config
+chmod 600 ~/.kube/config
 kubectl get nodes
 ```
 
-Expected: three nodes, status NotReady (no CNI yet), roles control-plane+worker.
+The positional argument is a file path, not a cluster name: `talosctl kubeconfig sf` writes a file named `sf` into the current directory. Wait for the API server first (`curl -k https://<node0-ip>:6443/readyz` answers 200); before it is up the command fails silently.
+
+Expected: the nodes, status NotReady (no CNI yet), roles control-plane+worker.
 
 ### Task 9: Cilium and the exit gate
 
@@ -1078,12 +1086,30 @@ Expected: three nodes, status NotReady (no CNI yet), roles control-plane+worker.
 
 - [ ] **Step 1: Install Cilium**
 
+Flannel must not run: the config generator always emits a KubeFlannelCNIConfig document, `cluster.network.cni.name: none` does not remove it, and the document makes Talos run flannel. The strip lives in the Task 7 README (strip after generation, `talosctl apply-config` per node). If the DaemonSet still exists at this point, delete it:
+
 ```bash
-cilium install --version 1.20.0
+kubectl -n kube-system delete ds/kube-flannel
+```
+
+Talos does not let workloads load kernel modules, so Cilium runs with the capability lists from the official Talos guide (no SYS_MODULE) and cgroup automount off. cilium-cli 0.20.1 has no `--encryption` flag; wireguard encryption goes through `--set`:
+
+```bash
+cilium install --version 1.20.0 \
+  --set ipam.mode=kubernetes \
+  --set kubeProxyReplacement=false \
+  --set 'securityContext.capabilities.ciliumAgent={CHOWN,KILL,NET_ADMIN,NET_RAW,IPC_LOCK,SYS_ADMIN,SYS_RESOURCE,DAC_OVERRIDE,FOWNER,SETGID,SETUID}' \
+  --set 'securityContext.capabilities.cleanCiliumState={NET_ADMIN,SYS_ADMIN,SYS_RESOURCE}' \
+  --set cgroup.autoMount.enabled=false \
+  --set cgroup.hostRoot=/sys/fs/cgroup \
+  --set encryption.enabled=true \
+  --set encryption.type=wireguard
 cilium status --wait
 ```
 
-Expected: all agents healthy on three nodes.
+With the default capabilities the agents stay Pending: the `clean-cilium-state` init container dies with `unable to apply caps: can't apply capabilities: operation not permitted`. If a release is already installed with wrong values, the same sets go through `cilium upgrade --version 1.20.0 ...`; it merges the last release's values by default.
+
+Expected: all agents healthy on the nodes.
 
 - [ ] **Step 2: Run the connectivity test**
 
@@ -1099,7 +1125,7 @@ Expected: all checks pass. If the node-mesh UDP rule is wrong, this fails here a
 kubectl get nodes
 ```
 
-Expected: three nodes Ready, roles control-plane+worker.
+Expected: all cluster nodes Ready, roles control-plane+worker. On the 2-of-3 limit run this is two nodes.
 
 - [ ] **Step 4: Gate check, firewall from home**
 
