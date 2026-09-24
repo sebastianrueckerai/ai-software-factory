@@ -826,14 +826,17 @@ talosctl gen secrets -o secrets.yaml
 ```yaml
 cluster:
   etcd:
-    advertiseSubnet: 10.0.1.0/24
+    listenSubnets:
+      - 10.0.1.0/24
+    advertisedSubnets:
+      - 10.0.1.0/24
 ---
 apiVersion: v1alpha1
 kind: UnattendedInstallConfig
-name: unattended-install
 provisioning:
   diskSelector:
-    size: 100GB
+    match: disk.size > 100000000000u
+  wipe: true
 ---
 apiVersion: v1alpha1
 kind: NetworkRuleConfig
@@ -893,12 +896,10 @@ Then `infra/talos/node-0.yaml` (node-1 and node-2 take `.11` and `.12`), forcing
 
 ```yaml
 apiVersion: v1alpha1
-kind: KubeletConfig
-name: node-ip
-kubelet:
-  nodeIP:
-    validSubnets:
-      - 10.0.1.10/32
+kind: KubeNodeConfig
+nodeIP:
+  validSubnets:
+    - 10.0.1.10/32
 ```
 
 The port list, with the reason each is open:
@@ -911,7 +912,7 @@ The port list, with the reason each is open:
 - 51820: Cilium wireguard, node to node, UDP. Task 9 turns encryption on.
 - 80, 443: Gateway endpoints for Let's Encrypt HTTP-01 and the public services from Stage 2 on.
 
-Node-to-node traffic rides the private network `10.0.1.0/24`. The etcd patch and the kubelet patches keep etcd and the node addresses on that network: the hcloud platform configures both NICs and the defaults pick the public side. The disk selector asks for at least 100 GB because the cpx42's nominal 320 GB disk reports about 300 GiB, and a `320GB` match could fail. Fill the home CIDR with the tfvars value verbatim, it already carries the `/32`. Verify the document names and field spellings against the Talos 1.14 docs pages for the ingress firewall and the install config before validating, this plan was written against 1.8-era schema names and the typed-document restructure of 1.14.
+Node-to-node traffic rides the private network `10.0.1.0/24`. The etcd patch and the kubelet patches keep etcd and the node addresses on that network: the hcloud platform configures both NICs and the defaults pick the public side. The disk selector matches any disk over 100,000,000,000 bytes (100 GB decimal) because the cpx42's nominal 320 GB disk reports about 300 GiB, and an exact `320GB` match could fail; the match is a CEL expression because 1.14's `DiskSelectorSpec` has only `match`, no `size` key. Fill the home CIDR with the tfvars value verbatim, it already carries the `/32`. Field spellings verified against the Talos 1.14.1 source (2026-09-24, empirically by generation and validation): etcd takes `listenSubnets` and `advertisedSubnets` as lists, `UnattendedInstallConfig` and `KubeNodeConfig` take no `name` key, and kubelet node IP is a `KubeNodeConfig` document, not `KubeletConfig`.
 
 - [ ] **Step 4: Reserve the endpoint IP, then generate the configs**
 
