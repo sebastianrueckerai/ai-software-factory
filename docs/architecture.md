@@ -6,8 +6,8 @@ it. No versioning, no decision records, until code exists.
 
 Decided so far:
 
-- Approach A: custom Go control plane. The harness is pluggable behind the
-  adapter contract (6.2); the first pick is under re-evaluation (6.1).
+- Approach A: custom Go control plane, opencode as the first worker harness
+  behind the adapter contract (6.2), Codex CLI as the named successor.
 - Talos Linux as the node operating system on three Hetzner Robot machines.
 - Go for all custom services.
 - Forgejo plus Forgejo Actions for version control, issue tracking and CI.
@@ -88,7 +88,7 @@ How we build the same shape with Go, reusing what OpenHands had to write:
 
 | OpenHands part | Our equivalent | Written by us? |
 |---|---|---|
-| Agent loop (CodeAct) | opencode, driven over ACP | No, reused. The harness is the replaceable part |
+| Agent loop (CodeAct) | opencode, driven headless over its JSON event stream (6.1) | No, reused. The harness is the replaceable part |
 | Runtime sandbox abstraction | sandbox-manager in `factoryd`: per-task namespace, ServiceAccount, gVisor pod, network policy | Yes, Go |
 | Server, sessions, history | `factoryd` task and session registry, session records in Postgres and S3 | Yes, Go |
 | Web chat UI | Ops and approval console first. Interactive attach over ACP later if wanted | Yes, Go server-rendered |
@@ -480,17 +480,37 @@ One task, one namespace, one ServiceAccount `task-<id>`, one pod.
 
 ### 6.1 Choosing the harness
 
-The harness choice is deliberately open. The 2026 field has no settled winner:
-opencode (anomalyco, formerly SST), pi, Hermes, OpenClaw, Codex CLI,
-Gemini CLI, goose, aider and OpenHands are all live candidates with different
-trade-offs between weight, governance and headless behaviour. A re-evaluation
-against the requirements in 6.2 is running; the pick lands in this section
-when it reports.
+Decision (surveyed 2026-09-24): opencode is the first harness, Codex CLI the
+named successor. The reasoning is written down so the next re-evaluation
+argues with evidence, not memory.
 
-What does not depend on the pick: the adapter contract and the identity proxy,
-the two parts that make switching cheap. Whatever wins gets its repository
-pinned and its version pinned in the sandbox image. Single-company governance
-anywhere in the chain is a reason the adapter seam stays sharp.
+The survey scored the live field against the four requirements in 6.2:
+
+| Candidate | Verdict | Why |
+|---|---|---|
+| opencode | Pick | The only candidate passing all four with a first-class programmatic surface: `run --format json` for one-shot jobs, `serve` with a REST API and SSE event bus for long-lived runs, whole config injectable via the `OPENCODE_CONFIG_CONTENT` env var. MIT, official image, largest community, so DeepSeek, Qwen and GLM quirks get fixed fastest here |
+| Codex CLI | Successor | Passes all four: `exec --json` JSONL plus an app-server JSON-RPC mode for long-lived driving. Apache-2.0. Risk: it is deprecating the chat wire API in favour of the Responses API, which our proxy would have to speak |
+| goose | Fallback | Apache-2.0 and the best governance in the field, a Linux Foundation project. No machine-readable event stream yet, only a structured final result |
+| pi | Out | The author rejects MCP by design. Requirement 3 fails |
+| Hermes | Out | A self-improving assistant shaped for chat platforms: heavy, no clean one-shot mode. Wrong tool, not a bad one |
+| OpenClaw | Out | A persistent personal-agent gateway for messaging channels, not a disposable coding worker |
+| Gemini CLI | Out | Requirement 2 fails: it speaks Google's own protocol, not OpenAI-compatible endpoints |
+| aider | Out | No MCP, and development stalled since May 2026 |
+| OpenHands | Out | Passes the requirements but is Docker-centric and drifting towards being a platform, the exact failure mode Approach A exists to avoid |
+
+The weak spot is unchanged from before the survey: one company governs
+opencode, it moved the repository once already (SST to Anomaly) and it is
+layering paid services on top. MIT licence, per-provider BYO keys and the
+adapter contract keep the exit real: the day any gating starts, the Codex
+adapter lands and nothing else changes.
+
+DeepSeek's own harness (dsh) sits on the watchlist: MIT, plugin architecture,
+any OpenAI-compatible endpoint, but a weeks-old developer preview. Re-evaluate
+when it documents a headless mode.
+
+Whatever runs gets its repository pinned and its version pinned in the
+sandbox image. Single-company governance anywhere in the chain is a reason
+the adapter seam stays sharp.
 
 ### 6.2 The adapter contract
 
@@ -607,6 +627,12 @@ Checked by web verification on 2026-09-24. Sources named inline.
 - MinIO: console removed from the free edition May 2025, removals confirmed
   permanent, repository reportedly archived in 2026. Self-host S3 fallback
   changed to SeaweedFS or Garage (4.1).
+- Harness survey: opencode passes all four requirements, with `run --format
+  json`, a `serve` REST+SSE mode and `OPENCODE_CONFIG_CONTENT` config
+  injection. Codex CLI passes but is deprecating the chat wire API. pi
+  rejects MCP by design, Gemini CLI is bound to Google's protocol, aider
+  stalled May 2026, Hermes and OpenClaw have the wrong shape. Decision in 6.1.
+  Caveat: survey-agent web sources, spot-check before the adapter is written.
 
 Not verified: stability of the Forgejo runner's Kubernetes backend beyond its
 docs and chart, and which agent leads overall benchmarks. Phase 1 proves the
@@ -625,7 +651,7 @@ runner on real jobs.
 | Policy engine | Go code now, OPA sidecar when rules multiply | Decided |
 | Human identity | Forgejo OAuth2 now, Keycloak only if SSO story demands | Decided |
 | Sandbox runtime | gVisor now, Kata microVMs later | Decided |
-| Worker harness | Open field (opencode, pi, Hermes, OpenClaw, Codex CLI, goose, aider, ...), adapter contract fixed | Open, re-evaluation running |
+| Worker harness | opencode first, Codex CLI successor, goose fallback, behind the adapter contract | Decided |
 | Node hardware | 3x Hetzner AX41 (6 cores, 64 GB, NVMe), about 39 EUR per month each | Decided |
 | Management access | Hetzner firewall allowlisting your home IP, headscale VPN later | Decided |
 | Repository layout | `infra` and `factory` now, `demo-app` in Phase 3 | Decided |
