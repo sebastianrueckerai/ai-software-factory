@@ -4,7 +4,7 @@
 
 **Goal:** Build the software factory from `docs/architecture.md` in ten stages, each with an exit test, from empty repos to a factory that works on its own code.
 
-**Architecture:** Three Hetzner Robot AX41 nodes run Talos Linux with the built-in nftables firewall. Flux deploys the platform services from Forgejo. Two Go services, factoryd and factory-gateway, hold the control plane. opencode workers run in per-task gVisor sandboxes behind the adapter contract (architecture 6.2).
+**Architecture:** Three Hetzner Cloud cax31 nodes run Talos Linux with the built-in nftables firewall behind a Hetzner Cloud firewall. Flux deploys the platform services from Forgejo. Two Go services, factoryd and factory-gateway, hold the control plane. opencode workers run in per-task gVisor sandboxes behind the adapter contract (architecture 6.2).
 
 **Tech Stack:** OpenTofu, Talos 1.14, Cilium 1.20, Flux, CloudNativePG, Temporal, OpenBao, LiteLLM OSS, SigNoz, Forgejo plus Actions, Go 1.25, cert-manager with Let's Encrypt HTTP-01.
 
@@ -14,7 +14,7 @@
 
 - Nothing is implemented before Sebastian's explicit go.
 - No secret enters Git, ever. Secrets live in the seed bundle (offline password manager plus printed copy) or in ignored `.env` files.
-- Nodes: 3x Hetzner Robot AX41, about 39 EUR per month each, verify the price at order time. All three run control-plane and workloads.
+- Nodes: 3x Hetzner Cloud cax31 (ARM, 8 shared vCPU, 16 GB, 160 GB), 20.99 EUR per month each, verify price and stock at order time. All three run control-plane and workloads.
 - Talos 1.14, Cilium 1.20, OpenTofu (`tofu`). No SSH on nodes, Talos API only.
 - Go module `github.com/sebastianrueckerai/ai-software-factory-code`, binaries `factoryd` and `factory-gateway`.
 - New work happens in a git worktree. Every task ends with a commit to master and a push.
@@ -25,10 +25,10 @@
 
 The five failure modes most likely to bite, each with the task that covers it:
 
-1. A wrong CIDR in the firewall blocks every path into the nodes. Task 7 validates the rule set before apply and Task 9 proves reachability from home and blocking from outside. Task 8 documents the Robot rescue path.
-2. OpenTofu state and tfvars carry Robot credentials. Task 2 ignores them in Git and Task 6 checks `git status` before every commit.
+1. A wrong CIDR in the firewall blocks every path into the nodes. Task 7 validates the rule set before apply and Task 9 proves reachability from home and blocking from outside. The Hetzner Cloud firewall is the outer layer and stays editable from the console when a node is unreachable.
+2. OpenTofu state and tfvars carry the Hetzner Cloud token. Task 2 ignores tfvars in Git and Task 6 checks `git status` before every commit.
 3. The Talos secrets bundle is the cluster root. Task 7 writes it to the seed bundle, never to the repo. Task 3 reserves the slot in the checklist.
-4. The Robot provider could be stale or gone. Task 6 verifies the provider against the registry before use and names the manual-order fallback.
+4. A cloud provider schema mismatch breaks the apply. Task 6 pins the official hetznercloud/hcloud provider version and validates attribute names against its registry docs before use.
 5. The healthz JSON shape becomes a contract that deploys and probes parse. Task 4 pins it in a test before anything depends on it.
 
 ## The stage cut
@@ -38,7 +38,7 @@ Each stage ends with an exit test. A stage starts only after the previous one pa
 | Stage | Builds | Exit test |
 |---|---|---|
 | 0 Seed | Repo skeletons, toolchain | Tests green in both repos, CI workflow committed |
-| 1 Metal | 3 AX41 nodes, Talos, firewall, Cilium | 3 nodes Ready, API reachable from home only |
+| 1 Metal | 3 cax31 cloud nodes, Talos, firewall, Cilium | 3 nodes Ready, API reachable from home only |
 | 2 Ranch | Forgejo, Flux, CNPG, Temporal, OpenBao, LiteLLM, SigNoz, TLS | git.aisoftwarefactory.world serves a valid cert, LiteLLM answers a smoke call |
 | 3 Burn-down | The re-seed drill | Full destroy and rebuild, Postgres and Forgejo restored |
 | 4 Gateway | factory-gateway v0 | JWT auth and virtual keys proven by tests on the cluster |
@@ -50,7 +50,7 @@ Each stage ends with an exit test. A stage starts only after the previous one pa
 
 The stages map to the build order in architecture 11: Ranch is stages 0 to 3, First loop is 4 to 6, Teeth is 7, Customer is 8, Self is 9.
 
-Standing reminder at every stage boundary from here on: the cluster costs about 120 EUR per month once Stage 1 orders the nodes, plus storage and model spend. Hetzner Robot servers cannot be paused, only cancelled. Raise the shutdown question at every boundary.
+Standing reminder at every stage boundary from here on: the cluster costs about 65 EUR per month once Stage 1 orders the nodes, plus storage and model spend. Hetzner Cloud servers bill hourly and deletion stops the meter. Raise the shutdown question at every boundary anyway.
 
 ---
 
@@ -590,21 +590,17 @@ git push
 
 ## Stage 1: Metal
 
-Three AX41 nodes run Talos with the firewall proven. First money: about 120 EUR per month starts here.
+Three cax31 cloud nodes run Talos with the firewall proven. First money: about 65 EUR per month starts here, billed hourly.
 
-### Task 5: Robot API access and seed facts
+### Task 5: Cloud API access and seed facts
 
 **Files:**
 - Create: `infra/terraform.tfvars` (ignored, never committed)
 
 **Interfaces:**
-- Produces: `home_cidr`, `hetzner_robot_user`, `hetzner_robot_password` for Task 6. The public IPv4 of the home line.
+- Produces: `hcloud_token`, `home_cidr` for Task 6. The public IPv4 of the home line.
 
-- [ ] **Step 1: Enable the Robot API and whitelist the home IP**
-
-In the Hetzner Robot panel: enable API access, whitelist the current public IP. Robot API calls from non-whitelisted addresses fail.
-
-- [ ] **Step 2: Record the public IP**
+- [ ] **Step 1: Record the public IP**
 
 ```bash
 curl -4 ifconfig.me
@@ -612,92 +608,151 @@ curl -4 ifconfig.me
 
 Expected: one IPv4 address. It goes into tfvars as `<ip>/32`.
 
-- [ ] **Step 3: Verify AX41 price and stock**
+- [ ] **Step 2: Verify cax31 price and stock**
 
-Open the Robot order page for AX41. If the price moved from about 39 EUR per month, note the new number and update architecture 3 before ordering.
+Ask the Hetzner Cloud API (`GET /v1/datacenters`, then `/v1/server_types`) or open the cloud pricing page. Expected: cax31 at about 21 EUR per month, listed as available in fsn1. If the price moved or the type is out of stock, note the new number and update architecture 3 before ordering.
 
-- [ ] **Step 4: Write tfvars**
+- [ ] **Step 3: Write tfvars**
 
 `infra/terraform.tfvars`:
 
 ```hcl
-home_cidr               = "<ip>/32"
-hetzner_robot_user      = "<robot user>"
-hetzner_robot_password  = "<robot password>"
+home_cidr   = "<ip>/32"
+hcloud_token = "<hcloud API token>"
 ```
 
-- [ ] **Step 5: Export the credentials for OpenTofu**
+The token lives in `.env.tools` on the seed machine (`HETZNER_KEY`). Copy the value without echoing it and never commit it.
+
+- [ ] **Step 4: Export the token for OpenTofu**
 
 ```bash
-export TF_VAR_hetzner_robot_user=...
-export TF_VAR_hetzner_robot_password=...
+export TF_VAR_hcloud_token=...
 ```
 
-Use the real values from the password manager. They never enter a command that logs them into Git history.
+Set it in the shell that runs tofu, without echoing the value. tfvars auto-loads anyway; the export is belt and braces.
 
-### Task 6: Order the three nodes
+- [ ] **Step 5: Set a cost alert (Sebastian)**
+
+In the Hetzner Cloud Console, project settings: create a cost alert that emails when the month's spend crosses a low threshold, 20 EUR is right for this cluster. The platform has no hard spend cap; each server alone is capped at its monthly price.
+
+### Task 6: The cluster substrate in OpenTofu
 
 **Files:**
+- Edit: `infra/versions.tf`
+- Edit: `infra/variables.tf`
+- Edit: `infra/terraform.tfvars.example`
+- Edit: `infra/docs/seed-bundle.md`
+- Edit: `infra/README.md`
 - Create: `infra/main.tf`
 - Create: `infra/outputs.tf`
 
 **Interfaces:**
-- Consumes: variables from Task 2, credentials from Task 5.
-- Produces: three running AX41 servers and their public IPv4 addresses, used by Tasks 7 and 8.
+- Consumes: `hcloud_token`, `home_cidr` from Task 5, the Talos machine config file that Task 7 generates (`infra/talos/controlplane.yaml`, referenced as a file, generated before apply).
+- Produces: tofu definitions for three cax31 servers, a private network and an outer firewall, plus their IP outputs, used by Tasks 7 and 8.
 
-- [ ] **Step 1: Verify the Robot provider on the registry**
+- [ ] **Step 1: Pin the provider and fix the variables**
 
-Check `registry.terraform.io` for `sophotechlabs/hetzner-robot` first, `driftstein/robot` second. Confirm the provider documents a `robot_server` resource and its address attribute. If both are unusable, use the fallback: order three AX41 by hand in the Robot console (Ubuntu image, FsN1), write the three IPs into `terraform.tfvars` as a `robot_ips` list, and skip Step 4's apply. The re-seed drill then includes a manual reorder, a few minutes of clicking, acceptable.
+In `versions.tf` add the required provider `hetznercloud/hcloud` pinned to the current version from registry.opentofu.org, and run `tofu init` so the lock file records it. In `variables.tf` replace the two Robot credential variables with one `hcloud_token` (string, sensitive), set `server_type` default to `cax31`, and add `location` (string, default `fsn1`). Update `terraform.tfvars.example` to match. In `docs/seed-bundle.md` change the Robot API slot to "Hetzner Cloud API token". In `README.md` change "OpenTofu for Hetzner Robot servers" to "OpenTofu for Hetzner Cloud servers".
 
 - [ ] **Step 2: Write main.tf**
 
-`infra/main.tf` (field names verified against the chosen provider's docs in Step 1):
+`infra/main.tf` (attribute names verified against the provider docs):
 
 ```hcl
-terraform {
-  required_providers {
-    hetzner-robot = {
-      source = "sophotechlabs/hetzner-robot"
-    }
+provider "hcloud" {
+  token = var.hcloud_token
+}
+
+resource "hcloud_network" "cluster" {
+  name     = var.cluster_name
+  ip_range = "10.0.0.0/16"
+}
+
+resource "hcloud_network_subnet" "nodes" {
+  network_id   = hcloud_network.cluster.id
+  type         = "cloud"
+  network_zone = "eu-central"
+  ip_range     = "10.0.1.0/24"
+}
+
+resource "hcloud_firewall" "cluster" {
+  name = var.cluster_name
+  rule {
+    direction  = "in"
+    protocol   = "tcp"
+    port       = "6443"
+    source_ips = [var.home_cidr]
+  }
+  rule {
+    direction  = "in"
+    protocol   = "tcp"
+    port       = "50000"
+    source_ips = [var.home_cidr]
+  }
+  rule {
+    direction  = "in"
+    protocol   = "tcp"
+    port       = "80"
+    source_ips = ["0.0.0.0/0", "::/0"]
+  }
+  rule {
+    direction  = "in"
+    protocol   = "tcp"
+    port       = "443"
+    source_ips = ["0.0.0.0/0", "::/0"]
   }
 }
 
-provider "hetzner-robot" {}
+resource "hcloud_server" "node" {
+  count        = var.node_count
+  name         = "${var.cluster_name}-${count.index}"
+  server_type  = var.server_type
+  location     = var.location
+  image        = "<Talos image id or label from Task 7's research>"
+  user_data    = file("${path.module}/talos/controlplane.yaml")
+  firewall_ids = [hcloud_firewall.cluster.id]
 
-resource "robot_server" "node" {
-  count       = var.node_count
-  name        = "${var.cluster_name}-${count.index}"
-  server_type = var.server_type
-  datacenter  = "fsn1-dc14"
-  image       = "ubuntu-24.04"
+  public_net {
+    ipv4_enabled = true
+    ipv6_enabled = true
+  }
+
+  network {
+    network_id = hcloud_network.cluster.id
+    ip         = cidrhost(hcloud_network_subnet.nodes.ip_range, 10 + count.index)
+  }
 }
 ```
 
-The Ubuntu image is a placeholder boot disk. Task 8 overwrites it with the Talos installer.
+The same `controlplane.yaml` serves all three nodes: Talos reads its own addresses at boot. Node-to-node traffic stays inside `10.0.1.0/24`, which the cloud firewall does not filter. The outer firewall mirrors the home allowlist so a lockout stays fixable from the console.
 
 - [ ] **Step 3: Write outputs.tf**
 
 `infra/outputs.tf`:
 
 ```hcl
-output "node_ips" {
+output "node_public_ips" {
   description = "Public IPv4 addresses of the three nodes"
-  value       = robot_server.node[*].public_net_ipv4
+  value       = hcloud_server.node[*].ipv4_address
+}
+
+output "node_private_ips" {
+  description = "Private network addresses of the three nodes"
+  value       = [for nic in hcloud_server.node[*].network : nic.ip]
 }
 ```
 
-Adjust the attribute name to what the provider documents.
+Adjust the attribute expressions to what the provider documents.
 
-- [ ] **Step 4: Plan and apply**
+- [ ] **Step 4: Validate**
 
 ```bash
 cd ~/repos/ai-software-factory-infra
 tofu init
-tofu plan
-tofu apply
+tofu validate
 ```
 
-Expected: three servers created. `tofu output node_ips` prints three addresses. Confirm the servers show as active in the Robot panel.
+Expected: `Success! The configuration is valid.` `tofu plan` and `tofu apply` wait for Task 7's config file and run in Task 8.
 
 - [ ] **Step 5: Check for secrets, then commit**
 
@@ -705,11 +760,11 @@ Expected: three servers created. `tofu output node_ips` prints three addresses. 
 git status --porcelain
 ```
 
-Expected: only `main.tf` and `outputs.tf` as new. Then:
+Expected: `versions.tf`, `variables.tf`, `terraform.tfvars.example`, `docs/seed-bundle.md` changed, `main.tf` and `outputs.tf` new, `.terraform.lock.hcl` new or changed. No tfvars, no state file. Then:
 
 ```bash
-git add main.tf outputs.tf
-git commit -m "Order three AX41 nodes via the Robot provider"
+git add versions.tf variables.tf terraform.tfvars.example docs/seed-bundle.md README.md main.tf outputs.tf .terraform.lock.hcl
+git commit -m "Hetzner Cloud substrate: three cax31 servers, private network, firewall"
 git push
 ```
 
@@ -744,23 +799,26 @@ talosctl gen secrets -o secrets.yaml
 - [ ] **Step 3: Generate the base configs**
 
 ```bash
-IP0=<node0-ip> IP1=<node1-ip> IP2=<node2-ip>
+IP0=<node0-public-ip>
 talosctl gen config sf https://$IP0:6443 \
   --with-secrets secrets.yaml \
   --config-patch-control-plane @patches.yaml \
   --output-dir .
 ```
 
-All three nodes run control-plane and workloads, so the control-plane config applies to every node. Patch only the endpoint per node when applying in Task 8.
+All three nodes run control-plane and workloads, so one control-plane config serves every node: it ships as user-data at server creation and Talos reads its own addresses at boot. The node addresses for the firewall rules are the private ones from `tofu output node_private_ips`.
 
 - [ ] **Step 4: Write the firewall patch**
 
-`infra/talos/patches.yaml`:
+`infra/talos/patches.yaml`, using the 1.14 typed documents (the install section as `UnattendedInstallConfig` with a disk selector that matches the cax31's 160 GB virtio disk rather than a device name):
 
 ```yaml
-machine:
-  install:
-    disk: /dev/nvme0n1
+apiVersion: v1alpha1
+kind: UnattendedInstallConfig
+name: unattended-install
+provisioning:
+  diskSelector:
+    size: 160GB
 ---
 apiVersion: v1alpha1
 kind: NetworkRuleConfig
@@ -771,7 +829,7 @@ portSelector:
     - 50000
   protocol: tcp
 ingress:
-  - subnet: <home-cidr>/32
+  - subnet: <home-cidr>
 ---
 apiVersion: v1alpha1
 kind: NetworkRuleConfig
@@ -786,9 +844,7 @@ portSelector:
     - 50000
   protocol: tcp
 ingress:
-  - subnet: <node0-ip>/32
-  - subnet: <node1-ip>/32
-  - subnet: <node2-ip>/32
+  - subnet: 10.0.1.0/24
 ---
 apiVersion: v1alpha1
 kind: NetworkRuleConfig
@@ -799,9 +855,7 @@ portSelector:
     - 6081
   protocol: udp
 ingress:
-  - subnet: <node0-ip>/32
-  - subnet: <node1-ip>/32
-  - subnet: <node2-ip>/32
+  - subnet: 10.0.1.0/24
 ---
 apiVersion: v1alpha1
 kind: NetworkRuleConfig
@@ -828,12 +882,12 @@ The port list, with the reason each is open:
 - 8472, 6081: Cilium VXLAN and Geneve, node to node, UDP.
 - 80, 443: Gateway endpoints for Let's Encrypt HTTP-01 and the public services from Stage 2 on.
 
-Fill the placeholders with the real IPs and CIDR before validating. Verify the document names and field spellings against the Talos 1.14 docs page for the ingress firewall before applying, this plan was written against the 1.8-era schema names.
+Node-to-node traffic rides the private network `10.0.1.0/24`. Fill the home CIDR with the tfvars value verbatim, it already carries the `/32`. Verify the document names and field spellings against the Talos 1.14 docs pages for the ingress firewall and the install config before validating, this plan was written against 1.8-era schema names and the typed-document restructure of 1.14.
 
 - [ ] **Step 5: Validate the configs**
 
 ```bash
-talosctl validate --config controlplane.yaml --mode metal
+talosctl validate --config controlplane.yaml --mode <mode from the Talos hcloud guide>
 ```
 
 Expected: valid. Fix and revalidate until it is.
@@ -860,37 +914,33 @@ git push
 
 Commit only the patch and the README. The generated configs and talosconfig stay untracked and out of Git, they embed the cluster secrets.
 
-### Task 8: Boot the nodes and apply the configs
+### Task 8: Create the nodes and form the cluster
 
-**Files:** none in Git. This task touches machines.
+**Files:** none in Git. This task spends money: three cax31 cost about 0.09 EUR per hour together. Tell Sebastian the moment the servers are created.
 
 **Interfaces:**
-- Consumes: machine configs from Task 7, node IPs from Task 6.
+- Consumes: the substrate from Task 6, the machine config from Task 7.
 - Produces: a running Talos cluster and a kubeconfig on the seed machine.
 
-Rescue path, read first: if a node becomes unreachable because the firewall dropped the seed machine, activate the Robot rescue system from the panel, boot it, and re-apply the config with `talosctl apply-config --insecure`. A mis-typed home CIDR is the one error this stage can produce that costs an hour rather than a minute.
+Rescue paths, read first: nodes are disposable. A broken node is `tofu destroy`/`tofu apply` away from a clean replacement, and Stage 3 re-seeds the whole cluster anyway. If the seed machine is locked out by a mis-typed home CIDR, fix the cloud firewall in the Hetzner console first: it is editable without node access and mirrors the same allowlist.
 
-- [ ] **Step 1: Boot each node into the Talos installer**
-
-For each node IP, in the Robot panel open the rescue console (or vKVM) and run:
+- [ ] **Step 1: Create the servers**
 
 ```bash
-wget https://github.com/siderolabs/talos/releases/download/v1.14.1/talos-amd64.iso
-dd if=talos-amd64.iso of=/dev/nvme0n1 bs=4M status=progress
-reboot
+cd ~/repos/ai-software-factory-infra
+tofu plan
+tofu apply
 ```
 
-The node now boots the Talos ISO environment from disk, waiting for a config.
+Expected: three servers created from the Talos image, each booting straight into Talos with the machine config from user-data. `tofu output node_public_ips` and `node_private_ips` print the addresses.
 
-- [ ] **Step 2: Apply the config to each node**
-
-From the seed machine, one node at a time:
+- [ ] **Step 2: Wait for the Talos API on each node**
 
 ```bash
-talosctl apply-config --insecure --nodes <node-ip> --file controlplane.yaml
+talosctl --nodes <node0-ip> status
 ```
 
-The same controlplane.yaml applies to all three nodes. Only the first node gets the bootstrap call in the next step.
+Repeat per node. Expected: each node answers with its Talos version. The first boot installs Talos to disk and reboots once, give it a few minutes.
 
 - [ ] **Step 3: Bootstrap etcd on the first node**
 
@@ -899,6 +949,8 @@ talosctl bootstrap --nodes <node0-ip> --endpoints <node0-ip>
 ```
 
 - [ ] **Step 4: Install kubectl and the Cilium CLI if missing**
+
+The seed machine is x86; the node architecture does not change these downloads.
 
 ```bash
 command -v kubectl >/dev/null || {
@@ -975,7 +1027,7 @@ Expected: timeout. The nftables drop works.
 
 - [ ] **Step 6: Record and remind**
 
-Note the measured monthly cost if it moved from 39 EUR per node. Raise the standing shutdown question: the meter now runs at about 120 EUR per month.
+Note the measured monthly cost if it moved from 21 EUR per node. Raise the standing shutdown question: the meter now runs at about 65 EUR per month, and `tofu destroy` stops it.
 
 **Stage 1 exit test:** all six gate checks above pass.
 
