@@ -871,7 +871,8 @@ portSelector:
   ports:
     - 8472
     - 6081
-    - 51820
+    # Cilium wireguard default port; the 1.20 helm chart has no listenPort override
+    - 51871
   protocol: udp
 ingress:
   - subnet: 10.0.1.0/24
@@ -909,7 +910,7 @@ The port list, with the reason each is open:
 - 10250: kubelet, node to node.
 - 4240: Cilium health checks, node to node.
 - 8472, 6081: Cilium VXLAN and Geneve, node to node, UDP.
-- 51820: Cilium wireguard, node to node, UDP. Task 9 turns encryption on.
+- 51871: Cilium wireguard, node to node, UDP. Task 9 turns encryption on. Cilium 1.20 defaults to 51871, not the standard wireguard port 51820, and the 1.20 helm chart exposes no listenPort override, so the rule matches the default (verified: with only 51820 allowed, the wireguard tunnel never handshakes and every cross-node pod packet drops; with 51871 allowed, ping passes at about 1 ms).
 - 80, 443: Gateway endpoints for Let's Encrypt HTTP-01 and the public services from Stage 2 on.
 
 Node-to-node traffic rides the private network `10.0.1.0/24`. The etcd patch and the kubelet patches keep etcd and the node addresses on that network: the hcloud platform configures both NICs and the defaults pick the public side. The disk selector matches any disk over 100,000,000,000 bytes (100 GB decimal) because the cpx42's nominal 320 GB disk reports about 300 GiB, and an exact `320GB` match could fail; the match is a CEL expression because 1.14's `DiskSelectorSpec` has only `match`, no `size` key. Fill the home CIDR with the tfvars value verbatim, it already carries the `/32`. Field spellings verified against the Talos 1.14.1 source (2026-09-24, empirically by generation and validation): etcd takes `listenSubnets` and `advertisedSubnets` as lists, `UnattendedInstallConfig` and `KubeNodeConfig` take no `name` key, and kubelet node IP is a `KubeNodeConfig` document, not `KubeletConfig`.
