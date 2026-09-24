@@ -6,7 +6,8 @@ it. No versioning, no decision records, until code exists.
 
 Decided so far:
 
-- Approach A: custom Go control plane, opencode as the worker harness.
+- Approach A: custom Go control plane. The harness is pluggable behind the
+  adapter contract (6.2); the first pick is under re-evaluation (6.1).
 - Talos Linux as the node operating system on three Hetzner Robot machines.
 - Go for all custom services.
 - Forgejo plus Forgejo Actions for version control, issue tracking and CI.
@@ -145,7 +146,9 @@ wait or resume across hours or days, it belongs in Temporal.
 
 ## 3. Chunk 1: cluster substrate
 
-Three Hetzner Robot dedicated machines, 64 GB class each. Talos Linux 1.14 on
+Three Hetzner Robot AX41 machines (Ryzen 5, six cores, 64 GB, NVMe, about
+39 EUR per month each): the cheapest fixed boxes that keep honest quorum, with
+three etcd votes and three Postgres members. Talos Linux 1.14 on
 all three. Cilium as the network layer: network policies with default deny, and
 Gateway API for ingress. Terraform creates the servers and applies the Talos
 machine configs. Flux deploys everything that runs on the cluster from Git.
@@ -173,6 +176,12 @@ No node holds state that Git, S3 and the seed bundle do not describe.
 Management access: the Hetzner firewall allowlists your home IP for the
 Kubernetes and Talos API ports. Nothing else reaches the nodes. A self-hosted
 VPN (headscale) is the named upgrade if you need roaming access later.
+
+Operating note, standing reminder: the cluster costs about 120 EUR per month
+plus storage and model spend. Hetzner Robot servers cannot be paused, only
+cancelled, and the re-seed drill is the off-switch: teardown is
+`terraform destroy`, comeback is the seed bundle plus Git plus S3. Claude
+raises this at every phase boundary and before long idle periods.
 
 ### 3.1 Storage strategy
 
@@ -345,9 +354,26 @@ OpenBao is the Linux Foundation fork of HashiCorp Vault, started when Vault
 changed its licence to BSL. Same API, MPL licence, community-governed. Vault
 itself remains the more battle-tested product with the bigger ecosystem.
 
-Decision: OpenBao, because licence risk on the secrets backbone is the one
+Decision (confirmed 2026-09-24): OpenBao, because licence risk on the secrets backbone is the one
 place this project should not carry it. The API being identical means the swap
 to Vault is a configuration change if OpenBao ever disappoints.
+
+### 4.4 Model and tool providers
+
+The seed bundle holds keys for DeepSeek, Alibaba (Qwen via DashScope), z.ai
+(GLM), Replicate, Firecrawl and fal.ai. These split into two groups at the
+gateway.
+
+Chat models reach LiteLLM as upstreams: deepseek, qwen, glm. The first alias
+table: `coding-cheap` maps to the DeepSeek and Qwen tier, `coding-frontier` to
+the GLM frontier tier, `review-frontier` to the strongest of the three,
+measured in Phase 2. Anthropic and OpenAI stay out at the start, deliberately:
+the factory should run on the providers its owner actually uses daily.
+
+Replicate, Firecrawl and fal.ai are not chat models for our loop: they are paid
+capabilities. They enter as connectors on the capability gateway with per-task
+request and euro caps, the exact spend-limited SaaS case from the baseline
+conversation.
 
 ## 5. Chunk 3: the control plane
 
@@ -430,26 +456,67 @@ gateway enforces by refusing the next call.
 
 One task, one namespace, one ServiceAccount `task-<id>`, one pod.
 
-The agent is opencode: MIT licence, non-interactive mode, ACP support. The
-project moved with its maker's rename from SST to Anomaly and now lives at
-`anomalyco/opencode`. We pin that exact repository: an unrelated Go project
-owns the `opencode-ai/opencode` name. Governance is single-company, so the
-adapter seam matters here more than anywhere else.
+### 6.1 Choosing the harness
 
-A thin Go adapter drives opencode over ACP (Agent Client Protocol, the
-stdin/stdout protocol IDEs use to drive coding agents). A Claude Code or Codex
-adapter later is a new adapter, no workflow change.
+The harness choice is deliberately open. The 2026 field has no settled winner:
+opencode (anomalyco, formerly SST), pi, Hermes, OpenClaw, Codex CLI,
+Gemini CLI, goose, aider and OpenHands are all live candidates with different
+trade-offs between weight, governance and headless behaviour. A re-evaluation
+against the requirements in 6.2 is running; the pick lands in this section
+when it reports.
+
+What does not depend on the pick: the adapter contract and the identity proxy,
+the two parts that make switching cheap. Whatever wins gets its repository
+pinned and its version pinned in the sandbox image. Single-company governance
+anywhere in the chain is a reason the adapter seam stays sharp.
+
+### 6.2 The adapter contract
+
+`factoryd` knows nothing about harnesses. It knows this Go interface:
+
+```go
+type Harness interface {
+        Prepare(ctx context.Context, env SandboxEnv, brief TaskBrief) error
+        Run(ctx context.Context, brief TaskBrief, emit func(Event)) Result
+}
+```
+
+`TaskBrief` is the whole task as data: objective, repository and SHA, issue
+context, findings from parent sessions, artifact paths, capability hints.
+`Event` is the normalized stream: model calls with alias and cost, tool calls
+with status, file changes, commands with exit codes, checkpoints, and the
+final result. Each adapter maps its harness's native output onto this set.
+Lossy mapping is acceptable: the git diff and the artifact store are the ground
+truth, the event stream is for observability and the audit trail.
+
+A harness is adaptable at all if it meets four requirements:
+
+1. Headless execution: it runs without a human at a terminal.
+2. A configurable model endpoint, OpenAI or Anthropic compatible, so its
+   traffic routes through the identity proxy.
+3. Configurable tools, ideally MCP servers, so tools route through the proxy
+   too.
+4. Programmatically readable session output.
+
+Requirement 2 is the filter that bites: a harness that only talks to its own
+cloud cannot run inside our identity model. Swapping harnesses means a new
+adapter file plus a container image. Workflows, gateway, policy and audit do
+not change.
+
+### 6.3 The identity proxy
 
 The adapter doubles as the identity proxy, and this closes the one wiring gap
-the review found. opencode makes its own model and tool calls, but it cannot
-present the pod's projected ServiceAccount JWT: that JWT is a file the kubelet
-rotates, and opencode has no mechanism to attach it to requests. So the adapter
-listens on localhost. opencode's provider configuration points at the adapter,
-and every MCP tool server it uses routes through the adapter too. On each
-request the adapter re-reads the current token file, attaches the fresh JWT,
-and forwards to `factory-gateway`. The only credential that ever exists inside
-the sandbox is the rotating task identity, and the gateway keeps a single
-authentication mechanism.
+the design review found. A harness makes its own model and tool calls, but it
+cannot present the pod's projected ServiceAccount JWT: that JWT is a file the
+kubelet rotates, and harnesses have no mechanism to attach it to requests. So
+the adapter listens on localhost. The harness's provider configuration points
+at the adapter, and its tool servers route through it too. On each request the
+adapter re-reads the current token file, attaches the fresh JWT, and forwards
+to `factory-gateway`. The only credential that ever exists inside the sandbox
+is the rotating task identity, and the gateway keeps a single authentication
+mechanism.
+
+### 6.4 Sandbox hardening
 
 Sandbox hardening:
 
@@ -459,6 +526,8 @@ Sandbox hardening:
 - Cilium network policy: default deny egress. Allowed: `factory-gateway`,
   Forgejo git, package registries. Nothing else, no cloud metadata endpoint.
 - Upgrade path for stronger isolation: Kata microVMs, a node pool change.
+
+### 6.5 Session records
 
 Session records stream out while the sandbox lives: prompts, tool calls,
 output, files touched, commits, cost. Full history to S3, compact restart state
@@ -526,7 +595,7 @@ runner on real jobs.
 | Fork | Recommendation | Status |
 |---|---|---|
 | Storage strategy | Local disks, CNPG replication, S3 artifacts | Decided |
-| Secrets backend | OpenBao | Decided, awaiting your nod |
+| Secrets backend | OpenBao | Decided |
 | Image registry | Forgejo registry, Harbor as upgrade | Decided |
 | Object storage | Hetzner Object Storage, SeaweedFS/Garage as self-host fallback | Decided |
 | Observability | SigNoz, Grafana stack as OTel-compatible fallback | Decided |
@@ -534,16 +603,24 @@ runner on real jobs.
 | Policy engine | Go code now, OPA sidecar when rules multiply | Decided |
 | Human identity | Forgejo OAuth2 now, Keycloak only if SSO story demands | Decided |
 | Sandbox runtime | gVisor now, Kata microVMs later | Decided |
-| Node hardware | 3x Hetzner AX42 (8 cores, 64 GB, 2x1 TB NVMe, about 50 EUR per month each) | Proposed, confirm |
-| Management access | Hetzner firewall allowlisting your home IP, headscale VPN later | Proposed |
-| Repository layout | `infra` and `factory` now, `demo-app` in Phase 3 | Proposed |
+| Worker harness | Open field (opencode, pi, Hermes, OpenClaw, Codex CLI, goose, aider, ...), adapter contract fixed | Open, re-evaluation running |
+| Node hardware | 3x Hetzner AX41 (6 cores, 64 GB, NVMe), about 39 EUR per month each | Decided |
+| Management access | Hetzner firewall allowlisting your home IP, headscale VPN later | Decided |
+| Repository layout | `infra` and `factory` now, `demo-app` in Phase 3 | Decided |
 | Demo app | Small real product with real telemetry | Open, chosen in Phase 3 |
 
 ## 11. Build order
 
-Three repositories carry the work: `infra` (Terraform, Talos configs, Flux),
-`factory` (the Go module, adapters, deploy manifests) and, from Phase 3,
-`demo-app`. Flux watches the manifest paths in `infra` and `factory`.
+Three repositories carry the work. `infra` holds what the cluster is: the
+Terraform for Hetzner servers and firewall, the Talos machine configs, the
+Flux bootstrap and the kustomizations that point at the other repositories. It
+changes rarely and stays human-only. `factory` holds the Go module with both
+binaries and the harness adapters, its tests, and its deploy manifests; its
+Forgejo Actions pipeline builds images into the registry. It changes often and
+is the first repository agents will work on. `demo-app` arrives in Phase 3.
+The split keeps different blast radii separate and makes per-repository
+capability grants natural later: `infra` can require a human while the factory
+works `factory` and `demo-app`.
 
 1. Ranch: Chunks 1 and 2. Talos cluster via Terraform and Flux, Postgres,
    Temporal, OpenBao, LiteLLM, SigNoz, Forgejo. Re-seed drill included.
