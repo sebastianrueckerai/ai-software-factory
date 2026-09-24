@@ -150,8 +150,9 @@ Three Hetzner Robot AX41 machines (Ryzen 5, six cores, 64 GB, NVMe, about
 39 EUR per month each): the cheapest fixed boxes that keep honest quorum, with
 three etcd votes and three Postgres members. Talos Linux 1.14 on
 all three. Cilium as the network layer: network policies with default deny, and
-Gateway API for ingress. Terraform creates the servers and applies the Talos
-machine configs. Flux deploys everything that runs on the cluster from Git.
+Gateway API for ingress. OpenTofu, the MPL fork of Terraform, creates the
+servers and applies the Talos machine configs. Flux deploys everything that
+runs on the cluster from Git.
 
 ```
 namespaces:
@@ -164,8 +165,8 @@ namespaces:
 
 The re-seed drill, run once before Phase 1 ends:
 
-1. `terraform destroy` the three nodes.
-2. `terraform apply`: new nodes, same Talos configs from Git.
+1. `tofu destroy` the three nodes.
+2. `tofu apply`: new nodes, same Talos configs from Git.
 3. Flux reinstalls every workload from Git.
 4. Restore Postgres from the S3 backups, restore Forgejo from its repository
    dump in S3, restore OpenBao from its S3 snapshot using the unseal keys
@@ -180,14 +181,18 @@ from the seed machine: apply the bootstrap slice, CNPG plus Forgejo, by hand,
 restore Forgejo's repositories from the S3 dump, then let Flux take over
 everything else.
 
-Management access: the Hetzner firewall allowlists your home IP for the
-Kubernetes and Talos API ports. Nothing else reaches the nodes. A self-hosted
-VPN (headscale) is the named upgrade if you need roaming access later.
+Management access: Talos ships a declarative nftables ingress firewall,
+configured as `NetworkRuleConfig` documents in the machine configs. The
+Kubernetes and Talos API ports accept the home address only, node-to-node
+ports accept the three node addresses, and everything else drops. Hetzner
+Robot offers no managed firewall for dedicated servers, so the firewall lives
+in Git with the rest of the cluster. A self-hosted VPN (headscale) is the
+named upgrade if you need roaming access later.
 
 Operating note, standing reminder: the cluster costs about 120 EUR per month
 plus storage and model spend. Hetzner Robot servers cannot be paused, only
 cancelled, and the re-seed drill is the off-switch: teardown is
-`terraform destroy`, comeback is the seed bundle plus Git plus S3. Claude
+`tofu destroy`, comeback is the seed bundle plus Git plus S3. Claude
 raises this at every phase boundary and before long idle periods.
 
 ### 3.1 Storage strategy
@@ -666,6 +671,13 @@ Checked by web verification on 2026-09-24. Sources named inline.
   rejects MCP by design, Gemini CLI is bound to Google's protocol, aider
   stalled May 2026, Hermes and OpenClaw have the wrong shape. Decision in 6.1.
   Caveat: survey-agent web sources, spot-check before the adapter is written.
+- Hetzner Robot has no managed firewall for dedicated servers (managed
+  firewalls belong to the managed-server product). The node firewall is
+  Talos's own: nftables rules declared as `NetworkRuleConfig` and
+  `NetworkDefaultActionConfig` machine config documents.
+- OpenTofu over Terraform for the same reason as OpenBao over Vault: the
+  original changed to BSL, the fork kept the MPL licence, the language is
+  identical.
 
 Not verified: stability of the Forgejo runner's Kubernetes backend beyond its
 docs and chart, and which agent leads overall benchmarks. Phase 1 proves the
@@ -686,7 +698,7 @@ runner on real jobs.
 | Sandbox runtime | gVisor now, Kata microVMs later | Decided |
 | Worker harness | opencode first, Codex CLI successor, goose fallback, behind the adapter contract | Decided |
 | Node hardware | 3x Hetzner AX41 (6 cores, 64 GB, NVMe), about 39 EUR per month each | Decided |
-| Management access | Hetzner firewall allowlisting your home IP, headscale VPN later | Decided |
+| Management access | Talos nftables firewall allowlisting your home IP, headscale VPN later | Decided |
 | Repository layout | `infra` and `factory` now, `demo-app` in Phase 3 | Decided |
 | Public DNS | Namecheap DNS stays, HTTP-01 certificates, Cloudflare as the named upgrade | Decided |
 | Demo app | Small real product with real telemetry | Open, chosen in Phase 3 |
@@ -694,7 +706,7 @@ runner on real jobs.
 ## 11. Build order
 
 Three repositories carry the work. `infra` holds what the cluster is: the
-Terraform for Hetzner servers and firewall, the Talos machine configs, the
+OpenTofu for Hetzner servers and firewall, the Talos machine configs, the
 Flux bootstrap and the kustomizations that point at the other repositories. It
 changes rarely and stays human-only. `factory` holds the Go module with both
 binaries and the harness adapters, its tests, and its deploy manifests; its
