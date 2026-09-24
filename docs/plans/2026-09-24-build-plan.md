@@ -1086,7 +1086,7 @@ Expected: the nodes, status NotReady (no CNI yet), roles control-plane+worker.
 
 - [ ] **Step 1: Install Cilium**
 
-Flannel must not run: the config generator always emits a KubeFlannelCNIConfig document, `cluster.network.cni.name: none` does not remove it, and the document makes Talos run flannel. The strip lives in the Task 7 README (strip after generation, `talosctl apply-config` per node). If the DaemonSet still exists at this point, delete it:
+Flannel must not run: the config generator always emits a KubeFlannelCNIConfig document, `cluster.network.cni.name: none` does not remove it, and the document makes Talos run flannel. The generator also registers the control-plane NoSchedule taint, which blocks every workload on a control-plane-only cluster. The strip in the Task 7 README removes both after generation (config patches cannot delete these fields; the typed patcher ignores null keys), and `talosctl apply-config` per node drops the live taint with it. If the flannel DaemonSet still exists at this point, delete it:
 
 ```bash
 kubectl -n kube-system delete ds/kube-flannel
@@ -1113,7 +1113,12 @@ Expected: all agents healthy on the nodes.
 
 - [ ] **Step 2: Run the connectivity test**
 
+The CLI labels its `cilium-test-*` namespaces `pod-security.kubernetes.io/enforce=baseline`, and its own pods add NET_RAW, which baseline forbids. Relabel first, or every deployment fails with `Error creating: ... violates PodSecurity "baseline:latest"`:
+
 ```bash
+for ns in $(kubectl get ns -o name | grep cilium-test); do
+  kubectl label $ns pod-security.kubernetes.io/enforce=privileged --overwrite
+done
 cilium connectivity test
 ```
 
