@@ -4,7 +4,7 @@
 
 **Goal:** Build the software factory from `docs/architecture.md` in ten stages, each with an exit test, from empty repos to a factory that works on its own code.
 
-**Architecture:** Three Hetzner Cloud cax31 nodes run Talos Linux with the built-in nftables firewall behind a Hetzner Cloud firewall. Flux deploys the platform services from Forgejo. Two Go services, factoryd and factory-gateway, hold the control plane. opencode workers run in per-task gVisor sandboxes behind the adapter contract (architecture 6.2).
+**Architecture:** Three Hetzner Cloud cpx42 nodes run Talos Linux with the built-in nftables firewall behind a Hetzner Cloud firewall. Flux deploys the platform services from Forgejo. Two Go services, factoryd and factory-gateway, hold the control plane. opencode workers run in per-task gVisor sandboxes behind the adapter contract (architecture 6.2).
 
 **Tech Stack:** OpenTofu, Talos 1.14, Cilium 1.20, Flux, CloudNativePG, Temporal, OpenBao, LiteLLM OSS, SigNoz, Forgejo plus Actions, Go 1.25, cert-manager with Let's Encrypt HTTP-01.
 
@@ -14,7 +14,7 @@
 
 - Nothing is implemented before Sebastian's explicit go.
 - No secret enters Git, ever. Secrets live in the seed bundle (offline password manager plus printed copy) or in ignored `.env` files.
-- Nodes: 3x Hetzner Cloud cax31 (ARM, 8 shared vCPU, 16 GB, 160 GB), 20.99 EUR per month each, verify price and stock at order time. All three run control-plane and workloads.
+- Nodes: 3x Hetzner Cloud cpx42 (x86, 8 shared vCPU, 16 GB, 320 GB), 69.49 EUR per month each net, verify orderability with a create-and-delete probe at order time, the API availability lists are unreliable. All three run control-plane and workloads.
 - Talos 1.14, Cilium 1.20, OpenTofu (`tofu`). No SSH on nodes, Talos API only.
 - Go module `github.com/sebastianrueckerai/ai-software-factory-code`, binaries `factoryd` and `factory-gateway`.
 - New work happens in a git worktree. Every task ends with a commit to master and a push.
@@ -38,7 +38,7 @@ Each stage ends with an exit test. A stage starts only after the previous one pa
 | Stage | Builds | Exit test |
 |---|---|---|
 | 0 Seed | Repo skeletons, toolchain | Tests green in both repos, CI workflow committed |
-| 1 Metal | 3 cax31 cloud nodes, Talos, firewall, Cilium | 3 nodes Ready, API reachable from home only |
+| 1 Metal | 3 cpx42 cloud nodes, Talos, firewall, Cilium | 3 nodes Ready, API reachable from home only |
 | 2 Ranch | Forgejo, Flux, CNPG, Temporal, OpenBao, LiteLLM, SigNoz, TLS | git.aisoftwarefactory.world serves a valid cert, LiteLLM answers a smoke call |
 | 3 Burn-down | The re-seed drill | Full destroy and rebuild, Postgres and Forgejo restored |
 | 4 Gateway | factory-gateway v0 | JWT auth and virtual keys proven by tests on the cluster |
@@ -50,7 +50,7 @@ Each stage ends with an exit test. A stage starts only after the previous one pa
 
 The stages map to the build order in architecture 11: Ranch is stages 0 to 3, First loop is 4 to 6, Teeth is 7, Customer is 8, Self is 9.
 
-Standing reminder at every stage boundary from here on: the cluster costs about 65 EUR per month once Stage 1 orders the nodes, plus storage and model spend. Hetzner Cloud servers bill hourly and deletion stops the meter. Raise the shutdown question at every boundary anyway.
+Standing reminder at every stage boundary from here on: the cluster costs about 210 EUR per month once Stage 1 orders the nodes, plus storage and model spend. Hetzner Cloud servers bill hourly and deletion stops the meter. Raise the shutdown question at every boundary anyway.
 
 ---
 
@@ -590,7 +590,7 @@ git push
 
 ## Stage 1: Metal
 
-Three cax31 cloud nodes run Talos with the firewall proven. First money: about 65 EUR per month starts here, billed hourly.
+Three cpx42 cloud nodes run Talos with the firewall proven. First money: about 210 EUR per month starts here, billed hourly. Stage 1 runs as a test and destroys everything at the end (Sebastian, 2026-09-24): run every gate check, then leave the account empty.
 
 ### Task 5: Cloud API access and seed facts
 
@@ -608,9 +608,9 @@ curl -4 ifconfig.me
 
 Expected: one IPv4 address. It goes into tfvars as `<ip>/32`.
 
-- [ ] **Step 2: Verify cax31 price and stock**
+- [ ] **Step 2: Verify cpx42 price and orderability**
 
-Ask the Hetzner Cloud API (`GET /v1/datacenters`, then `/v1/server_types`) or open the cloud pricing page. Expected: cax31 at about 21 EUR per month, listed as available in fsn1. If the price moved or the type is out of stock, note the new number and update architecture 3 before ordering.
+Ask the Hetzner Cloud API (`GET /v1/server_types`) for the price, and probe orderability by creating and deleting one server of the type: the `/v1/datacenters` availability lists are unreliable (2026-09-24: every ARM cax type was listed available yet failed creation with "unsupported location for server type" in fsn1, nbg1 and hel1). Expected: cpx42 at about 69.49 EUR per month net, orderable in fsn1. If the price moved or the type is unorderable, note the new number and update architecture 3 before ordering.
 
 - [ ] **Step 3: Write tfvars**
 
@@ -648,11 +648,11 @@ In the Hetzner Cloud Console, project settings: create a cost alert that emails 
 
 **Interfaces:**
 - Consumes: `hcloud_token`, `home_cidr` from Task 5, the per-node Talos machine config files that Task 7 generates (`infra/talos/controlplane-<N>.yaml`, referenced as files, generated before the full apply).
-- Produces: tofu definitions for three cax31 servers, a private network, reserved public IPv4 addresses and an outer firewall, plus their IP outputs, used by Tasks 7 and 8.
+- Produces: tofu definitions for three cpx42 servers, a private network, reserved public IPv4 addresses and an outer firewall, plus their IP outputs, used by Tasks 7 and 8.
 
 - [ ] **Step 1: Pin the provider and fix the variables**
 
-In `versions.tf` add the required provider `hetznercloud/hcloud` pinned to 1.69.0 (current release, verified 2026-09-24), and run `tofu init` so the lock file records it. In `variables.tf` replace the two Robot credential variables with one `hcloud_token` (string, sensitive), set `server_type` default to `cax31`, and add `location` (string, default `fsn1`). Update `terraform.tfvars.example` to match. In `docs/seed-bundle.md` change the Robot API slot to "Hetzner Cloud API token". In `README.md` change "OpenTofu for Hetzner Robot servers" to "OpenTofu for Hetzner Cloud servers".
+In `versions.tf` add the required provider `hetznercloud/hcloud` pinned to 1.69.0 (current release, verified 2026-09-24), and run `tofu init` so the lock file records it. In `variables.tf` replace the two Robot credential variables with one `hcloud_token` (string, sensitive), set `server_type` default to `cpx42`, and add `location` (string, default `fsn1`). Update `terraform.tfvars.example` to match. In `docs/seed-bundle.md` change the Robot API slot to "Hetzner Cloud API token". In `README.md` change "OpenTofu for Hetzner Robot servers" to "OpenTofu for Hetzner Cloud servers".
 
 - [ ] **Step 2: Write main.tf**
 
@@ -733,13 +733,13 @@ resource "hcloud_server_network" "node" {
 }
 
 data "hcloud_image" "talos" {
-  with_selector     = "os=talos,version=1.14.1,arch=arm64"
-  with_architecture = "arm"
+  with_selector     = "os=talos,version=1.14.1,arch=amd64"
+  with_architecture = "x86"
   most_recent       = true
 }
 ```
 
-Four decisions live here. The reserved primary IPv4 addresses exist before the servers do, so Task 7 can generate configs against a known endpoint address, and a node replacement or a full re-seed keeps the same addresses (`auto_delete = false` so a server deletion never releases one). The server-to-network attachment is a separate `hcloud_server_network` resource because the provider's inline `network` block has a detach and reattach bug. The machine config ships as user-data through the metadata service, which keeps the cluster secrets off the public wire: `apply-config --insecure` would send them as plaintext HTTP. The Talos image lookup goes through labels, not name, because snapshot images carry no name; Task 8's snapshot build sets the labels this selector matches, and `with_architecture` spells ARM as `arm`.
+Four decisions live here. The reserved primary IPv4 addresses exist before the servers do, so Task 7 can generate configs against a known endpoint address, and a node replacement or a full re-seed keeps the same addresses (`auto_delete = false` so a server deletion never releases one). The server-to-network attachment is a separate `hcloud_server_network` resource because the provider's inline `network` block has a detach and reattach bug. The machine config ships as user-data through the metadata service, which keeps the cluster secrets off the public wire: `apply-config --insecure` would send them as plaintext HTTP. The Talos image lookup goes through labels, not name, because snapshot images carry no name; Task 8's snapshot build sets the labels this selector matches, and `with_architecture` spells x86 as `x86`.
 
 - [ ] **Step 3: Write outputs.tf**
 
@@ -784,7 +784,7 @@ Expected: `versions.tf`, `variables.tf`, `terraform.tfvars.example`, `docs/seed-
 
 ```bash
 git add versions.tf variables.tf terraform.tfvars.example docs/seed-bundle.md README.md main.tf outputs.tf .terraform.lock.hcl
-git commit -m "Hetzner Cloud substrate: three cax31 servers, private network, firewall"
+git commit -m "Hetzner Cloud substrate: three cpx42 servers, private network, firewall"
 git push
 ```
 
@@ -821,7 +821,7 @@ talosctl gen secrets -o secrets.yaml
 
 - [ ] **Step 3: Write the patches**
 
-`infra/talos/patches.yaml` is one multi-document file: an untyped cluster patch pinning etcd to the private network, then 1.14 typed documents (the install section as `UnattendedInstallConfig` with a disk selector that matches the cax31's 160 GB virtio disk rather than a device name):
+`infra/talos/patches.yaml` is one multi-document file: an untyped cluster patch pinning etcd to the private network, then 1.14 typed documents (the install section as `UnattendedInstallConfig` with a disk selector that matches the cpx42's 320 GB virtio disk rather than a device name):
 
 ```yaml
 cluster:
@@ -911,7 +911,7 @@ The port list, with the reason each is open:
 - 51820: Cilium wireguard, node to node, UDP. Task 9 turns encryption on.
 - 80, 443: Gateway endpoints for Let's Encrypt HTTP-01 and the public services from Stage 2 on.
 
-Node-to-node traffic rides the private network `10.0.1.0/24`. The etcd patch and the kubelet patches keep etcd and the node addresses on that network: the hcloud platform configures both NICs and the defaults pick the public side. The disk selector asks for at least 100 GB because the cax31's nominal 160 GB disk reports about 155 GiB, and a `160GB` match could fail. Fill the home CIDR with the tfvars value verbatim, it already carries the `/32`. Verify the document names and field spellings against the Talos 1.14 docs pages for the ingress firewall and the install config before validating, this plan was written against 1.8-era schema names and the typed-document restructure of 1.14.
+Node-to-node traffic rides the private network `10.0.1.0/24`. The etcd patch and the kubelet patches keep etcd and the node addresses on that network: the hcloud platform configures both NICs and the defaults pick the public side. The disk selector asks for at least 100 GB because the cpx42's nominal 320 GB disk reports about 300 GiB, and a `320GB` match could fail. Fill the home CIDR with the tfvars value verbatim, it already carries the `/32`. Verify the document names and field spellings against the Talos 1.14 docs pages for the ingress firewall and the install config before validating, this plan was written against 1.8-era schema names and the typed-document restructure of 1.14.
 
 - [ ] **Step 4: Reserve the endpoint IP, then generate the configs**
 
@@ -967,7 +967,7 @@ Commit the patches, the README, the widened gitignore and the seed-bundle tick. 
 
 ### Task 8: Create the nodes and form the cluster
 
-**Files:** none in Git. This task spends money: the throwaway cax11 in Step 1 costs about 0.01 EUR once, the three cax31 cost about 0.09 EUR per hour together. Tell Sebastian the moment the servers are created.
+**Files:** none in Git. This task spends money: the throwaway cx23 in Step 1 costs about 0.01 EUR once, the three cpx42 cost about 0.29 EUR per hour together. Tell Sebastian the moment the servers are created.
 
 **Interfaces:**
 - Consumes: the substrate from Task 6, the machine config from Task 7.
@@ -977,7 +977,7 @@ Rescue paths, read first: nodes are disposable. A broken node is `tofu destroy`/
 
 - [ ] **Step 1: Build the Talos snapshot**
 
-Hetzner Cloud has no Talos machine image to create servers from, only a public ISO that attaches after creation and has no tofu-clean path. Build one instead: boot a throwaway cax11 into the rescue system, write the Talos factory image to its disk, snapshot it. The nodes then boot that snapshot, ARM to ARM. The token comes from `.env.tools`, never echoed.
+Hetzner Cloud has no Talos machine image to create servers from, only a public ISO that attaches after creation and has no tofu-clean path. Build one instead: boot a throwaway cx23 into the rescue system, write the Talos factory image to its disk, snapshot it. The nodes then boot that snapshot, x86 to x86. The token comes from `.env.tools`, never echoed.
 
 ```bash
 set -a; source ~/repos/ai-software-factory/.env.tools; set +a
@@ -991,7 +991,7 @@ FW=$(curl -s -H "$HC" -H "Content-Type: application/json" -X POST \
   -d "{\"name\":\"snapshot-build\",\"rules\":[{\"direction\":\"in\",\"protocol\":\"tcp\",\"port\":\"22\",\"source_ips\":[\"<home-cidr>\"]}]}" | jq -r .firewall.id)
 SRV=$(curl -s -H "$HC" -H "Content-Type: application/json" -X POST \
   https://api.hetzner.cloud/v1/servers \
-  -d "{\"name\":\"snapshot-build\",\"server_type\":\"cax11\",\"image\":\"ubuntu-24.04\",\"location\":\"fsn1\",\"ssh_keys\":[$KEY],\"firewalls\":[{\"firewall\":$FW}],\"public_net\":{\"enable_ipv4\":true,\"enable_ipv6\":false}}" | jq -r .server.id)
+  -d "{\"name\":\"snapshot-build\",\"server_type\":\"cx23\",\"image\":\"ubuntu-24.04\",\"location\":\"fsn1\",\"ssh_keys\":[$KEY],\"firewalls\":[{\"firewall\":$FW}],\"public_net\":{\"enable_ipv4\":true,\"enable_ipv6\":false}}" | jq -r .server.id)
 curl -s -H "$HC" -X POST https://api.hetzner.cloud/v1/servers/$SRV/actions/enable_rescue -d "{\"ssh_keys\":[$KEY]}" >/dev/null
 curl -s -H "$HC" -X POST https://api.hetzner.cloud/v1/servers/$SRV/actions/power_reset >/dev/null
 IP=$(curl -s -H "$HC" https://api.hetzner.cloud/v1/servers/$SRV | jq -r .server.public_net.ipv4.ip)
@@ -1001,11 +1001,11 @@ Wait about a minute for the rescue boot, then write the image and power off. The
 
 ```bash
 ssh -i /tmp/snap-key -o StrictHostKeyChecking=no root@$IP \
-  'wget -qO /tmp/talos.raw.xz https://factory.talos.dev/image/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba/v1.14.1/hcloud-arm64.raw.xz && xz -d -c /tmp/talos.raw.xz | dd of=/dev/sda && sync && shutdown -h now'
+  'wget -qO /tmp/talos.raw.xz https://factory.talos.dev/image/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba/v1.14.1/hcloud-amd64.raw.xz && xz -d -c /tmp/talos.raw.xz | dd of=/dev/sda && sync && shutdown -h now'
 until [ "$(curl -s -H "$HC" https://api.hetzner.cloud/v1/servers/$SRV | jq -r .server.status)" = off ]; do sleep 5; done
 curl -s -H "$HC" -H "Content-Type: application/json" -X POST \
   https://api.hetzner.cloud/v1/servers/$SRV/actions/create_image \
-  -d '{"description":"talos-1.14.1-arm64","type":"snapshot","labels":{"os":"talos","version":"1.14.1","arch":"arm64"}}' >/dev/null
+  -d '{"description":"talos-1.14.1-amd64","type":"snapshot","labels":{"os":"talos","version":"1.14.1","arch":"amd64"}}' >/dev/null
 ```
 
 Wait for the image to report `available` (GET `/v1/images?type=snapshot`, the one labelled `os=talos`). If the API rejects labels on create, set them with PATCH on the image, the selector lookup in Task 6 depends on them. Then delete the throwaway pieces:
@@ -1120,9 +1120,13 @@ Expected: timeout. The nftables drop works.
 
 - [ ] **Step 6: Record and remind**
 
-Note the measured monthly cost if it moved from 21 EUR per node. Raise the standing shutdown question: the meter now runs at about 65 EUR per month, and `tofu destroy` stops it.
+Note the measured monthly cost if it moved from 69.49 EUR per node. Raise the standing shutdown question: the meter now runs at about 210 EUR per month, and `tofu destroy` stops it.
 
-**Stage 1 exit test:** all six gate checks above pass.
+- [ ] **Step 7: Destroy the cluster**
+
+Sebastian's instruction (2026-09-24): run Stage 1 as a test and leave nothing billing. Destroy what tofu manages with `tofu destroy`, then delete the Talos snapshot from Task 8 Step 1 (`DELETE /v1/images/<id>`), which lives outside tofu. Verify afterwards: zero servers, zero primary IPs, zero networks, zero images in the project. The stage report names any gate check that could not run while the cluster lived.
+
+**Stage 1 exit test:** all six gate checks above pass. The from-outside check in Step 5 needs Sebastian during the live window; if he is unavailable, defer it and name it in the stage report.
 
 ---
 

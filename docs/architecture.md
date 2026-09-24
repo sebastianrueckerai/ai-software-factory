@@ -146,9 +146,13 @@ wait or resume across hours or days, it belongs in Temporal.
 
 ## 3. Chunk 1: cluster substrate
 
-Three Hetzner Cloud cax31 servers (Ampere ARM, eight shared vCPU, 16 GB,
-160 GB NVMe, 20.99 EUR per month each, fsn1): the cheapest in-stock line that
-keeps honest quorum, with three etcd votes and three Postgres members. Talos
+Three Hetzner Cloud cpx42 servers (x86, eight shared vCPU, 16 GB, 320 GB
+disk, 69.49 EUR per month each, fsn1): the cheapest orderable line at the
+16 GB floor. The cheaper ARM cax31 was unorderable everywhere on 2026-09-24
+despite the API listing it as available, and the API availability lists
+proved unreliable generally: the reliable orderability test is creating and
+deleting one server of the type. Three etcd votes and three Postgres
+members. Talos
 Linux 1.14 on all three, officially supported on Hetzner Cloud: the machine
 config reaches each node as server user-data and the node boots straight into
 Talos. Nodes boot from a project snapshot of the factory-built Talos image,
@@ -204,7 +208,7 @@ from the Hetzner console even when a node is unreachable, which makes a
 mistyped home address a console fix rather than a rescue boot. A self-hosted
 VPN (headscale) is the named upgrade if you need roaming access later.
 
-Operating note, standing reminder: the cluster costs about 65 EUR per month
+Operating note, standing reminder: the cluster costs about 210 EUR per month
 plus storage and model spend. Cloud servers bill hourly and deletion stops
 the meter, and the re-seed drill is the off-switch: teardown is
 `tofu destroy`, comeback is the seed bundle plus Git plus S3. Claude
@@ -695,11 +699,15 @@ Checked by web verification on 2026-09-24. Sources named inline.
   identical.
 
 - Hetzner Cloud (checked 2026-09-24, API and docs): Talos 1.14 is officially
-  supported on the platform, the machine config rides server user-data, and
-  the cax31 ARM line is in stock while the CX and CPX41 lines are not. Cloud
-  servers expose no /dev/kvm, so gVisor uses the systrap platform. No hard
-  per-project spend cap exists; per-server monthly price caps are automatic
-  and cost alerts are email-only.
+  supported on the platform and the machine config rides server user-data.
+  The /v1/datacenters availability lists proved unreliable: every ARM cax
+  type was listed available yet failed creation with "unsupported location
+  for server type" in fsn1, nbg1 and hel1, so orderability is probed by
+  creating and deleting one server. cpx42, 69.49 EUR per month, was the
+  cheapest orderable type at the 16 GB floor. Cloud servers expose no
+  /dev/kvm, so gVisor uses the systrap platform. No hard per-project spend
+  cap exists; per-server monthly price caps are automatic and cost alerts
+  are email-only.
 
 Not verified: stability of the Forgejo runner's Kubernetes backend beyond its
 docs and chart, and which agent leads overall benchmarks. Phase 1 proves the
@@ -719,7 +727,7 @@ runner on real jobs.
 | Human identity | Forgejo OAuth2 now, Keycloak only if SSO story demands | Decided |
 | Sandbox runtime | gVisor now, Kata microVMs later | Decided |
 | Worker harness | opencode first, Codex CLI successor, goose fallback, behind the adapter contract | Decided |
-| Node hardware | 3x Hetzner Cloud cax31 (8 vCPU ARM, 16 GB, 160 GB NVMe), about 21 EUR per month each | Decided |
+| Node hardware | 3x Hetzner Cloud cpx42 (8 vCPU x86, 16 GB, 320 GB disk), about 69 EUR per month each | Decided |
 | Management access | Talos nftables firewall allowlisting your home IP, headscale VPN later | Decided |
 | Repository layout | `ai-software-factory-infra` and `ai-software-factory-code` now, `demo-app` in Phase 3 | Decided |
 | Public DNS | Namecheap DNS stays, HTTP-01 certificates, Cloudflare as the named upgrade | Decided |
