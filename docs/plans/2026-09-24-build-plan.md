@@ -898,7 +898,22 @@ The same controlplane.yaml applies to all three nodes. Only the first node gets 
 talosctl bootstrap --nodes <node0-ip> --endpoints <node0-ip>
 ```
 
-- [ ] **Step 4: Get the kubeconfig**
+- [ ] **Step 4: Install kubectl and the Cilium CLI if missing**
+
+```bash
+command -v kubectl >/dev/null || {
+  curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+}
+command -v cilium >/dev/null || {
+  curl -L --remote-name-all https://github.com/cilium/cilium-cli/releases/latest/bin/cilium-linux-amd64.tar.gz{,.sha256sum}
+  sha256sum --check cilium-linux-amd64.tar.gz.sha256sum
+  sudo tar xzf cilium-linux-amd64.tar.gz -C /usr/local/bin cilium
+  rm cilium-linux-amd64.tar.gz*
+}
+```
+
+- [ ] **Step 5: Get the kubeconfig**
 
 ```bash
 talosctl kubeconfig -n <node0-ip> -e <node0-ip> sf
