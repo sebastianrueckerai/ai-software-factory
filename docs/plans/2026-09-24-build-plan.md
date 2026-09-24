@@ -1114,7 +1114,7 @@ Expected: all agents healthy on the nodes.
 
 - [ ] **Step 2: Run the connectivity test**
 
-The CLI labels its `cilium-test-*` namespaces `pod-security.kubernetes.io/enforce=baseline`, and its own pods add NET_RAW, which baseline forbids. Relabel first, or every deployment fails with `Error creating: ... violates PodSecurity "baseline:latest"`:
+The CLI creates its `cilium-test-*` namespaces without PodSecurity labels, and the Talos API server then enforces baseline on them by default; the CLI's own pods add NET_RAW, which baseline forbids. Relabel before the suite, or every deployment fails with `Error creating: ... violates PodSecurity "baseline:latest"`. Relabel after the namespaces exist; a `--force-deploy` run recreates them, and recreated namespaces are unlabeled again:
 
 ```bash
 for ns in $(kubectl get ns -o name | grep cilium-test); do
