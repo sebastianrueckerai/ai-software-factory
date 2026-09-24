@@ -215,8 +215,8 @@ Kubernetes. This is the enterprise answer and the fussiest thing on exactly
 three nodes: it wants headroom for its monitors and OSD daemons, and a full disk
 anywhere triggers rebalancing that you get to watch nervously.
 
-Decision: option 1, revisited only if stateful services appear that cannot
-replicate themselves.
+Decision (confirmed 2026-09-24): option 1, revisited only if stateful services
+appear that cannot replicate themselves.
 
 ### 3.2 Image registry
 
@@ -233,7 +233,7 @@ enterprise registry with vulnerability scanning, is a later drop-in if needed.
 | Secrets and dynamic credentials | OpenBao | Fork below |
 | Model routing | LiteLLM OSS proxy | Budgets, virtual keys and the key API are OSS. JWT auth is not, see 5.2 |
 | Object storage | Hetzner Object Storage | Fork below |
-| Observability | Grafana stack by default | Fork below, open |
+| Observability | SigNoz | Fork history below, decided |
 | Telemetry pipeline | OpenTelemetry Collector | Agents and services emit OTel; the collector routes |
 
 ### 4.1 Object storage: Hetzner Object Storage versus running S3 ourselves
@@ -268,6 +268,14 @@ or Garage (lightweight, small-cluster focus), not MinIO.
 Decision: Hetzner Object Storage. It is the reference hardware from goal.md,
 and the S3 API is the escape hatch to any other provider or to SeaweedFS.
 
+What switching later actually costs, so the promise stays honest: every tool
+that reads S3 (CNPG backups, the registry, the artifact store, SigNoz retention)
+only needs a new endpoint and credentials. The API is the standard. The data
+itself does not move by itself: a switch includes one bucket-sync copy of what
+we choose to keep, and we stick to the core S3 operations (put, get, list,
+delete) plus basic lifecycle rules, because providers differ in the fringes of
+the API, not the centre.
+
 ### 4.2 Observability: the Grafana stack versus the unified challengers
 
 Background. We need four observability signals: metrics (numbers over time:
@@ -294,13 +302,18 @@ one database and give you one UI.
 - VictoriaMetrics: often named in the same breath, but it replaces only the
   metrics database (a Prometheus successor), not the whole stack.
 
-Decision status: open. Default Grafana stack, because it is what an enterprise
-reviewer recognises and every Helm chart integrates with it. Phase 0 measures
-its real footprint on three nodes and compares it with SigNoz running the same
-workload. If the Grafana stack crowds the boxes or eats too much of the
-learning budget, SigNoz is the replacement candidate. Both paths keep
-OpenTelemetry as the ingest format, so switching later moves one storage
-backend, not the instrumented services.
+Decision (confirmed 2026-09-24): SigNoz. One database, one UI, one alert
+engine, and OpenTelemetry as the native ingest. The k8s-infra chart ships an
+OTel collector that scrapes Kubernetes and application metrics and forwards
+them, so exporters keep working. Retention beyond local disk goes to S3 via
+ClickHouse tiered storage.
+
+The accepted trade: Grafana is the name an enterprise reviewer recognises
+without explanation, SigNoz is not. We take the simpler operation on small
+nodes over that recognition, and the OTel ingest format keeps the exit open:
+moving to the Grafana stack later re-points collectors, it does not re-instrument
+services. SigNoz alert webhooks feed the signals intake exactly as Prometheus
+alerts would have.
 
 ### 4.3 Secrets: OpenBao versus Vault
 
@@ -431,8 +444,8 @@ demands it, is a Temporal signal. The waiting costs nothing.
 
 ## 8. Chunk 6: signals
 
-Forgejo webhooks on issues, PR comments and reviews. Prometheus alert rules on
-the demo app's telemetry. Both feed `factoryd` intake, which creates or updates
+Forgejo webhooks on issues, PR comments and reviews. SigNoz alert rules on the
+demo app's telemetry. Both feed `factoryd` intake, which creates or updates
 task rows. Priority comes from labels and severity. The agent's
 human-escalation tool call is one more intake event: it raises an approval
 task and pings the console.
@@ -471,11 +484,11 @@ runner on real jobs.
 
 | Fork | Recommendation | Status |
 |---|---|---|
-| Storage strategy | Local disks, CNPG replication, S3 artifacts | Decided, awaiting your nod |
+| Storage strategy | Local disks, CNPG replication, S3 artifacts | Decided |
 | Secrets backend | OpenBao | Decided, awaiting your nod |
 | Image registry | Forgejo registry, Harbor as upgrade | Decided |
 | Object storage | Hetzner Object Storage, SeaweedFS/Garage as self-host fallback | Decided |
-| Observability | Grafana stack, SigNoz as unified challenger | Open, measure both in Phase 0 |
+| Observability | SigNoz, Grafana stack as OTel-compatible fallback | Decided |
 | UI style | Server-rendered Go with htmx | Decided |
 | Policy engine | Go code now, OPA sidecar when rules multiply | Decided |
 | Human identity | Forgejo OAuth2 now, Keycloak only if SSO story demands | Decided |
@@ -486,7 +499,7 @@ runner on real jobs.
 ## 11. Build order
 
 1. Ranch: Chunks 1 and 2. Talos cluster via Terraform and Flux, Postgres,
-   Temporal, OpenBao, LiteLLM, observability, Forgejo. Re-seed drill included.
+   Temporal, OpenBao, LiteLLM, SigNoz, Forgejo. Re-seed drill included.
 2. First loop: intake to merged PR. One opencode worker, gateway v0 with JWT
    auth and virtual keys, sandbox hardening, session records.
 3. Teeth: capability policy, budgets, approvals, verification gates, cost
