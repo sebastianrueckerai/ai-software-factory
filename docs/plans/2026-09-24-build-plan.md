@@ -860,6 +860,8 @@ portSelector:
     - 10250
     - 4240
     - 50000
+    # Kubernetes NodePort range; the Cilium connectivity suite probes it node to node
+    - 30000-32767
   protocol: tcp
 ingress:
   - subnet: 10.0.1.0/24
@@ -908,6 +910,7 @@ The port list, with the reason each is open:
 - 6443, 50000: Kubernetes and Talos APIs, from home only.
 - 2379, 2380: etcd, node to node.
 - 10250: kubelet, node to node.
+- 30000-32767: Kubernetes NodePort range, node to node. The Cilium connectivity suite probes a NodePort service on a node IP; without the range the probe times out.
 - 4240: Cilium health checks, node to node.
 - 8472, 6081: Cilium VXLAN and Geneve, node to node, UDP.
 - 51871: Cilium wireguard, node to node, UDP. Task 9 turns encryption on. Cilium 1.20 defaults to 51871, not the standard wireguard port 51820, and the 1.20 helm chart exposes no listenPort override, so the rule matches the default (verified: with only 51820 allowed, the wireguard tunnel never handshakes and every cross-node pod packet drops; with 51871 allowed, ping passes at about 1 ms).
