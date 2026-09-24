@@ -246,7 +246,8 @@ third source is a small offline bundle holding what Git and S3 cannot hold:
 
 - the Hetzner API token,
 - the S3 access keys,
-- the Cloudflare DNS token for the `aisoftwarefactory.world` zone,
+- the Namecheap account access, registrar and DNS for
+  `aisoftwarefactory.world`,
 - the model provider API keys,
 - the OpenBao unseal keys.
 
@@ -267,29 +268,39 @@ OpenBao from the seed by hand. No secret the seed holds ever enters Git.
 | Object storage | Hetzner Object Storage | Fork below |
 | Observability | SigNoz | Fork history below, decided |
 | Telemetry pipeline | OpenTelemetry Collector | Agents and services emit OTel; the collector routes |
-| TLS certificates | cert-manager with Let's Encrypt | Wildcard via DNS-01, see 3.4 |
+| TLS certificates | cert-manager with Let's Encrypt | One per public endpoint, HTTP-01 via Gateway API, see 3.4 |
 
 ### 3.4 Public DNS and TLS
 
-The domain is `aisoftwarefactory.world`, registered at Namecheap. DNS hosting
-moves to Cloudflare's free tier. The registrar stays Namecheap, so switching
-DNS hosting again later is a nameserver change, nothing else.
+The domain is `aisoftwarefactory.world`, registered at Namecheap, and DNS
+stays on Namecheap. No second DNS provider, no extra account, no API token to
+manage.
 
-The reason is automation. Namecheap's API has no first-class support in
-cert-manager, certbot or Terraform. Cloudflare's DNS API is the one every ACME
-tool speaks, and a free zone is all we need from it.
+The design that makes this work: certificates come from the HTTP-01 challenge,
+not DNS-01. cert-manager, the in-cluster equivalent of certbot, proves control
+of a hostname by serving a token on port 80 through the cluster's own
+Gateway. Its Gateway API solver is a core feature, and no DNS API is involved
+anywhere. One certificate per public hostname instead of one wildcard for the
+zone, which costs nothing here: the endpoint list is short and known, and
+renewal is automatic either way.
 
-cert-manager (already in the platform table) is the in-cluster equivalent of
-certbot: same job, ACME against Let's Encrypt, but as a Kubernetes operator.
-It issues one wildcard certificate for the zone via the DNS-01 challenge,
-using a Cloudflare API token scoped to DNS edits on this one zone. The token
-lives in OpenBao and in the seed bundle.
+What we give up, knowingly. No wildcard certificate, so each hostname needs
+its Gateway listener before its cert exists: true for a handful of names. No
+record automation: Namecheap's API is whitelisted-IP only, and its Terraform
+provider is community-maintained with unclear 2026 health, so records are
+made by hand in the dashboard. They change once per re-seed, when new nodes
+get new IPs. A few minutes of clicking per rebuild, acceptable for a handful
+of A records.
 
-Two details that matter. Records stay "DNS only", the unproxied mode: the
-cluster's own Gateway terminates TLS, Cloudflare answers DNS and nothing else.
-And the Hetzner firewall opens ports 80 and 443 to the world for the Gateway
-endpoints, while the Talos and Kubernetes API ports stay allowlisted to the
-home IP. One firewall, two rules per audience.
+The named upgrade, if record churn ever appears: move DNS hosting to
+Cloudflare's free tier. The registrar stays Namecheap, the switch is a
+nameserver change, and it buys the API every ACME and Terraform tool speaks,
+wildcard certificates via DNS-01, and external-dns support. Not needed at
+this scale.
+
+The firewall rule stands: ports 80 and 443 open to the world for the Gateway
+endpoints, port 80 serving only the ACME challenge and a redirect to 443,
+while the Talos and Kubernetes API ports stay allowlisted to the home IP.
 
 ### 4.1 Object storage: Hetzner Object Storage versus running S3 ourselves
 
@@ -655,7 +666,7 @@ runner on real jobs.
 | Node hardware | 3x Hetzner AX41 (6 cores, 64 GB, NVMe), about 39 EUR per month each | Decided |
 | Management access | Hetzner firewall allowlisting your home IP, headscale VPN later | Decided |
 | Repository layout | `infra` and `factory` now, `demo-app` in Phase 3 | Decided |
-| Public DNS | Cloudflare-hosted zone for `aisoftwarefactory.world`, registrar Namecheap | Proposed, nameserver switch pending |
+| Public DNS | Namecheap DNS stays, HTTP-01 certificates, Cloudflare as the named upgrade | Decided |
 | Demo app | Small real product with real telemetry | Open, chosen in Phase 3 |
 
 ## 11. Build order
