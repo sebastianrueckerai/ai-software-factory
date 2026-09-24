@@ -16,9 +16,9 @@
 - No secret enters Git, ever. Secrets live in the seed bundle (offline password manager plus printed copy) or in ignored `.env` files.
 - Nodes: 3x Hetzner Robot AX41, about 39 EUR per month each, verify the price at order time. All three run control-plane and workloads.
 - Talos 1.14, Cilium 1.20, OpenTofu (`tofu`). No SSH on nodes, Talos API only.
-- Go module `github.com/sebastianrueckerai/factory`, binaries `factoryd` and `factory-gateway`.
+- Go module `github.com/sebastianrueckerai/ai-software-factory-code`, binaries `factoryd` and `factory-gateway`.
 - New work happens in a git worktree. Every task ends with a commit to master and a push.
-- Repositories: `infra` and `factory`, private on GitHub now, Forgejo becomes the primary in Stage 2 with GitHub as backup remote.
+- Repositories: `ai-software-factory-infra` and `ai-software-factory-code`, private on GitHub now, Forgejo becomes the primary in Stage 2 with GitHub as backup remote. File paths below say `infra/` and `factory/` for short.
 - British English in all documents.
 
 ## Review Focus
@@ -61,8 +61,8 @@ No money, no nodes. Two repositories exist with their toolchains proven.
 ### Task 1: Create the two repositories
 
 **Files:**
-- Create: `~/repos/infra` (clone of new GitHub repo)
-- Create: `~/repos/factory` (clone of new GitHub repo)
+- Create: `~/repos/ai-software-factory-infra` (clone of new GitHub repo)
+- Create: `~/repos/ai-software-factory-code` (clone of new GitHub repo)
 
 **Interfaces:**
 - Produces: the two remotes every later task commits to.
@@ -70,34 +70,34 @@ No money, no nodes. Two repositories exist with their toolchains proven.
 - [ ] **Step 1: Create the private repos on GitHub**
 
 ```bash
-gh repo create sebastianrueckerai/infra --private --description "Cluster substrate: OpenTofu, Talos configs, Flux"
-gh repo create sebastianrueckerai/factory --private --description "Control plane: factoryd, factory-gateway, harness adapters"
+gh repo create sebastianrueckerai/ai-software-factory-infra --private --description "Cluster substrate: OpenTofu, Talos configs, Flux"
+gh repo create sebastianrueckerai/ai-software-factory-code --private --description "Control plane: factoryd, factory-gateway, harness adapters"
 ```
 
 - [ ] **Step 2: Clone both**
 
 ```bash
 cd ~/repos
-gh repo clone sebastianrueckerai/infra
-gh repo clone sebastianrueckerai/factory
+gh repo clone sebastianrueckerai/ai-software-factory-infra
+gh repo clone sebastianrueckerai/ai-software-factory-code
 ```
 
 - [ ] **Step 3: Add a README to each and push**
 
-`infra/README.md`:
+`ai-software-factory-infra/README.md`:
 
 ```markdown
-# infra
+# ai-software-factory-infra
 
 What the cluster is: OpenTofu for Hetzner Robot servers, Talos machine
 configs, Flux bootstrap. Design lives in the ai-software-factory repo.
 Human-only repository, agents never write here.
 ```
 
-`factory/README.md`:
+`ai-software-factory-code/README.md`:
 
 ```markdown
-# factory
+# ai-software-factory-code
 
 Go module with factoryd and factory-gateway, harness adapters, tests,
 deploy manifests. First repository the agents will work on.
@@ -195,7 +195,7 @@ The provider lock file `.terraform.lock.hcl` stays committable: it pins provider
 - [ ] **Step 2: Install OpenTofu if missing and validate**
 
 ```bash
-cd ~/repos/infra
+cd ~/repos/ai-software-factory-infra
 tofu init
 tofu validate
 ```
@@ -275,8 +275,8 @@ git push
 - [ ] **Step 1: Create the module**
 
 ```bash
-cd ~/repos/factory
-go mod init github.com/sebastianrueckerai/factory
+cd ~/repos/ai-software-factory-code
+go mod init github.com/sebastianrueckerai/ai-software-factory-code
 ```
 
 - [ ] **Step 2: Write the failing health test**
@@ -497,7 +497,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/sebastianrueckerai/factory/internal/health"
+	"github.com/sebastianrueckerai/ai-software-factory-code/internal/health"
 )
 
 var version = "dev"
@@ -524,7 +524,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/sebastianrueckerai/factory/internal/health"
+	"github.com/sebastianrueckerai/ai-software-factory-code/internal/health"
 )
 
 var version = "dev"
@@ -691,7 +691,7 @@ Adjust the attribute name to what the provider documents.
 - [ ] **Step 4: Plan and apply**
 
 ```bash
-cd ~/repos/infra
+cd ~/repos/ai-software-factory-infra
 tofu init
 tofu plan
 tofu apply
@@ -735,7 +735,7 @@ Expected: client 1.14.x.
 - [ ] **Step 2: Generate the cluster secrets**
 
 ```bash
-cd ~/repos/infra/talos
+cd ~/repos/ai-software-factory-infra/talos
 talosctl gen secrets -o secrets.yaml
 ```
 
@@ -974,7 +974,7 @@ The detailed task plan for each stage below is written when the previous stage p
 
 Goal: the platform services run, deployed by Flux from Forgejo, with TLS.
 
-Steps: hand-apply the bootstrap slice (CNPG plus Forgejo) from the seed machine, restore Forgejo repositories from the S3 dump if any exist, push `infra` and `factory` to Forgejo and make it the primary remote with GitHub as backup, bootstrap Flux against Forgejo, deploy cert-manager and the Gateway with HTTP-01 solvers plus the Namecheap A records by hand, then roll out Temporal, OpenBao (init, unseal, first snapshot), LiteLLM with the three chat provider keys from the seed, SigNoz, and the Forgejo Actions Kubernetes runner. Make the S3 buckets and the nightly Forgejo dump job. Add seed-bundle slots for the credentials created before OpenBao is initialised (Forgejo admin password and token, LiteLLM master key, CNPG passwords).
+Steps: hand-apply the bootstrap slice (CNPG plus Forgejo) from the seed machine, restore Forgejo repositories from the S3 dump if any exist, push `ai-software-factory-infra` and `ai-software-factory-code` to Forgejo and make it the primary remote with GitHub as backup, bootstrap Flux against Forgejo, deploy cert-manager and the Gateway with HTTP-01 solvers plus the Namecheap A records by hand, then roll out Temporal, OpenBao (init, unseal, first snapshot), LiteLLM with the three chat provider keys from the seed, SigNoz, and the Forgejo Actions Kubernetes runner. Make the S3 buckets and the nightly Forgejo dump job. Add seed-bundle slots for the credentials created before OpenBao is initialised (Forgejo admin password and token, LiteLLM master key, CNPG passwords).
 
 Exit test: `https://git.aisoftwarefactory.world` serves a valid Let's Encrypt certificate, the factory repo's CI workflow runs green on the pod runner, a LiteLLM smoke call through a test virtual key answers with a DeepSeek completion.
 

@@ -699,16 +699,18 @@ runner on real jobs.
 | Worker harness | opencode first, Codex CLI successor, goose fallback, behind the adapter contract | Decided |
 | Node hardware | 3x Hetzner AX41 (6 cores, 64 GB, NVMe), about 39 EUR per month each | Decided |
 | Management access | Talos nftables firewall allowlisting your home IP, headscale VPN later | Decided |
-| Repository layout | `infra` and `factory` now, `demo-app` in Phase 3 | Decided |
+| Repository layout | `ai-software-factory-infra` and `ai-software-factory-code` now, `demo-app` in Phase 3 | Decided |
 | Public DNS | Namecheap DNS stays, HTTP-01 certificates, Cloudflare as the named upgrade | Decided |
 | Demo app | Small real product with real telemetry | Open, chosen in Phase 3 |
 
 ## 11. Build order
 
-Three repositories carry the work. `infra` holds what the cluster is: the
+Three repositories carry the work. `ai-software-factory-infra` (infra
+below) holds what the cluster is: the
 OpenTofu for Hetzner servers and firewall, the Talos machine configs, the
 Flux bootstrap and the kustomizations that point at the other repositories. It
-changes rarely and stays human-only. `factory` holds the Go module with both
+changes rarely and stays human-only. `ai-software-factory-code` (factory
+below) holds the Go module with both
 binaries and the harness adapters, its tests, and its deploy manifests; its
 Forgejo Actions pipeline builds images into the registry. It changes often and
 is the first repository agents will work on. `demo-app` arrives in Phase 3.
