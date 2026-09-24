@@ -152,7 +152,7 @@ machine configs. Flux deploys everything that runs on the cluster from Git.
 
 ```
 namespaces:
-  platform        cnpg, temporal, openbao, litellm, otel, observability
+  platform        cnpg, temporal, openbao, litellm, cert-manager, signoz
   forgejo         forgejo, runner, container registry
   factory         factoryd, factory-gateway
   factory-agents  one namespace per task, gVisor pods
@@ -164,10 +164,15 @@ The re-seed drill, run once before Phase 1 ends:
 1. `terraform destroy` the three nodes.
 2. `terraform apply`: new nodes, same Talos configs from Git.
 3. Flux reinstalls every workload from Git.
-4. Restore Postgres from the S3 backups and point services at the object
-   storage buckets.
+4. Restore Postgres from the S3 backups, restore OpenBao from its S3 snapshot
+   using the unseal keys from the seed bundle (3.3), and point services at the
+   object storage buckets.
 
-No node holds state that Git and S3 do not describe.
+No node holds state that Git, S3 and the seed bundle do not describe.
+
+Management access: the Hetzner firewall allowlists your home IP for the
+Kubernetes and Talos API ports. Nothing else reaches the nodes. A self-hosted
+VPN (headscale) is the named upgrade if you need roaming access later.
 
 ### 3.1 Storage strategy
 
@@ -224,6 +229,24 @@ Forgejo ships a container registry, S3-backed. We use it for our own images
 (factoryd, gateway, sandbox image, demo app). Escape hatch: Harbor, the
 enterprise registry with vulnerability scanning, is a later drop-in if needed.
 
+### 3.3 The seed bundle
+
+Re-seeding restores from three sources. Git holds all configuration. S3 holds
+the data: database backups, artifacts, and OpenBao's encrypted snapshots. The
+third source is a small offline bundle holding what Git and S3 cannot hold:
+
+- the Hetzner API token,
+- the S3 access keys,
+- DNS registrar credentials,
+- the model provider API keys,
+- the OpenBao unseal keys.
+
+The bundle lives in an offline password manager plus a printed copy. Bootstrap
+after a full wipe: Terraform creates the nodes from the seed's Hetzner token,
+Flux applies every workload, OpenBao restores from its S3 snapshot with the
+seed's unseal keys, and any credential newer than the last snapshot re-enters
+OpenBao from the seed by hand. No secret the seed holds ever enters Git.
+
 ## 4. Chunk 2: platform services
 
 | Concern | Component | Note |
@@ -235,6 +258,7 @@ enterprise registry with vulnerability scanning, is a later drop-in if needed.
 | Object storage | Hetzner Object Storage | Fork below |
 | Observability | SigNoz | Fork history below, decided |
 | Telemetry pipeline | OpenTelemetry Collector | Agents and services emit OTel; the collector routes |
+| TLS certificates | cert-manager with Let's Encrypt | One certificate per public endpoint, issued via Gateway API |
 
 ### 4.1 Object storage: Hetzner Object Storage versus running S3 ourselves
 
@@ -390,6 +414,12 @@ task requires capability X in environment E
 An OPA sidecar is the named upgrade when rules multiply beyond what Go code
 reads well. Policy never lives in a prompt.
 
+The first capability class is deliberately one: `coder`, holding repository
+read, branch write, model aliases and allowlisted tools, nothing else. The
+classes from the baseline conversation (analyzer, integration-tester,
+release-agent, prod-operator) arrive one per phase as the loops that need them
+come online.
+
 ### 5.4 Cost ledger
 
 LiteLLM tracks model spend per virtual key. The gateway tracks tool spend per
@@ -409,6 +439,17 @@ adapter seam matters here more than anywhere else.
 A thin Go adapter drives opencode over ACP (Agent Client Protocol, the
 stdin/stdout protocol IDEs use to drive coding agents). A Claude Code or Codex
 adapter later is a new adapter, no workflow change.
+
+The adapter doubles as the identity proxy, and this closes the one wiring gap
+the review found. opencode makes its own model and tool calls, but it cannot
+present the pod's projected ServiceAccount JWT: that JWT is a file the kubelet
+rotates, and opencode has no mechanism to attach it to requests. So the adapter
+listens on localhost. opencode's provider configuration points at the adapter,
+and every MCP tool server it uses routes through the adapter too. On each
+request the adapter re-reads the current token file, attaches the fresh JWT,
+and forwards to `factory-gateway`. The only credential that ever exists inside
+the sandbox is the rotating task identity, and the gateway keeps a single
+authentication mechanism.
 
 Sandbox hardening:
 
@@ -493,10 +534,16 @@ runner on real jobs.
 | Policy engine | Go code now, OPA sidecar when rules multiply | Decided |
 | Human identity | Forgejo OAuth2 now, Keycloak only if SSO story demands | Decided |
 | Sandbox runtime | gVisor now, Kata microVMs later | Decided |
-| Node hardware | 3x Hetzner Robot, 64 GB class | Open, exact SKU in Phase 0 |
+| Node hardware | 3x Hetzner AX42 (8 cores, 64 GB, 2x1 TB NVMe, about 50 EUR per month each) | Proposed, confirm |
+| Management access | Hetzner firewall allowlisting your home IP, headscale VPN later | Proposed |
+| Repository layout | `infra` and `factory` now, `demo-app` in Phase 3 | Proposed |
 | Demo app | Small real product with real telemetry | Open, chosen in Phase 3 |
 
 ## 11. Build order
+
+Three repositories carry the work: `infra` (Terraform, Talos configs, Flux),
+`factory` (the Go module, adapters, deploy manifests) and, from Phase 3,
+`demo-app`. Flux watches the manifest paths in `infra` and `factory`.
 
 1. Ranch: Chunks 1 and 2. Talos cluster via Terraform and Flux, Postgres,
    Temporal, OpenBao, LiteLLM, SigNoz, Forgejo. Re-seed drill included.
