@@ -193,7 +193,8 @@ The re-seed drill, run once before Phase 1 ends:
    personal access tokens, and the imperative namespace secrets. Nothing is
    duplicated into this file.
 
-No node holds state that Git, S3 and the seed bundle do not describe.
+No node holds state that Git, S3 and the seed bundle do not describe; step 5
+re-creates by hand the small remainder that no store carries.
 
 Measured on 2026-09-25: the full drill took about five hours wall-clock from
 the first `tofu apply` to all Stage 2 exit tests green. The substrate rebuild
