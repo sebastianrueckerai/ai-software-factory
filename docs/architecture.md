@@ -188,6 +188,10 @@ The re-seed drill, run once before Phase 1 ends:
    dump in S3, restore OpenBao from its S3 snapshot using the unseal key
    from the seed bundle (3.3), and point services at the object storage
    buckets.
+5. Re-create the imperative state the restore does not carry: the gateway
+   database role (SQL in the infra repository's README), the Forgejo
+   personal access tokens, and the imperative namespace secrets. Nothing is
+   duplicated into this file.
 
 No node holds state that Git, S3 and the seed bundle do not describe.
 
