@@ -185,7 +185,7 @@ The re-seed drill, run once before Phase 1 ends:
 2. `tofu apply`: new nodes, same Talos configs from Git.
 3. Flux reinstalls every workload from Git.
 4. Restore Postgres from the S3 backups, restore Forgejo from its repository
-   dump in S3, restore OpenBao from its S3 snapshot using the unseal keys
+   dump in S3, restore OpenBao from its S3 snapshot using the unseal key
    from the seed bundle (3.3), and point services at the object storage
    buckets.
 
@@ -285,12 +285,12 @@ third source is a small offline bundle holding what Git and S3 cannot hold:
 - the Namecheap account access, registrar and DNS for
   `aisoftwarefactory.world`,
 - the model provider API keys,
-- the OpenBao unseal keys.
+- the OpenBao unseal key.
 
 The bundle lives in an offline password manager plus a printed copy. Bootstrap
 after a full wipe: Terraform creates the nodes from the seed's Hetzner token,
 Flux applies every workload, OpenBao restores from its S3 snapshot with the
-seed's unseal keys, and any credential newer than the last snapshot re-enters
+seed's unseal key, and any credential newer than the last snapshot re-enters
 OpenBao from the seed by hand. No secret the seed holds ever enters Git.
 
 ## 4. Chunk 2: platform services
@@ -428,7 +428,8 @@ place this project should not carry it. The API being identical means the swap
 to Vault is a configuration change if OpenBao ever disappoints.
 
 One operational cost, named: auto-unseal needs a KMS we do not run, so
-unsealing after a full restart is manual, with the seed bundle's keys. Node
+unsealing after a full restart is manual, with the seed bundle's single key
+(OpenBao 2.6.3 rejects a threshold-one multi-share split). Node
 reboots are rare on Talos, and a few minutes of human time is the accepted
 price.
 
