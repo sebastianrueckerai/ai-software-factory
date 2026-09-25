@@ -140,8 +140,9 @@ Why it loses for us:
 | What the workflow is | YAML plus containers | Real code (Go for us), testable like code |
 
 The pattern we do take from Approach C: Kubernetes-native is the right shape for
-stateless platform plumbing. Flux deploys everything, the Forgejo runner starts
-verification pods, the sandbox is a pod. The moment a process needs to remember,
+stateless platform plumbing. Flux deploys everything, the Forgejo runner runs
+CI jobs as containers in its dind sidecar, the sandbox is a pod. The moment
+a process needs to remember,
 wait or resume across hours or days, it belongs in Temporal.
 
 ## 3. Chunk 1: cluster substrate
@@ -638,8 +639,8 @@ parent session ID, not as a resurrected process.
 Evidence in order of strength. Cheap deterministic gates first, the expensive
 model last:
 
-1. Forgejo Actions runs PR checks on its Kubernetes pod runner: build, tests,
-   lint, static security scanning.
+1. Forgejo Actions runs PR checks on the runner's docker-in-docker sidecar:
+   build, tests, lint, static security scanning.
 2. The Temporal workflow runs gate activities for what CI cannot decide: the
    failure reproduction now passes, the schema migration is reviewed, the
    policy evaluation returns allow.
@@ -671,7 +672,9 @@ Checked by web verification on 2026-09-24. Sources named inline.
 - Talos: 1.14.1 current. On Hetzner bare metal: boot ISO, apply machine
   config. gVisor runs as a runtime handler from the machine config.
 - Forgejo: GPL, non-profit governed, hard fork from Gitea since 2024. Actions
-  runner has a native Kubernetes pod backend, a Helm chart and KEDA autoscale.
+  runner has no Kubernetes backend: host, docker and lxc executors only
+  (runner source, verified 2026-09-25). It runs here as one chart instance
+  with a privileged dind sidecar, no KEDA.
   Gitea stays MIT but under a company with a copyright-assignment CLA.
 - OpenCode: MIT, moved to `anomalyco/opencode`, ACP and non-interactive mode
   confirmed.
@@ -709,9 +712,9 @@ Checked by web verification on 2026-09-24. Sources named inline.
   cap exists; per-server monthly price caps are automatic and cost alerts
   are email-only.
 
-Not verified: stability of the Forgejo runner's Kubernetes backend beyond its
-docs and chart, and which agent leads overall benchmarks. Phase 1 proves the
-runner on real jobs.
+Not verified: which agent leads overall benchmarks. The runner is proven on
+one real CI job (2026-09-25, run 1 on sf/ai-software-factory-code), not
+under load.
 
 ## 10. Open forks
 
