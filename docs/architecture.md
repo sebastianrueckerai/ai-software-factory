@@ -191,6 +191,14 @@ The re-seed drill, run once before Phase 1 ends:
 
 No node holds state that Git, S3 and the seed bundle do not describe.
 
+Measured on 2026-09-25: the full drill took about five hours wall-clock from
+the first `tofu apply` to all Stage 2 exit tests green. The substrate rebuild
+(new servers from the snapshot, bootstrap, Cilium) took about 45 minutes, the
+Postgres recovery from the S3 catalog about 9 minutes, and the remainder went
+to Forgejo, the repositories, Flux and the data restores. The barman plugin
+refuses to restore into a non-empty WAL archive, so each rebuild archives to a
+fresh sibling `serverName` (the tree's one-line, versioned edit per drill).
+
 Bootstrap breaks one circular dependency: Flux deploys everything from Git,
 but the Git server, Forgejo, is itself deployed by Flux. Step zero, run once
 from the seed machine: apply the bootstrap slice, CNPG plus Forgejo, by hand,
