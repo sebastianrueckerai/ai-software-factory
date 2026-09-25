@@ -4,8 +4,6 @@ This document holds the target architecture of the software factory and nothing 
 
 Status: current target. When the design changes, this file changes with it.
 
-Build state at 25 September 2026: the Ranch phase (section 12) is built and verified, meaning the substrate, the platform services, and Forgejo with its runner and CI. The factory, worker and application planes are pending. The Forgejo container registry is not configured yet. The cluster is powered down; the re-seed drill in section 3 is the way back.
-
 ## 1. What the factory is
 
 The factory is a largely autonomous system in which agents turn specifications, issues and telemetry into tested, reviewed and deployed software changes. Human involvement is a tool call the agents raise as seldom as possible. An approval is a workflow state, not a meeting.
@@ -128,7 +126,7 @@ The design runs no shared storage layer. Stateful services replicate themselves 
 
 **OpenBao.** Encrypted snapshots go to object storage.
 
-**SigNoz.** Telemetry lives in ClickHouse on a local volume, with retention set in SigNoz itself, tiered to object storage when local disks fill. Losing recent local history in a node failure is the one accepted loss.
+**SigNoz.** Telemetry lives in ClickHouse on a local volume, with retention tiered to object storage. Losing recent local history in a node failure is the one accepted loss.
 
 **Object storage.** Hetzner Object Storage speaks the S3 API, the standard that every backup tool, registry and analytics tool already speaks. It holds backups, artifacts, session records, log archives and container image blobs. Two buckets: `aisoftwarefactory-forgejo` for Forgejo object data, and `aisoftwarefactory-backups` with the prefixes `cnpg/`, `forgejo-dumps/` and `openbao/`. The S3 API is the escape hatch: any other compatible provider takes a new endpoint and credentials, nothing more.
 
@@ -155,7 +153,7 @@ Four of these deserve a closer look.
 
 **OpenBao** is the secrets store, the Linux Foundation fork of HashiCorp Vault with the same API. It holds the service credentials and hands out short-lived copies. It has no key management service for auto-unseal, so a full restart needs a human to enter the unseal key from the seed bundle. OpenBao 2.6.3 rejects a multi-share split with threshold one, so the bundle holds exactly one key. Node reboots are rare on Talos, so that price is accepted.
 
-**LiteLLM** fronts all chat model providers with one OpenAI-compatible API. The upstreams are DeepSeek, Qwen and GLM (z.ai); only DeepSeek is wired so far. Three aliases name the tiers: `coding-cheap` for the DeepSeek and Qwen tier, `coding-frontier` for the GLM frontier tier, and `review-frontier` for the strongest of the three. Anthropic and OpenAI are deliberately absent at the start: the factory runs on the providers its owner uses daily. Paid capabilities that are not chat models, Replicate, Firecrawl and fal.ai, enter as tools with per-task request and euro caps.
+**LiteLLM** fronts all chat model providers with one OpenAI-compatible API. The upstreams are DeepSeek, Qwen and GLM (z.ai). Three aliases name the tiers: `coding-cheap` for the DeepSeek and Qwen tier, `coding-frontier` for the GLM frontier tier, and `review-frontier` for the strongest of the three. Anthropic and OpenAI are deliberately absent at the start: the factory runs on the providers its owner uses daily. Paid capabilities that are not chat models, Replicate, Firecrawl and fal.ai, enter as tools with per-task request and euro caps.
 
 **SigNoz** stores traces, logs and metrics in one ClickHouse database, with dashboards and alerting on top. Services and agents emit OpenTelemetry, and SigNoz's own collector scrapes the cluster. Its alert webhooks feed the signals intake.
 
