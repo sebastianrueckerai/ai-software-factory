@@ -1430,8 +1430,11 @@ mkdir -p ~/.aws
 cat > ~/.aws/config <<'EOF'
 [default]
 region = fsn1
+services = hetzner
+
+[services hetzner]
 s3 =
-  endpoint_url = https://fsn1.your-objectstorage.com
+    endpoint_url = https://fsn1.your-objectstorage.com
 EOF
 cat > ~/.aws/credentials <<EOF
 [default]
@@ -1558,7 +1561,7 @@ spec:
       wal:
         compression: gzip
         maxParallel: 4
-      retentionPolicy: 30d
+    retentionPolicy: 30d
 ```
 
 ```bash
@@ -1609,7 +1612,7 @@ spec:
 ```
 
 ```bash
-kubectl apply -f k8s/platform/cnpg/databases.yaml k8s/platform/cnpg/backup.yaml
+kubectl apply -f k8s/platform/cnpg/databases.yaml -f k8s/platform/cnpg/backup.yaml
 ```
 
 Expected: each Database reports `status.applied: true` within a minute, and the immediate backup reaches `phase: completed`:
