@@ -999,12 +999,18 @@ FW=$(curl -s -H "$HC" -H "Content-Type: application/json" -X POST \
 SRV=$(curl -s -H "$HC" -H "Content-Type: application/json" -X POST \
   https://api.hetzner.cloud/v1/servers \
   -d "{\"name\":\"snapshot-build\",\"server_type\":\"cx23\",\"image\":\"ubuntu-24.04\",\"location\":\"fsn1\",\"ssh_keys\":[$KEY],\"firewalls\":[{\"firewall\":$FW}],\"public_net\":{\"enable_ipv4\":true,\"enable_ipv6\":false}}" | jq -r .server.id)
+if [ -z "$KEY" ] || [ -z "$FW" ] || [ -z "$SRV" ]; then
+  echo "create rejected (key=$KEY fw=$FW srv=$SRV)"
+  [ -n "$KEY" ] && curl -s -H "$HC" -X DELETE https://api.hetzner.cloud/v1/ssh_keys/$KEY
+  [ -n "$FW" ] && curl -s -H "$HC" -X DELETE https://api.hetzner.cloud/v1/firewalls/$FW
+  exit 1
+fi
 curl -s -H "$HC" -X POST https://api.hetzner.cloud/v1/servers/$SRV/actions/enable_rescue -d "{\"ssh_keys\":[$KEY]}" >/dev/null
 curl -s -H "$HC" -X POST https://api.hetzner.cloud/v1/servers/$SRV/actions/reset >/dev/null
 IP=$(curl -s -H "$HC" https://api.hetzner.cloud/v1/servers/$SRV | jq -r .server.public_net.ipv4.ip)
 ```
 
-`enable_rescue` fails silently (returns a null action) while the server is still `initializing`, and rescue boot needs the reset after the enable. Poll `GET /v1/servers/$SRV` until `status` is `running`, then run the two actions in the order shown (`/actions/reset`, not `power_reset`, which is not a route).
+`enable_rescue` fails silently (returns a null action) while the server is still `initializing`, and rescue boot needs the reset after the enable. Poll `GET /v1/servers/$SRV` until `status` is `running`, then run the two actions in the order shown (`/actions/reset`, not `power_reset`, which is not a route). Firewall names are unique per project: a leftover `snapshot-build` firewall from an earlier run makes the create fail with a null id, which the guard above turns into a clean exit instead of a null id chained into the server create. The teardown prints each DELETE's status code and waits for the server to be gone before deleting the firewall, so no stray survives a run that reports success.
 
 Wait about a minute for the rescue boot, then write the image and power off. The shutdown before the snapshot is the order the Talos guide uses, for a consistent disk:
 
@@ -1020,9 +1026,10 @@ curl -s -H "$HC" -H "Content-Type: application/json" -X POST \
 Wait for the image to report `available` (GET `/v1/images?type=snapshot`, the one labelled `os=talos`). If the API rejects labels on create, set them with PATCH on the image, the selector lookup in Task 6 depends on them. Then delete the throwaway pieces:
 
 ```bash
-curl -s -H "$HC" -X DELETE https://api.hetzner.cloud/v1/servers/$SRV
-curl -s -H "$HC" -X DELETE https://api.hetzner.cloud/v1/firewalls/$FW
-curl -s -H "$HC" -X DELETE https://api.hetzner.cloud/v1/ssh_keys/$KEY
+curl -s -o /dev/null -w 'server delete: %{http_code}\n' -H "$HC" -X DELETE https://api.hetzner.cloud/v1/servers/$SRV
+until [ "$(curl -s -H "$HC" https://api.hetzner.cloud/v1/servers/$SRV | jq -r '.error.code // .server.status')" = not_found ]; do sleep 5; done
+curl -s -o /dev/null -w 'firewall delete: %{http_code}\n' -H "$HC" -X DELETE https://api.hetzner.cloud/v1/firewalls/$FW
+curl -s -o /dev/null -w 'key delete: %{http_code}\n' -H "$HC" -X DELETE https://api.hetzner.cloud/v1/ssh_keys/$KEY
 rm -f /tmp/snap-key /tmp/snap-key.pub
 ```
 
