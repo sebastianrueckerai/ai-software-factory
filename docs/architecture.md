@@ -196,8 +196,15 @@ the first `tofu apply` to all Stage 2 exit tests green. The substrate rebuild
 (new servers from the snapshot, bootstrap, Cilium) took about 45 minutes, the
 Postgres recovery from the S3 catalog about 9 minutes, and the remainder went
 to Forgejo, the repositories, Flux and the data restores. The barman plugin
-refuses to restore into a non-empty WAL archive, so each rebuild archives to a
-fresh sibling `serverName` (the tree's one-line, versioned edit per drill).
+refuses to restore into a non-empty WAL archive, so each rebuild reads one
+generation and archives to a fresh sibling. Two committed lines carry the
+policy: the recovery source (`serverName` on the Cluster's `externalClusters`)
+always names the newest generation that holds a completed base backup, and the
+Cluster's own archive moves to the next sibling. Before any teardown that
+should preserve Postgres state, a completed base backup of the live generation
+must exist in S3. A rebuild is green only after the restored repositories'
+HEADs match the last pushed commits: a stale-source restore fails the gate
+instead of passing silently.
 
 Bootstrap breaks one circular dependency: Flux deploys everything from Git,
 but the Git server, Forgejo, is itself deployed by Flux. Step zero, run once
