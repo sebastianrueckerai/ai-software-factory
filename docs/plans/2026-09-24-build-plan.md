@@ -33,7 +33,7 @@ The five failure modes most likely to bite, each with the task that covers it:
 
 ## The stage cut
 
-Each stage ends with an exit test. A stage starts only after the previous one passed. Stages 0 and 1 are fully tasked below. The plan for each later stage is written when the previous stage passes its gate, because later stages depend on what the earlier ones teach.
+Each stage ends with an exit test. A stage starts only after the previous one passed. Stages 0 to 2 are fully tasked below. The plan for each later stage is written when the previous stage passes its gate, because later stages depend on what the earlier ones teach.
 
 | Stage | Builds | Exit test |
 |---|---|---|
@@ -1168,17 +1168,1531 @@ Sebastian's instruction (2026-09-24): run Stage 1 as a test and leave nothing bi
 
 ---
 
-## Stages 2 to 9: outlines
+## Stage 2: Ranch
 
-The detailed task plan for each stage below is written when the previous stage passes its gate, with the same bite-sized format as Stages 0 and 1. Each outline names the goal, the steps in order, and the exit test that closes the stage.
+Goal: the platform services run on the persistent cluster, deployed by Flux from Forgejo, with TLS.
 
-### Stage 2: Ranch
+The cluster PERSISTS through this stage (ruling 38): about 0.29 EUR per hour, about 7 EUR per day, the 20 EUR cost alert from ruling 37 stands. Hetzner Object Storage adds 6.49 EUR per month from the first bucket (Task 12), storage and traffic included up to 1 TB each. Stage 3 is the destroy and rebuild drill, nothing here is torn down.
 
-Goal: the platform services run, deployed by Flux from Forgejo, with TLS.
+Research basis: `.superpowers/sdd/2026-09-24-build-plan/research-g2-{edge,storage,git,platform}.md`, web verified 2026-09-25. No Forgejo dump exists to restore, so the restore path stays a Stage 3 concern.
 
-Steps: hand-apply the bootstrap slice (CNPG plus Forgejo) from the seed machine, restore Forgejo repositories from the S3 dump if any exist, push `ai-software-factory-infra` and `ai-software-factory-code` to Forgejo and make it the primary remote with GitHub as backup, bootstrap Flux against Forgejo, deploy cert-manager and the Gateway with HTTP-01 solvers plus the Namecheap A records by hand, then roll out Temporal, OpenBao (init, unseal, first snapshot), LiteLLM with the three chat provider keys from the seed, SigNoz, and the Forgejo Actions Kubernetes runner. Make the S3 buckets and the nightly Forgejo dump job. Add seed-bundle slots for the credentials created before OpenBao is initialised (Forgejo admin password and token, LiteLLM master key, CNPG passwords).
+Sebastian's queued steps. Each blocks the named task, not the plan:
 
-Exit test: `https://git.aisoftwarefactory.world` serves a valid Let's Encrypt certificate, the factory repo's CI workflow runs green on the pod runner, a LiteLLM smoke call through a test virtual key answers with a DeepSeek completion.
+1. S3 access keys from the Hetzner Console (Object Storage, then S3 Credentials; the secret shows once and cannot be fetched again). Record in the seed bundle, append `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY` to `.env.tools`. Blocks Task 12.
+2. Namecheap A records for `git.aisoftwarefactory.world` to the three node public IPv4 addresses from Task 10, TTL 300 or lower. Blocks the certificate in Task 13.
+3. DeepSeek API key, appended to `.env.tools` as `DEEPSEEK_API_KEY`. Blocks the Task 19 smoke call.
+
+Names used throughout, fixed here so tasks stay consistent: namespaces `platform` (CNPG, cert-manager, Temporal, OpenBao, LiteLLM, SigNoz), `forgejo` (Forgejo and its runner), `local-path-storage`, `cnpg-system`. CNPG Cluster `sf-cluster` in `platform`, services `sf-cluster-rw`, `sf-cluster-ro`, `sf-cluster-r`. Forgejo organisation `sf` holding both repositories. Buckets `aisoftwarefactory-forgejo` (Forgejo object data) and `aisoftwarefactory-backups` (prefixes `cnpg/`, `forgejo-dumps/`, `openbao/`). S3 endpoint `https://fsn1.your-objectstorage.com`, region string `fsn1`.
+
+Cilium, Talos and the tofu substrate stay OUTSIDE Flux, hand-managed from the seed machine: Cilium must run before any Flux pod schedules, so it cannot be a Flux payload. Its full install command lives in Task 10 and in the infra README. Everything above that line (operators, charts, manifests) is Flux-managed from Task 15 on.
+
+Shell blocks in this stage run from the infra repo root, `~/repos/ai-software-factory-infra`; the `infra/` prefix in Files blocks is the plan-wide shorthand for that repo.
+
+Stage 2 review focus, the failure modes most likely to bite:
+
+1. A secret value lands in Git through a values file or a manifest. Every task below checks `git status --porcelain` before its commit, secrets are created imperatively with kubectl, and the Files blocks name only secret-free paths.
+2. The first certificate never issues because DNS or the port 80 listener is missing when the Certificate is applied. Task 13 applies the Gateway and routes before the Certificate and gates on Sebastian's A records, the port 80 listener works from the start and the solver route's exact path match beats the redirect rule.
+3. A password with `$`, `/` or `@` breaks the LiteLLM database URL, which the chart composes from secret parts. All generated database passwords are `openssl rand -hex 24`, URL-safe by construction.
+4. The runner pod is rejected because PodSecurity baseline forbids the privileged dind container. Task 16 labels namespace `forgejo` enforce=privileged before the install.
+5. Flux adoption reverts hand-applied state instead of adopting it. Task 15 commits the same manifests that were hand-applied, HelmReleases match release name and namespace exactly, and the verification step greps the Flux events for field reverts.
+
+### Task 10: Cluster bring-up, kube-proxy-free
+
+**Files:** Modify: `infra/talos/patches.yaml` (two new documents), `infra/talos/README.md`. Controller-run: machine and money ops, not subagent work. The three cpx42 cost about 0.29 EUR per hour, tell Sebastian when they are created.
+
+**Interfaces:**
+- Consumes: the substrate from Task 6, the Stage 1 `secrets.yaml` (reused as-is, same cluster identity, the existing talosconfig stays valid), the twice-validated Stage 1 bring-up procedure.
+- Produces: a kube-proxy-free cluster with Gateway API ready and a 200 GB user volume per node mounted at `/var/mnt/local-path-provisioner`. Node public IPv4 addresses for the DNS step.
+
+Why the change: Cilium 1.20 hard-disables the Gateway API controller when `kubeProxyReplacement=false` (operator source `operator/pkg/gateway-api/cell.go` at v1.20.0). A fresh cluster installs kube-proxy-free from the start, so no live migration and no wedged Envoy listeners. KubePrism serves the Kubernetes API on `localhost:7445` on every node by default, that is the service host Cilium points at. Envoy binds 80 and 443 on the host network, which needs NET_BIND_SERVICE.
+
+The UserVolumeConfig goes into the committed patch set before the nodes install, because user volumes are carved at install time from the matched disk's free space. The cpx42 has one 320 GB virtio disk, so the selector matches by size exactly like the install document. `disk.transport == 'nvme'` matches nothing (virtio disk) and `!system_disk` excludes the only disk there is.
+
+- [ ] **Step 1: Commit the two machine-config documents**
+
+Append to `talos/patches.yaml`:
+
+```yaml
+---
+apiVersion: v1alpha1
+kind: KubeProxyConfig
+enabled: false
+---
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: local-path-provisioner
+provisioning:
+  diskSelector:
+    match: disk.size > 100000000000u
+  minSize: 200GB
+  maxSize: 200GB
+```
+
+Add one paragraph to `talos/README.md`: kube-proxy is disabled at generation time so Cilium runs kube-proxy-free (`KubeProxyConfig` document), and each node carves a 200 GB user volume at install time (`UserVolumeConfig` document, auto-mounted at `/var/mnt/local-path-provisioner`, Task 11 consumes it).
+
+Commit: `Kube-proxy off and a 200 GB user volume per node`.
+
+- [ ] **Step 2: Build the Talos snapshot**
+
+Task 8 Step 1 verbatim: throwaway cx23, rescue boot, dd the factory image `376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba/v1.14.1/hcloud-amd64.raw.xz`, snapshot with labels `os=talos,version=1.14.1,arch=amd64`, delete the throwaway pieces. The Stage 1 snapshots were deleted at teardown, this builds a new one.
+
+- [ ] **Step 3: Reserve the primary IPs**
+
+```bash
+cd ~/repos/ai-software-factory-infra
+tofu apply -target=hcloud_primary_ip.node
+tofu output -raw api_endpoint_ip
+```
+
+Record the endpoint IP, the regeneration command in the README reads it.
+
+- [ ] **Step 4: Regenerate, strip, validate**
+
+Run the regeneration block from `talos/README.md` (gen config with `--with-secrets secrets.yaml --config-patch-control-plane @patches.yaml`, per-node `node-<N>.yaml` patches, then the python strip of the KubeFlannelCNIConfig document and the taints block, then `talosctl validate --mode cloud` for all three).
+
+- [ ] **Step 5: Create the servers**
+
+```bash
+tofu apply
+```
+
+Expected: 9 resources applied, three servers from the snapshot, `tofu output node_public_ips` and `node_private_ips` print the addresses. Tell Sebastian the meter is running the moment this succeeds.
+
+- [ ] **Step 6: Bootstrap and kubeconfig**
+
+Per Task 8 Steps 3 to 6: wait for the Talos API on each node, `talosctl bootstrap` on node 0, `curl -k https://<node0>:6443/readyz` answers 200, `talosctl kubeconfig`, `chmod 600 ~/.kube/config`.
+
+- [ ] **Step 7: Install Cilium kube-proxy-free**
+
+```bash
+cilium install --version 1.20.0 \
+  --set ipam.mode=kubernetes \
+  --set kubeProxyReplacement=true \
+  --set k8sServiceHost=localhost \
+  --set k8sServicePort=7445 \
+  --set 'securityContext.capabilities.ciliumAgent={CHOWN,KILL,NET_ADMIN,NET_RAW,IPC_LOCK,SYS_ADMIN,SYS_RESOURCE,DAC_OVERRIDE,FOWNER,SETGID,SETUID}' \
+  --set 'securityContext.capabilities.cleanCiliumState={NET_ADMIN,SYS_ADMIN,SYS_RESOURCE}' \
+  --set cgroup.autoMount.enabled=false \
+  --set cgroup.hostRoot=/sys/fs/cgroup \
+  --set encryption.enabled=true \
+  --set encryption.type=wireguard \
+  --set gatewayAPI.enabled=true \
+  --set gatewayAPI.hostNetwork.enabled=true \
+  --set envoy.securityContext.capabilities.keepCapNetBindService=true \
+  --set 'envoy.securityContext.capabilities.envoy={NET_ADMIN,SYS_ADMIN,NET_BIND_SERVICE}'
+cilium status --wait
+```
+
+Expected: cilium 3/3, cilium-envoy 3/3, operator 1/1. Then verify the two properties this task exists for:
+
+```bash
+kubectl -n kube-system get ds | grep -c kube-proxy || echo "no kube-proxy"
+kubectl get gatewayclass
+```
+
+Expected: no kube-proxy DaemonSet exists, and a GatewayClass named `cilium` is present (the chart auto-creates it).
+
+- [ ] **Step 8: Connectivity suite**
+
+Pre-create the labelled namespaces as in Stage 1 (empty `cilium-test-*` namespaces with `pod-security.kubernetes.io/enforce=privileged`, no `--force-deploy`), run `cilium connectivity test`. Expected: all tests pass, wireguard active on UDP 51871.
+
+- [ ] **Step 9: Gate and handoff**
+
+```bash
+kubectl get nodes
+curl -k -m 5 https://<node0-ip>:6443
+```
+
+Expected: 3 nodes Ready control-plane, API reachable from home. Print the three public IPv4 addresses and queue Sebastian's A-record step against them.
+
+### Task 11: Local-path provisioner
+
+**Files:** Create: `infra/k8s/platform/local-path/kustomization.yaml`.
+
+**Interfaces:**
+- Consumes: the user volume at `/var/mnt/local-path-provisioner` from Task 10.
+- Produces: StorageClass `local-path` as cluster default. Every later PVC (CNPG, Forgejo, OpenBao, ClickHouse) names it or falls through to it.
+
+- [ ] **Step 1: Write the kustomization**
+
+`infra/k8s/platform/local-path/kustomization.yaml`, pinned to the version the Talos guide uses:
+
+```yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- github.com/rancher/local-path-provisioner/deploy?ref=v0.0.31
+patches:
+- patch: |-
+    kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: local-path-config
+      namespace: local-path-storage
+    data:
+      config.json: |-
+        {
+                "nodePathMap":[
+                {
+                        "node":"DEFAULT_PATH_FOR_NON_LISTED_NODES",
+                        "paths":["/var/mnt/local-path-provisioner"]
+                }
+                ]
+        }
+- patch: |-
+    apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    metadata:
+      name: local-path
+      annotations:
+        storageclass.kubernetes.io/is-default-class: "true"
+- patch: |-
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: local-path-storage
+      labels:
+        pod-security.kubernetes.io/enforce: privileged
+```
+
+The privileged label on the namespace is required: the helper pods are privileged and Talos namespaces default to baseline enforcement.
+
+- [ ] **Step 2: Apply and commit**
+
+```bash
+kubectl apply -k k8s/platform/local-path
+kubectl -n local-path-storage rollout status deploy/local-path-provisioner
+git status --porcelain
+git add k8s/platform/local-path/kustomization.yaml
+git commit -m "local-path provisioner on the Talos user volumes"
+```
+
+Expected: deployment ready. Check the StorageClass: `kubectl get sc` shows `local-path (default)`.
+
+- [ ] **Step 3: Prove a volume binds**
+
+```bash
+kubectl apply -f - <<'EOF'
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: {name: lp-test, namespace: default}
+spec: {accessModes: [ReadWriteOnce], resources: {requests: {storage: 1Gi}}}
+EOF
+kubectl -n default wait --for=jsonpath='{.status.phase}'=Bound pvc/lp-test --timeout=120s
+kubectl -n default delete pvc lp-test
+```
+
+Expected: Bound within the timeout (local-path binds at pod attach, `kubectl wait` on phase may need a writer pod first: if it stays Pending, attach a one-off pod mounting the claim, confirm Running, then delete both).
+
+### Task 12: Object Storage and CloudNativePG
+
+**Files:** Create: `infra/k8s/platform/cnpg/operator.yaml` (vendored), `infra/k8s/platform/cnpg/cluster.yaml`, `infra/k8s/platform/cnpg/databases.yaml`, `infra/k8s/platform/cnpg/backup.yaml`. Modify: `infra/docs/seed-bundle.md` (slots). Money: the first bucket starts the 6.49 EUR per month Object Storage base price.
+
+**Interfaces:**
+- Consumes: Sebastian's S3 access keys, StorageClass `local-path`.
+- Produces: Cluster `sf-cluster` (3 instances, service `sf-cluster-rw.platform.svc.cluster.local:5432`), roles `forgejo`, `litellm`, `temporal` with passwords in secrets `pg-forgejo`, `pg-litellm`, `pg-temporal` (namespace `platform`), databases `forgejo`, `litellm`, `temporal`, `temporal_visibility`, nightly base backups plus WAL to `s3://aisoftwarefactory-backups/cnpg/sf-cluster`.
+
+- [ ] **Step 1: Install the AWS CLI v2**
+
+```bash
+command -v aws >/dev/null || {
+  curl -sLo /tmp/awscliv2.zip https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+  unzip -q /tmp/awscliv2.zip -d /tmp/awscli
+  /tmp/awscli/aws/install -i ~/.local/aws-cli -b ~/.local/bin
+  rm -rf /tmp/awscliv2.zip /tmp/awscli
+}
+```
+
+No sudo on the seed machine, the user-local install path avoids it. `aws --version` answers 2.x.
+
+- [ ] **Step 2: Sebastian's keys, then buckets**
+
+BLOCKED until the S3 keys are in `.env.tools`. Configure once:
+
+```bash
+set -a; source ~/repos/ai-software-factory/.env.tools; set +a
+mkdir -p ~/.aws
+cat > ~/.aws/config <<'EOF'
+[default]
+region = fsn1
+s3 =
+  endpoint_url = https://fsn1.your-objectstorage.com
+EOF
+cat > ~/.aws/credentials <<EOF
+[default]
+aws_access_key_id = $S3_ACCESS_KEY_ID
+aws_secret_access_key = $S3_SECRET_ACCESS_KEY
+EOF
+chmod 600 ~/.aws/credentials
+aws s3 ls
+```
+
+Expected: an empty listing, no error (SigV4 against fsn1 works). Then create both buckets and the dump expiry:
+
+```bash
+aws s3 mb s3://aisoftwarefactory-forgejo --region fsn1
+aws s3 mb s3://aisoftwarefactory-backups --region fsn1
+cat > /tmp/lifecycle.json <<'EOF'
+{"Rules":[{"ID":"expire-forgejo-dumps","Filter":{"Prefix":"forgejo-dumps/"},"Status":"Enabled","Expiration":{"Days":14}}]}
+EOF
+aws s3api put-bucket-lifecycle-configuration \
+  --bucket aisoftwarefactory-backups --lifecycle-configuration file:///tmp/lifecycle.json
+```
+
+Bucket names are immutable and globally unique across Hetzner customers. If a name is taken, stop and pick a new one with Sebastian, then use it consistently from here on.
+
+- [ ] **Step 3: Install the CNPG operator (hand-applied, adopted by Flux in Task 15)**
+
+```bash
+mkdir -p k8s/platform/cnpg
+curl -sLo k8s/platform/cnpg/operator.yaml \
+  https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.30/releases/cnpg-1.30.1.yaml
+kubectl apply --server-side -f k8s/platform/cnpg/operator.yaml
+kubectl -n cnpg-system rollout status deploy/cnpg-controller-manager --timeout=300s
+```
+
+Expected: deployment ready. `--server-side` is required, the CRDs are too large for client-side apply.
+
+- [ ] **Step 4: Create the secrets (imperative, never in Git)**
+
+All passwords `openssl rand -hex 24`, URL-safe. Namespace `platform` holds the CNPG-facing secrets:
+
+```bash
+set -a; source ~/repos/ai-software-factory/.env.tools; set +a
+kubectl create namespace platform
+SUPER=$(openssl rand -hex 24); APP=$(openssl rand -hex 24)
+FORGEJO=$(openssl rand -hex 24); LITELLM=$(openssl rand -hex 24); TEMPORAL=$(openssl rand -hex 24)
+kubectl -n platform create secret generic sf-cluster-superuser --type=kubernetes.io/basic-auth \
+  --from-literal=username=postgres --from-literal=password=$SUPER
+kubectl -n platform create secret generic app-secret --type=kubernetes.io/basic-auth \
+  --from-literal=username=app --from-literal=password=$APP
+kubectl -n platform create secret generic pg-forgejo --type=kubernetes.io/basic-auth \
+  --from-literal=username=forgejo --from-literal=password=$FORGEJO
+kubectl -n platform label secret pg-forgejo cnpg.io/reload=true
+kubectl -n platform create secret generic pg-litellm --type=kubernetes.io/basic-auth \
+  --from-literal=username=litellm --from-literal=password=$LITELLM
+kubectl -n platform label secret pg-litellm cnpg.io/reload=true
+kubectl -n platform create secret generic pg-temporal --type=kubernetes.io/basic-auth \
+  --from-literal=username=temporal --from-literal=password=$TEMPORAL
+kubectl -n platform label secret pg-temporal cnpg.io/reload=true
+kubectl -n platform create secret generic cnpg-s3-creds \
+  --from-literal=ACCESS_KEY_ID=$S3_ACCESS_KEY_ID --from-literal=ACCESS_SECRET_KEY=$S3_SECRET_ACCESS_KEY
+```
+
+Print all five passwords for the seed bundle (Sebastian records them), tick the S3 slot.
+
+- [ ] **Step 5: Apply the Cluster**
+
+`infra/k8s/platform/cnpg/cluster.yaml`:
+
+```yaml
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: sf-cluster
+  namespace: platform
+spec:
+  instances: 3
+  superuserSecret:
+    name: sf-cluster-superuser
+  enableSuperuserAccess: true
+  storage:
+    storageClass: local-path
+    size: 20Gi
+  affinity:
+    enablePodAntiAffinity: true
+    topologyKey: kubernetes.io/hostname
+    podAntiAffinityType: required
+  bootstrap:
+    initdb:
+      database: app
+      owner: app
+      secret:
+        name: app-secret
+  managed:
+    roles:
+      - name: forgejo
+        ensure: present
+        login: true
+        superuser: false
+        passwordSecret:
+          name: pg-forgejo
+      - name: litellm
+        ensure: present
+        login: true
+        superuser: false
+        passwordSecret:
+          name: pg-litellm
+      - name: temporal
+        ensure: present
+        login: true
+        superuser: false
+        passwordSecret:
+          name: pg-temporal
+  backup:
+    barmanObjectStore:
+      destinationPath: s3://aisoftwarefactory-backups/cnpg/sf-cluster
+      endpointURL: https://fsn1.your-objectstorage.com
+      s3Credentials:
+        accessKeyId:
+          name: cnpg-s3-creds
+          key: ACCESS_KEY_ID
+        secretAccessKey:
+          name: cnpg-s3-creds
+          key: ACCESS_SECRET_KEY
+      wal:
+        compression: gzip
+        maxParallel: 4
+      retentionPolicy: 30d
+```
+
+```bash
+kubectl apply -f k8s/platform/cnpg/cluster.yaml
+kubectl -n platform wait --for=condition=Ready cluster/sf-cluster --timeout=900s
+```
+
+Expected: three instances ready, one per node (hard anti-affinity). The native barmanObjectStore method is deprecated since v1.26 but remains the default and fully functional in v1.30, one moving part less than the plugin. If barman logs show `x-amz-content-sha256` errors against Hetzner, add `spec.env` `AWS_REQUEST_CHECKSUM_CALCULATION=when_required` and `AWS_RESPONSE_CHECKSUM_VALIDATION=when_required` to the Cluster and re-apply.
+
+- [ ] **Step 6: Databases and the backup schedule**
+
+`infra/k8s/platform/cnpg/databases.yaml`:
+
+```yaml
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata: {name: forgejo-db, namespace: platform}
+spec: {name: forgejo, owner: forgejo, cluster: {name: sf-cluster}}
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata: {name: litellm-db, namespace: platform}
+spec: {name: litellm, owner: litellm, cluster: {name: sf-cluster}}
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata: {name: temporal-db, namespace: platform}
+spec: {name: temporal, owner: temporal, cluster: {name: sf-cluster}}
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata: {name: temporal-visibility-db, namespace: platform}
+spec: {name: temporal_visibility, owner: temporal, cluster: {name: sf-cluster}}
+```
+
+`infra/k8s/platform/cnpg/backup.yaml` (six-field cron with seconds, daily 02:00 UTC):
+
+```yaml
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata: {name: sf-cluster-daily, namespace: platform}
+spec:
+  schedule: "0 0 2 * * *"
+  backupOwnerReference: self
+  immediate: true
+  cluster:
+    name: sf-cluster
+```
+
+```bash
+kubectl apply -f k8s/platform/cnpg/databases.yaml k8s/platform/cnpg/backup.yaml
+```
+
+Expected: each Database reports `status.applied: true` within a minute, and the immediate backup reaches `phase: completed`:
+
+```bash
+kubectl -n platform get databases.postgresql.cnpg.io
+kubectl -n platform get backups.postgresql.cnpg.io
+```
+
+- [ ] **Step 7: Seed-bundle slots and commit**
+
+Add unchecked slots to `infra/docs/seed-bundle.md`: `CNPG passwords (superuser, app, forgejo, litellm, temporal)`, and tick the S3 keys slot. Commit the manifests and the checklist, never a secret:
+
+```bash
+git status --porcelain
+git add k8s/platform/cnpg docs/seed-bundle.md
+git commit -m "CNPG cluster, service databases, S3 backups"
+```
+
+### Task 13: TLS edge
+
+**Files:** Create: `infra/k8s/platform/gateway-api/crds.yaml` (vendored), `infra/k8s/platform/gateway-api/edge.yaml`.
+
+**Interfaces:**
+- Consumes: the Cilium Gateway API support from Task 10, the `web-from-world` firewall rule (80 and 443 from anywhere, in the committed patch set since Stage 1).
+- Produces: `https://git.aisoftwarefactory.world` with a Let's Encrypt certificate, secret `git-aisoftwarefactory-world-tls` in namespace `forgejo`, Gateway `edge-gateway` with an HTTP to HTTPS redirect. The exit route for every later HTTPS need.
+
+- [ ] **Step 1: Gateway API CRDs first**
+
+```bash
+mkdir -p k8s/platform/gateway-api
+curl -sLo k8s/platform/gateway-api/crds.yaml \
+  https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.1/standard-install.yaml
+kubectl apply --server-side -f k8s/platform/gateway-api/crds.yaml
+```
+
+CRDs before cert-manager starts: cert-manager checks for them at startup and disables the Gateway API support otherwise.
+
+- [ ] **Step 2: Install helm (if missing) and cert-manager**
+
+```bash
+command -v helm >/dev/null || {
+  curl -sLo /tmp/helm.tgz https://get.helm.sh/helm-v3.18.4-linux-amd64.tar.gz
+  tar xzf /tmp/helm.tgz -C ~/.local/bin --strip-components=1 linux-amd64/helm
+  rm /tmp/helm.tgz
+}
+helm repo add jetstack https://charts.jetstack.io
+helm install cert-manager jetstack/cert-manager --version v1.21.2 \
+  --namespace platform --create-namespace \
+  --set crds.enabled=true --set config.gatewayAPI.enabled=true
+kubectl -n platform wait --for=condition=Available deploy --all --timeout=300s
+```
+
+Namespace `platform` per the architecture's namespace layout. `config.gatewayAPI.enabled=true` switches on the Gateway HTTP-01 solver, off by default. The two `--set` flags are exactly the values the Task 15 HelmRelease repeats for adoption.
+
+- [ ] **Step 3: Gateway, routes, issuer, certificate**
+
+```bash
+kubectl create namespace forgejo
+```
+
+Then `infra/k8s/platform/gateway-api/edge.yaml`:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: edge-gateway
+  namespace: forgejo
+spec:
+  gatewayClassName: cilium
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: git.aisoftwarefactory.world
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: git-aisoftwarefactory-world-tls
+      allowedRoutes:
+        namespaces:
+          from: Same
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: git-redirect
+  namespace: forgejo
+spec:
+  parentRefs:
+    - name: edge-gateway
+      sectionName: http
+  hostnames: [git.aisoftwarefactory.world]
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect: {scheme: https, port: 443, statusCode: 301}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: git-app
+  namespace: forgejo
+spec:
+  parentRefs:
+    - name: edge-gateway
+      sectionName: https
+  hostnames: [git.aisoftwarefactory.world]
+  rules:
+    - backendRefs:
+        - name: forgejo-http
+          port: 3000
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-production
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-production-account-key
+    solvers:
+      - http01:
+          gatewayHTTPRoute:
+            parentRefs:
+              - name: edge-gateway
+                namespace: forgejo
+                kind: Gateway
+            serviceType: ClusterIP
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: git-aisoftwarefactory-world
+  namespace: forgejo
+spec:
+  secretName: git-aisoftwarefactory-world-tls
+  dnsNames: [git.aisoftwarefactory.world]
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+```
+
+The https listener stays not-ready until the certificate exists, that ordering is normal on first issue. cert-manager creates its own solver HTTPRoute named `cm-acme-http-solver-*` in namespace `forgejo`, its exact path match takes precedence over the redirect rule per the Gateway API v1.6.1 spec.
+
+- [ ] **Step 4: DNS and issuance**
+
+BLOCKED on Sebastian's A records. After they exist:
+
+```bash
+kubectl apply -f k8s/platform/gateway-api/edge.yaml
+kubectl -n forgejo wait --for=condition=Ready certificate/git-aisoftwarefactory-world --timeout=600s
+```
+
+Expected: certificate Ready. If issuance retries before DNS lands, that is expected, it succeeds on the next attempt once the records resolve.
+
+- [ ] **Step 5: Verify the edge**
+
+```bash
+curl -sI http://git.aisoftwarefactory.world | head -1
+curl -sI https://git.aisoftwarefactory.world | head -1
+```
+
+Expected: 301 on port 80, and on 443 a served response (503 from Envoy is correct at this point, the backend Service does not exist until Task 14) with a valid certificate chain:
+
+```bash
+curl -s https://git.aisoftwarefactory.world -o /dev/null -w '%{ssl_verify_result}\n'
+```
+
+Expected: 0. Listener ports are fixed after this point: editing a listener port wedges Envoy on Cilium 1.20.0 (issue 48132), change means delete and recreate the Gateway.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git status --porcelain
+git add k8s/platform/gateway-api
+git commit -m "Gateway API edge with Let's Encrypt HTTP-01"
+```
+
+### Task 14: Forgejo
+
+**Files:** Create: `infra/k8s/platform/forgejo/values.yaml`.
+
+**Interfaces:**
+- Consumes: `sf-cluster-rw.platform.svc.cluster.local:5432`, database `forgejo`, role `forgejo`, password secret `pg-forgejo` (namespace `platform`). Bucket `aisoftwarefactory-forgejo`. The TLS edge from Task 13.
+- Produces: Forgejo 15.0.9 LTS at `https://git.aisoftwarefactory.world`, admin secret `forgejo-admin-secret`, S3 creds `hetzner-s3-creds` (namespace `forgejo`, keys `access-key`, `secret-key`), helm release `forgejo` in namespace `forgejo` (adopted by Flux in Task 15, same name and namespace).
+
+- [ ] **Step 1: Create the secrets**
+
+```bash
+ADMIN_PW=$(openssl rand -hex 16)
+set -a; source ~/repos/ai-software-factory/.env.tools; set +a
+FORGEJO_DB_PW=$(kubectl -n platform get secret pg-forgejo -o jsonpath='{.data.password}' | base64 -d)
+kubectl -n forgejo create secret generic forgejo-admin-secret \
+  --from-literal=username=sebastian --from-literal=password=$ADMIN_PW
+kubectl -n forgejo create secret generic forgejo-db-creds --from-literal=password=$FORGEJO_DB_PW
+kubectl -n forgejo create secret generic hetzner-s3-creds \
+  --from-literal=access-key=$S3_ACCESS_KEY_ID --from-literal=secret-key=$S3_SECRET_ACCESS_KEY
+echo "forgejo admin password: $ADMIN_PW"
+```
+
+`forgejo-db-creds` is the namespace-local copy of `pg-forgejo`'s password (Kubernetes secrets do not cross namespaces). Print the admin password for the seed bundle. Keys are exactly `username` and `password` for the admin secret, the chart's templates read those names.
+
+- [ ] **Step 2: Write the values and install**
+
+`infra/k8s/platform/forgejo/values.yaml`:
+
+```yaml
+replicaCount: 1
+persistence:
+  enabled: true
+  size: 10Gi
+  storageClass: local-path
+service:
+  http:
+    type: ClusterIP
+    port: 3000
+gitea:
+  admin:
+    existingSecret: forgejo-admin-secret
+    email: admin@aisoftwarefactory.world
+    passwordMode: keepUpdated
+  config:
+    server:
+      ROOT_URL: https://git.aisoftwarefactory.world/
+      DOMAIN: git.aisoftwarefactory.world
+      SSH_DOMAIN: git.aisoftwarefactory.world
+    database:
+      DB_TYPE: postgres
+      HOST: sf-cluster-rw.platform.svc.cluster.local:5432
+      NAME: forgejo
+      USER: forgejo
+    storage:
+      STORAGE_TYPE: minio
+      MINIO_ENDPOINT: fsn1.your-objectstorage.com
+      MINIO_USE_SSL: true
+      MINIO_BUCKET: aisoftwarefactory-forgejo
+      MINIO_LOCATION: fsn1
+      MINIO_BUCKET_LOOKUP: auto
+    actions:
+      ENABLED: true
+      DEFAULT_ACTIONS_URL: https://data.forgejo.org
+  additionalConfigFromEnvs:
+    - name: FORGEJO__database__PASSWD
+      valueFrom:
+        secretKeyRef: {name: forgejo-db-creds, key: password}
+    - name: FORGEJO__storage__MINIO_ACCESS_KEY_ID
+      valueFrom:
+        secretKeyRef: {name: hetzner-s3-creds, key: access-key}
+    - name: FORGEJO__storage__MINIO_SECRET_ACCESS_KEY
+      valueFrom:
+        secretKeyRef: {name: hetzner-s3-creds, key: secret-key}
+```
+
+`MINIO_USE_SSL: true` matters, the default is false and the traffic would leak plaintext credentials to a public endpoint. `ROOT_URL` makes clone URLs and Actions callbacks point at the real domain. The chart ships no database subchart in v17, external Postgres is the only path, and no ingress is configured, the Gateway routes to the ClusterIP Service on 3000.
+
+```bash
+helm install forgejo oci://code.forgejo.org/forgejo-helm/forgejo \
+  --version 17.1.7 -n forgejo -f k8s/platform/forgejo/values.yaml
+kubectl -n forgejo rollout status deploy/forgejo --timeout=600s
+```
+
+- [ ] **Step 3: Verify through the edge**
+
+```bash
+curl -s https://git.aisoftwarefactory.world/api/v1/version | head -1
+curl -s -u sebastian:$ADMIN_PW https://git.aisoftwarefactory.world/api/v1/user | jq -r .login
+```
+
+Expected: a version string, then `sebastian`. Admin login works over TLS, Actions and the S3 storage initialised at boot (check `kubectl -n forgejo logs deploy/forgejo | grep -i minio` returns no errors).
+
+- [ ] **Step 4: Seed-bundle slot and commit**
+
+Add the slot `Forgejo admin password` to `infra/docs/seed-bundle.md`, ticked. Commit:
+
+```bash
+git status --porcelain
+git add k8s/platform/forgejo/values.yaml docs/seed-bundle.md
+git commit -m "Forgejo on CNPG and S3 behind the gateway"
+```
+
+### Task 15: Git primary and Flux bootstrap
+
+**Files:** Create: `infra/k8s/platform/kustomization.yaml`, `infra/k8s/platform/namespaces.yaml`, `infra/clusters/sf/platform.yaml`, `infra/k8s/platform/cert-manager/helmrelease.yaml`, `infra/k8s/platform/forgejo/helmrelease.yaml`, `infra/k8s/platform/sources.yaml`. Modify: `infra/README.md` (Flux layout, the Cilium-outside-Flux ruling, the push ritual).
+
+**Interfaces:**
+- Consumes: Forgejo from Task 14 with admin credentials, the hand-applied slice (Tasks 11 to 14).
+- Produces: Flux v2.9.5 bootstrapped against `https://git.aisoftwarefactory.world/sf/ai-software-factory-infra`, sync path `clusters/sf`. Forgejo is the primary remote (`origin`) for both factory repos, GitHub stays as `github`. From this task on, platform changes ship as commits to `k8s/platform` and Flux applies them.
+
+- [ ] **Step 1: Organisation, repositories, PAT**
+
+```bash
+ADMIN_PW=<admin password from Task 14>
+AUTH="sebastian:$ADMIN_PW"
+curl -s -u "$AUTH" -X POST https://git.aisoftwarefactory.world/api/v1/orgs \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"sf","visibility":"private"}'
+for r in ai-software-factory-infra ai-software-factory-code; do
+  curl -s -u "$AUTH" -X POST https://git.aisoftwarefactory.world/api/v1/orgs/sf/repos \
+    -H 'Content-Type: application/json' \
+    -d "{\"name\":\"$r\",\"private\":true,\"default_branch\":\"main\"}"
+done
+FLUX_PAT=$(curl -s -u "$AUTH" -X POST https://git.aisoftwarefactory.world/api/v1/users/sebastian/tokens \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"flux-bootstrap","scopes":["read:misc","write:repository"]}' | jq -r .sha1)
+echo "Forgejo PAT: $FLUX_PAT"
+```
+
+The token prints once for the seed bundle (slot `Forgejo PAT for Flux`), it is not retrievable again. The org is named `sf` to keep clone URLs short.
+
+- [ ] **Step 2: Remotes and credential store**
+
+In BOTH `~/repos/ai-software-factory-infra` and `~/repos/ai-software-factory-code`:
+
+```bash
+git remote rename origin github
+git remote add origin https://git.aisoftwarefactory.world/sf/$(basename $PWD).git
+git config --global credential.helper store
+echo "https://sebastian:$FLUX_PAT@git.aisoftwarefactory.world" >> ~/.git-credentials
+chmod 600 ~/.git-credentials
+git push origin main
+```
+
+The docs repository (`ai-software-factory`) stays on GitHub only, it is not a factory payload.
+
+- [ ] **Step 3: Bootstrap Flux**
+
+```bash
+command -v flux >/dev/null || {
+  U=$(curl -s https://api.github.com/repos/fluxcd/flux2/releases/latest \
+    | jq -r '.assets[] | select(.name=="flux_2.9.5_linux_amd64.tar.gz").browser_download_url')
+  curl -sL "$U" | tar xz -C ~/.local/bin flux
+}
+export GITEA_TOKEN=$FLUX_PAT
+flux bootstrap gitea --token-auth \
+  --hostname=git.aisoftwarefactory.world \
+  --owner=sf --repository=ai-software-factory-infra \
+  --branch=main --path=clusters/sf
+```
+
+The bootstrap targets the infra repo itself, not a separate fleet repo: architecture 11 makes the infra repository the human-owned source of truth, and one repository fewer to re-seed. Let's Encrypt is a public CA, no `--ca-file` needed. Bootstrap commits `gotk-components.yaml`, `gotk-sync.yaml` and `kustomization.yaml` to `clusters/sf` on the remote.
+
+- [ ] **Step 4: Pull the bootstrap commit and wire the platform tree**
+
+```bash
+cd ~/repos/ai-software-factory-infra
+git pull --rebase origin main
+```
+
+`infra/clusters/sf/platform.yaml` (the Flux Kustomization that owns the platform tree):
+
+```yaml
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata: {name: platform, namespace: flux-system}
+spec:
+  interval: 10m
+  path: ./k8s/platform
+  prune: true
+  sourceRef: {kind: GitRepository, name: flux-system}
+```
+
+`infra/k8s/platform/sources.yaml` (chart sources, all in namespace `flux-system`):
+
+```yaml
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata: {name: jetstack, namespace: flux-system}
+spec: {interval: 10m, url: https://charts.jetstack.io}
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata: {name: forgejo, namespace: flux-system}
+spec:
+  interval: 10m
+  url: oci://code.forgejo.org/forgejo-helm/forgejo
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    semver: ">=17.1.7 <17.2.0"
+```
+
+`infra/k8s/platform/cert-manager/helmrelease.yaml` (adopts the Task 13 release, identical values, matching release name and namespace):
+
+```yaml
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata: {name: cert-manager, namespace: platform}
+spec:
+  interval: 10m
+  releaseName: cert-manager
+  targetNamespace: platform
+  chart:
+    spec:
+      chart: cert-manager
+      version: v1.21.2
+      sourceRef: {kind: HelmRepository, name: jetstack, namespace: flux-system}
+  values:
+    crds: {enabled: true}
+    config: {gatewayAPI: {enabled: true}}
+```
+
+`infra/k8s/platform/forgejo/helmrelease.yaml` (adopts the Task 14 release the same way):
+
+```yaml
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata: {name: forgejo, namespace: forgejo}
+spec:
+  interval: 10m
+  releaseName: forgejo
+  targetNamespace: forgejo
+  chartRef:
+    kind: OCIRepository
+    name: forgejo
+    namespace: flux-system
+  values:
+    replicaCount: 1
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClass: local-path
+    service:
+      http:
+        type: ClusterIP
+        port: 3000
+    gitea:
+      admin:
+        existingSecret: forgejo-admin-secret
+        email: admin@aisoftwarefactory.world
+        passwordMode: keepUpdated
+      config:
+        server:
+          ROOT_URL: https://git.aisoftwarefactory.world/
+          DOMAIN: git.aisoftwarefactory.world
+          SSH_DOMAIN: git.aisoftwarefactory.world
+        database:
+          DB_TYPE: postgres
+          HOST: sf-cluster-rw.platform.svc.cluster.local:5432
+          NAME: forgejo
+          USER: forgejo
+        storage:
+          STORAGE_TYPE: minio
+          MINIO_ENDPOINT: fsn1.your-objectstorage.com
+          MINIO_USE_SSL: true
+          MINIO_BUCKET: aisoftwarefactory-forgejo
+          MINIO_LOCATION: fsn1
+          MINIO_BUCKET_LOOKUP: auto
+        actions:
+          ENABLED: true
+          DEFAULT_ACTIONS_URL: https://data.forgejo.org
+      additionalConfigFromEnvs:
+        - name: FORGEJO__database__PASSWD
+          valueFrom:
+            secretKeyRef: {name: forgejo-db-creds, key: password}
+        - name: FORGEJO__storage__MINIO_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef: {name: hetzner-s3-creds, key: access-key}
+        - name: FORGEJO__storage__MINIO_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef: {name: hetzner-s3-creds, key: secret-key}
+```
+
+`infra/k8s/platform/kustomization.yaml` (the tree root, in apply order):
+
+```yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- namespaces.yaml
+- sources.yaml
+- gateway-api/crds.yaml
+- gateway-api/edge.yaml
+- cert-manager/helmrelease.yaml
+- cnpg/operator.yaml
+- cnpg/cluster.yaml
+- cnpg/databases.yaml
+- cnpg/backup.yaml
+- local-path/kustomization.yaml
+- forgejo/helmrelease.yaml
+```
+
+With `infra/k8s/platform/namespaces.yaml` holding plain `Namespace` objects for `platform` and `forgejo` with no labels (labels for `forgejo` arrive with the runner in Task 16, which edits this file). The previously hand-applied manifests are already byte-identical in the tree, so Flux adopts them: prune is inventory-driven and only removes objects a Kustomization itself applied, and the HelmReleases find the existing helm release storage by name and upgrade in place with unchanged values.
+
+- [ ] **Step 5: Push, reconcile, verify adoption**
+
+```bash
+git status --porcelain
+git add clusters/sf k8s/platform README.md
+git commit -m "Flux owns the platform tree"
+git push origin main
+flux get kustomizations
+flux tree kustomization platform | head -40
+flux get helmreleases -A
+kubectl -n platform get cluster sf-cluster -o jsonpath='{.status.phase}'
+```
+
+Expected: kustomization `platform` Ready, `flux tree` lists the adopted objects, both HelmReleases Ready with no upgrade diff. Then check for silent drift correction:
+
+```bash
+kubectl -n forgejo get httproutes -o yaml | grep -c 'managed-by: kustomize-controller'
+```
+
+and read `kubectl -n flux-system events` for `FieldManager` conflicts. Expected: none, the committed manifests match what was applied by hand.
+
+- [ ] **Step 6: The push ritual from here on**
+
+Record in `infra/README.md`: after every task commit, `git push origin main && git push github main`. Forgejo is primary (Flux reads it), GitHub is the off-site backup.
+
+### Task 16: Actions runner and first green CI
+
+**Files:** Create: `infra/k8s/platform/forgejo/runner-chart/` (vendored chart 0.7.5), `infra/k8s/platform/forgejo/runner-helmrelease.yaml`. Modify: `infra/k8s/platform/namespaces.yaml` (privileged label on `forgejo`), `docs/architecture.md` sections 7 and 9 (this repository).
+
+**Interfaces:**
+- Consumes: Forgejo Actions enabled (Task 14), org `sf`, the code repo's existing `ci.yml` from Stage 0.
+- Produces: runner `sf-runner` online with label `ubuntu-latest:docker://catthehacker/ubuntu:act-22.04`, green CI on Forgejo. This is the first stage exit element.
+
+The runner has NO Kubernetes job backend: the label schemes in the runner source are `host`, `docker` and `lxc` only, and forgejo/act ships docker executors only. Jobs run as containers inside a privileged docker-in-docker sidecar of the runner pod. architecture.md's claim of a "native Kubernetes pod backend" is wrong and gets corrected in this task.
+
+- [ ] **Step 1: Vendor the chart**
+
+The chart is git-only (the OCI path 404s):
+
+```bash
+git clone --depth 1 https://code.forgejo.org/forgejo-helm/forgejo-runner /tmp/forgejo-runner
+helm show chart /tmp/forgejo-runner | grep -E '^(version|appVersion)'
+cp -r /tmp/forgejo-runner k8s/platform/forgejo/runner-chart
+rm -rf /tmp/forgejo-runner
+```
+
+Expected: version 0.7.5, appVersion 12.7.3. The clone may carry a `.git` directory, remove it inside the vendored copy.
+
+- [ ] **Step 2: Registration token**
+
+```bash
+AUTH="sebastian:<admin password>"
+RUNNER_TOKEN=$(curl -s -u "$AUTH" -X POST \
+  https://git.aisoftwarefactory.world/api/v1/orgs/sf/actions/runners/registration-token | jq -r .token)
+kubectl -n forgejo create secret generic runner-init \
+  --from-literal=CONFIG_NAME=sf-runner \
+  --from-literal=CONFIG_INSTANCE=https://git.aisoftwarefactory.world \
+  --from-literal=CONFIG_TOKEN=$RUNNER_TOKEN
+```
+
+If the org endpoint answers 404, fall back to the repo-scoped endpoint `POST /api/v1/repos/sf/ai-software-factory-code/actions/runners/registration-token`. If that also fails, take the token from the Forgejo UI (org settings, Actions, Runners, Create new runner), a Sebastian step. The token is a registration credential, it lives in the secret, not in Git.
+
+- [ ] **Step 3: Label the namespace and write the HelmRelease**
+
+```bash
+kubectl label ns forgejo pod-security.kubernetes.io/enforce=privileged --overwrite
+```
+
+Baseline rejects the privileged dind pod, so namespace `forgejo` runs privileged enforcement. Record the label on the Namespace object in `infra/k8s/platform/namespaces.yaml` (Flux would otherwise revert it).
+
+`infra/k8s/platform/forgejo/runner-helmrelease.yaml`:
+
+```yaml
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata: {name: forgejo-runner, namespace: forgejo}
+spec:
+  interval: 10m
+  releaseName: forgejo-runner
+  targetNamespace: forgejo
+  chart:
+    spec:
+      chart: ./k8s/platform/forgejo/runner-chart
+      sourceRef: {kind: GitRepository, name: flux-system}
+  values:
+    runner:
+      config:
+        create: true
+        existingInitSecret: runner-init
+        file:
+          runner:
+            labels:
+              - ubuntu-latest:docker://catthehacker/ubuntu:act-22.04
+    dind:
+      image:
+        tag: "29.5.2-dind"
+    securityContext:
+      privileged: true
+```
+
+Add `forgejo/runner-helmrelease.yaml` to the resources list in `k8s/platform/kustomization.yaml`.
+
+- [ ] **Step 4: Roll out and prove CI green**
+
+```bash
+git status --porcelain
+git add k8s/platform
+git commit -m "Forgejo runner with dind jobs"
+git push origin main && git push github main
+kubectl -n forgejo rollout status deploy/forgejo-runner --timeout=600s
+kubectl -n forgejo logs deploy/forgejo-runner | grep -i 'connected\|registered'
+```
+
+Expected: the runner registers and connects. Then trigger CI in the code repo:
+
+```bash
+cd ~/repos/ai-software-factory-code
+git commit --allow-empty -m "ci: runner smoke"
+git push origin main
+```
+
+Watch the run finish green: `https://git.aisoftwarefactory.world/sf/ai-software-factory-code/actions` (login as admin), or the runner logs showing the job container pull and the workflow steps. The workflow's `uses:` references resolve against `data.forgejo.org`, `actions/checkout@v4` and `actions/setup-go@v5` exist there.
+
+- [ ] **Step 5: Correct architecture.md**
+
+In `docs/architecture.md`: section 7's "Forgejo Actions runs PR checks on its Kubernetes pod runner" and section 9's "a native Kubernetes pod backend, a Helm chart and KEDA autoscale" are wrong (runner source verified 2026-09-25: docker, host and lxc backends only). Rewrite both to the dind sidecar reality, one chart instance, no KEDA. Commit in this repository: `Correct the runner backend claim`.
+
+### Task 17: OpenBao
+
+**Files:** Create: `infra/k8s/platform/openbao/helmrelease.yaml`.
+
+**Interfaces:**
+- Consumes: StorageClass `local-path`, bucket `aisoftwarefactory-backups`.
+- Produces: OpenBao 2.6.3 (chart 0.29.6) at `openbao.platform.svc:8200`, HA raft with one replica, sealed by default after restarts, unseal keys and root token in the seed bundle, first raft snapshot in S3.
+
+- [ ] **Step 1: HelmRelease**
+
+`infra/k8s/platform/openbao/helmrelease.yaml`:
+
+```yaml
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata: {name: openbao, namespace: flux-system}
+spec: {interval: 10m, url: https://openbao.github.io/openbao-helm}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata: {name: openbao, namespace: platform}
+spec:
+  interval: 10m
+  releaseName: openbao
+  targetNamespace: platform
+  chart:
+    spec:
+      chart: openbao
+      version: 0.29.6
+      sourceRef: {kind: HelmRepository, name: openbao, namespace: flux-system}
+  values:
+    injector:
+      enabled: false
+    server:
+      ha:
+        enabled: true
+        replicas: 1
+        raft:
+          enabled: true
+          setNodeId: true
+          config: |
+            ui = true
+            listener "tcp" {
+              tls_disable = 1
+              address = "[::]:8200"
+              cluster_address = "[::]:8201"
+            }
+            storage "raft" {
+              path = "/openbao/data"
+            }
+            service_registration "kubernetes" {}
+      dataStorage:
+        enabled: true
+        size: 2Gi
+        storageClass: local-path
+        accessMode: ReadWriteOnce
+        mountPath: /openbao/data
+      auditStorage:
+        enabled: false
+      dev:
+        enabled: false
+      updateStrategyType: OnDelete
+    ui:
+      enabled: true
+      serviceType: ClusterIP
+      externalPort: 8200
+```
+
+HA raft with one replica rather than the file backend: `bao operator raft snapshot` needs raft storage, the file backend has no snapshot command. The injector is off, Stage 2 uses OpenBao through the API only. Add the file to the kustomization resources, commit, push both remotes, wait:
+
+```bash
+kubectl -n platform rollout status statefulset/openbao --timeout=600s
+```
+
+- [ ] **Step 2: Init and unseal**
+
+Two key shares, threshold one: the second key is the spare for the printed seed bundle, a restart still needs just one.
+
+```bash
+kubectl -n platform exec -ti openbao-0 -- bao operator init -key-shares=2 -key-threshold=1
+```
+
+Print both unseal keys and the initial root token for the seed bundle, tick the slot `OpenBao unseal keys (created in Stage 2)`. Verify:
+
+```bash
+kubectl -n platform exec -ti openbao-0 -- bao status | grep -i sealed
+```
+
+Expected: `Sealed false`. After any pod restart the server seals again and unsealing is the manual step above, that is the design (identity belongs to the task, not the machine).
+
+- [ ] **Step 3: First snapshot to S3**
+
+```bash
+kubectl -n platform exec openbao-0 -- bao operator raft snapshot save /tmp/openbao.snap
+kubectl -n platform cp openbao-0:/tmp/openbao.snap /tmp/openbao-$(date +%F).snap
+aws s3 cp /tmp/openbao-$(date +%F).snap s3://aisoftwarefactory-backups/openbao/
+rm /tmp/openbao-$(date +%F).snap
+```
+
+Expected: the object lists under `s3://aisoftwarefactory-backups/openbao/`. The chart's snapshotAgent stays off in Stage 2, it needs a Kubernetes auth role that no consumer requires yet.
+
+### Task 18: Temporal
+
+**Files:** Create: `infra/k8s/platform/temporal/helmrelease.yaml`.
+
+**Interfaces:**
+- Consumes: `sf-cluster-rw.platform.svc:5432`, databases `temporal` and `temporal_visibility`, role `temporal`, password secret `pg-temporal` (namespace `platform`, key `password`).
+- Produces: Temporal 1.32.0 (chart 1.7.0), namespace `default` with 3 day retention, UI on service `temporal-ui` port 8080.
+
+- [ ] **Step 1: HelmRelease**
+
+`infra/k8s/platform/temporal/helmrelease.yaml`:
+
+```yaml
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata: {name: temporalio, namespace: flux-system}
+spec: {interval: 10m, url: https://go.temporal.io/helm-charts}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata: {name: temporal, namespace: platform}
+spec:
+  interval: 10m
+  releaseName: temporal
+  targetNamespace: platform
+  chart:
+    spec:
+      chart: temporal
+      version: 1.7.0
+      sourceRef: {kind: HelmRepository, name: temporalio, namespace: flux-system}
+  values:
+    server:
+      config:
+        persistence:
+          defaultStore: default
+          visibilityStore: visibility
+          numHistoryShards: 512
+          datastores:
+            default:
+              sql:
+                pluginName: postgres12
+                driverName: postgres12
+                databaseName: temporal
+                connectAddr: sf-cluster-rw.platform.svc:5432
+                connectProtocol: tcp
+                user: temporal
+                existingSecret: pg-temporal
+                secretKey: password
+                createDatabase: false
+                manageSchema: true
+                maxConns: 20
+                maxIdleConns: 20
+                maxConnLifetime: 1h
+            visibility:
+              sql:
+                pluginName: postgres12
+                driverName: postgres12
+                databaseName: temporal_visibility
+                connectAddr: sf-cluster-rw.platform.svc:5432
+                connectProtocol: tcp
+                user: temporal
+                existingSecret: pg-temporal
+                secretKey: password
+                createDatabase: false
+                manageSchema: true
+        namespaces:
+          create: true
+          useHelmHooks: false
+          namespace:
+            - name: default
+              retention: 3d
+      resources:
+        requests: {cpu: 100m, memory: 256Mi}
+        limits: {cpu: 500m, memory: 512Mi}
+    schema:
+      useHelmHooks: false
+      resources:
+        requests: {cpu: 100m, memory: 128Mi}
+    web:
+      resources:
+        requests: {cpu: 50m, memory: 64Mi}
+        limits: {memory: 128Mi}
+    admintools:
+      resources:
+        requests: {cpu: 50m, memory: 128Mi}
+```
+
+`numHistoryShards` is immutable after first deploy. `schema.useHelmHooks: false` and `namespaces.useHelmHooks: false` are REQUIRED under Flux, the chart's own values comment says so. `createDatabase: false` because the CNPG Database CRs own database creation. The repo URL is `go.temporal.io/helm-charts`, `helm.temporal.io` does not resolve. Add to the kustomization resources, commit, push both remotes.
+
+- [ ] **Step 2: Verify**
+
+```bash
+kubectl -n platform get jobs | grep temporal
+kubectl -n platform rollout status deploy/temporal-frontend --timeout=600s
+kubectl -n platform get deploy
+kubectl -n platform port-forward svc/temporal-ui 8080:8080 &
+curl -s -o /dev/null -w '%{http_code}\n' http://localhost:8080
+```
+
+Expected: the schema job reaches Completion, frontend and its siblings roll out (history, matching, worker), the UI answers 200 through the port-forward. If the service is named differently, `kubectl -n platform get svc | grep temporal` shows the chart's actual names.
+
+### Task 19: LiteLLM
+
+**Files:** Create: `infra/k8s/platform/litellm/helmrelease.yaml`.
+
+**Interfaces:**
+- Consumes: `sf-cluster-rw.platform.svc`, database `litellm`, role `litellm`, secret `pg-litellm` (namespace `platform`, keys `username`, `password`), Sebastian's DeepSeek key from `.env.tools`.
+- Produces: LiteLLM proxy 1.102.1 (chart 1.102.1, OCI) at `litellm.platform.svc:4000`, model alias `deepseek-chat`. The smoke call is the third stage exit element.
+
+- [ ] **Step 1: Secrets**
+
+```bash
+set -a; source ~/repos/ai-software-factory/.env.tools; set +a
+MASTER="sk-$(openssl rand -hex 24)"
+kubectl -n platform create secret generic litellm-master-key --from-literal=masterkey=$MASTER
+kubectl -n platform create secret generic litellm-deepseek --from-literal=DEEPSEEK_API_KEY=$DEEPSEEK_API_KEY
+echo "LiteLLM master key: $MASTER"
+```
+
+Print the master key for the seed bundle (slot `LiteLLM master key`).
+
+- [ ] **Step 2: HelmRelease**
+
+`infra/k8s/platform/litellm/helmrelease.yaml`:
+
+```yaml
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata: {name: litellm, namespace: flux-system}
+spec:
+  interval: 10m
+  url: oci://ghcr.io/berriai/litellm-helm
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    semver: ">=1.102.1 <1.103.0"
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata: {name: litellm, namespace: platform}
+spec:
+  interval: 10m
+  releaseName: litellm
+  targetNamespace: platform
+  chartRef:
+    kind: OCIRepository
+    name: litellm
+    namespace: flux-system
+  values:
+    replicaCount: 1
+    masterkeySecretName: litellm-master-key
+    db:
+      deployStandalone: false
+      useExisting: true
+      endpoint: sf-cluster-rw.platform.svc
+      database: litellm
+      url: postgresql://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST)/$(DATABASE_NAME)
+      secret:
+        name: pg-litellm
+        usernameKey: username
+        passwordKey: password
+    proxyConfigMap:
+      create: true
+    proxy_config:
+      model_list:
+        - model_name: deepseek-chat
+          litellm_params:
+            model: deepseek/deepseek-chat
+            api_key: os.environ/DEEPSEEK_API_KEY
+      general_settings:
+        master_key: os.environ/PROXY_MASTER_KEY
+    environmentSecrets:
+      - litellm-deepseek
+    migrationJob:
+      enabled: true
+      hooks:
+        argocd:
+          enabled: false
+    service:
+      type: ClusterIP
+      port: 4000
+    resources:
+      requests: {cpu: 200m, memory: 512Mi}
+      limits: {cpu: "1", memory: 1Gi}
+```
+
+`pg-litellm` is the same secret CNPG manages the role from, both consumers live in namespace `platform` so one secret serves both. The composed `db.url` is why the password is hex. Add to the kustomization resources, commit, push both remotes, wait for the migration job and the deployment.
+
+- [ ] **Step 3: Smoke call through a virtual key (stage exit element)**
+
+```bash
+kubectl -n platform port-forward svc/litellm 4000:4000 &
+curl -s http://localhost:4000/key/generate \
+  -H "Authorization: Bearer $MASTER" -H 'Content-Type: application/json' \
+  -d '{"models":["deepseek-chat"],"max_budget":5,"duration":"30d","key_alias":"sf-smoke-test"}' | jq -r .key
+curl -s http://localhost:4000/v1/chat/completions \
+  -H "Authorization: Bearer sk-<the virtual key just printed>" \
+  -H 'Content-Type: application/json' \
+  -d '{"model":"deepseek-chat","messages":[{"role":"user","content":"Reply with the single word: pong"}]}' \
+  | jq -r '.choices[0].message.content'
+```
+
+Expected: a virtual key starting `sk-`, then `pong` from DeepSeek through the proxy. Record the response and the token usage line as the evidence.
+
+### Task 20: SigNoz
+
+**Files:** Create: `infra/k8s/platform/signoz/helmrelease.yaml`.
+
+**Interfaces:**
+- Consumes: StorageClass `local-path`.
+- Produces: SigNoz 0.143.0 (unified UI and query service on port 8080), otel-collector on OTLP 4317 and 4318, ClickHouse through the bundled Altinity operator, ZooKeeper one replica.
+
+- [ ] **Step 1: HelmRelease**
+
+`infra/k8s/platform/signoz/helmrelease.yaml`:
+
+```yaml
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata: {name: signoz, namespace: flux-system}
+spec: {interval: 10m, url: https://charts.signoz.io}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata: {name: signoz, namespace: platform}
+spec:
+  interval: 10m
+  releaseName: signoz
+  targetNamespace: platform
+  chart:
+    spec:
+      chart: signoz
+      version: 0.143.0
+      sourceRef: {kind: HelmRepository, name: signoz, namespace: flux-system}
+  values:
+    global:
+      storageClass: local-path
+    clickhouse:
+      persistence:
+        enabled: true
+        storageClass: local-path
+        size: 20Gi
+      zookeeper:
+        enabled: true
+    signoz:
+      replicaCount: 1
+    otelCollector:
+      replicaCount: 1
+```
+
+The chart no longer bundles k8s-infra (node telemetry), that chart arrives when Stage 8 needs infra metrics. Add to the kustomization resources, commit, push both remotes.
+
+- [ ] **Step 2: Verify**
+
+```bash
+kubectl -n platform get pods | grep -E 'signoz|clickhouse|zookeeper'
+kubectl -n platform port-forward svc/signoz-signoz 8080:8080 &
+curl -s -o /dev/null -w '%{http_code}\n' http://localhost:8080
+```
+
+Expected: pods Running, UI answers 200. Port 8080 is the unified service, 3301 was the removed separate frontend. Retention is set in the UI (Settings, General) when first used, it is not a chart value. If PodSecurity rejects any Altinity or ClickHouse pod under baseline, move that component to its own labelled namespace and record the deviation in `infra/README.md`.
+
+### Task 21: Nightly Forgejo dump and stage close
+
+**Files:** Create: `infra/k8s/platform/cronjobs/forgejo-dump.yaml`. Modify: `infra/docs/seed-bundle.md` (final ticks).
+
+**Interfaces:**
+- Consumes: helm release forgejo, bucket `aisoftwarefactory-backups` with the 14 day expiry on `forgejo-dumps/`.
+- Produces: a nightly zip of Forgejo (database, repos, config) in S3 at 02:30 UTC, and the stage report.
+
+- [ ] **Step 1: The CronJob**
+
+`infra/k8s/platform/cronjobs/forgejo-dump.yaml`:
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: forgejo-dump, namespace: forgejo}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: forgejo-dump, namespace: forgejo}
+rules:
+  - apiGroups: [""]
+    resources: [pods]
+    verbs: [get, list]
+  - apiGroups: [""]
+    resources: [pods/exec]
+    verbs: [create, get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: forgejo-dump, namespace: forgejo}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: forgejo-dump}
+subjects: [{kind: ServiceAccount, name: forgejo-dump}]
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata: {name: forgejo-dump, namespace: forgejo}
+spec:
+  schedule: "30 2 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: forgejo-dump
+          restartPolicy: Never
+          initContainers:
+            - name: dump
+              image: alpine/kubectl:1.36.1
+              command: [/bin/sh, -c]
+              args:
+                - |
+                  set -e
+                  POD=$(kubectl -n forgejo get pod -l app.kubernetes.io/name=forgejo -o jsonpath='{.items[0].metadata.name}')
+                  kubectl -n forgejo exec $POD -- forgejo dump --type zip --file /tmp/forgejo-dump.zip
+                  kubectl -n forgejo cp $POD:/tmp/forgejo-dump.zip /dump/forgejo-dump.zip
+              volumeMounts: [{name: dump, mountPath: /dump}]
+          containers:
+            - name: upload
+              image: amazon/aws-cli:2.28.5
+              command: [/bin/sh, -c]
+              args:
+                - aws s3 cp /dump/forgejo-dump.zip s3://aisoftwarefactory-backups/forgejo-dumps/forgejo-$(date +%F).zip
+              env:
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom: {secretKeyRef: {name: hetzner-s3-creds, key: access-key}}
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom: {secretKeyRef: {name: hetzner-s3-creds, key: secret-key}}
+                - name: AWS_ENDPOINT_URL
+                  value: https://fsn1.your-objectstorage.com
+                - name: AWS_REGION
+                  value: fsn1
+              volumeMounts: [{name: dump, mountPath: /dump}]
+          volumes: [{name: dump, emptyDir: {}}]
+```
+
+InitContainers run in order before the main container, so the dump lands in the emptyDir before the upload starts. The five-field schedule is Kubernetes cron, the six-field form belongs to CNPG's barman only. Add `cronjobs/forgejo-dump.yaml` to the resources list in `k8s/platform/kustomization.yaml`. If `forgejo dump` cannot find its config, check `kubectl exec $POD -- env | grep -i gitea` for the config path the deployment uses and pass it with `--config`.
+
+- [ ] **Step 2: Prove it once, then commit**
+
+```bash
+git status --porcelain
+git add k8s/platform/cronjobs k8s/platform/kustomization.yaml
+git commit -m "Nightly Forgejo dump to S3"
+git push origin main && git push github main
+flux reconcile kustomization platform --with-source
+kubectl -n forgejo get cronjob forgejo-dump
+kubectl -n forgejo create job --from=cronjob/forgejo-dump forgejo-dump-manual
+kubectl -n forgejo wait --for=condition=complete job/forgejo-dump-manual --timeout=600s
+aws s3 ls s3://aisoftwarefactory-backups/forgejo-dumps/
+kubectl -n forgejo delete job forgejo-dump-manual
+```
+
+Expected: today's zip listed in the bucket.
+
+- [ ] **Step 3: Seed bundle and stage close**
+
+Tick every Stage 2 slot in `infra/docs/seed-bundle.md` and commit. Run the stage exit test in full:
+
+1. `curl -sI https://git.aisoftwarefactory.world` answers 200 or 301 with a valid Let's Encrypt certificate (Task 13 evidence refreshed).
+2. The code repo's latest CI run on Forgejo is green on the runner (Task 16 evidence refreshed).
+3. The LiteLLM smoke call through a fresh virtual key answers with a DeepSeek completion (Task 19 evidence refreshed).
+
+Then write the stage report to Sebastian: what runs where, the month's cost line (about 210 EUR servers plus 6.49 EUR storage plus model spend), every deferred item, and the shutdown question. Stage 3 is not started without his go.
+
+**Stage 2 exit test:** `https://git.aisoftwarefactory.world` serves a valid Let's Encrypt certificate, the factory repo's CI workflow runs green on the runner, and a LiteLLM smoke call through a test virtual key answers with a DeepSeek completion.
+
+---
+
+## Stages 3 to 9: outlines
+
+The detailed task plan for each stage below is written when the previous stage passes its gate, with the same bite-sized format as Stages 0 to 2. Each outline names the goal, the steps in order, and the exit test that closes the stage.
 
 ### Stage 3: Burn-down
 
