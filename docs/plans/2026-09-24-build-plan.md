@@ -1213,9 +1213,9 @@ Stage 2 review focus, the failure modes most likely to bite:
 
 Why the change: Cilium 1.20 hard-disables the Gateway API controller when `kubeProxyReplacement=false` (operator source `operator/pkg/gateway-api/cell.go` at v1.20.0). A fresh cluster installs kube-proxy-free from the start, so no live migration and no wedged Envoy listeners. KubePrism serves the Kubernetes API on `localhost:7445` on every node by default, that is the service host Cilium points at. Envoy binds 80 and 443 on the host network, which needs NET_BIND_SERVICE.
 
-The UserVolumeConfig goes into the committed patch set before the nodes install, because user volumes are carved at install time from the matched disk's free space. The cpx42 has one 320 GB virtio disk, so the selector matches by size exactly like the install document. `disk.transport == 'nvme'` matches nothing (virtio disk) and `!system_disk` excludes the only disk there is.
+The UserVolumeConfig goes into the committed patch set before the nodes install, because user volumes are carved at install time from the matched disk's free space. The cpx42 has one 320 GB virtio disk, so the selector matches by size exactly like the install document. `disk.transport == 'nvme'` matches nothing (virtio disk) and `!system_disk` excludes the only disk there is. EPHEMERAL must be capped too: with no `maxSize` it grows to fill the whole disk at install, and Talos volumes grow only and never shrink, so the user volume then fails with "not enough space" on every node (found live in Stage 2; the fix re-laid the disks through server replacement, since hcloud user_data is immutable and `talosctl reset` would re-read the old user_data and re-grow EPHEMERAL).
 
-- [ ] **Step 1: Commit the two machine-config documents**
+- [ ] **Step 1: Commit the machine-config documents**
 
 Append to `talos/patches.yaml`:
 
@@ -1224,6 +1224,14 @@ Append to `talos/patches.yaml`:
 apiVersion: v1alpha1
 kind: KubeProxyConfig
 enabled: false
+---
+apiVersion: v1alpha1
+kind: VolumeConfig
+name: EPHEMERAL
+provisioning:
+  diskSelector:
+    match: disk.size > 100000000000u
+  maxSize: 100GB
 ---
 apiVersion: v1alpha1
 kind: UserVolumeConfig
@@ -1235,7 +1243,7 @@ provisioning:
   maxSize: 200GB
 ```
 
-Add one paragraph to `talos/README.md`: kube-proxy is disabled at generation time so Cilium runs kube-proxy-free (`KubeProxyConfig` document), and each node carves a 200 GB user volume at install time (`UserVolumeConfig` document, auto-mounted at `/var/mnt/local-path-provisioner`, Task 11 consumes it).
+Add one paragraph to `talos/README.md`: kube-proxy is disabled at generation time so Cilium runs kube-proxy-free (`KubeProxyConfig` document), and each node caps EPHEMERAL at 100 GB (`VolumeConfig` document) and carves a 200 GB user volume at install time (`UserVolumeConfig` document, auto-mounted at `/var/mnt/local-path-provisioner`, Task 11 consumes it).
 
 Commit: `Kube-proxy off and a 200 GB user volume per node`.
 
