@@ -1905,7 +1905,7 @@ git commit -m "Forgejo on CNPG and S3 behind the gateway"
 
 ### Task 15: Git primary and Flux bootstrap
 
-**Files:** Create: `infra/k8s/platform/kustomization.yaml`, `infra/k8s/platform/namespaces.yaml`, `infra/clusters/sf/platform.yaml`, `infra/k8s/platform/cert-manager/helmrelease.yaml`, `infra/k8s/platform/forgejo/helmrelease.yaml`, `infra/k8s/platform/sources.yaml`. Modify: `infra/README.md` (Flux layout, the Cilium-outside-Flux ruling, the push ritual).
+**Files:** Create: `infra/k8s/platform/kustomization.yaml`, `infra/k8s/platform/namespaces.yaml`, `infra/k8s/platform/coredns.yaml`, `infra/clusters/sf/platform.yaml`, `infra/clusters/sf/kustomization.yaml`, `infra/k8s/platform/cert-manager/helmrelease.yaml`, `infra/k8s/platform/forgejo/helmrelease.yaml`, `infra/k8s/platform/sources.yaml`. Delete: `infra/k8s/platform/forgejo/values.yaml` (Task 14's applied-values record, superseded by the HelmRelease's inline values). Modify: `infra/README.md` (Flux layout, the Cilium-outside-Flux ruling, the push ritual).
 
 **Interfaces:**
 - Consumes: Forgejo from Task 14 with admin credentials, the hand-applied slice (Tasks 11 to 14).
@@ -1962,13 +1962,75 @@ flux bootstrap gitea --token-auth \
   --branch=main --path=clusters/sf
 ```
 
-The bootstrap targets the infra repo itself, not a separate fleet repo: architecture 11 makes the infra repository the human-owned source of truth, and one repository fewer to re-seed. Let's Encrypt is a public CA, no `--ca-file` needed. Bootstrap commits `gotk-components.yaml`, `gotk-sync.yaml` and `kustomization.yaml` to `clusters/sf` on the remote.
+The bootstrap targets the infra repo itself, not a separate fleet repo: architecture 11 makes the infra repository the human-owned source of truth, and one repository fewer to re-seed. Let's Encrypt is a public CA, no `--ca-file` needed. Bootstrap commits `gotk-components.yaml` and `gotk-sync.yaml` to `clusters/sf` on the remote.
+
+The first sync after bootstrap fails while source-controller sits on sf-0: DNS points `git.aisoftwarefactory.world` at sf-0's own public IPv4, and Cilium 1.20's host-network gateway drops pod traffic to the node's own IP on 80 and 443 (cross-node, ClusterIP and outside paths all answer 200, found live 2026-09-25). Unblock it with a CoreDNS split-DNS rewrite to the gateway Service, applied by hand before the platform tree exists, then poke the source:
+
+```bash
+kubectl apply -f k8s/platform/coredns.yaml
+flux reconcile source git flux-system
+```
+
+`infra/k8s/platform/coredns.yaml` is the live Corefile plus one rewrite block, committed byte-identical so Flux adopts it:
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns
+  namespace: kube-system
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health {
+            lameduck 5s
+        }
+        ready
+        log . {
+            class error
+        }
+        prometheus :9153
+
+        rewrite stop {
+            name exact git.aisoftwarefactory.world cilium-gateway-edge-gateway.forgejo.svc.cluster.local
+        }
+
+        kubernetes cluster.local in-addr.arpa ip6.arpa {
+            pods insecure
+            fallthrough in-addr.arpa ip6.arpa
+            ttl 30
+        }
+        forward . /etc/resolv.conf {
+           max_concurrent 1000
+        }
+        cache 30 {
+           disable success cluster.local
+           disable denial cluster.local
+        }
+        loop
+        reload
+        loadbalance
+    }
+```
+
+The `reload` plugin picks the change up without a pod restart. On a re-seed this hand-apply is part of the drill: bootstrap recreates the same deadlock until the rewrite exists, and the file sits in the tree Flux cannot yet fetch. The rewrite is safe for the ACME solver, Let's Encrypt validates from outside the cluster and only cluster DNS clients see the override.
 
 - [ ] **Step 4: Pull the bootstrap commit and wire the platform tree**
 
 ```bash
 cd ~/repos/ai-software-factory-infra
 git pull --rebase origin main
+```
+
+`infra/clusters/sf/kustomization.yaml` (the build root the sync path loads, without it `kubectl kustomize clusters/sf` has nothing to build):
+
+```yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- flux-system
+- platform.yaml
 ```
 
 `infra/clusters/sf/platform.yaml` (the Flux Kustomization that owns the platform tree):
@@ -2093,6 +2155,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - namespaces.yaml
+- coredns.yaml
 - sources.yaml
 - gateway-api/crds.yaml
 - gateway-api/edge.yaml
@@ -2101,11 +2164,11 @@ resources:
 - cnpg/cluster.yaml
 - cnpg/databases.yaml
 - cnpg/backup.yaml
-- local-path/kustomization.yaml
+- local-path
 - forgejo/helmrelease.yaml
 ```
 
-With `infra/k8s/platform/namespaces.yaml` holding plain `Namespace` objects for `platform` and `forgejo` with no labels (labels for `forgejo` arrive with the runner in Task 16, which edits this file). The previously hand-applied manifests are already byte-identical in the tree, so Flux adopts them: prune is inventory-driven and only removes objects a Kustomization itself applied, and the HelmReleases find the existing helm release storage by name and upgrade in place with unchanged values.
+With `infra/k8s/platform/namespaces.yaml` holding plain `Namespace` objects for `platform` and `forgejo` with no labels (labels for `forgejo` arrive with the runner in Task 16, which edits this file). `local-path` is referenced as a directory, kustomize cannot load a kustomization by file path. Delete `k8s/platform/forgejo/values.yaml` in the same commit, the HelmRelease carries the values inline and the file is no longer referenced (one way only, a re-seed deploys through Flux, not the hand install). The previously hand-applied manifests are already byte-identical in the tree, so Flux adopts them: prune is inventory-driven and only removes objects a Kustomization itself applied, and the HelmReleases find the existing helm release storage by name and upgrade in place with unchanged values.
 
 - [ ] **Step 5: Push, reconcile, verify adoption**
 
