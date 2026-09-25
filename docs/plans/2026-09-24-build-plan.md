@@ -1185,7 +1185,7 @@ Research basis: `.superpowers/sdd/2026-09-24-build-plan/research-g2-{edge,storag
 
 Sebastian's queued steps. Each blocks the named task, not the plan:
 
-1. S3 access keys from the Hetzner Console (Object Storage, then S3 Credentials; the secret shows once and cannot be fetched again). Record in the seed bundle, append `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY` to `.env.tools`. Blocks Task 12.
+1. S3 access keys from the Hetzner Console (Object Storage, then S3 Credentials; the secret shows once and cannot be fetched again). Record in the seed bundle, append `HETZNER_S3_ACCESS_KEY_ID` and `HETZNER_S3_SECRET_ACCESS_KEY` to `.env.tools`. Blocks Task 12.
 2. Namecheap A records for `git.aisoftwarefactory.world` to the three node public IPv4 addresses from Task 10, TTL 300 or lower. Blocks the certificate in Task 13.
 3. DeepSeek API key, appended to `.env.tools` as `DEEPSEEK_API_KEY`. Blocks the Task 19 smoke call.
 
@@ -1435,8 +1435,8 @@ s3 =
 EOF
 cat > ~/.aws/credentials <<EOF
 [default]
-aws_access_key_id = $S3_ACCESS_KEY_ID
-aws_secret_access_key = $S3_SECRET_ACCESS_KEY
+aws_access_key_id = $HETZNER_S3_ACCESS_KEY_ID
+aws_secret_access_key = $HETZNER_S3_SECRET_ACCESS_KEY
 EOF
 chmod 600 ~/.aws/credentials
 aws s3 ls
@@ -1491,7 +1491,7 @@ kubectl -n platform create secret generic pg-temporal --type=kubernetes.io/basic
   --from-literal=username=temporal --from-literal=password=$TEMPORAL
 kubectl -n platform label secret pg-temporal cnpg.io/reload=true
 kubectl -n platform create secret generic cnpg-s3-creds \
-  --from-literal=ACCESS_KEY_ID=$S3_ACCESS_KEY_ID --from-literal=ACCESS_SECRET_KEY=$S3_SECRET_ACCESS_KEY
+  --from-literal=ACCESS_KEY_ID=$HETZNER_S3_ACCESS_KEY_ID --from-literal=ACCESS_SECRET_KEY=$HETZNER_S3_SECRET_ACCESS_KEY
 ```
 
 Print all five passwords for the seed bundle (Sebastian records them), tick the S3 slot.
@@ -1816,7 +1816,7 @@ kubectl -n forgejo create secret generic forgejo-admin-secret \
   --from-literal=username=sebastian --from-literal=password=$ADMIN_PW
 kubectl -n forgejo create secret generic forgejo-db-creds --from-literal=password=$FORGEJO_DB_PW
 kubectl -n forgejo create secret generic hetzner-s3-creds \
-  --from-literal=access-key=$S3_ACCESS_KEY_ID --from-literal=secret-key=$S3_SECRET_ACCESS_KEY
+  --from-literal=access-key=$HETZNER_S3_ACCESS_KEY_ID --from-literal=secret-key=$HETZNER_S3_SECRET_ACCESS_KEY
 echo "forgejo admin password: $ADMIN_PW"
 ```
 
