@@ -1120,7 +1120,7 @@ cilium install --version 1.20.0 \
 cilium status --wait
 ```
 
-With the default capabilities the agents stay Pending: the `clean-cilium-state` init container dies with `unable to apply caps: can't apply capabilities: operation not permitted`. If a release is already installed with wrong values, the same sets go through `cilium upgrade --version 1.20.0 ...`; it merges the last release's values by default.
+With the default capabilities the agents stay Pending: the `clean-cilium-state` init container dies with `unable to apply caps: can't apply capabilities: operation not permitted`. If a release is already installed with wrong values, the same sets go through `cilium upgrade --version 1.20.0 ...`; it merges the last release's values by default. That merge does NOT cover `k8sServiceHost`/`k8sServicePort`: cilium-cli auto-detects the cluster endpoint and overrides them with the public `138.199.224.193:6443` on every upgrade. Only the endpoint's own node can reach that address, so agents on the other nodes crash in the `config` init (exit 255, dial timeout) and the operator follows. Always pass the complete flag set to `cilium upgrade`, never a partial one.
 
 Expected: all agents healthy on the nodes.
 
