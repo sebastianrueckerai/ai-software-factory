@@ -210,13 +210,13 @@ The sandbox holds no key material. The gateway mints LiteLLM virtual keys throug
 
 ### Policy
 
-Capability policy is data: rows in Postgres, edited through the console or API, versioned in Git. Enforcement is code in the gateway. Network policy makes bypass unreachable: a sandbox pod can reach only the gateway, Forgejo git and package registries.
+Capability policy is data: rows in Postgres, edited through the console or API, versioned in Git. Enforcement is code in the gateway. Network policy makes bypass unreachable: a sandbox pod can reach only the gateway and Forgejo git, plus a package registry named per toolchain.
 
 The first capability class is `coder`: repository read, branch write, model aliases and allowlisted tools, nothing else. Further classes, such as analyzer, integration tester and release agent, arrive one per phase with the loops that need them. If rules ever multiply beyond what plain Go code reads well, an Open Policy Agent sidecar is the reserved upgrade. Policy never lives in a prompt.
 
 ### Budgets
 
-The gateway enforces hard caps by refusing the next call. LiteLLM tracks model spend per virtual key, the gateway tracks tool spend per call, and factoryd aggregates both per task and per day. Hetzner offers no hard per-project spend cap, so this ledger is the real spend limit. Agents may also commission cloud resources through gateway-gated tools: euro caps and hard resource quotas are policy data like any capability, the gateway mints short-lived scoped credentials so the agent never holds a provider key, every commissioned resource is tagged with its task and tracked in a factoryd-owned registry, and a periodic garbage collector reaps untracked or orphaned resources.
+The gateway enforces hard caps by refusing the next call. It books each model call's own cost into the task the moment the call ends, and after the task finishes factoryd settles the total to what LiteLLM recorded. LiteLLM tracks model spend per virtual key, the gateway tracks tool spend per call, and factoryd aggregates both per task and per day. Hetzner offers no hard per-project spend cap, so this ledger is the real spend limit. Agents may also commission cloud resources through gateway-gated tools: euro caps and hard resource quotas are policy data like any capability, the gateway mints short-lived scoped credentials so the agent never holds a provider key, every commissioned resource is tagged with its task and tracked in a factoryd-owned registry, and a periodic garbage collector reaps untracked or orphaned resources.
 
 ## 7. The worker plane
 
@@ -224,7 +224,7 @@ How does an agent run, and what can it touch?
 
 One task gets one namespace, one ServiceAccount named `task-<id>`, and one pod.
 
-**The sandbox.** The pod runs under gVisor, a user-space kernel that intercepts the container's system calls, so a hostile program never reaches the host kernel. The container is non-root with dropped capabilities and a read-only root filesystem. Cilium enforces default-deny egress: only the gateway, Forgejo git and package registries answer, and the cloud metadata endpoint is unreachable. Kata microVMs, one small virtual machine per pod, are the reserved stronger tier.
+**The sandbox.** The pod runs under gVisor, a user-space kernel that intercepts the container's system calls, so a hostile program never reaches the host kernel. The container is non-root with dropped capabilities and a read-only root filesystem. Cilium enforces default-deny egress: only the gateway and Forgejo git answer, DNS resolves only their names, and the cloud metadata endpoint is unreachable. A package registry joins the list by name when the sandbox image carries a toolchain that needs it. Each task namespace has a resource quota, and factoryd, which creates these namespaces, is confined by an admission policy to exactly this shape. Kata microVMs, one small virtual machine per pod, are the reserved stronger tier.
 
 **The harness.** The coding agent inside the sandbox is opencode, driven headless. factoryd knows nothing about harnesses, only a Go interface:
 
@@ -241,7 +241,7 @@ A harness fits the factory if it meets four requirements: it runs headless, it a
 
 **The identity proxy.** A harness makes its own model and tool calls, but it cannot attach the pod's projected ServiceAccount token, a file the kubelet rotates. So the adapter listens on localhost inside the pod, the harness points its provider configuration at it, and on each request the adapter reads the current token file and forwards the call to factory-gateway. Model and tool traffic never leaves this path, and no model key material ever enters the sandbox.
 
-**The git exception.** Harnesses run git as a shell command, so git is the one path that bypasses the gateway. The sandbox instead holds a Forgejo token minted by factoryd at task start, scoped to branch write on the task's repository, and revoked at task end. Every exchange with the world stays attributable: model and tool calls by the task identity, git pushes by the task token.
+**The git exception.** Git is the one path outside the gateway, and the agent still never holds its credential. factoryd mints a Forgejo token at task start, scoped to branch write on the task's repository, and revokes it at task end. The worker process in the pod clones with it before the agent starts, keeps it out of the agent's environment and repository config, and after the agent finishes kills every other process in the pod and pushes from a clean repository of its own. A token inside the agent's repository would leak through git hooks and lingering processes. Every exchange with the world stays attributable: model and tool calls by the task identity, git pushes by the task token.
 
 **Session records.** The sandbox streams its session out while it lives: prompts, tool calls, output, files touched, commits and cost. Full history goes to object storage, a compact restart state to Postgres. A dead session resumes as a new pod that receives the findings and the parent session id, not as a resurrected process. Session supervision runs beside the stream: a no-progress watchdog on harness events, a wall-clock cap per task, and a repetition detector that fires when files stop changing. Each trip takes the same path as a dead session — snapshot, kill, resume or retry with a stronger model — and the Temporal workflow enforces heartbeat and wall-clock timeouts so a stuck agent is visible instead of silent.
 
@@ -308,12 +308,13 @@ The same journey in words:
 
 ## 11. The security model in one place
 
-Six rules, all enforced by code rather than by instruction:
+Seven rules, all enforced by code rather than by instruction:
 
 - **Identity belongs to the task.** A pod carries a projected ServiceAccount token, short-lived and audience-scoped, rotated by the kubelet. No shared machine identity exists. SPIFFE/SPIRE, the workload identity standard that reaches beyond one cluster, is the reserved upgrade.
-- **No credentials in the sandbox.** Model calls ride virtual keys the gateway holds, tool calls ride the gateway, and the one exception, git, rides a per-task token scoped to one repository and one permission.
+- **No credentials in the agent's reach.** Model calls ride virtual keys the gateway holds, tool calls ride the gateway, and git rides a per-task token scoped to one repository and one permission that only the worker process uses, before the agent starts and after it is killed.
 - **Policy lives outside the model.** Capability rules are database rows enforced in gateway code. A prompt cannot grant a capability.
-- **The network forbids by default.** A sandbox pod reaches the gateway, Forgejo git and package registries. Nothing else, including the cloud metadata endpoint.
+- **The network forbids by default.** A sandbox pod reaches the gateway and Forgejo git, and resolves only their names. Nothing else, including the cloud metadata endpoint.
+- **Untrusted code never reaches a privileged builder.** CI with privileged docker-in-docker runs only on protected `main`, which only a human merges into.
 - **Spending has hard caps.** Per task and per day, enforced by refusing the next call.
 - **Everything is audited.** The gateway writes an audit row for every decision, and session records preserve what each agent did.
 

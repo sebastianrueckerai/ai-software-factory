@@ -2801,6 +2801,15 @@ Steps: land the Stage 4 runner gate before any commit the controller did not pus
 
 Exit test: a task submitted to factoryd produces a branch and a commit on Forgejo, the session record lands in S3, and a curl from inside the sandbox to any address outside that allowlist fails.
 
+Closed 2026-09-26 after three review rounds. Standing contracts:
+- **The runner gate:** CI runs on push to protected `main` only, and only the human pushes or merges there (Rulings 76, 77). The unprivileged pull-request runner is Stage 6's first step.
+- **Git credentials:** the agent never holds the Forgejo token. The worker clones with it before the harness starts, kills every agent process, and pushes from a clean repository of its own.
+- **Egress:** the sandbox reaches the gateway and Forgejo, and DNS resolves only their names. The Go module proxy was dropped because the sandbox image has no Go toolchain; a registry joins by name with the toolchain that needs it.
+- **factoryd itself:** it is confined by a ValidatingAdmissionPolicy to `factory-agents-*` namespaces. Its intake takes a bearer token and clamps the budget. It restarts with `Recreate`, and a mid-run restart requeues the task, anchored to its persisted start time.
+- **Spend:** the gateway books each call's own cost, and factoryd settles each finished task to LiteLLM's recorded key spend.
+- **TaskBrief:** capability hints stay out of it, because capabilities are policy the gateway enforces.
+- **Node image:** the schematic and `talos/build-snapshot.sh` live in the infra repo, proven end to end.
+
 ### Stage 6: close the loop
 
 Goal: a signal becomes a merged change.

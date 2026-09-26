@@ -218,7 +218,10 @@ does not add extensions, so a changed schematic means a new snapshot and a
 server replacement. The snapshot build downloads the factory image on the
 seed machine, verifies it with `xz -t`, and streams it over ssh to a fresh
 rescue system; downloading inside the rescue system corrupted the image
-twice. Forgejo's `SECRET_KEY` is pinned as an imperative secret, because the
+twice. The recipe is committed in the infra repo as `talos/build-snapshot.sh`
+beside `talos/schematic.yaml`, and the snapshot carries a `schematic` label
+that the OpenTofu image selector requires, so a snapshot without the
+extension can never be picked. Forgejo's `SECRET_KEY` is pinned as an imperative secret, because the
 restored database holds Actions secrets encrypted under it, and a fresh key
 breaks every CI run. After any key change the Actions secrets are stored
 again. Every push made while Forgejo is down goes to GitHub only, so right
@@ -545,7 +548,7 @@ task requires capability X in environment E
    -> task row: granted / requires approval / forbidden
    -> gateway enforces on every call, audit row for every decision
    -> network policy makes bypass unreachable (the sandbox can only
-      route to the gateway, Forgejo git, and package registries)
+      route to the gateway and Forgejo git, plus named registries)
 ```
 
 An OPA sidecar is the named upgrade when rules multiply beyond what Go code
@@ -562,6 +565,15 @@ come online.
 LiteLLM tracks model spend per virtual key. The gateway tracks tool spend per
 call. `factoryd` aggregates both per task and per day, with hard caps that the
 gateway enforces by refusing the next call.
+
+The gateway books each model call's own cost atomically into the task row:
+the `x-litellm-response-cost` header for plain calls, and the `usage.cost`
+field of the final chunk for streams, which the gateway forces on. LiteLLM's
+`x-litellm-key-spend` header cannot serve: it is the cached spend before the
+call, zero on every stream. After a task finishes, factoryd settles its spend
+upward to the total LiteLLM recorded on the task's keys, which covers
+abandoned streams; LiteLLM writes that total 60 to 80 seconds late. The
+per-key `max_budget` stays the hard backstop.
 
 ## 6. Chunk 4: the worker plane
 
@@ -648,12 +660,18 @@ adapter re-reads the current token file, attaches the fresh JWT, and forwards
 to `factory-gateway`. Model and tool calls stay entirely on that identity
 path.
 
-Git is the one deliberate exception, because harnesses run git as a shell
-command. The sandbox holds a per-task Forgejo token, minted by factoryd
-through Forgejo's API at task start, scoped to branch write on the task's
-repository, revoked at task end. Everything an agent exchanges with the world
-is still attributable: model and tool calls by the task identity, git pushes
-by the task token.
+Git is the one path outside the gateway, and the agent never holds its
+credential. factoryd mints a per-task Forgejo token at task start, scoped to
+branch write on the task's repository, and revokes it at task end. The
+worker, running as pid 1 in the pod, clones with that token before the
+harness starts, then runs the harness in its own process group without the
+token in its environment or in `.git/config`. When the harness finishes, the
+worker kills and reaps every other process in the pod, fetches the agent's
+commits into a fresh repository it owns with hooks and repository config
+disabled, and pushes from there. Built in Stage 5 because a token in the
+agent's repository leaks through git hooks, `core.fsmonitor` and lingering
+processes that read `/proc/<pid>/environ`. Everything stays attributable:
+model and tool calls by the task identity, git pushes by the task token.
 
 ### 6.4 Sandbox hardening
 
@@ -662,8 +680,17 @@ Sandbox hardening:
 - gVisor RuntimeClass (verified supported in Talos machine configs): the
   container runs under an userspace kernel, not the host kernel.
 - Non-root, dropped capabilities, read-only root filesystem.
-- Cilium network policy: default deny egress. Allowed: `factory-gateway`,
-  Forgejo git, package registries. Nothing else, no cloud metadata endpoint.
+- Cilium network policy: default deny egress. Allowed: `factory-gateway` on
+  its port and Forgejo git. DNS answers only those names (`matchName`, not a
+  wildcard, which would open a DNS exfiltration channel). A package registry
+  joins the list by name when the sandbox image carries the toolchain that
+  needs it. Nothing else, no cloud metadata endpoint.
+- Per-task namespace with a ResourceQuota and LimitRange, container limits,
+  and size-capped emptyDir volumes.
+- factoryd creates task namespaces through a narrow ClusterRole, and a
+  ValidatingAdmissionPolicy confines it to `factory-agents-*` namespaces with
+  the restricted Pod Security label, gVisor pods without an automounted API
+  token, and a RoleBinding only to itself.
 - Upgrade path for stronger isolation: Kata microVMs, a node pool change.
 
 ### 6.5 Session records
