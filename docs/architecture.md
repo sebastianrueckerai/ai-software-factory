@@ -633,13 +633,22 @@ gateway tools, never through a provider key.
 ### 5.6 The console board
 
 The console shows a kanban board. Forgejo has kanban boards in its web
-interface, but its REST API has no endpoints for them: a program cannot
-create a board, add a card or move a card between columns (as of 2026-09,
-upstream work in forgejo/forgejo#13700). Only a person clicking in the
-browser can. Our tasks change state on their own, so factoryd would have to
-move cards by program, and a Forgejo board would go stale. The console is a
-web application we build anyway, so it draws the board itself from
-factoryd's task table:
+interface, but a card's column is its own record, not a view of the issue's
+state: closing or labelling an issue leaves the card where it is (open
+requests forgejo#773 and #4462), and the REST API has no endpoint that adds
+an issue to a board or moves a card (checked against the swagger of a
+16.0 instance on 2026-09-27: no project paths, no project field on issue
+create or edit). Only a person dragging in the browser moves a card.
+Forgejo has no plugin system either. Its only customisation is template
+overrides, which the project documents as unsupported and likely to break
+on any update, or a source patch, which means our own fork and build on
+every security release. The upstream projects API is under way: its
+groundwork merged on 2026-09-19 (forgejo#13700), the endpoints follow in
+later pull requests with no date. So the console, a web application we
+build anyway, draws the board itself from factoryd's task table. When the
+Forgejo API lands, factoryd mirrors columns onto a Forgejo project the same
+way it mirrors state onto labels today, and both boards show the same
+picture:
 
 - **Agent lane.** One card per task, in columns derived from factoryd task
   states: queued, running, waiting on a human, in review, done, failed.
