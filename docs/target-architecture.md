@@ -176,7 +176,7 @@ One Go module produces two binaries.
 - **Intake.** Forgejo webhooks, SigNoz alerts and escalation events arrive here and create or update task rows.
 - **The task registry.** Each task carries a priority, required capabilities, a risk class and a cost ledger.
 - **The Temporal worker.** It runs the task lifecycle workflow: intake, sandbox, agent run, verification, pull request, approval, merge.
-- **The console.** A server-rendered Go interface with htmx for operators and approvals, served at `console.aisoftwarefactory.world` through the Gateway. Humans log in through Forgejo OAuth2. It shows every workflow's state at a glance, keeps the human-action queue of approvals and escalations waiting on a person, and carries a task-creation form for work that does not start as an issue.
+- **The console.** A server-rendered Go interface with htmx for operators and approvals, served at `console.aisoftwarefactory.world` through the Gateway. Humans log in through Forgejo OAuth2. Its main view is a kanban board. Agent tasks move through columns derived from their state: queued, running, waiting on a human, in review, done, failed. A separate lane holds human tasks: approvals, escalations and tasks you file for yourself. A new-task button files a Forgejo issue labelled `agent` or `human`, so every task has one record with its discussion, and factoryd mirrors state onto issue labels. Forgejo's own project boards cannot serve, because its API cannot move cards. The console also lists every commissioned cloud resource by project and task with its cost so far.
 - **Cost aggregation.** Model spend from LiteLLM plus tool spend from the gateway, summed per task and per day.
 
 **factory-gateway** is the enforcement point. Every model call and every tool call an agent makes passes through it:
@@ -216,7 +216,7 @@ The first capability class is `coder`: repository read, branch write, model alia
 
 ### Budgets
 
-The gateway enforces hard caps by refusing the next call. It books each model call's own cost into the task the moment the call ends, and after the task finishes factoryd settles the total to what LiteLLM recorded. LiteLLM tracks model spend per virtual key, the gateway tracks tool spend per call, and factoryd aggregates both per task and per day. Hetzner offers no hard per-project spend cap, so this ledger is the real spend limit. Agents may also commission cloud resources through gateway-gated tools: euro caps and hard resource quotas are policy data like any capability, the gateway mints short-lived scoped credentials so the agent never holds a provider key, every commissioned resource is tagged with its task and tracked in a factoryd-owned registry, and a periodic garbage collector reaps untracked or orphaned resources.
+The gateway enforces hard caps by refusing the next call. It books each model call's own cost into the task the moment the call ends, and after the task finishes factoryd settles the total to what LiteLLM recorded. LiteLLM tracks model spend per virtual key, the gateway tracks tool spend per call, and factoryd aggregates both per task and per day. Hetzner offers no hard per-project spend cap, so this ledger is the real spend limit. Agents may also commission cloud resources through gateway tools. They live in a separate Hetzner project whose token only the gateway holds, and the gateway calls the provider itself. A human sets each project's resource envelope from a standard default, and a request beyond it becomes an approval card. The gateway writes a registry row with task, project and lease before each create and labels the resource the same way. Task completion deletes a task's resources. If an agent dies, the lease still expires and a garbage collector deletes the resource, along with anything in the agent project the registry does not know. A human can promote a resource to project-owned.
 
 ## 7. The worker plane
 
@@ -243,7 +243,7 @@ A harness fits the factory if it meets four requirements: it runs headless, it a
 
 **The git exception.** Git is the one path outside the gateway, and the agent still never holds its credential. factoryd mints a Forgejo token at task start, scoped to branch write on the task's repository, and revokes it at task end. The worker process in the pod clones with it before the agent starts, keeps it out of the agent's environment and repository config, and after the agent finishes kills every other process in the pod and pushes from a clean repository of its own. A token inside the agent's repository would leak through git hooks and lingering processes. Every exchange with the world stays attributable: model and tool calls by the task identity, git pushes by the task token.
 
-**Session records.** The sandbox streams its session out while it lives: prompts, tool calls, output, files touched, commits and cost. Full history goes to object storage, a compact restart state to Postgres. A dead session resumes as a new pod that receives the findings and the parent session id, not as a resurrected process. Session supervision runs beside the stream: a no-progress watchdog on harness events, a wall-clock cap per task, and a repetition detector that fires when files stop changing. Each trip takes the same path as a dead session — snapshot, kill, resume or retry with a stronger model — and the Temporal workflow enforces heartbeat and wall-clock timeouts so a stuck agent is visible instead of silent.
+**Session records.** The sandbox streams its session out while it lives: prompts, tool calls, output, files touched, commits and cost. Full history goes to object storage, a compact restart state to Postgres. A dead session resumes as a new pod that receives the findings and the parent session id, not as a resurrected process. **Supervision.** Cheap detectors watch every session: a no-progress watchdog on harness events, a wall-clock cap per task, and a cycle detector that hashes the work tree after each file change and fires when a state recurs, A to B to C and back to A. A trip, or a task past half its time or budget, calls the supervisor: the strongest model available, under its own `supervisor` alias. It reads the brief, the session record and the work-tree history, and picks one action: continue, redirect with guidance, retry on a stronger model, or stop and escalate to a human. It never raises a cap. The Temporal workflow enforces heartbeat and wall-clock timeouts, so a stuck agent is visible instead of silent.
 
 ## 8. Verification and delivery
 
@@ -261,7 +261,7 @@ Merge is a pull request merge. Flux deploys the merged commit to the staging nam
 
 What starts a task?
 
-Forgejo webhooks carry issues, pull request comments and reviews. SigNoz alert rules watch the demo application's telemetry. Both feed factoryd intake, which creates or updates task rows, with priority from labels and severity. The agent's human-escalation tool call is one more intake event: it raises an approval task and pings the console.
+Forgejo webhooks carry issues, pull request comments and reviews. SigNoz alert rules watch the demo application's telemetry. Both feed factoryd intake, which creates or updates task rows, with priority from labels and severity. The agent's human-escalation tool call is one more intake event: it raises an approval task and pings the console. Every task becomes a Forgejo issue, whatever its source, so the console board and Forgejo's issue list show the same work.
 
 ## 10. One task, end to end
 
@@ -284,7 +284,8 @@ sequenceDiagram
     S->>G: model call with the pod token
     G->>M: forward under the per-task virtual key
     M-->>S: completion
-    S->>ISS: push branch, open pull request
+    S->>ISS: the worker pushes the branch
+    T->>ISS: open pull request
     ISS->>C: run PR checks
     C-->>T: checks pass
     T->>T: gate activities, then model review
@@ -299,9 +300,9 @@ sequenceDiagram
 The same journey in words:
 
 1. An issue arrives, factoryd records the task and the Temporal workflow starts.
-2. The workflow creates a namespace, a ServiceAccount and a gVisor pod, and injects the task brief and the per-task git token.
+2. The workflow creates a namespace, a ServiceAccount and a gVisor pod, and injects the task brief. The worker process clones with the per-task git token before the agent starts.
 3. opencode works on a branch. Its model and tool calls go through the localhost adapter, which attaches the pod token and forwards to the gateway. The gateway checks policy and budget, then forwards to LiteLLM or to the tool.
-4. The agent pushes the branch and opens a pull request. Forgejo Actions runs the checks.
+4. The agent commits. The worker kills the agent's processes, pushes the branch from its own clean repository, and the workflow opens a pull request. Forgejo Actions runs the checks on the unprivileged runner. If the agent stalls or circles on the way, the supervisor steps in.
 5. The workflow runs its gate activities and then the model review.
 6. Where policy demands it, the workflow sends the approval request and sleeps.
 7. The pull request merges. Flux deploys staging, then prod. The application's telemetry reaches SigNoz, whose alert rules watch for the next signal.

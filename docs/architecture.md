@@ -578,6 +578,58 @@ finished within the last hour once a minute. Each pass lists LiteLLM's keys
 once, and the raise never lowers spend. The per-key `max_budget` stays the
 hard backstop.
 
+### 5.5 Cloud-resource commissioning
+
+Agents may need a database, a VM or a bucket for a task. They get it through
+gateway tools, never through a provider key.
+
+- **A separate provider project.** Agent resources live in their own Hetzner
+  project. Only the gateway holds its API token. Hetzner tokens cannot be
+  scoped below a project, so the gateway calls the API itself instead of
+  handing out credentials. The cluster's own project stays out of agent
+  reach, and the garbage collector never touches it.
+- **An envelope per project.** When a project starts, a human sets its
+  resource envelope from a standard default: a monthly euro cap, the
+  allowed resource types and sizes, a maximum count, and a maximum lease.
+  Each task draws from the envelope under its own cap.
+- **More needs a human.** A request beyond the envelope becomes an approval
+  card with the resource, the reason and the cost per month. Approval
+  widens the grant for that task or for the project.
+- **Registry first.** Before each create, the gateway writes a registry row:
+  task, project, session, resource type, price per hour and lease expiry.
+  The provider resource carries the task and project as labels. The console
+  lists every resource by project and task with its cost so far.
+- **Leases end orphans.** Every resource has a lease, by default the task's
+  wall-clock cap plus a margin. Task completion deletes the task's
+  resources. If the agent or factoryd dies, the lease still expires and the
+  garbage collector deletes the resource. A human can promote a resource to
+  project-owned, for example a staging database, and it then counts against
+  the project's monthly cap without a lease.
+- **The collector trusts the registry.** Every few minutes it deletes
+  expired leases, deletes anything in the agent project the registry does
+  not know, and marks registry rows whose resource vanished. The worst-case
+  orphan cost is one lease length times the resource's hourly price.
+- **Reachability.** While a lease lives, the task's egress policy admits the
+  resource's address, so the sandbox can use it.
+
+### 5.6 The console board
+
+The console shows a kanban board. Forgejo has project boards, but its API
+cannot move cards (no projects API as of 2026-09, upstream work in
+forgejo/forgejo#13700), so the factory could not keep a Forgejo board
+current. The board lives in the console instead:
+
+- **Agent lane.** One card per task, in columns derived from factoryd task
+  states: queued, running, waiting on a human, in review, done, failed.
+  Cards move by themselves.
+- **Human lane.** Approvals, escalations, and tasks a human files for
+  themself. Closing a card or pressing approve signals the waiting workflow.
+- **New task.** The button files a Forgejo issue labelled `agent` or
+  `human`. Every task is an issue, including those raised by SigNoz alerts
+  and escalations, so there is one record with its discussion. factoryd
+  mirrors task state onto issue labels through the issues API, so Forgejo's
+  own issue list shows the same picture.
+
 ## 6. Chunk 4: the worker plane
 
 One task, one namespace, one ServiceAccount `task-<id>`, one pod.
@@ -703,13 +755,37 @@ output, files touched, commits, cost. Full history to S3, compact restart state
 to Postgres. A dead session resumes as a new pod with its findings and its
 parent session ID, not as a resurrected process.
 
+### 6.6 Supervision
+
+Two layers. Cheap detectors in factoryd watch every session: a no-progress
+watchdog (no harness events for a set interval), a wall-clock cap per task
+that survives restarts, and a cycle detector. After each file change the
+worker hashes the work tree. A hash that recurs after the tree has moved on
+means the agent is going in circles, A to B to C and back to A.
+
+The detectors do not decide. A trip, or a task past half its wall-clock cap
+or half its budget, calls the supervisor: the strongest model configured,
+under its own `supervisor` alias. It reads the brief, the session record and
+the work-tree history, then picks one action: continue, redirect (a new pod
+resumes with the supervisor's guidance as findings), retry on a stronger
+model, or stop and escalate to a human. The supervisor never raises a cap or
+a budget. Only a human does that. Most tasks never reach the supervisor, so
+its cost stays small.
+
+Stage 5 shipped a repetition detector that fires when tool calls continue
+but files stop changing, which catches an agent that only reads or reruns
+tests. The half-cap check-in covers that case, so Stage 6 replaces the
+repetition detector with the cycle detector.
+
 ## 7. Chunk 5: verification and delivery
 
 Evidence in order of strength. Cheap deterministic gates first, the expensive
 model last:
 
-1. Forgejo Actions runs PR checks on the untrusted runner, whose job
-   containers get no privilege and no credentials: build, tests, lint, static
+1. Forgejo Actions runs PR checks on the untrusted runner: an ephemeral
+   pod under gVisor that takes one job and exits, runs it on the host
+   executor, builds images with rootless BuildKit, and holds no privilege
+   and no credentials (Ruling 78): build, tests, lint, static
    security scanning. The privileged dind runner is node root, so it only
    builds protected `main` and publishes images (Ruling 76).
 2. The Temporal workflow runs gate activities for what CI cannot decide: the
