@@ -572,8 +572,11 @@ field of the final chunk for streams, which the gateway forces on. LiteLLM's
 `x-litellm-key-spend` header cannot serve: it is the cached spend before the
 call, zero on every stream. After a task finishes, factoryd settles its spend
 upward to the total LiteLLM recorded on the task's keys, which covers
-abandoned streams; LiteLLM writes that total 60 to 80 seconds late. The
-per-key `max_budget` stays the hard backstop.
+abandoned streams. LiteLLM writes that total 60 to 80 seconds late, so a
+settlement loop, apart from the runner's claim loop, re-settles every task
+finished within the last hour once a minute. Each pass lists LiteLLM's keys
+once, and the raise never lowers spend. The per-key `max_budget` stays the
+hard backstop.
 
 ## 6. Chunk 4: the worker plane
 
