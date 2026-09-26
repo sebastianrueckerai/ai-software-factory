@@ -611,13 +611,35 @@ gateway tools, never through a provider key.
   orphan cost is one lease length times the resource's hourly price.
 - **Reachability.** While a lease lives, the task's egress policy admits the
   resource's address, so the sandbox can use it.
+- **Cost comes from the provider's price list.** Each connector reads its
+  provider's price catalogue through the API. Hetzner's is one call,
+  `GET /v1/pricing`, and it prices every resource type they sell: server
+  types per location, primary and floating IPs, volumes and snapshots per
+  GB and month, load balancers, backups and traffic (verified 2026-09-27; a
+  cpx42 in fsn1 is 0.1114 EUR per hour). Before a create, the gateway prices
+  the request: hourly price times the lease, plus the provider's minimum.
+  That reserved amount counts against the task cap and the project envelope
+  at once, and the registry accrues the real cost per hour while the
+  resource lives. Resources priced by time (servers, IPs, volumes, load
+  balancers, buckets by size) are known in full up front. Resources priced
+  by usage (functions, traffic, requests) are not: they get an estimate cap
+  in the envelope, and the connector reconciles the estimate against the
+  provider's billing or usage API afterwards. DigitalOcean, AWS and GCP all
+  publish price lists through their APIs (sizes, the Price List API, the
+  Cloud Billing Catalog), so the same connector shape fits them later.
+  Hetzner comes first. The standard envelope covers what tasks need most:
+  servers, a fixed IP, block storage and a bucket.
 
 ### 5.6 The console board
 
-The console shows a kanban board. Forgejo has project boards, but its API
-cannot move cards (no projects API as of 2026-09, upstream work in
-forgejo/forgejo#13700), so the factory could not keep a Forgejo board
-current. The board lives in the console instead:
+The console shows a kanban board. Forgejo has kanban boards in its web
+interface, but its REST API has no endpoints for them: a program cannot
+create a board, add a card or move a card between columns (as of 2026-09,
+upstream work in forgejo/forgejo#13700). Only a person clicking in the
+browser can. Our tasks change state on their own, so factoryd would have to
+move cards by program, and a Forgejo board would go stale. The console is a
+web application we build anyway, so it draws the board itself from
+factoryd's task table:
 
 - **Agent lane.** One card per task, in columns derived from factoryd task
   states: queued, running, waiting on a human, in review, done, failed.
@@ -757,25 +779,43 @@ parent session ID, not as a resurrected process.
 
 ### 6.6 Supervision
 
-Two layers. Cheap detectors in factoryd watch every session: a no-progress
-watchdog (no harness events for a set interval), a wall-clock cap per task
-that survives restarts, and a cycle detector. After each file change the
-worker hashes the work tree. A hash that recurs after the tree has moved on
-means the agent is going in circles, A to B to C and back to A.
+Two layers. Cheap detectors in factoryd read the event stream and decide
+when to call the supervisor. The supervisor, a model, decides what to do.
 
-The detectors do not decide. A trip, or a task past half its wall-clock cap
-or half its budget, calls the supervisor: the strongest model configured,
-under its own `supervisor` alias. It reads the brief, the session record and
-the work-tree history, then picks one action: continue, redirect (a new pod
+An agent that circles rarely repeats itself word for word. It tries the same
+idea in new words, so no deterministic check catches every circle. What a
+deterministic check can catch cheaply is the trace a circle leaves in the
+event stream. The detectors, each a few lines over the events factoryd
+already stores:
+
+- **Stall.** No harness events for a set interval.
+- **Reading without writing.** A set number of tool calls with no file
+  change. An agent that only reads, greps or reruns a test is stuck too.
+- **The same failure again.** The same command fails with the same error
+  signature (output with timestamps, addresses and durations stripped) a
+  set number of times in a row. This is the most common circle: edit, test,
+  same failure, edit, test, same failure.
+- **The same call again.** The same tool with the same arguments, repeated.
+- **Flip-flop.** A file returns to a content it had before, after other
+  content in between.
+- **Churn without progress.** Many file changes while the diff against the
+  base commit stops growing and no new test passes.
+- **Half way.** The task passed half its wall-clock cap or half its budget.
+
+A trip calls the supervisor: the strongest model configured, under its own
+`supervisor` alias. It gets the brief, the session record and a progress
+digest: the commands run with their outcomes over time, the files touched
+with edit counts, the last error signatures and the diff so far. That digest
+is what a human reviewer would read to see a circle that the detectors
+cannot name. The supervisor picks one action: continue, redirect (a new pod
 resumes with the supervisor's guidance as findings), retry on a stronger
-model, or stop and escalate to a human. The supervisor never raises a cap or
-a budget. Only a human does that. Most tasks never reach the supervisor, so
-its cost stays small.
+model, or stop and escalate to a human. It never raises a cap or a budget.
+Only a human does that. Most tasks never trip a detector, so the supervisor
+costs little.
 
-Stage 5 shipped a repetition detector that fires when tool calls continue
-but files stop changing, which catches an agent that only reads or reruns
-tests. The half-cap check-in covers that case, so Stage 6 replaces the
-repetition detector with the cycle detector.
+Stage 5 shipped the stall watchdog, the wall-clock cap and the
+reading-without-writing detector, which today kill and resume the session.
+Stage 6 adds the other detectors and routes every trip to the supervisor.
 
 ## 7. Chunk 5: verification and delivery
 
