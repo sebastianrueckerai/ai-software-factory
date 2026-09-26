@@ -678,8 +678,10 @@ parent session ID, not as a resurrected process.
 Evidence in order of strength. Cheap deterministic gates first, the expensive
 model last:
 
-1. Forgejo Actions runs PR checks on the runner's docker-in-docker sidecar:
-   build, tests, lint, static security scanning.
+1. Forgejo Actions runs PR checks on the untrusted runner, whose job
+   containers get no privilege and no credentials: build, tests, lint, static
+   security scanning. The privileged dind runner is node root, so it only
+   builds protected `main` and publishes images (Ruling 76).
 2. The Temporal workflow runs gate activities for what CI cannot decide: the
    failure reproduction now passes, the schema migration is reviewed, the
    policy evaluation returns allow.

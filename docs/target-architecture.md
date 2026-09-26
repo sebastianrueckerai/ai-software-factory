@@ -91,7 +91,7 @@ flowchart TD
 The namespaces, in the order of the diagram:
 
 - `platform` holds the shared services: CloudNativePG, Temporal, OpenBao, LiteLLM, SigNoz and cert-manager. The operator namespaces `cnpg-system` and `local-path-storage` support them.
-- `forgejo` holds the git server, its Actions runner and its container registry.
+- `forgejo` holds the git server, its container registry and two Actions runners. The trusted runner builds and publishes images from protected `main` only; its dind sidecar is privileged, so nothing an agent wrote reaches it unreviewed. The untrusted runner checks agent pull requests without privilege, registry or repository credentials.
 - `factory` holds the two self-written services, factoryd and factory-gateway.
 - `factory-agents` holds one namespace per running task, each with one gVisor pod.
 - `apps` holds the demo application in staging and prod, deployed by Flux.
