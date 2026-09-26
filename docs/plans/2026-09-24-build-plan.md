@@ -12,12 +12,12 @@
 
 ## Global Constraints
 
-- Nothing is implemented before Sebastian's explicit go.
+- Stages 0 to 2 ran under Sebastian's per-stage go; Stages 3 to 9 carry his standing authorization (2026-09-25), no stage-end check-ins.
 - No secret enters Git, ever. Secrets live in the seed bundle (offline password manager plus printed copy) or in ignored `.env` files.
 - Nodes: 3x Hetzner Cloud cpx42 (x86, 8 shared vCPU, 16 GB, 320 GB), 69.49 EUR per month each net, verify orderability with a create-and-delete probe at order time, the API availability lists are unreliable. All three run control-plane and workloads.
 - Talos 1.14, Cilium 1.20, OpenTofu (`tofu`). No SSH on nodes, Talos API only.
 - Go module `github.com/sebastianrueckerai/ai-software-factory-code`, binaries `factoryd` and `factory-gateway`.
-- New work happens in a git worktree. Every task ends with a commit to master and a push.
+- New work happens in a git worktree. Every task ends with a commit to master and a push. (Exception, Ruling 1: the infra repo works on main directly so untracked tofu and Talos state survives task and stage boundaries.)
 - Repositories: `ai-software-factory-infra` and `ai-software-factory-code`, private on GitHub now, Forgejo becomes the primary in Stage 2 with GitHub as backup remote. File paths below say `infra/` and `factory/` for short.
 - British English in all documents.
 
@@ -50,7 +50,7 @@ Each stage ends with an exit test. A stage starts only after the previous one pa
 
 The stages map to the build order in architecture 11: Ranch is stages 0 to 3, First loop is 4 to 6, Teeth is 7, Customer is 8, Self is 9.
 
-Standing reminder at every stage boundary from here on: the cluster costs about 210 EUR per month once Stage 1 orders the nodes, plus storage and model spend. Hetzner Cloud servers bill hourly and deletion stops the meter. Raise the shutdown question at every boundary anyway.
+No shutdown question at stage boundaries: Stages 3 to 9 run under standing authorization and stop only when stuck or when Sebastian's input is genuinely needed (Rulings 56, 62, 69). At a real stopping point, take a completed base backup of the live Postgres generation (Ruling 63), then `tofu destroy` stops the meter; the Stage 3 drill is the way back.
 
 ---
 
@@ -2779,9 +2779,9 @@ The detailed task plan for each stage below is written when the previous stage p
 
 Goal: prove the immutability claim from goal.md on the real cluster.
 
-Steps: back up (CNPG S3 backup, Forgejo dump, OpenBao snapshot), `tofu destroy`, `tofu apply`, re-apply configs, Flux converge, restore Postgres, Forgejo and OpenBao from the seed bundle plus S3, measure the wall-clock duration of the whole drill. This stage is also the off-switch rehearsal: the same path with cancellation instead of rebuild.
+Steps: back up (ScheduledBackup through the barman-cloud plugin, Forgejo dump, OpenBao snapshot), `tofu destroy`, `tofu apply`, re-apply configs, Flux converge, restore Postgres through the plugin's ObjectStore CR (the in-tree `barmanObjectStore` path is dead at CNPG 1.31, Ruling 59), Forgejo from its dump extracted into `gitea-repositories`, OpenBao from its S3 snapshot with the seed unseal key, then re-create the imperative state the restores do not carry: the gateway database role, the Forgejo tokens, the imperative namespace secrets, and any OpenBao KV newer than the last snapshot. The recovery origin always names the newest generation holding a completed base backup while the live archive runs one sibling ahead; a teardown that must preserve Postgres state takes that base backup first; a rebuild is green only when the restored repositories' HEADs match the last pushed commits (Rulings 61, 63). Measure the wall-clock duration (about five hours, 2026-09-25). This stage is also the off-switch rehearsal: the same path with cancellation instead of rebuild. Closed 2026-09-25; the drill is the standing rebuild recipe for every later stage.
 
-Exit test: the cluster is whole again, all Stage 2 exit tests still pass, and the drill duration is written down in architecture 3.
+Exit test: the cluster is whole again, all Stage 2 exit tests still pass, the restored repositories' HEADs match the last pushed commits, and the drill duration is written down in architecture 3.
 
 ### Stage 4: factory-gateway v0
 
@@ -2791,19 +2791,21 @@ Steps: TDD the JWT validation against the cluster OIDC issuer (unit tests forge 
 
 Exit test: on the cluster, a call with a valid task JWT reaches LiteLLM under a per-task virtual key, a call with no or foreign JWT gets 401, and a call past the task budget gets 402 with an audit row for each outcome.
 
+Closed 2026-09-26. Standing contracts: `coding-cheap` is a load-balanced DeepSeek and Qwen pair and `review-frontier` maps to GLM (Ruling 64); the gateway tracks budget itself and maps LiteLLM's proactive 429 `budget_exceeded` to 402 at the edge, LiteLLM is the second line (Ruling 65); `deepseek-chat` stays pinned unless the API rejects it (Ruling 66). Architecture 5.1 step 4b, the tool path and OpenBao minting, lands in Stage 7.
+
 ### Stage 5: worker plane
 
 Goal: one task runs one agent in one sandbox, attributable end to end.
 
-Steps: spot-check the three load-bearing opencode facts from architecture 9 (JSON run output, serve API, `OPENCODE_CONFIG_CONTENT`) before writing the adapter, build the pinned opencode sandbox image with the gVisor RuntimeClass, implement the adapter plus the localhost identity proxy from architecture 6.3 (it re-reads the rotating token file per request, unit test with a temp file that changes), the per-task Forgejo token minting and revocation, the factoryd task registry with Postgres, and session records streaming to S3. Verify the sandbox network policy: egress to factory-gateway and Forgejo git only. Decide whether TaskBrief grows the capability-hints field named in architecture 6.2.
+Steps: land the Stage 4 runner gate before any commit the controller did not push can trigger CI: a runner egress NetworkPolicy limiting job containers to the architecture 5.3 allowlist plus the image pulls dind needs, or a second runner whose job containers use dind bridge networking with untrusted builds routed by label; the code repo's `k8s/` tree is risk-classed: changes by anyone but the controller merge only through a human. Spot-check the three load-bearing opencode facts from architecture 9 (JSON run output, serve API, `OPENCODE_CONFIG_CONTENT`) before writing the adapter, build the pinned opencode sandbox image with the gVisor RuntimeClass, implement the adapter plus the localhost identity proxy from architecture 6.3 (it re-reads the rotating token file per request, unit test with a temp file that changes), the per-task Forgejo token minting, and revocation of both the Forgejo token and the LiteLLM virtual key in the task-completion path, the factoryd task registry with Postgres: priority, required capabilities, risk class and cost ledger per task (architecture 6), and session records (prompts, tool calls, output, files touched, commits, cost) streaming full history to S3 and a compact restart state to Postgres; a dead session resumes as a new pod carrying its findings and the parent session id. The adapter sets caller-side token budgets (GLM is reasoning-always-on, architecture 4.4) so tier budgets hold. One namespace and one ServiceAccount `task-<id>` per task; the pod non-root with dropped capabilities and a read-only root filesystem; gVisor on the systrap platform (no /dev/kvm on cloud, architecture 3). Verify the sandbox network policy: egress to factory-gateway, Forgejo git and the package registries, with the cloud metadata endpoint unreachable. Decide whether TaskBrief grows the capability-hints field named in architecture 6.2.
 
-Exit test: a task submitted to factoryd produces a branch and a commit on Forgejo, the session record lands in S3, and a curl from inside the sandbox to any other address fails.
+Exit test: a task submitted to factoryd produces a branch and a commit on Forgejo, the session record lands in S3, and a curl from inside the sandbox to any address outside that allowlist fails.
 
 ### Stage 6: close the loop
 
 Goal: a signal becomes a merged change.
 
-Steps: Forgejo webhooks into factoryd intake, task rows from issues, the Temporal task workflow end to end (intake, sandbox, run, verify, PR), Forgejo Actions as the first verification gate, the human merge as the delivery step.
+Steps: Forgejo webhooks into factoryd intake (issues, pull request comments and reviews; priority from labels and severity), task rows from issues, the Temporal task workflow end to end (intake, sandbox, run, verify, PR), durable across crashes, with retry on a stronger model while the previous attempt's artifacts stay in place, Forgejo Actions as the first verification gate, the human merge as the delivery step.
 
 Exit test: an issue created on the factory repo becomes a pull request with green checks, a human merges it, and the session record shows the full path.
 
@@ -2811,15 +2813,15 @@ Exit test: an issue created on the factory repo becomes a pull request with gree
 
 Goal: the enforcement from architecture 5.3 and 5.4 is real.
 
-Steps: the `coder` capability class in Postgres with gateway enforcement, hard euro caps per task and per day in the cost ledger, the approval workflow state with the console UI (server-rendered Go, htmx), the Temporal gate activities from architecture 7, model review last on surviving diffs.
+Steps: the `coder` capability class as policy data in Postgres, edited through the console or API and versioned in Git, enforced in the gateway (capability, budget and approval state on every call), the gateway tool path from architecture 5.1 step 4b: proxy tool calls to their MCP servers or mint short-lived OpenBao credentials for the narrow case where the agent must connect itself, tool spend per call in the cost ledger, and the paid non-chat capabilities (Replicate, Firecrawl, fal.ai) as connectors with per-task request and euro caps, hard euro caps per task and per day in the cost ledger, the approval workflow state with the console UI (server-rendered Go, htmx), human login through Forgejo OAuth2, the agent's human-escalation tool call as one more intake event that raises an approval task and pings the console, the Temporal gate activities from architecture 7, model review last on surviving diffs.
 
-Exit test: a task over budget has its next model call refused by the gateway, a risk-classed change waits in an approval state and completes when approved, and the cost dashboard shows both.
+Exit test: a task over budget has its next model call refused by the gateway, a risk-classed change waits in an approval state, completes when approved, and the workflow merges the pull request, and the cost dashboard shows both.
 
 ### Stage 8: customer
 
 Goal: the demo app, the first external customer of the factory.
 
-Steps: choose the demo app (fork still open, architecture 10), staging and prod namespaces deployed by Flux, OpenTelemetry emission, SigNoz alert rules feeding factoryd intake, fault injection.
+Steps: choose the demo app (fork still open, architecture 10), staging and prod namespaces deployed by Flux, OpenTelemetry emission from the demo app and from the factory itself: factoryd, factory-gateway and the worker adapters emit OTel, and gateway audit rows go to OTel as well as Postgres (architecture 5.1 step 5), the k8s-infra chart for node telemetry and CronJob failure watching into SigNoz, ClickHouse resource requests, and SigNoz retention tiered to object storage (architecture 4), SigNoz alert rules feeding factoryd intake, fault injection.
 
 Exit test: an injected fault raises an alert, the alert creates a task, the agent's fix passes verification, merges, deploys to staging, and promotes to prod on the rule.
 
@@ -2827,6 +2829,6 @@ Exit test: an injected fault raises an alert, the alert creates a task, the agen
 
 Goal: the factory works on its own repositories, the portfolio claim from goal.md.
 
-Steps: grant the `coder` class scoped access to `factory` (never `infra`), let real issues drive real changes, add the self-improvement analytics from architecture 11, evaluate SPIRE and OPA only if a need appears that the current design fails to cover.
+Steps: grant the `coder` class scoped access to `factory` (never `infra`), let real issues drive real changes, model review escalation from architecture 11: a failed review verdict escalates the task, back to the worker with findings or to a human, rather than dead-ending, grow the capability classes beyond `coder` as the loops need them (analyzer, integration tester, release agent; architecture 6), add the self-improvement analytics from architecture 11, evaluate SPIRE and OPA only if a need appears that the current design fails to cover.
 
 Exit test: an agent PR to `factory` merges under the same policy a human change would face, with the audit trail complete.
