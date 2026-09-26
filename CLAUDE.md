@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A largely autonomous "software factory": agents build and improve software from specs and from live feedback (issues, telemetry), with human escalation as a tool call used as sparingly as possible. It exists as a portfolio project to show enterprises that a lone developer can run an enterprise-grade agentic setup.
 
-The repository holds design docs only. There is no code, build, or test tooling yet. When code lands, record its commands here.
+This repository holds the design docs and the build plan. Code lives in two sibling repositories, each pushed to Forgejo (`origin`) and GitHub (`github`): `~/repos/ai-software-factory-code` (Go: factoryd, factory-gateway, agent-worker; `go test -race ./...`) and `~/repos/ai-software-factory-infra` (OpenTofu, Talos configs, Flux manifests). Build progress, rulings and the rebuild recipe live in the gitignored ledger `.superpowers/sdd/2026-09-24-build-plan/progress.md`.
 
 ## Read first
 
