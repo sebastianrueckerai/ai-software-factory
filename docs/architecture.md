@@ -211,6 +211,22 @@ must exist in S3. A rebuild is green only after the restored repositories'
 HEADs match the last pushed commits: a stale-source restore fails the gate
 instead of passing silently.
 
+The second rebuild (2026-09-26, for the worker plane) added five rules. The
+node image is a project snapshot built from a Talos Image Factory schematic
+that bakes in the gVisor system extension; an in-place `talosctl upgrade`
+does not add extensions, so a changed schematic means a new snapshot and a
+server replacement. The snapshot build downloads the factory image on the
+seed machine, verifies it with `xz -t`, and streams it over ssh to a fresh
+rescue system; downloading inside the rescue system corrupted the image
+twice. Forgejo's `SECRET_KEY` is pinned as an imperative secret, because the
+restored database holds Actions secrets encrypted under it, and a fresh key
+breaks every CI run. After any key change the Actions secrets are stored
+again. Every push made while Forgejo is down goes to GitHub only, so right
+after the Forgejo restore every repository is fast-forward pushed to Forgejo
+before Flux's first sync; otherwise Flux converges to the dump's stale tree.
+Nodes installed from the schematic image register with the control-plane
+taint, so the drill removes it after registration.
+
 Bootstrap breaks one circular dependency: Flux deploys everything from Git,
 but the Git server, Forgejo, is itself deployed by Flux. Step zero, run once
 from the seed machine: apply the bootstrap slice, CNPG plus Forgejo, by hand,
@@ -232,8 +248,8 @@ VPN (headscale) is the named upgrade if you need roaming access later.
 Operating note, standing reminder: the cluster costs about 210 EUR per month
 plus storage and model spend. Cloud servers bill hourly and deletion stops
 the meter, and the re-seed drill is the off-switch: teardown is
-`tofu destroy`, comeback is the seed bundle plus Git plus S3. Claude
-raises this at every phase boundary and before long idle periods.
+`tofu destroy`, comeback is the seed bundle plus Git plus S3. At a stopping
+point, take a completed base backup of the live Postgres generation first.
 
 ### 3.1 Storage strategy
 
@@ -597,7 +613,9 @@ type Harness interface {
 ```
 
 `TaskBrief` is the whole task as data: objective, repository and SHA, issue
-context, findings from parent sessions, artifact paths, capability hints.
+context, findings from parent sessions and artifact paths. Capability hints
+stay out of the brief: capabilities are policy, enforced by the gateway, not
+something the harness is told.
 `Event` is the normalized stream: model calls with alias and cost, tool calls
 with status, file changes, commands with exit codes, checkpoints, and the
 final result. Each adapter maps its harness's native output onto this set.
