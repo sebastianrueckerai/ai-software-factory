@@ -763,8 +763,11 @@ model and tool calls by the task identity, git pushes by the task token.
 
 Sandbox hardening:
 
-- gVisor RuntimeClass (verified supported in Talos machine configs): the
-  container runs under an userspace kernel, not the host kernel.
+- gVisor RuntimeClass: the container runs under a userspace kernel, not
+  the host kernel. The runtime comes from the gVisor system extension baked
+  into the node image by the Image Factory schematic, on the systrap
+  platform because cloud servers have no /dev/kvm. The machine config only
+  adds the `user.max_user_namespaces` sysctl.
 - Non-root, dropped capabilities, read-only root filesystem.
 - Cilium network policy: default deny egress. Allowed: `factory-gateway` on
   its port and Forgejo git. DNS answers only those names (`matchName`, not a
@@ -865,8 +868,10 @@ Checked by web verification on 2026-09-24. Sources named inline.
   the gateway terminates identity (5.2).
 - Temporal: server is MIT, never relicensed (the BSL result in searches is
   Terraform). Official Helm chart 1.0 since April 2026, operators optional.
-- Talos: 1.14.1 current. On Hetzner bare metal: boot ISO, apply machine
-  config. gVisor runs as a runtime handler from the machine config.
+- Talos: 1.14.1 current. On Hetzner Cloud: a snapshot written from the
+  Image Factory image, apply machine config. gVisor is a system extension
+  in the Image Factory schematic, not a machine-config stanza (learned in
+  Stage 5: an in-place upgrade does not add extensions).
 - Forgejo: GPL, non-profit governed, hard fork from Gitea since 2024. Actions
   runner has no Kubernetes backend: host, docker and lxc executors only
   (runner source, verified 2026-09-25). It runs here as one chart instance
@@ -930,6 +935,10 @@ under load.
 | Management access | Talos nftables firewall allowlisting your home IP, headscale VPN later | Decided |
 | Repository layout | `ai-software-factory-infra` and `ai-software-factory-code` now, `demo-app` in Phase 3 | Decided |
 | Public DNS | Namecheap DNS stays, HTTP-01 certificates, Cloudflare as the named upgrade | Decided |
+| Untrusted CI runner | An ephemeral runner pod under gVisor, one job then exit, rootless BuildKit, no credentials; the privileged dind runner serves protected `main` only | Decided (Ruling 78) |
+| Supervision | Cheap trace detectors over the event stream, the strongest model as supervisor under its own alias | Decided (Ruling 82) |
+| Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list | Decided (Rulings 80, 83) |
+| Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Decided (Rulings 81, 84) |
 | Demo app | Small real product with real telemetry | Open, chosen in Phase 3 |
 
 ## 11. Build order
@@ -977,3 +986,6 @@ works `factory` and `demo-app`.
 | Gateway API | The Kubernetes-standard way to describe inbound HTTP routing |
 | gVisor | An userspace kernel that intercepts container syscalls, stronger isolation than plain containers |
 | Kata | MicroVM containers: a real lightweight VM per pod, strongest isolation tier |
+| Supervisor | The strongest configured model, called when a detector trips or a task passes half its cap, choosing continue, redirect, retry or escalate |
+| Envelope | The resource and euro allowance a human sets per project for commissioned cloud resources |
+| Lease | The expiry every commissioned resource carries; the garbage collector deletes what outlives it |

@@ -329,7 +329,7 @@ Which repositories carry the work, and in what order does it land?
 | `ai-software-factory-code` | The Go module with both binaries, the harness adapters, tests and deploy manifests | Changes often, first repository the agents work on |
 | `demo-app` | A small real product with real telemetry | Arrives in the Customer phase |
 
-GitHub hosts the two factory repositories today. Forgejo becomes the primary remote once it runs, with GitHub kept as the backup.
+Forgejo is the primary remote and the one Flux reads. GitHub is the off-site mirror, pushed after every commit. While Forgejo is down, pushes reach GitHub only, so a restore is followed by a fast-forward push of every repository back to Forgejo.
 
 Build order, five phases:
 
@@ -366,6 +366,9 @@ The cluster is three servers at 69.49 EUR per month, about 210 EUR per month, pl
 | PV and PVC | Persistent volume, a disk the cluster offers, and persistent volume claim, a pod's request for one |
 | ServiceAccount | A Kubernetes identity for a pod, not for a person |
 | Streaming replication | Postgres replicas replaying the write-ahead log of the primary as it is written |
+| Supervisor | The strongest model available, called when a detector trips or a task passes half its cap. It chooses continue, redirect, retry or escalate, and never raises a cap |
+| Envelope | The resource and euro allowance a human sets per project for commissioned cloud resources |
+| Lease | The expiry every commissioned resource carries. The garbage collector deletes what outlives it |
 | Talos Linux | The minimal operating system that runs only Kubernetes on each node |
 | Temporal | The durable execution engine: workflow state and timers live in a database |
 | Virtual key | A LiteLLM key scoped to one task, carrying its budget and allowed models |
