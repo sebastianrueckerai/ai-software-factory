@@ -176,7 +176,7 @@ One Go module produces two binaries.
 - **Intake.** Forgejo webhooks, SigNoz alerts and escalation events arrive here and create or update task rows.
 - **The task registry.** Each task carries a priority, required capabilities, a risk class and a cost ledger.
 - **The Temporal worker.** It runs the task lifecycle workflow: intake, sandbox, agent run, verification, pull request, approval, merge.
-- **The console.** A server-rendered Go interface with htmx for operators and approvals. Humans log in through Forgejo OAuth2.
+- **The console.** A server-rendered Go interface with htmx for operators and approvals, served at `console.aisoftwarefactory.world` through the Gateway. Humans log in through Forgejo OAuth2. It shows every workflow's state at a glance, keeps the human-action queue of approvals and escalations waiting on a person, and carries a task-creation form for work that does not start as an issue.
 - **Cost aggregation.** Model spend from LiteLLM plus tool spend from the gateway, summed per task and per day.
 
 **factory-gateway** is the enforcement point. Every model call and every tool call an agent makes passes through it:
@@ -216,7 +216,7 @@ The first capability class is `coder`: repository read, branch write, model alia
 
 ### Budgets
 
-The gateway enforces hard caps by refusing the next call. LiteLLM tracks model spend per virtual key, the gateway tracks tool spend per call, and factoryd aggregates both per task and per day. Hetzner offers no hard per-project spend cap, so this ledger is the real spend limit.
+The gateway enforces hard caps by refusing the next call. LiteLLM tracks model spend per virtual key, the gateway tracks tool spend per call, and factoryd aggregates both per task and per day. Hetzner offers no hard per-project spend cap, so this ledger is the real spend limit. Agents may also commission cloud resources through gateway-gated tools: euro caps and hard resource quotas are policy data like any capability, the gateway mints short-lived scoped credentials so the agent never holds a provider key, every commissioned resource is tagged with its task and tracked in a factoryd-owned registry, and a periodic garbage collector reaps untracked or orphaned resources.
 
 ## 7. The worker plane
 
@@ -243,7 +243,7 @@ A harness fits the factory if it meets four requirements: it runs headless, it a
 
 **The git exception.** Harnesses run git as a shell command, so git is the one path that bypasses the gateway. The sandbox instead holds a Forgejo token minted by factoryd at task start, scoped to branch write on the task's repository, and revoked at task end. Every exchange with the world stays attributable: model and tool calls by the task identity, git pushes by the task token.
 
-**Session records.** The sandbox streams its session out while it lives: prompts, tool calls, output, files touched, commits and cost. Full history goes to object storage, a compact restart state to Postgres. A dead session resumes as a new pod that receives the findings and the parent session id, not as a resurrected process.
+**Session records.** The sandbox streams its session out while it lives: prompts, tool calls, output, files touched, commits and cost. Full history goes to object storage, a compact restart state to Postgres. A dead session resumes as a new pod that receives the findings and the parent session id, not as a resurrected process. Session supervision runs beside the stream: a no-progress watchdog on harness events, a wall-clock cap per task, and a repetition detector that fires when files stop changing. Each trip takes the same path as a dead session — snapshot, kill, resume or retry with a stronger model — and the Temporal workflow enforces heartbeat and wall-clock timeouts so a stuck agent is visible instead of silent.
 
 ## 8. Verification and delivery
 
