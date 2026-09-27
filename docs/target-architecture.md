@@ -91,9 +91,9 @@ flowchart TD
 The namespaces, in the order of the diagram:
 
 - `platform` holds the shared services: CloudNativePG, Temporal, OpenBao, LiteLLM, SigNoz and cert-manager. The operator namespaces `cnpg-system` and `local-path-storage` support them.
-- `forgejo` holds the git server, its container registry and two Actions runners. The trusted runner builds and publishes images from protected `main` only; its dind sidecar is privileged, so nothing an agent wrote reaches it unreviewed. The untrusted runner checks agent pull requests without privilege, registry or repository credentials.
+- `forgejo` holds the git server, its container registry and the trusted Actions runner, which builds and publishes images from protected `main` only; its dind sidecar is privileged, so nothing an agent wrote reaches it unreviewed. Agent pull requests are checked elsewhere, by untrusted runners factoryd starts one per job (section 8).
 - `factory` holds the two self-written services, factoryd and factory-gateway.
-- `factory-agents` holds one namespace per running task, each with one gVisor pod.
+- `factory-agents` holds one namespace per running agent session, each with one gVisor pod, and one namespace per untrusted CI job, named `factory-agents-ci-<job>`.
 - `apps` holds the demo application in staging and prod, deployed by Flux.
 
 ### Re-seedability
@@ -105,6 +105,8 @@ No node holds state that Git, S3 and the seed bundle do not describe. Teardown a
 3. Flux reinstalls every workload from Git.
 4. Restore Postgres from its S3 backups, Forgejo from its repository dump, and OpenBao from its S3 snapshot. The unseal key comes from the seed bundle.
 5. Point the services at the object storage buckets.
+
+The last full rebuild, in September 2026, took about 21 minutes from empty servers to a task running end to end, because the recipe in the infra repository already solves every trap the earlier drills hit.
 
 Step zero exists because of one circular dependency: Flux deploys everything from Git, but the Git server is itself deployed by Flux. The bootstrap applies the first slice, the database operator and Forgejo, by hand, restores the repositories, and leaves everything else to Flux.
 
@@ -153,7 +155,7 @@ Four of these deserve a closer look.
 
 **OpenBao** is the secrets store, the Linux Foundation fork of HashiCorp Vault with the same API. It holds the service credentials and hands out short-lived copies. It has no key management service for auto-unseal, so a full restart needs a human to enter the unseal key from the seed bundle. OpenBao 2.6.3 rejects a multi-share split with threshold one, so the bundle holds exactly one key. Node reboots are rare on Talos, so that price is accepted.
 
-**LiteLLM** fronts all chat model providers with one OpenAI-compatible API. The upstreams are DeepSeek, Qwen and GLM (z.ai). Three aliases name the tiers: `coding-cheap` for the DeepSeek and Qwen tier, `coding-frontier` for the GLM frontier tier, and `review-frontier` for the strongest of the three. Anthropic and OpenAI are deliberately absent at the start: the factory runs on the providers its owner uses daily. Paid capabilities that are not chat models, Replicate, Firecrawl and fal.ai, enter as tools with per-task request and euro caps.
+**LiteLLM** fronts all chat model providers with one OpenAI-compatible API. The upstreams are DeepSeek, Qwen and GLM (z.ai). Four aliases name the tiers: `coding-cheap` for the DeepSeek and Qwen tier, where every task starts, `coding-frontier` for the GLM frontier tier, where a retry climbs, `review-frontier` for the model review, and `supervisor` for the strongest configured model, used only by the supervisor. Anthropic and OpenAI are deliberately absent at the start: the factory runs on the providers its owner uses daily. Paid capabilities that are not chat models, Replicate, Firecrawl and fal.ai, enter as tools with per-task request and euro caps.
 
 **SigNoz** stores traces, logs and metrics in one ClickHouse database, with dashboards and alerting on top. Services and agents emit OpenTelemetry, and SigNoz's own collector scrapes the cluster. Its alert webhooks feed the signals intake.
 
@@ -173,9 +175,9 @@ One Go module produces two binaries.
 
 **factoryd** holds everything that remembers:
 
-- **Intake.** Forgejo webhooks, SigNoz alerts and escalation events arrive here and create or update task rows.
+- **Intake.** Forgejo webhooks arrive here, signed with a shared secret that factoryd checks before it reads the body. An issue labelled `agent` becomes an agent task, one labelled `human` a task in the human lane. Callers that are not Forgejo use an authenticated API, which files the issue itself, so every task is an issue. SigNoz alerts and agent escalations will arrive the same way.
 - **The task registry.** Each task carries a priority, required capabilities, a risk class and a cost ledger.
-- **The Temporal worker.** It runs the task lifecycle workflow: intake, sandbox, agent run, verification, pull request, approval, merge.
+- **The Temporal worker.** factoryd runs it itself. One workflow per task: link the issue, run up to three agent sessions, open the pull request, wait for the checks, then wait at no cost for a person to merge, close or ask for changes. factoryd keeps exactly one `state/*` label on the task's issue (queued, running, waiting-human, in-review, done, failed), and every step lands in a timeline record. A heal pass at boot and every minute starts any workflow that is missing and re-reads Forgejo for anything a webhook missed.
 - **The console.** A server-rendered Go interface with htmx for operators and approvals, served at `console.aisoftwarefactory.world` through the Gateway. Humans log in through Forgejo OAuth2. Its main view is a kanban board. Agent tasks move through columns derived from their state: queued, running, waiting on a human, in review, done, failed. A separate lane holds human tasks: approvals, escalations and tasks you file for yourself. A new-task button files a Forgejo issue labelled `agent` or `human`, so every task has one record with its discussion, and factoryd mirrors state onto issue labels. Forgejo's own kanban boards cannot serve yet: a card's column is separate from the issue's state, and the API has no endpoint to add or move a card, so factoryd could not keep a board current. Forgejo has no plugin system, and a source patch would mean our own fork. When the upstream projects API lands, its groundwork merged in September 2026, factoryd mirrors columns onto a Forgejo project as well. The console also lists every commissioned cloud resource by project and task with its cost so far.
 - **Cost aggregation.** Model spend from LiteLLM plus tool spend from the gateway, summed per task and per day.
 
@@ -224,7 +226,7 @@ How does an agent run, and what can it touch?
 
 One task gets one namespace, one ServiceAccount named `task-<id>`, and one pod.
 
-**The sandbox.** The pod runs under gVisor, a user-space kernel that intercepts the container's system calls, so a hostile program never reaches the host kernel. The container is non-root with dropped capabilities and a read-only root filesystem. Cilium enforces default-deny egress: only the gateway and Forgejo git answer, DNS resolves only their names, and the cloud metadata endpoint is unreachable. A package registry joins the list by name when the sandbox image carries a toolchain that needs it. Each task namespace has a resource quota, and factoryd, which creates these namespaces, is confined by an admission policy to exactly this shape. Kata microVMs, one small virtual machine per pod, are the reserved stronger tier.
+**The sandbox.** The pod runs under gVisor, a user-space kernel that intercepts the container's system calls, so a hostile program never reaches the host kernel. The container is non-root with dropped capabilities and a read-only root filesystem. Cilium enforces default-deny egress: only the gateway, Forgejo git and the Go module proxy and checksum database answer, DNS resolves only their names, and the cloud metadata endpoint is unreachable. The image carries the Go toolchain, so the agent can run the same tests its pull request checks will run; a package registry joins the list by name only together with a toolchain that needs it. The module proxy is a known narrow leak, since an agent could encode data in a module path it requests, and it is accepted because the sandbox holds no secret worth leaking. Each task namespace has a resource quota, and factoryd, which creates these namespaces, is confined by an admission policy to exactly this shape; factoryd itself runs under default-deny egress too. The reserved stronger tier is microVMs, Kata Containers or Firecracker: one small virtual machine with its own kernel per pod. They need `/dev/kvm`, which cloud servers lack, so they arrive with bare-metal nodes once the build volume pays for them (section 8).
 
 **The harness.** The coding agent inside the sandbox is opencode, driven headless. factoryd knows nothing about harnesses, only a Go interface:
 
@@ -241,9 +243,9 @@ A harness fits the factory if it meets four requirements: it runs headless, it a
 
 **The identity proxy.** A harness makes its own model and tool calls, but it cannot attach the pod's projected ServiceAccount token, a file the kubelet rotates. So the adapter listens on localhost inside the pod, the harness points its provider configuration at it, and on each request the adapter reads the current token file and forwards the call to factory-gateway. Model and tool traffic never leaves this path, and no model key material ever enters the sandbox.
 
-**The git exception.** Git is the one path outside the gateway, and the agent still never holds its credential. factoryd mints a Forgejo token at task start, scoped to branch write on the task's repository, and revokes it at task end. The worker process in the pod clones with it before the agent starts, keeps it out of the agent's environment and repository config, and after the agent finishes kills every other process in the pod and pushes from a clean repository of its own. A token inside the agent's repository would leak through git hooks and lingering processes. Every exchange with the world stays attributable: model and tool calls by the task identity, git pushes by the task token.
+**The git exception.** Git is the one path outside the gateway, and the agent still never holds its credential. For every session factoryd mints two Forgejo tokens and revokes both at the end: one reads the upstream repository, the other writes only to a fork owned by the `factory-agent` account. The worker process in the pod clones from upstream before the agent starts, keeps both tokens out of the agent's environment and repository config, and after the agent finishes kills every other process in the pod and pushes the branch `factory/<id>` to the fork from a clean repository of its own. A token inside the agent's repository would leak through git hooks and lingering processes. The pull request then goes from the fork into the upstream repository, which matters for CI: Forgejo gives the checks of a fork pull request a read-only token, while a pull request from a branch of the same repository gets a token that can write to it. A pull request's workflow files come from the branch itself, so the worker refuses to push any change to the `.forgejo`, `.gitea` or `.github` directories, comparing the directories as git trees rather than file names, and factoryd checks again before it opens the pull request. Every exchange with the world stays attributable: model and tool calls by the task identity, git pushes by the task tokens.
 
-**Session records.** The sandbox streams its session out while it lives: prompts, tool calls, output, files touched, commits and cost. Full history goes to object storage, a compact restart state to Postgres. A dead session resumes as a new pod that receives the findings and the parent session id, not as a resurrected process. **Supervision.** An agent that circles rarely repeats itself word for word, so no fixed rule catches every circle. Cheap detectors in factoryd catch the traces a circle leaves in the event stream: a stall, tool calls without file changes, the same command failing with the same error again and again, the same tool call repeated, a file flipping back to earlier content, many edits while the diff stops growing, and a task past half its time or budget. Any trip calls the supervisor: the strongest model available, under its own `supervisor` alias. It reads the brief, the session record and a progress digest of commands, outcomes, files and errors over time, the same view a human reviewer would use, and picks one action: continue, redirect with guidance, retry on a stronger model, or stop and escalate to a human. It never raises a cap. The Temporal workflow enforces heartbeat and wall-clock timeouts, so a stuck agent is visible instead of silent.
+**Session records.** The sandbox streams its session out while it lives: prompts, tool calls, output, files touched, commits and cost. Full history goes to object storage, a compact restart state to Postgres. A dead session resumes as a new pod that receives the findings and the parent session id, not as a resurrected process. **Supervision.** An agent that circles rarely repeats itself word for word, so no fixed rule catches every circle. Cheap detectors in factoryd catch the traces a circle leaves in the event stream: a stall, tool calls without file changes, the same command failing with the same error again and again, the same tool call repeated, a file flipping back to earlier content, many edits while the diff stops growing, and a task past half its time or budget, once per task. The same-failure check compares the command and its output with timestamps and other noise stripped, and it does not trust the exit code of a command such as `make test; echo $?`, which always succeeds. Any trip calls the supervisor inside the running session: the strongest model available, under its own `supervisor` alias. It reads the brief, the session record and a progress digest of commands, outcomes, files and errors over time, the same view a human reviewer would use, and answers in strict JSON with one action: continue, redirect with guidance, retry on a stronger model, or stop and escalate to a human. A session gets at most three supervisor calls, and each call is paid from the task's own remaining budget through a key capped at exactly that amount. A stop is graceful: the worker pushes the work in progress first, so the next session starts from it. An escalation moves the task to waiting-human and comments on the issue; a trusted person's reply becomes guidance for one more session and may grant a bounded slice of extra time. A human may raise a cap that way, the supervisor never. The Temporal workflow enforces heartbeat and wall-clock timeouts, where the wall clock counts the agent's working time across attempts, so a stuck agent is visible instead of silent.
 
 ## 8. Verification and delivery
 
@@ -251,71 +253,85 @@ What must a change survive before it merges?
 
 Evidence ranks by strength, cheap deterministic gates first, the expensive model last:
 
-1. **Forgejo Actions** runs the pull request checks in pods on the cluster: build, tests, lint and static security scanning.
+1. **Forgejo Actions** runs the pull request checks on the untrusted runner: tests, vet and format, static security scanning, an audit of the job's own environment, and the image builds.
 2. **Gate activities** in the Temporal workflow decide what CI cannot: a reported failure now reproduces or not, a schema migration reads correctly, the policy evaluation returns allow.
 3. **Model review** runs last, on diffs that survived the gates. A stronger model reads the diff and writes a review verdict. The verdict is evidence for the merge decision. It never has the authority to skip the gates above.
 
-Merge is a pull request merge. Flux deploys the merged commit to the staging namespace, then to prod on the promotion rule. Where policy demands a human, the workflow waits as a Temporal signal. The wait costs nothing.
+Merge is a pull request merge. Flux deploys the merged commit to the staging namespace, then to prod on the promotion rule. Where policy demands a human, the workflow waits as a Temporal signal. The wait costs nothing. Today a human merges every agent pull request: `main` is protected with one required approval, only the human may push or merge, and the rule binds repository admins too.
+
+**The untrusted runner.** Forgejo's runner has no Kubernetes mode that starts a fresh pod per job, so factoryd does it. Its CI spawner watches the queue of waiting pull request jobs, registers a one-job runner scoped to the code repository for each, and starts it in a namespace of its own as one gVisor pod: non-root, no service-account token, and egress only to Forgejo, the Go module proxy and the image registries the builds pull from. The runner takes its job, exits, and the namespace is deleted. The registrations come from a dedicated Forgejo account, `factory-ci`. Forgejo's runner API answers only the repository's owner, so the account is an organisation owner, but its token reaches the code repository alone and `main` refuses its pushes. Because agent pull requests come from a fork, each job's token is read-only and no Actions secrets reach it; a check in every run proves that the token cannot push.
+
+**The build pod.** Building container images needs root somewhere, and no rootless BuildKit mode works under gVisor. So a job that builds images gets a second gVisor pod, the build pod, where BuildKit runs as root inside the sandbox. Root in gVisor is root of an emulated kernel, not of the node. The build pod holds no token and no credential, only the build context the job sends it, and nothing it builds is published: publishing stays with the trusted runner on `main`.
+
+**Build speed, and the road to microVMs.** The image builds of one pull request take about 25 to 30 minutes. gVisor offers no overlay filesystem, so every layer is copied in full; each job starts with an empty cache; file access through the user-space kernel costs extra; and the three images build one after another. The next build step cuts this: build only the images a pull request changes, read a cache that trusted `main` builds fill and that holds no credential, build in parallel, and move builds onto a throwaway Hetzner Cloud server per build job, created for the build and deleted after it, billed by the hour. At larger scale the clean route is microVMs: Kata Containers or Firecracker give every job and every agent sandbox its own real kernel, so overlay filesystems and Docker work at near-native speed inside one prison for both. They need `/dev/kvm`, which Hetzner Cloud servers lack, so that route means bare-metal nodes, for example Hetzner dedicated servers, or a cloud with nested virtualisation, and it pays once the build volume outweighs running such nodes.
 
 ## 9. Signals
 
 What starts a task?
 
-Forgejo webhooks carry issues, pull request comments and reviews. SigNoz alert rules watch the demo application's telemetry. Both feed factoryd intake, which creates or updates task rows, with priority from labels and severity. The agent's human-escalation tool call is one more intake event: it raises an approval task and pings the console. Every task becomes a Forgejo issue, whatever its source, so the console board and Forgejo's issue list show the same work.
+Forgejo webhooks carry issues, pull request events, comments and reviews. SigNoz alert rules watch the demo application's telemetry. Both feed factoryd intake, which creates or updates task rows, with priority from labels and severity. The agent's human-escalation tool call is one more intake event: it raises an approval task and pings the console. Every task becomes a Forgejo issue, whatever its source, so the console board and Forgejo's issue list show the same work.
+
+A webhook must carry a valid signature, and a signal may change a running task only if a trusted person sent it: a comment, review or change request counts only from someone with owner, admin or write permission on the repository. Bot events and edited comments never count. Forgejo never retries a failed delivery, so a merge made while factoryd is down would otherwise be lost. The heal pass closes that gap: every minute it re-reads the pull requests, issues and comments of every task that waits on a person, applies the same trust checks, and signals what it finds exactly as a webhook would.
 
 ## 10. One task, end to end
+
+This path runs on the cluster today, from an issue to a merged pull request. The steps marked as later join it in the Teeth and Customer phases.
 
 ```mermaid
 sequenceDiagram
     autonumber
+    participant H as human
     participant ISS as Forgejo
     participant D as factoryd
     participant T as Temporal
     participant S as sandbox pod
     participant G as factory-gateway
     participant M as LiteLLM and models
-    participant C as Forgejo Actions
-    participant H as human
+    participant C as untrusted runner
     participant P as Flux and SigNoz
 
-    ISS->>D: issue webhook
+    H->>ISS: file an issue labelled agent
+    ISS->>D: signed issue webhook
     D->>T: start the task workflow
     T->>S: create namespace, ServiceAccount, gVisor pod
     S->>G: model call with the pod token
     G->>M: forward under the per-task virtual key
     M-->>S: completion
-    S->>ISS: the worker pushes the branch
-    T->>ISS: open pull request
-    ISS->>C: run PR checks
-    C-->>T: checks pass
-    T->>T: gate activities, then model review
-    T->>H: approval request where policy demands it
-    H-->>T: approved
-    T->>ISS: merge
-    ISS->>P: commit on main
-    P->>P: deploy to staging, then prod
-    P-->>D: alert on bad telemetry becomes the next signal
+    S->>ISS: the worker pushes factory/id to the fork
+    T->>ISS: open pull request from the fork
+    ISS->>C: PR jobs, one fresh gVisor pod each
+    C-->>ISS: commit statuses
+    ISS-->>T: checks green
+    Note over T: later: gate activities, model review, approvals
+    H->>ISS: review and merge
+    ISS->>D: merge webhook
+    D->>T: pr_merged signal
+    T->>ISS: task done, issue closed, fork branch deleted
+    Note over P: later: Flux deploys staging, then prod, alerts feed signals
 ```
 
 The same journey in words:
 
-1. An issue arrives, factoryd records the task and the Temporal workflow starts.
-2. The workflow creates a namespace, a ServiceAccount and a gVisor pod, and injects the task brief. The worker process clones with the per-task git token before the agent starts.
-3. opencode works on a branch. Its model and tool calls go through the localhost adapter, which attaches the pod token and forwards to the gateway. The gateway checks policy and budget, then forwards to LiteLLM or to the tool.
-4. The agent commits. The worker kills the agent's processes, pushes the branch from its own clean repository, and the workflow opens a pull request. Forgejo Actions runs the checks on the unprivileged runner. If the agent stalls or circles on the way, the supervisor steps in.
-5. The workflow runs its gate activities and then the model review.
-6. Where policy demands it, the workflow sends the approval request and sleeps.
-7. The pull request merges. Flux deploys staging, then prod. The application's telemetry reaches SigNoz, whose alert rules watch for the next signal.
+1. A person files an issue labelled `agent`, or a caller uses factoryd's API, which files the issue itself. The signed webhook creates the task row, the issue gets `state/queued`, and the Temporal workflow starts.
+2. The workflow creates a namespace, a ServiceAccount and a gVisor pod, and injects the task brief. The worker process clones the upstream repository with a read-only token before the agent starts.
+3. opencode works on a branch. Its model and tool calls go through the localhost adapter, which attaches the pod token and forwards to the gateway. The gateway checks policy and budget, then forwards to LiteLLM or to the tool. If the agent stalls or circles, the detectors call the supervisor.
+4. The agent commits. The worker kills the agent's processes, refuses any change to the workflow directories, and pushes `factory/<id>` to the fork from its own clean repository. The workflow opens a pull request from the fork and labels the issue `state/in-review`.
+5. The spawner runs each check in a fresh untrusted runner pod with a read-only job token. Red checks send the next attempt to a stronger model with the failures as findings.
+6. With green checks the workflow waits, at no cost, for a person. A trusted change request runs another session. The merge webhook, or the heal pass if the webhook was missed, finishes the task `done`: credentials revoked, spend settled to what LiteLLM recorded, the issue closed with `state/done`, the fork branch deleted.
+7. Every step lands in the task's timeline in object storage, from intake through each session, supervisor decision, pull request and signal to the final state, readable through factoryd's API beside the full session records.
+
+Later on the same path: gate activities and a model review before the merge, an approval where policy demands it, and Flux deploying the merge to staging and prod, whose telemetry reaches SigNoz and becomes the next signal.
 
 ## 11. The security model in one place
 
-Seven rules, all enforced by code rather than by instruction:
+Eight rules, all enforced by code rather than by instruction:
 
 - **Identity belongs to the task.** A pod carries a projected ServiceAccount token, short-lived and audience-scoped, rotated by the kubelet. No shared machine identity exists. SPIFFE/SPIRE, the workload identity standard that reaches beyond one cluster, is the reserved upgrade.
-- **No credentials in the agent's reach.** Model calls ride virtual keys the gateway holds, tool calls ride the gateway, and git rides a per-task token scoped to one repository and one permission that only the worker process uses, before the agent starts and after it is killed.
+- **No credentials in the agent's reach.** Model calls ride virtual keys the gateway holds, tool calls ride the gateway, and git rides two per-session tokens, read on the upstream repository and write on the agent's fork only, that only the worker process uses, before the agent starts and after it is killed.
 - **Policy lives outside the model.** Capability rules are database rows enforced in gateway code. A prompt cannot grant a capability.
-- **The network forbids by default.** A sandbox pod reaches the gateway and Forgejo git, and resolves only their names. Nothing else, including the cloud metadata endpoint.
-- **Untrusted code never reaches a privileged builder.** CI with privileged docker-in-docker runs only on protected `main`, which only a human merges into.
+- **The network forbids by default.** A sandbox pod reaches the gateway, Forgejo git and the Go module proxy, and resolves only their names. Nothing else, including the cloud metadata endpoint. factoryd and every CI pod run under default-deny egress as well.
+- **Untrusted code never reaches a privileged builder.** CI with privileged docker-in-docker runs only on protected `main`, which only a human merges into, and the rule binds repository admins too. Agent pull requests come from a fork and run on untrusted runners: one fresh gVisor pod per job, a read-only job token, no secrets, and image builds in a separate gVisor build pod that holds no credential. Agents cannot change what those runners execute, because the worker refuses to push changes to the workflow directories and factoryd checks again. An admission policy confines every pod factoryd creates: no privileged containers, no host namespaces or host paths, no added capabilities, non-root everywhere except the labelled build pod.
+- **Only trusted people steer a running task.** Webhooks must carry a valid signature, and comments, reviews and escalation answers count only from people with write access or more. The supervisor may stop or redirect an agent but never raise a cap; only a human's answer can grant more time, and only a bounded slice.
 - **Spending has hard caps.** Per task and per day, enforced by refusing the next call.
 - **Everything is audited.** The gateway writes an audit row for every decision, and session records preserve what each agent did.
 
@@ -343,7 +359,7 @@ Build order, five phases:
 
 What does the factory cost?
 
-The cluster is three servers at 69.49 EUR per month, about 210 EUR per month, plus object storage and model spend. Servers bill hourly and deletion stops the meter. `tofu destroy` is the off-switch, and the re-seed drill is the way back.
+The cluster is three servers at 69.49 EUR per month, about 210 EUR per month, plus object storage and model spend. Servers bill hourly and deletion stops the meter. `tofu destroy` is the off-switch, and the re-seed drill is the way back. The planned throwaway build servers bill the same way, by the hour and only while a build runs, so a pull request's builds cost cents, charged to the separate agent project and tracked in the same registry as every commissioned resource.
 
 ## 14. Glossary
 
@@ -351,25 +367,32 @@ The cluster is three servers at 69.49 EUR per month, about 210 EUR per month, pl
 |---|---|
 | ACME | The protocol Let's Encrypt uses to issue certificates. HTTP-01 proves control of a domain over port 80 |
 | ACP | Agent Client Protocol, one way a client drives a coding agent over stdin and stdout |
+| Build pod | The gVisor pod that runs a pull request's image builds as sandbox root, holding no credential |
 | CI | Continuous integration, automated build and test runs on every pull request |
 | CNI | Container network interface, the cluster's network layer. Cilium here |
+| Envelope | The resource and euro allowance a human sets per project for commissioned cloud resources |
+| factory-ci | The Forgejo account that registers the one-job untrusted runners |
+| Fork pull request | A pull request from the `factory-agent` account's fork into the upstream repository. Its CI jobs get a read-only token and no secrets |
+| Gateway API | The Kubernetes-standard way to describe inbound HTTP routing |
 | GitOps | The cluster converges to what the Git repository says. Flux does this here |
 | gVisor | A user-space kernel that intercepts container system calls, stronger isolation than a plain container |
-| Gateway API | The Kubernetes-standard way to describe inbound HTTP routing |
+| Heal pass | factoryd's check at boot and every minute that restarts missing workflows and re-reads Forgejo for anything a webhook missed |
+| Job token | The token Forgejo Actions gives each CI job. Writable on a pull request from the same repository, read-only on one from a fork |
 | JWT | JSON Web Token, a signed short-lived token. The pod's identity for API calls |
 | Kata | Containers inside lightweight virtual machines, the strongest isolation tier |
 | KubePrism | The small Kubernetes API load balancer each Talos node runs on localhost |
+| Lease | The expiry every commissioned resource carries. The garbage collector deletes what outlives it |
 | MCP | Model Context Protocol, how agents call tools and data sources |
+| MicroVM | A small virtual machine with its own kernel per pod or job, from Kata or Firecracker. Needs `/dev/kvm`, so bare-metal servers or nested virtualisation |
 | OIDC | OpenID Connect, the identity protocol the cluster uses to issue and verify pod tokens |
 | Operator | A controller plus custom object types that runs a piece of software on Kubernetes |
 | OTel | OpenTelemetry, traces, metrics and logs in one vendor-neutral format |
 | PV and PVC | Persistent volume, a disk the cluster offers, and persistent volume claim, a pod's request for one |
 | ServiceAccount | A Kubernetes identity for a pod, not for a person |
 | Streaming replication | Postgres replicas replaying the write-ahead log of the primary as it is written |
-| Supervisor | The strongest model available, called when a detector trips or a task passes half its cap. It chooses continue, redirect, retry or escalate, and never raises a cap |
-| Envelope | The resource and euro allowance a human sets per project for commissioned cloud resources |
-| Lease | The expiry every commissioned resource carries. The garbage collector deletes what outlives it |
+| Supervisor | The strongest model available, called inside the session when a detector trips or a task passes half its cap. It chooses continue, redirect, retry or escalate, and never raises a cap |
 | Talos Linux | The minimal operating system that runs only Kubernetes on each node |
 | Temporal | The durable execution engine: workflow state and timers live in a database |
+| Timeline | A task's step-by-step record in object storage, from intake to its final state |
 | Virtual key | A LiteLLM key scoped to one task, carrying its budget and allowed models |
 | WAL | Write-ahead log, the change log Postgres writes before touching data files |

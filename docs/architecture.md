@@ -1,8 +1,11 @@
 # Software factory: target architecture
 
-Status: living design document. Nothing is built. We amend this file as the design
-talk continues, so it always holds the current design plus the explanations behind
-it. No versioning, no decision records, until code exists.
+Status: living design document. The build plan's Stages 0 to 6 are built: the
+loop from an issue to a merged pull request runs on the cluster. Sections that
+describe built behaviour say so; the rest is still design. We amend this file
+as the design moves, so it always holds the current design plus the
+explanations behind it. Rulings live in the build ledger and are cited here by
+number.
 
 Decided so far:
 
@@ -175,7 +178,8 @@ namespaces:
   platform        cnpg, temporal, openbao, litellm, cert-manager, signoz
   forgejo         forgejo, runner, container registry
   factory         factoryd, factory-gateway
-  factory-agents  one namespace per task, gVisor pods
+  factory-agents  one namespace per task session and one per untrusted CI
+                  job (factory-agents-ci-*), gVisor pods
   apps            demo app staging and prod, deployed by Flux
 ```
 
@@ -221,14 +225,24 @@ rescue system; downloading inside the rescue system corrupted the image
 twice. The recipe is committed in the infra repo as `talos/build-snapshot.sh`
 beside `talos/schematic.yaml`, and the snapshot carries a `schematic` label
 that the OpenTofu image selector requires, so a snapshot without the
-extension can never be picked. Forgejo's `SECRET_KEY` is pinned as an imperative secret, because the
-restored database holds Actions secrets encrypted under it, and a fresh key
-breaks every CI run. After any key change the Actions secrets are stored
-again. Every push made while Forgejo is down goes to GitHub only, so right
+extension can never be picked. Forgejo's `SECRET_KEY` is recorded in the
+seed bundle and applied as an imperative secret, because the restored
+database holds Actions secrets encrypted under it, and a fresh key breaks
+every CI run (Ruling 85: the key once lived only in the cluster and died with
+it). After any key change the Actions secrets are stored again. Every push made while Forgejo is down goes to GitHub only, so right
 after the Forgejo restore every repository is fast-forward pushed to Forgejo
 before Flux's first sync; otherwise Flux converges to the dump's stale tree.
 Nodes installed from the schematic image register with the control-plane
 taint, so the drill removes it after registration.
+
+The third rebuild (2026-09-26 to 27, before the loop was closed) took about
+21 minutes from the first `tofu apply` to every Stage 2 exit test green and a
+task run end to end, against about five hours in the first drill. Nothing
+got faster by itself: every trap the first two drills hit was pre-solved in
+the recipe. The step-by-step recipe lives in the infra repository's README
+and seed-bundle document; what the restores do not carry (the Forgejo
+webhook secret, the fresh CI registrar token, the Actions secrets) is listed
+there as re-seed items.
 
 Bootstrap breaks one circular dependency: Flux deploys everything from Git,
 but the Git server, Forgejo, is itself deployed by Flux. Step zero, run once
@@ -516,13 +530,75 @@ factory-gateway
 
 `factoryd` is everything else:
 
-- intake: webhooks from Forgejo, alerts from Prometheus, escalation events
+- intake: webhooks from Forgejo, an authenticated API, later SigNoz alerts
+  and escalation events
 - the task registry: priority, required capabilities, risk class, cost ledger
-- the Temporal worker running the task lifecycle workflows
+- the Temporal worker running the task lifecycle workflows, and the heal
+  pass that keeps rows, workflows and Forgejo in step
+- the CI spawner for the untrusted runner (7.1)
 - the API and the UI (server-rendered Go, htmx; a SPA is the fork if the
   console outgrows it)
 - human login via Forgejo OAuth2. Keycloak later if an enterprise SSO story
   needs it, not before.
+
+Built in Stage 6: intake, the issue record, the workflow and the heal pass.
+The console is Stage 7.
+
+**Intake.** Two doors, one record. Forgejo posts webhooks to
+`/webhooks/forgejo`; factoryd checks the HMAC-SHA256 signature in
+`X-Forgejo-Signature` against the shared secret before it parses a byte of
+the body, answers 401 on a mismatch, and claims the delivery id so a
+redelivery is a no-op. An issue labelled `agent` becomes an agent task, one
+labelled `human` a human-lane task; bot-authored and unlabelled issues are
+ignored. Priority is the higher of the `priority/p0..p3` and
+`severity/critical..low` labels. The second door is `POST /tasks` with a
+bearer token, for callers that are not Forgejo: it clamps the budget, files
+the issue itself (the body says it was filed by factoryd intake), then stores
+the row. Either way every task is an issue, so the discussion, the state and
+the audit trail share one record.
+
+**Labels.** factoryd creates the label set at boot and keeps exactly one
+`state/*` label on each task's issue: `state/queued`, `state/running`,
+`state/waiting-human`, `state/in-review`, `state/done`, `state/failed`.
+Forgejo's own issue list therefore shows the board's picture until the
+console exists.
+
+**The human lane.** A `human` issue gets a task row in `waiting-human` and no
+workflow. Closing the issue finishes it `done`. Agent escalations land in
+the same state (6.6).
+
+**The workflow.** factoryd runs the Temporal worker itself, on task queue
+`factory-tasks`, one workflow `task-<id>` per agent task. It links the issue,
+runs up to three sessions, opens the pull request, waits for the checks
+(45 minutes at most) and then waits for a person: a merge finishes the task
+`done`, a pull request closed without merge or a closed issue finishes it
+`failed`, a trusted change request runs another session with the request as
+findings. Attempts start on `coding-cheap`; red checks or a repetition trip
+move the next attempt to `coding-frontier` (Ruling 86). The wall-clock cap
+counts the agent's working time across attempts, not time since intake,
+because a PR image build alone takes longer than a session (Ruling 93);
+human waits have no timer, since a Temporal wait costs nothing. Terminal
+signals cancel a running session or check wait at once instead of after it.
+Each step appends a line to the task's timeline, `sessions/<id>/timeline.jsonl`
+in S3, served by `GET /tasks/{id}/timeline`: intake, sessions with their
+parents and findings, supervisor decisions, the pull request, every signal,
+the final state. `Finish` revokes the credentials, sets the final label,
+comments the reason, closes a failed task's pull request and deletes the
+fork branch; it retries without limit, because a task stuck half finished
+is worse than a slow one.
+
+**Heal pass and Reconcile.** Forgejo never retries a failed webhook
+delivery, so a signal that arrives while factoryd is down is lost unless
+someone asks again. The heal pass runs at boot and every minute: it starts
+a workflow for every unfinished agent task that has none (Temporal refuses
+duplicates), re-reads Forgejo for every task in review or waiting on a
+human (pull request merged or closed, issue closed, trusted comments newer
+than the last one seen) and signals what it finds exactly as the webhook
+path would, and prunes delivery ids older than 30 days. Every workflow run
+begins with a `Reconcile` activity that reads where the task really stands,
+so a restarted workflow adopts an open pull request instead of starting a
+new session, and finishes a task whose pull request was merged while no run
+existed.
 
 ### 5.2 Why the gateway holds the LiteLLM keys
 
@@ -661,6 +737,9 @@ picture:
   mirrors task state onto issue labels through the issues API, so Forgejo's
   own issue list shows the same picture.
 
+Built so far: the issue record, the `state/*` labels and the human lane
+(5.1). The board and the new-task button come with the console in Stage 7.
+
 ## 6. Chunk 4: the worker plane
 
 One task, one namespace, one ServiceAccount `task-<id>`, one pod.
@@ -747,17 +826,43 @@ to `factory-gateway`. Model and tool calls stay entirely on that identity
 path.
 
 Git is the one path outside the gateway, and the agent never holds its
-credential. factoryd mints a per-task Forgejo token at task start, scoped to
-branch write on the task's repository, and revokes it at task end. The
-worker, running as pid 1 in the pod, clones with that token before the
-harness starts, then runs the harness in its own process group without the
-token in its environment or in `.git/config`. When the harness finishes, the
-worker kills and reaps every other process in the pod, fetches the agent's
-commits into a fresh repository it owns with hooks and repository config
-disabled, and pushes from there. Built in Stage 5 because a token in the
-agent's repository leaks through git hooks, `core.fsmonitor` and lingering
-processes that read `/proc/<pid>/environ`. Everything stays attributable:
-model and tool calls by the task identity, git pushes by the task token.
+credential. For every session factoryd mints two Forgejo tokens for the
+`factory-agent` account and revokes both when the session ends: one reads
+the upstream repository, the other writes only to the account's fork of it,
+`factory-agent/ai-software-factory-code`, which factoryd ensures at boot
+(private, Actions off). The worker, running as pid 1 in the pod, clones from
+upstream with the read token before the harness starts, then runs the
+harness in its own process group without either token in its environment or
+in `.git/config`. When the harness finishes, the worker kills and reaps every
+other process in the pod, fetches the agent's commits into a fresh repository
+it owns with hooks and repository config disabled, and pushes
+`factory/<id>` to the fork from there. factoryd then opens the pull request
+`sf:main ← factory-agent:factory/<id>`. A token in the agent's repository
+leaks through git hooks, `core.fsmonitor` and lingering processes that read
+`/proc/<pid>/environ`, hence the clean repository.
+
+The fork exists because of the CI job token. On a pull request from a branch
+of the same repository, Forgejo hands the Actions job a token that can
+write to that repository; a probe job pushed a branch with it. On a pull
+request from a fork, Forgejo gives the job a read-only token and no secrets
+by design, which is exactly what the untrusted runner must hold (Ruling 97).
+Branch protection on every branch was the rejected alternative: it stops git
+pushes, not API writes with the same token.
+
+A pull request's workflows come from its head, so an agent that edits a
+workflow file would choose what the runner executes. The worker therefore
+refuses to push when `.forgejo`, `.gitea` or `.github` differs between the
+base and the head, comparing the directories' tree entries
+(`git rev-parse <commit>:<dir>`) in its own repository rather than parsing
+file names, which non-ASCII names and renames defeat; factoryd re-checks
+the same three directories through the compare API before it opens the pull
+request, and fails the task (Rulings 90, 100). The worker's check is the one
+that matters for a follow-up push to an open pull request, which triggers
+the head's workflows before factoryd sees it. Forgejo offers no server-side
+rule that blocks workflow edits yet permits branch creation: its protected
+file patterns treat a new branch as changing every file. Everything stays
+attributable: model and tool calls by the task identity, git pushes by the
+task tokens.
 
 ### 6.4 Sandbox hardening
 
@@ -770,17 +875,40 @@ Sandbox hardening:
   adds the `user.max_user_namespaces` sysctl.
 - Non-root, dropped capabilities, read-only root filesystem.
 - Cilium network policy: default deny egress. Allowed: `factory-gateway` on
-  its port and Forgejo git. DNS answers only those names (`matchName`, not a
-  wildcard, which would open a DNS exfiltration channel). A package registry
-  joins the list by name when the sandbox image carries the toolchain that
-  needs it. Nothing else, no cloud metadata endpoint.
+  its port, Forgejo git, and the Go module proxy and checksum database
+  (`proxy.golang.org`, `sum.golang.org`) on 443. DNS answers only those names
+  (`matchName`, not a wildcard, which would open a DNS exfiltration channel).
+  Nothing else, no cloud metadata endpoint.
+- The sandbox image carries the Go 1.25 toolchain, checksum-pinned and the
+  same version as the runner image, with `GOPROXY` pinned to the proxy and no
+  `direct` fallback. A registry joins the list by name only with the
+  toolchain that needs it, and Go qualified: without it an agent cannot run
+  the tests its pull request checks will run, and the exit-test agent spent
+  an attempt trying to install it (Ruling 99). The caveat, accepted: the
+  module proxy fetches any public module path on request, so an agent could
+  leak data by requesting a path that encodes it. The budget, the session
+  record and the absence of any secret in the sandbox bound what there is to
+  leak.
 - Per-task namespace with a ResourceQuota and LimitRange, container limits,
   and size-capped emptyDir volumes.
 - factoryd creates task namespaces through a narrow ClusterRole, and a
   ValidatingAdmissionPolicy confines it to `factory-agents-*` namespaces with
   the restricted Pod Security label, gVisor pods without an automounted API
-  token, and a RoleBinding only to itself.
-- Upgrade path for stronger isolation: Kata microVMs, a node pool change.
+  token, ClusterIP Services only, and a RoleBinding only to itself. Two
+  exceptions serve the untrusted runner (7.1): a `factory-agents-ci-*`
+  namespace may carry the baseline label instead, and in such a namespace
+  root is admitted only for the pod labelled as the BuildKit build pod.
+  Every other container, init container and ephemeral container of every
+  pod factoryd creates must run as non-root, judged per container, not just
+  at pod level. Shape checks apply to every pod regardless of labels: no
+  privileged container, no host network, PID or IPC namespace, no added
+  capabilities, no hostPath volume. The policy fails closed.
+- factoryd itself runs under default-deny egress, because it holds the
+  LiteLLM master key, the bot account and the S3 keys: only the API server
+  (by its injected address, not a DNS name), Postgres, Temporal, LiteLLM,
+  Forgejo and S3 answer.
+- Upgrade path for stronger isolation: microVMs on bare-metal KVM nodes,
+  one kernel per pod, for agent sandboxes and CI jobs alike (7.2).
 
 ### 6.5 Session records
 
@@ -825,21 +953,66 @@ model, or stop and escalate to a human. It never raises a cap or a budget.
 Only a human does that. Most tasks never trip a detector, so the supervisor
 costs little.
 
-Stage 5 shipped the stall watchdog, the wall-clock cap and the
-reading-without-writing detector, which today kill and resume the session.
-Stage 6 adds the other detectors and routes every trip to the supervisor.
+As built (Stage 6), with the defaults that tuning starts from:
+
+- **The same failure** keys on the command plus its normalised output: the
+  last 20 lines with timestamps, clock times, line numbers, temp paths, hex
+  addresses, durations and pids stripped, hashed together with the command.
+  Three in a row, each after a file change, trip it; a pass of that command
+  or a new signature resets the count, and a rerun with nothing changed is
+  no evidence. Agents like to run `cmd; echo $?`, which exits 0 whatever
+  `cmd` did, so a command that can mask its exit status (`;`, `|`, `&`, a
+  second line, `$?`) is judged by its output, not its exit code. The first
+  live loop tripped nothing until this was in.
+- **The same call** is the same tool with the same arguments, compared by a
+  hash of their canonical JSON, four times in a session.
+- **Flip-flop** compares each file's content hash with the hashes it had
+  before.
+- **Churn** is 15 file changes since the diff against the base last grew,
+  with no failing command turning green in between. The worker measures the
+  diff every 15 seconds from a repository of its own, never running git in
+  the agent's repository, so an agent's git config cannot run code there.
+- **Reading without writing** is 24 tool calls and commands without a file
+  change. **Stall** is five minutes without an event.
+- **Half way** fires once per task, not once per session: the flag lives on
+  the task row, so a restart or a new session cannot fire it again.
+- The **wall-clock cap** (20 minutes of agent time by default) ends the
+  session without a call, because the supervisor could only ask to continue,
+  which would raise the cap.
+
+The supervisor runs inside the session activity, because `continue` needs the
+live session (Ruling 87). It must answer strict JSON with one of the four
+actions, a redirect carrying guidance and an escalation carrying a reason; an
+unreadable answer escalates. A session gets at most three supervisor calls,
+and the next trip escalates without one. Each call runs under a per-task
+`supervisor` virtual key whose `max_budget` is the task's remaining budget,
+counting spend LiteLLM has recorded but not yet settled, so the supervisor
+spends from the task's money and cannot overrun it; with nothing left, the
+task escalates without a call. `supervisor` maps to GLM-5.3, the strongest
+configured model. Every decision goes to the session record, the timeline
+and an issue comment.
+
+Stopping is graceful: the worker gets SIGTERM, pushes the work in progress to
+the fork and reports what it did, so a redirect resumes from the pushed head
+with the dead session's findings. An escalation moves the task to
+`waiting-human`, comments the reason on the issue and waits without a timer.
+The answer is a comment from a trusted human (owner, admin or write on the
+repository), newer than the escalation comment. It becomes findings for one
+more session and may grant a bounded slice of agent time, ten minutes by
+default and never more than the full cap per answer. A human may raise a
+cap this way; the supervisor never can.
 
 ## 7. Chunk 5: verification and delivery
 
 Evidence in order of strength. Cheap deterministic gates first, the expensive
 model last:
 
-1. Forgejo Actions runs PR checks on the untrusted runner: an ephemeral
-   pod under gVisor that takes one job and exits, runs it on the host
-   executor, builds images with rootless BuildKit, and holds no privilege
-   and no credentials (Ruling 78): build, tests, lint, static
-   security scanning. The privileged dind runner is node root, so it only
-   builds protected `main` and publishes images (Ruling 76).
+1. Forgejo Actions runs PR checks on the untrusted runner (7.1): one
+   ephemeral gVisor pod per job, no privilege, no credential beyond a
+   read-only job token: tests, vet and format, static security scanning, an
+   audit of the job's own environment, and the image builds. The
+   privileged dind runner is node root, so it only builds protected `main`
+   and publishes images (Ruling 76).
 2. The Temporal workflow runs gate activities for what CI cannot decide: the
    failure reproduction now passes, the schema migration is reviewed, the
    policy evaluation returns allow.
@@ -851,6 +1024,116 @@ Merge is a PR merge. Flux picks up the commit and deploys to the staging
 namespace, then to prod on the promotion rule. Human approval, where policy
 demands it, is a Temporal signal. The waiting costs nothing.
 
+Built through Stage 6: step 1 and the human merge. `main` on both
+repositories is protected with one required approval, push and merge
+whitelisted to the human, and `apply_to_admins` on, so no repository admin,
+human or service account, bypasses it. The merge webhook finishes the task.
+Steps 2 and 3 arrive in Stage 7.
+
+### 7.1 The untrusted runner
+
+Forgejo's runner has no Kubernetes backend and no autoscaler, and a runner
+Deployment reuses its pod across jobs, so factoryd runs the fresh-pod-per-job
+loop itself (Ruling 89). The CI spawner polls the code repository's waiting
+jobs every ten seconds. For each job labelled `pr-untrusted` it registers a
+repository-scoped, ephemeral runner, creates a namespace
+`factory-agents-ci-<job>` through the same sandbox machinery and admission
+policy as agent sessions, and starts one runner pod under gVisor: non-root,
+restricted, no service-account token, the host executor inside the pod, and
+the architecture 5.3 egress allowlist (Forgejo, the Go module proxy and
+checksum database, the image registries the builds pull from, nothing else,
+no metadata endpoint). The runner takes its one job and exits; the spawner
+deletes the namespace and deregisters the runner. At most eight CI
+namespaces run at once, the rest queue.
+
+The registrations come from a dedicated Forgejo account, `factory-ci`
+(Rulings 101, 101a). Forgejo's repository runner API answers only the
+repository's owner, which for an organisation repository means an
+organisation owner; a repository admin is refused. So `factory-ci` sits in
+the organisation's Owners team, while its token is scoped to the code
+repository alone and it is on no whitelist for `main`. With
+`apply_to_admins` on, a push to `main` with that token is refused, which was
+proven. A leaked token could administer the code repository's settings,
+runners and collaborators, but not change `main`; a narrower grant needs a
+Forgejo change (a runner API for repository admins). The same token reads
+collaborator permissions for the trust checks in 8.
+
+A pull request comes from the `factory-agent` fork (6.3), so its jobs get a
+read-only job token and no Actions secrets. The check `job-env-audit` proves
+it on every run: it asserts that the job token cannot push. Workflow files
+come from the head, which is why the worker and factoryd refuse any change
+to the workflow directories.
+
+Image builds need root somewhere. Every rootless BuildKit path fails under
+gVisor: writing a wide uid map through `newuidmap` is refused, with any
+seccomp profile. So a job labelled `pr-untrusted-build` gets a second pod,
+the build pod: BuildKit running as root inside its gVisor sandbox, with the
+native snapshotter, reached by `buildctl` over TCP through a ClusterIP
+Service (Ruling 91). Root inside gVisor is root of an emulated kernel, not
+of the node, so the boundary Ruling 78 guards, no node root for untrusted
+code, holds. The job pod that runs agent code and holds the job token stays
+non-root and restricted; the build pod holds no token, no credential and no
+service-account token, only the build context, and reaches only the package
+and registry hosts the Dockerfiles need. Its namespace is labelled Pod
+Security baseline, and the admission policy admits root only for that pod
+shape in a CI namespace (6.4). Nothing a PR build produces is pushed:
+publishing stays with the trusted runner on `main`.
+
+The trusted runner's dind storage is a size-limited `emptyDir` (40 GiB).
+The `docker:dind` image declares `/var/lib/docker` a volume, and without a
+mount containerd backs it with an anonymous volume the kubelet neither
+bounds nor counts: it grew past 50 GiB, put a node under disk pressure, and
+the kubelet evicted an innocent untrusted build instead.
+
+**PR build speed.** A PR's image builds take about 25 to 30 minutes. Four
+causes add up.
+gVisor offers no overlay filesystem to BuildKit, so the native snapshotter
+copies every layer in full instead of stacking it. Every job starts in a
+fresh pod with an empty cache. File I/O through gVisor's userspace kernel
+costs extra on every layer. And the three images build one after the other,
+the sandbox image including a warm step that waits on a timeout. The
+remedies, planned as Stage 7's first step: build only the Dockerfiles a pull
+request changes; give PR builds a read-only cache that holds no credential,
+exported to an in-cluster cache registry by trusted `main` builds only and
+reachable by network policy only from CI namespaces; drop the warm step;
+build in parallel; and move builds to throwaway build VMs (7.2). The
+prison itself stays: shared-kernel containers are weak prisons for code an
+agent wrote, so the fix for the cost is fewer and cached builds, not a
+weaker sandbox.
+
+### 7.2 Stronger isolation at scale: microVMs
+
+The clean large-scale route gives every job its own real kernel. Kata
+Containers, or Firecracker microVMs under a Kubernetes runtime class, run
+each pod in a small virtual machine on a KVM host. The guest kernel is
+ordinary Linux, so overlay filesystems, Docker and BuildKit work as on any
+machine, at near-native speed, and a kernel exploit inside the job owns only
+its throwaway VM. The same prison serves both workloads: CI jobs and agent
+sandboxes become the same pod shape under a different runtime class, and
+the agent could even run Docker itself.
+
+The catch is hardware. MicroVMs need `/dev/kvm`, and Hetzner Cloud servers
+expose none (3). This route needs bare-metal nodes, for example Hetzner
+dedicated servers joined to the cluster as a microVM pool, or a cloud that
+offers nested virtualisation. It pays off when the build volume is high
+enough that the cost per build on gVisor (compute time, a node held for half
+an hour per PR) exceeds a dedicated node's fixed monthly price, and when
+someone is ready to operate that node: firmware, disks and a Talos
+installation outside the cloud's API, where a replacement is a ticket, not a
+`tofu apply`. At today's volume, a handful of PRs a day, gVisor on cloud VMs
+is cheaper and simpler.
+
+The interim step, planned next: a throwaway Hetzner Cloud VM per build job.
+factoryd creates the VM for one build, the job's builds run there on an
+ordinary kernel with overlay filesystems and full speed, and factoryd
+deletes the VM afterwards. Cloud servers bill by the hour, so a build costs
+cents. The VM lives in the separate agent project from 5.5, never in the
+cluster's own project, so this step lays the first brick of cloud-resource
+commissioning: the agent project's token, the registry row before the
+create, the lease and the collector that deletes a VM whose build died with
+it. The VM is the job's prison, so it holds no credential beyond what the
+job itself holds.
+
 ## 8. Chunk 6: signals
 
 Forgejo webhooks on issues, PR comments and reviews. SigNoz alert rules on the
@@ -858,6 +1141,18 @@ demo app's telemetry. Both feed `factoryd` intake, which creates or updates
 task rows. Priority comes from labels and severity. The agent's
 human-escalation tool call is one more intake event: it raises an approval
 task and pings the console.
+
+Built in Stage 6: the Forgejo half (5.1). A signal changes a running task
+only if a trusted person sent it. Comments, reviews and change requests act
+only when their author holds owner, admin or write permission on the
+repository, looked up through the collaborator permission API and cached
+for ten minutes; bot-authored events and edited or deleted comments never
+act. Everything is still recorded as an intake event. A pull request event
+counts only for the pull request the workflow itself opened, matched by
+number and fork head. Because Forgejo never retries a failed delivery, the
+heal pass re-reads the same state every minute and applies the same trust
+checks, so a merge or an answer made while factoryd was down still reaches
+the workflow. SigNoz alerts join in Stage 8.
 
 ## 9. What the 2026-09-24 verification pass established
 
@@ -874,8 +1169,9 @@ Checked by web verification on 2026-09-24. Sources named inline.
   Stage 5: an in-place upgrade does not add extensions).
 - Forgejo: GPL, non-profit governed, hard fork from Gitea since 2024. Actions
   runner has no Kubernetes backend: host, docker and lxc executors only
-  (runner source, verified 2026-09-25). It runs here as one chart instance
-  with a privileged dind sidecar, no KEDA.
+  (runner source, verified 2026-09-25). The trusted runner is one chart
+  instance with a privileged dind sidecar, no KEDA; the untrusted runner is
+  factoryd's spawner (7.1).
   Gitea stays MIT but under a company with a copyright-assignment CLA.
 - OpenCode: MIT, moved to `anomalyco/opencode`, ACP and non-interactive mode
   confirmed.
@@ -913,9 +1209,9 @@ Checked by web verification on 2026-09-24. Sources named inline.
   cap exists; per-server monthly price caps are automatic and cost alerts
   are email-only.
 
-Not verified: which agent leads overall benchmarks. The runner is proven on
-one real CI job (2026-09-25, run 1 on sf/ai-software-factory-code), not
-under load.
+Not verified: which agent leads overall benchmarks. Both runners have served
+real jobs since 2026-09-25, the untrusted one on every agent pull request
+since Stage 6, but neither has run under load.
 
 ## 10. Open forks
 
@@ -929,14 +1225,19 @@ under load.
 | UI style | Server-rendered Go with htmx | Decided |
 | Policy engine | Go code now, OPA sidecar when rules multiply | Decided |
 | Human identity | Forgejo OAuth2 now, Keycloak only if SSO story demands | Decided |
-| Sandbox runtime | gVisor now, Kata microVMs later | Decided |
+| Sandbox runtime | gVisor on cloud VMs now; microVMs (Kata or Firecracker) on bare-metal KVM nodes when build volume pays for them, for CI jobs and agent sandboxes alike (7.2) | Decided |
 | Worker harness | opencode first, Codex CLI successor, goose fallback, behind the adapter contract | Decided |
 | Node hardware | 3x Hetzner Cloud cpx42 (8 vCPU x86, 16 GB, 320 GB disk), about 69 EUR per month each | Decided |
 | Management access | Talos nftables firewall allowlisting your home IP, headscale VPN later | Decided |
 | Repository layout | `ai-software-factory-infra` and `ai-software-factory-code` now, `demo-app` in Phase 3 | Decided |
 | Public DNS | Namecheap DNS stays, HTTP-01 certificates, Cloudflare as the named upgrade | Decided |
-| Untrusted CI runner | An ephemeral runner pod under gVisor, one job then exit, rootless BuildKit, no credentials; the privileged dind runner serves protected `main` only | Decided (Ruling 78) |
-| Supervision | Cheap trace detectors over the event stream, the strongest model as supervisor under its own alias | Decided (Ruling 82) |
+| Untrusted CI runner | factoryd's CI spawner: one ephemeral gVisor pod per job, repository-scoped ephemeral registration, read-only job token, no secrets; the privileged dind runner serves protected `main` only | Decided (Rulings 78, 89) |
+| PR image builds | BuildKit as sandbox root in a separate gVisor build pod without credentials, because gVisor has no working rootless path | Decided (Ruling 91) |
+| PR build speed | Changed Dockerfiles only, a credential-free read-only cache fed by `main`, no warm step, parallel builds, then throwaway Hetzner Cloud build VMs per job | Planned, Stage 7 first step |
+| Agent pull requests | From a `factory-agent` fork, so PR jobs get a read-only token; two session tokens, read upstream and write the fork; workflow-directory guard in the worker and factoryd | Decided (Rulings 97, 100) |
+| CI registrar | Dedicated `factory-ci` account, organisation owner because the runner API demands it, token scoped to the code repository, `main` protected with `apply_to_admins` | Decided (Rulings 101, 101a) |
+| Missed webhooks | The heal pass re-reads Forgejo every minute and signals what webhooks missed; `Reconcile` at the start of every workflow run | Decided |
+| Supervision | Cheap trace detectors over the event stream, the strongest model as supervisor under its own alias, inside the session activity, at most three calls per session, paid from the task's remaining budget | Decided (Rulings 82, 86, 87) |
 | Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list | Decided (Rulings 80, 83) |
 | Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Decided (Rulings 81, 84) |
 | Demo app | Small real product with real telemetry | Open, chosen in Phase 3 |
@@ -986,6 +1287,13 @@ works `factory` and `demo-app`.
 | Gateway API | The Kubernetes-standard way to describe inbound HTTP routing |
 | gVisor | An userspace kernel that intercepts container syscalls, stronger isolation than plain containers |
 | Kata | MicroVM containers: a real lightweight VM per pod, strongest isolation tier |
-| Supervisor | The strongest configured model, called when a detector trips or a task passes half its cap, choosing continue, redirect, retry or escalate |
+| MicroVM | A small virtual machine with its own kernel, started per pod or job on a KVM host (Kata, Firecracker); needs `/dev/kvm`, so bare metal or nested virtualisation |
+| Supervisor | The strongest configured model, called inside the session when a detector trips or a task passes half its cap, choosing continue, redirect, retry on a stronger model or escalate; never raises a cap |
+| Fork PR | A pull request from `factory-agent`'s fork into `sf`; Forgejo gives its CI jobs a read-only token and no secrets |
+| Job token | The token Forgejo Actions hands each CI job; writable on a same-repository PR, read-only on a fork PR |
+| factory-ci | The Forgejo account that registers ephemeral untrusted runners and reads collaborator permissions |
+| Build pod | The gVisor pod that runs BuildKit as sandbox root for a PR's image builds, holding no credential |
+| Heal pass | factoryd's pass at boot and every minute that starts missing workflows and re-reads Forgejo for signals a webhook missed |
+| Timeline | A task's step-by-step record in S3 (`sessions/<id>/timeline.jsonl`), from intake to its final state |
 | Envelope | The resource and euro allowance a human sets per project for commissioned cloud resources |
 | Lease | The expiry every commissioned resource carries; the garbage collector deletes what outlives it |
