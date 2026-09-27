@@ -1127,12 +1127,15 @@ The interim step, planned next: a throwaway Hetzner Cloud VM per build job.
 factoryd creates the VM for one build, the job's builds run there on an
 ordinary kernel with overlay filesystems and full speed, and factoryd
 deletes the VM afterwards. Cloud servers bill by the hour, so a build costs
-cents. The VM lives in the separate agent project from 5.5, never in the
-cluster's own project, so this step lays the first brick of cloud-resource
-commissioning: the agent project's token, the registry row before the
-create, the lease and the collector that deletes a VM whose build died with
-it. The VM is the job's prison, so it holds no credential beyond what the
-job itself holds.
+cents. The VM lives in its own Hetzner project for CI builds, never in the
+cluster's project and never in the agent project from 5.5: build VMs are
+verification-plane machinery that factoryd runs, not resources an agent
+commissions, so factoryd holds the CI project's token while the agent
+project's token stays with the gateway alone. The step still reuses the
+commissioning pattern of 5.5: a registry row before the create, provider
+labels, a lease, and a collector that deletes a VM whose build died with it
+and anything in the CI project the registry does not know. The VM is the
+job's prison, so it holds no credential beyond what the job itself holds.
 
 ## 8. Chunk 6: signals
 
