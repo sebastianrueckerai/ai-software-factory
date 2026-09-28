@@ -822,14 +822,18 @@ it over SSH in the live proof.
   OpenBao, `ssh-client-signer`. cloud-init sets no authorised keys and no
   password, and removes the expired root password Hetzner emails. The gateway
   signs the agent's public key through Kubernetes auth with a sign-only
-  policy. A certificate lasts 30 minutes at most and never past the lease.
+  policy. A certificate lasts 30 minutes at most and ends at the lease cutoff, 210 s
+  before the lease end (Ruling 130), when the egress rule goes too.
   Its principal is `resource-<row id>`, and cloud-init writes exactly that
   principal into the root user's `AuthorizedPrincipalsFile`, so a certificate
   opens one server only (Ruling 125). OpenBao 2.6.3 cannot restrict
   principals by prefix, so the role admits any principal, with the default
   `unassigned`, which no server lists. The binding is each server's
   principals file plus the gateway, which signs only for the task's own
-  servers.
+  servers. Proven live on 2026-09-28 from a task's own sandbox: the other
+  server's certificate got "Certificate does not contain an authorized
+  principal", and a server with a volume had both provider deletes issued
+  103 s and 88 s before the lease end.
 - **Cost comes from the provider's price list.** Each connector reads its
   provider's price catalogue through the API. Hetzner's is one call,
   `GET /v1/pricing`, cached for an hour, and it prices every resource type
