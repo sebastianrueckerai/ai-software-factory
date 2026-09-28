@@ -1,11 +1,12 @@
 # Software factory: target architecture
 
 Status: living design document. The build plan's Stages 0 to 6 are built: the
-loop from an issue to a merged pull request runs on the cluster. Sections that
-describe built behaviour say so; the rest is still design. We amend this file
-as the design moves, so it always holds the current design plus the
-explanations behind it. Rulings live in the build ledger and are cited here by
-number.
+loop from an issue to a merged pull request runs on the cluster. The parts of
+Stage 7 are built and proven one by one, and its exit test is still to run.
+Sections that describe built behaviour say so; the rest is still design. We
+amend this file as the design moves, so it always holds the current design
+plus the explanations behind it. Rulings live in the build ledger and are
+cited here by number.
 
 Decided so far:
 
@@ -232,6 +233,11 @@ every CI run (Ruling 85: the key once lived only in the cluster and died with
 it). After any key change the Actions secrets are stored again. Every push made while Forgejo is down goes to GitHub only, so right
 after the Forgejo restore every repository is fast-forward pushed to Forgejo
 before Flux's first sync; otherwise Flux converges to the dump's stale tree.
+Forgejo push-mirrors both repositories to GitHub on every commit and every
+8 hours, so a merge by the `factory-merge` bot (7) reaches the off-site copy
+without a human push (Ruling 126). The mirror's GitHub token is stored
+encrypted in Forgejo's database and comes back with the database restore, as
+long as it is still valid. Humans still push to both remotes.
 Nodes installed from the schematic image register with the control-plane
 taint, so the drill removes it after registration.
 
@@ -542,7 +548,9 @@ factory-gateway
   needs it, not before.
 
 Built in Stage 6: intake, the issue record, the workflow and the heal pass.
-The console is Stage 7.
+Built in Stage 7: capability policy (5.3), the cost ledger with hard caps
+(5.4), commissioning (5.5), the console (5.6), and the gates, the model review
+and the bot merge (7).
 
 **Intake.** Two doors, one record. Forgejo posts webhooks to
 `/webhooks/forgejo`; factoryd checks the HMAC-SHA256 signature in
@@ -557,7 +565,8 @@ the issue itself (the body says it was filed by factoryd intake), then stores
 the row. Either way every task is an issue, so the discussion, the state and
 the audit trail share one record.
 
-**Labels.** factoryd creates the label set at boot and keeps exactly one
+**Labels.** factoryd creates the label set at boot, the `priority/*` and
+`severity/*` labels included, and keeps exactly one
 `state/*` label on each task's issue: `state/queued`, `state/running`,
 `state/waiting-human`, `state/in-review`, `state/done`, `state/failed`.
 Forgejo's own issue list therefore shows the board's picture until the
@@ -570,7 +579,8 @@ the same state (6.6).
 **The workflow.** factoryd runs the Temporal worker itself, on task queue
 `factory-tasks`, one workflow `task-<id>` per agent task. It links the issue,
 runs up to three sessions, opens the pull request, waits for the checks
-(45 minutes at most) and then waits for a person: a merge finishes the task
+(45 minutes at most), runs the gates and the model review, files an approval
+request (7) and then waits for a person: a merge finishes the task
 `done`, a pull request closed without merge or a closed issue finishes it
 `failed`, a trusted change request runs another session with the request as
 findings. Attempts start on `coding-cheap`; red checks or a repetition trip
@@ -594,7 +604,9 @@ a workflow for every unfinished agent task that has none (Temporal refuses
 duplicates), re-reads Forgejo for every task in review or waiting on a
 human (pull request merged or closed, issue closed, trusted comments newer
 than the last one seen) and signals what it finds exactly as the webhook
-path would, and prunes delivery ids older than 30 days. Every workflow run
+path would, and prunes delivery ids older than 30 days. It also files a task
+for every open `agent` or `human` issue that has none, so an issue opened
+while factoryd was down still becomes a task. Every workflow run
 begins with a `Reconcile` activity that reads where the task really stands,
 so a restarted workflow adopts an open pull request instead of starting a
 new session, and finishes a task whose pull request was merged while no run
@@ -615,9 +627,19 @@ now answers "what may this agent do" for models, tools and databases alike.
 
 ### 5.3 Policy
 
-Capability policy is data: rows in Postgres, edited through the UI or API,
-versioned in Git. Enforcement is code in the gateway. The hierarchy, from the
-baseline conversation:
+Capability policy is data: a YAML document in the infra repository, applied
+by Flux as the ConfigMap `factory-policy` (Ruling 107). The plan said "rows in
+Postgres, edited through the UI or API". Git is the editing surface instead,
+so a human authors every change in a commit and Git holds the history. factoryd
+reads the file every 30 seconds and stores each new content as an immutable
+`policy_versions` row. The gateway enforces the current version from Postgres,
+and every audit row names that version. An invalid file logs `POLICY REJECTED`,
+and the old version stays current. A revert to known content makes the earlier
+row current again. factoryd refuses to boot only when no valid version exists.
+The console shows the current version and links to its file in Forgejo.
+Runtime decisions (envelopes, approvals, promotions) are Postgres rows that a
+human edits in the console, and each one is audited. Enforcement is code in
+the gateway. The hierarchy, from the baseline conversation:
 
 ```
 task requires capability X in environment E
@@ -627,6 +649,31 @@ task requires capability X in environment E
       route to the gateway and Forgejo git, plus named registries)
 ```
 
+Besides its `version`, the document has six sections:
+
+- `budget`: the task default, the task maximum and the day cap, in euros.
+- `classes`: per capability class, the allowed model aliases and tools, each
+  tool with `max_requests` and `max_eur`.
+- `prices`: the tool prices no provider API returns (Firecrawl credits,
+  Replicate rates per hardware SKU with a model to SKU map, fal's
+  `max_megapixels`).
+- `risk`: the risk classes of changed paths for the policy gate (7).
+- `envelope_default`: the standard resource envelope (5.5).
+- `approvers`: the Forgejo users who may authorise spend in the console (5.6).
+
+The decoder is strict: an unknown key or a second YAML document rejects the
+file. So a new section lands in infra before the factoryd that reads it. The
+running factoryd rejects the new key and keeps its current version until the
+roll.
+
+The gateway checks each model call in this order: the JWT, the task status, a
+capability class that allows the model (else 403 `refused_capability`), the
+task headroom (else 402 `refused_budget`) and the day headroom (else 402
+`refused_day_cap`). It refuses routing overrides in the request body, such as
+LiteLLM's client-side `fallbacks`, which would reach any model under an
+allowed alias. It admits function tools and text parts only. Each minted key
+carries the class's model list, so LiteLLM refuses other models as well.
+
 An OPA sidecar is the named upgrade when rules multiply beyond what Go code
 reads well. Policy never lives in a prompt.
 
@@ -634,77 +681,173 @@ The first capability class is deliberately one: `coder`, holding repository
 read, branch write, model aliases and allowlisted tools, nothing else. The
 classes from the baseline conversation (analyzer, integration-tester,
 release-agent, prod-operator) arrive one per phase as the loops that need them
-come online.
+come online. `review-frontier` stays out of `coder`: the model review and the
+supervisor call LiteLLM under factoryd's own per-task keys, not through the
+agent's gateway path.
 
 ### 5.4 Cost ledger
 
 LiteLLM tracks model spend per virtual key. The gateway tracks tool spend per
 call. `factoryd` aggregates both per task and per day, with hard caps that the
-gateway enforces by refusing the next call.
+gateway enforces on every call.
 
 The gateway books each model call's own cost atomically into the task row:
 the `x-litellm-response-cost` header for plain calls, and the `usage.cost`
 field of the final chunk for streams, which the gateway forces on. LiteLLM's
 `x-litellm-key-spend` header cannot serve: it is the cached spend before the
-call, zero on every stream. After a task finishes, factoryd settles its spend
-upward to the total LiteLLM recorded on the task's keys, which covers
+call, zero on every stream. After a task finishes, factoryd settles its model
+spend upward to the total LiteLLM recorded on the task's keys, which covers
 abandoned streams. LiteLLM writes that total 60 to 80 seconds late, so a
-settlement loop, apart from the runner's claim loop, re-settles every task
-finished within the last hour once a minute. Each pass lists LiteLLM's keys
-once, and the raise never lowers spend. The per-key `max_budget` stays the
-hard backstop.
+settlement loop, apart from the runner's claim loop, re-settles once a minute
+every task finished within the last two hours (the hold lifetime plus an hour)
+whose model holds have closed. Each pass lists LiteLLM's keys once, the raise
+never lowers spend, and a difference below 1e-9 EUR is float noise and books
+nothing.
+
+Caps hold on the call itself (Ruling 113). LiteLLM checks a key's
+`max_budget` only before a call, so one call can run past it: in a proof, a
+supervisor call on a key capped at 0.0007 EUR cost 0.028 EUR. So the gateway
+prices each call's worst case from LiteLLM's `/model/info`, with every
+per-token rate, tier and cache rate. It clamps the output-token limit so that
+the worst case fits the free headroom of the task and the day. It takes a
+`holds` row for that amount under a Postgres advisory lock before it calls,
+which closes the race between concurrent calls. After the call it books the
+real cost, or the whole hold when the cost is unknown. Five concurrent calls
+on a task with room for one gave one 200 and four 402s. The supervisor, the
+model review, tool calls and commissioned resources take holds in the same
+table. LiteLLM's `fail_closed_budget_enforcement` and the per-key
+`max_budget` stay the backstop.
+
+A real cost above its hold is booked in full and flagged `allowed_over_hold`
+in the audit (Ruling 117). The cap then holds by refusing the next call. A
+call cut mid-flight, because the issue closed or the session stopped, books
+its whole hold and is never reconciled downward (Ruling 115). LiteLLM's figure
+for a cut stream is no upper bound of the provider's charge: a GLM call logged
+0 completion tokens after it had reasoned. So a stopped task's total errs high
+by at most one hold per cut call.
+
+Every booking is a row in the append-only `ledger` table, of kind `model`,
+`tool`, `resource` or `settlement`, with its UTC day. factoryd serves the sums
+per task and per day at `GET /costs`, and the console shows them.
+
+Tool calls reach the gateway's `/mcp` endpoint, an MCP server over stateless
+streamable HTTP. It offers `web_scrape` and `web_search` (Firecrawl),
+`replicate_predict`, `fal_run`, `escalate_to_human` (6.6) and the
+commissioning tools (5.5). A paid call takes a hold for its worst case, calls
+the provider without the agent's cancel, so a disconnect cannot cut a billed
+call, and books the real cost: Firecrawl's `creditsUsed` times the credit
+price, Replicate's `predict_time` times the hardware rate, and fal's price per
+request or per megapixel from its pricing API. A call whose cost the gateway
+cannot bound is refused before it runs: a Replicate model without a hardware
+mapping, or a fal unit other than requests and megapixels. For megapixel fal
+endpoints the input keys are an allowlist, and any other key is refused
+before the hold (Ruling 117). Every admitted tool call writes a ledger row,
+at 0 EUR too, because those rows count the requests against `max_requests`.
 
 ### 5.5 Cloud-resource commissioning
 
-Agents may need a database, a VM or a bucket for a task. They get it through
-gateway tools, never through a provider key.
+Agents may need a server, with a database or a service on it, for a task.
+They get it through gateway tools, never through a provider key. As built in
+Stage 7, the tools are `cloud_prices`, `commission_server`, `list_resources`,
+`release_resource`, `ssh_certificate` and `resource_request_status`, and
+Hetzner is the first provider. A sandbox commissioned a cx23 and logged in to
+it over SSH in the live proof.
 
 - **A separate provider project.** Agent resources live in their own Hetzner
-  project. Only the gateway holds its API token. Hetzner tokens cannot be
-  scoped below a project, so the gateway calls the API itself instead of
-  handing out credentials. The cluster's own project stays out of agent
-  reach, and the garbage collector never touches it.
-- **An envelope per project.** When a project starts, a human sets its
-  resource envelope from a standard default: a monthly euro cap, the
-  allowed resource types and sizes, a maximum count, and a maximum lease.
-  Each task draws from the envelope under its own cap.
-- **More needs a human.** A request beyond the envelope becomes an approval
-  card with the resource, the reason and the cost per month. Approval
-  widens the grant for that task or for the project.
-- **Registry first.** Before each create, the gateway writes a registry row:
-  task, project, session, resource type, price per hour and lease expiry.
-  The provider resource carries the task and project as labels. The console
+  project. Only the gateway holds its API token, and factoryd never gets it.
+  Hetzner tokens cannot be scoped below a project, so the gateway calls the
+  API itself instead of handing out credentials. The cluster's own project
+  and the CI project (7.1) stay out of agent reach.
+- **Servers and volumes, no buckets.** The standard envelope covers servers
+  with their IPv4 and volumes (Ruling 121). Hetzner's Cloud API has no bucket
+  endpoint, and an Object Storage key reaches every bucket of its project, so
+  a per-task bucket would put a shared key in the agent's reach. Buckets join
+  when Hetzner offers bucket-scoped credentials, or behind a gateway S3 proxy.
+  Until then a task that needs a bucket asks a human.
+- **An envelope per project.** The policy's `envelope_default` holds a
+  monthly euro cap, the allowed server types, a maximum count, a maximum lease
+  and a maximum volume size. Today it is 10 EUR a month, cx23 and cx33, two
+  servers, four hours and 20 GB. A project's first request copies it into the
+  `envelopes` table, one row per repository, and a human edits that row in
+  the console. Each task draws from the envelope under its own cap. The
+  provider's own quota can still refuse a type the envelope lists: the agent
+  project refused a cx43 on its shared-core limit.
+- **More needs a human.** A request beyond the envelope writes an
+  `approval_requests` row of kind `resource` (Ruling 116) and answers the
+  agent "pending human approval", which it polls with
+  `resource_request_status`. The console card shows the server type, the
+  purpose, the lease, the cost per month, the reservation and what the
+  request exceeds. Approval for the task admits one commission of that spec
+  or a smaller one. Approval for the project widens the envelope just enough.
+  An approval covers only the limits it was granted for, so a count exceeded
+  later needs a new request. A task has at most three pending requests.
+- **Registry first.** Before any create, the gateway writes the hold and a
+  registry row for the firewall, the server and any volume in one
+  transaction: task, project, session, type, size, purpose and lease expiry.
+  The provider resources carry the labels `factory=agent`, `task`, `project`
+  and `resource=<row id>`. The gateway creates the firewall, then the server
+  (Debian 12, IPv4 only), then the volume. A failed create releases what it
+  made, and a create whose answer was lost is found by its label. The console
   lists every resource by project and task with its cost so far.
-- **Leases end orphans.** Every resource has a lease, by default the task's
-  wall-clock cap plus a margin. Task completion deletes the task's
-  resources. If the agent or factoryd dies, the lease still expires and the
-  garbage collector deletes the resource. A human can promote a resource to
-  project-owned, for example a staging database, and it then counts against
-  the project's monthly cap without a lease.
-- **The collector trusts the registry.** Every few minutes it deletes
-  expired leases, deletes anything in the agent project the registry does
-  not know, and marks registry rows whose resource vanished. The worst-case
-  orphan cost is one lease length times the resource's hourly price.
-- **Reachability.** While a lease lives, the task's egress policy admits the
-  resource's address, so the sandbox can use it.
+- **Leases end orphans.** The agent picks the lease in minutes, within the
+  envelope's maximum. Task completion deletes the task's resources. If the
+  agent or factoryd dies, the lease still ends and the collector deletes the
+  resource. It deletes at the last tick before the lease ends, so a lease of
+  N started hours never bills hour N+1 (Ruling 124). A lease therefore ends
+  up to 2.5 minutes early. A human can promote a resource to project-owned,
+  for example a staging database, and it then counts against the project's
+  monthly cap without a lease. A human can also release it early.
+- **The collector trusts the registry.** It runs in the gateway every 2
+  minutes. It deletes expired leases and the resources of finished tasks,
+  deletes every server, firewall and volume the registry does not know,
+  deletes primary IPs no server holds, and marks a row vanished only after a
+  direct 404. The worst-case orphan cost is one lease length times the
+  resource's hourly price. An interlock guards the wipe (Ruling 123): a pass
+  deletes nothing and logs loudly when a listed server has a cluster node's
+  public IPv4, or when anything listed carries another project's `factory`
+  label. Either means the token opens the wrong project. A hand-made,
+  unlabelled server is still deleted. The CI project's collector (7.1) runs
+  the same code.
+- **Reachability and access.** factoryd reads the live leases every 10
+  seconds and adds each server's address on port 22 to the task's egress
+  policy. It drops the address at the same cutoff the collector uses. The
+  server's firewall admits SSH only from the cluster nodes, whose public IPv4s
+  come from the infra-owned ConfigMap `cluster-facts` (Ruling 112). Its
+  outbound is tcp 53, 80 and 443 and udp 53 to anywhere (Ruling 122). The
+  server is the task's own machine, holds no factory credential, and is
+  bounded by its lease, the envelope and the task's euro cap. So an agent can
+  move data out through its server for the length of the lease, which is
+  accepted. A name-allowlisting egress proxy is the named upgrade.
+- **Certificates, not keys.** Servers trust the SSH certificate authority in
+  OpenBao, `ssh-client-signer`. cloud-init sets no authorised keys and no
+  password, and removes the expired root password Hetzner emails. The gateway
+  signs the agent's public key through Kubernetes auth with a sign-only
+  policy. A certificate lasts 30 minutes at most and never past the lease.
+  Its principal is `resource-<row id>`, and cloud-init writes exactly that
+  principal into the root user's `AuthorizedPrincipalsFile`, so a certificate
+  opens one server only (Ruling 125). OpenBao 2.6.3 cannot restrict
+  principals by prefix, so the role admits any principal, with the default
+  `unassigned`, which no server lists. The binding is each server's
+  principals file plus the gateway, which signs only for the task's own
+  servers.
 - **Cost comes from the provider's price list.** Each connector reads its
   provider's price catalogue through the API. Hetzner's is one call,
-  `GET /v1/pricing`, and it prices every resource type they sell: server
-  types per location, primary and floating IPs, volumes and snapshots per
-  GB and month, load balancers, backups and traffic (verified 2026-09-27; a
-  cpx42 in fsn1 is 0.1114 EUR per hour). Before a create, the gateway prices
-  the request: hourly price times the lease, plus the provider's minimum.
-  That reserved amount counts against the task cap and the project envelope
-  at once, and the registry accrues the real cost per hour while the
-  resource lives. Resources priced by time (servers, IPs, volumes, load
-  balancers, buckets by size) are known in full up front. Resources priced
-  by usage (functions, traffic, requests) are not: they get an estimate cap
-  in the envelope, and the connector reconciles the estimate against the
+  `GET /v1/pricing`, cached for an hour, and it prices every resource type
+  they sell: server types per location, primary and floating IPs, volumes and
+  snapshots per GB and month, load balancers, backups and traffic (verified
+  2026-09-27). Before a create, the gateway reserves the started hours of the
+  lease times the hourly price of the server with its IPv4 plus the volume. A
+  cx23 costs 0.0088 EUR per hour and its IPv4 0.0008, so a one-hour cx23
+  reserves 0.0096 EUR. The reservation is one `resource` hold, taken under the
+  headroom lock with the task, day and month checks. The collector books each
+  started hour as a `resource` ledger row and takes it off the hold. An
+  overrun is booked in full and flagged, as in 5.4. When the commission
+  closes, the rest of the hold is dropped. Resources priced by usage
+  (functions, traffic, requests) are not known up front: a later connector
+  gives them an estimate cap in the envelope and reconciles it against the
   provider's billing or usage API afterwards. DigitalOcean, AWS and GCP all
   publish price lists through their APIs (sizes, the Price List API, the
   Cloud Billing Catalog), so the same connector shape fits them later.
-  Hetzner comes first. The standard envelope covers what tasks need most:
-  servers, a fixed IP, block storage and a bucket.
 
 ### 5.6 The console board
 
@@ -731,14 +874,51 @@ picture:
   Cards move by themselves.
 - **Human lane.** Approvals, escalations, and tasks a human files for
   themself. Closing a card or pressing approve signals the waiting workflow.
+  A merge approval first submits an APPROVED review as the human, then
+  signals (7).
 - **New task.** The button files a Forgejo issue labelled `agent` or
   `human`. Every task is an issue, including those raised by SigNoz alerts
   and escalations, so there is one record with its discussion. factoryd
   mirrors task state onto issue labels through the issues API, so Forgejo's
   own issue list shows the same picture.
 
-Built so far: the issue record, the `state/*` labels and the human lane
-(5.1). The board and the new-task button come with the console in Stage 7.
+Built in Stage 7, at `console.aisoftwarefactory.world`. factoryd serves the
+console on its own port, 8090, behind the Gateway, with `html/template` and
+htmx 2.0.11, vendored and pinned by its sha256. The pages are the board with
+both lanes and the approval cards, `/resources` with the commissioned
+resources and the envelopes, `/costs` and `/policy`. The board polls every 10
+seconds. It shows at most 300 tasks, open ones first, and reads only
+Postgres, never the timelines in S3.
+
+- **Login.** Forgejo OAuth2, the authorisation code flow with PKCE (S256), a
+  confidential client and an explicit scope list: `read:user`,
+  `write:repository`, `write:issue`. Forgejo enforces requested scopes, and an
+  unscoped token reaches everything, admin included, so the list is always
+  explicit. The login state and the PKCE verifier travel in a `__Host-`
+  cookie signed with HMAC-SHA256, so an anonymous `/login` keeps no state on
+  the server. The human's tokens stay in factoryd and never reach the
+  browser.
+- **Who gets in.** Only users with write access or more on the repository,
+  checked at login and again on every request. factoryd caches
+  the writer list for a minute and shares one fetch between requests. When
+  Forgejo fails, the last list serves for up to 5 minutes, then the console
+  answers 503.
+- **Who authorises spend.** Resource approval, envelope edits, promotion and
+  the merge approve button need a user on the policy's `approvers` list
+  (Ruling 128). Other writers see the cards without those buttons, and a POST
+  gets 403. Deny, request changes, reject and release stay open to every
+  writer. The ruling first named Forgejo's approvals whitelist on `main` as
+  the list, but only a repository admin can read branch protections, and
+  factoryd holds no admin token. So the list lives in policy, versioned in
+  Git with the rest, and Forgejo's whitelist stays the merge authority. When
+  the two disagree, Forgejo refuses the merge and the card shows why.
+- **Actions run as the human.** A new task, an escalation answer, a review
+  and a rejection go to Forgejo through the human's own token, so Forgejo
+  records the human as their author.
+- **Hardening.** A CSRF token on every POST, a Content Security Policy,
+  `Strict-Transport-Security`, server timeouts, and fixed error sentences
+  that log the detail instead of showing it. Forgejo has no token revocation
+  API, so a refused login's tokens lapse within their hour.
 
 ## 6. Chunk 4: the worker plane
 
@@ -876,9 +1056,13 @@ Sandbox hardening:
 - Non-root, dropped capabilities, read-only root filesystem.
 - Cilium network policy: default deny egress. Allowed: `factory-gateway` on
   its port, Forgejo git, and the Go module proxy and checksum database
-  (`proxy.golang.org`, `sum.golang.org`) on 443. DNS answers only those names
-  (`matchName`, not a wildcard, which would open a DNS exfiltration channel).
-  Nothing else, no cloud metadata endpoint.
+  (`proxy.golang.org`, `sum.golang.org`) on 443, plus
+  `storage.googleapis.com`, where the proxy redirects module downloads
+  (Ruling 114). It sits inside the same trust boundary as the proxy, so no
+  mirror was added. DNS answers only those names (`matchName`, not a
+  wildcard, which would open a DNS exfiltration channel). While a
+  commissioned server's lease lives, its address on port 22 joins the list
+  (5.5). Nothing else, no cloud metadata endpoint.
 - The sandbox image carries the Go 1.25 toolchain, checksum-pinned and the
   same version as the runner image, with `GOPROXY` pinned to the proxy and no
   `direct` fallback. A registry joins the list by name only with the
@@ -894,19 +1078,19 @@ Sandbox hardening:
 - factoryd creates task namespaces through a narrow ClusterRole, and a
   ValidatingAdmissionPolicy confines it to `factory-agents-*` namespaces with
   the restricted Pod Security label, gVisor pods without an automounted API
-  token, ClusterIP Services only, and a RoleBinding only to itself. Two
-  exceptions serve the untrusted runner (7.1): a `factory-agents-ci-*`
-  namespace may carry the baseline label instead, and in such a namespace
-  root is admitted only for the pod labelled as the BuildKit build pod.
-  Every other container, init container and ephemeral container of every
-  pod factoryd creates must run as non-root, judged per container, not just
-  at pod level. Shape checks apply to every pod regardless of labels: no
-  privileged container, no host network, PID or IPC namespace, no added
-  capabilities, no hostPath volume. The policy fails closed.
+  token, and a RoleBinding only to itself. CI namespaces carry the restricted
+  label too: build VMs replaced the root build pod (7.1), so the baseline
+  carve-out and the Service kind left the policy. Every container, init
+  container and ephemeral container of every pod factoryd creates must run as
+  non-root, judged per container, not just at pod level. Shape checks apply to
+  every pod regardless of labels: no privileged container, no host network,
+  PID or IPC namespace, no added capabilities, no hostPath volume. The policy
+  fails closed.
 - factoryd itself runs under default-deny egress, because it holds the
-  LiteLLM master key, the bot account and the S3 keys: only the API server
-  (by its injected address, not a DNS name), Postgres, Temporal, LiteLLM,
-  Forgejo and S3 answer.
+  LiteLLM master key, the bot accounts, the S3 keys and the CI project's
+  Hetzner token: only the API server (by its injected address, not a DNS
+  name), Postgres, Temporal, LiteLLM, Forgejo, S3 and `api.hetzner.cloud`
+  answer.
 - Upgrade path for stronger isolation: microVMs on bare-metal KVM nodes,
   one kernel per pod, for agent sandboxes and CI jobs alike (7.2).
 
@@ -985,22 +1169,36 @@ live session (Ruling 87). It must answer strict JSON with one of the four
 actions, a redirect carrying guidance and an escalation carrying a reason; an
 unreadable answer escalates. A session gets at most three supervisor calls,
 and the next trip escalates without one. Each call runs under a per-task
-`supervisor` virtual key whose `max_budget` is the task's remaining budget,
-counting spend LiteLLM has recorded but not yet settled, so the supervisor
-spends from the task's money and cannot overrun it; with nothing left, the
-task escalates without a call. `supervisor` maps to GLM-5.3, the strongest
-configured model. Every decision goes to the session record, the timeline
-and an issue comment.
+`supervisor` virtual key and takes a hold for its worst case like any model
+call (5.4), so the supervisor spends from the task's money and cannot overrun
+it or the day cap. With nothing left, the task escalates without a call.
+`supervisor` maps to GLM-5.3, the strongest configured model. Every decision
+goes to the session record, the timeline and an issue comment.
 
 Stopping is graceful: the worker gets SIGTERM, pushes the work in progress to
 the fork and reports what it did, so a redirect resumes from the pushed head
 with the dead session's findings. An escalation moves the task to
 `waiting-human`, comments the reason on the issue and waits without a timer.
 The answer is a comment from a trusted human (owner, admin or write on the
-repository), newer than the escalation comment. It becomes findings for one
-more session and may grant a bounded slice of agent time, ten minutes by
-default and never more than the full cap per answer. A human may raise a
-cap this way; the supervisor never can.
+repository), newer than the escalation comment, written in Forgejo or in the
+console. It may grant a bounded slice of agent time, ten minutes by default
+and never more than the full cap per answer. A human may raise a cap this
+way; the supervisor never can.
+
+The answers are a part of the next session's brief in their own section,
+newest first, each one tagged with the question it answers (Ruling 118). The
+workflow keeps every answer of the task across attempts, so a repeat
+escalation never loses an earlier one. A run that the heal pass starts
+rebuilds the answers from the task's intake events, which are the durable
+record (Ruling 120). Each answer is cut at 4000 bytes in the brief, and the
+issue keeps it in full. Before this, an agent treated an answer as one more
+finding and asked the same question again.
+
+The agent can escalate by itself too, with the `escalate_to_human` tool. The
+gateway passes the question and the reason to factoryd, which records an
+intake event and hands the escalation to the live session. The session stops
+with a work-in-progress push, calls no supervisor, and the workflow posts the
+question on the issue as for any escalation.
 
 ## 7. Chunk 5: verification and delivery
 
@@ -1024,11 +1222,89 @@ Merge is a PR merge. Flux picks up the commit and deploys to the staging
 namespace, then to prod on the promotion rule. Human approval, where policy
 demands it, is a Temporal signal. The waiting costs nothing.
 
-Built through Stage 6: step 1 and the human merge. `main` on both
-repositories is protected with one required approval, push and merge
-whitelisted to the human, and `apply_to_admins` on, so no repository admin,
-human or service account, bypasses it. The merge webhook finishes the task.
-Steps 2 and 3 arrive in Stage 7.
+Built through Stage 7: all three steps, the approval and the bot merge. After
+green checks the workflow runs the gates as Temporal activities. Each one
+records a timeline step and comments on the pull request.
+
+- **Policy gate.** It reads the pull request's changed files, a rename under
+  both names, and classifies each path under the policy's `risk` section
+  (5.3). The first matching rule decides a path's class, and the pull request
+  takes its most severe class. The live classes: `forbidden` for the
+  workflow directories `.forgejo/**`, `.gitea/**` and `.github/**`,
+  `migration` for `internal/*/migrations/**` and `internal/policy/schema.sql`,
+  `high` for `k8s/**`, `**/Dockerfile*`, `go.mod` and `go.sum`, and `normal`
+  by default. A forbidden class fails the task and closes the pull request.
+  Every other class needs a human's approval, because no class merges without
+  one yet.
+- **Migration gate.** When migration paths changed, it comments "schema
+  migration: human review required" with the list, and the approval card
+  carries it.
+- **Reproduction gate.** A task may carry a reproduction command, from the
+  first fenced `repro` block in the issue body or from `POST /tasks`. The
+  gate runs it in a fresh task namespace with the worker image in repro mode:
+  a read-only token on the repository, no gateway token, no push token and
+  the sandbox's egress. The worker refuses to run unless the pull request's
+  head is the gated commit. The command runs for 10 minutes by default, 15 at
+  most. A nonzero exit sends the next attempt to the stronger model with the
+  exit code, the command and the last 4 KiB of output as findings, the same
+  as red checks.
+- **Model review.** `review-frontier` reads the brief, the diff (cut at
+  48 KiB) and the gate results, and answers strict JSON: a verdict of
+  `approve` or `concerns`, a summary and findings. The call runs under a
+  per-task key with a hold, like the supervisor's. A review the headroom
+  cannot pay for, a failed call and an unreadable answer become a note on
+  the card, never a failure. The activity heartbeats every 30 seconds with a
+  2-minute heartbeat timeout, so a terminal signal cuts the call in flight.
+  The verdict is evidence on the approval card and a pull request comment,
+  never authority to skip a gate.
+
+Each gate and the review check that the pull request's head is still the
+gated commit. A moved head fails the task, because the checks passed on a
+different commit.
+
+The workflow then writes an `approval_requests` row of kind `merge` (Ruling
+116), at most one pending per task, and waits without a timer. The console's
+approve button submits an APPROVED review on the gated commit as the
+logged-in human, through the human's OAuth token, and then signals
+`approved` (Ruling 109). The `Merge` activity merges as the bot
+`factory-merge`, pinned to the gated commit. `main` on both repositories is
+protected with `apply_to_admins` on, so no repository admin, human or service
+account, bypasses it:
+
+| Setting | Value |
+|---|---|
+| Push whitelist | the human |
+| Merge whitelist | the human and `factory-merge` |
+| Approvals whitelist | the human |
+| Required approvals | 1 |
+| Stale approvals | dismissed |
+| Rejected reviews | block the merge |
+
+So Forgejo itself refuses the bot's merge until a whitelisted human has
+approved the current head. Proven on a throwaway repository: 405 before the
+approval, 200 after the human's, 405 after a non-whitelisted writer's, and
+403 for a push by the bot. The invariant of Rulings 76 and 77, no agent code
+reaches privileged `main` CI without a human, holds on the server side. A
+leaked `factory-merge` token can merge only pull requests a whitelisted human
+has approved. The bot's token reaches the code repository only.
+
+A 405 or 409 from Forgejo is a refusal: the workflow comments it, notes it on
+the card and keeps waiting. Any other merge error is retried 5 times, then
+reported as a `merge_failed` step and comment, and retried after 10 minutes
+with the same approval. After 6 such retries, about an hour, the workflow
+comments "merge retries exhausted", sets no timer and waits for a signal
+only, and a new approval starts again (Ruling 129). This bounds the workflow
+history, and the human path stays open. A merge finishes the task `done` at
+once, without waiting for the `pr_merged` webhook. A human who merges in
+Forgejo is credited as the merger. The activity merges only into `main`.
+
+Workflow changes since Stage 6 sit behind Temporal `GetVersion` change ids
+(`gates`, `answers`, `gates-pinned`, `merge-failure-reported`,
+`merge-retry-cap`), so a run started before a change keeps its old path. A
+replay test runs every recorded live history in the code repository's
+testdata. Live: PR #100 merged by `factory-merge` after the human's approval
+and a 405 before it, and PR #126 went through every gate, the review, the
+console approval and the merge.
 
 ### 7.1 The untrusted runner
 
@@ -1041,10 +1317,14 @@ repository-scoped, ephemeral runner, creates a namespace
 policy as agent sessions, and starts one runner pod under gVisor: non-root,
 restricted, no service-account token, the host executor inside the pod, and
 the architecture 5.3 egress allowlist (Forgejo, the Go module proxy and
-checksum database, the image registries the builds pull from, nothing else,
-no metadata endpoint). The runner takes its one job and exits; the spawner
-deletes the namespace and deregisters the runner. At most eight CI
-namespaces run at once, the rest queue.
+checksum database, `storage.googleapis.com` for the proxy's redirects,
+nothing else, no metadata endpoint). The rebuild drill's gate found the
+last one: `go vet` fetched a new dependency, the proxy redirected the
+download to `storage.googleapis.com`, and every pull request's vet check
+failed (Ruling 114). A build job's pod also reaches its build VM,
+`auth.docker.io` and the build cache (below). The runner takes its one job
+and exits; the spawner deletes the namespace and deregisters the runner.
+At most eight CI namespaces run at once, the rest queue.
 
 The registrations come from a dedicated Forgejo account, `factory-ci`
 (Rulings 101, 101a). Forgejo's repository runner API answers only the
@@ -1066,18 +1346,81 @@ to the workflow directories.
 
 Image builds need root somewhere. Every rootless BuildKit path fails under
 gVisor: writing a wide uid map through `newuidmap` is refused, with any
-seccomp profile. So a job labelled `pr-untrusted-build` gets a second pod,
-the build pod: BuildKit running as root inside its gVisor sandbox, with the
-native snapshotter, reached by `buildctl` over TCP through a ClusterIP
-Service (Ruling 91). Root inside gVisor is root of an emulated kernel, not
-of the node, so the boundary Ruling 78 guards, no node root for untrusted
-code, holds. The job pod that runs agent code and holds the job token stays
-non-root and restricted; the build pod holds no token, no credential and no
-service-account token, only the build context, and reaches only the package
-and registry hosts the Dockerfiles need. Its namespace is labelled Pod
-Security baseline, and the admission policy admits root only for that pod
-shape in a CI namespace (6.4). Nothing a PR build produces is pushed:
-publishing stays with the trusted runner on `main`.
+seccomp profile. Stage 6 therefore ran BuildKit as root inside a second
+gVisor pod (Ruling 91). That pod is gone: build VMs replaced it, one way only,
+because gVisor offers no overlay filesystem and copied every layer in full
+(Ruling 106). The pod, its Service, its egress policy and the admission
+policy's root carve-out are deleted.
+
+A job labelled `pr-untrusted-build` gets a throwaway Hetzner Cloud server in
+the CI project (7.2, Ruling 103), a cx23 in fsn1 on Debian 12. factoryd
+creates the job's namespace first, then the server, because the collector
+reads a missing namespace as a finished job. cloud-init installs a
+checksum-pinned static `buildkitd` v0.33.0 behind mutual TLS on tcp 1234,
+with no SSH key. Each server gets its own ECDSA certificate authority, whose
+key factoryd drops after signing a server certificate for the fixed name
+`buildkitd` and one client certificate. The client certificate reaches the
+runner pod as a read-only secret, and the runner's egress gains exactly one
+rule for the server's address on 1234. The server's Hetzner firewall admits
+1234 only from the cluster nodes' public IPv4s (`cluster-facts`, Ruling 112)
+and lets out tcp 80 and 443 and tcp and udp 53. The server needs an IPv4,
+because GitHub has no IPv6. Hetzner firewalls match addresses, not names, so
+the build VM's egress is open on those ports (Ruling 110). This is accepted,
+because the build context is code the agent already had and the VM holds no
+credential. The cost if wrong: a malicious Dockerfile can send the pull
+request's own source out for at most the job deadline. A name-allowlisting
+egress proxy is the named upgrade.
+
+`buildctl` in the runner pod drives the remote daemon. BuildKit fetches
+registry tokens through the client session, so a build job's runner pod also
+reaches `auth.docker.io`. The layers come from `registry-1.docker.io` to the
+VM, and the runner does not reach it. Nothing a PR build produces is pushed:
+the output goes to `/dev/null`, and publishing stays with the trusted runner
+on `main`.
+
+At most two build VMs run at once (`CI_BUILD_VMS_MAX`, the CI project's
+quota). Further build jobs wait in Forgejo's queue, and ordinary jobs are
+unaffected. Teardown deletes the server, then its firewall, then the
+namespace, whatever ended the pod. factoryd runs the collector of 5.5 on the
+CI project every minute, with the interlock of Ruling 123. A build VM's lease
+is the 45-minute job deadline plus 15 minutes. Live proofs: `buildkitd`
+answered 40 to 47 seconds after the create, the VM was gone 3 seconds after
+the job, a killed factoryd left a server that the collector deleted 62
+seconds later, and a hand-made server in the CI project was deleted in 48
+seconds.
+
+Forgejo hands a job to a runner before it evaluates the job's `if`. So a
+docs-only pull request's skipped image build still got a VM, which lived 10
+seconds and billed a full hour. `runs-on` is therefore an expression in
+`pr.yml`: with no image to build, the job lands on an ordinary
+`pr-untrusted` runner and skips there.
+
+A build VM costs 0.0096 EUR per build: one started hour of a cx23 with its
+IPv4. The type stays cx23 by measurement (Ruling 127). The same pull request
+with the same cache took 115 seconds for the image-build step on a cx33 and
+115 seconds on a cx23. Only the Go compile was about 21 % faster, at about
+twice the price. `CI_BUILD_VM_TYPE` in factoryd's config changes the type.
+
+**The build cache.** PR builds read a cache that holds no credential (Ruling
+111). It is a `registry:3` Deployment in the `forgejo` namespace on a
+local-path volume, Service `build-cache` on port 5000. A Cilium L7 policy is
+the access control: the trusted runner may use any method, the runner pods
+of build jobs in CI namespaces may send only GET and HEAD, and nothing else
+connects. Main CI exports the cache from the dind's default builder with
+`--cache-to type=registry,mode=max,ignore-error=true`, so a cache outage
+cannot fail `main` (Ruling 119). The dind uses the containerd image store,
+which supports a registry cache export without a separate builder. A PR's
+runner pod fetches each image's cache with `crane pull` by digest into a
+local OCI layout, under a 120-second timeout, and streams it to the VM with
+`--import-cache type=local`. The VM never reaches the cache. A missing cache
+means a cold build, and the check stays green. A garbage collection runs at
+every registry start, and a daily CronJob restarts the registry at 03:30.
+Its `kubectl` image is pinned by digest, because the job may patch a
+Deployment in a privileged namespace, and a hijacked tag would mean node
+root. The cache grows about 100 to 200 MB per main run that changes code,
+and a restart took the store from 2.35 to 1.16 GB with all three cache tags
+kept. local-path does not enforce the volume's 20 GiB, so the daily
+collection is the bound.
 
 The trusted runner's dind storage is a size-limited `emptyDir` (40 GiB).
 The `docker:dind` image declares `/var/lib/docker` a volume, and without a
@@ -1085,21 +1428,22 @@ mount containerd backs it with an anonymous volume the kubelet neither
 bounds nor counts: it grew past 50 GiB, put a node under disk pressure, and
 the kubelet evicted an innocent untrusted build instead.
 
-**PR build speed.** A PR's image builds take about 25 to 30 minutes. Four
-causes add up.
-gVisor offers no overlay filesystem to BuildKit, so the native snapshotter
-copies every layer in full instead of stacking it. Every job starts in a
-fresh pod with an empty cache. File I/O through gVisor's userspace kernel
-costs extra on every layer. And the three images build one after the other,
-the sandbox image including a warm step that waits on a timeout. The
-remedies, planned as Stage 7's first step: build only the Dockerfiles a pull
-request changes; give PR builds a read-only cache that holds no credential,
-exported to an in-cluster cache registry by trusted `main` builds only and
-reachable by network policy only from CI namespaces; drop the warm step;
-build in parallel; and move builds to throwaway build VMs (7.2). The
+**PR build speed.** A PR's image builds took about 25 to 30 minutes in
+Stage 6, and 38 minutes on the rebuild drill's gate. Four causes added up:
+gVisor's missing overlay filesystem, an empty cache in every fresh pod, file
+I/O through gVisor's userspace kernel, and three images built one after the
+other, the sandbox image including a warm step that waited on a timeout.
+Stage 7's first step removed them. The `changes` job builds only the images
+whose inputs a pull request changed, the rest build in parallel, the warm
+step is gone, builds run on build VMs, and they read the cache. A docs-only
+pull request now goes from intake to six green checks in about 5 minutes. A
+pull request that changes Go runs its checks in about 4 to 5 minutes, and
+its image build takes about 2.5 minutes on a VM. The cache saves the
+dependency steps, but compiling the changed Go dominates on a cx23, and main
+CI's image jobs take 15 to 20 seconds longer for the cache upload. The
 prison itself stays: shared-kernel containers are weak prisons for code an
-agent wrote, so the fix for the cost is fewer and cached builds, not a
-weaker sandbox.
+agent wrote, so the fix for the cost is fewer and cached builds on a
+throwaway kernel, not a weaker sandbox.
 
 ### 7.2 Stronger isolation at scale: microVMs
 
@@ -1115,27 +1459,27 @@ the agent could even run Docker itself.
 The catch is hardware. MicroVMs need `/dev/kvm`, and Hetzner Cloud servers
 expose none (3). This route needs bare-metal nodes, for example Hetzner
 dedicated servers joined to the cluster as a microVM pool, or a cloud that
-offers nested virtualisation. It pays off when the build volume is high
-enough that the cost per build on gVisor (compute time, a node held for half
-an hour per PR) exceeds a dedicated node's fixed monthly price, and when
+offers nested virtualisation. It pays off when the build volume is high enough
+that the cost per job on gVisor pods and build VMs (compute time, a billed VM
+hour per build) exceeds a dedicated node's fixed monthly price, and when
 someone is ready to operate that node: firmware, disks and a Talos
 installation outside the cloud's API, where a replacement is a ticket, not a
 `tofu apply`. At today's volume, a handful of PRs a day, gVisor on cloud VMs
 is cheaper and simpler.
 
-The interim step, planned next: a throwaway Hetzner Cloud VM per build job.
+The interim step is built: a throwaway Hetzner Cloud VM per build job (7.1).
 factoryd creates the VM for one build, the job's builds run there on an
-ordinary kernel with overlay filesystems and full speed, and factoryd
-deletes the VM afterwards. Cloud servers bill by the hour, so a build costs
-cents. The VM lives in its own Hetzner project for CI builds, never in the
-cluster's project and never in the agent project from 5.5: build VMs are
-verification-plane machinery that factoryd runs, not resources an agent
+ordinary kernel with overlay filesystems and full speed, and factoryd deletes
+the VM afterwards. Cloud servers bill by the started hour, so a build costs
+about 0.01 EUR. The VM lives in its own Hetzner project for CI builds, never
+in the cluster's project and never in the agent project from 5.5: build VMs
+are verification-plane machinery that factoryd runs, not resources an agent
 commissions, so factoryd holds the CI project's token while the agent
-project's token stays with the gateway alone. The step still reuses the
-commissioning pattern of 5.5: a registry row before the create, provider
-labels, a lease, and a collector that deletes a VM whose build died with it
-and anything in the CI project the registry does not know. The VM is the
-job's prison, so it holds no credential beyond what the job itself holds.
+project's token stays with the gateway alone. The step reuses the
+commissioning code of 5.5: a registry row before the create, provider labels,
+a lease, and a collector that deletes a VM whose build died with it and
+anything in the CI project the registry does not know. The VM is the job's
+prison, so it holds no credential at all.
 
 ## 8. Chunk 6: signals
 
@@ -1155,7 +1499,8 @@ counts only for the pull request the workflow itself opened, matched by
 number and fork head. Because Forgejo never retries a failed delivery, the
 heal pass re-reads the same state every minute and applies the same trust
 checks, so a merge or an answer made while factoryd was down still reaches
-the workflow. SigNoz alerts join in Stage 8.
+the workflow. Built in Stage 7: the agent's escalation tool call (6.6), which
+moves the task into the console's human lane. SigNoz alerts join in Stage 8.
 
 ## 9. What the 2026-09-24 verification pass established
 
@@ -1227,6 +1572,8 @@ since Stage 6, but neither has run under load.
 | Observability | SigNoz, Grafana stack as OTel-compatible fallback | Decided |
 | UI style | Server-rendered Go with htmx | Decided |
 | Policy engine | Go code now, OPA sidecar when rules multiply | Decided |
+| Policy source | A YAML document in Git (ConfigMap `factory-policy`), loaded into immutable Postgres versions. Runtime decisions are Postgres rows edited in the console | Decided (Ruling 107) |
+| Hard caps | A hold for each call's worst case under an advisory lock, the output clamped to the headroom, the real cost booked in full, a cut call books its hold | Decided (Rulings 113, 115, 117) |
 | Human identity | Forgejo OAuth2 now, Keycloak only if SSO story demands | Decided |
 | Sandbox runtime | gVisor on cloud VMs now; microVMs (Kata or Firecracker) on bare-metal KVM nodes when build volume pays for them, for CI jobs and agent sandboxes alike (7.2) | Decided |
 | Worker harness | opencode first, Codex CLI successor, goose fallback, behind the adapter contract | Decided |
@@ -1235,14 +1582,19 @@ since Stage 6, but neither has run under load.
 | Repository layout | `ai-software-factory-infra` and `ai-software-factory-code` now, `demo-app` in Phase 3 | Decided |
 | Public DNS | Namecheap DNS stays, HTTP-01 certificates, Cloudflare as the named upgrade | Decided |
 | Untrusted CI runner | factoryd's CI spawner: one ephemeral gVisor pod per job, repository-scoped ephemeral registration, read-only job token, no secrets; the privileged dind runner serves protected `main` only | Decided (Rulings 78, 89) |
-| PR image builds | BuildKit as sandbox root in a separate gVisor build pod without credentials, because gVisor has no working rootless path | Decided (Ruling 91) |
-| PR build speed | Changed Dockerfiles only, a credential-free read-only cache fed by `main`, no warm step, parallel builds, then throwaway Hetzner Cloud build VMs per job | Planned, Stage 7 first step |
+| PR image builds | A throwaway Hetzner Cloud build VM per job in a CI project of its own, `buildkitd` over mutual TLS, no credential on the VM, cx23 by measurement. The gVisor build pod is gone | Decided (Rulings 103, 106, 110, 127) |
+| PR build speed | Changed images only, parallel builds, no warm step, build VMs, and an in-cluster read-only cache that only `main` writes, streamed to the VM through the runner pod | Built (Rulings 106, 111, 119) |
+| Go module egress | `storage.googleapis.com` joins the CI, build and sandbox allowlists by name, no mirror | Decided (Ruling 114) |
 | Agent pull requests | From a `factory-agent` fork, so PR jobs get a read-only token; two session tokens, read upstream and write the fork; workflow-directory guard in the worker and factoryd | Decided (Rulings 97, 100) |
 | CI registrar | Dedicated `factory-ci` account, organisation owner because the runner API demands it, token scoped to the code repository, `main` protected with `apply_to_admins` | Decided (Rulings 101, 101a) |
 | Missed webhooks | The heal pass re-reads Forgejo every minute and signals what webhooks missed; `Reconcile` at the start of every workflow run | Decided |
-| Supervision | Cheap trace detectors over the event stream, the strongest model as supervisor under its own alias, inside the session activity, at most three calls per session, paid from the task's remaining budget | Decided (Rulings 82, 86, 87) |
-| Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list | Decided (Rulings 80, 83) |
-| Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Decided (Rulings 81, 84) |
+| Supervision | Cheap trace detectors over the event stream, the strongest model as supervisor under its own alias, inside the session activity, at most three calls per session, paid from the task's remaining budget. Human answers are kept across attempts in their own brief section | Decided (Rulings 82, 86, 87, 118, 120) |
+| Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list. Servers and volumes, no buckets. SSH certificates bound to one server. Outbound tcp 53, 80 and 443. Deletion at the last tick before the lease ends | Built (Rulings 80, 83, 121, 122, 124, 125) |
+| Collector safety | A pass that sees a cluster node's IPv4 or another project's label deletes nothing | Decided (Ruling 123) |
+| Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Built (Rulings 81, 84) |
+| Merge authority | The `factory-merge` bot merges after a whitelisted human's approval, enforced by Forgejo's branch protection. Merge retries are capped at six | Built (Rulings 109, 129) |
+| Spend approvers | The policy's `approvers` list gates resource approval, envelope edits, promotion and the merge approve button | Decided (Ruling 128) |
+| Git remotes | Forgejo is primary and push-mirrors both repositories to GitHub | Decided (Ruling 126) |
 | Demo app | Small real product with real telemetry | Open, chosen in Phase 3 |
 
 ## 11. Build order
@@ -1295,8 +1647,14 @@ works `factory` and `demo-app`.
 | Fork PR | A pull request from `factory-agent`'s fork into `sf`; Forgejo gives its CI jobs a read-only token and no secrets |
 | Job token | The token Forgejo Actions hands each CI job; writable on a same-repository PR, read-only on a fork PR |
 | factory-ci | The Forgejo account that registers ephemeral untrusted runners and reads collaborator permissions |
-| Build pod | The gVisor pod that runs BuildKit as sandbox root for a PR's image builds, holding no credential |
+| Build VM | A throwaway Hetzner Cloud server in the CI project that runs `buildkitd` for one PR build job, reached over mutual TLS, holding no credential, deleted after the job |
+| Build cache | The in-cluster `registry:3` that `main` CI writes and that PR build jobs read with GET and HEAD only, streamed to the build VM through the runner pod |
+| factory-merge | The Forgejo bot that merges an agent pull request after a whitelisted human approved it. It cannot push |
+| Approvers | The policy's list of Forgejo users who may authorise spend in the console |
+| Hold | A reservation of a call's or a resource's worst-case cost, taken before it runs and replaced by the real cost |
+| Push mirror | Forgejo's push of every commit to the GitHub copy of a repository |
 | Heal pass | factoryd's pass at boot and every minute that starts missing workflows and re-reads Forgejo for signals a webhook missed |
 | Timeline | A task's step-by-step record in S3 (`sessions/<id>/timeline.jsonl`), from intake to its final state |
-| Envelope | The resource and euro allowance a human sets per project for commissioned cloud resources |
-| Lease | The expiry every commissioned resource carries; the garbage collector deletes what outlives it |
+| Envelope | The resource and euro allowance per project for commissioned cloud resources: monthly euros, server types, count, lease length, volume size. Copied from the policy default and edited in the console |
+| Lease | The expiry every commissioned resource and build VM carries. The collector deletes the resource at the last tick before it ends |
+| Principal | The name an SSH certificate is valid for. A commissioned server accepts only its own, `resource-<row id>` |
