@@ -2835,14 +2835,6 @@ Steps: first PR build speed, because a pull request's image builds take 25 to 30
 
 Exit test: a task over budget has its next model call refused by the gateway, a risk-classed change waits in an approval state, completes when approved, and the workflow merges the pull request, and the cost dashboard shows both. A server commissioned by a task whose sandbox is killed mid-run is deleted when its lease expires, a server created in the agent project by hand is deleted by the collector, and the console board shows the tasks and the resources with their cost.
 
-### Stage 8: customer
-
-Goal: the demo app, the first external customer of the factory.
-
-Steps: choose the demo app (fork still open, architecture 10), staging and prod namespaces deployed by Flux, OpenTelemetry emission from the demo app and from the factory itself: factoryd, factory-gateway and the worker adapters emit OTel, and gateway audit rows go to OTel as well as Postgres (architecture 5.1 step 5), the k8s-infra chart for node telemetry and CronJob failure watching into SigNoz, ClickHouse resource requests, and SigNoz retention tiered to object storage (architecture 4), SigNoz alert rules feeding factoryd intake, which files each alert as a Forgejo issue so it lands on the board like any task, fault injection.
-
-Exit test: an injected fault raises an alert, the alert creates a task, the agent's fix passes verification, merges, deploys to staging, and promotes to prod on the rule.
-
 Closed 2026-09-28. Exit test run verbatim on 2026-09-28 (task 57, code
 f46c350, roll 7254da0): all seven steps pass. Step 3 failed on the first run
 because the console showed every EUR amount with two decimals, so a 0.000543
@@ -2868,20 +2860,52 @@ recorded replay history; Forgejo as the primary remote with push mirrors to
 GitHub; cx23 build VMs (cx33 measured equal). What Stage 7 leaves for Stage
 8 is in the "step zero" paragraph below and in the handover.
 
-Stage 8 step zero, agreed with Sebastian on 2026-09-28 (discuss the specifics
-with him before any code): factory instrumentation. What the Stage 7 session
-lacked: pipeline and roll durations as metrics, a per-task timeline of gate
-durations, progress from long-running work before it ends, and a log line per
-applied migration. The plan: (1) main CI and PR check durations, build VM
-lifetime and roll-to-live time as OpenTelemetry metrics from factoryd into
-SigNoz, with one dashboard; (2) the task timeline records the start and end of
-every gate (intake, session, checks, reproduction, review, approval, merge)
-and the console shows the durations per task; (3) a factoryd log line per
-applied migration and per policy version; (4) the three hand steps of the
-rebuild recipe become Flux-managed Jobs: the OpenBao auth role audience after
-a roll, the Forgejo push mirrors to GitHub, the console OAuth app secret.
-About two days. Sebastian's steer: no 20-minute silent waits without a
-visible reason.
+### Stage 8: customer
+
+Goal: the demo app, the first external customer of the factory.
+
+Steps, amended 2026-09-28 with Sebastian (rulings 140 to 152 in the ledger,
+the discussion in stage8-answers.md): step zero, factory instrumentation and
+the three hand steps as CronJobs; the gate supervisor and the alerts table
+with a verdict per alert; project registration and per-project settings
+(merge rule, notify list, the envelope with task and standing resources, an
+in-cluster quota); every bug from any source starts a task, the `auto` merge
+outcome, the non-reproducible path with a question to the poster and
+Forgejo's bell; the demo app, a Go link shortener with Postgres in its own
+repository with its own CI/CD as code (staging, 15 minutes without an alert,
+prod); OpenTelemetry emission from the demo app and from the factory itself:
+factoryd, factory-gateway and the worker adapters emit OTel, and gateway
+audit rows go to OTel as well as Postgres (architecture 5.1 step 5); the
+k8s-infra chart for node telemetry and CronJob failure watching into SigNoz,
+ClickHouse resource requests, and SigNoz retention tiered to object storage
+(architecture 4); SigNoz alert rules feeding factoryd intake, which files
+each alert as a Forgejo issue in the repository of the namespace's project;
+fault injection as a planted regression; Forgejo accounts for collaborators.
+
+Exit test, amended 2026-09-28: two projects with two deploy chains in one
+factory. A planted regression in the demo app raises an alert, the alert
+files an issue that starts a task, the agent's fix passes the gates, merges
+on the demo app's `auto` setting, and the demo app's own workflow takes it to
+staging and, after 15 minutes without an alert, to prod. The factory's own
+repositories keep their roll and their `human` setting. The alerts panel
+shows the run's alerts with their verdicts.
+
+Stage 8 step zero, agreed with Sebastian on 2026-09-28: factory
+instrumentation. What the Stage 7 session lacked: pipeline and roll durations
+as metrics, a per-task timeline of gate durations, visible progress from
+long-running work, and a log line per applied migration. The plan: (1) main
+CI and PR check durations, CI queue time, build VM lifetime and roll-to-live
+time as OpenTelemetry metrics from factoryd into SigNoz, with one dashboard
+as code; (2) the task timeline records the start and end of every gate and
+the console shows the durations per task; (3) a factoryd log line per applied
+migration and per policy version (done in Stage 7's final fix wave); (4) the
+three hand steps of the rebuild recipe become Flux-managed CronJobs: the
+OpenBao auth role, the Forgejo push mirrors to GitHub, the console OAuth app
+secret. Sebastian's steer: every stage gets a check when it appears to stall,
+the bounds are configurable, and the factory counts its alerts and how many
+were real problems, so the bounds can be tuned from data. Controller
+monitoring reads the subagents' transcripts instead of asking agents for
+heartbeats. About three days.
 
 ### Stage 9: self
 
