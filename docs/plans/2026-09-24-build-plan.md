@@ -2843,6 +2843,21 @@ Steps: choose the demo app (fork still open, architecture 10), staging and prod 
 
 Exit test: an injected fault raises an alert, the alert creates a task, the agent's fix passes verification, merges, deploys to staging, and promotes to prod on the rule.
 
+Stage 8 step zero, agreed with Sebastian on 2026-09-28 (discuss the specifics
+with him before any code): factory instrumentation. What the Stage 7 session
+lacked: pipeline and roll durations as metrics, a per-task timeline of gate
+durations, progress from long-running work before it ends, and a log line per
+applied migration. The plan: (1) main CI and PR check durations, build VM
+lifetime and roll-to-live time as OpenTelemetry metrics from factoryd into
+SigNoz, with one dashboard; (2) the task timeline records the start and end of
+every gate (intake, session, checks, reproduction, review, approval, merge)
+and the console shows the durations per task; (3) a factoryd log line per
+applied migration and per policy version; (4) the three hand steps of the
+rebuild recipe become Flux-managed Jobs: the OpenBao auth role audience after
+a roll, the Forgejo push mirrors to GitHub, the console OAuth app secret.
+About two days. Sebastian's steer: no 20-minute silent waits without a
+visible reason.
+
 ### Stage 9: self
 
 Goal: the factory works on its own repositories, the portfolio claim from goal.md.
