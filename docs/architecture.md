@@ -2,11 +2,10 @@
 
 Status: living design document. The build plan's Stages 0 to 7 are built: the
 loop from an issue to a merged pull request runs on the cluster under policy,
-hard caps and human approval. Stage 8, the first customer, is in progress. Its
-parts are built and proven one by one, and its exit test runs in Task 70.
-Sections that describe built behaviour say so. A part that is built on a
-branch but not yet rolled onto the cluster says that too. The rest is still
-design. We amend this file as the design moves, so it always holds the
+hard caps and human approval. Stage 8, the first customer, closed 2026-09-28:
+a planted regression in the demo app went from alert to fixed in prod in 31
+minutes without a human. Sections that describe built behaviour say so. The
+rest is still design. We amend this file as the design moves, so it always holds the
 current design plus the explanations behind it. Rulings live in the build
 ledger and are cited here by number.
 
@@ -580,8 +579,8 @@ As built in Stage 8 (Task 69):
   exactly as SigNoz's GET returns it, with every Go zero value spelled out,
   or every run would log an update. A project's own alert rules are project
   code (Ruling 159): a ConfigMap in its deploy directory labelled
-  `factory/signoz-rules`, which the same job applies. Built in Task 70, exit
-  test pending.
+  `factory/signoz-rules`, which the same job applies. Built in Task 70 and
+  proven by the Stage 8 exit test.
 - **Tiered retention.** Traces and metrics are deleted at 720 hours and move
   to the S3 volume at 168 hours. Logs keep 30 days and move at 7. ClickHouse
   reads the Hetzner key pair through `include_from` with
@@ -679,7 +678,10 @@ the two resource kinds (5.5), telemetry from all three binaries (below), the
 gate supervisor (6.6) and the alerts table (8). Built in Stage 8 on branches
 and rolled 2026-09-28: the intake lanes and the `auto` outcome (Task
 66), every factoryd model call through the gateway (Task 71), and SigNoz
-alerts into intake (Task 70, exit test pending).
+alerts into intake (Task 70). The Stage 8 exit test passed on 2026-09-28:
+a planted regression in the demo app fired the 5xx alert, the alert filed
+issue #5, the agent's fix merged on `auto` 9 minutes 47 seconds after the
+issue, and prod ran the fix 31 minutes 23 seconds after the alert.
 
 **Intake.** Two doors, one record. Forgejo posts webhooks to
 `/webhooks/forgejo`. factoryd checks the HMAC-SHA256 signature in
@@ -1816,8 +1818,8 @@ history, and the human path stays open. A merge finishes the task `done` at
 once, without waiting for the `pr_merged` webhook. A human who merges in
 Forgejo is credited as the merger. The activity merges only into `main`.
 
-**The `auto` outcome** (Rulings 149, 167, 169, built in Task 66, not yet
-rolled). A project on merge rule `auto` merges without a card when all of
+**The `auto` outcome** (Rulings 149, 167, 169, built in Task 66, rolled
+2026-09-28 and proven by the exit test's merge of PR #6). A project on merge rule `auto` merges without a card when all of
 these hold:
 
 1. The policy gate's class is `normal`, whose outcome is `auto`.
@@ -1839,8 +1841,8 @@ verdict, the agent's recommendation and every unmet condition. A project on
 factory's repositories do. The factory's own repositories stay on `human`,
 so every change to them still waits for a whitelisted human.
 
-**Not reproducible, nothing found** (Ruling 150, built in Task 66, not yet
-rolled). The agent calls the tool `request_info` with what it tried and
+**Not reproducible, nothing found** (Ruling 150, built in Task 66, rolled
+2026-09-28 and proven live on issue #3 of the demo app). The agent calls the tool `request_info` with what it tried and
 what it needs, and the session ends `needs_info`. The task moves to
 `waiting-poster`. The comment on the issue mentions the author and the
 project's `notify` list, the approvers by default, so Forgejo's bell is the
@@ -2105,8 +2107,8 @@ moves the task into the console's human lane. Stage 8 adds the issue lanes
 from any account (5.1), the poster's answer to an information request (7),
 a project's pushes to `main` (5.1), and SigNoz alerts.
 
-**Alerts into intake** (Rulings 146, 148, 159, built in Task 70, exit test
-pending). A SigNoz notification channel, created as code by the
+**Alerts into intake** (Rulings 146, 148, 159, built in Task 70, proven by
+the Stage 8 exit test). A SigNoz notification channel, created as code by the
 `signoz-objects` job, posts firing and resolved alerts to factoryd's `POST
 /webhooks/signoz`, with basic auth from the secret `signoz-webhook`. An
 alert names a symptom and never a command, so for an alert-filed issue the
@@ -2148,7 +2150,13 @@ factoryd exposes the table as `factory.alert.count{kind,verdict}`, with
 open count falls when its alert gets a verdict. Proven live: an escalation
 clicked `noise (sebastian)`, supervisor trips judged `noise (supervisor)`,
 and `gate_bound` open at 1 in SigNoz while a trip waited. The dashboard's
-precision panel, alerts per kind and verdict per week, comes with Task 70.
+precision panel, alerts per kind and verdict per day, came with Task 70. The
+exit test found two defects in it: factoryd reported only the kind and
+verdict pairs the table held, so a series whose rows moved on kept its last
+value in SigNoz, and the panel summed over factoryd pods, so a restart
+doubled a count. Since the fix factoryd reports every kind and verdict pair,
+0 when the table has none, and the panel takes the maximum over pods
+(Rulings 173, 174).
 
 ## 9. What the 2026-09-24 verification pass established
 

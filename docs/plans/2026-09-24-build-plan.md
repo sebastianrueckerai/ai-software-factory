@@ -2890,8 +2890,25 @@ staging and, after 15 minutes without an alert, to prod. The factory's own
 repositories keep their roll and their `human` setting. The alerts panel
 shows the run's alerts with their verdicts.
 
-Closed 2026-09-28. Exit test run on 2026-09-28 (task 70): [EXIT TEST RESULT
-PENDING, filled from task-70-report.md]. The rebuild that opened the stage
+Closed 2026-09-28. Exit test run on 2026-09-28 (task 70), passed: the planted
+regression merged into the demo app's main at 21:02:25 UTC and reached
+staging at 21:07:41; SigNoz's `5xx rate above 5 %` fired at 21:13:19 (6.67
+percent), factoryd filed issue #5 and started the task 31 seconds later, the
+agent opened its fix as PR #6 at 21:18:22, four checks ran green on the
+ephemeral runners, the reproduction gate proved the agent's own repro block
+red at the base and green at the head, the frontier review approved it as a
+strict improvement, and factory-merge merged it on `auto` at 21:23:36, 9
+minutes 47 seconds after the issue. The demo app's own workflow took the fix
+to staging at 21:29:32, SigNoz resolved the alert at 21:37:19 and factoryd
+commented the resolve on the issue, and prod ran the fix at 21:44:42 after
+15 minutes on staging without an alert; the regression's own promotion to
+prod had failed on the firing alert, so prod never ran the fault. Alert to
+prod: 31 minutes 23 seconds; the task cost EUR 0.037. The factory's own
+repositories rolled in the same window on their `human` setting, none of it
+by factory-merge. The alerts panel showed the run's alert with verdict
+`real`, and the run found the panel's two defects (a series whose rows moved
+on kept its last value, and a sum across factoryd pods), fixed and rolled
+before the stage closed. The rebuild that opened the stage
 took 62 minutes end to end, the platform whole after 18, and the step-zero
 gate passed on its intent (one supervisor call cut by its timeout booked its
 hold, ruling 115). Measured: a roll takes 61 to 73 s from push to ready for
