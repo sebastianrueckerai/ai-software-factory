@@ -2890,6 +2890,35 @@ staging and, after 15 minutes without an alert, to prod. The factory's own
 repositories keep their roll and their `human` setting. The alerts panel
 shows the run's alerts with their verdicts.
 
+Closed 2026-09-28. Exit test run on 2026-09-28 (task 70): [EXIT TEST RESULT
+PENDING, filled from task-70-report.md]. The rebuild that opened the stage
+took 62 minutes end to end, the platform whole after 18, and the step-zero
+gate passed on its intent (one supervisor call cut by its timeout booked its
+hold, ruling 115). Measured: a roll takes 61 to 73 s from push to ready for
+two images and 161 s for four; the demo app's own chain builds on a build VM
+in about a minute and rolls staging and prod by its own CI, and its 15-minute
+promote gate refused prod once on eight load-generator failures; a task's
+gate durations equal its timeline to the hundredth of a second; the
+factory's spend equals LiteLLM's key spend to the last digit once every
+model call, review and supervisor included, passes the gateway. Standing
+contracts from this stage, all in the ledger as rulings 140 to 172: step
+zero's metrics, dashboard, bounds and alerts table with verdicts; the gate
+supervisor for the five long gates with one wait and one retry per run, a
+finished gate winning over a late answer; transcripts instead of heartbeats;
+the three hand steps as CronJobs and a one-time OpenBao bootstrap; a project
+as its own Forgejo organisation with a deploy branch as its rolled state,
+registration reconciled from Postgres, hostnames as an infra commit, a
+default-deny policy and Flux tenancy per namespace, two resource kinds in
+one envelope; every bug from any account or alert starts a task, `auto`
+needs the review's approve and strict_improvement true plus a reproduction
+that fails at base and passes at head or the agent's fault note, the
+poster's text as untrusted information, request_info with a 14-day close;
+every factoryd model call through the gateway; OpenTelemetry from all three
+binaries with the audit rows as scrubbed log records and one redact package;
+node telemetry, the Job-failure alert on the failure event, tiered retention
+with S3 cold storage; project alert rules as project code applied by one
+platform job. What Stage 8 leaves for Stage 9 is in the handover.
+
 Stage 8 step zero, agreed with Sebastian on 2026-09-28: factory
 instrumentation. What the Stage 7 session lacked: pipeline and roll durations
 as metrics, a per-task timeline of gate durations, visible progress from
