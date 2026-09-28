@@ -1,12 +1,14 @@
 # Software factory: target architecture
 
-Status: living design document. The build plan's Stages 0 to 6 are built: the
-loop from an issue to a merged pull request runs on the cluster. The parts of
-Stage 7 are built and proven one by one, and its exit test is still to run.
-Sections that describe built behaviour say so; the rest is still design. We
-amend this file as the design moves, so it always holds the current design
-plus the explanations behind it. Rulings live in the build ledger and are
-cited here by number.
+Status: living design document. The build plan's Stages 0 to 7 are built: the
+loop from an issue to a merged pull request runs on the cluster under policy,
+hard caps and human approval. Stage 8, the first customer, is in progress. Its
+parts are built and proven one by one, and its exit test runs in Task 70.
+Sections that describe built behaviour say so. A part that is built on a
+branch but not yet rolled onto the cluster says that too. The rest is still
+design. We amend this file as the design moves, so it always holds the
+current design plus the explanations behind it. Rulings live in the build
+ledger and are cited here by number.
 
 Decided so far:
 
@@ -177,11 +179,14 @@ platform.
 ```
 namespaces:
   platform        cnpg, temporal, openbao, litellm, cert-manager, signoz
-  forgejo         forgejo, runner, container registry
+  k8s-infra       the node and cluster telemetry collectors (4.2)
+  forgejo         forgejo, runner, container registry, build cache
   factory         factoryd, factory-gateway
   factory-agents  one namespace per task session and one per untrusted CI
                   job (factory-agents-ci-*), gVisor pods
-  apps            demo app staging and prod, deployed by Flux
+  <environment>   one namespace per environment of each registered project,
+                  labelled factory/project=<name> (5.1): demo-staging and
+                  demo-prod for the demo app, deployed by Flux
 ```
 
 The re-seed drill, run once before Phase 1 ends:
@@ -250,6 +255,44 @@ and seed-bundle document; what the restores do not carry (the Forgejo
 webhook secret, the fresh CI registrar token, the Actions secrets) is listed
 there as re-seed items.
 
+The fourth rebuild (2026-09-28, the start of Stage 8) had the platform whole
+18 minutes after the first `tofu apply`. It turned three of the recipe's hand
+steps into Flux-managed CronJobs (Ruling 143). Each runs every 10 minutes
+with `concurrencyPolicy: Forbid`, `backoffLimit: 0` and a 300-second
+deadline, from a digest-pinned image. Each converges: a run with nothing to
+do logs `no change`, and every run writes one log line.
+
+- `openbao-config` writes the SSH certificate authority's role, the
+  gateway's Kubernetes auth role and their policies. It logs in through its
+  own Kubernetes auth role, `openbao-config`, whose policy pins every
+  parameter the job writes, so the job cannot make itself admin. It creates
+  a certificate authority only when OpenBao answers "no default issuer
+  currently configured". The review found that the first draft created a new
+  authority on any failed read, and a second authority would have locked
+  every commissioned server out. The root token never enters the cluster:
+  `scripts/openbao-config-bootstrap.sh` runs once from the seed machine with
+  the root token on stdin and writes the job's role and policy, and a raft
+  snapshot after it carries both into the next restore. Proven live: a
+  restored OpenBao accepts the new cluster's ServiceAccount tokens, so a
+  restore needs no root token, and an audience cleared by hand on the
+  gateway's role was back 9 seconds later. The unseal stays a hand step.
+- `push-mirrors` deletes and recreates a mirror whose `last_error` is not
+  empty. The mirrors use a fine-grained GitHub token limited to the two
+  repositories, contents read and write (Ruling 144), from the secret
+  `github-mirror`. While that secret is missing, the job idles with one log
+  line.
+- `console-oauth` regenerates the console's OAuth application only when its
+  secret is missing or the secret's `client_id` differs from the
+  application's, and then restarts factoryd, which reads the keys only at
+  boot. Proven live: a secret deleted at 17:34:51Z was regenerated 5 seconds
+  later, and a login through the new application worked.
+
+The same rebuild found two traps. Let's Encrypt's rate limit had run out for
+the Forgejo hostname (3.4). And Flux reverts a `kubectl rollout restart` of a
+Deployment it owns, so the recipe deletes the pod instead. GitHub has refused
+every push from the seed machine since 2026-09-28 with GH007, its e-mail
+privacy block, so the off-site copy waits for that block to lift.
+
 Bootstrap breaks one circular dependency: Flux deploys everything from Git,
 but the Git server, Forgejo, is itself deployed by Flux. Step zero, run once
 from the seed machine: apply the bootstrap slice, CNPG plus Forgejo, by hand,
@@ -292,7 +335,11 @@ are plain files on a local PV. Postgres is covered by CNPG's S3 backups,
 Forgejo by a nightly dump of its repositories to S3, and OpenBao by its
 snapshots: one backup path per data service, no cluster-wide backup tool.
 Everything else is either stateless and rebuilt from Git, or blob-shaped and
-already on S3-class storage. SigNoz's local history is the one accepted loss.
+already on S3-class storage. SigNoz's history is the one accepted loss: its
+last 7 days sit on a local volume, and older data moves to the bucket
+`signoz-cold` (4.2), but ClickHouse keeps that disk's metadata on the local
+volume, so a rebuild orphans the cold objects. The bucket's lifecycle rule
+expires them after 31 days.
 
 CloudNativePG is an operator for Postgres. You write a Kubernetes object that
 says "Postgres, three replicas, this much disk, backups to this S3 bucket". The
@@ -362,7 +409,7 @@ OpenBao from the seed by hand. No secret the seed holds ever enters Git.
 | Model routing | LiteLLM OSS proxy | Budgets, virtual keys and the key API are OSS. JWT auth is not, see 5.2 |
 | Object storage | Hetzner Object Storage | Fork below |
 | Observability | SigNoz | Fork history below, decided |
-| Telemetry pipeline | OpenTelemetry Collector | Agents and services emit OTel; the collector routes |
+| Telemetry pipeline | OpenTelemetry Collector | factoryd, the gateway, the worker and project apps emit OTel to SigNoz's collector. The k8s-infra chart's collectors scrape the nodes and the cluster (4.2) |
 | TLS certificates | cert-manager with Let's Encrypt | One per public endpoint, HTTP-01 via Gateway API, see 3.4 |
 
 ### 3.4 Public DNS and TLS
@@ -396,6 +443,23 @@ this scale.
 The firewall rule stands: ports 80 and 443 open to the world for the Gateway
 endpoints, port 80 serving only the ACME challenge and a redirect to 443,
 while the Talos and Kubernetes API ports stay allowlisted to the home IP.
+
+Let's Encrypt issues at most 5 certificates per exact set of names in 7
+days. The rebuild drills used them up for `git.aisoftwarefactory.world`, and
+the fourth rebuild served an interim certificate for a new name set (git
+plus console) until the limit lapsed. The durable fix, due before the next
+shutdown: the shutdown backups take the edge TLS secrets, and the restore
+puts them back before cert-manager starts.
+
+A project's public hostnames are an infra commit (Ruling 155): a Gateway
+listener and a Certificate per name on the shared edge gateway, plus the DNS
+records. Registration (5.1) prints the YAML, and the controller or a human
+commits it. factoryd does not patch the Gateway, because Flux owns it and
+would revert the patch, and a wildcard certificate needs the DNS-01 provider
+we do not have. The commit is also the human's OK for each project. The demo
+app's names, `demo-staging` and `demo`, wait for hand-made A records:
+Namecheap's dynamic DNS API updates existing records only, and until the
+records exist the certificates and listeners stay not ready.
 
 ### 4.1 Object storage: Hetzner Object Storage versus running S3 ourselves
 
@@ -476,6 +540,62 @@ moving to the Grafana stack later re-points collectors, it does not re-instrumen
 services. SigNoz alert webhooks feed the signals intake exactly as Prometheus
 alerts would have.
 
+As built in Stage 8 (Task 69):
+
+- **Node and cluster telemetry.** The k8s-infra chart 0.17.1 runs in its own
+  namespace `k8s-infra`, labelled privileged, because its node agent reads
+  host paths, which Talos's default `baseline` profile forbids, and a
+  privileged `platform` would loosen ClickHouse and OpenBao with it. The
+  node agent, a DaemonSet, collects host metrics, kubelet stats and pod
+  logs. It mounts `/var/log` and the container log directory but not the
+  host root, since kubelet stats already report node network and disk, and
+  its ClusterRole reads pods, nodes, volumes and jobs plus `nodes/stats`
+  and `nodes/pods`, nothing more. It has no OTLP receiver and no host port,
+  so a sandbox cannot inject into it. A cluster collector adds the cluster
+  metrics and the Kubernetes events. Proven live: CPU and memory of all
+  three nodes, a factoryd log line searchable, and no 403 in the agents'
+  logs over 30 minutes.
+- **What stays out.** Logs of the `factory-agents-*` namespaces never
+  reach SigNoz: a probe wrote 30 marker lines in such a namespace and 0
+  arrived, while the same probe in `platform` delivered 30 of 30. Their
+  Kubernetes events still arrive, and those carry pod and image names, no
+  output. The Forgejo runner's logs, which carry CI job output, and
+  SigNoz's own pods are excluded too.
+- **The failure alert.** Rule "Job failed" fires on a Job's failure event,
+  `BackoffLimitExceeded` or `DeadlineExceeded`, within the last 15 minutes,
+  grouped by namespace and Job, and clears by itself (Ruling 160). The
+  first design watched the metric `k8s.job.failed_pods`, but a CronJob keeps
+  its last failed Job, so that alert would never clear after one failure.
+  Live: a failing Job fired the rule 3 minutes 18 seconds after the failure,
+  and it cleared 15 minutes later while the failed Job still existed. Its
+  first live catch was the `push-mirrors` job failing at its deadline every
+  10 minutes for a missing secret, which led to the job's idle state (3).
+  SigNoz refuses a rule that routes by channel without a channel, so the
+  rule routes by notification policy. The cost, named: the events receiver
+  skips events older than its own start, so a Job that fails while the
+  cluster collector restarts raises no alert.
+- **Objects as code.** The CronJob `signoz-objects` applies the dashboards,
+  the alert rules and the retention settings every 10 minutes and logs `no
+  change` when SigNoz already matches the files. The files hold each object
+  exactly as SigNoz's GET returns it, with every Go zero value spelled out,
+  or every run would log an update. A project's own alert rules are project
+  code (Ruling 159): a ConfigMap in its deploy directory labelled
+  `factory/signoz-rules`, which the same job applies. Built in Task 70, exit
+  test pending.
+- **Tiered retention.** Traces and metrics are deleted at 720 hours and move
+  to the S3 volume at 168 hours. Logs keep 30 days and move at 7. ClickHouse
+  reads the Hetzner key pair through `include_from` with
+  `hide_in_preprocessed`, so the keys never appear in its preprocessed
+  config (0 occurrences, checked live), and the chart's plain-text cold
+  storage option is not used. A move factor of 0.1 sends the oldest parts to
+  S3 once the local volume is 90 % full. Live: 1000 rows moved to
+  `signoz-cold` and read back.
+- **Requests.** Set from 8 minutes of kubelet stats on an idle cluster,
+  since the cluster runs no metrics-server: ClickHouse requests 250m and
+  1 GiB with limits of 2 CPU and 3 GiB, and ZooKeeper's heap drops to
+  256 MB. The whole telemetry stack requests about 10 % of the three nodes'
+  CPU and 13 % of their memory.
+
 ### 4.3 Secrets: OpenBao versus Vault
 
 OpenBao is the Linux Foundation fork of HashiCorp Vault, started when Vault
@@ -490,7 +610,9 @@ One operational cost, named: auto-unseal needs a KMS we do not run, so
 unsealing after a full restart is manual, with the seed bundle's single key
 (OpenBao 2.6.3 rejects a threshold-one multi-share split). Node
 reboots are rare on Talos, and a few minutes of human time is the accepted
-price.
+price. The unseal is the one OpenBao step left by hand: its configuration
+converges from the `openbao-config` CronJob, which a one-time bootstrap with
+the root token enables (3).
 
 ### 4.4 Model and tool providers
 
@@ -536,9 +658,11 @@ factory-gateway
 
 `factoryd` is everything else:
 
-- intake: webhooks from Forgejo, an authenticated API, later SigNoz alerts
-  and escalation events
+- intake: webhooks from Forgejo, an authenticated API, SigNoz alerts and
+  escalation events
 - the task registry: priority, required capabilities, risk class, cost ledger
+- the project registry: registration, per-project settings, and the
+  reconcile of every project's Forgejo and cluster objects
 - the Temporal worker running the task lifecycle workflows, and the heal
   pass that keeps rows, workflows and Forgejo in step
 - the CI spawner for the untrusted runner (7.1)
@@ -550,20 +674,49 @@ factory-gateway
 Built in Stage 6: intake, the issue record, the workflow and the heal pass.
 Built in Stage 7: capability policy (5.3), the cost ledger with hard caps
 (5.4), commissioning (5.5), the console (5.6), and the gates, the model review
-and the bot merge (7).
+and the bot merge (7). Built in Stage 8: projects and their registration,
+the two resource kinds (5.5), telemetry from all three binaries (below), the
+gate supervisor (6.6) and the alerts table (8). Built in Stage 8 on branches
+and rolled 2026-09-28: the intake lanes and the `auto` outcome (Task
+66), every factoryd model call through the gateway (Task 71), and SigNoz
+alerts into intake (Task 70, exit test pending).
 
 **Intake.** Two doors, one record. Forgejo posts webhooks to
-`/webhooks/forgejo`; factoryd checks the HMAC-SHA256 signature in
+`/webhooks/forgejo`. factoryd checks the HMAC-SHA256 signature in
 `X-Forgejo-Signature` against the shared secret before it parses a byte of
 the body, answers 401 on a mismatch, and claims the delivery id so a
-redelivery is a no-op. An issue labelled `agent` becomes an agent task, one
-labelled `human` a human-lane task; bot-authored and unlabelled issues are
-ignored. Priority is the higher of the `priority/p0..p3` and
-`severity/critical..low` labels. The second door is `POST /tasks` with a
-bearer token, for callers that are not Forgejo: it clamps the budget, files
-the issue itself (the body says it was filed by factoryd intake), then stores
-the row. Either way every task is an issue, so the discussion, the state and
-the audit trail share one record.
+redelivery is a no-op. Bot-authored issues are ignored. Priority is the
+higher of the `priority/p0..p3` and `severity/critical..low` labels. The
+second door is `POST /tasks` with a bearer token, for callers that are not
+Forgejo: it clamps the budget, files the issue itself (the body says it was
+filed by factoryd intake), then stores the row. Either way every task is an
+issue, so the discussion, the state and the audit trail share one record.
+
+Every bug gets fixed, whether it comes from telemetry or from any account
+(Ruling 148). Bug reporting is how a user without write access steers the
+software. Every factory-managed repository carries two issue templates,
+`bug` and `improvement`, each of which applies its label on creation. The
+lanes, built in Task 66 and rolled 2026-09-28:
+
+- `human` wins: a human-lane task.
+- `agent` or `bug` starts an agent task at once, whoever filed it. So does
+  every issue an alert files (8).
+- `improvement` alone becomes a task row in state `suggested`, with no base
+  commit, no gate and no workflow. It starts only when a writer labels it
+  `agent` or `bug`. An agent that presorts improvements and a human decision
+  before any starts are a later lane, not Stage 8 (Ruling 152).
+- An issue with none of these labels counts as a bug, and the
+  reproduce-first flow (7) sorts out what is not one.
+
+Forgejo 15 keeps any label an account posts through the web form, a
+smuggled `agent` on the improvement form included, while its API drops a
+non-writer's labels. So intake takes `agent`, `human`, `priority/*` and
+`severity/*` off an outside account's new issue, and only a writer's label
+event starts a suggestion. Each task stores its author and whether the
+author could write when the issue arrived. That standing goes into the
+brief and the model review (7). The bounds on abuse are the admin-created
+Forgejo accounts (Ruling 144) and the policy's day cap. A screening stage
+for attacks disguised as bug reports is a later item (Ruling 152).
 
 **Labels.** factoryd creates the label set at boot, the `priority/*` and
 `severity/*` labels included, and keeps exactly one
@@ -610,7 +763,158 @@ while factoryd was down still becomes a task. Every workflow run
 begins with a `Reconcile` activity that reads where the task really stands,
 so a restarted workflow adopts an open pull request instead of starting a
 new session, and finishes a task whose pull request was merged while no run
-existed.
+existed. With Task 66 the heal pass reads every open issue of the code
+repository and of every managed project, labelled or not, and it closes a
+suggestion a writer closed, but it never starts one.
+
+**Projects.** A project is what the factory builds software for. The
+factory makes software and does not own how a project runs: the project's
+CI/CD, its environments and its promotion are the project's own code in its
+own repository, developed through the same gates (Ruling 146). The
+factory's interest is identity and hardware. Built in Task 65, and the demo
+app registered live after roll 7914efb:
+
+- **Its own Forgejo organisation** (Ruling 164). Registration creates the
+  organisation `<name>` with the repository `<name>/<name>`, its packages
+  and its teams. A user `ci-<name>` in the organisation's team `ci` holds
+  package write in that organisation only, and its token is the project's
+  registry login. The review found the Critical that forced this: on `auto`,
+  agent code would have run in main CI on sf's privileged runner, as node
+  root, with a PAT that writes every sf package. Forgejo 15 scopes package
+  write per organisation, not per package, so the bound is the
+  organisation. The user `factory-projects` owns every project organisation
+  and holds nothing in `sf`, so its one `write:repository` token never
+  reaches the factory's own repositories.
+- **Its CI on the factory's ephemeral runners.** The spawner (7.1) serves a
+  project's pull request and `main` jobs with the projects token, never sf's
+  organisation runner, which cannot see another organisation's jobs.
+- **Its credentials.** Registration mints `pull` and `registry` for
+  `ci-<name>`, `git-<name>` (Flux's read token, limited to the repository)
+  for `factory-projects`, and `project-<name>` for `factory-merge`, whose
+  merge and trust checks on the project use that token. A write deploy key
+  pushes the project's rolls, and its private half lives only in the
+  Actions secret `DEPLOY_KEY`. The Actions secrets are `DEPLOY_KEY`,
+  `FACTORY_READ_TOKEN`, `FACTORY_SSH_HOST_KEY`, `REGISTRY_USER` and
+  `REGISTRY_PASSWORD`. `FACTORY_SSH_HOST_KEY` is Forgejo's SSH host key as
+  factoryd's own in-cluster handshake finds it, rewritten when it changes
+  (Ruling 165), because Forgejo keeps its host keys on a volume the rebuild
+  does not restore, so a key pinned in Git would break every project at
+  each rebuild. Forgejo refuses Actions secret names that start with
+  `FORGEJO_`, which the first live registration found. The pull, git and
+  merge tokens are plain text in Postgres and its backups, each reaching
+  one project, which is accepted.
+- **The deploy branch holds the rolled state** (Ruling 166). `main` keeps
+  the push whitelist (`factory-merge` and the approvers, never the deploy
+  key) and 0 or 1 required approvals by merge rule. Branch `deploy` is
+  created from `main` at its first commit and protected with the pattern
+  `.forgejo/**;.gitea/**;.github/**`, with only the deploy key allowed to
+  push. Flux tracks `deploy`. The first design put that pattern on `main`,
+  and it refused the demo app's first push, since every first push carries
+  `.forgejo/`, the admin's included. On `deploy` it blocks exactly a
+  workflow change pushed with the deploy key. Forgejo refuses to create a
+  branch its pattern covers, so the repository starts empty and `deploy`
+  is protected only after it exists. As built, a roll copies `deploy/` of
+  the built commit into `deploy`, which holds nothing else.
+- **Flux tenancy** (Rulings 157, 164). A project never owns Flux objects.
+  Registration creates the GitRepository `<name>` in `flux-system`, which
+  the admission policy pins to `https://git.aisoftwarefactory.world/<name>/<name>`
+  and the secret `<name>-git`, and one Kustomization per environment, path
+  `deploy/<env>`, in the environment's namespace, with the ServiceAccount
+  `flux` and that namespace as target. Flux takes the account from the
+  Kustomization's own namespace. `flux` is bound to the ClusterRole
+  `factory-project-deployer`: workloads, Services, HTTPRoutes and CNPG
+  objects, no RBAC, no Flux kind, no network policy, nothing
+  cluster-scoped. So a merged change to `deploy/` reaches only the project's
+  own namespaces, and cannot take over the cluster, which a root
+  Kustomization with the controller's rights would allow. The controller
+  itself refuses remote bases and defaults a Kustomization without an
+  account to its namespace's `default` account.
+- **Namespaces, network and quota.** Each environment namespace carries
+  `factory/project=<name>` and the restricted Pod Security label. The label
+  routes an alert from that namespace to the project's repository (8) and
+  feeds the collector interlock (Ruling 123). The CiliumNetworkPolicy
+  `project` denies by default: in from the namespace, the edge Envoy and
+  CNPG, out to the namespace, DNS, the API server, the SigNoz collector on
+  4318 and the world on 443. The ResourceQuota `project` is the project's
+  in-cluster quota, 2 CPU, 4 GiB and 10 GiB by default.
+- **Registration is one factoryd action, reconciled from Postgres** (Ruling
+  156). `factoryd register-project` takes the Forgejo admin's password on
+  stdin, because Forgejo mints the CI and pull tokens only under a password,
+  records the row and reconciles. factoryd reconciles every project at
+  boot, on a console change and when the policy version changes, and a
+  push to a project's `main` without a `deploy` branch runs the reconcile
+  too. Git is not the store for these objects: the Postgres restore
+  re-seeds them. A second run logs only `no change`, `ready` or `ensured`.
+  The hostnames are the one exception, an infra commit (3.4, Ruling 155).
+  The factory's two repositories are rows too, unmanaged, on merge rule
+  `human`: the factory is no special project.
+
+Per-project settings live in the factory, edited in the console's
+`/projects` and stored in Postgres, with defaults from the policy's
+`project_default` (Ruling 146): the merge rule `auto` or `human` (7), the
+`notify` list for information requests (8), the envelope with its task and
+standing blocks (5.5) and the in-cluster quota. There is no run-model file.
+A project's promotion is its own code, and one factory read endpoint serves
+it: `GET /projects/{name}/alerts?namespace=<ns>` with the project's
+`FACTORY_READ_TOKEN` answers the firing SigNoz alerts of that namespace plus
+a `rollout_not_ready` entry for an unfinished rollout, cached 30 seconds,
+and fails closed. factoryd reads SigNoz as a viewer-role user.
+
+The demo app, the first project, is a Go link shortener with Postgres
+(Rulings 145, 153), repository `demo-app/demo-app`. `POST /links` needs a
+bearer token from the secret `demo-write-token`, which keeps an open
+shortener from serving phishing links. Each environment runs its own
+single-instance CNPG cluster inside its namespace, under the project's
+quota. A load generator CronJob creates one link every minute, follows it
+five times and requests one malformed slug, which must answer 404. A
+recover middleware answers a handler panic with a 500 and records it on the
+metric and the span, so a panic raises a 5xx signal. Its `ci.yml` builds
+the image on a build VM, pushes it with `crane`, rolls staging on `deploy`,
+waits 15 minutes, asks the alerts endpoint about `demo-staging` and rolls
+prod only on an empty answer. Its first live run held prod back: 8 "Job
+failed" alerts fired in `demo-staging` while staging still ran the
+placeholder digest, and the gate did its job.
+
+**Telemetry.** factoryd, factory-gateway and the worker emit OpenTelemetry
+traces, metrics and logs over OTLP/HTTP to SigNoz's collector on 4318, each
+binary naming its own `service.name` (Tasks 60, 68). Without an endpoint the
+providers are no-ops, and the exporters never retry.
+
+- factoryd spans every Temporal activity with `task.id`, and its metrics
+  cover the pipeline: CI job and run durations, the CI queue, build VM
+  lifetime, ready time and cost (7.1), roll-to-live (7), one gate duration
+  histogram, the age of the oldest open activity per kind
+  (`factory.activity.open_age`) and `factory.alert.count{kind,verdict}` (8).
+  One dashboard, `factory pipeline`, is JSON applied by the `signoz-objects`
+  job, and the per-day roll-up lives in SigNoz only.
+- The gateway gives each request a server span, with a child span `model
+  <alias>` or `tool <tool>` carrying task, project, upstream status, hold
+  and cost, and counts `gateway.calls`, `gateway.call.duration`,
+  `gateway.spend.eur{project}` and `gateway.refusals{reason}`. Every audit
+  row the store accepted also becomes one log record, body `audit
+  <decision>`, the columns as `audit.*` attributes. Postgres stays the
+  authoritative record: a sandbox may send OTLP to the collector (6.4), so
+  it could forge a copy in SigNoz. On SIGTERM the gateway drains and
+  flushes its telemetry before it exits.
+- The worker's trace has a root span `session` with the children `brief`,
+  `run` and `push` and a span per tool call, and it counts session
+  duration, tool calls and tokens. It ends and flushes the session span
+  before it prints its result, because the pod's deletion would lose it.
+- Traces join by `task.id`, not by parent links: the gateway ignores trace
+  headers from the sandbox.
+
+One package, `internal/redact`, scrubs every text that leaves for
+telemetry or a model: bearer and basic credentials, URL userinfo, JWTs,
+provider key shapes, PEM blocks, provider response bodies, configured
+secrets, and any run of 32 or more token characters. The gateway's audit
+records, the worker's git errors and the gate supervisor's bundle (6.6) all
+use it. The known cost: the 32-character rule also masks long URL paths and
+commit ids. Proven live on task t-c4e5c525334f: 31 spans under its id (10
+from factoryd, 14 from the gateway, 7 from the worker), 5 audit records equal
+to its 5 audit rows, and none of 37 gateway records holding `sk-`, `Bearer`,
+`BEGIN` or a fragment of the gateway's own keys. The live data found one
+false positive, "missing bearer token" arriving as "missing bearer
+[redacted]", now fixed.
 
 ### 5.2 Why the gateway holds the LiteLLM keys
 
@@ -649,17 +953,25 @@ task requires capability X in environment E
       route to the gateway and Forgejo git, plus named registries)
 ```
 
-Besides its `version`, the document has six sections:
+Besides its `version`, the decoder knows nine sections:
 
 - `budget`: the task default, the task maximum and the day cap, in euros.
 - `classes`: per capability class, the allowed model aliases and tools, each
-  tool with `max_requests` and `max_eur`.
+  tool with `max_requests` and `max_eur`, and the `review_model` and
+  `supervisor_model` factoryd may call for a task of that class (Task 71).
 - `prices`: the tool prices no provider API returns (Firecrawl credits,
   Replicate rates per hardware SKU with a model to SKU map, fal's
   `max_megapixels`).
-- `risk`: the risk classes of changed paths for the policy gate (7).
+- `risk`: the risk classes of changed paths for the policy gate (7), each
+  with its outcome.
 - `envelope_default`: the standard resource envelope (5.5).
+- `project_default`: a new project's merge rule, quota and standing block
+  (5.1, 5.5).
 - `approvers`: the Forgejo users who may authorise spend in the console (5.6).
+- `bounds`: seconds per Temporal activity before its gate counts as stuck
+  (6.6), plus a `default`.
+- `supervisor`: the thresholds of the session supervisor's progress
+  detector (6.6).
 
 The decoder is strict: an unknown key or a second YAML document rejects the
 file. So a new section lands in infra before the factoryd that reads it. The
@@ -681,9 +993,25 @@ The first capability class is deliberately one: `coder`, holding repository
 read, branch write, model aliases and allowlisted tools, nothing else. The
 classes from the baseline conversation (analyzer, integration-tester,
 release-agent, prod-operator) arrive one per phase as the loops that need them
-come online. `review-frontier` stays out of `coder`: the model review and the
-supervisor call LiteLLM under factoryd's own per-task keys, not through the
-agent's gateway path.
+come online. `review-frontier` and `supervisor` stay out of the class's
+`models`, so no agent can call them. Every factoryd model call goes through
+the gateway like an agent's (Task 71, rolled 2026-09-28 in ba2d80a).
+The Task 71 brief assumed the gate supervisor already did. It did not:
+factoryd called LiteLLM directly for the session supervisor, the gate
+supervisor and the model review, held and booked the cost itself, and the
+gateway wrote no audit row and applied no policy. Task 68's live proof
+showed the gap: a task's `spent_eur` of 0.009077 EUR held 0.000895 EUR of
+gateway calls, 0.00629 EUR of gate supervisor and 0.00190 EUR of review that
+no gateway metric or span could see. In the new path factoryd sends its
+existing `gateway-factoryd` token with `X-Factory-Task` and
+`X-Factory-Purpose` (`review`, `supervisor` or `gate-supervisor`). The
+gateway admits exactly the class's `review_model` or `supervisor_model` for
+that purpose, on a task that is running or in review, and holds, clamps,
+books and audits the call like an agent's. The hold and ledger ref is
+`<purpose>/<alias>`, the audit row's `kind` names the purpose, and the
+LiteLLM key sits in the task's own factoryd slot, so it neither retires nor
+shares the session's key. A sandbox's JWT never reads those headers, so an
+agent's purpose is always `agent`. factoryd's own model path is deleted.
 
 ### 5.4 Cost ledger
 
@@ -727,8 +1055,12 @@ for a cut stream is no upper bound of the provider's charge: a GLM call logged
 by at most one hold per cut call.
 
 Every booking is a row in the append-only `ledger` table, of kind `model`,
-`tool`, `resource` or `settlement`, with its UTC day. factoryd serves the sums
-per task and per day at `GET /costs`, and the console shows them.
+`tool`, `resource`, `settlement` or `standing`, with its UTC day. A standing
+resource's hours (5.5) book under `standing:<repository>`, add no task
+spend and take nothing from the day's headroom. factoryd serves the sums
+per task and per day at `GET /costs`, and the console shows them. With Task
+71, each task's total also lists its lines by kind and ref, so the review
+reads as `model review/review-frontier`.
 
 Tool calls reach the gateway's `/mcp` endpoint, an MCP server over stateless
 streamable HTTP. It offers `web_scrape` and `web_search` (Firecrawl),
@@ -772,6 +1104,22 @@ it over SSH in the live proof.
   the console. Each task draws from the envelope under its own cap. The
   provider's own quota can still refuse a type the envelope lists: the agent
   project refused a cx43 on its shared-core limit.
+- **Two resource kinds, one envelope, one process** (Ruling 147, built in
+  Task 65). A `task` resource is what the rest of this section describes:
+  leased, requested by an agent through the gateway, booked to the task and
+  the project's monthly pool. A `standing` resource is a project's
+  environment: no lease, requested by the project's registration or a human
+  in the console, never by an agent session, and shown as a fixed monthly
+  line. Each kind has its own monthly euros, server types and maximum count
+  in the envelope, a human changes them at any time, and a request beyond
+  them is an approval card. The column `lifetime` on `cloud_resources` holds
+  `lease` or `standing`. The collector skips standing rows unless a human
+  released them, `release_resource` refuses a standing server, and agents
+  get no SSH and no egress to standing servers by default: they read
+  telemetry and logs. The same split holds inside the cluster: sandbox
+  limits for task work, the project's namespace quota for standing
+  environments. The standing path through registration is not built, since
+  no project needs one yet, and the demo app runs in the cluster.
 - **More needs a human.** A request beyond the envelope writes an
   `approval_requests` row of kind `resource` (Ruling 116) and answers the
   agent "pending human approval", which it polls with
@@ -794,9 +1142,10 @@ it over SSH in the live proof.
   agent or factoryd dies, the lease still ends and the collector deletes the
   resource. It deletes at the last tick before the lease ends, so a lease of
   N started hours never bills hour N+1 (Ruling 124). A lease therefore ends
-  up to 2.5 minutes early. A human can promote a resource to project-owned,
-  for example a staging database, and it then counts against the project's
-  monthly cap without a lease. A human can also release it early.
+  up to 2.5 minutes early. A human can make a resource standing, for
+  example a staging database, within the envelope's standing block, and it
+  then counts against the project's standing line without a lease. A human
+  can also release it early.
 - **The collector trusts the registry.** It runs in the gateway every 2
   minutes. It deletes expired leases and the resources of finished tasks,
   deletes every server, firewall and volume the registry does not know,
@@ -893,6 +1242,31 @@ both lanes and the approval cards, `/resources` with the commissioned
 resources and the envelopes, `/costs` and `/policy`. The board polls every 10
 seconds. It shows at most 300 tasks, open ones first, and reads only
 Postgres, never the timelines in S3.
+
+Added in Stage 8 (Tasks 61, 65, 67):
+
+- **Where a task stands.** The task row carries its current `gate` and
+  `gate_since`, set by the `GateWatch` worker interceptor at each gate
+  activity's start from Temporal's first scheduled time, so a retry keeps
+  it. A card reads, for example, "2 h 5 min in all" and "checks for 25
+  min". The timeline page opens with a gates table: gate, attempt, start,
+  duration, outcome and a meter bar, with a row per CI job from the checks
+  step, and the open gate shows "open for N min". Every step that ends a
+  gate carries `started`, the approval wait included, whichever way it
+  ends: an approval, a change request, a merge in Forgejo, or a close.
+- **`/alerts`.** The newest 200 alerts (8), with the supervisor's action,
+  diagnosis and recommendation for machine alerts. An open escalation has
+  two buttons, "real problem" and "noise", on this page and on the board's
+  escalation card, and only approvers may press them.
+- **`/projects`.** Every project with its merge rule, notify list,
+  namespaces, quota, both envelope blocks and its standing monthly line.
+  Approvers register a project and edit its merge rule, notify list and
+  quota, reconciled at once. The console cannot mint the CI and pull
+  tokens, which need the Forgejo admin's password, so the page names the
+  `register-project` command for them.
+- **The card's recommendation** (Task 66, rolled 2026-09-28). The approval card
+  shows the review's verdict, the agent's recommendation and a "Why a
+  human" line with every unmet `auto` condition (7).
 
 - **Login.** Forgejo OAuth2, the authorisation code flow with PKCE (S256), a
   confidential client and an explicit scope list: `read:user`,
@@ -1066,7 +1440,10 @@ Sandbox hardening:
   mirror was added. DNS answers only those names (`matchName`, not a
   wildcard, which would open a DNS exfiltration channel). While a
   commissioned server's lease lives, its address on port 22 joins the list
-  (5.5). Nothing else, no cloud metadata endpoint.
+  (5.5). The SigNoz collector on port 4318 is the one Stage 8 addition
+  (Ruling 158), so the worker sends its own spans and metrics. No data
+  leaves the cluster that way, and SigNoz's retention bounds what an agent
+  could spam. Nothing else, no cloud metadata endpoint.
 - The sandbox image carries the Go 1.25 toolchain, checksum-pinned and the
   same version as the runner image, with `GOPROXY` pinned to the proxy and no
   `direct` fallback. A registry joins the list by name only with the
@@ -1094,7 +1471,13 @@ Sandbox hardening:
   LiteLLM master key, the bot accounts, the S3 keys and the CI project's
   Hetzner token: only the API server (by its injected address, not a DNS
   name), Postgres, Temporal, LiteLLM, Forgejo, S3 and `api.hetzner.cloud`
-  answer.
+  answer. Stage 8 added the SigNoz collector on 4318, SigNoz's API on 8080
+  for the alerts endpoint, Forgejo's SSH on 2222 for the host key scan
+  (5.1) and, with Task 71, the gateway on 8081. Task 60 first measured a
+  build VM's ready time by dialling `buildkitd` from factoryd, which would
+  have opened this pod, the one with the master keys, to any public IPv4
+  on 1234. The review refused it, and an init container reports the ready
+  time instead (7.1).
 - Upgrade path for stronger isolation: microVMs on bare-metal KVM nodes,
   one kernel per pod, for agent sandboxes and CI jobs alike (7.2).
 
@@ -1176,7 +1559,9 @@ and the next trip escalates without one. Each call runs under a per-task
 `supervisor` virtual key and takes a hold for its worst case like any model
 call (5.4), so the supervisor spends from the task's money and cannot overrun
 it or the day cap. With nothing left, the task escalates without a call.
-`supervisor` maps to GLM-5.3, the strongest configured model. Every decision
+With Task 71 (rolled 2026-09-28) the call goes through the gateway, which
+audits it with kind `supervisor` and books it under `supervisor/<alias>`
+(5.3). `supervisor` maps to GLM-5.3, the strongest configured model. Every decision
 goes to the session record, the timeline and an issue comment.
 
 Stopping is graceful: the worker gets SIGTERM, pushes the work in progress to
@@ -1202,7 +1587,91 @@ The agent can escalate by itself too, with the `escalate_to_human` tool. The
 gateway passes the question and the reason to factoryd, which records an
 intake event and hands the escalation to the live session. The session stops
 with a work-in-progress push, calls no supervisor, and the workflow posts the
-question on the issue as for any escalation.
+question on the issue as for any escalation. With Task 66 (rolled 2026-09-28)
+the tool requires a `recommendation` of at most 2000 bytes, so the issue and
+the card read "The agent asks", "Why" and "Recommendation", and the agent's
+text stands in a code block, where Forgejo reads no mentions (Ruling 149).
+
+**The progress detector** (Rulings 141, 161, built in Task 67). `no_write`
+trips when an agent event, a tool call, a command or a model call, arrives
+300 seconds after the last write or edit tool call or the session start.
+Ticks, checkpoints and silence never trip it: silence is the stall
+detector's. The policy's `supervisor` section sets the seconds. Ruling 141
+named two more, no commit and events without writes, but under the 20-minute
+cap they duplicate `no_write` and the cap, so they were dropped. Proven
+live with a 60-second threshold: `no_write` tripped twice during five
+`sleep 20` tool calls, and the supervisor answered `continue` both times
+with the diagnosis "False alarm", which the alerts table records as noise.
+
+**The gate supervisor** (Rulings 141, 154, 162, 163, built in Task 67, live
+since roll e3f7c16). The session supervisor watches an agent. The gate
+supervisor watches the machine gates, so no gate waits in silence. Each
+activity has a bound, from the policy's `bounds` section, else the default
+of the ruling, else the policy's `default`, else 120 seconds:
+
+| Activity | Default bound s | Note |
+|---|---|---|
+| RunSession | 1260 | The 20-minute cap plus 60 s: a session at the cap is stopped by the cap, so the bound catches a stuck runner (Ruling 154) |
+| WaitChecks | 600 | Main CI took about 7.7 minutes at the step-zero gate |
+| GateReproduction | 900 | Task 66 runs the command twice, at the base and the head, and sets 1800 in the policy |
+| ModelReview | 180 | Ruling 140 |
+| Merge | 90 | One API call under a 2-minute timeout, so the first default of 300 s could never fire (Ruling 163) |
+| every other activity | 120 | One API call each, seconds (Ruling 140) |
+
+`GateWatch` writes a `gate_bound` alert (8) for each attempt still running
+at its bound. Only the five long gates, RunSession, WaitChecks,
+GateReproduction, ModelReview and Merge, go on to the supervisor (Ruling
+162): the short gates' 2-minute timeout ends before a supervisor answer
+could arrive, so their alert is their record. For a long gate `GateWatch`
+signals the task's workflow, and the workflow runs `SuperviseGate` once per
+trip. factoryd assembles the bundle in code, with no model tools and read
+access only: the objective, the timeline tail, the activity's input, the
+bound, the elapsed time, Temporal's last failure, and per gate the commit
+statuses and the CI queue, the sandbox pod's state and its last 100 log
+lines, the pull request's merge state, or the last review result. The
+whole bundle passes through `internal/redact` (5.1). The model answers
+strict JSON with an action, a diagnosis and a recommendation:
+
+- `wait` re-arms the bound once, to twice the bound. Not for RunSession.
+- `retry` ends the attempt, and Temporal's retry policy runs it again. Not
+  on the last attempt.
+- `cancel` fails the task with the diagnosis.
+- `escalate` cancels the activity and opens the human card, with the same
+  alert and comment as any escalation. The answer runs the same gate again
+  with the same arguments, so a merge keeps its approval.
+
+A run allows one wait and one retry. The supervisor call runs alongside the
+gate: a gate that finishes first wins, and a late answer lands on the alert
+with the note "gate ended before the answer" and has no effect (Ruling 171,
+change id `gate-supervisor-race`). A malformed answer, a disallowed action
+or a failed call escalates. `wait` and `retry` act inside the process, which
+assumes one factoryd replica: after a restart, the attempt that tripped no
+longer runs there, and the alert becomes noise without a model call. The
+workflow change sits behind the change id `gate-supervisor`. Proven live:
+three WaitChecks trips at a temporary 180-second bound, each showing
+`factory.alert.count{kind=gate_bound,verdict=open}` = 1 in SigNoz. Two were
+cut by rolls and judged noise without a call, which is the restart path. The
+third escalated, and that run found a bug: after the session the task
+namespace and factoryd's binding in it are gone, so the token read for the
+scrub answered 403, not 404, and every check-wait bundle was withheld. The
+tokens are now read only while the sandbox runs. Not yet proven live: a
+model's `wait`, `retry` or `cancel`, and a scrubbed WaitChecks bundle.
+
+**The supervisor alias is slower than its timeout.** At the step-zero gate,
+the `supervisor` alias (GLM) took 5 minutes for one call against factoryd's
+4-minute supervisor timeout. The cut call turned a `half_way` trip into a
+human escalation and booked its whole hold (5.4). A faster supervisor alias
+or a longer timeout is a policy call, still open. The same latency is why
+the short gates do not wait for a supervisor.
+
+The build's own agents are watched the same way, from outside. The
+controller never asks a subagent for a heartbeat (Ruling 142). A script,
+`agents.sh`, reads each running subagent's transcript and worktree and
+prints one line per agent, never an action: QUIET after 10 minutes without
+a transcript record, with the last tool call, NO-OUTPUT after 30 minutes
+without a file written in a task worktree, NO-COMMIT after 90 minutes
+without an implementer's commit, and LOOP when transcripts grow but nothing
+is written for 60 minutes.
 
 ## 7. Chunk 5: verification and delivery
 
@@ -1222,13 +1691,36 @@ model last:
    diff and writes a review verdict. The verdict is evidence for the merge
    decision, never authority to skip the gates above.
 
-Merge is a PR merge. Flux picks up the commit and deploys to the staging
-namespace, then to prod on the promotion rule. Human approval, where policy
-demands it, is a Temporal signal. The waiting costs nothing.
+Merge is a PR merge. Human approval, where policy demands it, is a Temporal
+signal. The waiting costs nothing. What happens after the merge depends on
+the repository. The factory's own repositories roll: a human commits the new
+image digests under `k8s/` on `main`, and Flux applies them at once. A
+project deploys through its own CI/CD as code (5.1): its `main` workflow
+rolls staging on the `deploy` branch, and its own promotion rule takes the
+change to prod. Two projects therefore run two deploy chains in one
+factory, which is the Stage 8 exit test.
+
+**Roll-to-live.** factoryd measures every roll of its own repository once,
+at boot (Task 60). It takes the newest `main` commit that touched `k8s/`,
+and only when that commit changed a Deployment's images against its parent
+and has a push run: the push time is the `created` of that commit's push
+run in `actions/runs`, the apply time is the `kustomize-controller` entry in
+the Deployments' managed fields, and the ready time is the Deployments'
+`Progressing` condition. It stores the row in `rolls`, emits
+`factory.roll.duration`, `.apply` and `.ready`, and logs, for example, "roll
+bad81fc... live: push to apply 60 s, apply to ready 13 s". A commit that
+changed no image records nothing, which held live when a manifest-only push
+restarted both Deployments. The rolls of factoryd and the gateway measured
+61 to 73 seconds from push to ready (e3f7c16 61 s, c70a790 63 s, 7914efb
+69 s, bad81fc 73 s). The roll of all four images with migrations 0024 and
+0025, 95345e6, took 161 seconds, 123 of them from apply to ready.
 
 Built through Stage 7: all three steps, the approval and the bot merge. After
 green checks the workflow runs the gates as Temporal activities. Each one
-records a timeline step and comments on the pull request.
+records a timeline step, with its start (5.6), and comments on the pull
+request. Stage 8 adds the `auto` outcome, the reproduction at the base and
+the head, and the non-reproducible path, all built in Task 66 and
+rolled 2026-09-28 in ba2d80a (Rulings 149, 150, 167, 168, 169).
 
 - **Policy gate.** It reads the pull request's changed files, a rename under
   both names, and classifies each path under the policy's `risk` section
@@ -1238,8 +1730,14 @@ records a timeline step and comments on the pull request.
   `migration` for `internal/*/migrations/**` and `internal/policy/schema.sql`,
   `high` for `k8s/**`, `**/Dockerfile*`, `go.mod` and `go.sum`, and `normal`
   by default. A forbidden class fails the task and closes the pull request.
-  Every other class needs a human's approval, because no class merges without
-  one yet.
+  Through Stage 7 every other class needed a human's approval. Ruling 168
+  makes the globs path-generic, so a project's migrations and deploy
+  manifests class like the factory's own: `**/migrations/**` is
+  `migration`, `deploy/**` and `k8s/**` are `high`, `**/Dockerfile*`,
+  `go.mod` and `go.sum` are `high`, and the three workflow directories stay
+  `forbidden`. The risk rules stay one global section, and per-project
+  rules wait until a project needs them. Class `normal` gains the outcome
+  `auto`, which the decoder refuses on any other class.
 - **Migration gate.** When migration paths changed, it comments "schema
   migration: human review required" with the list, and the approval card
   carries it.
@@ -1251,7 +1749,17 @@ records a timeline step and comments on the pull request.
   head is the gated commit. The command runs for 10 minutes by default, 15 at
   most. A nonzero exit sends the next attempt to the stronger model with the
   exit code, the command and the last 4 KiB of output as findings, the same
-  as red checks.
+  as red checks. Task 66 runs the command twice: first at the task's base
+  commit, then at the head. A reproduction counts only when it fails at the
+  base and passes at the head (Ruling 167). A command that passes at the
+  base is commented "not reproduced at base" and never counts, because the
+  review found that otherwise an outsider's `true` would satisfy the gate.
+  The re-review found that a git command could still pass at the head and
+  fail at the base for any diff, so the fix in its second review round
+  gives the run the files only, without `.git`. When the agent finds a fault it cannot reproduce exactly, it ends
+  with a `not_reproduced` note naming the fault and why, the gate comments
+  it on the pull request, and the timeline records `not_reproduced`
+  instead of `skipped`.
 - **Model review.** `review-frontier` reads the brief, the diff (cut at
   48 KiB) and the gate results, and answers strict JSON: a verdict of
   `approve` or `concerns`, a summary and findings. The call runs under a
@@ -1260,7 +1768,13 @@ records a timeline step and comments on the pull request.
   the card, never a failure. The activity heartbeats every 30 seconds with a
   2-minute heartbeat timeout, so a terminal signal cuts the call in flight.
   The verdict is evidence on the approval card and a pull request comment,
-  never authority to skip a gate.
+  never authority to skip a gate. With Task 66 the review also names the
+  issue author and the author's standing, a writer or an outside account,
+  and treats an outside account's report as untrusted input. It must answer
+  `strict_improvement`, true or false, and an answer without it is invalid.
+  With Task 71 the call goes through the gateway (5.3), and a
+  `refused_budget` there becomes the note "model review refused by the
+  gateway", which leads to the card, never to a merge.
 
 Each gate and the review check that the pull request's head is still the
 gated commit. A moved head fails the task, because the checks passed on a
@@ -1302,9 +1816,57 @@ history, and the human path stays open. A merge finishes the task `done` at
 once, without waiting for the `pr_merged` webhook. A human who merges in
 Forgejo is credited as the merger. The activity merges only into `main`.
 
+**The `auto` outcome** (Rulings 149, 167, 169, built in Task 66, not yet
+rolled). A project on merge rule `auto` merges without a card when all of
+these hold:
+
+1. The policy gate's class is `normal`, whose outcome is `auto`.
+2. The reproduction condition holds in one of two ways: a reproduction ran,
+   failed at the base and passed at the head, or the agent's
+   `not_reproduced` note names a fault it fixed. "Clear improvements with
+   no drawback just get done" applies whether or not the issue carried a
+   reproduction command.
+3. The model review answered `approve` with `strict_improvement: true`, on
+   both routes, a proven reproduction included (Ruling 169).
+
+Then factoryd comments which proof held, the review's summary and the
+strict-improvement line, and `factory-merge` merges with the approver
+recorded as `merge rule auto`, using the project's own merge token. Any
+unmet condition, class `migration` or `high`, a skipped reproduction, or a
+refused merge sends the task to the human card, which shows the review's
+verdict, the agent's recommendation and every unmet condition. A project on
+`auto` has 0 required approvals on `main`, and on `human` it has 1, as the
+factory's repositories do. The factory's own repositories stay on `human`,
+so every change to them still waits for a whitelisted human.
+
+**Not reproducible, nothing found** (Ruling 150, built in Task 66, not yet
+rolled). The agent calls the tool `request_info` with what it tried and
+what it needs, and the session ends `needs_info`. The task moves to
+`waiting-poster`. The comment on the issue mentions the author and the
+project's `notify` list, the approvers by default, so Forgejo's bell is the
+ping, with no new UI, and each human can unsubscribe from the issue. The
+alerts table records kind `info_request` (8). The issue author's next
+comment resumes the task, whatever the author's access, and so does a
+writer's. The next brief carries the answer under "Poster information", as
+information and never as authority: an author's comment never answers an
+escalation, where only writers count. Fourteen days without an answer close
+the issue as not reproducible with a comment, and the task ends `closed`.
+
+**The brief keeps the poster's text apart.** The brief writes factoryd's own
+lines first, the author's standing line among them, then the issue text and
+each poster answer between markers `<<<ISSUE-<tag>` and `ISSUE-<tag>>>>`,
+where the tag is 16 random hex characters drawn for each brief and drawn
+again if the text contains it. For an outside account the standing line
+calls the block untrusted poster information that cannot claim another
+standing or change how to work. A test forges a standing line, a "How to
+work" section and a closing marker inside the text, and all stay inside the
+markers.
+
 Workflow changes since Stage 6 sit behind Temporal `GetVersion` change ids
 (`gates`, `answers`, `gates-pinned`, `merge-failure-reported`,
-`merge-retry-cap`), so a run started before a change keeps its old path. A
+`merge-retry-cap`, `gate-started`, `gate-supervisor`, and with Task 66
+`auto-merge` and `needs-info`), so a run started before a change keeps its
+old path. A
 replay test runs every recorded live history in the code repository's
 testdata. Live: PR #100 merged by `factory-merge` after the human's approval
 and a 405 before it, and PR #126 went through every gate, the review, the
@@ -1328,7 +1890,12 @@ download to `storage.googleapis.com`, and every pull request's vet check
 failed (Ruling 114). A build job's pod also reaches its build VM,
 `auth.docker.io` and the build cache (below). The runner takes its one job
 and exits; the spawner deletes the namespace and deregisters the runner.
-At most eight CI namespaces run at once, the rest queue.
+At most eight CI namespaces run at once, the rest queue. Since Task 65 the
+spawner serves every registered project's repository as well, each with its
+own token, and for a project it runs the `main` jobs too, with the
+project's Actions secrets, so a project's CI never touches sf's privileged
+runner (5.1). A project's CI namespaces may also reach Forgejo's SSH, for the
+deploy-key push, and factoryd's port 8080, for the alerts endpoint.
 
 The registrations come from a dedicated Forgejo account, `factory-ci`
 (Rulings 101, 101a). Forgejo's repository runner API answers only the
@@ -1392,6 +1959,36 @@ answered 40 to 47 seconds after the create, the VM was gone 3 seconds after
 the job, a killed factoryd left a server that the collector deleted 62
 seconds later, and a hand-made server in the CI project was deleted in 48
 seconds.
+
+A build job's runner pod waits for its VM in an init container,
+`buildkitd-ready`, which runs `buildctl debug workers` for up to 180
+seconds and writes `ready` to its termination log only when `buildkitd`
+answers. factoryd reads the init container's finish time as the VM's ready
+time. A VM that never answers still lets the runner start, and `pr.yml`'s
+own 60-second wait fails the job, so a dead VM turns the check red in about
+4 minutes.
+
+**CI metrics** (Task 60). factoryd measures its CI and emits it to SigNoz.
+Job durations come from Forgejo's `actions/tasks`, polled every 60 seconds,
+and run durations from `actions/runs`, as `stopped` minus `created`, queue
+time included. A failed run's duration is the time to its first red job.
+The spawner measures each job's queue time on its own polls. A job taken
+and finished between two polls is never listed, and a job first seen
+already taken is counted in `factory.ci.job.queue.unmeasured`. The checks
+step on the timeline carries each job's run and queue seconds. A build VM's
+close emits its lifetime, its ready time and its cost, one started hour
+times the hourly price. Proven live against Forgejo and the registry rows:
+
+| Measure | SigNoz | Truth |
+|---|---|---|
+| PR run duration, task t-5ec64626c65f | 309 s | 17:02:04 to 17:07:13, 309 s |
+| Job `test` / `vet-and-format` / `security` | 295 / 121 / 139 s | the same from Forgejo |
+| Queue of `test` and `vet-and-format` | 20.18 s | created 17:02:04, taken 17:02:18, at the spawner's 10-s poll |
+| Queue of `security`, held at the 8-runner cap | 120.09 s | taken 17:03:59 |
+| Build VM lifetime | 59.655 s | 59.654 s from the row |
+| Build VM ready | 38.289 s | from the init container's finish |
+| Build VM cost | 0.0096 EUR | one started hour of a cx23 with its IPv4 |
+| Main CI run 488 on the roll commit | 76 s | 16:55:54 to 16:57:10 |
 
 Forgejo hands a job to a runner before it evaluates the job's `if`. So a
 docs-only pull request's skipped image build still got a VM, which lived 10
@@ -1504,7 +2101,54 @@ number and fork head. Because Forgejo never retries a failed delivery, the
 heal pass re-reads the same state every minute and applies the same trust
 checks, so a merge or an answer made while factoryd was down still reaches
 the workflow. Built in Stage 7: the agent's escalation tool call (6.6), which
-moves the task into the console's human lane. SigNoz alerts join in Stage 8.
+moves the task into the console's human lane. Stage 8 adds the issue lanes
+from any account (5.1), the poster's answer to an information request (7),
+a project's pushes to `main` (5.1), and SigNoz alerts.
+
+**Alerts into intake** (Rulings 146, 148, 159, built in Task 70, exit test
+pending). A SigNoz notification channel, created as code by the
+`signoz-objects` job, posts firing and resolved alerts to factoryd's `POST
+/webhooks/signoz`, with basic auth from the secret `signoz-webhook`. An
+alert names a symptom and never a command, so for an alert-filed issue the
+agent's own `repro` block counts as the reproduction under the same
+fail-at-base and pass-at-head check, and the review is told it came from the
+agent (Ruling 170); an outside account's bug without a command gets no such
+credit.
+factoryd maps the alert's `namespace` label to a project through the
+namespace's `factory/project` label. It files one issue per alert
+fingerprint in the project's repository, labelled `bug`, titled `alert:
+<name> in <namespace>`, with the labels, the value, the SigNoz link and the
+firing time in the body. A repeat of an open fingerprint comments on its
+issue instead, and the resolve comments `resolved at <time>`. The `bug`
+label starts the task at once (5.1). An alert without a mapped project is
+logged and dropped. The demo app's own rules are a 5xx rate above 5 % over
+5 minutes, a redirect p95 above 500 ms over 5 minutes, and a rollout not
+ready for 10 minutes, each per namespace. The exit test plants a regression
+as a normal commit (Ruling 151): `ValidSlug` panics on a malformed slug,
+the load generator's malformed request then answers 500, and the 5xx rule
+fires. The chain from there runs through the task, the gates, `auto`, the
+demo app's staging roll, 15 minutes without an alert and the prod roll.
+
+**Alerts with verdicts** (Ruling 140, built in Task 61). Every alert the
+factory raises about itself is a row in the `alerts` table: kind, source,
+task, raised, bound, resolved, verdict (`real` or `noise`), resolved by, and
+a detail. The verdict says whether the alert was a real problem, so the
+bounds and detectors can be tuned from data:
+
+| Kind | Raised when | Verdict |
+|---|---|---|
+| `gate_bound` | a gate activity runs past its bound (6.6) | the gate supervisor's action: `wait` is noise, the rest real. A short gate's row stays open |
+| `supervisor_trip` | a session detector trips | `continue` is noise, any other action real, resolved by `supervisor` |
+| `escalation` | an agent or a supervisor escalates | one click by an approver on the console answer, "real problem" or "noise" |
+| `info_request` | an agent asks the poster (7), Task 66 | no verdict rule yet |
+| `alert` | a SigNoz alert files an issue, Task 70 | real when the task's pull request merges, noise when a human closes the issue without a merge |
+
+factoryd exposes the table as `factory.alert.count{kind,verdict}`, with
+`open` for a row without a verdict. It is an up-down counter, because an
+open count falls when its alert gets a verdict. Proven live: an escalation
+clicked `noise (sebastian)`, supervisor trips judged `noise (supervisor)`,
+and `gate_bound` open at 1 in SigNoz while a trip waited. The dashboard's
+precision panel, alerts per kind and verdict per week, comes with Task 70.
 
 ## 9. What the 2026-09-24 verification pass established
 
@@ -1573,7 +2217,8 @@ since Stage 6, but neither has run under load.
 | Secrets backend | OpenBao | Decided |
 | Image registry | Forgejo registry, Harbor as upgrade | Decided |
 | Object storage | Hetzner Object Storage, SeaweedFS/Garage as self-host fallback | Decided |
-| Observability | SigNoz, Grafana stack as OTel-compatible fallback | Decided |
+| Observability | SigNoz, Grafana stack as OTel-compatible fallback. k8s-infra in its own privileged namespace, agent logs excluded, retention 7 days hot and 30 in total with S3 cold storage, alert rules and dashboards as code | Built (Rulings 159, 160) |
+| Instrumentation | OTel traces, metrics and logs from factoryd, the gateway and the worker. Audit rows as scrubbed log records, Postgres authoritative. One redact package. CI, build VM and roll metrics. Bounds in policy | Built (Rulings 140, 158) |
 | UI style | Server-rendered Go with htmx | Decided |
 | Policy engine | Go code now, OPA sidecar when rules multiply | Decided |
 | Policy source | A YAML document in Git (ConfigMap `factory-policy`), loaded into immutable Postgres versions. Runtime decisions are Postgres rows edited in the console | Decided (Ruling 107) |
@@ -1592,14 +2237,20 @@ since Stage 6, but neither has run under load.
 | Agent pull requests | From a `factory-agent` fork, so PR jobs get a read-only token; two session tokens, read upstream and write the fork; workflow-directory guard in the worker and factoryd | Decided (Rulings 97, 100) |
 | CI registrar | Dedicated `factory-ci` account, organisation owner because the runner API demands it, token scoped to the code repository, `main` protected with `apply_to_admins` | Decided (Rulings 101, 101a) |
 | Missed webhooks | The heal pass re-reads Forgejo every minute and signals what webhooks missed; `Reconcile` at the start of every workflow run | Decided |
-| Supervision | Cheap trace detectors over the event stream, the strongest model as supervisor under its own alias, inside the session activity, at most three calls per session, paid from the task's remaining budget. Human answers are kept across attempts in their own brief section | Decided (Rulings 82, 86, 87, 118, 120) |
+| Supervision | Cheap trace detectors over the event stream, the strongest model as supervisor under its own alias, inside the session activity, at most three calls per session, paid from the task's remaining budget. Human answers are kept across attempts in their own brief section. A `no_write` progress detector, and a gate supervisor for the five long gates with wait, retry, cancel or escalate | Built (Rulings 82, 86, 87, 118, 120, 141, 154, 161, 162, 163) |
+| Alerts | An `alerts` table with a verdict per alert, counted in SigNoz, with a precision panel | Built (Ruling 140) |
+| Factory model calls | The review and both supervisors call through the gateway with factoryd's token and purpose headers, audited and booked like an agent's | Built (Task 71) |
 | Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list. Servers and volumes, no buckets. SSH certificates bound to one server. Outbound tcp 53, 80 and 443. Deletion at the last tick before the lease ends | Built (Rulings 80, 83, 121, 122, 124, 125) |
 | Collector safety | A pass that sees a cluster node's IPv4 or another project's label deletes nothing | Decided (Ruling 123) |
 | Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Built (Rulings 81, 84) |
-| Merge authority | The `factory-merge` bot merges after a whitelisted human's approval, enforced by Forgejo's branch protection. Merge retries are capped at six | Built (Rulings 109, 129) |
+| Merge authority | The `factory-merge` bot merges after a whitelisted human's approval, enforced by Forgejo's branch protection. Merge retries are capped at six. A project on `auto` merges class `normal` without a card after a proven reproduction or a strict improvement and an approving review; the factory's repositories stay on `human` | Built (Rulings 109, 129). `auto` built (Rulings 149, 167, 169) |
+| Intake lanes | Every bug from any account or alert starts a task. Improvements wait as suggestions for a writer. Outsiders' writer-only labels are stripped. The poster's text is untrusted information between random markers | Built (Rulings 148, 150) |
+| Projects | Each project its own Forgejo organisation with a CI user, runner registration, deploy key and deploy branch. Flux tenancy through a namespaced account. A default-deny network policy and a quota per environment. Registration is one factoryd action reconciled from Postgres. Hostnames are an infra commit | Built (Rulings 146, 155, 156, 157, 164, 165, 166) |
+| Resource kinds | `task` (leased, agent-requested) and `standing` (no lease, registration or a human) in one envelope | Built (Ruling 147) |
+| Hand steps | OpenBao configuration, push mirrors and the console's OAuth app as converging CronJobs. The unseal and a one-time OpenBao bootstrap stay by hand | Built (Ruling 143) |
 | Spend approvers | The policy's `approvers` list gates resource approval, envelope edits, promotion and the merge approve button | Decided (Ruling 128) |
-| Git remotes | Forgejo is primary and push-mirrors both repositories to GitHub | Decided (Ruling 126) |
-| Demo app | Small real product with real telemetry | Open, chosen in Phase 3 |
+| Git remotes | Forgejo is primary and push-mirrors both repositories to GitHub with a fine-grained token limited to the two repositories. Sharing code with people moves to admin-created Forgejo accounts | Decided (Rulings 126, 144) |
+| Demo app | A Go link shortener with Postgres, `demo-app/demo-app`, with its own CI/CD: staging, 15 minutes without an alert, prod | Built (Rulings 145, 153) |
 
 ## 11. Build order
 
@@ -1611,7 +2262,9 @@ changes rarely and stays human-only. `ai-software-factory-code` (factory
 below) holds the Go module with both
 binaries and the harness adapters, its tests, and its deploy manifests; its
 Forgejo Actions pipeline builds images into the registry. It changes often and
-is the first repository agents will work on. `demo-app` arrives in Phase 3.
+is the first repository agents will work on. The demo app arrived in Stage
+8 as the first project, `demo-app/demo-app` in its own Forgejo organisation
+(5.1).
 The split keeps different blast radii separate and makes per-repository
 capability grants natural later: `infra` can require a human while the factory
 works `factory` and `demo-app`.
@@ -1662,3 +2315,11 @@ works `factory` and `demo-app`.
 | Envelope | The resource and euro allowance per project for commissioned cloud resources: monthly euros, server types, count, lease length, volume size. Copied from the policy default and edited in the console |
 | Lease | The expiry every commissioned resource and build VM carries. The collector deletes the resource at the last tick before it ends |
 | Principal | The name an SSH certificate is valid for. A commissioned server accepts only its own, `resource-<row id>` |
+| Project | A repository the factory builds software for, registered with its own Forgejo organisation, namespaces, quota and settings. The factory's own repositories are projects on `human` |
+| Merge rule | A project's setting, `auto` or `human`: whether a qualifying change merges without a card |
+| Deploy branch | A project's branch `deploy`, which holds the rolled state that Flux applies. Only the deploy key pushes to it |
+| Standing resource | A project's environment server: no lease, requested by registration or a human, a fixed monthly line |
+| Bound | The seconds a gate activity may run before it raises a `gate_bound` alert |
+| Gate supervisor | The supervisor model called when one of the five long gates passes its bound. It chooses wait, retry, cancel or escalate |
+| Alert verdict | Whether an alert was a real problem or noise, set by the supervisor's action, a human's click or the task's outcome |
+| Poster information | An issue author's answer to an information request, carried in the brief as untrusted information, never as authority |
