@@ -2843,6 +2843,31 @@ Steps: choose the demo app (fork still open, architecture 10), staging and prod 
 
 Exit test: an injected fault raises an alert, the alert creates a task, the agent's fix passes verification, merges, deploys to staging, and promotes to prod on the rule.
 
+Closed 2026-09-28. Exit test run verbatim on 2026-09-28 (task 57, code
+f46c350, roll 7254da0): all seven steps pass. Step 3 failed on the first run
+because the console showed every EUR amount with two decimals, so a 0.000543
+EUR spend read 0.00; fixed in the final fix wave (ruling 135, four decimals)
+and re-checked live after roll 552d477. Measured: a Go-only pull request
+finishes its six checks in about 4 minutes, a Dockerfile pull request builds
+on a throwaway cx23 that is gone seconds after the job, the CI project ends
+at zero servers, a 60-minute lease books one hour and both provider deletes
+of a server with a volume are issued before the lease end (ruling 130,
+cutoff 210 s), a hand-made server in the agent project is deleted by the
+collector's next pass, and the ledger's spent_eur equals the LiteLLM key
+spend to the cent. Standing contracts from this stage, all in the ledger as
+rulings 114 to 137: egress by name including storage.googleapis.com; policy
+in Git with `risk` and `approvers` sections and a strict decoder; holds
+booked or released exactly once with real cost over hold and one shared
+over-hold flag; commissioning with servers and volumes only, outbound
+53/80/443, deletion at the last tick before the lease end, per-server SSH
+principals `resource-<id>`, a collector interlock on node addresses and
+foreign labels; the console's spend actions limited to the policy's
+approvers; merge by `factory-merge` after a whitelisted approval with six
+bounded retries; every workflow change behind a Temporal change id with a
+recorded replay history; Forgejo as the primary remote with push mirrors to
+GitHub; cx23 build VMs (cx33 measured equal). What Stage 7 leaves for Stage
+8 is in the "step zero" paragraph below and in the handover.
+
 Stage 8 step zero, agreed with Sebastian on 2026-09-28 (discuss the specifics
 with him before any code): factory instrumentation. What the Stage 7 session
 lacked: pipeline and roll durations as metrics, a per-task timeline of gate
