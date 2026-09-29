@@ -3185,3 +3185,28 @@ the same thing.
    Linear's agent sessions, GitHub Agent HQ and Factory Mission Control
    for the board patterns (stage10-queue.md H lists the seventeen found so
    far).
+
+Also after Stage 9, from the market research's worker, credential and
+policy items Sebastian accepted (2026-09-29, detail in stage10-queue.md
+section I):
+
+1. A setup snapshot per project and base commit (a cached image or PVC),
+   after measuring the task pod's start and setup time.
+2. No credential in the pod: the two per-session Forgejo tokens give way
+   to an on-demand credential helper or injection at egress.
+3. Credentials minted inside each Temporal activity, never in workflow
+   history, with a test that scans history for tokens.
+4. Composite attribution: task identity plus the human behind the task on
+   every audit row and agent commit.
+5. A denied tool is hidden from the agent's tool list and still denied if
+   called.
+6. Questions without a human are recoverable: rules so agents do not ask,
+   a denied question reaches the model as an error, factoryd runs the
+   answer chain (other agents included) and wakes the session.
+7. Stricter wins: deny beats allow at every level, and a project overlay
+   cannot loosen a cluster-wide cap.
+8. Protected files: manifests and lockfiles of every ecosystem, agent
+   instruction files, `CODEOWNERS` and top-level dot directories join the
+   `high` risk class.
+9. Sanitise untrusted text into the brief and agent-written text out to
+   Forgejo: hidden comments, mentions, closing keywords, off-list URLs.
