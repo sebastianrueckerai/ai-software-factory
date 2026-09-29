@@ -3047,3 +3047,32 @@ folder hold the evidence and the detail):
 7. Housekeeping: the GitHub push block is off, the global git email is
    the noreply address, the code and infra mirrors must show
    `github/main` equal to Forgejo main at the next step-zero gate.
+
+A UX phase after Stage 9, at Sebastian's wish (2026-09-29), from the
+market research (docs/market-research/SYNTHESIS.md sections 6 and 8, and
+stage10-queue.md section H in the ledger folder). The kanban board stays
+the one interface: every new view opens from a card, no second way to do
+the same thing.
+
+1. A live task page behind every card: the agent's events streamed over
+   htmx SSE from one normalised `Event` type (Vibe Kanban's
+   NormalizedEntry, Linear's AgentActivity), the diff, the CI checks and
+   the gate durations in one view. The card itself shows a status badge
+   fed by the same events and, when it waits on a human, the reason.
+2. Inline diff comments that go back to the agent: comments on any lines
+   of any file, batched into one follow-up message (cline/kanban, Vibe
+   Kanban). Needs the message call of ruling 188.
+3. Progress where the requester already is: one comment on the Forgejo
+   issue, edited in place (Symphony's workpad, Cyrus), and push
+   notifications for done, question and approval only.
+4. "I am going in": a button on a card opens VS Code in the browser on
+   the task's workspace at any state. The agent pauses in the
+   waiting-on-human state, the human inspects, edits or guides, and a
+   resume signal hands back. On a running task, a code-server sidecar in
+   the task pod behind the console's login. On a finished task, a fresh
+   workspace pod from the task branch. The human's session never holds the
+   task's identity, and their commits carry their own name.
+5. Before designing: read cline/kanban, Vibe Kanban, Automaker, Nimbalyst,
+   Linear's agent sessions, GitHub Agent HQ and Factory Mission Control
+   for the board patterns (stage10-queue.md H lists the twelve found so
+   far).
