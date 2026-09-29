@@ -3007,3 +3007,17 @@ After Stage 9, at Sebastian's explicit wish that neither is forgotten
 (ruling 188): messages into a running agent session and agent-to-agent
 interaction, through the harness's serve mode, about 1.5 days; and a final
 security audit stage whose findings always go to a human.
+
+Also after Stage 9, at Sebastian's wish (2026-09-29): a second harness
+behind the adapter contract of architecture 6.2, so a harness swap is a
+proven path and not a promise. The factory needs nothing a harness builds
+for a human at a terminal: no permission prompts, no approval UI, no
+internal sandbox, no ask-the-user tool that blocks; the sandbox, the
+gateway and the escalation tools cover those. What a harness must keep is
+what protects the loop itself: repeated-call detection, context
+compaction, tool-output truncation, timeouts, a turn cap. The candidate
+survey and the advice are in
+[research-harnesses.md](/home/womb/repos/ai-software-factory/.superpowers/sdd/2026-09-24-build-plan/research-harnesses.md)
+(local, gitignored). The `harness` becomes a dimension of the audit row
+and the task metrics, so two harnesses can be ranked by measurement the
+way model tiers are (ruling 181).
