@@ -3289,16 +3289,21 @@ section K; revisit-later items in architecture 10):
 
 1. Configurable pipelines: the workflow as an authorable graph of stages,
    classes and gates per project, with optional preconfigured stages
-   (spec phase with hidden acceptance scenarios, plan critic, plan
-   approval, two-pass review). Likely its own phase.
+   (spec phase, plan critic, plan approval, two-pass review). Likely its
+   own phase.
 2. An anti-cheat rule and check in every fix loop.
-3. Gate calibration with seeded defects.
+3. Mutation testing as a canned routine for every project, the
+   factory's own included, on demand or scheduled: the test suite and the
+   gate pipeline.
 4. The workflow-directory guard tested against case variants and
    symlinks.
 5. An evidence receipt per merged task.
 6. Flaky-aware CI retries, three per head SHA.
 7. Standing scheduled tasks as files, skipped when nothing changed.
-8. An alert recurrence threshold before an alert spends budget.
+8. Repeat alerts: the first occurrence starts work, one task per
+   fingerprint, repeats only count, a "not fixable automatically" verdict
+   holds until the rate jumps, a return after a merged fix is a new
+   linked task.
 9. LiteLLM's OpenTelemetry callback and credential health checks.
 10. Signed images, verified before the roll and at deploy.
 11. A conformance suite for harness adapters.
