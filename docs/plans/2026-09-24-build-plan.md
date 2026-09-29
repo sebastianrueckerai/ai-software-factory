@@ -3003,6 +3003,115 @@ issue; one improvement issue is written up by the lane; and the audit trail
 is complete for every task: every model call audited, the spend equal to
 LiteLLM's to the last digit, the timeline, the alert rows, the roll row.
 
+Closed 2026-09-29. The rebuild that opened the stage ran from 07:29Z to
+08:16Z, the platform whole after 29 minutes, and the step-zero gate passed
+with the spend equal to LiteLLM's to the last digit (EUR 0.01831564 over 17
+rows). Landed, rolled and proven, with rulings 176 to 195 in the ledger:
+Task 72, configuration as files (ruling 183): factoryd reads the tree
+`factory/` from the infra repository's `main` every 30 seconds
+(`policy.yaml` with a `limits` section, `projects/<name>.yaml`,
+`workflow.yaml`), the commit is the version, every task pins the version it
+started under, a JSON Schema generated from the Go types, `factoryd config
+check` as a CI job on the infra repository, and a refused commit keeps the
+old version and files a `config_rejected` issue in the human lane (proven
+with a bad push and its revert, versions 155 and 156); Task 73, the factory
+as a normal project (ruling 179): every project's settings from its file,
+`objects: factory | seed` and `agents: coder | none`, the infra repository
+on `agents: none` (`POST /tasks` answers 422, infra issue #4 ran in the
+human lane), no repository name in code; Task 74, the workflow as an
+ordered list of stages with one `on_findings` setting each (rulings 177,
+190), the review loop, the `analyzer` class with its `report` session mode,
+the improvement presort and the screening stage for outside accounts on the
+stronger rung (rulings 182, 185, 191); Task 75, the roll as a factory task
+(ruling 178): from 13:10Z every roll was a pull request the roller opened,
+six merged through the card (#185, #188, #190, #192, #202, #213), a newer
+commit folded into an open roll at 14:06Z, and the roll watcher records a
+row per image; Task 76, alerts on the factory routed by the namespace label
+(ruling 180), ten rules as code, and a fix to factoryd's admission policy
+that keeps it out of the infra-owned namespaces; Task 77, model tiers in
+LiteLLM (rulings 181, 189, 192): tier-high holds zai/glm-5.3,
+dashscope/qwen3.8-max and deepseek/deepseek-v4-pro at equal weight for
+`supervisor`, `review-frontier` and `coding-frontier`, tier-low serves
+`coding-cheap`, no fallback crosses a tier, the audit row names the
+deployment that answered, and Groq left both lower tiers after it refused
+multi-turn sessions; Task 78, four task metrics, the revert mark (live:
+demo-app #6 marked reverted by #11) and four panels (ruling 185); Task 79,
+backlog items 23, 27, 44 and 45, memory limits set from measured cgroup
+peaks; Task 81, every exhaustion of the session loop opens the card, and a
+repeated supervisor trip takes the stronger rung (ruling 193); Task 82, the
+work guide states the sandbox contract; and from the lane itself, six
+merged fixes (backlog 26, 3, 32, 4, 49, 63). The controller's fixes during the
+run: the supervisor timeout at 6 minutes (ruling 186), the sandbox limit at
+4Gi with an 8Gi namespace ceiling after three sessions died with their
+unpushed work (1cd22b8), a resumed session whose branch already holds the
+work counts as a pushed result (f870bdb), the ModelReview bound at 360 s
+(infra 0c86925, ruling 194), and the "Key is blocked" fix landed from the
+lane's pull request (c6f374a, ruling 195). Exit test run on 2026-09-29
+(task 80, 14:29Z to 16:10Z), passed with two deviations. Step 1, deviation
+(ruling 195): the "Key is blocked" fix came from agent task #203 through
+the checks in pull request #209; the task ended at its wall-clock cap on
+one gosec line, the controller added that line and pushed c6f374a, and roll
+task #213 took it live through card 104 at 16:02Z; no key was blocked
+after that roll (#216 took three answered supervisor calls), the planted
+restarts at 16:02Z cut #214's running attempt twice and it resumed and
+pushed, and the planted bound trip was not run.
+Step 2 passed: five more backlog items (26, 3, 32, 4, 49) went through the
+lane end to end, pull requests #200, #208, #206, #207 and #211, merged by
+`factory-merge` after the card and rolled in #213. Step 3 passed live: #214's
+review answered `concerns` at 16:18Z (the agent had committed its scratch
+test, the defect the task fixes), the findings went back to the agent, and
+the second review approved at 16:34Z; pull request #217 merged as f333477.
+Step 4 passed: factoryd's restarts filed code issues #193 and #216, each
+starting an agent task, and a failed platform Job filed infra issue #5 in
+the human lane; the gateway's 5xx alert #210 was real but came out `noise`
+(backlog 64), and #215 was a false "roll not live" alert (backlog 67).
+Step 5 passed: improvement #178 was written up by the lane. Step 6,
+deviation (backlog 66): every model call has its audit row, 31 to 87 per
+task, `spent_eur` equals the ledger on every task and LiteLLM's key spend
+on five of seven, and the other two book calls cut by the gate at their
+hold. The bug lane: 11 issues filed by the controller on seven backlog
+items (1 three times, 4 and 49 twice, 3, 26, 32, 63 once), five merged by
+the lane, one landed by the controller, five failed (one at the round cap
+before ruling 193, four at the wall-clock cap, two of them after sandbox
+memory kills), and #214 (backlog 63) merged after a concerns loop; EUR 2.92 over the
+eleven finished tasks, EUR 1.30 of it on the six merges. The first
+round of six issues produced one merge; the controller fixed four
+machinery defects before the second. Measured: checks 2 min 24 s to 8 min
+41 s, a review 4 s to 1 min 27 s (210 s once, cut at the old 180 s bound),
+an approval click 31 s to 1 min 56 s, a merge 1 s, a session 17 s to 7 min
+51 s. Standing contracts from this stage, all in the ledger as rulings 176
+to 195: configuration and processes as typed files in the infra
+repository, Git as the editing surface and the console read-only, the
+commit as the version and a pin per task; Kubernetes as the substrate only;
+findings from any stage go back to the agent, to the card or fail the task
+as the stage's setting says, a repeat from one stage takes the stronger
+rung, and the session cap is the round cap for every exhaustion; the
+factory as a normal project; the roll as a task with a card; alerts on the
+factory by namespace label; model tiers by quality, ordered by latency
+inside a tier, never crossing tiers; the screening stage on the stronger
+rung; four task metrics and a revert mark; a defect that blocks the lane
+itself is landed by the controller from the lane's pull request, once.
+Sebastian's ruling 196 at the close, "settle down": a task past the settle
+window is set to LiteLLM's final figure once (code 7dc76e8, migration
+0034, not rolled). The close itself went wrong: at 17:57Z the controller's
+`tofu apply` for a second home-address change of the day replaced the
+three nodes, because `hcloud_server.node` takes its `user_data` from the
+Talos config files the morning's recovery had told the controller to edit,
+and the controller applied a plan that said "6 to add, 6 to destroy"
+without reading the replacement lines. The fresh nodes had empty disks;
+the close's backups could not be taken. What survived: the CNPG generation
+v8 in S3 with its base backup of 07:42Z and WAL segments to 17:52Z (every
+database, so every table of the exit test), every repository on this
+machine and on GitHub, demo-app's tree. Lost: SigNoz's data, OpenBao's
+raft since Stage 8 (re-seeded), Forgejo's git storage (re-pushed at the
+rebuild) and the merge commits of demo-app #11 and #12. The README names
+the trap; the next rebuild's step-zero gate is the test of the recovery.
+What Stage 9 leaves: backlog items 58 to 68 in stage9-backlog.md as the
+next bug lane (66 closed by ruling 196), the Stage 8 items not yet worked
+in their lanes, the thirteen accepted risks (14, 16, 21, 22, 30, 31, 41,
+46, 48, 50, 51, 53, 54), and the proofs the exit test left open; the
+handover lists them.
+
 After Stage 9, at Sebastian's explicit wish that neither is forgotten
 (ruling 188): messages into a running agent session and agent-to-agent
 interaction, through the harness's serve mode, about 1.5 days; and a final
