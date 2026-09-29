@@ -3183,5 +3183,5 @@ the same thing.
    task's identity, and their commits carry their own name.
 5. Before designing: read cline/kanban, Vibe Kanban, Automaker, Nimbalyst,
    Linear's agent sessions, GitHub Agent HQ and Factory Mission Control
-   for the board patterns (stage10-queue.md H lists the twelve found so
+   for the board patterns (stage10-queue.md H lists the seventeen found so
    far).
