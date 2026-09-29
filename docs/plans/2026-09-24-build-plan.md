@@ -3275,3 +3275,11 @@ section J; revisit-later items and rejections in architecture 10):
 9. Blocker-aware dispatch through Forgejo issue dependencies.
 10. Blocked with a next action: a typed reason through `request_info`
     picks who acts next.
+11. A spend-rail catalogue: every limit with what it stops, what 0 means
+    and the text the card and the agent see.
+12. Gate results and human decisions as separate records, so "gates
+    passed, human rejected" can be counted.
+13. Typed reasons for session-start failures, the permanent ones
+    non-retryable.
+
+The UX phase also gets a stop button on the card that closes the issue.
