@@ -3210,3 +3210,47 @@ section I):
    `high` risk class.
 9. Sanitise untrusted text into the brief and agent-written text out to
    Forgejo: hidden comments, mentions, closing keywords, off-list URLs.
+
+### Stage 10: hardening
+
+Settled 2026-09-29 at the Stage 9 close (rulings 197 to 199), on
+Sebastian's steer: hardening, security, small incremental improvements and
+bug fixes first; the larger items of the lists above (the UX phase, the pi
+adapter, parallelism, setup snapshots, no credential in the pod, composite
+attribution) wait for his scoping and are Stage 11 at the earliest. The
+handover `handover-stage10.md` in the ledger folder holds the round in
+full; the ledger holds the rulings.
+
+Steps: the rebuild with the recovery from CNPG generation v8 and the
+re-push of every repository from the controller's machine (the test of the
+close's recovery), the step-zero gate with the mirror check; Task 85, the
+security audit stage of ruling 188 (`on_findings: human`, an analyzer
+session on the stronger rung over the diff with a fixed checklist); Task
+86, the merge path (a model review with a verdict for every risk class,
+backlog 68; the roller's registry read on a read-only package token;
+backlog 56 checked); Task 87, opencode's headless config hardened (the
+`question` tool removed, a step cap from `limits`, denials the model sees);
+Task 89, the small hardening items accepted from the market research
+(credentials minted inside activities and a history scan for tokens, deny
+hides the tool, stricter wins, protected files as `high`, sanitised text
+in and out); the bug lane by the factory itself from the gate's first roll
+on (backlog 58, 59, 61, 62, 64, 65, 67, then Stage 8's 2, 8, 9, 11, 18, 20,
+24, 25, 29, 33, 34, 37, 47 and demo-app 15, 17); last, Task 88, message-in
+in its smallest form (one adapter call, opencode's serve mode on one port
+only factoryd reaches, the loop nudge as its first user), the item ruling
+188 asked not to forget; the answer chain only if 88 lands with days to
+spare.
+
+Exit test (ruling 199), on the factory's own repository, a human clicking
+cards only: the recovery brings back every table of Stage 9's exit test
+and Forgejo's issues and pull requests; a planted secret in a test file
+reaches the card with the audit stage's finding and a clean pull request
+passes; a migration-class pull request gets a model review with a verdict,
+and a review without a verdict goes to the card as a finding; five
+bug-lane fixes merged through the card and rolled, with cost and gate
+durations; one loop nudge into a running session that changes its course
+and one repetition trip after a nudge that did not help; the audit trail
+complete, the ledger equal to LiteLLM's figure on every finished task after
+the settle window (ruling 196). Fallbacks named in the report: a planted
+pull request for the audit and the review cases; the nudge reported as not
+built if Task 88 does not land.
