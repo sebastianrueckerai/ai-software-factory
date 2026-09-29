@@ -3254,3 +3254,24 @@ complete, the ledger equal to LiteLLM's figure on every finished task after
 the settle window (ruling 196). Fallbacks named in the report: a planted
 pull request for the audit and the review cases; the nudge reported as not
 built if Task 88 does not land.
+
+A second round of accepted items (2026-09-29, detail in stage10-queue.md
+section J; revisit-later items and rejections in architecture 10):
+
+1. "CPU and memory limits set" joins the admission policy on task pods.
+2. A resolved-address guard in the gateway's outbound connections.
+3. An egress probe as the worker's first step: canary, metadata, a direct
+   IP, a blocked name answered REFUSED, the UID. Any failure fails the
+   session and alerts.
+4. Side-effect MCP tools on the gateway, live: follow-up issue, comment,
+   label, each capped, sanitised and audited.
+5. An optional scan of untrusted input for injection attempts, per project
+   and input kind, on top of the screening stage. Agents keep the exact
+   input.
+6. Budget steering: a warning to the agent near its budget, session or
+   wall-clock cap.
+7. Stop reasons as board states.
+8. Budgets per task, day and project, with a project cap on model spend.
+9. Blocker-aware dispatch through Forgejo issue dependencies.
+10. Blocked with a next action: a typed reason through `request_info`
+    picks who acts next.
