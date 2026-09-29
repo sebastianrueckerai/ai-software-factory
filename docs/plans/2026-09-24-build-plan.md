@@ -3008,16 +3008,42 @@ After Stage 9, at Sebastian's explicit wish that neither is forgotten
 interaction, through the harness's serve mode, about 1.5 days; and a final
 security audit stage whose findings always go to a human.
 
-Also after Stage 9, at Sebastian's wish (2026-09-29): a second harness
-behind the adapter contract of architecture 6.2, so a harness swap is a
-proven path and not a promise. The factory needs nothing a harness builds
-for a human at a terminal: no permission prompts, no approval UI, no
-internal sandbox, no ask-the-user tool that blocks; the sandbox, the
-gateway and the escalation tools cover those. What a harness must keep is
-what protects the loop itself: repeated-call detection, context
-compaction, tool-output truncation, timeouts, a turn cap. The candidate
-survey and the advice are in
-[research-harnesses.md](/home/womb/repos/ai-software-factory/.superpowers/sdd/2026-09-24-build-plan/research-harnesses.md)
-(local, gitignored). The `harness` becomes a dimension of the audit row
-and the task metrics, so two harnesses can be ranked by measurement the
-way model tiers are (ruling 181).
+Also after Stage 9, at Sebastian's wish (2026-09-29), from the harness
+discussion (research-harnesses.md and stage10-queue.md in the ledger
+folder hold the evidence and the detail):
+
+1. Tighten opencode's headless config: remove the `question` tool (a
+   denied tool ends the turn, so removal, not deny), cap `steps` from
+   `limits`, leave `doom_loop` on allow (a denied doom loop stops the
+   session unseen by the model), set
+   `experimental.continue_loop_on_deny`, keep the fixture-based parser.
+   The only ask path is the gateway's `request_info` and
+   `escalate_to_human`.
+2. A configurable answer chain for questions per workflow stage, like
+   `on_findings`: `questions: [self, model:<tier>, human]`, later
+   `agent:<class>`. `self` is a prompt guideline in the tool description
+   and the brief, not an injected answer. Metrics: questions per task and
+   the share answered at each step.
+3. Loop detection in factoryd, which sees every tool call: on three
+   identical calls, a nudge into the running session (needs the message
+   call of ruling 188), never a stop.
+4. The second harness, pi, behind the adapter contract: `--mode rpc` over
+   stdio, the worker owns the pipe and exposes the one port factoryd may
+   reach, `models.json` at the identity proxy, `mcp.json` with the
+   gateway's server, the JSONL event mapping, a second sandbox image.
+   `harness` becomes a column of the audit row and a label of the task
+   metrics, ranked by measurement like model tiers (ruling 181).
+5. Architecture 6.1 re-surveyed as of 2026-09-29: pi passes (built-in
+   MCP), goose passes (stream-json, Linux Foundation) and becomes the
+   named successor, Codex CLI fails requirement 2 since 2026-02 (Responses
+   API only), Kilo CLI (opencode fork) is the zero-cost fallback, dsh and
+   Trae Agent on the watchlist.
+6. Parallelism: in the agent for small, homogeneous, read-mostly fan-out
+   and one-message chains, bounded by the pod's identity and budget; in
+   the factory for anything with an artifact, class, credential, budget
+   or review of its own. Personas are classes and stages. The policy says
+   which subagents a class may spawn, and the brief carries it to the
+   harness (opencode `permission.task`, pi's subagent extension).
+7. Housekeeping: the GitHub push block is off, the global git email is
+   the noreply address, the code and infra mirrors must show
+   `github/main` equal to Forgejo main at the next step-zero gate.
