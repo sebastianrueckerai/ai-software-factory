@@ -2960,3 +2960,50 @@ Goal: the factory works on its own repositories, the portfolio claim from goal.m
 Steps: grant the `coder` class scoped access to `factory` (never `infra`), let real issues drive real changes, model review escalation from architecture 11: a failed review verdict escalates the task, back to the worker with findings or to a human, rather than dead-ending, grow the capability classes beyond `coder` as the loops need them (analyzer, integration tester, release agent; architecture 6), add the self-improvement analytics from architecture 11, evaluate SPIRE and OPA only if a need appears that the current design fails to cover.
 
 Exit test: an agent PR to `factory` merges under the same policy a human change would face, with the audit trail complete.
+
+Steps, amended 2026-09-28 with Sebastian (rulings 176 to 188 in the ledger,
+the discussion in stage9-answers.md). What the plan's steps asked for is
+partly built: agents have worked on the code repository from a fork with
+per-task tokens since Stage 6, a review verdict of `concerns` ends at a
+human card and never dead-ends, and no need for SPIRE or OPA appeared (one
+cluster, projected service account tokens, nine policy sections read by Go
+code). Stage 9 adds: configuration as files, factoryd reads its
+configuration tree straight from the infra repository with the commit as the
+version, a generated JSON Schema for IDE completion and a CI check, every
+limit in one `limits` section, per-project settings as files, and Git as the
+editing surface with a read-only console; Kubernetes stays the substrate and
+none of the factory's own files carries its vocabulary; the workflow as an
+ordered list of stages with one `on_findings` setting each (agent, human or
+fail), so the review's `concerns` goes back to the agent first, a repeat
+from the same stage takes the stronger model, and the session cap is the
+round cap; the factory as a normal project, every project row with the same
+settings and flows, one setting for who owns the repository objects (the
+factory or the seed) and one for agent access (the infra repository has
+none), no repository name in code; the roll as a factory task, a digest
+pull request that factoryd opens, a card, the bot's merge and a roll row per
+image; alerts on the factory itself routed by the namespace label like any
+project's, with rules as code; model tiers in LiteLLM across z.ai, Alibaba,
+DeepSeek and Groq, ranked by measurement, the role aliases mapped onto
+tiers, the answering deployment in the audit row; the `analyzer` class with
+a report session mode for the improvement lane; a reusable, switchable
+screening stage, on for outsider bug reports; four task metrics with a
+revert mark and panels; the supervisor timeout at 6 minutes; the open
+defects of Stage 8 fixed by the factory's own agents as bug issues, the
+first of them the blocked gateway key. Subagents build the machinery, the
+factory fixes the defects. About 10 subagent days.
+
+Exit test, amended 2026-09-28: all on the factory's own code repository, in
+one session, with a human doing card clicks only. The open defect "Key is
+blocked" is filed as a bug issue, fixed by an agent task through the
+checks, the gates and the review, merged on `human` through the card,
+rolled by the roll task's pull request and card, and proven fixed live; five
+more open defects from the Stage 8 backlog are fixed the same way; one
+review loop is seen live if one occurs; one alert on the factory files an
+issue; one improvement issue is written up by the lane; and the audit trail
+is complete for every task: every model call audited, the spend equal to
+LiteLLM's to the last digit, the timeline, the alert rows, the roll row.
+
+After Stage 9, at Sebastian's explicit wish that neither is forgotten
+(ruling 188): messages into a running agent session and agent-to-agent
+interaction, through the harness's serve mode, about 1.5 days; and a final
+security audit stage whose findings always go to a human.
