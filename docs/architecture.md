@@ -14,7 +14,12 @@ security audit stage sends its findings to a human, a review without a
 verdict is a finding, the harness runs as a server that takes a message
 mid-session and the first message is the loop nudge, untrusted text is
 sanitised in and out, one model provider and a month cap bound the spend,
-and the factory's own lane merged 25 fixes through the card. Sections that describe built behaviour
+and the factory's own lane merged 25 fixes through the card. Stage 11,
+building from a spec, closed 2026-09-30: a spec card on an empty board
+became a deployed link shortener through a planner, ten planned cards,
+four agents at once and a merge queue, with processes composed from YAML
+blocks and a check that refuses what cannot work, and with 17 cards the
+human had to refile. Sections that describe built behaviour
 say so. The rest is still design. We amend this file as the design moves, so it always holds the
 current design plus the explanations behind it. Rulings live in the build
 ledger and are cited here by number.
@@ -866,6 +871,17 @@ passed on 2026-09-30 with two named fallbacks: a review without a verdict
 was not produced live by a plant and rests on tests plus the same rule
 live on the audit stage, and the trip after a nudge happened live through
 `no_write`, not `same_call`.
+Built in Stage 11 (rulings 205 to 211): processes composed from blocks,
+the lanes and the planner (below, 5.3, 7), dependencies between cards and
+the merge queue (7), templates and the seed commit for a new project
+(below), the console's lane board, plan card and new-project button (5.6),
+and migration and change-id names that parallel branches cannot share (7).
+The Stage 11 exit test passed on 2026-09-30 (ruling 210): a spec card on
+the empty project `linkshort` became a plan of ten cards, four sessions ran
+at once, fifteen pull requests merged through the queue one at a time, and
+the app ran on staging with its nine acceptance tests green. It took 17
+refiled, split or fix cards from the human (ruling 211), since 12 of 28
+tasks failed, 11 at the wall-clock cap.
 
 **Intake.** Two doors, one record. Forgejo posts webhooks to
 `/webhooks/forgejo`. factoryd checks the HMAC-SHA256 signature in
@@ -910,12 +926,59 @@ Forgejo accounts (Ruling 144) and the policy's day cap. Since Stage 9 a
 screening stage reads an outside account's bug report before the coder
 starts (7, Rulings 182, 191).
 
+**Lanes come from the project's process** (Rulings 206, 208, Tasks 94, 97).
+Since Stage 11 the lanes above are configuration: each project names a
+process file (5.3), and the process lists two or three lanes, `backlog`,
+`ready` and optionally `plan`. A card in `backlog` does not start, a card
+entering `ready` starts a task of the lane's `class`, and a card entering
+`plan` starts a planner (below). The label underneath is `backlog`, `agent`
+or `plan`, and the intake rule is fixed in code for every process:
+`human` wins, then `agent` or `bug` asks for ready, `plan` asks for plan
+where the process has that lane, `backlog` or `improvement` is backlog, and
+no label asks for ready. A starting lane's `moved_by`, `writers` or
+`approvers`, judges every entry, at creation, by a label added later or by
+a label removed: a refused entry lands in backlog, the bot restores the
+label and comments once. The default entry keeps Ruling 148 on both shipped
+processes: under `writers` a bug from anyone enters ready. Tasks filed
+through the API and by alerts enter ready the same way, and rolls and
+human-lane tasks carry no lane. The task row gains `lane`, `process` and
+`plan_key`, and the status `suggested` became `backlog` (migration
+`20260930095046_lanes`). The shipped `maintenance` process is the flow
+above, with the presort as the backlog's `write_up`. The `spec` process
+adds the plan lane.
+
+**The planner and the plan card** (Rulings 205, 208, Task 101). A card in
+lane `plan` starts a task of class `planner`, whose session mode is `plan`:
+a report session on the stronger rung that reads the repository and the
+spec, writes nothing, and ends with one JSON block of 2 to `max_cards`
+cards, each with a key, a role (`foundation`, `feature`, `integration`),
+a brief of at most 1500 characters, guidance directories, dependencies,
+acceptance items and a size of `small` or `medium`. `ValidatePlan` refuses
+a plan that breaks the shape, and the findings go back to the planner.
+factoryd, not the model, adds the edges that put the foundation first and
+the integration last. Each valid answer is a row in `plan_revisions`,
+posted on the issue and filed as an approval request of kind `plan`. A
+writer's comment sends the planner round again, Reject fails the task, and
+"Accept plan" (approvers) runs `CreateChildren`: one task row and one bot
+issue per card in topological order, labelled `backlog`, with the Forgejo
+dependencies and rows in `task_deps`, idempotent by a marker in the body.
+A child's brief carries the spec and the plan's summary and the
+`featureGuide`, which asks for a test per acceptance item. "Start plan"
+(approvers) labels every child still in the backlog `agent` as the human,
+so each move passes `moved_by`. Live, the planner answered 9 cards in 58
+seconds, took one change request and answered 10, and the acceptance filed
+them with 25 dependency rows. It sized the foundation, a Go API plus a Vite
+scaffold, `medium`, and the card failed at the wall-clock cap: the size
+rule has no ceiling the planner can measure.
+
 **Labels.** factoryd creates the label set at boot on every project's
 repository, the seed projects' included (5.1), the `priority/*`, `severity/*`
 and, since Stage 9, `noise` labels among them (8), and keeps exactly one
 `state/*` label on each task's issue: `state/queued`, `state/running`,
-`state/waiting-human`, `state/in-review`, `state/done`, `state/failed`.
-Forgejo's own issue list therefore shows the board's picture until the
+`state/waiting-human`, `state/in-review`, `state/done`, `state/failed`,
+and since Stage 11 `state/backlog` (renamed in place from
+`state/suggested`) and `state/waiting-deps`, with the lane labels of the
+project's process. Forgejo's own issue list therefore shows the board's picture until the
 console exists.
 
 **The human lane.** A `human` issue gets a task row in `waiting-human` and no
@@ -1070,6 +1133,35 @@ app registered live after roll 7914efb:
   Since Stage 9 the settings come from the project's file and the row keeps
   the name and the minted tokens, so `register-project` takes the name
   only (Task 73).
+- **A new project from the console and a seeded repository** (Ruling 205,
+  Tasks 99, 104). The console's "New project" form writes the project file,
+  judges it with the loader's own check over infra's head, and opens a pull
+  request on infra as the human (Ruling 183 kept). Infra's `main` needs 0
+  approvals since Ruling 209, because Forgejo refuses an author's own
+  approval and one human could never merge such a pull request. Sebastian
+  stays its only pusher and merger. A status panel shows four steps with
+  tooltips and polls every 3 seconds until the last: the pull request, its
+  merge and load, "Create repository", where the Forgejo admin types the
+  password once and it is never stored, and "Board ready", set from
+  `projects.ready_at` by the first clean reconcile. A project file may name
+  a `template`, a directory under infra's `factory/templates/`. The seed
+  step renders it (delimiters `[[ ]]`) and commits it as `main`'s first
+  commit through the contents API as `factory-projects`, before `main` is
+  protected, since agents may not write `.forgejo/`. The template `ts-go`
+  (a Go API and a Vite single-page app in one image) seeds the three-job
+  checks, the main CI with staging and promote, `roll.sh`, an empty
+  `deploy/base`, the staging kustomization and `AGENTS.md` with the layout
+  the CI relies on. Every job skips on an empty repository, so the seed
+  commit's run is green. Live on `linkshort`: the button to "Board ready"
+  took 87 seconds. The exit test showed what the template lacks (backlog
+  89): project namespaces enforce Pod Security `restricted` and pull from a
+  private registry, and nothing told the planner or the agents, so staging
+  first ran no pod, while the CI `staging` job read green because it only
+  writes the digest. A seeded Deployment skeleton with the restricted
+  security context and `imagePullSecrets`, and a staging job that waits for
+  the rollout, close it. The template's deletion rule also compares a
+  branch with `main`'s head, not the merge base, so a branch behind `main`
+  read as deleting a file (backlog 83).
 
 Per-project settings are a file since Stage 9, `factory/projects/<name>.yaml`
 in the infra repository (Rulings 146, 179, 183, Task 73): the repository,
@@ -1186,7 +1278,9 @@ factory's configuration (Ruling 183, Task 72). factoryd reads the tree
 `factory/` straight from the infra repository's `main` every 30 seconds,
 with a read-only token of its own Forgejo user `factory-config`:
 `policy.yaml` with the sections below, `projects/<name>.yaml` per project
-(5.1) and `workflow.yaml` with the workflow's stages (7). No ConfigMap and
+(5.1), and since Stage 11 `processes/<name>.yaml` per process (below) and
+`templates/<name>/` per repository template (5.1). `workflow.yaml` went
+into the process files. No ConfigMap and
 no custom resource carries it. The first design, the ConfigMap
 `factory-policy` applied by Flux (Ruling 107), is gone, and Kubernetes stays
 the substrate only, with none of its vocabulary in the factory's own files
@@ -1280,6 +1374,40 @@ file. So a new section lands in infra before the factoryd that reads it. The
 running factoryd rejects the new key and keeps its current version until the
 roll.
 
+**Processes composed from blocks** (Rulings 206, 208, Tasks 94, 95, 98).
+The factory ships no fixed development process. A process file holds four
+blocks with fixed keys and enumerated values: `lanes` (5.1),
+`dependencies` (only with a plan lane), `stages` (7) and `merge` (`queue:
+none | project`, 7). A project with `agents: coder` names one by
+`process:`, and another developer adds a process by adding a file that
+passes the check. Two ship: `maintenance`, today's flow, on the code repository and
+the demo app, and `spec`, plan then build. A class is defined in
+`policy.yaml` only and named by a process, so a process cannot widen what an
+agent may call. Each class carries a `session` mode, `code`, `report` or
+`plan`, which picks the workflow's program. The workflow reads its process,
+lane, class, stages, queue and dependencies from the task's pinned version
+(`TaskConfig`, change id `processes`), and no code path names a process: a
+test greps for the two file names. The check is mechanical, with no model:
+schema and names, needs met in order (a lane's class of the right session
+mode, naming the review, audit and supervisor models the stages call, and
+`dependencies` for a plan lane), a graph in which every entry reaches done
+or a human card and every cycle is capped, and floor rules no process may
+lower (F1 to F11: checks always run, with findings to the agent or fail,
+policy fails on forbidden, approval stands right before merge, and merge
+comes last). Every
+refusal is one line, `<file>: <block>: <reason>`, and `factoryd config
+check` and the loader share the judgement, 66 fixtures agreeing. One rule
+only the running factoryd can apply: a head that removes a lane still
+holding open cards is refused with their issue numbers. `factoryd config
+explain <process> <card kind>` prints the path a card takes, generated from
+the same graph, so the text and the check cannot drift. What no process may
+express, such as conditions, lanes beyond the three, triggers, a merge
+without checks or a per-project override, is listed in the design and left
+to later blocks (roadmap 27a). The switch from `workflow.yaml` was one
+infra commit: the old factoryd refused it (`CONFIG REJECTED`, infra #9),
+and the roll of the new one dropped the stored version, loaded the head as
+version 275 and closed the issue.
+
 The gateway checks each model call in this order: the JWT, the task status, a
 capability class that allows the model (else 403 `refused_capability`), the
 task headroom (else 402 `refused_budget`) and the day headroom (else 402
@@ -1307,7 +1435,10 @@ come online. Stage 9 added the second, `analyzer` (Rulings 182, 185, Task
 commissioning tools, and a session in report mode (6.3). It serves the
 improvement presort (5.1) and the screening stage (7). No Stage 9 loop
 needed another class: the release is the roll task, code with no class (7).
-Nor did a need for SPIRE or OPA appear: one cluster, projected
+Stage 11 added the third, `planner` (session `plan`, 5.1): the coder's
+models, starting on the stronger rung since one plan steers every card it
+files, web search and scraping with caps, `escalate_to_human`, and no
+`request_info`, since the spec's author answers on the plan card. Nor did a need for SPIRE or OPA appear: one cluster, projected
 ServiceAccount tokens, and ten policy sections that Go code reads. `review-frontier` and `supervisor` stay out of the class's
 `models`, so no agent can call them. Every factoryd model call goes through
 the gateway like an agent's (Task 71, rolled 2026-09-28 in ba2d80a).
@@ -1659,6 +1790,21 @@ its "why a human" list names an audit finding and a review without a
 verdict; the card no longer says a pull request "passed its gates" when a
 finding put it there.
 
+Changed in Stage 11 (Tasks 103, 104): the board's columns are the lanes of
+the shown projects' processes in the fixed order backlog, plan, ready, then
+Running, Waiting on a human, Waiting on the author, In review, Done, Failed
+and Closed, with a filter per project and a lane badge on every card. A
+backlog card has one button per starting lane the viewer may use, and drag
+and drop submits the same form, so the board works by keyboard as by mouse.
+The move adds the lane label with the human's token, and intake judges it
+(5.1). The new-task form has a lane select. The plan card shows the plan's
+table with "Accept plan" (approvers, and a stale revision answers 409),
+"Request changes" and "Reject", then stays in Done with its children and
+"Start plan (n in backlog)". A child reads `part of plan #n` and `waiting on
+#3, #5`. `/projects/new` and the status panel are in 5.1. Three acts of the
+exit test still went outside the console: two closes, since the card has no
+close button, and one comment into a running session.
+
 - **Login.** Forgejo OAuth2, the authorisation code flow with PKCE (S256), a
   confidential client and an explicit scope list: `read:user`,
   `write:repository`, `write:issue`. Forgejo enforces requested scopes, and an
@@ -1924,14 +2070,27 @@ Sandbox hardening:
   module proxy fetches any public module path on request, so an agent could
   leak data by requesting a path that encodes it. The budget, the session
   record and the absence of any secret in the sandbox bound what there is to
-  leak.
+  leak. Since Stage 11 (Task 96) the sandbox and runner images carry Node
+  24 with npm, checksum-pinned like Go, and `registry.npmjs.org` joins the
+  sandbox and CI allowlists by name, the same kind of narrow leak as the
+  module proxy. The checks install with `npm ci --ignore-scripts`. The
+  image still lacks gosec, and the sandbox cannot open a CI log, so on the
+  exit test three cards failed on gosec findings their agents could not
+  see or reproduce (backlog 85, 86).
 - Per-task namespace with a ResourceQuota and LimitRange, container limits,
   and size-capped emptyDir volumes. Since 2026-09-29 the sandbox
   container's memory limit is 4Gi and the namespace ceiling 8Gi (1cd22b8):
   three sessions of the first bug-lane round died with their unpushed work
   while a `go test` of factoryd ran beside the harness at 800 to 1370 MiB
   working set against the old 2 GiB. The kill reason itself was not
-  captured, since the pods were gone within seconds.
+  captured, since the pods were gone within seconds. The volumes are
+  `home` 1 GiB, `tmp` 1 GiB and `workspace` 4 GiB, and the Go module cache
+  lives in `home`. On the Stage 11 exit test the kubelet evicted 5 sessions
+  that crossed 1 GiB there (modernc.org/sqlite with its libc is about 600
+  MB per version, and agents compared versions), on nodes with 82 of 99 GB
+  free (backlog 82). The worker reads the SIGTERM as a stop and pushes the
+  work in progress, factoryd reads a `no_push` session, and no line in the
+  timeline says "evicted". Each eviction cost one of three sessions.
 - factoryd creates task namespaces through a narrow ClusterRole, and a
   ValidatingAdmissionPolicy confines it to `factory-agents-*` namespaces with
   the restricted Pod Security label, gVisor pods without an automounted API
@@ -2041,7 +2200,16 @@ As built (Stage 6), with the defaults that tuning starts from:
   the task row, so a restart or a new session cannot fire it again.
 - The **wall-clock cap** (20 minutes of agent time by default) ends the
   session without a call, because the supervisor could only ask to continue,
-  which would raise the cap.
+  which would raise the cap. On the Stage 11 exit test it failed 11 of 28
+  tasks, all on the cheap tier (Qwen 3.8 Flash alone since Ruling 204): of
+  58 sessions 18 pushed, 23 ended in a supervisor redirect and 7 at the
+  cap. The agents probed toolchains, read library sources, re-verified
+  finished work and tried to install CI's tools. The redirects were right
+  almost every time, but each cost a session. Three tasks (#11, #19, #35)
+  had their work done and pushed when the cap came, and the task failed
+  anyway: `Finish` deletes the branch of every task that ends, and the
+  sandbox cannot reach Forgejo to resume from a closed pull request's ref
+  (backlog 80, 88).
 
 The supervisor runs inside the session activity, because `continue` needs the
 live session (Ruling 87). It must answer strict JSON with one of the four
@@ -2128,6 +2296,11 @@ cap they duplicate `no_write` and the cap, so they were dropped. Proven
 live with a 60-second threshold: `no_write` tripped twice during five
 `sleep 20` tool calls, and the supervisor answered `continue` both times
 with the diagnosis "False alarm", which the alerts table records as noise.
+A command event arrives when the command ends, so a long command's running
+time counts as time without a write: a cold `go test` compile of factoryd
+in the sandbox takes over two minutes, and it tripped `no_write` on the
+Stage 11 gate's lane task, whose redirect ended the session and its build
+cache with it (backlog 77).
 
 **The gate supervisor** (Rulings 141, 154, 162, 163, built in Task 67, live
 since roll e3f7c16). The session supervisor watches an agent. The gate
@@ -2300,7 +2473,8 @@ the head, and the non-reproducible path, all built in Task 66 and
 rolled 2026-09-28 in ba2d80a (Rulings 149, 150, 167, 168, 169).
 
 **Stages and findings** (Rulings 177, 190, Task 74). Since Stage 9 the
-workflow is an ordered list of stages in `workflow.yaml` (5.3): screening,
+workflow is an ordered list of stages, since Stage 11 the `stages` block of
+the task's process file (5.3), no longer `workflow.yaml`: screening,
 checks, policy, migration, reproduction, review, since Stage 10 audit,
 approval and merge. Each
 stage has one `on_findings` setting: `agent` sends the findings back to the
@@ -2314,9 +2488,10 @@ finding so far. A stage may carry `max_returns`, which caps its own returns
 before the card; the default sets none, so with three sessions a review can
 return twice. A stage may be switched off, or limited to outside accounts
 with `when: outsider`, except checks, policy, approval and merge. The loader
-refuses a workflow without policy, approval and merge, with merge not last,
-approval not right before it, screening not first or migration before
-policy. So a review's `concerns` goes back to the agent first on every merge
+refuses a workflow without checks, policy, approval and merge, with merge
+not last, approval not right before it, screening not first or migration
+before policy, and since Stage 11 checks whose findings go to a human
+(floor rule F11). So a review's `concerns` goes back to the agent first on every merge
 rule, and the next review reads the earlier findings and says which of them
 the new head addressed. After a restart, `Reconcile` rebuilds the return
 counts, the findings and the earlier reviews from the timeline. Change id
@@ -2337,7 +2512,14 @@ came up live: the lane's first filing of the fix held the whole change in
 its first session, its image build failed twice on one head, and the next
 sessions circled until the controller pushed that empty commit by hand and
 the checks went green. A build VM whose `buildkitd` never answers is
-replaced once (backlog 65, proven live at 22:18Z on 2026-09-29).
+replaced once (backlog 65, proven live at 22:18Z on 2026-09-29). The same
+blindness costs the agent: its finding reads "Failing after 1m14s" with a
+link the sandbox cannot open. On the Stage 11 exit test one agent judged a
+red gosec job flaky and pushed nothing, and three cards failed on gosec
+findings only CI could run, until the human read the log and answered
+with the fix (backlog 85: the failing step's last lines in the finding,
+backlog 86: the checks' tools in the sandbox, or the brief naming which
+checks run in CI only).
 
 **Screening** (Rulings 182, 191, Task 74). Before the first session of a
 fresh task filed by an outside account, an `analyzer` task in report mode
@@ -2502,6 +2684,50 @@ history, and the human path stays open. A merge finishes the task `done` at
 once, without waiting for the `pr_merged` webhook. A human who merges in
 Forgejo is credited as the merger. The activity merges only into `main`.
 
+**Only a green head merges** (Task 95). Since Stage 11 `Merge`, the one
+activity every merge passes, approval, `auto` or roll, reads the gated
+head's combined commit status and refuses anything but success or warning
+with its own result kind `merge_red_head`, never read as a conflict: the
+card says the checks are red, the approval stays, and a change request
+sends the agent back. Before it, a task at its session cap reached the
+card with red checks and a human's approval merged them, since `main`'s
+protection holds no status check. The required contexts differ per
+project, so the guard is factoryd's, not Forgejo's.
+
+**Dependencies between cards** (Rulings 205, 208, Task 100). A process
+with a plan lane carries `dependencies: {wait_until: done, on_failed:
+human}`, the one value of each in the first version. The workflow's first
+step after `Reconcile` (change id `dep-wait`) reads the task's rows in
+`task_deps`. With none open it goes on. With any open the task waits in
+`waiting-deps` and the card reads "waiting on #3, #5", until `Finish` of a
+dependency or the heal pass signals `dep_ended`. A dependency that ended
+failed or closed opens a human card, where an answer starts the card anyway
+and a close ends it. The wait costs nothing. On the exit test the rule held
+as designed and showed its gap: when the foundation failed, all nine
+dependents came to the human at once, and an answer starts a card
+regardless of its other dependencies, so the human answered each in the
+plan's order by hand (Ruling 211), and a refiled card is no plan child and
+lost the plan's spec section (backlog 81).
+
+**The merge queue** (Rulings 205, 208, Task 102). With `merge: {queue:
+project}` a task at the approval stage enters its project's queue, a row in
+`merge_queue` by entry time (change id `merge-queue`), and holds its turn
+through the approval wait and the merge: syncing before the approval keeps
+`dismiss_stale_approvals` from asking the human twice. At the head,
+`SyncWithMain` merges `main` into the pull request through Forgejo's
+update endpoint as the bot when `main` has moved, and the checks run again
+on the new head, recorded as factoryd's own move. A 409 is a conflict and
+goes back to the agent on backlog 70's path, red checks after a sync go
+back with the prefix "after main was merged in:", and either way the task
+leaves the queue. `LeaveQueue` runs on every exit and in `Finish`, and the
+heal pass signals every queue's head once a minute. Review and audit are
+not run again, since the agent's diff is unchanged. On the exit test 15
+pull requests merged through the queue and no two turns overlapped. Six
+were synced and re-checked: two web cards editing the same routes file
+merged cleanly after a sync, and one sync's re-run caught an image that
+did not build, from base-image digests the model had invented. The design expected at least half to sync, but in a mostly
+serial run `main` seldom moved. The code repository stays on `queue: none`.
+
 **The `auto` outcome** (Rulings 149, 167, 169, built in Task 66, rolled
 2026-09-28 and proven by the exit test's merge of PR #6). A project on merge rule `auto` merges without a card when all of
 these hold:
@@ -2578,8 +2804,17 @@ Workflow changes since Stage 6 sit behind Temporal `GetVersion` change ids
 (`gates`, `answers`, `gates-pinned`, `merge-failure-reported`,
 `merge-retry-cap`, `gate-started`, `gate-supervisor`, with Task 66
 `auto-merge` and `needs-info`, in Stage 9 `stages`, `roll` and
-`session-cap`, and in Stage 10 `audit`, `review-verdict`, `checks-rerun`,
-`poster-cap` and `merge-conflict`), so a run started before a change keeps its old path. A
+`session-cap`, in Stage 10 `audit`, `review-verdict`, `checks-rerun`,
+`poster-cap` and `merge-conflict`, and in Stage 11 `processes`, `dep-wait`,
+`plan` and `merge-queue`), so a run started before a change keeps its old path.
+Since Stage 11 (Task 96, after two parallel fixes of Stage 10 both took `v21`) a new
+change id is a name in a named field, never `vNN`, and a new migration is
+named `<UTC yyyymmddhhmmss>_<slug>.sql`, so parallel branches cannot take
+the same one: `TestChangeIDsUnique` and `TestMigrationNames` refuse a
+repeat or an old-style name, and `TestKindChecksAccept` inserts every alert
+and approval kind after all migrations, since two migrations that each
+rewrite one check list keep only the last. The work guide and the
+template's checks carry the naming rule into every project. A
 replay test runs every recorded live history in the code repository's
 testdata. Live: PR #100 merged by `factory-merge` after the human's approval
 and a 405 before it, and PR #126 went through every gate, the review, the
@@ -3012,15 +3247,17 @@ since Stage 6, but neither has run under load.
 | Instrumentation | OTel traces, metrics and logs from factoryd, the gateway and the worker. Audit rows as scrubbed log records, Postgres authoritative. One redact package. CI, build VM and roll metrics. Bounds in policy | Built (Rulings 140, 158) |
 | UI style | Server-rendered Go with htmx | Decided |
 | Policy engine | Go code now, OPA sidecar when rules multiply | Decided |
-| Policy source | The tree `factory/` in the infra repository (policy, projects, workflow), read by factoryd, the commit as the version, pinned per task, a generated JSON Schema and a CI check, the console read-only. Runtime decisions are Postgres rows. Kubernetes is the substrate only | Built (Rulings 107, 183, 184) |
-| Workflow | An ordered list of stages, each with one `on_findings` setting (agent, human or fail); a repeat from one stage takes the stronger rung; the session cap is the round cap for every exhaustion; a review without a verdict is a finding on the card; a red head the agent left unchanged re-runs its checks once | Built (Rulings 177, 190, 193, 201) |
+| Policy source | The tree `factory/` in the infra repository (policy, projects, processes, templates), read by factoryd, the commit as the version, pinned per task, a generated JSON Schema and a CI check, the console read-only. Runtime decisions are Postgres rows. Kubernetes is the substrate only | Built (Rulings 107, 183, 184) |
+| Workflow | An ordered list of stages, each with one `on_findings` setting (agent, human or fail); a repeat from one stage takes the stronger rung; the session cap is the round cap for every exhaustion; a review without a verdict is a finding on the card; a red head the agent left unchanged re-runs its checks once. Since Stage 11 only a green head merges | Built (Rulings 177, 190, 193, 201) |
+| Processes | No fixed process: lanes, dependencies, stages and the merge queue as YAML blocks in a process file a project names. A mechanical check (schema, names, needs, graph, floor rules) shared by the loader and `config check`, and `config explain`. Two shipped processes, `maintenance` and `spec`. The later blocks are roadmap 27a | Built (Rulings 206, 208) |
+| Building from a spec | A plan lane whose planner answers a plan, which approvers accept and factoryd turns into cards with their dependencies. Start plan, cards that wait on their dependencies, a merge queue per project, and a new project from the console seeded from a template | Built (Rulings 205, 209, 210) |
 | Security audit | A stage after the review, per project, a secret pre-check on the added lines and one call on the class's `audit_model` with a six-item checklist; findings, a missing verdict included, to the card only | Built (Rulings 188, 200) |
 | Message-in | A `Message` call in the adapter contract; opencode as a server in the pod, one port only factoryd reaches, a per-session bearer; the restart as the fallback for a harness without it. First user: the loop nudge, counted from the event stream | Built (Rulings 188, 202) |
 | Untrusted text | One sanitiser into the brief and out to Forgejo: hidden comments stripped, mentions and closing keywords neutralised, off-list links defanged; agent commits squashed under a sanitised subject | Built (Task 89) |
 | Answer chain for questions | `questions: [self, model:<tier>, human]` per stage (queue item B), on top of the message call | Not built, waits for Sebastian's scoping |
 | Rolls | The code repository rolls through a roll task: a digest pull request from factoryd, a card, the bot's merge, a row per image. Infra changes stay human commits | Built (Ruling 178) |
 | Model routing | Three LiteLLM tiers, membership by quality, latency order inside a tier, no fallback across tiers, the answering deployment in the audit row; one provider, Alibaba, one deployment per tier, retries without cooldown | Built (Rulings 181, 189, 192, 204) |
-| Capability classes | `coder`, and `analyzer` with a report session mode for the improvement presort and the screening stage. The release is the roll task, no class | Built (Rulings 182, 185, 191) |
+| Capability classes | `coder`, `analyzer` with a report session mode for the improvement presort and the screening stage, and `planner` with a plan session mode. The release is the roll task, no class | Built (Rulings 182, 185, 191, 208) |
 | Task analytics | Four task metrics, a revert mark and four panels, no report task | Built (Ruling 185) |
 | SPIRE and OPA | No need appeared in Stage 9 | Deferred |
 | Policy expressiveness | When the YAML outgrows plain Go: Cedar through cedar-go (no validator, no formal semantics in the Go port) or the OPA sidecar. Two ideas from Keycard worth taking either way: a soft rule that turns a deny into an approval card, and an observe-only replay of a new policy version against recent audit rows before it goes live (docs/market-research) | Revisit later |
@@ -3058,7 +3295,7 @@ since Stage 6, but neither has run under load.
 | Collector safety | A pass that sees a cluster node's IPv4 or another project's label deletes nothing | Decided (Ruling 123) |
 | Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Built (Rulings 81, 84) |
 | Merge authority | The `factory-merge` bot merges after a whitelisted human's approval, enforced by Forgejo's branch protection. Merge retries are capped at six. A project on `auto` merges class `normal` without a card after a proven reproduction or a strict improvement and an approving review; the factory's repositories stay on `human` | Built (Rulings 109, 129). `auto` built (Rulings 149, 167, 169) |
-| Intake lanes | Every bug from any account or alert starts a task. Improvements wait as suggestions for a writer, with an analyzer's write-up. Outsiders' bug reports pass a screening stage. Outsiders' writer-only labels are stripped. The poster's text is untrusted information between random markers | Built (Rulings 148, 150, 182, 185) |
+| Intake lanes | Lanes backlog, plan and ready from the project's process, `moved_by` judging every entry. Every bug from any account or alert starts a task. Improvements wait in the backlog for a writer, with an analyzer's write-up. Outsiders' bug reports pass a screening stage. Outsiders' writer-only labels are stripped. The poster's text is untrusted information between random markers | Built (Rulings 148, 150, 182, 185) |
 | Projects | Each project its own Forgejo organisation with a CI user, runner registration, deploy key and deploy branch. Flux tenancy through a namespaced account. A default-deny network policy with the file's outside hosts only and a quota per environment. Stricter wins: a project file only tightens the policy's defaults. Reconciled hourly. Settings from the project's file, `objects: factory \| seed` and `agents: coder \| none`, so the factory's two repositories are projects like any. Hostnames are an infra commit | Built (Rulings 146, 155, 156, 157, 164, 165, 166, 179) |
 | Resource kinds | `task` (leased, agent-requested) and `standing` (no lease, registration or a human) in one envelope | Built (Ruling 147) |
 | Hand steps | OpenBao configuration, push mirrors and the console's OAuth app as converging CronJobs. The unseal and a one-time OpenBao bootstrap stay by hand | Built (Ruling 143) |
@@ -3099,9 +3336,13 @@ works `factory` and `demo-app`.
    Forgejo dump, the security audit stage, the review-verdict rule,
    message-in and the loop nudge, the hardened harness configuration,
    hidden tools, stricter wins, protected files, the sanitiser, one model
-   provider and a month cap, and a bug lane the factory ran on itself. What follows waits for Sebastian's
-   scoping: the UX phase, the second harness and parallelism are the
-   known candidates.
+   provider and a month cap, and a bug lane the factory ran on itself.
+7. Building from a spec (Stage 11, closed 2026-09-30): processes composed
+   from YAML blocks, lanes, the planner and the plan card, dependencies
+   between cards, a merge queue per project, a new project from the
+   console seeded from a template, and collision-free names for migrations
+   and change ids. What follows is in the roadmap: first the exit test's
+   follow-ups, then the UX phase and a second harness.
 
 ## 12. Glossary
 
@@ -3147,9 +3388,15 @@ works `factory` and `demo-app`.
 | Gate supervisor | The supervisor model called when one of the six long gates passes its bound. It chooses wait, retry, cancel or escalate |
 | Alert verdict | Whether an alert was a real problem or noise, set by the supervisor's action, a human's click or the task's outcome |
 | Poster information | An issue author's answer to an information request, carried in the brief as untrusted information, never as authority |
-| Configuration tree | The directory `factory/` in the infra repository: `policy.yaml`, `projects/<name>.yaml` and `workflow.yaml`, read by factoryd, with the commit as the version |
+| Configuration tree | The directory `factory/` in the infra repository: `policy.yaml`, `projects/<name>.yaml`, `processes/<name>.yaml` and `templates/<name>/`, read by factoryd, with the commit as the version |
 | Pin | The configuration version a task started under; its caps and bounds come from it |
-| Stage | One step of the workflow in `workflow.yaml`, from screening to merge, with one `on_findings` setting |
+| Stage | One step of the `stages` block of a process file, from screening to merge, with one `on_findings` setting |
+| Process | A file `processes/<name>.yaml` of four blocks, lanes, dependencies, stages and merge, that a project names. The loader and `config check` refuse one that cannot work |
+| Lane | Where a card waits or starts: `backlog` does not start, `ready` starts a coder, `plan` starts a planner. `moved_by` says who may put a card there |
+| Planner | The capability class whose plan session answers a plan of cards from a spec, never code |
+| Plan card | The approval card of kind `plan` where approvers accept a plan revision, after which factoryd files one card per planned card |
+| Merge queue | A project's order of pull requests at the approval stage: one at a time, each synced with `main` and re-checked when `main` moved |
+| Template | A directory `templates/<name>/` of files that registration renders into a new project's first commit |
 | on_findings | A stage's setting for what its findings do: `agent` (back to the next session), `human` (the card) or `fail` |
 | Round cap | The session cap as the bound on returns: a task at its cap goes to the card with every finding |
 | Seed project | A project whose repository objects come from the infra repository and the seed, not from registration (`objects: seed`) |

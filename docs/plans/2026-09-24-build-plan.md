@@ -3304,8 +3304,8 @@ Every other future topic is in [the roadmap](../roadmap.md).
 
 ### Stage 11: building software from a spec
 
-Settled 2026-09-30 after the Stage 10 close (rulings 205 to 207), outline in
-[the roadmap](../roadmap.md), "Next". The factory so far fixes and improves
+Settled 2026-09-30 after the Stage 10 close (rulings 205 to 208). The
+factory so far fixes and improves
 existing code; this stage makes it build a new application from a written
 spec, with several agents in parallel. Sebastian's principle (ruling 206):
 no fixed development process, only primitives, each a plain YAML block with
@@ -3329,3 +3329,71 @@ of about ten cards, at least four agents work in parallel, the merge queue
 lands them, the integration card passes and the app deploys to staging,
 with no controller code in the new repository and a human clicking cards
 only.
+
+Closed 2026-09-30. The rebuild that opened the stage was the first clean
+recovery: CNPG recovered generation v9 into v10 with every WAL to the
+close in 2.3 minutes, Forgejo came back from its dump with every repository
+and pull request ref, OpenBao from its snapshot, and nothing was set by
+hand but one empty commit to start main CI. The step-zero gate passed at
+09:04Z. Its lane task merged at 10:35Z as the fourth filing (#325, the
+SigNoz alert text through the sanitiser, roadmap 48 in part) after the
+controller's own drafts had failed #321 and #324: closing keywords, an HTML
+comment and a zero-width space in the test fixtures, which the inbound
+sanitiser neutralised before the agent read them. Landed and rolled in
+four rolls (517e29f, f6016eb, 2a4bbb0, 5e6119e) and the infra pin 0213ad7,
+Tasks 93 to 104. Task 93 was the design (stage11-design.md, after two
+review rounds). Task 94 made processes YAML blocks in infra's
+`factory/processes/`, with `factoryd config check` and its 61 refusal
+subtests (schema, names, needs in order, the graph and the floor rules F1
+to F11) and `factoryd config explain`. Task 95 made the engine read each
+task's process from its pinned version (change id `processes`), deleted
+`workflow.yaml` in one infra commit that the old factoryd refused and the
+new one loaded, and made `Merge` refuse a head without green checks
+(`merge_red_head`). Task 96 named migrations by UTC timestamp and change
+ids by name, each held by a test, and put Node 24 with npm into the
+sandbox and runner images. Task 97 built the lanes backlog, plan and
+ready, with `moved_by` judging every entry. Task 98 recorded the five
+events, refused a head that removes a lane still holding open cards, and
+added the labels `process` and `lane` to the task metrics. Task 99 put
+templates into `factory/templates/` and made registration seed the empty
+repository, proven live on a scratch project. Task 100 made cards wait on
+their dependencies (`waiting-deps`), with a human card on a failed one.
+Task 101 built the planner class, plan revisions, the approval kind `plan`
+and `CreateChildren`. Task 102 built the merge queue per project with
+`SyncWithMain`. Task 103 gave the console lane columns, moves, the plan
+card and Start plan, and Task 104 the new-project button and its status
+panel. Exit test run on 2026-09-30 (Task 105, ruling 210), passed at
+18:16Z, 6 h 12 min into the 7-hour window. The button's infra pull request
+merged from the panel, and registration seeded `linkshort` from template
+`ts-go`. The planner answered 9 cards, took one change request and
+answered 10, which the human accepted, and factoryd filed them with 25
+dependency rows. One Start plan click started the foundation, and the rest
+waited on it. The peak was 4 sessions at once at 13:08:52Z, held 10.8
+minutes. 14 merges went through the queue by the step's count, 15 by the
+end, and no two turns overlapped. 6 were synced with main, below the
+design's half, since main seldom moved in a mostly serial run. A1 to A9
+pass under `-race` on main, the staging smoke passed (health, the app
+page, sign-up, log-in, a link, its redirect and its clicks), and main holds
+commits by `factory-projects`, `factory-agent` and `factory-merge` only,
+none by the controller. The cost was far above the design's. 12 of 28
+tasks failed, 11 at the 20-minute wall-clock cap, and the controller filed
+17 refile, split or fix cards as the human (ruling 211), answered 20 cards
+and made 3 acts outside the console. The causes, by cost: the cheap tier
+looped on probes, library sources and tool installs within 20 minutes (58
+sessions: 18 pushed, 23 supervisor redirects), finished work was discarded
+at the cap (backlog 80, 88), the kubelet evicted 5 sessions at the `home`
+emptyDir's 1 GiB (backlog 82), gosec and `-race` run only in CI and the
+finding carries no log (backlog 85, 86), and the template seeded no deploy
+skeleton for Pod Security `restricted` and the registry pull secret, so
+staging ran no pod while its CI job read green, until two fix cards
+(backlog 89). Spend: linkshort EUR 5.99, the day EUR 7.33, the month EUR
+24.33. Standing contracts from this stage, in the ledger as rulings 209 to
+211. Infra `main` needs 0 approvals, so a console-authored pull request can
+merge, and sebastian stays its only pusher and merger. The exit test ran
+as designed, with its named fallbacks. A plan card that fails at a cap is
+refiled by the human in cards that fit one session, and its dependents are
+answered in the plan's order. The round's findings are backlog 77 to 89,
+now in [the roadmap](../roadmap.md).
+
+After Stage 11: [the roadmap](../roadmap.md), "Next", holds the follow-ups
+of the exit test. Every other future topic is there too.
