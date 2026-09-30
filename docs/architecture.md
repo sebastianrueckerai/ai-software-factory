@@ -22,7 +22,9 @@ ledger and are cited here by number.
 Decided so far:
 
 - Approach A: custom Go control plane, opencode as the first worker harness
-  behind the adapter contract (6.2), Codex CLI as the named successor.
+  behind the adapter contract (6.2), which lets several harnesses run side
+  by side. pi and goose are the next to try, and the choice is per task
+  class and by measurement.
 - Talos Linux as the node operating system on three Hetzner Cloud machines.
 - Go for all custom services.
 - Forgejo plus Forgejo Actions for version control, issue tracking and CI.
@@ -1693,18 +1695,23 @@ One task, one namespace, one ServiceAccount `task-<id>`, one pod.
 
 ### 6.1 Choosing the harness
 
-Decision (surveyed 2026-09-24): opencode is the first harness, Codex CLI the
-named successor. The reasoning is written down so the next re-evaluation
-argues with evidence, not memory.
+Decision (surveyed 2026-09-24): opencode is the first harness. The goal is
+not a successor to it: the adapter contract lets several harnesses run side
+by side, chosen per task class and ranked by measurement like model tiers.
+pi and goose are the next to try. The re-survey of 2026-09-29 found that pi
+now passes (built-in MCP), goose passes (stream-json output), and Codex CLI
+fails requirement 2 since 2026-02 (Responses API only). The table below is
+the survey of 2026-09-24. The reasoning is written down so the next
+re-evaluation argues with evidence, not memory.
 
 The survey scored the live field against the four requirements in 6.2:
 
 | Candidate | Verdict | Why |
 |---|---|---|
 | opencode | Pick | The only candidate passing all four with a first-class programmatic surface: `run --format json` for one-shot jobs, `serve` with a REST API and SSE event bus for long-lived runs, whole config injectable via the `OPENCODE_CONFIG_CONTENT` env var. MIT, official image, largest community, so DeepSeek, Qwen and GLM quirks get fixed fastest here |
-| Codex CLI | Successor | Passes all four: `exec --json` JSONL plus an app-server JSON-RPC mode for long-lived driving. Apache-2.0. Risk: it is deprecating the chat wire API in favour of the Responses API, which our proxy would have to speak |
-| goose | Fallback | Apache-2.0 and the best governance in the field, a Linux Foundation project. No machine-readable event stream yet, only a structured final result |
-| pi | Out | The author rejects MCP by design. Requirement 3 fails |
+| Codex CLI | Candidate | Passed all four: `exec --json` JSONL plus an app-server JSON-RPC mode for long-lived driving. Apache-2.0. Risk: it is deprecating the chat wire API in favour of the Responses API, which our proxy would have to speak |
+| goose | Candidate, to try | Apache-2.0 and the best governance in the field, a Linux Foundation project. Re-surveyed 2026-09-29: it now streams events (`--output-format stream-json`) and runs unattended by default (`GOOSE_MODE=auto`, `GOOSE_MAX_TURNS`), so it passes |
+| pi | Candidate, to try next | Re-surveyed 2026-09-29: MCP is built in since about 0.8x (stdio and streamable HTTP), so requirement 3 passes; `--mode rpc` over stdio takes prompts and steering messages into a running session |
 | Hermes | Out | A self-improving assistant shaped for chat platforms: heavy, no clean one-shot mode. Wrong tool, not a bad one |
 | OpenClaw | Out | A persistent personal-agent gateway for messaging channels, not a disposable coding worker |
 | Gemini CLI | Out | Requirement 2 fails: it speaks Google's own protocol, not OpenAI-compatible endpoints |
@@ -1714,8 +1721,8 @@ The survey scored the live field against the four requirements in 6.2:
 The weak spot is unchanged from before the survey: one company governs
 opencode, it moved the repository once already (SST to Anomaly) and it is
 layering paid services on top. MIT licence, per-provider BYO keys and the
-adapter contract keep the exit real: the day any gating starts, the Codex
-adapter lands and nothing else changes.
+adapter contract keep the exit real: the day any gating starts, another
+harness's adapter takes the load and nothing else changes.
 
 DeepSeek's own harness (dsh) sits on the watchlist: MIT, plugin architecture,
 any OpenAI-compatible endpoint, but a weeks-old developer preview. Re-evaluate
@@ -3032,7 +3039,7 @@ since Stage 6, but neither has run under load.
 | Hard caps | A hold for each call's worst case under an advisory lock, the output clamped to the headroom, the real cost booked in full, a cut call books its hold until the settle window ends; caps per task, day and UTC month, the month over all projects, with LiteLLM's proxy budget behind it | Decided (Rulings 113, 115, 117, 196, 204) |
 | Human identity | Forgejo OAuth2 now, Keycloak only if SSO story demands | Decided |
 | Sandbox runtime | gVisor on cloud VMs now; microVMs (Kata or Firecracker) on bare-metal KVM nodes when build volume pays for them, for CI jobs and agent sandboxes alike (7.2) | Decided |
-| Worker harness | opencode first, Codex CLI successor, goose fallback, behind the adapter contract | Decided |
+| Worker harness | opencode first. The adapter contract lets several harnesses run side by side, pi and goose are the next to try, the choice is per task class and by measurement | Decided |
 | Node hardware | 3x Hetzner Cloud cpx42 (8 vCPU x86, 16 GB, 320 GB disk), about 69 EUR per month each | Decided |
 | Management access | Talos nftables firewall allowlisting your home IP, headscale VPN later | Decided |
 | Repository layout | `ai-software-factory-infra` and `ai-software-factory-code` now, `demo-app` in Phase 3 | Decided |
