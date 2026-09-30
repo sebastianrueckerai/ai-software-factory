@@ -3299,9 +3299,8 @@ section K, revisit-later items in architecture 10): fourteen items on
 configurable pipelines, verification, signals and the gateway, now in [the
 roadmap](../roadmap.md).
 
-After Stage 10, nothing is settled beyond Sebastian's scoping. The next
-stage starts with the rebuild and the step-zero gate. The known candidates
-and every other future topic are in [the roadmap](../roadmap.md).
+After Stage 10: Stage 11 below, settled with Sebastian after the close.
+Every other future topic is in [the roadmap](../roadmap.md).
 
 ### Stage 11: building software from a spec
 
