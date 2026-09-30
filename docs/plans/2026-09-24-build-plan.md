@@ -3119,97 +3119,20 @@ security audit stage whose findings always go to a human.
 
 Also after Stage 9, at Sebastian's wish (2026-09-29), from the harness
 discussion (research-harnesses.md and stage10-queue.md in the ledger
-folder hold the evidence and the detail):
-
-1. Tighten opencode's headless config: remove the `question` tool (a
-   denied tool ends the turn, so removal, not deny), cap `steps` from
-   `limits`, leave `doom_loop` on allow (a denied doom loop stops the
-   session unseen by the model), set
-   `experimental.continue_loop_on_deny`, keep the fixture-based parser.
-   The only ask path is the gateway's `request_info` and
-   `escalate_to_human`.
-2. A configurable answer chain for questions per workflow stage, like
-   `on_findings`: `questions: [self, model:<tier>, human]`, later
-   `agent:<class>`. `self` is a prompt guideline in the tool description
-   and the brief, not an injected answer. Metrics: questions per task and
-   the share answered at each step.
-3. Loop detection in factoryd, which sees every tool call: on three
-   identical calls, a nudge into the running session (needs the message
-   call of ruling 188), never a stop.
-4. The second harness, pi, behind the adapter contract: `--mode rpc` over
-   stdio, the worker owns the pipe and exposes the one port factoryd may
-   reach, `models.json` at the identity proxy, `mcp.json` with the
-   gateway's server, the JSONL event mapping, a second sandbox image.
-   `harness` becomes a column of the audit row and a label of the task
-   metrics, ranked by measurement like model tiers (ruling 181).
-5. Architecture 6.1 re-surveyed as of 2026-09-29: pi passes (built-in
-   MCP), goose passes (stream-json, Linux Foundation) and becomes the
-   named successor, Codex CLI fails requirement 2 since 2026-02 (Responses
-   API only), Kilo CLI (opencode fork) is the zero-cost fallback, dsh and
-   Trae Agent on the watchlist.
-6. Parallelism: in the agent for small, homogeneous, read-mostly fan-out
-   and one-message chains, bounded by the pod's identity and budget; in
-   the factory for anything with an artifact, class, credential, budget
-   or review of its own. Personas are classes and stages. The policy says
-   which subagents a class may spawn, and the brief carries it to the
-   harness (opencode `permission.task`, pi's subagent extension).
-7. Housekeeping: the GitHub push block is off, the global git email is
-   the noreply address, the code and infra mirrors must show
-   `github/main` equal to Forgejo main at the next step-zero gate.
+folder hold the evidence and the detail): seven items. Stage 10 built the
+headless config, the loop nudge and the housekeeping, and the rest are in
+[the roadmap](../roadmap.md).
 
 A UX phase after Stage 9, at Sebastian's wish (2026-09-29), from the
-market research (docs/market-research/SYNTHESIS.md sections 6 and 8, and
-stage10-queue.md section H in the ledger folder). The kanban board stays
-the one interface: every new view opens from a card, no second way to do
-the same thing.
-
-1. A live task page behind every card: the agent's events streamed over
-   htmx SSE from one normalised `Event` type (Vibe Kanban's
-   NormalizedEntry, Linear's AgentActivity), the diff, the CI checks and
-   the gate durations in one view. The card itself shows a status badge
-   fed by the same events and, when it waits on a human, the reason.
-2. Inline diff comments that go back to the agent: comments on any lines
-   of any file, batched into one follow-up message (cline/kanban, Vibe
-   Kanban). Needs the message call of ruling 188.
-3. Progress where the requester already is: one comment on the Forgejo
-   issue, edited in place (Symphony's workpad, Cyrus), and push
-   notifications for done, question and approval only.
-4. "I am going in": a button on a card opens VS Code in the browser on
-   the task's workspace at any state. The agent pauses in the
-   waiting-on-human state, the human inspects, edits or guides, and a
-   resume signal hands back. On a running task, a code-server sidecar in
-   the task pod behind the console's login. On a finished task, a fresh
-   workspace pod from the task branch. The human's session never holds the
-   task's identity, and their commits carry their own name.
-5. Before designing: read cline/kanban, Vibe Kanban, Automaker, Nimbalyst,
-   Linear's agent sessions, GitHub Agent HQ and Factory Mission Control
-   for the board patterns (stage10-queue.md H lists the seventeen found so
-   far).
+market research: the kanban board stays the one interface, every new view
+opens from a card. Its items (the live task page, inline diff comments back
+to the agent, progress on the issue, "I am going in", the board patterns)
+are in [the roadmap](../roadmap.md).
 
 Also after Stage 9, from the market research's worker, credential and
 policy items Sebastian accepted (2026-09-29, detail in stage10-queue.md
-section I):
-
-1. A setup snapshot per project and base commit (a cached image or PVC),
-   after measuring the task pod's start and setup time.
-2. No credential in the pod: the two per-session Forgejo tokens give way
-   to an on-demand credential helper or injection at egress.
-3. Credentials minted inside each Temporal activity, never in workflow
-   history, with a test that scans history for tokens.
-4. Composite attribution: task identity plus the human behind the task on
-   every audit row and agent commit.
-5. A denied tool is hidden from the agent's tool list and still denied if
-   called.
-6. Questions without a human are recoverable: rules so agents do not ask,
-   a denied question reaches the model as an error, factoryd runs the
-   answer chain (other agents included) and wakes the session.
-7. Stricter wins: deny beats allow at every level, and a project overlay
-   cannot loosen a cluster-wide cap.
-8. Protected files: manifests and lockfiles of every ecosystem, agent
-   instruction files, `CODEOWNERS` and top-level dot directories join the
-   `high` risk class.
-9. Sanitise untrusted text into the brief and agent-written text out to
-   Forgejo: hidden comments, mentions, closing keywords, off-list URLs.
+section I): nine items. Stage 10 built five of them (Task 89), and the
+rest are in [the roadmap](../roadmap.md).
 
 ### Stage 10: hardening
 
@@ -3365,69 +3288,17 @@ the Forgejo admin password, which reached two local transcripts; the
 handover `handover-stage11.md` lists them.
 
 A second round of accepted items (2026-09-29, detail in stage10-queue.md
-section J; revisit-later items and rejections in architecture 10):
-
-1. "CPU and memory limits set" joins the admission policy on task pods.
-2. A resolved-address guard in the gateway's outbound connections.
-3. An egress probe as the worker's first step: canary, metadata, a direct
-   IP, a blocked name answered REFUSED, the UID. Any failure fails the
-   session and alerts.
-4. Side-effect MCP tools on the gateway, live: follow-up issue, comment,
-   label, each capped, sanitised and audited.
-5. An optional scan of untrusted input for injection attempts, per project
-   and input kind, on top of the screening stage. Agents keep the exact
-   input.
-6. Budget steering: a warning to the agent near its budget, session or
-   wall-clock cap.
-7. Stop reasons as board states.
-8. Budgets per task, day and project, with a project cap on model spend.
-9. Blocker-aware dispatch through Forgejo issue dependencies.
-10. Blocked with a next action: a typed reason through `request_info`
-    picks who acts next.
-11. A spend-rail catalogue: every limit with what it stops, what 0 means
-    and the text the card and the agent see.
-12. Gate results and human decisions as separate records, so "gates
-    passed, human rejected" can be counted.
-13. Typed reasons for session-start failures, the permanent ones
-    non-retryable.
+section J, revisit-later items and rejections in architecture 10):
+thirteen worker, budget and dispatch items, now in [the
+roadmap](../roadmap.md).
 
 The UX phase also gets a stop button on the card that closes the issue.
 
 A third round of accepted items (2026-09-29, detail in stage10-queue.md
-section K; revisit-later items in architecture 10):
+section K, revisit-later items in architecture 10): fourteen items on
+configurable pipelines, verification, signals and the gateway, now in [the
+roadmap](../roadmap.md).
 
-1. Configurable pipelines: the workflow as an authorable graph of stages,
-   classes and gates per project, with optional preconfigured stages
-   (spec phase, plan critic, plan approval, two-pass review). Likely its
-   own phase.
-2. An anti-cheat rule and check in every fix loop.
-3. Mutation testing as a canned routine for every project, the
-   factory's own included, on demand or scheduled: the test suite and the
-   gate pipeline.
-4. The workflow-directory guard tested against case variants and
-   symlinks.
-5. An evidence receipt per merged task.
-6. Flaky-aware CI retries, three per head SHA.
-7. Standing scheduled tasks as files, skipped when nothing changed.
-8. Repeat alerts: the first occurrence starts work, one task per
-   fingerprint, repeats only count, a "not fixable automatically" verdict
-   holds until the rate jumps, a return after a merged fix is a new
-   linked task.
-9. LiteLLM's OpenTelemetry callback and credential health checks.
-10. Signed images, verified before the roll and at deploy.
-11. A conformance suite for harness adapters.
-12. The intervention rate as a metric.
-13. A readiness check at project onboarding.
-14. Approval scopes in the UX phase.
-
-After Stage 10, nothing is settled beyond Sebastian's scoping, which he
-does in parallel from docs/market-research/SYNTHESIS.md; the next stage
-starts with the rebuild and the step-zero gate and then takes what he has
-added. The known candidates, none decided here: the UX phase (items 1 to 5
-of "A UX phase after Stage 9", with the stop button and the approval
-scopes); the harness queue D to F of stage10-queue.md (the second harness
-pi, the architecture 6.1 survey re-dated, parallelism in the agent and in
-the factory); the larger market-research items I27 (a setup snapshot per
-project and base commit), I28 (no credential in the pod) and I30
-(composite attribution); the answer chain for questions (queue item B);
-and the second and third rounds above.
+After Stage 10, nothing is settled beyond Sebastian's scoping. The next
+stage starts with the rebuild and the step-zero gate. The known candidates
+and every other future topic are in [the roadmap](../roadmap.md).
