@@ -3255,6 +3255,115 @@ the settle window (ruling 196). Fallbacks named in the report: a planted
 pull request for the audit and the review cases; the nudge reported as not
 built if Task 88 does not land.
 
+Closed 2026-09-30. The rebuild that opened the stage ran from 19:43Z on
+2026-09-29 and was the test of the Stage 9 close's recovery: CNPG recovered
+generation v8 into v9 with every WAL to 17:52:36Z in 2.8 minutes, and every
+table of Stage 9's exit test came back (tasks 160, audit 3213, ledger 1986,
+alerts 73, rolls 34). Forgejo came back with its database and without its
+git storage, since the close took no dump: an empty bare repository per
+row, the re-push of code, infra, docs and demo-app from the controller's
+machine, the pull request refs of 19 merged pull requests restored from
+their merge commits, and the push mirrors created again. OpenBao was
+initialised fresh and re-seeded. The step-zero gate passed at 20:30Z with
+the spend equal to LiteLLM's to the last digit (EUR 0.008096722 over 8
+calls) and `github/main` equal to Forgejo's for code and infra; the gate's
+roll went live at 20:37Z and its lane task merged at 20:57Z. Landed, rolled
+and proven, with rulings 200 to 204 in the ledger: Task 85, the security
+audit stage of ruling 188: stage `audit` between review and approval,
+`on_findings: human` only, switched on per project, a secret pre-check on
+the diff's added lines and one call on the class's `audit_model`
+(coding-frontier, ruling 200) with a six-item checklist, findings to the
+card and never to the agent, and no verdict counted as a finding; Task 86,
+the merge path: a review without a verdict is a finding on the card, never
+a pass (backlog 68, change id `review-verdict`), the roller reads the
+registry as a read-only package user, and the untrusted PR job's OIDC
+variables proven empty with a check that fails if they are not (backlog
+56); Task 87, opencode's headless config: the `question` tool hidden, a
+step cap from `limits.steps`, `doom_loop` on allow and denials the model
+sees; Task 89, the small hardening items: no credential in any workflow
+history (a whole task's 54 payloads scanned), a denied tool hidden from
+`tools/list` and still refused, stricter wins for project files, protected
+files in the `high` class, and one sanitiser for untrusted text into the
+brief and agent text out to Forgejo, with every agent commit squashed onto
+the session's start with a sanitised subject; Task 88, message-in in its
+smallest form: a `Message` call in the adapter contract, opencode under
+`serve`, a port on the worker pod only factoryd reaches with a
+per-session bearer, and the loop nudge after three identical calls as its
+first user, counted from the session's event stream (ruling 202); Task 91,
+one model provider (ruling 204): the three tiers on Alibaba's Qwen 3.8 max,
+3.7 plus and 3.8 flash, one deployment each, retries without a cooldown,
+and a LiteLLM proxy budget of 55 USD a month behind the factory's cap; and
+Task 92, the month cap: `budget.month_eur` 50 over every project and the
+factory, a task that meets it parks at a human card
+(`refused_month_cap`), alerts at 50 and 80 percent and an infra issue at
+the cap. The bug lane, run by the factory itself: 28 issues on 26 backlog
+items, 25 merged through the card (23 on the code repository, 2 on
+demo-app), every code merge rolled by 01:29Z on 2026-09-30, 3 failed and
+each refiled and merged; EUR 3.55 over the lane, EUR 1.91 on the merges,
+19 of the 25 in one cheap session. It fixed Stage 9's own findings (58, 59, 61,
+62 as a re-run of an unchanged red head once, ruling 201, 64, 65, 67),
+Stage 8's items 11, 20 (a per-project egress host list in place of `world`
+on 443), 24, 25 and 29 and demo-app's 15 and 17 (ruling 203 closed 2, 9 and
+33 and accepted 8, 18, 34, 37 and 47), and the round's own findings 69 to
+76 and 89a, among them a merge conflict sent back to the agent (70) and
+the spend repair (73). Exit test run on 2026-09-29 and 30 (task 90), passed
+with named fallbacks and deviations. Step 1 passed with deviations: every
+table and every issue came back, #179 to #181 excepted (purged with an
+outside account before the close), and task-80-report.md's own counts
+held three errors. Step 2 passed: the planted PEM key in a test file
+(#241, PR #245) reached card 147 with the pre-check's and the model's
+findings, and a clean pull request (#252) passed with `clear` in 2 s and
+merged. Step 3's first half passed live: the migration-class pull request
+#249 reached its card with the review's verdict, the migration finding and
+an audit finding, and lane #281 did the same on a real migration; the
+planted 2 s review bound (#288) did not yield a review without a verdict,
+because the review finished before the gate supervisor's answer (ruling
+171's race), so the second half rests on the fallback: Task 86's tests and
+the live no-verdict audit finding on #276, whose audit call died with a
+roll's gateway restart. Step 4 passed: backlog 58, 59, 61, 64 and 65
+merged through the card and rolled first, with cost and gate durations,
+and 20 more followed. Step 5's first half passed live: demo-app #22's
+session ended pushed after the nudge, and #24's model changed its command
+right after its nudge; the trip after a nudge that did not help happened
+live through `no_write`, and the `same_call` trip after a nudge rests on
+unit tests, since the planted proof's model reasoned its way out. Step 6
+passed with two defects that the lane then fixed and rolled: every model call has its
+audit row except one cut by a roll (backlog 74), the ledger equals
+LiteLLM's figure on every task past the settle window, and the final
+settle pass had doubled `spent_eur` on 41 tasks from before the ledger
+(backlog 73, +4.84 EUR, the ledger itself right); since the fix
+`spent_eur` is set from the ledger sum, and after the repair migration no
+settled task's spend differs from its ledger. The final check of every
+Stage 10 task after its settle window, at 03:43Z on 2026-09-30: all 221
+finished tasks settled, `spent_eur` equal to the ledger on all and to
+LiteLLM on every task with a key. Measured on the 25
+merges: checks 2 min 44 s (demo-app) and 4 min 46 s to 12 minutes (code),
+a review 4 s to 2 min 56 s, an audit 2 s to 1 min 13 s, an approval click
+8 s to 6 min 11 s, a merge 1 to 2 s, a session 13 s to 7 min 53 s, issue
+to merge 5 min 37 s to 36 min, median 16 min; a roll from merge to live
+11 s to 3 min 13 s. Under the proofs and the lane together the throughput limit
+showed: eight CI runners and two build VMs queue the image builds, and a
+roll that folds every lane merge restarts its build and trips its 10-minute
+checks bound (three times on one roll). Model spend of the round through
+LiteLLM, rebuild included: EUR 6.14 over 1950 calls. Sebastian's two
+additions after the Stage 9 close, one model provider and the month cap,
+were found late: he added them to the handover at 20:34Z, after the
+controller had read it once, and they surfaced at 00:4xZ; until Task 91
+landed at 00:56Z every tier spent on three providers and only `day_eur`
+bounded spend, about EUR 5.9 by then. Both were applied that night (ruling
+204): the proof window at 18 EUR, below September's 18.26, parked a
+planted task at its card with spend 0 and filed the infra issue. Standing
+contracts from this stage, in the ledger as rulings 200 to 204: the audit
+stage on the task class's `audit_model`; a red head the agent left as it
+was re-runs its checks once before its findings go back; the loop nudge
+counts from the harness's event stream; the Stage 8 lane items settled as
+built, closed or accepted; one model provider, Alibaba, and a month cap of
+50 EUR on all variable spend with a LiteLLM budget behind it. What Stage 10 leaves: an empty lane queue, the
+month cap's 50 and 80 percent alerts to see in October's first days, the
+accepted risks, the open proofs of task-90-report.md, and the rotation of
+the Forgejo admin password, which reached two local transcripts; the
+handover `handover-stage11.md` lists them.
+
 A second round of accepted items (2026-09-29, detail in stage10-queue.md
 section J; revisit-later items and rejections in architecture 10):
 
@@ -3310,3 +3419,15 @@ section K; revisit-later items in architecture 10):
 12. The intervention rate as a metric.
 13. A readiness check at project onboarding.
 14. Approval scopes in the UX phase.
+
+After Stage 10, nothing is settled beyond Sebastian's scoping, which he
+does in parallel from docs/market-research/SYNTHESIS.md; the next stage
+starts with the rebuild and the step-zero gate and then takes what he has
+added. The known candidates, none decided here: the UX phase (items 1 to 5
+of "A UX phase after Stage 9", with the stop button and the approval
+scopes); the harness queue D to F of stage10-queue.md (the second harness
+pi, the architecture 6.1 survey re-dated, parallelism in the agent and in
+the factory); the larger market-research items I27 (a setup snapshot per
+project and base commit), I28 (no credential in the pod) and I30
+(composite attribution); the answer chain for questions (queue item B);
+and the second and third rounds above.

@@ -8,7 +8,13 @@ minutes without a human. Stage 9, the factory working on itself, closed
 2026-09-29: the factory's own agents fixed five of its open defects, each
 merged through the card and rolled by a roll task, and the fix of a sixth,
 the blocked gateway key, reached `main` through the controller from the
-lane's own pull request (Ruling 195). Sections that describe built behaviour
+lane's own pull request (Ruling 195). Stage 10, hardening, closed
+2026-09-30: the recovery of the Stage 9 close brought back every table, a
+security audit stage sends its findings to a human, a review without a
+verdict is a finding, the harness runs as a server that takes a message
+mid-session and the first message is the loop nudge, untrusted text is
+sanitised in and out, one model provider and a month cap bound the spend,
+and the factory's own lane merged 25 fixes through the card. Sections that describe built behaviour
 say so. The rest is still design. We amend this file as the design moves, so it always holds the
 current design plus the explanations behind it. Rulings live in the build
 ledger and are cited here by number.
@@ -322,6 +328,40 @@ in the cluster's private network that patched the Talos rule
 `api-from-home` on the three nodes without a reboot, since node-to-node
 traffic from 10.0.1.0/24 passes. Git and the edge were never affected.
 
+The Stage 9 close went wrong, and the sixth rebuild (2026-09-29, the start
+of Stage 10) was the test of its recovery. At the close a `tofu apply` for
+a second home-address change replaced the three nodes: `hcloud_server.node`
+takes its `user_data` from the Talos configs, which the morning's recovery
+had edited, and the plan's replacement lines went unread. The fresh nodes
+had empty disks, so the close's backups were never taken: no base backup,
+no Forgejo dump, no OpenBao snapshot. What survived was CNPG generation v8
+in S3, with the morning's base backup and WAL segments every five minutes to
+17:52Z, and every repository on the seed machine and on GitHub. The rebuild
+recovered v8 into v9 in 2.8 minutes, replaying every WAL, and every table
+of the Stage 9 exit test came back, Forgejo's issues, pull requests and
+comments included, since Forgejo's database is one of the four. Forgejo's
+git storage was gone while its rows stood, and Forgejo has no tool that
+recreates a bare repository for an existing row. The recipe without a dump:
+an empty bare repository per row inside the Forgejo container, `forgejo
+doctor` for the server hooks, a push of every repository from the seed
+machine before Flux starts, the refs `refs/pull/<n>/head` of the merged pull
+requests restored from their merge commits' second parents (the revert pass
+reads their diffs), and the push mirrors created again, since the doctor's
+fix deleted the mirror rows whose remote the new repositories lacked. A
+project's protected `deploy` branch cannot be pushed back, because only its
+deploy key may push there; the project's own CI starts it again on its next
+`main` run, with a new history. OpenBao, with no snapshot newer than the
+seed's tokens, was initialised fresh and re-seeded. The gate passed 47
+minutes after the start, with the task's spend equal to LiteLLM's to the
+last digit and GitHub's `main` equal to Forgejo's for both repositories. It
+found a trap and a defect. `flux bootstrap` echoes the credential it was
+given when it fails, and the seed machine's git credential store held the
+Forgejo admin's password, so the README now names the Flux token's source.
+factoryd's project reconcile stopped at the missing `deploy` branch before
+it set the new SSH host key, which the bug lane fixed (backlog 69). The
+README also names the replacement trap: never apply a plan that replaces a
+node.
+
 Bootstrap breaks one circular dependency: Flux deploys everything from Git,
 but the Git server, Forgejo, is itself deployed by Flux. Step zero, run once
 from the seed machine: apply the bootstrap slice, CNPG plus Forgejo, by hand,
@@ -435,7 +475,7 @@ OpenBao from the seed by hand. No secret the seed holds ever enters Git.
 | Postgres | CloudNativePG | One cluster, one database per service, S3 backups |
 | Durable execution | Temporal, official Helm chart | MIT licence, chart 1.0 since April 2026 |
 | Secrets and dynamic credentials | OpenBao | Fork below |
-| Model routing | LiteLLM OSS proxy | Budgets, virtual keys and the key API are OSS. JWT auth is not, see 5.2. Three model tiers across providers since Stage 9 (4.4) |
+| Model routing | LiteLLM OSS proxy | Budgets, virtual keys and the key API are OSS. JWT auth is not, see 5.2. Three model tiers since Stage 9, one provider since Stage 10 (4.4) |
 | Object storage | Hetzner Object Storage | Fork below |
 | Observability | SigNoz | Fork history below, decided |
 | Telemetry pipeline | OpenTelemetry Collector | factoryd, the gateway, the worker and project apps emit OTel to SigNoz's collector. The k8s-infra chart's collectors scrape the nodes and the cluster (4.2) |
@@ -659,11 +699,15 @@ Added in Stage 9 (Ruling 180, Task 76):
   and factoryd and the gateway exported no namespace until
   `OTEL_RESOURCE_ATTRIBUTES` set it on both Deployments. A histogram is
   stored as a `.bucket` series, so a rule or panel that names the bare
-  metric shows nothing; the pipeline dashboard's histogram panels are still
-  to be checked for it (backlog 57).
+  metric shows nothing; at the Stage 10 rebuild every histogram panel of
+  the pipeline dashboard named the bare metric, and all of them query the
+  `.bucket` series since (backlog 57).
 - **Live.** Two plantings of three factoryd pod deletions each fired the
   restarts rule, at 14:20Z and 16:02Z on 2026-09-29. The roll rule fired falsely once, three minutes
   after a roll was live, while factoryd's pod was being deleted (backlog 67).
+  Since the bug lane's fix (#234) both roll rules need a full 10-minute
+  window of points (`requireMinPoints`), and no false roll alert fired
+  across the next six rolls.
 
 ### 4.3 Secrets: OpenBao versus Vault
 
@@ -724,7 +768,21 @@ gateway's audit row records the deployment that answered, from LiteLLM's
 dearest deployment of its tier, so a hold covers whichever answers, and a
 deployment with a price field the book does not know makes its alias
 unpriced, which the gateway refuses. A provider switch is one infra file.
-The chat providers are z.ai, Alibaba, DeepSeek and Groq.
+
+Since Stage 10 (Ruling 204, Task 91) one provider, Alibaba, serves all
+three tiers, one deployment each: tier-high `dashscope/qwen3.8-max`,
+tier-mid `qwen3.7-plus`, tier-low `qwen3.8-flash`, with thinking off.
+Sebastian wanted one account to top up; the tiers and the aliases stay,
+so a second provider is again one infra file. With one deployment per
+tier a cooldown would lock the whole tier, so the router retries twice
+with backoff and runs no cooldown. The measurement gave 9 of 9 on each
+tier (p50 4.2, 5.2 and 4.3 s). DeepSeek, z.ai and Groq left the release,
+and their key secrets left the cluster. Until the switch at 00:56Z on
+2026-09-30, the Stage 10 run spent on all three providers. LiteLLM also
+holds a proxy-wide budget of 55 USD a month (`litellm_settings.max_budget`,
+reset on the 1st at 00:00 UTC), the backstop behind the factory's month cap
+(5.4); its refusal names no entity, and the gateway reads it as the month
+cap.
 
 Replicate, Firecrawl and fal.ai are not chat models for our loop: they are paid
 capabilities. They enter as connectors on the capability gateway with per-task
@@ -794,6 +852,18 @@ the task analytics (8), and model tiers (4.4). The Stage 9 exit test passed
 on 2026-09-29 with two deviations (Ruling 195, backlog 66): the factory's
 agents fixed five of the factory's own open defects, each merged by
 `factory-merge` after the card and rolled by a roll task.
+Built in Stage 10: one model provider and the month cap (4.4, 5.4), the
+security audit stage and the rule that a review
+without a verdict is a finding (7), message-in through the harness's serve
+mode with the loop nudge as its first user (6.2, 6.6), the hardened
+harness configuration and the sanitiser (6.4, 7), hidden tools, stricter
+wins and protected files (5.3, 7), credentials kept out of workflow
+history (below), and from the bug lane the checks re-run (7), project
+egress hosts and the hourly reconcile (below). The Stage 10 exit test
+passed on 2026-09-30 with two named fallbacks: a review without a verdict
+was not produced live by a plant and rests on tests plus the same rule
+live on the audit stage, and the trip after a nudge happened live through
+`no_write`, not `same_call`.
 
 **Intake.** Two doors, one record. Forgejo posts webhooks to
 `/webhooks/forgejo`. factoryd checks the HMAC-SHA256 signature in
@@ -874,6 +944,13 @@ own. The gap showed on the bug lane's first task, #186: a roll restarted
 factoryd during its fourth session, the resumed session fired the half-way
 check-in at once, the supervisor answered `retry_stronger`, and the task
 failed "4 attempts exhausted" with no pull request.
+Since Stage 10 no workflow or activity input or result carries a
+credential (Task 89): every activity takes the task id and plain values,
+and mints or reads its tokens inside itself, so Temporal's history, which
+outlives the task, never holds one. A test runs a whole task on the real
+activities with a recording data converter and scans all 54 payloads for
+tokens, with a canary to prove the scan bites; a live task's 145 history
+payloads held none. No workflow change was needed.
 Each step appends a line to the task's timeline, `sessions/<id>/timeline.jsonl`
 in S3, served by `GET /tasks/{id}/timeline`: intake, sessions with their
 parents and findings, supervisor decisions, the pull request, every signal,
@@ -967,7 +1044,12 @@ app registered live after roll 7914efb:
   feeds the collector interlock (Ruling 123). The CiliumNetworkPolicy
   `project` denies by default: in from the namespace, the edge Envoy and
   CNPG, out to the namespace, DNS, the API server, the SigNoz collector on
-  4318 and the world on 443. The ResourceQuota `project` is the project's
+  4318 and, since Stage 10, the outside hosts the project's file lists under
+  `egress` and nothing else (backlog 20, Ruling 203). The first design ended
+  with the world on 443, which let a compromised app send its secrets to any
+  host; a project without the list reaches nothing outside the cluster.
+  Proven live: after the roll demo-staging's policy held DNS, the API
+  server and the collector only, and the app kept running. The ResourceQuota `project` is the project's
   in-cluster quota, 2 CPU, 4 GiB and 10 GiB by default.
 - **Registration is one factoryd action, reconciled from Postgres** (Ruling
   156). `factoryd register-project` takes the Forgejo admin's password on
@@ -975,7 +1057,12 @@ app registered live after roll 7914efb:
   records the row and reconciles. factoryd reconciles every project at
   boot, on a console change and when the policy version changes, and a
   push to a project's `main` without a `deploy` branch runs the reconcile
-  too. Git is not the store for these objects: the Postgres restore
+  too. Since Stage 10 it also reconciles every project hourly, so a hand
+  edit in Forgejo is set back within the hour (backlog 25); it removes a
+  factory project's collaborators it does not keep, so an approver taken
+  off the policy leaves the repository (backlog 24); and a protected
+  `deploy` branch that does not exist no longer stops the reconcile before
+  the deploy key and the host key (backlog 69). Git is not the store for these objects: the Postgres restore
   re-seeds them. A second run logs only `no change`, `ready` or `ensured`.
   The hostnames are the one exception, an infra commit (3.4, Ruling 155).
   Since Stage 9 the settings come from the project's file and the row keeps
@@ -1141,12 +1228,15 @@ task requires capability X in environment E
       route to the gateway and Forgejo git, plus named registries)
 ```
 
-Besides its `version`, `policy.yaml` holds ten sections:
+Besides its `version`, `policy.yaml` holds eleven sections:
 
-- `budget`: the task default, the task maximum and the day cap, in euros.
+- `budget`: the task default, the task maximum, the day cap and, since
+  Stage 10, the month cap `month_eur` (5.4), in euros.
 - `classes`: per capability class, the allowed model aliases and tools, each
   tool with `max_requests` and `max_eur`, and the `review_model` and
-  `supervisor_model` factoryd may call for a task of that class (Task 71).
+  `supervisor_model` factoryd may call for a task of that class (Task 71),
+  and since Stage 10 the `audit_model` for the security audit (7, Ruling
+  200).
 - `prices`: the tool prices no provider API returns (Firecrawl credits,
   Replicate rates per hardware SKU with a model to SKU map, fal's
   `max_megapixels`).
@@ -1156,6 +1246,9 @@ Besides its `version`, `policy.yaml` holds ten sections:
 - `project_default`: a new project's quota and standing block (5.1, 5.5).
   Every project file names its own merge rule since Stage 9.
 - `approvers`: the Forgejo users who may authorise spend in the console (5.6).
+- `link_hosts`, since Stage 10: the hosts a link in agent-written text may
+  name when factoryd posts it to Forgejo; the sanitiser defangs any other
+  (7).
 - `bounds`: seconds per Temporal activity before its gate counts as stuck
   (6.6), plus a `default`.
 - `supervisor`: the thresholds of the session supervisor's progress
@@ -1165,7 +1258,20 @@ Besides its `version`, `policy.yaml` holds ten sections:
   minutes, Ruling 186, at most 15) and `stronger_after`, the returns from
   one stage before the stronger rung (1). They replace factoryd's
   environment variables `MAX_SESSIONS`, `WALL_CLOCK_CAP` and
-  `SUPERVISOR_MAX_CALLS`.
+  `SUPERVISOR_MAX_CALLS`. Stage 10 added `steps`, the harness's step cap
+  per session (200, 6.4), and the loop nudge's three (6.6): `nudge_after`
+  (3 identical calls in a row), `nudges` (1 per repeated call) and
+  `same_call` (4, the trip), with `nudge_after` below `same_call` or the
+  loader refuses the tree.
+
+Stricter wins (Task 89): a project file may only tighten what
+`policy.yaml` sets. Its quota, envelope (monthly euros, server types,
+count, lease hours, volume size) and standing block are bounded by
+`envelope_default` and `project_default`, compared in base units, and the
+loader and `factoryd config check` refuse a looser file; the schema's
+descriptions name the bound. Proven: a demo-app file with 3 CPU, 50 EUR a
+month and a cx53 was refused with one line per field. A deny beats an
+allow at every level, which a denied tool shows (below).
 
 The decoder is strict: an unknown key or a second YAML document rejects the
 file. So a new section lands in infra before the factoryd that reads it. The
@@ -1179,6 +1285,12 @@ task headroom (else 402 `refused_budget`) and the day headroom (else 402
 LiteLLM's client-side `fallbacks`, which would reach any model under an
 allowed alias. It admits function tools and text parts only. Each minted key
 carries the class's model list, so LiteLLM refuses other models as well.
+Since Stage 10 one admission check serves the tool list and the call (Task
+89): `tools/list` shows a session only the tools its classes may call, the
+brief names the same tools, and a hidden tool called anyway is refused
+with `refused_capability` and audited. Live, a coder session's list held
+its class's 12 tools; the hiding itself is proven by test only, since no
+narrower class ran a session.
 
 An OPA sidecar is the named upgrade when rules multiply beyond what Go code
 reads well. Policy never lives in a prompt.
@@ -1233,13 +1345,43 @@ the `x-litellm-response-cost` header for plain calls, and the `usage.cost`
 field of the final chunk for streams, which the gateway forces on. LiteLLM's
 `x-litellm-key-spend` header cannot serve: it is the cached spend before the
 call, zero on every stream. After a task finishes, factoryd settles its model
-spend upward to the total LiteLLM recorded on the task's keys, which covers
+spend to the total LiteLLM recorded on the task's keys, which covers
 abandoned streams. LiteLLM writes that total 60 to 80 seconds late, so a
 settlement loop, apart from the runner's claim loop, re-settles once a minute
 every task finished within the last two hours (the hold lifetime plus an hour)
-whose model holds have closed. Each pass lists LiteLLM's keys once, the raise
-never lowers spend, and a difference below 1e-9 EUR is float noise and books
-nothing.
+whose model holds have closed. Inside that window a pass only raises. Past
+it, once, the final pass sets the task's model spend to LiteLLM's figure,
+down as well as up, with a settlement row that may be negative, dated the
+task's own finished day, and marks the task settled (Ruling 196, migration
+0034, "settle down", live since the Stage 10 gate's roll). Each pass lists
+LiteLLM's keys once, and a difference below 1e-9 EUR is float noise and
+books nothing. The first final pass found a defect: it added its delta to
+`spent_eur`, and 41 tasks settled before the ledger existed had their whole
+LiteLLM figure booked a second time (+4.84 EUR, the ledger itself right).
+Since the bug lane's fix `spent_eur` is set from the task's ledger sum
+(backlog 73), so the ledger is the one record and `spent_eur` only
+mirrors it, and the one-time migration gateway/0009 repaired the 41 rows
+and gave 14 old tasks their missing finish time. After it no settled task's
+`spent_eur` differs from its ledger. On the Stage 10 run every task past
+the window showed `spent_eur` equal to its ledger and its model rows equal
+to LiteLLM's figure.
+
+**The month cap** (Ruling 204, Task 92). `budget.month_eur`, 50 EUR, caps
+all variable spend of every project and the factory in the UTC calendar
+month: the ledger's rows since the 1st, standing lines left out, plus
+every outstanding hold, read under the same advisory lock as the task and
+day headroom. Model calls, paid tools and commissioned servers take the
+smallest of the three headrooms, and a call that finds the month spent is
+refused with `refused_month_cap`. The task then parks: its session ends as
+an escalation, and the card says the cap is reached and that only a human
+raises it, by a commit. factoryd raises a `month_cap` alert once a month at
+50, 80 and 100 percent, and at 100 percent files an issue in the infra
+repository's human lane that links the cap's line in `policy.yaml`. The
+key is required: a version without it reads 0, which stops all spend, so a
+missing value fails closed. Proven live with a window at 18 EUR against
+September's 18.26: a planted task parked at spend 0 with the card, and the
+infra issue was filed. The 50 and 80 percent alerts were not seen, since
+the window jumped past them.
 
 Caps hold on the call itself (Ruling 113). LiteLLM checks a key's
 `max_budget` only before a call, so one call can run past it: in a proof, a
@@ -1266,9 +1408,13 @@ costs: a review cut by its gate bound booked its hold of 0.1447 EUR twice on
 one task, and a redirect's cut session booked its hold on another, so those
 two tasks' ledgers stood at 0.4767 EUR against LiteLLM's 0.2751 and 0.2058
 against 0.1404, while five other tasks matched LiteLLM to the digit.
-Whether the settlement should lower a cut call to LiteLLM's figure after
-the settle window, or keep the hold as the conservative charge, is open
-(backlog 66).
+Sebastian ruled the settlement lowers a cut call to LiteLLM's figure after
+the settle window (Ruling 196, above), so the hold is the charge only while
+the window runs. A hold that no call ever closed, because a restart cut
+the caller, is booked by the hold sweep; since Stage 10 the sweep writes the
+call's audit row too (backlog 74), after the security audit's call on one
+task died with a roll's gateway restart and left LiteLLM's log one row
+longer than the audit.
 
 Every booking is a row in the append-only `ledger` table, of kind `model`,
 `tool`, `resource`, `settlement` or `standing`, with its UTC day. A standing
@@ -1504,6 +1650,13 @@ Changed in Stage 9 (Tasks 72 to 75, 81):
   109), which the first roll found when an approval made through the API
   merged nothing.
 
+Changed in Stage 10 (Tasks 85, 86): the card has a "Security audit"
+section beside the reviews, with the verdict, the model and the deployment
+that answered and one line per finding (item, file and line, why), and
+its "why a human" list names an audit finding and a review without a
+verdict; the card no longer says a pull request "passed its gates" when a
+finding put it there.
+
 - **Login.** Forgejo OAuth2, the authorisation code flow with PKCE (S256), a
   confidential client and an explicit scope list: `read:user`,
   `write:repository`, `write:issue`. Forgejo enforces requested scopes, and an
@@ -1580,13 +1733,39 @@ the adapter seam stays sharp.
 type Harness interface {
         Prepare(ctx context.Context, env SandboxEnv, brief TaskBrief) error
         Run(ctx context.Context, brief TaskBrief, emit func(Event)) Result
+        Message(ctx context.Context, text string) error
 }
 ```
 
 `TaskBrief` is the whole task as data: objective, repository and SHA, issue
-context, findings from parent sessions and artifact paths. Capability hints
-stay out of the brief: capabilities are policy, enforced by the gateway, not
-something the harness is told.
+context, findings from parent sessions and artifact paths. Capabilities are
+policy, enforced by the gateway, not something the harness is told. Since
+Stage 10 the brief names the factory tools the task's classes may call, so
+the model is not tempted by tools it would be refused (5.3); the gateway
+still decides every call.
+
+`Message` (Ruling 188, Task 88) puts text into the running session as the
+next user turn. A harness without such a mode answers `ErrNotSupported`,
+and factoryd then redirects to a fresh session with the text as its
+finding, the restart it used before; `ErrNotRunning` means no session
+runs. opencode supports it by running as a server: the worker starts
+`opencode serve` on 127.0.0.1 inside the pod, subscribes to its event
+stream, creates the session with the same denials `opencode run` sets,
+prompts the brief with `prompt_async` and answers each permission request
+"once", as `--auto` did. `opencode run --format json` is itself a client
+of the same in-process server in the pinned v1.18.32, so the event mapping
+and the recorded fixtures stayed unchanged. A message sent mid-turn
+reaches the next model call, after the pending tool results: opencode's
+loop re-reads the session's messages on every turn. The worker exposes one
+port, 8091, with `POST /message`; the bearer is drawn per session and
+lives only in factoryd's memory, and the pod holds its SHA-256, which the
+worker unsets before the harness starts. The task namespace's policy
+admits factoryd alone on that port, and factoryd's egress admits the port
+on worker pods. The bearer crosses the pod network in plain HTTP, like
+factoryd's other in-cluster calls. The agent can reach opencode's own
+loopback server, which gives it nothing its shell does not. The first
+user is the loop nudge (6.6); inline review comments and questions
+answered by other agents are the later ones.
 `Event` is the normalized stream: model calls with alias and cost, tool calls
 with status, file changes, commands with exit codes, checkpoints, and the
 final result. Each adapter maps its harness's native output onto this set.
@@ -1670,9 +1849,19 @@ hunting for push credentials after a human's answer said "push", another
 tried SSH to a Hetzner server for a C compiler, and a third asked for a
 server to run the database tests. The guide now also names what the
 sandbox lacks, a C compiler (so no `-race`), a database and a server, and
-says that the pull request's checks run both. The worker commits whatever
-the tree holds, the agent's scratch reproduction tests included, and one
-merge carried such a file (backlog 63).
+says that the pull request's checks run both. The worker commits the
+tree, leaving out the agent's scratch reproduction tests (`zz_repro*`,
+backlog 63, fixed by the Stage 9 lane after one merge carried such a
+file). Since Stage 10 the worker writes one commit of its own onto the
+session's start commit, with a subject sanitised from the issue's first
+line, so the agent's own commit messages, which could carry closing
+keywords or mentions, never reach the fork (Task 89). A commit the
+agent pulled from `main` mid-session stays `main`'s: the worker then
+parents its commit on the newest `main` commit the agent's history holds
+(beside the work in progress on a resumed session), and the workflow
+guard compares against it, so the pull request's diff and the review see
+only the agent's change (backlog 72; before the
+fix a review flagged main's own change as out of scope).
 
 **Report sessions** (Ruling 185, Task 74). An `analyzer` task runs in
 report mode: the worker gets the upstream read token only, no fork token
@@ -1694,6 +1883,18 @@ Sandbox hardening:
   platform because cloud servers have no /dev/kvm. The machine config only
   adds the `user.max_user_namespaces` sysctl.
 - Non-root, dropped capabilities, read-only root filesystem.
+- The harness configuration is hardened against the pinned opencode's
+  source (Task 87): the `question` tool is hidden, so the only ask path is
+  the gateway's `request_info` and `escalate_to_human`; a step cap per
+  session from `limits.steps` (200), a soft cap, at which opencode asks the
+  model to summarise and stop, while the agent time stays the hard stop;
+  `doom_loop` stays on allow, since a denied doom loop would stop the
+  session unseen by the model; and `experimental.continue_loop_on_deny`
+  keeps a refused prompt from ending the turn. A proof window at 15 steps
+  stopped a live session at the cap with opencode's summary, and the
+  factory opened its pull request. The worker sets `PWD` to the workspace,
+  since opencode takes its directory from it first, and opencode's
+  environment holds no git token.
 - Cilium network policy: default deny egress. Allowed: `factory-gateway` on
   its port, Forgejo git, and the Go module proxy and checksum database
   (`proxy.golang.org`, `sum.golang.org`) on 443, plus
@@ -1753,6 +1954,8 @@ Sandbox hardening:
   have opened this pod, the one with the master keys, to any public IPv4
   on 1234. The review refused it, and an init container reports the ready
   time instead (7.1).
+- The worker pod has an ingress rule since Stage 10: only factoryd, on
+  8091, the message port (6.2). Every other ingress to a sandbox is denied.
 - factory-gateway has an ingress policy since 2026-09-29 (backlog 26, fixed
   by the bug lane as #198 and merged as ddf2c09): only the sandbox pods of
   task namespaces and factoryd reach its port 8081. Before it, any
@@ -1817,7 +2020,8 @@ As built (Stage 6), with the defaults that tuning starts from:
   second line, `$?`) is judged by its output, not its exit code. The first
   live loop tripped nothing until this was in.
 - **The same call** is the same tool with the same arguments, compared by a
-  hash of their canonical JSON, four times in a session.
+  hash of their canonical JSON, `limits.same_call` times in a session (4).
+  Since Stage 10 it is preceded by the loop nudge (below).
 - **Flip-flop** compares each file's content hash with the hashes it had
   before.
 - **Churn** is 15 file changes since the diff against the base last grew,
@@ -1842,7 +2046,8 @@ call (5.4), so the supervisor spends from the task's money and cannot overrun
 it or the day cap. With nothing left, the task escalates without a call.
 With Task 71 (rolled 2026-09-28) the call goes through the gateway, which
 audits it with kind `supervisor` and books it under `supervisor/<alias>`
-(5.3). `supervisor` maps to GLM-5.3, the strongest configured model. Every decision
+(5.3). `supervisor` maps to tier-high, the strongest configured model,
+since Stage 10 Qwen 3.8 max alone (4.4). Every decision
 goes to the session record, the timeline and an issue comment.
 
 Stopping is graceful: the worker gets SIGTERM, pushes the work in progress to
@@ -1862,9 +2067,31 @@ next session runs on the stronger rung, Sebastian's rule for a repeat of the
 same problem. When the attempts run out, the task goes to the card (5.1).
 The bug lane's first task showed both gaps: its three cheap sessions circled
 into the repetition detector twice at the same rung before a roll restart
-ended it. After a factoryd restart, a new run can still start on the
-cheaper model when the last session ended with `retry_stronger` (backlog
-58).
+ended it. A `retry_stronger` on the last attempt is recorded as a climb
+too, so a new run after a factoryd restart starts on the stronger rung
+(backlog 58, the Stage 10 lane's first merge).
+
+**The loop nudge** (Rulings 188, 202, Task 88). factoryd counts identical
+calls in a row from the session's event stream: a call is the tool plus
+its input hash, a command its command line, a file change its path and
+content, and model steps in between do not break the run. At
+`limits.nudge_after` (3) it sends one message into the running session
+(6.2): "You repeated the same call three times (<tool>). Change approach,
+then continue.", records a `nudge` step on the timeline and resets both
+counts for that call. The same call again after its `nudges` (1) trips
+`same_call` to the supervisor as before, with "after 1 nudge" in the
+trip. A nudge counts only once the worker answered; an undelivered one
+trips to the supervisor, and a harness without messages gets the redirect
+with the nudge as guidance. The count reads the event stream, not the
+gateway's audit rows, because opencode's built-in tools, the shell, read
+and edit, never pass the gateway and the audit rows carry no input hash
+(Ruling 202); a harness whose stream lies about its calls evades the nudge,
+and the other detectors still trip. Proven live on demo-app: #22's session
+got its nudge after three identical test runs and ended pushed, and #24's
+model answered its nudge with "Continuing with a different command form",
+then kept looping in varied forms until `no_write` tripped. A `same_call`
+trip after a nudge rests on unit tests: in the planted proof the model
+reasoned its way out instead of repeating.
 
 The answers are a part of the next session's brief in their own section,
 newest first, each one tagged with the question it answers (Ruling 118). The
@@ -1907,12 +2134,13 @@ of the ruling, else the policy's `default`, else 120 seconds:
 | WaitChecks | 600 | Main CI took about 7.7 minutes at the step-zero gate |
 | GateReproduction | 900 | Task 66 runs the command twice, at the base and the head, and sets 1800 in the policy |
 | ModelReview | 360 | Ruling 194: a review of a 100-line diff by glm-5.3 took 210 s on 2026-09-29, and the first default of 180 s (Ruling 140) cut a correct review twice |
+| GateAudit | 360 | The security audit (7), one frontier call like the review; it answered in 2 s to 85 s in Stage 10 |
 | Merge | 90 | One API call under a 2-minute timeout, so the first default of 300 s could never fire (Ruling 163) |
 | every other activity | 120 | One API call each, seconds (Ruling 140) |
 
 `GateWatch` writes a `gate_bound` alert (8) for each attempt still running
-at its bound. Only the five long gates, RunSession, WaitChecks,
-GateReproduction, ModelReview and Merge, go on to the supervisor (Ruling
+at its bound. Only the six long gates, RunSession, WaitChecks,
+GateReproduction, ModelReview, GateAudit (since Stage 10) and Merge, go on to the supervisor (Ruling
 162): the short gates' 2-minute timeout ends before a supervisor answer
 could arrive, so their alert is their record. For a long gate `GateWatch`
 signals the task's workflow, and the workflow runs `SuperviseGate` once per
@@ -1987,7 +2215,8 @@ model last:
    policy evaluation returns allow.
 3. Model review runs last, on diffs that survived: a stronger model reads the
    diff and writes a review verdict. The verdict is evidence for the merge
-   decision, never authority to skip the gates above.
+   decision, never authority to skip the gates above. Since Stage 10 a
+   security audit follows it, whose findings always go to a human.
 
 Merge is a PR merge. Human approval, where policy demands it, is a Temporal
 signal. The waiting costs nothing. What happens after the merge depends on
@@ -2049,9 +2278,12 @@ issue, a pull request, an approval, a merge and roll rows, and a fold was
 seen live at 14:06Z. The first live roll found two defects: Forgejo 15
 ignores a `limit` without a `page` on the runs query and answered 2.7 MB,
 past factoryd's 1 MiB read cap, and the pull request's security scan
-flagged seeded secret names. The registry read uses the `forgejo-registry`
-pull secret, whose token can write packages; a read-only package token is
-the tighter option, accepted for now.
+flagged seeded secret names. Since Stage 10 the roller reads the
+registry as a user of its own, `factory-registry-read`, whose one team
+grants package read on no repository and whose token carries
+`read:package` only (Task 86); the `forgejo-registry` pull secret, whose
+token can write packages, stays for pulling images into task namespaces.
+Live: the token reads a manifest, and an upload answers 401.
 
 Built through Stage 7: all three steps, the approval and the bot merge. After
 green checks the workflow runs the gates as Temporal activities. Each one
@@ -2062,12 +2294,13 @@ rolled 2026-09-28 in ba2d80a (Rulings 149, 150, 167, 168, 169).
 
 **Stages and findings** (Rulings 177, 190, Task 74). Since Stage 9 the
 workflow is an ordered list of stages in `workflow.yaml` (5.3): screening,
-checks, policy, migration, reproduction, review, approval and merge. Each
+checks, policy, migration, reproduction, review, since Stage 10 audit,
+approval and merge. Each
 stage has one `on_findings` setting: `agent` sends the findings back to the
 next session, `human` collects them for the card while the other stages run
 and rules out `auto`, and `fail` fails the task. The defaults: checks,
 reproduction and review `agent`, policy `fail` on forbidden, migration,
-screening, approval and merge `human`. The first return from a stage keeps
+screening, audit, approval and merge `human`. The first return from a stage keeps
 the model, and a return past `stronger_after` takes the stronger rung. The
 session cap is the round cap: a task at its cap goes to the card with every
 finding so far. A stage may carry `max_returns`, which caps its own returns
@@ -2082,6 +2315,22 @@ the new head addressed. After a restart, `Reconcile` rebuilds the return
 counts, the findings and the earlier reviews from the timeline. Change id
 `stages`. Red checks on a roll are no agent return: the roll fails "checks
 failed".
+
+**Red checks the agent cannot act on** (Ruling 201, backlog 62, the Stage 10
+lane). A build VM's i/o timeout or a runner that dies fails the checks as
+surely as a real defect, and factoryd cannot tell them apart: Forgejo
+15.0.9 serves no job log over its API, and the image build also fails on a
+real Dockerfile error. So a blind re-run would double every real red.
+Instead, when a session leaves the head as it was and the same head fails
+its checks again, factoryd runs them once more, once per head, by an
+empty commit on the bot's branch through Forgejo's contents API
+(`RerunChecks`), before the findings go back to the agent; a re-run's own
+head is never re-run. Change id `checks-rerun`. The case that asked for it
+came up live: the lane's first filing of the fix held the whole change in
+its first session, its image build failed twice on one head, and the next
+sessions circled until the controller pushed that empty commit by hand and
+the checks went green. A build VM whose `buildkitd` never answers is
+replaced once (backlog 65, proven live at 22:18Z on 2026-09-29).
 
 **Screening** (Rulings 182, 191, Task 74). Before the first session of a
 fresh task filed by an outside account, an `analyzer` task in report mode
@@ -2111,7 +2360,12 @@ closed as real.
   `go.mod` and `go.sum` are `high`, and the three workflow directories stay
   `forbidden`. The risk rules stay one global section, and per-project
   rules wait until a project needs them. Class `normal` gains the outcome
-  `auto`, which the decoder refuses on any other class.
+  `auto`, which the decoder refuses on any other class. Since Stage 10
+  protected files rank `high` too (Task 89): every ecosystem's manifests
+  and lockfiles, agent instruction files, `CODEOWNERS` and every top-level
+  dot file and directory, so a change to what installs, builds or
+  instructs the agent always waits for a human. Live: a pull request that
+  touched only `go.mod` went to the card as `high`.
 - **Migration gate.** When migration paths changed, it comments "schema
   migration: human review required" with the list, and the approval card
   carries it.
@@ -2152,7 +2406,45 @@ closed as real.
   `concerns` verdict goes back to the agent (above), and the card shows
   every earlier review. One pull request of class `migration` reached its
   card with the review recorded as "no verdict" in 0 seconds and no audit
-  row, while the card said it had passed its gates (backlog 68).
+  row, while the card said it had passed its gates (backlog 68). The review
+  had run, since no class skips it, and returned a note; the defect was
+  that a note counted as a pass. Since Stage 10 (Task 86, change id
+  `review-verdict`) a review that ran without a verdict, for any reason, a
+  failed call, a refusal or an unreadable answer, is the finding "the
+  review gave no verdict" on the card, whatever the stage's `on_findings`:
+  never to the agent, which cannot answer a failed call, and never a merge
+  on `auto`. The loader refuses `when` on the review, so switching it off
+  is its only skip, and a roll's note stays no finding (Ruling 178). Live,
+  a migration-class pull request reached its card with the review's
+  verdict and the migration finding. A planted 2-second review bound did
+  not produce a review without a verdict, since the review finished before
+  the gate supervisor answered (Ruling 171's race); the rule is proven by
+  its tests and by the same rule on the audit stage, live below.
+- **Security audit** (Ruling 188, Task 85). After the review, for a project
+  whose file says `audit: true` (the code repository's does), a stage
+  `audit` with `on_findings: human` only: its findings go to the card,
+  never to the agent, and rule out `auto`. It runs in two parts. A
+  pre-check scans the diff's added lines for secret shapes (private keys,
+  credentials in URLs, bearer tokens, JWTs, provider token prefixes, a
+  password or token assigned a literal) and reports file and line, never
+  the value. Then one call on the task class's `audit_model`
+  (coding-frontier on the stronger rung; the gateway admits factoryd only
+  the aliases the task's own class names, Ruling 200) reads the diff
+  against a fixed checklist of six items: secrets, network egress, RBAC
+  and service accounts, policy and workflow files, migrations that drop or
+  widen, and the sandbox contract. It answers `clear` or `findings`. No
+  verdict, a cut diff (48 KiB), a refused or failed call are findings too.
+  Every finding's text passes the scrubber, fed with the secret values the
+  diff itself holds, so the card and the timeline never show one. It posts
+  no pull request comment. A roll skips it. Bound `GateAudit`, 360 s, under
+  the gate supervisor. Live: a PEM key planted in a test file reached the
+  card with the pre-check's finding and the model's, a clean doc comment
+  passed as `clear` in 2 seconds, and on the lane it flagged a
+  collaborator delete, a changed push path and protection re-asserted for
+  a human. One audit call died with a roll's gateway restart and landed on
+  the card as "the audit call failed". The checklist's fourth item first
+  fired on Go source that merely names policy types; it now names the
+  configuration files by path (backlog 71).
 
 Each gate and the review check that the pull request's head is still the
 gated commit. A moved head fails the task, because the checks passed on a
@@ -2185,7 +2477,16 @@ leaked `factory-merge` token can merge only pull requests a whitelisted human
 has approved. The bot's token reaches the code repository only.
 
 A 405 or 409 from Forgejo is a refusal: the workflow comments it, notes it on
-the card and keeps waiting. Any other merge error is retried 5 times, then
+the card and keeps waiting. Stage 10 found the gap in that rule: a pull
+request that no longer merges, because `main` moved under it, answers 405
+on every approval, and the card stays open with no finding. The lane's
+fix landed at the end of the round (backlog 70, change id
+`merge-conflict`): a refusal whose pull request no longer merges is a
+conflict, not a refusal, and goes back to the agent as a finding that asks
+it to merge `main`, on the approval path and on `auto` alike. It needed
+backlog 72 first, since the agent's merge of `main` would otherwise carry
+`main`'s workflow change and be refused at push. Not yet seen on a live
+conflict. Any other merge error is retried 5 times, then
 reported as a `merge_failed` step and comment, and retried after 10 minutes
 with the same approval. After 6 such retries, about an hour, the workflow
 comments "merge retries exhausted", sets no timer and waits for a signal
@@ -2213,7 +2514,8 @@ these hold:
 Then factoryd comments which proof held, the review's summary and the
 strict-improvement line, and `factory-merge` merges with the approver
 recorded as `merge rule auto`, using the project's own merge token. Any
-unmet condition, class `migration` or `high`, a skipped reproduction, or a
+unmet condition, class `migration` or `high`, a skipped reproduction, a
+review without a verdict, an audit finding (since Stage 10), or a
 refused merge sends the task to the human card, which shows the review's
 verdict, the agent's recommendation and every unmet condition. A project on
 `auto` has 0 required approvals on `main`, and on `human` it has 1, as the
@@ -2230,7 +2532,10 @@ alerts table records kind `info_request` (8). The issue author's next
 comment resumes the task, whatever the author's access, and so does a
 writer's. The next brief carries the answer under "Poster information", as
 information and never as authority: an author's comment never answers an
-escalation, where only writers count. Fourteen days without an answer close
+escalation, where only writers count. Since Stage 10 a poster's answers
+buy at most two extra attempts per task (backlog 29, change id
+`poster-cap`, migration 0035), so an account without write access cannot
+keep a task running on answers alone. Fourteen days without an answer close
 the issue as not reproducible with a comment, and the task ends `closed`.
 
 **The brief keeps the poster's text apart.** The brief writes factoryd's own
@@ -2243,11 +2548,31 @@ standing or change how to work. A test forges a standing line, a "How to
 work" section and a closing marker inside the text, and all stay inside the
 markers.
 
+**Sanitised text, in and out** (Task 89). One sanitiser,
+`internal/sanitize`, cleans untrusted text on its way into the brief and
+agent-written text on its way out to Forgejo. Inbound, the issue text, the
+poster's answers and the findings lose hidden HTML comments and Markdown
+comment definitions, which a human reading the issue never sees, and
+mentions and closing keywords are neutralised. Outbound, everything
+factoryd posts from an agent or a model, the pull request's title and body,
+escalations, information requests, the review, reports, supervisor
+comments and the roll's commit subjects, loses hidden comments too,
+mentions become `＠name`, a closing keyword before a reference becomes
+`(Fixes) #12`, and a link to a host outside `link_hosts`, the Forgejo
+host and the project's own hosts is defanged. The forms were tested
+against 49 hostile samples built from Forgejo 15's own mention and
+keyword patterns, emphasis-stripped forms included. Live: an issue with a
+hidden comment asking to add a CODEOWNER, a Markdown comment with a
+`curl | sh`, a mention and "Fixes #1" reached the agent with the hidden
+parts gone and the rest neutralised, and the agent obeyed neither hidden
+instruction. The review model still reads the raw issue text.
+
 Workflow changes since Stage 6 sit behind Temporal `GetVersion` change ids
 (`gates`, `answers`, `gates-pinned`, `merge-failure-reported`,
 `merge-retry-cap`, `gate-started`, `gate-supervisor`, with Task 66
-`auto-merge` and `needs-info`, and in Stage 9 `stages`, `roll` and
-`session-cap`), so a run started before a change keeps its old path. A
+`auto-merge` and `needs-info`, in Stage 9 `stages`, `roll` and
+`session-cap`, and in Stage 10 `audit`, `review-verdict`, `checks-rerun`,
+`poster-cap` and `merge-conflict`), so a run started before a change keeps its old path. A
 replay test runs every recorded live history in the code repository's
 testdata. Live: PR #100 merged by `factory-merge` after the human's approval
 and a 405 before it, and PR #126 went through every gate, the review, the
@@ -2280,8 +2605,8 @@ deploy-key push, and factoryd's port 8080, for the alerts endpoint. Since
 Task 73 the spawner serves every project with `agents: coder`, the
 factory's code repository included, through the same project path.
 
-The Stage 9 bug lane found three defects here, open as backlog 61, 62 and
-65. A spawn that failed after creating its namespace, on Hetzner's
+The Stage 9 bug lane found three defects here, backlog 61, 62 and 65,
+which the Stage 10 lane fixed (7). A spawn that failed after creating its namespace, on Hetzner's
 "Primary IP limit exceeded" while earlier build VMs' firewalls still
 answered `resource_in_use` (backlog 2), left an empty namespace that the
 spawner reconciled with a forbidden read every 10 seconds and never
@@ -2290,7 +2615,11 @@ respawned. Build VMs on one Hetzner address failed with i/o timeouts to
 other addresses built. And a failure the agent cannot act on goes back to
 it as a finding, while Forgejo 15.0.9 has no API to re-run a job: the
 controller re-ran jobs through the web route and once pushed an empty
-commit onto the bot's branch as site admin.
+commit onto the bot's branch as site admin. Since the fixes the spawner
+creates the namespace's RoleBinding before the build VM and deletes the
+namespace when the binding fails, a silent `buildkitd` gets one
+replacement VM, and a red head the agent left unchanged re-runs its checks
+once (7).
 
 The registrations come from a dedicated Forgejo account, `factory-ci`
 (Rulings 101, 101a). Forgejo's repository runner API answers only the
@@ -2306,7 +2635,13 @@ collaborator permissions for the trust checks in 8.
 
 A pull request comes from the `factory-agent` fork (6.3), so its jobs get a
 read-only job token and no Actions secrets. The check `job-env-audit` proves
-it on every run: it asserts that the job token cannot push. Workflow files
+it on every run: it asserts that the job token cannot push. The job's
+environment also names Forgejo's OIDC request variables, which the runner
+always sets; Forgejo 15.0.9 fills them only when a workflow enables
+OpenID Connect and forces that off for a fork's pull request, so they are
+empty and the job can mint nothing (backlog 56, read from the source in
+Task 86 and seen live). Since Stage 10 the check fails if either is ever
+non-empty. Workflow files
 come from the head, which is why the worker and factoryd refuse any change
 to the workflow directories.
 
@@ -2570,9 +2905,11 @@ doubled a count. Since the fix factoryd reports every kind and verdict pair,
 (Rulings 173, 174). Open escalation and information-request rows used to
 stay open after their task ended, so the panel carried stale opens; the bug
 lane fixed it (backlog 3, #195, migration 0033). An agent task's alert that
-a human closes as a duplicate still comes out `noise`, and the console
-refuses a later verdict: the gateway's real 5xx alert #210 counts as noise
-(backlog 64).
+a human closes as a duplicate came out `noise`, and the console refused a
+later verdict: the gateway's real 5xx alert #210 counted as noise (backlog
+64). Since the Stage 10 lane's fix, a label `real` on such an issue at the
+close judges its alert real, the mirror of `noise` in the human lane;
+proven live when the CI queue alert #273 was closed with it.
 
 **Task analytics** (Ruling 185, Task 78). factoryd counts four things per
 task: `factory.task.outcome{project,state,model_alias,attempts,merge_rule}`
@@ -2669,9 +3006,13 @@ since Stage 6, but neither has run under load.
 | UI style | Server-rendered Go with htmx | Decided |
 | Policy engine | Go code now, OPA sidecar when rules multiply | Decided |
 | Policy source | The tree `factory/` in the infra repository (policy, projects, workflow), read by factoryd, the commit as the version, pinned per task, a generated JSON Schema and a CI check, the console read-only. Runtime decisions are Postgres rows. Kubernetes is the substrate only | Built (Rulings 107, 183, 184) |
-| Workflow | An ordered list of stages, each with one `on_findings` setting (agent, human or fail); a repeat from one stage takes the stronger rung; the session cap is the round cap for every exhaustion | Built (Rulings 177, 190, 193) |
+| Workflow | An ordered list of stages, each with one `on_findings` setting (agent, human or fail); a repeat from one stage takes the stronger rung; the session cap is the round cap for every exhaustion; a review without a verdict is a finding on the card; a red head the agent left unchanged re-runs its checks once | Built (Rulings 177, 190, 193, 201) |
+| Security audit | A stage after the review, per project, a secret pre-check on the added lines and one call on the class's `audit_model` with a six-item checklist; findings, a missing verdict included, to the card only | Built (Rulings 188, 200) |
+| Message-in | A `Message` call in the adapter contract; opencode as a server in the pod, one port only factoryd reaches, a per-session bearer; the restart as the fallback for a harness without it. First user: the loop nudge, counted from the event stream | Built (Rulings 188, 202) |
+| Untrusted text | One sanitiser into the brief and out to Forgejo: hidden comments stripped, mentions and closing keywords neutralised, off-list links defanged; agent commits squashed under a sanitised subject | Built (Task 89) |
+| Answer chain for questions | `questions: [self, model:<tier>, human]` per stage (queue item B), on top of the message call | Not built, waits for Sebastian's scoping |
 | Rolls | The code repository rolls through a roll task: a digest pull request from factoryd, a card, the bot's merge, a row per image. Infra changes stay human commits | Built (Ruling 178) |
-| Model routing | Three LiteLLM tiers across providers, membership by quality, latency order inside a tier, no fallback across tiers, the answering deployment in the audit row | Built (Rulings 181, 189, 192) |
+| Model routing | Three LiteLLM tiers, membership by quality, latency order inside a tier, no fallback across tiers, the answering deployment in the audit row; one provider, Alibaba, one deployment per tier, retries without cooldown | Built (Rulings 181, 189, 192, 204) |
 | Capability classes | `coder`, and `analyzer` with a report session mode for the improvement presort and the screening stage. The release is the roll task, no class | Built (Rulings 182, 185, 191) |
 | Task analytics | Four task metrics, a revert mark and four panels, no report task | Built (Ruling 185) |
 | SPIRE and OPA | No need appeared in Stage 9 | Deferred |
@@ -2688,7 +3029,7 @@ since Stage 6, but neither has run under load.
 | Hold-out scenarios | Acceptance scenarios a step is graded against, kept outside that step's read access (StrongDM). Would belong to a spec stage of the configurable pipelines | Revisit later, not any time soon (Sebastian, 2026-09-29) |
 | Reader and writer split | A read-only agent for untrusted text, a writer that never sees it (GitLab). Rejected: every agent keeps the exact input, an optional scan for injection attempts guards it instead | Rejected (Sebastian, 2026-09-29) |
 | Command-level policy | Allowlisting commands inside the sandbox (Codex execpolicy, Ona exec-gate, OpenShell binary pins). Rejected: allowlisting every legitimate command is an endless race, so the sandbox allows everything and the blast radius stays contained | Rejected (Sebastian, 2026-09-29) |
-| Hard caps | A hold for each call's worst case under an advisory lock, the output clamped to the headroom, the real cost booked in full, a cut call books its hold | Decided (Rulings 113, 115, 117) |
+| Hard caps | A hold for each call's worst case under an advisory lock, the output clamped to the headroom, the real cost booked in full, a cut call books its hold until the settle window ends; caps per task, day and UTC month, the month over all projects, with LiteLLM's proxy budget behind it | Decided (Rulings 113, 115, 117, 196, 204) |
 | Human identity | Forgejo OAuth2 now, Keycloak only if SSO story demands | Decided |
 | Sandbox runtime | gVisor on cloud VMs now; microVMs (Kata or Firecracker) on bare-metal KVM nodes when build volume pays for them, for CI jobs and agent sandboxes alike (7.2) | Decided |
 | Worker harness | opencode first, Codex CLI successor, goose fallback, behind the adapter contract | Decided |
@@ -2703,7 +3044,7 @@ since Stage 6, but neither has run under load.
 | Agent pull requests | From a `factory-agent` fork, so PR jobs get a read-only token; two session tokens, read upstream and write the fork; workflow-directory guard in the worker and factoryd | Decided (Rulings 97, 100) |
 | CI registrar | Dedicated `factory-ci` account, organisation owner because the runner API demands it, token scoped to the code repository, `main` protected with `apply_to_admins` | Decided (Rulings 101, 101a) |
 | Missed webhooks | The heal pass re-reads Forgejo every minute and signals what webhooks missed; `Reconcile` at the start of every workflow run | Decided |
-| Supervision | Cheap trace detectors over the event stream, the strongest model as supervisor under its own alias, inside the session activity, at most three calls per session, paid from the task's remaining budget. Human answers are kept across attempts in their own brief section. A `no_write` progress detector, and a gate supervisor for the five long gates with wait, retry, cancel or escalate. A 6-minute supervisor timeout, every exhausted task to the card, a repeated trip to the stronger rung | Built (Rulings 82, 86, 87, 118, 120, 141, 154, 161, 162, 163, 186, 193) |
+| Supervision | Cheap trace detectors over the event stream, the strongest model as supervisor under its own alias, inside the session activity, at most three calls per session, paid from the task's remaining budget. Human answers are kept across attempts in their own brief section. A `no_write` progress detector, and a gate supervisor for the six long gates with wait, retry, cancel or escalate. A 6-minute supervisor timeout, every exhausted task to the card, a repeated trip to the stronger rung. A nudge into the running session before the same-call trip | Built (Rulings 82, 86, 87, 118, 120, 141, 154, 161, 162, 163, 186, 193, 202) |
 | Alerts | An `alerts` table with a verdict per alert, counted in SigNoz, with a precision panel. Alerts on the factory's own namespaces route by the namespace label like a project's | Built (Rulings 140, 180) |
 | Factory model calls | The review and both supervisors call through the gateway with factoryd's token and purpose headers, audited and booked like an agent's | Built (Task 71) |
 | Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list. Servers and volumes, no buckets. SSH certificates bound to one server. Outbound tcp 53, 80 and 443. Deletion at the last tick before the lease ends | Built (Rulings 80, 83, 121, 122, 124, 125) |
@@ -2711,7 +3052,7 @@ since Stage 6, but neither has run under load.
 | Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Built (Rulings 81, 84) |
 | Merge authority | The `factory-merge` bot merges after a whitelisted human's approval, enforced by Forgejo's branch protection. Merge retries are capped at six. A project on `auto` merges class `normal` without a card after a proven reproduction or a strict improvement and an approving review; the factory's repositories stay on `human` | Built (Rulings 109, 129). `auto` built (Rulings 149, 167, 169) |
 | Intake lanes | Every bug from any account or alert starts a task. Improvements wait as suggestions for a writer, with an analyzer's write-up. Outsiders' bug reports pass a screening stage. Outsiders' writer-only labels are stripped. The poster's text is untrusted information between random markers | Built (Rulings 148, 150, 182, 185) |
-| Projects | Each project its own Forgejo organisation with a CI user, runner registration, deploy key and deploy branch. Flux tenancy through a namespaced account. A default-deny network policy and a quota per environment. Settings from the project's file, `objects: factory \| seed` and `agents: coder \| none`, so the factory's two repositories are projects like any. Hostnames are an infra commit | Built (Rulings 146, 155, 156, 157, 164, 165, 166, 179) |
+| Projects | Each project its own Forgejo organisation with a CI user, runner registration, deploy key and deploy branch. Flux tenancy through a namespaced account. A default-deny network policy with the file's outside hosts only and a quota per environment. Stricter wins: a project file only tightens the policy's defaults. Reconciled hourly. Settings from the project's file, `objects: factory \| seed` and `agents: coder \| none`, so the factory's two repositories are projects like any. Hostnames are an infra commit | Built (Rulings 146, 155, 156, 157, 164, 165, 166, 179) |
 | Resource kinds | `task` (leased, agent-requested) and `standing` (no lease, registration or a human) in one envelope | Built (Ruling 147) |
 | Hand steps | OpenBao configuration, push mirrors and the console's OAuth app as converging CronJobs. The unseal and a one-time OpenBao bootstrap stay by hand | Built (Ruling 143) |
 | Spend approvers | The policy's `approvers` list gates resource approval, envelope edits, promotion and the merge approve button | Decided (Ruling 128) |
@@ -2747,6 +3088,13 @@ works `factory` and `demo-app`.
    review escalation, self-improvement analytics. Closed 2026-09-29: the
    review's findings go back to the agent, the analytics are four task
    metrics with panels, and no need for SPIRE or OPA appeared.
+6. Hardening (Stage 10, closed 2026-09-30): the recovery without a
+   Forgejo dump, the security audit stage, the review-verdict rule,
+   message-in and the loop nudge, the hardened harness configuration,
+   hidden tools, stricter wins, protected files, the sanitiser, one model
+   provider and a month cap, and a bug lane the factory ran on itself. What follows waits for Sebastian's
+   scoping: the UX phase, the second harness and parallelism are the
+   known candidates.
 
 ## 12. Glossary
 
@@ -2789,7 +3137,7 @@ works `factory` and `demo-app`.
 | Deploy branch | A project's branch `deploy`, which holds the rolled state that Flux applies. Only the deploy key pushes to it |
 | Standing resource | A project's environment server: no lease, requested by registration or a human, a fixed monthly line |
 | Bound | The seconds a gate activity may run before it raises a `gate_bound` alert |
-| Gate supervisor | The supervisor model called when one of the five long gates passes its bound. It chooses wait, retry, cancel or escalate |
+| Gate supervisor | The supervisor model called when one of the six long gates passes its bound. It chooses wait, retry, cancel or escalate |
 | Alert verdict | Whether an alert was a real problem or noise, set by the supervisor's action, a human's click or the task's outcome |
 | Poster information | An issue author's answer to an information request, carried in the brief as untrusted information, never as authority |
 | Configuration tree | The directory `factory/` in the infra repository: `policy.yaml`, `projects/<name>.yaml` and `workflow.yaml`, read by factoryd, with the commit as the version |
@@ -2804,3 +3152,10 @@ works `factory` and `demo-app`.
 | Report session | A session with a read token only and no push, whose last message factoryd posts as an issue comment |
 | Screening | The stage in which an analyzer reads an outside account's bug report before the coder starts and answers clear or suspect |
 | Revert mark | A done task's mark when a later pull request undid its change or its alert was filed again within 14 days |
+| Security audit | The workflow stage after the review that checks a diff for secrets and risky changes; its findings always go to a human |
+| Loop nudge | The message factoryd sends into a running session after three identical calls in a row, before the same-call trip |
+| Message port | Port 8091 on a worker pod, where factoryd alone posts a message into the running session with a per-session bearer |
+| Sanitiser | `internal/sanitize`: strips hidden text and neutralises mentions, closing keywords and off-list links in untrusted text into the brief and agent text out to Forgejo |
+| Protected files | Manifests, lockfiles, agent instruction files, `CODEOWNERS` and top-level dot files, which rank `high` in the policy gate |
+| Stricter wins | The rule that a project file may only tighten the policy's defaults and caps |
+| Month cap | `budget.month_eur`: the variable spend of every project and the factory in one UTC month; a task that meets it parks at a human card |
