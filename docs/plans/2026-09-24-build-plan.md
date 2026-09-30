@@ -3302,3 +3302,31 @@ roadmap](../roadmap.md).
 After Stage 10, nothing is settled beyond Sebastian's scoping. The next
 stage starts with the rebuild and the step-zero gate. The known candidates
 and every other future topic are in [the roadmap](../roadmap.md).
+
+### Stage 11: building software from a spec
+
+Settled 2026-09-30 after the Stage 10 close (rulings 205 to 207), outline in
+[the roadmap](../roadmap.md), "Next". The factory so far fixes and improves
+existing code; this stage makes it build a new application from a written
+spec, with several agents in parallel. Sebastian's principle (ruling 206):
+no fixed development process, only primitives, each a plain YAML block with
+a schema and a fixed list of options, composed by the user and checked by
+`factoryd config check`, which refuses a composition that cannot work.
+
+Steps: the rebuild and the step-zero gate; a design task for the primitives'
+YAML, schemas and refusals; then a new project from the console (a button
+that opens a pull request on infra, ruling 183 kept, with a loading
+indicator, step status and tooltips); board lanes Backlog and Ready as
+configuration; a planner class whose accepted plan factoryd turns into
+child cards with dependencies; "Start plan", with a card that waits on its
+dependencies and starts by itself; a foundation card first and an
+integration card last; `merge.queue` per project; collision-free numbering
+for migrations and change ids; the checks stage on an empty repository and
+Node in the worker image and CI.
+
+Exit test, in outline: on a new, empty project, one spec card for a link
+shortener with a TypeScript single-page frontend and a Go API becomes a plan
+of about ten cards, at least four agents work in parallel, the merge queue
+lands them, the integration card passes and the app deploys to staging,
+with no controller code in the new repository and a human clicking cards
+only.
