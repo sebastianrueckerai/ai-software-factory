@@ -14,8 +14,8 @@ This folder holds the round's artifacts:
 |---|---|---|
 | Per-solution report format | [research-template.md](research-template.md) | final, use as-is |
 | Scan table over the field | [scan.md](scan.md) | written (Task 143) |
-| Deep reports, one per kept solution | `reports/<name>.md` with `reports/shots/` | in progress (Tasks 144 to 155) |
-| Aggregate report (steal / exclusive alternatives / expectations / leave out) | `report-final.md` | to write |
-| First improved board proposal | `proposal-v1.md` | to write |
-| The board-only roadmap (everything later) | `roadmap.md` | to write |
+| Deep reports, one per kept solution | `reports/<name>.md` with `reports/shots/` | written (Tasks 144 to 155) |
+| Aggregate report (steal / exclusive alternatives / expectations / leave out) | [report-final.md](report-final.md) | written (Task 156) |
+| First improved board proposal | [proposal-v1.md](proposal-v1.md) | written (Task 157, rulings 243-248) |
+| The board-only roadmap (everything later) | [roadmap.md](roadmap.md) | written (Task 157) |
 | Local click dummy with real card data | `../../board-lab/` | data extracted (Task 142); UI to build |
