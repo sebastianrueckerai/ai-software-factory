@@ -78,7 +78,9 @@ alive, board-centric or afterthought.
   Mission Control is the dashboard: running droids, elapsed time, spend,
   checks per droid. Dashboard-centric rather than card-centric, but the
   densest per-card telemetry in the field (our old pattern 7 cites it).
-- **Conductor** (conductor.is). Closed macOS app, alive. Parallel Claude Code
+- **Conductor** (conductor.build; the scan first said conductor.is, which is an
+  unrelated QuickBooks-API product - corrected after the deep report). Closed
+  macOS app, alive. Parallel Claude Code
   and Codex sessions in worktrees on one screen, with a Checks tab for review
   across sessions. Desktop-centric; the board is one view of several.
 - **Claude Squad** (smtg-ai/claude-squad). AGPL-3.0, alive (releases through
