@@ -2102,20 +2102,30 @@ to `factory-gateway`. Model and tool calls stay entirely on that identity
 path.
 
 Git is the one path outside the gateway, and the agent never holds its
-credential. For every session factoryd mints two Forgejo tokens for the
-`factory-agent` account and revokes both when the session ends: one reads
-the upstream repository, the other writes only to the account's fork of it,
-`factory-agent/ai-software-factory-code`, which factoryd ensures at boot
-(private, Actions off). The worker, running as pid 1 in the pod, clones from
-upstream with the read token before the harness starts, then runs the
-harness in its own process group without either token in its environment or
-in `.git/config`. When the harness finishes, the worker kills and reaps every
-other process in the pod, fetches the agent's commits into a fresh repository
-it owns with hooks and repository config disabled, and pushes
-`factory/<id>` to the fork from there. factoryd then opens the pull request
-`sf:main ← factory-agent:factory/<id>`. A token in the agent's repository
-leaks through git hooks, `core.fsmonitor` and lingering processes that read
-`/proc/<pid>/environ`, hence the clean repository.
+credential — since round 2 of Stage 12, not even the pod's worker
+container does while the agent lives. The session's clone runs in an init
+container that holds the one read token (read:repository on the upstream
+repository and the bot's fork), mounts the workspace only, and exits; the
+worker container's environment carries no Forgejo token at all, and
+`task-git` holds the read token alone. The worker records main's head at
+clone time, so the final push needs no fetch: it takes main's commit from
+the agent's own objects. When the harness finishes, the worker kills and
+reaps every other process in the pod and then — and only then — asks for
+the push token: it writes the push envelope on stdout and waits on its
+message port while factoryd mints the write:repository token for the bot's
+fork (`factory-agent/ai-software-factory-code`, ensured at boot, private,
+Actions off) and posts it; the worker pushes `factory/<id>` from a fresh
+repository it owns with hooks and repository config disabled, git by its
+absolute path (an agent-planted `git` on the PATH-writable cache cannot
+take the call), and the deferred revocation still removes the token.
+factoryd then opens the pull request `sf:main ← factory-agent:factory/<id>`.
+Every stop path — the supervisor's stop, the wall clock, factoryd's own
+graceful shutdown — funnels through the same hand-over inside the pod's
+termination grace, proven live by round 2's drills with
+`scripts/agent-sees-no-token.sh` finding zero credentials in the running
+session. The accepted costs (rulings 231, 240): a factoryd that dies
+without its graceful shutdown, and a session cancelled outright, lose that
+session's unpushed work.
 
 The fork exists because of the CI job token. On a pull request from a branch
 of the same repository, Forgejo hands the Actions job a token that can
