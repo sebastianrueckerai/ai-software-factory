@@ -3524,6 +3524,68 @@ the start (no `[service]` section in its configuration), was switched off
 (infra a668a94); every factory repository and organisation is private.
 Ruling 213's goal is met in round 1.
 
+Round 2 ran on 2026-10-01, ruled by Sebastian as 228 (round2-proposal.md
+with every recommendation taken) and closed by this build. The rebuild
+recovered generation v11 into v12, passed the step-zero gate (the gate's
+roll needed a second try: the first failed at its own checks, root-caused
+as gVisor's gofer permission-checking an open of a 0644 file another
+sandbox wrote on the shared build cache — fixed by umask 0000 in the two
+containers that mount a project claim, ruling 241), and the lane task
+proved the content-filter escalation end to end with its ledger spend
+equal to LiteLLM's to the cent. Ruling 227's account work landed first
+(Task 123, rulings 229 and 239): a machine admin `factory-admin` and the
+controller's own account `controller` now hold every credential the
+factory uses — the chart's admin, OpenBao's registration login, the seed,
+both CronJobs, the OAuth app, the registry, Flux — and Sebastian's
+account holds no token at all, so he may switch TOTP on whenever he
+likes; the audit trail names the controller's clicks as its own. Forgejo
+now requires a login to view anything (item 138) and probe_sent's two
+repositories went private. The security review (Task 125, ruling 230)
+walked every accepted risk and kept all of them, none reachable under
+the agent-PR-outsider threat model; its one finding, demo-app's main CI
+still sharing the warm cache with its untrusted PR jobs, was fixed the
+same hour. Two rolls carried the build: Roll 1 the security half (item
+40: the clone in an init container and the push token minted only after
+the agent's processes are dead, proven live by scripts/agent-sees-no-token;
+screening of an outsider's later answers; outsiders' text sanitised into
+the review and both supervisors and activity errors scrubbed of every
+secret factoryd loads; CPU and memory limits required by the admission
+policy; a euro cap per project, drilled live), Roll 2 the flow half (the
+answer slice as a quarter of the card's agent time; one route file per
+feature in the template; Retry of a failed plan card, proven live end to
+end after its missing wiring panicked in drill 2 and was fixed in Roll 3;
+the roller comparing against the last merged roll; roll-window 5xx
+alerts recorded, not filed; the content-filter refusal escalated at once;
+cache and branch pruning with the claim-directory repair; the project
+key `model: stronger`). The drills on scratch12 passed six of nine
+clean, and the two failures became Roll 3's fixes: the Retry route's
+nil wiring (now guarded by a test that every console function field is
+wired) and the stuck rule's alternation memory, which a delivered
+message used to clear, letting a circling agent buy message after
+message for 38 minutes (ruling 224's intent restored: flip_flop and
+churn stay armed across messages). The eviction drill found its wording
+cannot make the cheap tier sit in the loop the kubelet needs to sample
+usage, and that gVisor plus an emptyDir sizeLimit gives no write-time
+protection — recorded; Stage 11's five real evictions remain the proof
+of the recording. The timed stronger-tier run built the linkshort spec
+in 1 h 10 min for 3.99 EUR on a ten-card plan (the cheap tier's round 1:
+1 h 43 min, 1.69 EUR, seven cards): a third faster at 2.4 times the
+cost, with a review that caught real code-level defects the cheap tier
+passed; the speed breakdown (Task 141) shows model wait at 58 percent of
+session time and dependency waits dominating wall time, which no tier
+touches. The exit test built two specs at once from the button —
+linkshort3 from the Stage 11 spec and a new notes app spec (tags,
+search, pinning, share links) — with no refile, no failed card and no
+cap card, acceptance 9/9 under `-race` each and staging smokes passing;
+one genuine design question (a root catch-all route against the
+foundation's store hand-back) was asked well and answered with the
+agent's own three-line fix. Its one finding became the round's last fix:
+ruling 226 keeps main's jobs off the shared cache, and their cold caches
+filled the runner pod's 1 GiB tmp emptyDir until the kubelet killed the
+pod mid-run — tmp is now 4 GiB (ruling 242, Roll 4), and linkshort3's
+rerun went green with staging rolling the digest. Standing contracts
+from this round, in the ledger as rulings 229 to 242.
+
 After Stage 12: the next scope is Sebastian's. [The roadmap](../roadmap.md),
 "Next", holds what round 1 found, and every other future topic is there
 too.
