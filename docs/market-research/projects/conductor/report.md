@@ -9,7 +9,7 @@ open_source: no
 self_hostable: no
 hosting_model: free local Mac app, plus paid Conductor Cloud sandboxes (Vercel, us-east-1)
 company: Conductor (formerly Melty Labs), YC S24, San Francisco, founded 2024 by Charlie Holtz and Jackson de Campos, $22M Series A led by Matrix and Spark, announced 2026-03-30
-maturity: no public repository or stars; app version 0.87.6 as of 2026-09-29; SOC 2 Type II attested; self-reported 10x user growth since January 2026
+maturity: no public repository or stars; app version 0.89.1 as of 2026-10-02 (0.87.6 at the 2026-09-29 baseline); SOC 2 Type II attested; self-reported 10x user growth since January 2026
 similarity: 1
 axes:
   signals_intake: 2
@@ -107,4 +107,47 @@ WebSearch: Conductor.build API webhooks Linear GitHub issue intake trigger works
 https://madewithlove.com/blog/conductor-running-multiple-ai-coding-agents-in-parallel/ (via search summary, 2026-09-29)
 https://www.conductor.build/blog/series-a (via search summary, 2026-09-29)
 /home/womb/repos/ai-software-factory/.claude/worktrees/market-research/docs/market-research/00-our-vision.md
+
+## 10. Refresh 2026-10-02 (board UX round)
+
+Documentation-only re-read against the 2026-09-29 baseline (site, full docs sitemap,
+changelog, Mac App Store listing, nimbalyst compare page, HN and Reddit voices). What
+changed or was missed above:
+
+- **Version 0.87.6 → 0.89.1**, still shipping weekly: 0.89.0 "Sign in with ChatGPT",
+  0.89.1 "GPT-6.1 Sol" (2026-09-29). Frontmatter updated.
+- **Docs restructured**: `/docs/core/*` became `/docs/concepts/*` (parallel-agents,
+  workspaces-and-branches, agent-modes, workflow, git-worktrees, testing), so the
+  baseline's 404 on `agent-modes` is resolved; new pages include first-workspace,
+  reference/diff-viewer, the whole `cloud/*` section, `docs/api`, and per-harness
+  reference pages. The keyboard-shortcuts reference page is a stub.
+- **Shipped since the baseline text was written but absent from it**: the Dispatcher
+  (0.63.0, ⌘N submits one prompt to several new workspaces at once), the PR page
+  (0.73.0, view PR comments and checks, edit title and description, merge in-app), and
+  0.85.0's sidebar "sections" (user-named workspace groups), experimental Workspace
+  status matrix (a grid of every workspace's status), routines GA (cloud-only, Pro and
+  Teams), per-workspace model loadouts ⌃⌘1–5 (shareable since 0.86.0). 0.85.0 also
+  loads PR comments and failing-check logs while a cloud workspace sleeps.
+- **Mobile app verified real**: Mac App Store listing "Conductor Build" v1.0.4, no
+  ratings yet — "run a team of coding agents in the cloud and control them from your
+  mac or phone"; release notes: "control your agents from your phone, keep them
+  running, review code, see PR status, merge your changes". The baseline's "a mobile
+  app to follow along" is now fact, and nimbalyst's compare-table claim "No iOS
+  companion app" is stale.
+- **Pricing/doc drift persists**: the docs FAQ still says "Right now we don't [make
+  money]" while the pricing page sells Pro and Teams; `/enterprise` remains a sparse
+  contact landing despite advertising SSO, SCIM, DPA and SLA; cloud hours are still
+  unmetered "for now".
+- **Security posture unchanged**: no sandbox, policy layer, budget or audit addition
+  found in the new docs or changelog; local workspaces still run with the developer's
+  full permissions ("development isolation, not a security boundary").
+- Board-level findings moved to the round's per-solution report:
+  `docs/board/reports/conductor.md` (Checks-tab breakdown, derived-status sidebar,
+  steering queue, pattern checks against stage10 section H).
+
+Refresh sources: https://www.conductor.build/changelog (full sitemap, 2026-10-02),
+https://www.conductor.build/docs/concepts/parallel-agents,
+https://www.conductor.build/docs/reference/checks (2026-10-02),
+https://apps.apple.com/ca/app/conductor-build/id6791228564 (2026-10-02),
+https://www.nimbalyst.com/compare/conductor (2026-10-02).
 </content>
