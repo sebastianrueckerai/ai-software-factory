@@ -51,10 +51,13 @@ alive, board-centric or afterthought.
   `NormalizedEntry` event model our old research already cites. The shutdown
   is itself a data point: a leading AI board with no revenue floor folded
   within a year.
-- **Automaker** (automaker.app). Closed SaaS, alive. Kanban-first project
-  management for agent work: tasks, specs, roadmap, agents execute the cards;
-  the run's configuration (model, harness, dependencies) sits on the card and
-  the board is keyboard-driven with single-letter views. Board-centric.
+- **Automaker** (automaker.app, AutoMaker-Org/automaker). Open source and
+  local-first (an Electron/React/Express app; the site self-describes as
+  "local, open-source"). Kanban-first project management for agent work:
+  tasks, specs, roadmap, agents execute the cards; the run's configuration
+  (model, harness, dependencies) sits on the card and the board is
+  keyboard-driven with single-letter views. Maintenance status to verify in
+  the deep report (the scan saw signs it may be unmaintained). Board-centric.
 - **Nimbalyst** (nimbalyst.com, github.com/nimbalyst/nimbalyst). Open source,
   alive. Sessions on a kanban by phase (backlog, planning, implementing,
   complete), each in its own git worktree; live transcripts, alerts on finish
@@ -116,7 +119,8 @@ Kept for deep reports (Tasks 144+), in field order:
 7. **Nimbalyst** - sessions as cards, live transcripts, approvals from a
    phone; cloneable if the stack runs locally, else documentation.
 8. **Automaker** - kanban-first agent PM with the run-config-on-card and
-   keyboard views our old patterns cite; closed, studied from documentation.
+   keyboard views our old patterns cite; open source (corrected from the
+   scan's first pass, which called it closed), studied from a clone.
 9. **Hermes Kanban** - the board as the agents' shared medium; cloneable.
 10. **GitHub Agent HQ** - the forge-integrated shape nearest our issue
     mirroring; documentation, refreshed from the existing report.
