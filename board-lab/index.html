@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>board lab - the factory board, proposal v1</title>
+<link rel="stylesheet" href="board.css">
+</head>
+<body>
+<header class="top">
+  <span class="brand">board lab</span>
+  <label>project <select id="project"></select></label>
+  <label>accent <select id="accentfilter"><option value="">any</option></option></select></label>
+  <span class="right">
+    <span id="spend"></span>
+    <button class="small" id="theme" title="toggle dark / light">theme</button>
+    <button class="small" id="showkeys" title="?">?</button>
+  </span>
+</header>
+<div id="clockbar">
+  <button id="play" title="replay the board from the first card">replay</button>
+  <input type="range" id="clock" min="0" max="0" value="0" step="1">
+  <span class="when" id="when"></span>
+</div>
+<main>
+  <h2 class="band">needs you</h2>
+  <div id="needsyou"></div>
+  <h2 class="band">agent lane</h2>
+  <div id="board"></div>
+</main>
+<div id="peek"></div>
+<div id="toast"></div>
+<aside id="detail"></aside>
+<div id="keys"><div class="box">
+  <table>
+    <tr><td>1-9, 0</td><td>open a running card's detail</td></tr>
+    <tr><td>d</td><td>clear the top decision (approve)</td></tr>
+    <tr><td>x</td><td>clear the top decision (deny with redirect box)</td></tr>
+    <tr><td>t</td><td>toggle dark / light</td></tr>
+    <tr><td>[ ]</td><td>scrub the board clock</td></tr>
+    <tr><td>space</td><td>hover-peek on the focused card (hover works too)</td></tr>
+    <tr><td>esc</td><td>close detail, peek, this overlay</td></tr>
+  </table>
+</div></div>
+<script src="board.js"></script>
+</body>
+</html>
