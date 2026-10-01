@@ -2309,8 +2309,19 @@ Sandbox hardening:
   result among them, or a binary first on `PATH` that a `main` job with
   the push token runs. Only pull request jobs and agents, which run the
   same untrusted code, share the warm cache; a merge's main CI runs cold,
-  about four minutes more. Nothing prunes the caches yet, a removed
-  project's included (roadmap).
+  about four minutes more. Two round-2 findings hardened this: gVisor's
+  gofer serves the volume per sandbox and checks an open of a file another
+  sandbox created against its group bits, so Go's 0644 (umask 022) cache
+  entries denied `O_RDWR` to the same uid in a sibling pod and cmd/go
+  reported `package X is not in std` — the two containers that mount a
+  claim now run with umask 0000 (Ruling 241, reproduced 19 of 33
+  concurrent cold runs before, 0 of 30 after); and a real app's cold main
+  checks outgrow a 1 GiB `/tmp`, so the CI runner's tmp emptyDir is 4 GiB
+  (Ruling 242). local-path's setup script prunes at every claim: a claim
+  directory unused for 14 days goes, and above 10 GiB per project per node
+  the files idle for 3 days do; claim stamps live outside the caches,
+  where a pod cannot forge them, and a 0755 directory the kubelet recreated
+  is repaired to 0777.
 - factoryd creates task namespaces through a narrow ClusterRole, and a
   ValidatingAdmissionPolicy confines it to `factory-agents-*` namespaces with
   the restricted Pod Security label, gVisor pods without an automounted API
