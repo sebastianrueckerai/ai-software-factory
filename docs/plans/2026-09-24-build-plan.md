@@ -3395,5 +3395,135 @@ refiled by the human in cards that fit one session, and its dependents are
 answered in the plan's order. The round's findings are backlog 77 to 89,
 now in [the roadmap](../roadmap.md).
 
-After Stage 11: [the roadmap](../roadmap.md), "Next", holds the follow-ups
-of the exit test. Every other future topic is there too.
+After Stage 11: Stage 12 below, a series of short bugfix rounds settled
+with Sebastian after the close (ruling 213). Every other future topic is in
+[the roadmap](../roadmap.md).
+
+### Stage 12: bugfix rounds
+
+Settled 2026-09-30 after the Stage 11 close. Ruling 213, Sebastian's: the
+next rounds are short bugfix rounds, no features, until the factory builds
+the Stage 11 test software reliably and quicker, with fewer loops and gates
+rather than more. Each round ends with that build as its test: linkshort
+from the same spec (exit11-spec.md) on a fresh project, with no refile, the
+human's clicks only the plan and the approvals, in under three hours,
+measured in time, refiles, clicks, failures and spend, and the next round
+fixes what it shows. The work of round 1 was the Stage 11 root cause
+analysis's seven suggestions, with Sebastian's rulings 212 and 214 to 217
+of the same evening: no human types a password for an internal service,
+the sanitiser for outsiders' text only, a board he can watch live, an
+agent-time cap of hours with a periodic check-in in place of the half-way
+check, check-ins and detectors that message the running session instead of
+ending it, and the cap and the check-in configurable per class, process and
+project.
+
+Round 1 ran on 2026-09-30 and 2026-10-01. The rebuild recovered generation
+v10 into v11 to the close's last transaction, brought Forgejo back from
+its dump and OpenBao from its snapshot, and passed the step-zero gate at
+22:29Z: the gate's roll of 2060cdf live at 22:16:58Z, and its lane task,
+the board's 3-second refresh (Task 107, ruling 215, code #342), merged in
+one session, with its 14 ledger rows equal to LiteLLM's at 0.01137014 EUR.
+Task 106 was the design (stage12-design.md), with six open questions ruled
+as 218 to 221. The tasks:
+
+- Task 107, the board refreshes every 3 seconds (the gate's lane task).
+- Task 108, the sanitiser for outsiders' text only (ruling 214, backlog
+  90): hidden comments stripped outside code blocks, no neutralising on
+  the way in, a writer's text as written. Built by a subagent, not the
+  lane, since its test data is the very text the old sanitiser rewrote.
+- Task 109, registration from OpenBao (rulings 212, 219): the reconcile
+  registers with the admin's login read from OpenBao, and the console's
+  password field and register click went.
+- Task 110, agent time and check-in per class, process and project
+  (rulings 216 to 218).
+- Task 111, the supervisor's continue, message or escalate, with its
+  message delivered into the running session, the check-in in place of
+  half way, shell writes counted, and one stuck rule (ruling 224).
+- Task 112, finished work kept at every cap, one cap card, a change
+  request at the cap as the answer (ruling 225), and first sessions from
+  main's head (change id `keep-work`).
+- Task 113, the per-project cache volume for sandboxes and CI, with Go's
+  module cache per pod (ruling 223); Task 113b moved the cache to its own
+  exec-capable node path and kept main CI off it (ruling 226), after a
+  warm cache segfaulted the second `go run` of gosec on scratch12.
+- Task 114, gcc, make and python3 in the worker image, and evictions
+  recorded as such.
+- Task 115, the failing job's log lines in the checks finding, read
+  through the bot's web session, since Forgejo 15.0.9 serves job logs to
+  no token.
+- Task 118, the alerts endpoint's digest query, which the template's
+  staging job waits on.
+- Task 119, the template `ts-go` that works out of the box, with its
+  `check` (ruling 222: CI fails a `check` that drops gosec or
+  `go test -race`).
+- Task 120, the guides: bash check, then end; named tests; cards sized by
+  what they produce; the foundation's contracts.
+- Task 122, the gateway's 499 for a caller's cancel, after an alert on 502s
+  from sessions the supervisor ended filed code #348 (debug-gateway-5xx.md).
+- Tasks 116 and 117, `run_checks`, were not built (ruling 221): the
+  sandbox runs the same `bash check` CI runs.
+
+Three rolls carried the code. Roll 1, be962f6 (Tasks 109, 113, 114, 118),
+was live at 23:05Z (roll #346, pull request #347), after the infra commits
+that it needed first: the StorageClass `factory-cache` (d9f3fa3, 78f857e)
+and OpenBao's kv mount, policy and role with the seeded admin login
+(04d932d, 4084d88), applied by the bootstrap and the seed by hand. The
+template followed on infra (40c677d, 001e04a). Roll 2, of 026ded8 (Tasks
+110, 111, 112, 115, 120, 108, the controller's guide fix 4506bbb and its
+gosec fix 026ded8), was live at 00:10Z (#351, pull request #352), with the
+time values on infra in the same window (6925852, d0fb868: agent time 2 h,
+check-in 45 min, steps 1500, supervisor calls 6, the planner 30 min with
+no check-in) and the config check's pin (72ac1cb). Its first roll task
+#349 failed on gosec G104 in Task 115's code, which the implementer and the
+landing had checked with vet and `-race` only. Roll 3, 549e32b (Task 122),
+was live at 00:36Z (#353, pull request #354), with the pin bumped
+(462d803). Ruling 226's cache path and main CI's env landed on infra as
+61c4fde without a roll. The live proofs ran on a scratch project,
+`scratch12` (infra 88b207d): the button and Merge registered it from
+OpenBao with no password in 30 seconds, its seed's main CI went green
+through staging with the pod on the run's digest (checks 4 min 11 s,
+image 39 s, staging 39 s), and two smoke cards merged, one through a queue
+conflict settled by a session that merged `main`.
+
+Closed 2026-10-01. The round's exit test (Task 121, ruling 220) built the
+spec on the fresh project `linkshort2`, beside `linkshort`, which stays
+registered. It passed clean: no refile, no failed card, no answer to a
+card and no cap card. From the button at 00:36:50Z the planner's seven
+cards (foundation, auth, links, stats-qr, ratelimit, frontend,
+integration) were all merged at 1 h 43 min and staging served `main` at
+1 h 52 min. Against Stage 11's exit test: 1 h 43 min to all cards merged
+where Stage 11 took 6 h 12 min with its fixes; 0 refiles, splits or fix
+cards against 17; 0 of 8 tasks failed against 12 of 28; 12 human clicks
+(the button, the project's Merge, the spec card, Accept plan, Start plan
+and seven merge approvals) against about 45, most of them answers and
+refiles; 12 sessions against 58, four of them a short session merging
+`main` after the queue found a conflict; 6 supervisor trips, four
+messages into the running session and two continues, with no restart and
+no stuck end, against 30 redirects that each ended a session; 0
+evictions against 5; a peak of 5 sessions at once against 4; and 1.69 EUR
+against 5.99, on the cheap tier throughout, so the stronger tier was not
+needed for coding cards (suggestion 7). The foundation finished in one
+session of 19 minutes where Stage 11's failed at the 20-minute cap and was
+split. The longest session ran 41 minutes, the auth card's, held on track
+by two messages. A1 to A9 pass under `-race` on `main` 9e879d7, and the
+staging smoke passes from a pod in the namespace. The run's findings, in
+[the roadmap](../roadmap.md): every feature card conflicted once with
+`main` on the template's one route list and spent a short session on it,
+and staging serves only plain http in the cluster, so a `Secure` cookie
+does not round-trip there. Standing contracts from this round, in the
+ledger as rulings 218 to 226: agent time 2 hours, check-in 45 minutes,
+1500 steps and 6 supervisor calls by default, the planner 30 minutes;
+registration in the reconcile with no human step; `run_checks` only if a
+run shows a failure CI found and `bash check` could not; a repository's
+`check` the agents may extend and not weaken; Go's module cache per pod;
+the supervisor chooses only continue, message or escalate, and the stuck
+rule in code climbs the rung; a writer's change request at a cap is the
+answer; the cache class on its own exec-capable node path, and `main` CI
+off the shared cache. At the close Forgejo's self-registration, open since
+the start (no `[service]` section in its configuration), was switched off
+(infra a668a94); every factory repository and organisation is private.
+Ruling 213's goal is met in round 1.
+
+After Stage 12: the next scope is Sebastian's. [The roadmap](../roadmap.md),
+"Next", holds what round 1 found, and every other future topic is there
+too.
