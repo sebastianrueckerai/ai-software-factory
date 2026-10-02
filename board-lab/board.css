@@ -126,6 +126,26 @@ aside#detail .accents { display: flex; gap: .45rem; align-items: center; flex-wr
 aside#detail .accents .swatch { width: 1.35rem; height: 1.35rem; border-radius: 4px; border: 2px solid transparent; cursor: pointer; }
 aside#detail .accents .swatch.set { border-color: var(--text); }
 
+.card .about { color: var(--text-muted); font-size: .83rem; margin-top: .22rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card .badgechip.role-plan { color: var(--review); border-color: var(--review); }
+.card .badgechip.role-exec { color: var(--done); border-color: var(--done); }
+.card .badgechip.tier-frontier { color: var(--waiting); border-color: var(--waiting); }
+.card .badgechip.tier-cheap { color: var(--text-muted); }
+aside#detail h3 { font-size: 1.05rem; }
+aside#detail .about { color: var(--text); margin: .55rem 0 .15rem; max-width: 46ch; }
+aside#detail .provenance { color: var(--text-muted); font-size: .8rem; margin: .1rem 0 .4rem; }
+aside#detail .fold { margin-top: .8rem; }
+aside#detail .fold summary { cursor: pointer; color: var(--accent); font-size: .88rem; }
+aside#detail .related { list-style: none; padding: 0; margin: 0; }
+aside#detail .related li { display: flex; gap: .55rem; align-items: baseline; padding: .22rem 0; border-bottom: 1px solid var(--line-subtle); cursor: pointer; }
+aside#detail .related li:hover { color: var(--accent); }
+aside#detail .related .why { color: var(--text-muted); font-size: .78rem; min-width: 9ch; }
+aside#detail .chat { max-height: 26rem; overflow-y: auto; border: 1px solid var(--line-subtle); border-radius: 8px; padding: .5rem .6rem; }
+aside#detail .chat .sesshead { font-family: ui-monospace, monospace; font-size: .74rem; color: var(--accent); margin: .55rem 0 .3rem; }
+aside#detail .chat .sesshead:first-child { margin-top: 0; }
+aside#detail .chat .msg { margin-bottom: .35rem; }
+aside#detail .chat .msg .who { font-family: ui-monospace, monospace; }
+
 #keys { position: fixed; inset: 0; background: oklch(0 0 0 / .55); display: none; align-items: center; justify-content: center; z-index: 70; }
 #keys.open { display: flex; }
 #keys .box { background: var(--bg-raised); border: 1px solid var(--line-strong); border-radius: 10px; padding: 1.2rem 1.6rem; }

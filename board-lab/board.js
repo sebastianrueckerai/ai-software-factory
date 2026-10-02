@@ -20,6 +20,21 @@ const STATUS_TEXT = {
   done: "done", failed: "failed", closed: "closed",
 };
 const ACCENTS = ["1", "2", "3", "4", "5", "6", "7", "8"];
+// The objective's shape: a headline line, a provenance line ("Card x of plan
+// #n, accepted by ... Written by the planner."), then the body.
+const objLines = (c) => (c.objective || "").split("\n").map((s) => s.trim()).filter(Boolean);
+const headline = (c) => objLines(c)[0] || title(c);
+const provenance = (c) => (/^Card .*(of plan|accepted|written by)/i.test(objLines(c)[1] || "") ? objLines(c)[1] : "");
+function about(c) {
+  const lines = objLines(c);
+  let i = provenance(c) ? 2 : 1;
+  const s = lines.slice(i).join(" ").replace(/\s+/g, " ").trim();
+  if (!s) return "";
+  const cut = s.split(/(?<=[.!?])\s/).slice(0, 2).join(" ");
+  return cut.length > 190 ? cut.slice(0, 187) + "…" : cut;
+}
+const roleOf = (c) => c.kind === "human" ? "human" : c.parent_task ? "exec" : c.lane === "plan" ? "plan" : "";
+const tierOf = (c) => /frontier/.test(c.model_alias) ? "frontier" : /cheap/.test(c.model_alias) ? "cheap" : "";
 const store = {
   get(k, d) { try { return JSON.parse(localStorage.getItem("bl:" + k)) ?? d; } catch { return d; } },
   set(k, v) { localStorage.setItem("bl:" + k, JSON.stringify(v)); },
@@ -178,6 +193,9 @@ function cardHTML(c, s, st) {
     ? `<span class="pill" style="background:transparent;color:var(--text-muted);border:1px solid var(--line-strong)">${s.lane}</span>`
     : `<span class="pill ${s.status === "waiting-human" ? "wait" : ""}" style="${pillStyle(s)}">${STATUS_TEXT[s.status] || s.status}</span>`;
   const badges = [];
+  const role = roleOf(c), tier = tierOf(c);
+  if (role) badges.push(`<span class="badgechip role-${role}">${role}</span>`);
+  if (tier) badges.push(`<span class="badgechip tier-${tier}">${tier}</span>`);
   if (c.model_alias) badges.push(c.model_alias.replace("factory/", ""));
   if (s.status === "lane-wait" && c.deps.length) badges.push("blocked by #" + c.deps.join(" #"));
   if (c.parent_task) badges.push("part of plan #" + (BYID[c.parent_task]?.issue_number || "?"));
@@ -192,6 +210,7 @@ function cardHTML(c, s, st) {
       ${accent ? `<span class="humantag" style="background:var(--acc)" title="human accent"></span>` : ""}
       ${unread ? `<span class="bubble">◍ ${comments.length}</span>` : ""}
     </div>
+    ${about(c) ? `<div class="about">${esc(about(c))}</div>` : ""}
     <div class="telemetry">${pill} ${s.telemetry.map((t) => `<span>${esc(t)}</span>`).join("")}</div>
     <div class="activity">${esc(s.activity).slice(0, 110)}</div>
     ${badges.length ? `<div class="badges">${badges.map((b) => `<span class="badgechip">${esc(b)}</span>`).join("")}</div>` : ""}
@@ -269,27 +288,49 @@ function toast(msg, refuse) {
 }
 
 // detail drawer
+function relatedHTML(c, s) {
+  const rel = [];
+  for (const dep of c.deps) {
+    const k = DATA.cards.find((x) => x.issue_number === dep && x.repository === c.repository);
+    if (k) rel.push({ c: k, why: "blocked by" });
+  }
+  if (c.parent_task && BYID[c.parent_task]) rel.push({ c: BYID[c.parent_task], why: "part of plan" });
+  const kids = DATA.cards.filter((k) => k.parent_task === c.id);
+  for (const k of kids) rel.push({ c: k, why: "child" });
+  if (!rel.length) return "";
+  return `<section><h4>related cards</h4><ul class="related">${rel.map(({ c: k, why }) => {
+    const ks = cardState(k, T);
+    return `<li data-open="${k.id}"><span class="why">${why}</span>
+      <span class="pill" style="${pillStyle(ks)}">${STATUS_TEXT[ks.status] || ks.status}</span>
+      <strong>#${k.issue_number} ${esc(title(k))}</strong></li>`;
+  }).join("")}</ul></section>`;
+}
+
 async function openDetail(c) {
   const st = state(), s = cardState(c, T);
   const accent = st.accents[c.id];
-  const msgs = await conversationTail(c, 3);
+  const chat = await conversationHTML(c);
   $("#detail").innerHTML = `
     <button class="close" data-x>✕</button>
-    <h3>#${c.issue_number} ${esc(title(c))}</h3>
+    <h3>#${c.issue_number} ${esc(headline(c))}</h3>
     <span class="pill" style="${pillStyle(s)}">${STATUS_TEXT[s.status] || s.status}</span>
+    ${[roleOf(c), tierOf(c)].filter(Boolean).map((t) => `<span class="badgechip">${t}</span>`).join(" ")}
     <span class="telemetry" style="display:inline;margin-left:.5rem">${s.telemetry.map(esc).join(" · ")}</span>
+    ${about(c) ? `<p class="about">${esc(about(c))}</p>` : ""}
+    ${provenance(c) ? `<p class="provenance">${esc(provenance(c))}</p>` : ""}
     <dl class="facts">
       <dt>project</dt><dd>${esc(c.repository)}</dd>
       <dt>model</dt><dd>${esc(c.model_alias || "–")}</dd>
       <dt>author</dt><dd>${esc(c.author)}</dd>
       <dt>links</dt><dd>${c.issue_url ? `<a href="${c.issue_url}">issue</a>` : ""} ${c.pr_url ? `<a href="${c.pr_url}">PR #${c.pr_number}</a>` : ""}</dd>
     </dl>
-    <div class="objective">${esc(c.objective)}</div>
-    ${c.agent_summary ? `<section><h4>agent summary</h4><div class="msg">${esc(c.agent_summary)}</div></section>` : ""}
-    ${msgs.length ? `<section><h4>last messages <span style="text-transform:none">(the full conversation is one click deeper)</span></h4>${msgs.join("")}</section>` : ""}
-    <section><h4>timeline replay</h4>
+    ${relatedHTML(c, s)}
+    ${c.agent_summary ? `<details class="fold"><summary>the agent's last words</summary><div class="msg">${esc(c.agent_summary)}</div></details>` : ""}
+    <details class="fold"><summary>full objective</summary><div class="objective">${esc(c.objective)}</div></details>
+    ${chat}
+    <details class="fold"><summary>timeline</summary>
       <ul class="tl">${c.timeline.filter(visEvent).map((e) => `<li><span class="t">${e.time.slice(11, 16)}</span><span class="s">${esc(e.step)}</span><span>${esc(detailOf(e)).slice(0, 140)}</span></li>`).join("")}</ul>
-    </section>
+    </details>
     <section><h4>human accent</h4>
       <div class="accents">${ACCENTS.map((a) => `<span class="swatch ${accent === a ? "set" : ""}" data-acc="${a}" style="background:${accentVar(a)}"></span>`).join("")}
       ${accent ? `<button data-acc="clear">clear</button>` : ""}</div>
@@ -307,6 +348,7 @@ async function openDetail(c) {
     if (b.dataset.acc === "clear") delete s3.accents[c.id]; else s3.accents[c.id] = b.dataset.acc;
     store.set("state", s3); render(); openDetail(c);
   });
+  document.querySelectorAll("#detail [data-open]").forEach((li) => li.onclick = () => openDetail(BYID[li.dataset.open]));
   $("[data-c]").onclick = () => {
     const ta = $("#detail textarea"), text = ta.value.trim();
     if (!text) return;
@@ -315,22 +357,29 @@ async function openDetail(c) {
     store.set("state", s4); render(); openDetail(c);
     toast("comment kept in this browser; in the console it files an issue comment the agent reads");
   };
+  const box = $("#detail .chat");
+  if (box) box.scrollTop = box.scrollHeight;
+}
+
+// the whole conversation, scrollable: one block per session, its model
+// messages in order, newest at the bottom.
+async function conversationHTML(c) {
+  const blocks = [];
+  for (const sess of c.sessions) {
+    const lines = await transcript(`data/sessions/${c.id}/${sess.id}.jsonl`);
+    const msgs = lines.filter((l) => l.kind === "model_call" && l.detail?.text);
+    if (!msgs.length) continue;
+    blocks.push(`<div class="sesshead">session ${sess.id.slice(0, 10)} · ${esc(sess.model)} · ${esc(sess.created_at.slice(11, 16))}Z</div>` +
+      msgs.map((l) => `<div class="msg"><div class="who">${l.time.slice(11, 19)}Z</div>${esc(l.detail.text.trim())}</div>`).join(""));
+  }
+  if (!blocks.length) return "";
+  return `<section><h4>conversation <span style="text-transform:none">(the agent's messages, whole run, scrollable)</span></h4><div class="chat">${blocks.join("")}</div></section>`;
 }
 const visEvent = (e) => !["reconcile", "intake", "event"].includes(e.step);
 const detailOf = (e) => e.summary || e.reason || e.guidance || e.outcome || e.digest || e.decision || e.action ||
   (e.findings ? JSON.stringify(e.findings).slice(0, 120) : "") || "";
 
 // conversation tail: last n model messages from the newest transcript
-async function conversationTail(c, n) {
-  const files = c.sessions.map((s) => `data/sessions/${c.id}/${s.id}.jsonl`);
-  for (let i = files.length - 1; i >= 0; i--) {
-    const lines = await transcript(files[i]);
-    const msgs = lines.filter((l) => l.kind === "model_call" && l.detail && l.detail.text)
-      .slice(-n).map((l) => `<div class="msg"><div class="who">${l.time.slice(11, 19)} · ${esc(c.model_alias)}</div>${esc(l.detail.text.trim()).slice(0, 320)}</div>`);
-    if (msgs.length) return msgs;
-  }
-  return [];
-}
 async function transcript(path) {
   if (!transcriptCache[path]) {
     try {
@@ -398,23 +447,34 @@ function setClock(t) {
   T = Math.max(DATA.t0, Math.min(DATA.t1, t));
   cancelPeek(); $("#detail").classList.remove("open"); render();
 }
+let playFrom = null, playSpeed = 1, rafId = 0;
 function playReplay() {
-  playing = true; setClock(DATA.t0);
-  const span = DATA.t1 - DATA.t0, dur = 45000, t00 = performance.now();
+  if (playing) { pauseReplay(); return; }
+  playing = true; playFrom = T >= DATA.t1 - 1000 ? DATA.t0 : T;
+  updatePlayButtons();
+  const span = DATA.t1 - playFrom, dur = 90000 / playSpeed, t00 = performance.now();
   (function step(now) {
     if (!playing) return;
     const k = (now - t00) / dur;
-    if (k >= 1) { playing = false; setClock(DATA.t1); return; }
-    T = DATA.t0 + span * k; render();
-    requestAnimationFrame(step);
+    if (k >= 1) { playing = false; setClock(DATA.t1); updatePlayButtons(); return; }
+    T = playFrom + span * k; render();
+    rafId = requestAnimationFrame(step);
   })(performance.now());
+}
+function pauseReplay() {
+  playing = false; cancelAnimationFrame(rafId); updatePlayButtons(); render();
+}
+function updatePlayButtons() {
+  $("#play").textContent = playing ? "⏸ pause" : "▶ replay";
+  $("#speed").textContent = playSpeed + "×";
 }
 
 // keyboard
 document.addEventListener("keydown", (e) => {
   if (e.target.matches("textarea, select, input")) return;
   const k = e.key;
-  if (k === "Escape") { $("#detail").classList.remove("open"); $("#keys").classList.remove("open"); cancelPeek(); playing = false; return; }
+  if (k === "Escape") { $("#detail").classList.remove("open"); $("#keys").classList.remove("open"); cancelPeek(); if (playing) pauseReplay(); return; }
+  if (k === "p") { playReplay(); return; }
   if (k === "?") { $("#keys").classList.toggle("open"); return; }
   if (k === "t") { toggleTheme(); return; }
   if (k === "[") { playing = false; setClock(T - 15 * 60000); return; }
@@ -452,9 +512,10 @@ const applyTheme = () => (document.documentElement.dataset.theme = state().theme
   $("#theme").onclick = toggleTheme;
   $("#showkeys").onclick = () => $("#keys").classList.toggle("open");
   $("#play").onclick = playReplay;
+  $("#speed").onclick = () => { playSpeed = playSpeed === 1 ? 2 : playSpeed === 2 ? 4 : 1; updatePlayButtons(); };
   const clk = $("#clock");
   clk.min = DATA.t0; clk.max = DATA.t1; clk.value = DATA.t1;
-  clk.oninput = () => { playing = false; setClock(+clk.value); };
+  clk.oninput = () => { if (playing) pauseReplay(); setClock(+clk.value); };
   T = DATA.t1;
   const hash = new URLSearchParams(location.hash.slice(1));
   if (hash.get("t")) T = Math.max(DATA.t0, Math.min(DATA.t1, new Date(hash.get("t")).getTime() || DATA.t1));
