@@ -104,8 +104,21 @@ h2.band { font-size: .82rem; margin: .9rem 0 .5rem; color: var(--text-muted); te
 
 #peek { position: fixed; z-index: 50; max-width: 34rem; background: var(--bg-raised); border: 1px solid var(--line-strong); border-radius: 8px; padding: .6rem .7rem; font-family: ui-monospace, monospace; font-size: .78rem; color: var(--text-muted); display: none; box-shadow: 0 8px 30px oklch(0 0 0 / .45); white-space: pre-wrap; max-height: 40vh; overflow: auto; }
 
-aside#detail { position: fixed; top: 0; right: 0; bottom: 0; width: min(46rem, 92vw); background: var(--bg-raised); border-left: 1px solid var(--line-strong); z-index: 40; padding: 1rem 1.2rem 2rem; overflow-y: auto; display: none; }
-aside#detail.open { display: block; }
+aside#detail { position: fixed; top: 0; right: 0; bottom: 0; width: min(46rem, 92vw); background: var(--bg-raised); border-left: 1px solid var(--line-strong); z-index: 40; padding: 1rem 1.2rem 1rem; overflow: hidden; display: none; flex-direction: column; }
+aside#detail.open { display: flex; }
+aside#detail .tabs { display: flex; gap: .4rem; margin: .8rem 0 .6rem; border-bottom: 1px solid var(--line-subtle); }
+aside#detail .tabs .tab { background: transparent; border: 0; border-bottom: 2px solid transparent; color: var(--text-muted); padding: .3rem .8rem; font-size: .92rem; }
+aside#detail .tabs .tab.on { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+aside#detail .pane { flex: 1; overflow-y: auto; padding-bottom: 1.5rem; }
+aside#detail .pane-chat { display: flex; flex-direction: column; }
+aside#detail .pane-chat .chatsec { display: flex; flex-direction: column; flex: 1; min-height: 0; margin-top: 0; }
+aside#detail .pane-chat .chat { flex: 1; max-height: none; }
+aside#detail .pane-card section, aside#detail .pane-card .fold { margin-top: .9rem; }
+.card .evidence { color: var(--text-muted); font-size: .76rem; margin-top: .3rem; font-variant-numeric: tabular-nums; }
+.denybox { display: flex; gap: .4rem; margin-top: .4rem; }
+.denybox input { flex: 1; background: var(--bg-sunken); color: var(--text); border: 1px solid var(--waiting); border-radius: 6px; padding: .3rem .5rem; font: inherit; }
+.denybox button { background: var(--failed); color: oklch(0.98 0.01 25); border: 0; border-radius: 6px; padding: .3rem .7rem; }
+.denybox button[data-dcancel] { background: transparent; color: var(--text-muted); border: 1px solid var(--line-strong); }
 aside#detail .close { float: right; background: transparent; border: 0; color: var(--text-muted); font-size: 1.1rem; }
 aside#detail h3 { margin: .2rem 0 .4rem; }
 aside#detail .facts { display: grid; grid-template-columns: max-content 1fr; gap: .12rem .8rem; font-size: .88rem; margin: .6rem 0; }

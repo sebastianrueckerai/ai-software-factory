@@ -100,6 +100,8 @@ function cardState(c, t) {
   else if (waiting === "deps") s.status = "lane-wait";
   else s.status = "lane";
   s.col = s.status.startsWith("lane") ? s.lane : s.status;
+  const moved = store.get("moves", {})[c.id];
+  if (moved && s.status.startsWith("lane")) { s.lane = moved; s.col = moved; }
   if (["done", "failed", "closed"].includes(c.status) && finishedBy(c, t) && !s.done && !s.failed)
     { s.status = c.status; s.col = c.status; }
   // telemetry
@@ -116,6 +118,26 @@ function cardState(c, t) {
   }
   s.telemetry.push(fmt.eur(spend) + " / " + fmt.eur(c.budget_eur));
   if (s.pr) s.telemetry.push("PR #" + s.pr);
+  // checks state: the last checks run says green or red; findings after it
+  // turn red; the merge queue says queued
+  for (const e of evs) {
+    if (e.step === "checks") s.checks = e.state === "success" ? "✓" : "✗";
+    if (e.step === "stage_findings" && (e.findings || []).length) s.checks = "✗";
+    if (e.step === "queue_entered") s.checks = "queued";
+    if (e.step === "merged") s.checks = "✓";
+  }
+  if (s.checks && s.status !== "lane" && s.status !== "lane-wait")
+    s.telemetry.push("checks " + s.checks);
+  // evidence for a finished card: commit, checks, review verdict
+  if (["done", "failed", "closed"].includes(s.status)) {
+    const opened = [...evs].reverse().find((e) => e.step === "pr_opened" && e.commit);
+    const decided = c.approvals.filter((a) => a.decided_at || s.status === "done").pop();
+    s.evidence = [
+      opened ? "commit " + opened.commit.slice(0, 7) : "",
+      s.checks ? "checks " + s.checks : "",
+      decided?.spec?.review?.verdict ? "review " + decided.spec.review.verdict : "",
+    ].filter(Boolean);
+  }
   // activity line: waiting cards say why; running show the last step
   if (s.status === "waiting-human" && escText(lastEscalation(evs))) s.activity = escText(lastEscalation(evs));
   else if (!s.activity && evs.length) s.activity = lastStep.replace(/_/g, " ");
@@ -217,7 +239,10 @@ function cardHTML(c, s, st) {
     <div class="activity">${esc(s.activity).slice(0, 110)}</div>
   ${badges.length ? `<div class="badges">${badges.map((b) => `<span class="badgechip">${b}</span>`).join("")}</div>` : ""}
     ${children || ""}
+    ${s.status === "lane" ? `<div class="buttons">${["plan", "ready"].filter((l) => l !== s.lane).map((l) =>
+      `<button data-move="${l}" title="the console's move form: only a lane start, never a machine-owned state">to ${l}</button>`).join("")}</div>` : ""}
     ${s.approvals.length ? `<div class="buttons"><button data-act="approve" title="approve and let the run continue (the dummy jumps to the recorded decision)">Approve</button><button class="deny" data-act="deny" title="deny with a redirect: empty cancels, text regenerates">Request changes</button></div>` : ""}
+    ${s.evidence ? `<div class="evidence" title="the proof this card carries: commit, checks, review verdict">${s.evidence.join(" · ")}</div>` : ""}
   </article>`;
 }
 function childrenRollup(c, s) {
@@ -260,22 +285,48 @@ function bindCards() {
     el.addEventListener("dragend", () => el.classList.remove("dragging"));
   });
   document.querySelectorAll(".card [data-act]").forEach((b) =>
-    b.addEventListener("click", (e) => { e.stopPropagation(); decisionAct(b.dataset.act, BYID[b.closest(".card").dataset.id]); }));
+    b.addEventListener("click", (e) => { e.stopPropagation(); decisionAct(b.dataset.act, BYID[b.closest(".card").dataset.id], null, b); }));
+  document.querySelectorAll(".card [data-move]").forEach((b) =>
+    b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const id = b.closest(".card").dataset.id, lane = b.dataset.move;
+      const mv = store.get("moves", {});
+      mv[id] = lane; store.set("moves", mv); render();
+      toast(`moved to ${lane} — the dummy keeps this locally; the console files the lane's move form`);
+    }));
   document.querySelectorAll("#needsyou [data-act]").forEach((b) =>
     b.addEventListener("click", () => {
       const n = $("#needsyou")._data[+b.closest(".decision").dataset.i];
-      decisionAct(b.dataset.act, n.c, n.a);
+      decisionAct(b.dataset.act, n.c, n.a, b);
     }));
 }
-function decisionAct(act, c, a) {
+function decisionAct(act, c, a, fromEl) {
   const t = T;
-  if (act === "deny") {
-    toast("the redirect box: an empty deny cancels, text regenerates (Automaker). This dummy has no live agent.", true);
-    return;
-  }
+  if (act === "deny") { denyBox(fromEl, c); return; }
   const after = (a && a.decided_at) || nextDecision(c, t);
   if (after) { setClock(new Date(after).getTime()); toast(`recorded decision applied; the clock jumped to ${fmt.clock(after)}`); }
   else toast("the dummy replays history; this card has no later decision recorded", true);
+}
+// the redirect box (Automaker's rule): empty cancels the deny, text becomes
+// the agent's next instruction
+function denyBox(fromEl, c) {
+  document.querySelectorAll(".denybox").forEach((b) => b.remove());
+  if (!fromEl) { toast("the redirect box: empty cancels, text regenerates", true); return; }
+  const box = document.createElement("div");
+  box.className = "denybox";
+  box.innerHTML = `<input type="text" placeholder="what would make it yes? empty cancels the request"><button data-dsend>request changes</button><button data-dcancel>✕</button>`;
+  fromEl.closest(".decision, .card")?.appendChild(box);
+  const inp = box.querySelector("input");
+  inp.focus();
+  box.querySelector("[data-dcancel]").onclick = () => box.remove();
+  box.querySelector("[data-dsend]").onclick = () => {
+    const text = inp.value.trim();
+    if (!text) { box.remove(); return; }
+    const q = store.get("queue", {});
+    (q[c.id] = q[c.id] || []).push({ text, when: fmt.clock(Date.now()) });
+    store.set("queue", q); box.remove(); render();
+    toast("request changes queued for the agent (empty would have cancelled)");
+  };
 }
 const nextDecision = (c, t) => {
   const later = c.timeline.find((e) => ["signal", "session_start", "merged"].includes(e.step) &&
@@ -328,22 +379,36 @@ async function openDetail(c) {
       <dt>author</dt><dd>${esc(c.author)}</dd>
       <dt>links</dt><dd>${c.issue_url ? `<a href="${c.issue_url}">issue</a>` : ""} ${c.pr_url ? `<a href="${c.pr_url}">PR #${c.pr_number}</a>` : ""}</dd>
     </dl>
-    ${relatedHTML(c, s)}
-    ${await chatHTML(c, s)}
-    <details class="fold"><summary title="the objective exactly as filed">full objective</summary><div class="objective">${esc(c.objective)}</div></details>
-    <details class="fold"><summary title="every timeline event of this card">timeline</summary>
-      <ul class="tl">${c.timeline.filter(visEvent).map((e) => `<li><span class="t">${e.time.slice(11, 16)}</span><span class="s">${esc(e.step)}</span><span>${esc(detailOf(e)).slice(0, 140)}</span></li>`).join("")}</ul>
-    </details>
-    <section><h4>accent</h4>
-      <div class="accents">${ACCENTS.map((a) => `<span class="swatch ${accent === a ? "set" : ""}" data-acc="${a}" style="background:${accentVar(a)}" title="accent ${a}: your own colour, never a state"></span>`).join("")}
-      ${accent ? `<button data-acc="clear" title="remove this card's accent">clear</button>` : ""}</div>
-    </section>
-    <section class="commentform"><h4>comments</h4>
-      ${comments.map((m, i) => `<div class="msg"><div class="who">${esc(m.who)} · ${esc(m.when)} <button class="mini" data-ce="${i}" title="edit this comment">edit</button> <button class="mini" data-cd="${i}" title="remove this comment">remove</button></div>${esc(m.text)}</div>`).join("")}
-      <textarea placeholder="a comment for this card; the dummy keeps it in this browser, the console would file an issue comment"></textarea>
-      <button data-c title="the comment stays on the card; the agent reads it on its next session">comment</button>
-    </section>`;
+    <nav class="tabs">
+      <button data-tab="chat" class="tab on" title="the whole conversation and your steering box">chat</button>
+      <button data-tab="card" class="tab" title="facts, related cards, objective, timeline, accent, comments">card</button>
+    </nav>
+    <div class="pane pane-chat">
+      ${await chatHTML(c, s)}
+    </div>
+    <div class="pane pane-card" style="display:none">
+      ${relatedHTML(c, s)}
+      <details class="fold"><summary title="the objective exactly as filed">full objective</summary><div class="objective">${esc(c.objective)}</div></details>
+      <details class="fold"><summary title="every timeline event of this card">timeline</summary>
+        <ul class="tl">${c.timeline.filter(visEvent).map((e) => `<li><span class="t">${e.time.slice(11, 16)}</span><span class="s">${esc(e.step)}</span><span>${esc(detailOf(e)).slice(0, 140)}</span></li>`).join("")}</ul>
+      </details>
+      <section><h4>accent</h4>
+        <div class="accents">${ACCENTS.map((a) => `<span class="swatch ${accent === a ? "set" : ""}" data-acc="${a}" style="background:${accentVar(a)}" title="accent ${a}: your own colour, never a state"></span>`).join("")}
+        ${accent ? `<button data-acc="clear" title="remove this card's accent">clear</button>` : ""}</div>
+      </section>
+      <section class="commentform"><h4>comments</h4>
+        ${comments.map((m, i) => `<div class="msg"><div class="who">${esc(m.who)} · ${esc(m.when)} <button class="mini" data-ce="${i}" title="edit this comment">✎</button> <button class="mini" data-cd="${i}" title="remove this comment">✕</button></div>${esc(m.text)}</div>`).join("")}
+        <textarea placeholder="a comment for this card; the dummy keeps it in this browser, the console would file an issue comment"></textarea>
+        <button data-c title="the comment stays on the card; the agent reads it on its next session">comment</button>
+      </section>
+    </div>`;
   $("#detail").classList.add("open");
+  document.querySelectorAll("#detail .tabs .tab").forEach((tb) => tb.onclick = () => {
+    document.querySelectorAll("#detail .tabs .tab").forEach((x) => x.classList.toggle("on", x === tb));
+    $("#detail .pane-chat").style.display = tb.dataset.tab === "chat" ? "" : "none";
+    $("#detail .pane-card").style.display = tb.dataset.tab === "card" ? "" : "none";
+    if (tb.dataset.tab === "chat") bindChat(c);
+  });
   const st2 = state(); st2.read[c.id] = true; store.set("state", st2);
   $("[data-x]").onclick = () => $("#detail").classList.remove("open");
   document.querySelectorAll("#detail [data-acc]").forEach((b) => b.onclick = () => {
@@ -412,7 +477,7 @@ async function chatHTML(c, s) {
   const queue = store.get("queue", {})[c.id] || [];
   return `<section class="chatsec"><h4>chat <span style="text-transform:none">${live ? "· live, you can steer" : "· history (the run ended)"}</span></h4>
     <div class="chat" data-chat>${blocks.join("") || "<div class='brief'>no transcript for this card</div>"}</div>
-    ${queue.length ? `<div class="queued">${queue.map((q, i) => `<div class="qmsg" data-q="${i}">queued: ${esc(q.text)} <button data-qe="${i}">edit</button> <button data-qd="${i}">remove</button></div>`).join("")}</div>` : ""}
+    ${queue.length ? `<div class="queued">${queue.map((q, i) => `<div class="qmsg" data-q="${i}">queued: ${esc(q.text)} <button class="mini" data-qe="${i}" title="edit the queued message">✎</button> <button class="mini" data-qd="${i}" title="remove the queued message">✕</button></div>`).join("")}</div>` : ""}
     <div class="steer">
       <input type="text" placeholder="${live ? "steer the agent — in the console this reaches the running session" : "the run ended; the chat is history"}" ${live ? "" : "disabled"}>
       <button data-steer ${live ? "" : "disabled"}>send</button>
