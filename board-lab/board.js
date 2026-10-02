@@ -26,6 +26,8 @@ const objLines = (c) => (c.objective || "").split("\n").map((s) => s.trim()).fil
 const headline = (c) => objLines(c)[0] || title(c);
 const provenance = (c) => (/^Card .*(of plan|accepted|written by)/i.test(objLines(c)[1] || "") ? objLines(c)[1] : "");
 function about(c) {
+  const override = store.get("summaries", {})[c.id];
+  if (override !== undefined) return override;
   const lines = objLines(c);
   let i = provenance(c) ? 2 : 1;
   const s = lines.slice(i).join(" ").replace(/\s+/g, " ").trim();
@@ -190,32 +192,32 @@ function cardHTML(c, s, st) {
   const comments = st.comments[c.id] || [];
   const unread = comments.length && !st.read[c.id];
   const pill = s.status === "lane" || s.status === "lane-wait"
-    ? `<span class="pill" style="background:transparent;color:var(--text-muted);border:1px solid var(--line-strong)">${s.lane}</span>`
-    : `<span class="pill ${s.status === "waiting-human" ? "wait" : ""}" style="${pillStyle(s)}">${STATUS_TEXT[s.status] || s.status}</span>`;
+    ? `<span class="pill" style="background:transparent;color:var(--text-muted);border:1px solid var(--line-strong)" title="${esc(statusTip(s))}">${s.lane}</span>`
+    : `<span class="pill ${s.status === "waiting-human" ? "wait" : ""}" style="${pillStyle(s)}" title="${esc(statusTip(s))}">${STATUS_TEXT[s.status] || s.status}</span>`;
   const badges = [];
   const role = roleOf(c), tier = tierOf(c);
-  if (role) badges.push(`<span class="badgechip role-${role}">${role}</span>`);
-  if (tier) badges.push(`<span class="badgechip tier-${tier}">${tier}</span>`);
-  if (c.model_alias) badges.push(c.model_alias.replace("factory/", ""));
-  if (s.status === "lane-wait" && c.deps.length) badges.push("blocked by #" + c.deps.join(" #"));
-  if (c.parent_task) badges.push("part of plan #" + (BYID[c.parent_task]?.issue_number || "?"));
+  if (role) badges.push(`<span class="badgechip" title="${role === "plan" ? "the planner card" : "an execution card of an accepted plan"}">${role}</span>`);
+  if (tier) badges.push(`<span class="badgechip" title="the model tier of the last session">${tier}</span>`);
+  if (c.model_alias) badges.push(`<span class="badgechip" title="the model of the last session">${esc(c.model_alias.replace("factory/", ""))}</span>`);
+  if (s.status === "lane-wait" && c.deps.length) badges.push(`<span class="badgechip" title="this card waits on these cards">blocked by #${c.deps.join(" #")}</span>`);
+  if (c.parent_task) badges.push(`<span class="badgechip" title="open the plan card">part of plan #${BYID[c.parent_task]?.issue_number || "?"}</span>`);
   const children = childrenRollup(c, s);
   return `
   <article class="card ${s.stale ? "stale" : ""} ${unread ? "unread" : ""} ${s.status === "lane" && s.lane === "backlog" ? "draggable" : ""}"
     data-id="${c.id}" tabindex="0" style="${accent ? `--acc:${accentVar(accent)}` : ""}">
-    ${accent ? `<span class="accent-edge" style="background:var(--acc)"></span>` : ""}
+    ${accent ? `<span class="accent-edge" style="background:var(--acc)" title="your accent on this card"></span>` : ""}
     <div class="line1">
       <span class="ref">#${c.issue_number}</span>
-      <span class="title">${esc(title(c))}</span>
-      ${accent ? `<span class="humantag" style="background:var(--acc)" title="human accent"></span>` : ""}
-      ${unread ? `<span class="bubble">◍ ${comments.length}</span>` : ""}
+      <span class="title" title="${esc(headline(c))}">${esc(title(c))}</span>
+      ${accent ? `<span class="humantag" style="background:var(--acc)" title="your accent on this card"></span>` : ""}
+      ${unread ? `<span class="bubble" title="unread comments">◍ ${comments.length}</span>` : ""}
     </div>
-    ${about(c) ? `<div class="about">${esc(about(c))}</div>` : ""}
-    <div class="telemetry">${pill} ${s.telemetry.map((t) => `<span>${esc(t)}</span>`).join("")}</div>
+    ${about(c) ? `<div class="about" title="${esc(about(c))}">${esc(about(c))}</div>` : ""}
+    <div class="telemetry" title="${esc(statusTip(s))}">${pill} ${s.telemetry.map((t) => `<span>${esc(t)}</span>`).join("")}</div>
     <div class="activity">${esc(s.activity).slice(0, 110)}</div>
-    ${badges.length ? `<div class="badges">${badges.map((b) => `<span class="badgechip">${esc(b)}</span>`).join("")}</div>` : ""}
+  ${badges.length ? `<div class="badges">${badges.map((b) => `<span class="badgechip">${b}</span>`).join("")}</div>` : ""}
     ${children || ""}
-    ${s.approvals.length ? `<div class="buttons"><button data-act="approve">Approve</button><button class="deny" data-act="deny">Request changes</button></div>` : ""}
+    ${s.approvals.length ? `<div class="buttons"><button data-act="approve" title="approve and let the run continue (the dummy jumps to the recorded decision)">Approve</button><button class="deny" data-act="deny" title="deny with a redirect: empty cancels, text regenerates">Request changes</button></div>` : ""}
   </article>`;
 }
 function childrenRollup(c, s) {
@@ -309,14 +311,16 @@ function relatedHTML(c, s) {
 async function openDetail(c) {
   const st = state(), s = cardState(c, T);
   const accent = st.accents[c.id];
-  const chat = await conversationHTML(c);
+  const summaries = store.get("summaries", {});
+  const comments = st.comments[c.id] || [];
   $("#detail").innerHTML = `
-    <button class="close" data-x>✕</button>
+    <button class="close" data-x title="close (esc)">✕</button>
     <h3>#${c.issue_number} ${esc(headline(c))}</h3>
-    <span class="pill" style="${pillStyle(s)}">${STATUS_TEXT[s.status] || s.status}</span>
-    ${[roleOf(c), tierOf(c)].filter(Boolean).map((t) => `<span class="badgechip">${t}</span>`).join(" ")}
-    <span class="telemetry" style="display:inline;margin-left:.5rem">${s.telemetry.map(esc).join(" · ")}</span>
-    ${about(c) ? `<p class="about">${esc(about(c))}</p>` : ""}
+    <span class="pill" style="${pillStyle(s)}" title="${esc(statusTip(s))}">${STATUS_TEXT[s.status] || s.status}</span>
+    ${[roleOf(c) && `<span class="badgechip" title="${roleOf(c) === "plan" ? "the planner card: it drafts the plan the human accepts" : "an execution card filed by an accepted plan"}">${roleOf(c)}</span>`,
+       tierOf(c) && `<span class="badgechip" title="the model tier of the last session">${tierOf(c)}</span>`].filter(Boolean).join(" ")}
+    <span class="telemetry" style="display:inline;margin-left:.5rem" title="elapsed or waiting time · spend against budget · pull request">${s.telemetry.map(esc).join(" · ")}</span>
+    ${about(c) !== "" ? `<p class="about" title="${esc(about(c))}">${esc(about(c))} <button class="mini" data-editabout title="edit this card's summary (the generated one or your own)">edit</button></p>` : ""}
     ${provenance(c) ? `<p class="provenance">${esc(provenance(c))}</p>` : ""}
     <dl class="facts">
       <dt>project</dt><dd>${esc(c.repository)}</dd>
@@ -325,20 +329,19 @@ async function openDetail(c) {
       <dt>links</dt><dd>${c.issue_url ? `<a href="${c.issue_url}">issue</a>` : ""} ${c.pr_url ? `<a href="${c.pr_url}">PR #${c.pr_number}</a>` : ""}</dd>
     </dl>
     ${relatedHTML(c, s)}
-    ${c.agent_summary ? `<details class="fold"><summary>the agent's last words</summary><div class="msg">${esc(c.agent_summary)}</div></details>` : ""}
-    <details class="fold"><summary>full objective</summary><div class="objective">${esc(c.objective)}</div></details>
-    ${chat}
-    <details class="fold"><summary>timeline</summary>
+    ${await chatHTML(c, s)}
+    <details class="fold"><summary title="the objective exactly as filed">full objective</summary><div class="objective">${esc(c.objective)}</div></details>
+    <details class="fold"><summary title="every timeline event of this card">timeline</summary>
       <ul class="tl">${c.timeline.filter(visEvent).map((e) => `<li><span class="t">${e.time.slice(11, 16)}</span><span class="s">${esc(e.step)}</span><span>${esc(detailOf(e)).slice(0, 140)}</span></li>`).join("")}</ul>
     </details>
-    <section><h4>human accent</h4>
-      <div class="accents">${ACCENTS.map((a) => `<span class="swatch ${accent === a ? "set" : ""}" data-acc="${a}" style="background:${accentVar(a)}"></span>`).join("")}
-      ${accent ? `<button data-acc="clear">clear</button>` : ""}</div>
+    <section><h4>accent</h4>
+      <div class="accents">${ACCENTS.map((a) => `<span class="swatch ${accent === a ? "set" : ""}" data-acc="${a}" style="background:${accentVar(a)}" title="accent ${a}: your own colour, never a state"></span>`).join("")}
+      ${accent ? `<button data-acc="clear" title="remove this card's accent">clear</button>` : ""}</div>
     </section>
     <section class="commentform"><h4>comments</h4>
-      ${(st.comments[c.id] || []).map((m) => `<div class="msg"><div class="who">${esc(m.who)} · ${esc(m.when)}</div>${esc(m.text)}</div>`).join("")}
+      ${comments.map((m, i) => `<div class="msg"><div class="who">${esc(m.who)} · ${esc(m.when)} <button class="mini" data-ce="${i}" title="edit this comment">edit</button> <button class="mini" data-cd="${i}" title="remove this comment">remove</button></div>${esc(m.text)}</div>`).join("")}
       <textarea placeholder="a comment for this card; the dummy keeps it in this browser, the console would file an issue comment"></textarea>
-      <button data-c>comment</button>
+      <button data-c title="the comment stays on the card; the agent reads it on its next session">comment</button>
     </section>`;
   $("#detail").classList.add("open");
   const st2 = state(); st2.read[c.id] = true; store.set("state", st2);
@@ -349,6 +352,14 @@ async function openDetail(c) {
     store.set("state", s3); render(); openDetail(c);
   });
   document.querySelectorAll("#detail [data-open]").forEach((li) => li.onclick = () => openDetail(BYID[li.dataset.open]));
+  const editAbout = $("#detail [data-editabout]");
+  if (editAbout) editAbout.onclick = () => {
+    const t = prompt("the card's summary (empty restores the generated one)", about(c));
+    if (t === null) return;
+    const sums = store.get("summaries", {});
+    if (t.trim() === "") delete sums[c.id]; else sums[c.id] = t.trim();
+    store.set("summaries", sums); render(); openDetail(c);
+  };
   $("[data-c]").onclick = () => {
     const ta = $("#detail textarea"), text = ta.value.trim();
     if (!text) return;
@@ -357,23 +368,79 @@ async function openDetail(c) {
     store.set("state", s4); render(); openDetail(c);
     toast("comment kept in this browser; in the console it files an issue comment the agent reads");
   };
-  const box = $("#detail .chat");
-  if (box) box.scrollTop = box.scrollHeight;
+  document.querySelectorAll("#detail [data-ce]").forEach((b) => b.onclick = () => {
+    const s5 = state(), m = s5.comments[c.id][+b.dataset.ce], t = prompt("edit comment", m.text);
+    if (t !== null && t.trim()) { m.text = t.trim(); store.set("state", s5); render(); openDetail(c); }
+  });
+  document.querySelectorAll("#detail [data-cd]").forEach((b) => b.onclick = () => {
+    const s6 = state();
+    s6.comments[c.id].splice(+b.dataset.cd, 1); store.set("state", s6); render(); openDetail(c);
+  });
+  bindChat(c);
 }
+const statusTip = (s) => ({
+  running: "an agent session is working on this card now",
+  "waiting-human": "a decision or approval on this card waits for you",
+  "waiting-poster": "the agent asked the card's author a question",
+  "in-review": "checks, model review or the merge queue hold this card",
+  done: "merged; the evidence stays on the card",
+  failed: "ended without a merge; retryable",
+  closed: "ended without a merge",
+  lane: "waiting to be started",
+  "lane-wait": "blocked by another card",
+}[s.status] || s.status);
 
-// the whole conversation, scrollable: one block per session, its model
-// messages in order, newest at the bottom.
-async function conversationHTML(c) {
+// the chat: the whole run as a chat - brief block, assistant messages,
+// tool calls as collapsible blocks, a steering box while the card is live.
+async function chatHTML(c, s) {
   const blocks = [];
   for (const sess of c.sessions) {
     const lines = await transcript(`data/sessions/${c.id}/${sess.id}.jsonl`);
-    const msgs = lines.filter((l) => l.kind === "model_call" && l.detail?.text);
-    if (!msgs.length) continue;
-    blocks.push(`<div class="sesshead">session ${sess.id.slice(0, 10)} · ${esc(sess.model)} · ${esc(sess.created_at.slice(11, 16))}Z</div>` +
-      msgs.map((l) => `<div class="msg"><div class="who">${l.time.slice(11, 19)}Z</div>${esc(l.detail.text.trim())}</div>`).join(""));
+    const parts = [];
+    const findings = (sess.findings || []).length
+      ? `<div class="brief">session brief: ${esc((sess.findings || []).join(" · ")).slice(0, 220)}</div>` : "";
+    for (const l of lines) {
+      if (l.kind === "model_call" && l.detail?.text)
+        parts.push(`<div class="bubble-in"><div class="who">${l.time.slice(11, 19)}Z · ${esc(modelShort(sess.model))}</div>${esc(l.detail.text.trim())}</div>`);
+      else if (l.kind === "tool_call")
+        parts.push(`<details class="tool"><summary>🔧 ${esc(l.detail?.tool || "?")} <span>${esc(JSON.stringify(l.detail?.args || {})).slice(0, 90)}</span> · ${l.detail?.duration_ms ?? "?"} ms</summary><pre>${esc(JSON.stringify(l.detail, null, 1))}</pre></details>`);
+    }
+    if (!parts.length && !findings) continue;
+    blocks.push(`<div class="sesshead">session ${sess.id.slice(0, 10)} · ${esc(modelShort(sess.model))} · ${esc(sess.created_at.slice(11, 16))}Z</div>${findings}${parts.join("")}`);
   }
-  if (!blocks.length) return "";
-  return `<section><h4>conversation <span style="text-transform:none">(the agent's messages, whole run, scrollable)</span></h4><div class="chat">${blocks.join("")}</div></section>`;
+  const live = s.status === "running" || s.status === "waiting-poster";
+  const queue = store.get("queue", {})[c.id] || [];
+  return `<section class="chatsec"><h4>chat <span style="text-transform:none">${live ? "· live, you can steer" : "· history (the run ended)"}</span></h4>
+    <div class="chat" data-chat>${blocks.join("") || "<div class='brief'>no transcript for this card</div>"}</div>
+    ${queue.length ? `<div class="queued">${queue.map((q, i) => `<div class="qmsg" data-q="${i}">queued: ${esc(q.text)} <button data-qe="${i}">edit</button> <button data-qd="${i}">remove</button></div>`).join("")}</div>` : ""}
+    <div class="steer">
+      <input type="text" placeholder="${live ? "steer the agent — in the console this reaches the running session" : "the run ended; the chat is history"}" ${live ? "" : "disabled"}>
+      <button data-steer ${live ? "" : "disabled"}>send</button>
+    </div>
+  </section>`;
+}
+const modelShort = (m) => (m || "").replace("factory/", "");
+function bindChat(c) {
+  const box = $("#detail .chat");
+  if (box) box.scrollTop = box.scrollHeight;
+  const send = () => {
+    const inp = $("#detail .steer input"), text = inp.value.trim();
+    if (!text) return;
+    const q = store.get("queue", {});
+    (q[c.id] = q[c.id] || []).push({ text, when: fmt.clock(Date.now()) });
+    store.set("queue", q); openDetail(c);
+    toast("queued in this browser; in the console the message reaches the live session (and stays editable until it lands)");
+  };
+  $("#detail [data-steer]").onclick = send;
+  $("#detail .steer input").onkeydown = (e) => { if (e.key === "Enter") send(); };
+  document.querySelectorAll("#detail [data-qe]").forEach((b) => b.onclick = () => {
+    const q = store.get("queue", {})[c.id], t = prompt("edit the queued message", q[b.dataset.qe].text);
+    if (t !== null && t.trim()) { q[b.dataset.qe].text = t.trim(); const all = store.get("queue", {}); all[c.id] = q; store.set("queue", all); openDetail(c); }
+  });
+  document.querySelectorAll("#detail [data-qd]").forEach((b) => b.onclick = () => {
+    const all = store.get("queue", {});
+    all[c.id].splice(+b.dataset.qd, 1); store.set("queue", all); openDetail(c);
+  });
 }
 const visEvent = (e) => !["reconcile", "intake", "event"].includes(e.step);
 const detailOf = (e) => e.summary || e.reason || e.guidance || e.outcome || e.digest || e.decision || e.action ||

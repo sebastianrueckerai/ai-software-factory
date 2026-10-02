@@ -9,18 +9,18 @@
 <body>
 <header class="top">
   <span class="brand">board lab</span>
-  <label>project <select id="project"></select></label>
-  <label>accent <select id="accentfilter"><option value="">any</option></option></select></label>
+  <label title="show one project or every project">project <select id="project"></select></label>
+  <label title="show only cards you marked with this accent">accent <select id="accentfilter"><option value="">any</option></option></select></label>
   <span class="right">
-    <span id="spend"></span>
-    <button class="small" id="theme" title="toggle dark / light">theme</button>
-    <button class="small" id="showkeys" title="?">?</button>
+    <span id="spend" title="the spend of every card shown"></span>
+    <button class="small" id="theme" title="toggle dark / light (t)">theme</button>
+    <button class="small" id="showkeys" title="the keyboard map (?)">?</button>
   </span>
 </header>
 <div id="clockbar">
-  <button id="play" title="replay or pause (p)">▶ replay</button>
-  <button id="speed" title="playback speed">1×</button>
-  <input type="range" id="clock" min="0" max="0" value="0" step="1">
+  <button id="play" title="replay the whole round, or pause (p)">▶ replay</button>
+  <button id="speed" title="playback speed: 1x, 2x or 4x">1×</button>
+  <input type="range" id="clock" min="0" max="0" value="0" step="1" title="the board's clock: every card sits where it was at this moment ([ and ] scrub, dragging pauses)">
   <span class="when" id="when"></span>
 </div>
 <main>

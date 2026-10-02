@@ -127,12 +127,9 @@ aside#detail .accents .swatch { width: 1.35rem; height: 1.35rem; border-radius: 
 aside#detail .accents .swatch.set { border-color: var(--text); }
 
 .card .about { color: var(--text-muted); font-size: .83rem; margin-top: .22rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.card .badgechip.role-plan { color: var(--review); border-color: var(--review); }
-.card .badgechip.role-exec { color: var(--done); border-color: var(--done); }
-.card .badgechip.tier-frontier { color: var(--waiting); border-color: var(--waiting); }
-.card .badgechip.tier-cheap { color: var(--text-muted); }
 aside#detail h3 { font-size: 1.05rem; }
-aside#detail .about { color: var(--text); margin: .55rem 0 .15rem; max-width: 46ch; }
+aside#detail .about { color: var(--text); margin: .55rem 0 .15rem; max-width: 52ch; }
+.mini { background: transparent; color: var(--accent); border: 1px solid var(--line-subtle); border-radius: 5px; padding: .02rem .4rem; font-size: .74rem; cursor: pointer; }
 aside#detail .provenance { color: var(--text-muted); font-size: .8rem; margin: .1rem 0 .4rem; }
 aside#detail .fold { margin-top: .8rem; }
 aside#detail .fold summary { cursor: pointer; color: var(--accent); font-size: .88rem; }
@@ -140,11 +137,21 @@ aside#detail .related { list-style: none; padding: 0; margin: 0; }
 aside#detail .related li { display: flex; gap: .55rem; align-items: baseline; padding: .22rem 0; border-bottom: 1px solid var(--line-subtle); cursor: pointer; }
 aside#detail .related li:hover { color: var(--accent); }
 aside#detail .related .why { color: var(--text-muted); font-size: .78rem; min-width: 9ch; }
-aside#detail .chat { max-height: 26rem; overflow-y: auto; border: 1px solid var(--line-subtle); border-radius: 8px; padding: .5rem .6rem; }
-aside#detail .chat .sesshead { font-family: ui-monospace, monospace; font-size: .74rem; color: var(--accent); margin: .55rem 0 .3rem; }
-aside#detail .chat .sesshead:first-child { margin-top: 0; }
-aside#detail .chat .msg { margin-bottom: .35rem; }
-aside#detail .chat .msg .who { font-family: ui-monospace, monospace; }
+
+.chatsec .chat { max-height: 24rem; overflow-y: auto; border: 1px solid var(--line-subtle); border-radius: 8px; padding: .55rem .65rem; background: var(--bg-sunken); }
+.chatsec .sesshead { font-family: ui-monospace, monospace; font-size: .74rem; color: var(--accent); margin: .6rem 0 .3rem; }
+.chatsec .sesshead:first-child { margin-top: 0; }
+.chatsec .brief { color: var(--text-muted); font-size: .8rem; border-left: 3px solid var(--line-strong); padding: .15rem .5rem; margin: .25rem 0; }
+.chatsec .bubble-in { border: 1px solid var(--line-subtle); border-radius: 10px; border-top-left-radius: 2px; background: var(--bg-raised); padding: .4rem .55rem; margin: .3rem 0; font-size: .86rem; max-width: 52ch; white-space: pre-wrap; }
+.chatsec .bubble-in .who { font-family: ui-monospace, monospace; font-size: .72rem; color: var(--text-muted); margin-bottom: .15rem; }
+.chatsec details.tool { margin: .3rem 0; font-size: .8rem; }
+.chatsec details.tool summary { cursor: pointer; color: var(--text-muted); font-family: ui-monospace, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chatsec details.tool pre { font-size: .74rem; margin: .3rem 0 0; }
+.chatsec .qmsg { font-size: .84rem; color: var(--waiting); border: 1px dashed var(--waiting); border-radius: 6px; padding: .2rem .5rem; margin: .25rem 0; }
+.chatsec .steer { display: flex; gap: .45rem; margin-top: .5rem; }
+.chatsec .steer input { flex: 1; background: var(--bg-sunken); color: var(--text); border: 1px solid var(--line-strong); border-radius: 6px; padding: .4rem .55rem; font: inherit; }
+.chatsec .steer input:disabled, .chatsec .steer button:disabled { opacity: .5; }
+.chatsec .steer button { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 6px; padding: .35rem .9rem; }
 
 #keys { position: fixed; inset: 0; background: oklch(0 0 0 / .55); display: none; align-items: center; justify-content: center; z-index: 70; }
 #keys.open { display: flex; }

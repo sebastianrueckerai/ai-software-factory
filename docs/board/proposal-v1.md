@@ -127,6 +127,32 @@ board header selects accents across projects. The accent is task metadata
 (set through the console's own action, one POST), visible to anyone who
 sees the board, and invisible to the agent's brief.
 
+## Iteration notes (Sebastian's click tests, 2026-10-02)
+
+The dummy's first two test rounds sharpened the spec; the console build
+inherits these:
+
+- **The chat lives inside the card detail as a real chat panel**, not a
+  folded transcript: session headers, the agent's messages as bubbles, tool
+  calls as collapsed monospace blocks, and a steering box that is ENABLED
+  while the card runs (or waits on the author) and becomes read-only
+  history once the run ends - a small Claude-Code-shaped chat per card
+  (ruling 243 sharpened). Queued steering messages stay editable and
+  removable until they land (Conductor's queue).
+- **The card's one-line summary is editable by the human**: the generated
+  one is a default, the human's version wins and shows on the face.
+- **Colour is one channel: the status pill carries colour and word
+  together.** Role (plan/exec), model tier (cheap/frontier) and model name
+  are plain text chips - never coloured - so nothing competes with state.
+- **The objective renders structured**: headline line, provenance line
+  ("Card x of plan #n, accepted by …"), body; the planner should write a
+  real summary field rather than the UI parsing one.
+- **Related cards on the detail**: blocked-by, part-of-plan, children,
+  each with its live state, clickable.
+- **Replay controls**: pause and speed on the board clock; scrubbing
+  pauses.
+- **Tooltips** on every non-obvious chip, pill and control.
+
 ## Non-goals
 
 Everything in report-final section 4, plus: no live SSE in v1 (the poll
