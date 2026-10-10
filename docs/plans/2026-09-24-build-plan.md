@@ -3599,6 +3599,20 @@ merge (run 570), inside round 2's 4 to 5.5 minutes either way; a warm
 main-side cache stays item 71's ground. Standing contracts
 from this round, in the ledger as rulings 229 to 242.
 
+The Stage 14 rebuild (2026-10-10, ruling 250) brought the round 2
+close's backups back on a new address set and folded round 2's findings
+in through the factory's own lane: items 141 (Start plan waits up to
+15 s for an accepted plan's cards to be filed instead of answering 409),
+142 (a merge-project merge Forgejo refuses answers 409 in Forgejo's
+words, a 405 retried three times first) and 143 (the CI spawner's
+reconcile skips Terminating namespaces, so no forbidden status reads)
+went in as console cards on the cheap tier, two of them sent back once
+for a leaner shape, about 1 EUR together, merged on the controller's
+approval and live after two rolls; 140 and 144 closed in the docs above.
+The rebuild's own finding: two console-oauth runs at once left a stale
+OAuth client secret behind a run that said no change, so the CronJob now
+probes Forgejo's token endpoint before it trusts the stored secret.
+
 After Stage 12: the next scope is Sebastian's. [The roadmap](../roadmap.md),
 "Next", holds what round 1 found, and every other future topic is there
 too.

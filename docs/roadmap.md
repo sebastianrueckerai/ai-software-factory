@@ -23,9 +23,6 @@ Stage 12 round 2 (closed 2026-10-01, the plan's Stage 12 paragraphs) closed the 
 
 The board's own backlog now lives in its own roadmap: [docs/board/roadmap.md](board/roadmap.md) (the old UX items 22 to 31 moved there, with this round's research behind them in [docs/board/](board/)). The board UX round of 2026-10-01/02 decided its v1 shape (rulings 243 to 248: the chat behind a click with a hover peek, htmx plus SSE kept, system lanes only, buttons for moves, two colour channels that never mix, replay and live from one log).
 
-- **141. Start-plan right after accept answers 409 once.** Both exit-test projects and the ping3 verification hit a 409 on the first Start plan click within seconds of the accept, 303 on the second: a small race between the accept's state change and the start's check. Cost today: one dead click per plan. Sources: progress.md Stage 12 round 2 (14:58Z, 12:41Z). Where it stands: found twice. Priority:
-- **142. The console's second merge-project click can silently not merge.** Filed twice in one window (linkshort3 then notes, 14:37Z): the first merged, the second answered 303 but its PR stayed open, noticed only when no project row appeared; an API merge fixed it. Also: newtask's project field is the project NAME, not owner/repo (a 400 otherwise) — the script's usage line does not say so. Sources: progress.md 14:37-14:56Z. Where it stands: found by the exit test. Priority:
-- **143. The CI spawner's status reads are forbidden all day.** `ci spawner: reconcile factory-agents-ci-NNNN status: ... forbidden: cannot get pods` about 20 s after each job ends (the namespace's teardown racing the status read): log noise on every run since the rebuild, no effect observed. Sources: factoryd's log, the rebuild and exit-test days. Where it stands: chronic noise. Priority:
 
 Older items still open from Stage 11: 119 is BUILT (Retry, round 2); the list below renumbers nothing — see git history for the built ones.
 
