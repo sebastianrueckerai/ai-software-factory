@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>board lab - the factory board, proposal v1</title>
+<title>board lab - the project screen</title>
 <link rel="stylesheet" href="board.css">
 </head>
-<body>
+<body class="split pane-board">
 <header class="top">
   <span class="brand">board lab</span>
-  <label title="show one project or every project">project <select id="project"></select></label>
-  <label title="show only cards you marked with this accent">accent <select id="accentfilter"><option value="">any</option></option></select></label>
+  <label title="the project this screen shows (#project=)">project <select id="project"></select></label>
+  <label title="show only cards you marked with this accent">accent <select id="accentfilter"></select></label>
   <span class="right">
-    <span id="spend" title="the spend of every card shown"></span>
+    <button class="small" id="wide" aria-pressed="false" title="wide: the full-width board with every lane and state column, chat hidden (w)">wide</button>
     <button class="small" id="theme" title="toggle dark / light (t)">theme</button>
     <button class="small" id="showkeys" title="the keyboard map (?)">?</button>
   </span>
@@ -23,21 +23,51 @@
   <input type="range" id="clock" min="0" max="0" value="0" step="1" title="the board's clock: every card sits where it was at this moment ([ and ] scrub, dragging pauses)">
   <span class="when" id="when"></span>
 </div>
-<main>
-  <h2 class="band">needs you</h2>
-  <div id="needsyou"></div>
-  <h2 class="band">agent lane</h2>
-  <div id="board"></div>
+<div id="statusline" role="status" aria-live="polite"></div>
+<div id="pulse">
+  <span class="say" title="the single most useful thing to know at this moment; click for more"></span>
+  <button class="mini" id="more" aria-expanded="false" title="three or four bullets behind the sentence">more</button>
+  <ul class="bullets" hidden></ul>
+</div>
+<nav id="viewtabs" aria-label="board or chat">
+  <button data-pane="board" class="on" title="the five columns">Board</button>
+  <button data-pane="chat" title="the project agent">Chat</button>
+</nav>
+<main id="split">
+  <section id="boardpane">
+    <div id="wideonly">
+      <h2 class="band">needs you</h2>
+      <div id="needsyou"></div>
+      <h2 class="band">agent lane</h2>
+    </div>
+    <div id="board"></div>
+  </section>
+  <section id="chatpane" aria-label="project chat">
+    <header class="chathead">
+      <strong>chat</strong>
+      <span class="muted" id="chatproj" title="the project agent operates this project: it reads, explains, moves, answers, steers and approves; it runs no code"></span>
+      <button class="mini" id="chatclear" title="start a new conversation (this project's history in this browser is removed)">new</button>
+    </header>
+    <div id="pchat"></div>
+    <div id="pqueue"></div>
+    <div class="composer">
+      <textarea id="ask" rows="2" placeholder="Ask or tell the project… (enter sends, shift+enter breaks the line)"></textarea>
+      <button id="asksend" title="send; while a reply streams the message waits in the queue">send</button>
+    </div>
+  </section>
 </main>
 <div id="peek"></div>
-<div id="toast"></div>
+<div id="toast" role="status"></div>
 <aside id="detail"></aside>
 <div id="keys"><div class="box">
   <table>
     <tr><td>1-9, 0</td><td>open a running card's detail</td></tr>
     <tr><td>d</td><td>clear the top decision (approve)</td></tr>
     <tr><td>x</td><td>clear the top decision (deny with redirect box)</td></tr>
+    <tr><td>w</td><td>wide board / board beside the chat</td></tr>
+    <tr><td>/</td><td>write to the project chat</td></tr>
     <tr><td>t</td><td>toggle dark / light</td></tr>
+    <tr><td>p</td><td>replay or pause</td></tr>
     <tr><td>[ ]</td><td>scrub the board clock</td></tr>
     <tr><td>space</td><td>hover-peek on the focused card (hover works too)</td></tr>
     <tr><td>esc</td><td>close detail, peek, this overlay</td></tr>
