@@ -47,8 +47,14 @@ Each stage ends with an exit test. A stage starts only after the previous one pa
 | 7 Teeth | Policy, budgets, approvals, verification gates | An over-budget call is refused, an approval flow completes |
 | 8 Customer | Demo app, staging and prod | An alert creates a task, the fix deploys |
 | 9 Self | Factory on its own repos | An agent PR to `factory` merges under policy |
+| 10 Hardening | The recovery from CNPG with every repository re-pushed, the security audit stage, a verdict for every review, message-in with the loop nudge, the hardened harness configuration, hidden tools, stricter wins, the sanitiser, one model provider and a month cap, the factory's own bug lane | The recovery brings back every table, a planted secret reaches the card, five bug-lane fixes merge and roll, one nudge changes a running session's course |
+| 11 Spec | Processes as YAML blocks with a check, lanes, the planner and the plan card, dependencies between cards, a merge queue per project, a new project from the console seeded from a template | One spec card on an empty project becomes a deployed app of about ten cards, four agents in parallel, the human clicking cards only |
+| 12 Bugfix rounds | Round 1: agent time in hours with check-ins, the supervisor's message into the running session, finished work kept at every cap, cache volumes, a working template, registration without a password. Round 2: no Forgejo credential in the worker while the agent runs, machine accounts, Retry of a failed plan card, the project euro cap | The Stage 11 spec on a fresh project with no refile, the human's clicks only the plan and the approvals, in under three hours |
+| 13 Board UX | Research of the kanban field, proposal-v1, the board roadmap and a local click dummy over real card data | The dummy through Sebastian's click tests, with no cluster and no spend |
+| 14 Rebuild | The cluster rebuilt from the round 2 close's backups on a new address set, round 2's findings folded in through the factory's own lane | The step-zero gate passed, and three fold-in cards merged through the lane and rolled |
+| 15 Project chat | The project screen (status line, pulse, five columns, chat, drawer), the project agent inside factoryd, inline answers, members and approvers per project, GitHub import and export | An app built through the chat alone: uptime, about ten cards, a staging deployment and a smoke test, under 50 EUR for the round |
 
-The stages map to the build order in architecture 11: Ranch is stages 0 to 3, First loop is 4 to 6, Teeth is 7, Customer is 8, Self is 9.
+The stages map to the build order in architecture 11: Ranch is stages 0 to 3, First loop is 4 to 6, Teeth is 7, Customer is 8, Self is 9. Hardening, Spec and the bugfix rounds are its items 6 to 8, and the project screen its item 9.
 
 No shutdown question at stage boundaries: Stages 3 to 9 run under standing authorization and stop only when stuck or when Sebastian's input is genuinely needed (Rulings 56, 62, 69). At a real stopping point, take a completed base backup of the live Postgres generation (Ruling 63), then `tofu destroy` stops the meter; the Stage 3 drill is the way back.
 
@@ -3599,6 +3605,25 @@ merge (run 570), inside round 2's 4 to 5.5 minutes either way; a warm
 main-side cache stays item 71's ground. Standing contracts
 from this round, in the ledger as rulings 229 to 242.
 
+The board UX round (Stage 13, 2026-10-01 and 02, rulings 243 to 248, Tasks
+142 to 159) ran with no cluster and no spend, on Sebastian's scope:
+research the kanban field, decide what the factory's board should steal,
+refuse and leave out, and iterate an improved board on a local click dummy
+with real card data, restored from the round 2 close's backup into a local
+Postgres. Twelve solutions got a report each on one template, and one
+aggregate ranked seventeen steals and named six exclusive choices, which
+Sebastian ruled as 243 to 248: the conversation behind a click with a hover
+peek, the console server-rendered htmx with SSE for the live parts, system
+lanes only, buttons as the state machine with drag for lane starts only,
+two colour channels that never mix, and replay and live from one log.
+[proposal-v1](../board/proposal-v1.md) and [the board
+roadmap](../board/roadmap.md) followed, then the dummy in `board-lab/`,
+which three rounds of his click tests reshaped over four iterations (the
+chat inside the card as the drawer's main stage, an editable summary,
+colour as one channel), measured against the aggregate in [the gap
+analysis](../board/gap-analysis.md). The round's artifacts are in
+[docs/board/](../board/README.md).
+
 The Stage 14 rebuild (2026-10-10, ruling 250) brought the round 2
 close's backups back on a new address set and folded round 2's findings
 in through the factory's own lane: items 141 (Start plan waits up to
@@ -3613,6 +3638,124 @@ The rebuild's own finding: two console-oauth runs at once left a stale
 OAuth client secret behind a run that said no change, so the CronJob now
 probes Forgejo's token endpoint before it trusts the stored secret.
 
-After Stage 12: the next scope is Sebastian's. [The roadmap](../roadmap.md),
-"Next", holds what round 1 found, and every other future topic is there
-too.
+### Stage 15: the project chat
+
+Settled 2026-10-10 after the Stage 14 rebuild (rulings 251 to 256), once
+Sebastian had read his conversation on the human's side of the factory,
+[the UX conversation](../ai-software-factory-ux-conversation.md), which is
+the round's design baseline as the export is the factory's. The spec is the
+ledger's proposal-project-chat.md, OK'd by Sebastian that evening with his
+answers: the project agent inside factoryd, `operator` on the high tier and
+the pulse on the low tier, the confirm defaults, the phases through the
+factory's own lane with the controller as the reviewer under 50 EUR, and
+the exit test's app. The design is in architecture 5.7, target-architecture
+6 and [proposal-v2](../board/proposal-v2.md). The stage opened the same
+night.
+
+The human's tool becomes one project screen per project: a status line for
+the state, a pulse for what to understand about it, a board of five columns
+for the work, a chat to ask or change anything, and a card drawer for one
+piece of work. Behind the chat runs the project agent, which operates the
+factory as the human through the console's own actions and never does the
+work. Round 1 builds the status line, the pulse, the chat, the board beside
+the chat with fewer columns, inline answers on needs-you cards, and GitHub
+import and export (ruling 256). Messenger push and the mobile layout are
+roadmap items 145 and 146.
+
+Phases: each is a spec card on the factory's own code project where the
+lane can carry it, with the controller as the reviewer, as the Stage 14
+fold-ins ran. A phase the lane fails twice goes to the controller.
+
+1. The dummy's iteration 5 and Sebastian's click test (no cluster, no
+   spend): the split layout with a scripted chat, canned replies over the
+   real data and every tool call rendered, as the design reference before
+   any console code. The documents land first.
+2. The event spine: every console action records one event with `via`, the
+   project event feed as one endpoint, SSE to the board (ruling 244, the
+   board roadmap's first item). The live badge replaces the 3-second poll.
+3. The project screen: the status line, five columns with chips, the
+   drawer's tabs, the full-width board kept.
+4. The project agent: the loop, the tools, the `chat` policy block, the
+   streaming chat panel, proposals and undo, the `operator` alias and
+   ledger ref.
+5. The pulse.
+6. Inline answers: the escalation gains `choices`, the agent's tool schema
+   with it, and the card renders them.
+7. Members and per-project approvers.
+8. GitHub import and export.
+9. The exit test below, then the close: the documents folded, the roadmap
+   updated with what the test found.
+
+Exit test (ruling 256). A member builds an app of the Stage 11 size (eight
+to twelve planned cards, a staging deployment, a smoke test) using only the
+chat and the needs-you cards, with the board looked at but not clicked:
+
+1. File the spec through the chat, a confirmed `new_card` in the plan lane.
+2. Accept the plan through the chat, with the plan shown in the proposal.
+3. Answer every agent question inline on its card or through the chat.
+4. Steer one running card through the chat with a requirement change, and
+   see the change land.
+5. Approve every merge through the chat's confirmed proposals.
+6. Ask "what happened since this morning" and "why is card n waiting" and
+   get answers that match the board.
+7. Export the finished project to GitHub from the chat.
+
+The app is uptime, a status page for URLs, invented for the test: small,
+but more than one agent's work and a real use for the board. The spec goes
+to the plan lane as one card and asks for about ten planned cards: the
+foundation (store, schema, migrations), the targets API (add, list and
+remove a URL with its check interval), the checker (a scheduler that probes
+every target on its interval and records status and latency), uptime and
+latency over a window, the status page (per target: state, uptime percent
+over 24 h and 7 d, a latency sparkline), incidents (opened after three
+failed checks, closed on recovery, with a human note), the admin page
+behind a token, a webhook on incident open and close, the JSON API behind
+the page, and the staging deployment with a smoke test. The dependency
+graph forks after the foundation (checker, API and page in parallel) and
+joins at incidents, so several agents run at once and the board shows
+waiting, running and verifying side by side. The spec leaves two choices
+open on purpose, the default check interval and the retention window, so
+the agents ask and the inline answers get their test. Step 4's steer adds a
+requirement mid-build: latency as p95, not the mean.
+
+The measures, against the Stage 11 spec's builds in Stage 12 (round 1 on
+the cheap tier: 1 h 43 min and 1.69 EUR, round 2's timed run on the
+stronger tier: 1 h 10 min and 3.99 EUR): wall time, card spend, the project
+agent's and the pulse's spend as their own lines, the number of clicks
+outside the chat (target: only Do it and the inline answers), and every
+place the chat misread an instruction.
+
+Budget (Sebastian's ruling): under 50 EUR for the whole round, build and
+exit test together. At the open October had spent 13.00 EUR, which leaves
+about 42 EUR under LiteLLM's 55 EUR budget and 37 EUR under the policy's
+month cap of 50 EUR, so the round may run into November's. The Stage 11
+spec's ten-card build on the stronger tier cost 3.99 EUR, and these phases
+are larger. The session reports the spend at every phase close and never
+passes 50 EUR.
+
+The rulings, in the ledger:
+
+- 251. The project screen is the human's tool: status line, pulse, board,
+  chat and drawer, each with one job. Per project. Members get the same
+  screen.
+- 252. The project agent is a tool-calling agent inside factoryd that acts
+  as the human through the console's own actions, one event whatever the
+  input. Whether a tool needs an OK is the `chat.confirm` setting, with the
+  defaults of architecture 5.7. It runs no code.
+- 253. No containment of chat-to-agent text beyond the sandbox and the
+  gates. It amends the baseline sentence "agents exchange artifacts, not
+  chat" to: agents exchange artifacts, humans and the project agent may
+  message a running agent, and the gates judge the result.
+- 254. A member is a writer on the project's repository and sees only their
+  projects. The chat never creates or manages projects. Approvers per
+  project file.
+- 255. Five columns in the split view as a fixed grouping of the task
+  states, lane and fine state as chips, and the full-width board keeps
+  today's columns, lanes first. Processes keep composing their lanes.
+  Rulings 245 and 246 stand.
+- 256. Round 1's scope with GitHub import and export, and the exit test
+  through the chat. Messenger push and the mobile layout are roadmap items.
+
+After Stage 15: the next scope is Sebastian's. [The roadmap](../roadmap.md)
+holds every future topic, and its items 145 to 150 hold what this round
+leaves for later.
