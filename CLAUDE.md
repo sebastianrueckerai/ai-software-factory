@@ -12,10 +12,11 @@ This repository holds the design docs and the build plan. Code lives in two sibl
 
 - `docs/goal.md`: requirements and constraints.
 - `docs/software_factory_conversation_export.md`: the exported design conversation. Treat it as the architectural baseline, not just background.
+- `docs/ai-software-factory-ux-conversation.md`: the exported conversation on the human's side of the factory. Treat it as the baseline of the human interface, as the export above is for the architecture.
 
-## Architecture baseline (from the export)
+## Architecture baseline (from the export and the UX conversation)
 
-Five planes in a loop: signals (issues, telemetry, alerts) feed a durable control plane (task state, scheduler, policy, approvals, model choice, cost and audit), which spawns disposable agent workers in sandboxes (ephemeral workspace, constrained network, temporary credentials); their output passes a verification plane (tests, security, stronger-model review, policy evaluation) before merge and deploy, and telemetry feeds back into signals. Kubernetes is the substrate, not the orchestrator. The harness is replaceable and model-independent, behind a model gateway. Policy lives outside the LLM. Identity belongs to the task, not the machine, with short-lived credentials. Agents exchange artifacts, not chat.
+Five planes in a loop: signals (issues, telemetry, alerts) feed a durable control plane (task state, scheduler, policy, approvals, model choice, cost and audit), which spawns disposable agent workers in sandboxes (ephemeral workspace, constrained network, temporary credentials); their output passes a verification plane (tests, security, stronger-model review, policy evaluation) before merge and deploy, and telemetry feeds back into signals. Kubernetes is the substrate, not the orchestrator. The harness is replaceable and model-independent, behind a model gateway. Policy lives outside the LLM. Identity belongs to the task, not the machine, with short-lived credentials. Agents exchange artifacts. Humans and the project agent may message a running agent, and the gates judge the result. The human's tool is one project screen per project: status line, pulse, board, a chat with the project agent, and a card drawer.
 
 ## Constraints that shape every choice
 
