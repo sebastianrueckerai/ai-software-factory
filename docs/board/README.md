@@ -18,4 +18,5 @@ This folder holds the round's artifacts:
 | Aggregate report (steal / exclusive alternatives / expectations / leave out) | [report-final.md](report-final.md) | written (Task 156) |
 | First improved board proposal | [proposal-v1.md](proposal-v1.md) | written (Task 157, rulings 243-248) |
 | The board-only roadmap (everything later) | [roadmap.md](roadmap.md) | written (Task 157) |
-| Local click dummy with real card data | [../../board-lab/](../../board-lab/) | built (Task 158): `python3 -m http.server 8765` in board-lab, open http://localhost:8765/ |
+| Gap analysis and next moves | [gap-analysis.md](gap-analysis.md) | written (Task 159) |
+| Local click dummy with real card data | [../../board-lab/](../../board-lab/) | built (Tasks 158-159): `python3 -m http.server 8765` in board-lab, open http://localhost:8765/ |
