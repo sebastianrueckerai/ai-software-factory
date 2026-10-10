@@ -5,15 +5,20 @@ Everything board-shaped that v1 does not build (see
 evidence. The main roadmap's UX items (22 to 31) live here now; their old
 numbers are kept.
 
-- **Live badge and live task page over SSE** (old 22, 20): the agent's
-  events stream onto the card badge and one task page; Vibe Kanban's
-  JSON-patch-over-one-log design maps onto htmx SSE, and its dead-board
-  rivals (Plane's measured 24 s) are the warning ([vibe-kanban],
-  [plane]). Includes Linear's 10 s-ack / 30 min-stale clock as the
-  supervisor's stall defaults ([linear]).
-- **Steering box with an editable message queue** (old 23): a box always
-  present on the task page, queued messages editable until they land -
-  Conductor's queue is the precedent ([conductor]).
+Stage 15 ([proposal-v2.md](proposal-v2.md), rulings 251 to 256) took four
+items out. The live badge over SSE is its phase 2, and the steering box
+with the editable queue is built in the dummy and part of the project
+chat. The mobile web pass moved to the main roadmap's item 146, and
+approvals on the phone folded into its notification item 145
+([../roadmap.md](../roadmap.md)). What the live badge item held beyond
+the badge stays below.
+
+- **Live task page over SSE and the stall clock** (old 20, the rest of
+  old 22): the agent's events stream onto one task page over the event
+  feed Stage 15 builds for the board, Vibe Kanban's JSON-patch-over-one-log
+  design mapped onto htmx SSE ([vibe-kanban], with Plane's measured 24 s
+  as the warning, [plane]), and Linear's 10 s-ack / 30 min-stale clock as
+  the supervisor's stall defaults ([linear]).
 - **Inline diff comments back to the agent** (old 23): click lines,
   comments collect, send once as `file:line | quote | comment`;
   Conductor's composer and cline/kanban's diff panel ([conductor],
@@ -23,9 +28,6 @@ numbers are kept.
 - **Approval scopes** (old 27): once, per task, or per class of future
   request, bounded by policy - Atlassian Rovo and the AWS sample show the
   shape.
-- **Approvals on the phone** (old 29): a push channel plus a small
-  approval page; Nimbalyst's iOS path and Happy's push approvals are the
-  field's proof ([nimbalyst]).
 - **The recorder tool** (Sebastian's idea, this round): a small factory
   tool that captures cards and their contents over time - a card's life as
   an artifact, feeding demos and post-mortems.
@@ -57,8 +59,6 @@ numbers are kept.
 - **Full keyboard map** (Automaker): number keys into running agents,
   single-letter views, the overlay - one key for the top decision ships in
   v1, the map comes later ([automaker]).
-- **Mobile web pass**: the board usable one-handed; table stakes after
-  Trello and Linear, deferrable past v1.
 - **Forgejo project mirror** (old 30): board columns mirrored onto a
   Forgejo project, waiting on the upstream projects API.
 
@@ -67,7 +67,6 @@ numbers are kept.
 [linear]: reports/linear.md
 [conductor]: reports/conductor.md
 [cline-kanban]: reports/cline-kanban.md
-[nimbalyst]: reports/nimbalyst.md
 [factory-mission-control]: reports/factory-mission-control.md
 [wekan]: reports/wekan.md
 [github-agent-hq]: reports/github-agent-hq.md

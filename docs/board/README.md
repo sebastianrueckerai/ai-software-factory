@@ -20,3 +20,5 @@ This folder holds the round's artifacts:
 | The board-only roadmap (everything later) | [roadmap.md](roadmap.md) | written (Task 157) |
 | Gap analysis and next moves | [gap-analysis.md](gap-analysis.md) | written (Task 159) |
 | Local click dummy with real card data | [../../board-lab/](../../board-lab/) | built (Tasks 158-159): `python3 -m http.server 8765` in board-lab, open http://localhost:8765/ |
+| Second proposal: the project screen (status line, pulse, five columns, chat, drawer) | [proposal-v2.md](proposal-v2.md) | written (Stage 15, rulings 251 to 256) |
+| The dummy's iteration 5: the split layout with a scripted chat over the real data | [../../board-lab/](../../board-lab/) | in progress, Stage 15 phase 1 |

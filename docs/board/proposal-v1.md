@@ -1,5 +1,10 @@
 # Proposal v1: the first improved board
 
+Superseded for the console's layout by [proposal-v2.md](proposal-v2.md),
+the project screen of Stage 15 (rulings 251 to 256). This file stays as
+the record the click dummy implemented, and v2 keeps what it does not
+change.
+
 Task 157. Everything here is decided by the aggregate
 ([report-final.md](report-final.md)) and rulings 243 to 248; each choice
 cites its evidence. The scope: the console's current server-rendered htmx
