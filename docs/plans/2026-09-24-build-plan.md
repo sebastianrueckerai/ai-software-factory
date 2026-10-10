@@ -3590,7 +3590,12 @@ agent's own three-line fix. Its one finding became the round's last fix:
 ruling 226 keeps main's jobs off the shared cache, and their cold caches
 filled the runner pod's 1 GiB tmp emptyDir until the kubelet killed the
 pod mid-run — tmp is now 4 GiB (ruling 242, Roll 4), and linkshort3's
-rerun went green with staging rolling the digest. Standing contracts
+rerun went green with staging rolling the digest. Item 144 (main's cold
+CI cost) closed on that ruling at the Stage 14 rebuild: every main run is
+cold by design (ruling 226), and the code repository's main `test` job
+on a freshly rebuilt cluster ran green in 5 min 28 s (run 566,
+2026-10-10), inside the 4 to 5.5 minutes measured in round 2; the warm
+main-side cache stays item 71's ground. Standing contracts
 from this round, in the ledger as rulings 229 to 242.
 
 After Stage 12: the next scope is Sebastian's. [The roadmap](../roadmap.md),
