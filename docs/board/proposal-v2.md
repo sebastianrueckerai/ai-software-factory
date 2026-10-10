@@ -27,7 +27,7 @@ One screen per project, five parts, each with one job (ruling 251):
 │ NEEDS YOU  QUEUED  WORKING  VERIFYING  DONE │  chat                    │
 │ ┌───────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐  │  …                       │
 │ │Choose │ │#14  │ │#9   │ │#11  │ │#3   │  │  I will:                 │
-│ │storage│ │plan │ │run  │ │rev. │ │done │  │  • move #9 back to queued│
+│ │storage│ │plan │ │run  │ │rev. │ │done │  │  • move #14 to ready     │
 │ │○ pg   │ └─────┘ └─────┘ └─────┘ └─────┘  │  • add your note to it   │
 │ │○ file │                                   │  [Do it]  [Cancel]       │
 │ │[send] │                                   │                          │

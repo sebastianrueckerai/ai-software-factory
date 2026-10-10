@@ -3726,12 +3726,15 @@ outside the chat (target: only Do it and the inline answers), and every
 place the chat misread an instruction.
 
 Budget (Sebastian's ruling): under 50 EUR for the whole round, build and
-exit test together. At the open October had spent 13.00 EUR, which leaves
-about 42 EUR under LiteLLM's 55 EUR budget and 37 EUR under the policy's
-month cap of 50 EUR, so the round may run into November's. The Stage 11
-spec's ten-card build on the stronger tier cost 3.99 EUR, and these phases
-are larger. The session reports the spend at every phase close and never
-passes 50 EUR.
+exit test together. At the open October had spent 13.00 EUR, so the caps
+were raised for the round (infra 14817b1): a card may spend 5 EUR (10 at
+most), the day 40 and the policy's month 80, LiteLLM's proxy stop follows at
+88 USD, and the code project's own month cap of 50 EUR is the round's stop,
+enforced by the factory. Back to 2, 5, 20, 50 and 55 at the close. The
+Stage 11 spec's ten-card build on the stronger tier cost 3.99 EUR, and
+these phases are larger, so the phases run cheap first and climb to the
+stronger tier on their second session (`stronger_after: 1`), and the
+session reports the spend at every phase close.
 
 The rulings, in the ledger:
 

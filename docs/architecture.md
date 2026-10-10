@@ -1521,9 +1521,11 @@ chat:
 A tool in `confirm` renders a proposal with a Do-it button, a tool outside
 it applies at once, and an empty list lets the agent do everything it is
 told. `monthly_eur` caps the agent's and the pulse's calls together (5.4).
-Stricter wins (below) would refuse a project's `confirm` that is shorter
-than the policy's, so whether a project may drop a confirm the policy sets
-is open for the build to settle.
+`confirm` is a preference, not a cap, so stricter wins (below) does not
+bind it: a project file's list replaces the policy's, shorter or longer,
+and the policy's list is the default for a file that sets none. The
+project's `monthly_eur` stays bounded by the policy's, as every spend
+figure is.
 
 Stricter wins (Task 89): a project file may only tighten what
 `policy.yaml` sets. Its quota, envelope (monthly euros, server types,
