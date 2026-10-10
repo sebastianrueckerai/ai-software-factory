@@ -3567,7 +3567,14 @@ churn stay armed across messages). The eviction drill found its wording
 cannot make the cheap tier sit in the loop the kubelet needs to sample
 usage, and that gVisor plus an emptyDir sizeLimit gives no write-time
 protection — recorded; Stage 11's five real evictions remain the proof
-of the recording. The timed stronger-tier run built the linkshort spec
+of the recording. The next eviction drill (item 140, settled 2026-10-10
+as the drill's wording, no factory change) keeps the over-limit pod
+alive past the kubelet's volume sampling, which about 50 s did not
+reach: the long-running allocation is the card's deliverable — a server
+whose start fills /tmp past the 1 GiB sizeLimit and whose acceptance
+holds it serving for over two minutes — or the fill comes from tooling
+(an exec into the session pod), never from asking the agent to sit in a
+sleep loop. The timed stronger-tier run built the linkshort spec
 in 1 h 10 min for 3.99 EUR on a ten-card plan (the cheap tier's round 1:
 1 h 43 min, 1.69 EUR, seven cards): a third faster at 2.4 times the
 cost, with a review that caught real code-level defects the cheap tier
