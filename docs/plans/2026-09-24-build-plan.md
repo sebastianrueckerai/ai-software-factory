@@ -3592,9 +3592,10 @@ filled the runner pod's 1 GiB tmp emptyDir until the kubelet killed the
 pod mid-run — tmp is now 4 GiB (ruling 242, Roll 4), and linkshort3's
 rerun went green with staging rolling the digest. Item 144 (main's cold
 CI cost) closed on that ruling at the Stage 14 rebuild: every main run is
-cold by design (ruling 226), and the code repository's main `test` job
-on a freshly rebuilt cluster ran green in 5 min 28 s (run 566,
-2026-10-10), inside the 4 to 5.5 minutes measured in round 2; the warm
+off the shared cache by design (ruling 226), and the code repository's
+main `test` job ran green in 5 min 28 s on the freshly rebuilt cluster
+(run 566, 2026-10-10, everything cold) and in 2 min 0 s on the next
+merge (run 570), inside round 2's 4 to 5.5 minutes either way; a warm
 main-side cache stays item 71's ground. Standing contracts
 from this round, in the ledger as rulings 229 to 242.
 
