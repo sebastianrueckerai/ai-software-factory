@@ -94,6 +94,7 @@ h2.band { font-size: .82rem; margin: .9rem 0 .5rem; color: var(--text-muted); te
 .card .humantag { flex: none; width: .8rem; height: .8rem; border-radius: 3px; align-self: center; }
 .pill { display: inline-block; border-radius: 999px; padding: .06rem .55rem; font-size: .74rem; font-weight: 600; }
 .card .telemetry { display: flex; gap: .55rem; flex-wrap: wrap; color: var(--text-muted); font-size: .8rem; margin-top: .3rem; font-variant-numeric: tabular-nums; }
+.card .telemetry .over { color: var(--waiting); font-weight: 650; }
 .card .activity { font-family: ui-monospace, monospace; font-size: .78rem; color: var(--text-muted); margin-top: .28rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-height: 1.05em; }
 .card .badges { display: flex; gap: .35rem; flex-wrap: wrap; margin-top: .32rem; }
 .badgechip { font-size: .72rem; color: var(--text-muted); border: 1px solid var(--line-subtle); border-radius: 999px; padding: .04rem .45rem; }

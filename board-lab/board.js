@@ -142,7 +142,8 @@ function cardState(c, t) {
     s.waitingMin = (t - last) / 60000;
     s.telemetry.push("waiting " + fmt.min(s.waitingMin));
   }
-  s.telemetry.push(fmt.eur(s.spend) + " / " + fmt.eur(c.budget_eur));
+  const used = c.budget_eur ? s.spend / c.budget_eur : 0;
+  s.telemetry.push((used >= 0.8 ? "⚠ " : "") + fmt.eur(s.spend) + " / " + fmt.eur(c.budget_eur) + (used >= 0.8 ? ` (${Math.round(used * 100)}% of budget)` : ""));
   if (s.pr) s.telemetry.push("PR #" + s.pr);
   // checks state: the last checks run says green or red; findings after it
   // turn red; the merge queue says queued
@@ -417,7 +418,7 @@ function cardHTML(c, s, st, five) {
       ${unread ? `<span class="bubble" title="unread comments">◍ ${comments.length}</span>` : ""}
     </div>
     ${about(c) && !five ? `<div class="about" title="${esc(about(c))}">${esc(about(c))}</div>` : ""}
-    <div class="telemetry" title="${esc(statusTip(s))}">${pill} ${s.telemetry.map((t) => `<span>${esc(t)}</span>`).join("")}</div>
+    <div class="telemetry" title="${esc(statusTip(s))}">${pill} ${s.telemetry.map((t) => `<span${t.startsWith("⚠") ? ` class="over"` : ""}>${esc(t)}</span>`).join("")}</div>
     ${needs && five ? `<div class="reason" title="${esc(reason)}">${esc(reason)}</div>` : `<div class="activity">${esc(s.activity).slice(0, 110)}</div>`}
     ${five ? chips : badges.length || fine ? `<div class="badges">${badges.join("")}${fine}</div>` : ""}
     ${five ? "" : childrenRollup(c, s)}
