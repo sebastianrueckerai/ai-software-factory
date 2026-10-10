@@ -43,7 +43,7 @@ One screen per project, five parts, each with one job (ruling 251):
 
 The chat is per project and never creates or manages projects. Anyone who
 steers a project, Sebastian or an invited member, gets the same screen
-(ruling 254). Three principles from the conversation:
+(rulings 251 and 254). Three principles from the conversation:
 
 - The board state is the truth. The event log is the history. The chat is
   an operator over both.
