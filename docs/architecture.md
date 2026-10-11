@@ -24,8 +24,9 @@ same spec on a fresh project built clean in 1 h 43 min, with no refile, no
 failed card and only the plan's and the merges' clicks, after agent time
 became hours, the supervisor began to message the running session instead
 of ending it, finished work survived every cap, and the sandbox gained what
-CI runs. Stage 15, the project screen and the project agent (5.7), is
-design and not built. Sections that describe built behaviour
+CI runs. Stage 15 built the project screen and the project agent (5.7)
+on 2026-10-11, without members, approvers per project and GitHub import
+and export, and its exit test is pending. Sections that describe built behaviour
 say so. The rest is still design. We amend this file as the design moves, so it always holds the
 current design plus the explanations behind it. Rulings live in the build
 ledger and are cited here by number.
@@ -1309,8 +1310,9 @@ that runs the digest but is not rolled out, its pod starting or crash
 looping, each answer `rollout_not_ready`, and the digest is part of the
 cache key. The template's staging job waits on it.
 
-**Members, approvers per project and GitHub** (Stage 15, Rulings 254 and
-256, design, not built, 5.7). A member will be a write collaborator on the
+**Members, approvers per project and GitHub** (Rulings 254 and 256,
+design, not built, 5.7). Stage 15 moved them to the roadmap (151, 152).
+A member will be a write collaborator on the
 project's Forgejo repository, admitted to the console for the projects they
 write and to no other, while the factory-level pages stay with the writers
 of the factory's own code repository. Approvers move from the policy into
@@ -1504,23 +1506,25 @@ Besides its `version`, `policy.yaml` holds eleven sections:
   session kind, plan and report sessions included, takes its time from
   the task's class, process and project.
 
-Stage 15 adds a twelfth section, `chat` (Ruling 252, design, not built,
-5.7), which a project's file may set as well: the project agent's model
-alias, its monthly euros and the tools that need a human's OK. The
-defaults:
+Stage 15 added a twelfth section, `chat` (Rulings 252 and 259, 5.7),
+which a project's file may set as well: the project agent's model alias,
+its monthly euros and the tools that need a human's OK. The defaults
+(`policy.DefaultChat`):
 
 ```
 chat:
   model: operator          # LiteLLM alias, tier-high
   monthly_eur: 5           # the project agent's own line
-  confirm: [new_card, move_card, start_plan, answer, steer, retry,
+  confirm: [new_card, move_card, answer, steer, start_plan, retry,
             accept_plan, request_changes, reject_plan, approve_merge,
-            deny_merge, github_export, github_sync]
+            deny_merge]
 ```
 
 A tool in `confirm` renders a proposal with a Do-it button, a tool outside
 it applies at once, and an empty list lets the agent do everything it is
-told. `monthly_eur` caps the agent's and the pulse's calls together (5.4).
+told. `github_export` and `github_sync` join the list with GitHub export
+(roadmap 152). `monthly_eur` is the budget of the project's chat task each
+month, which the agent's and the pulse's calls share (5.4).
 `confirm` is a preference, not a cap, so stricter wins (below) does not
 bind it: a project file's list replaces the policy's, shorter or longer,
 and the policy's list is the default for a file that sets none. The
@@ -1735,10 +1739,13 @@ per task and per day at `GET /costs`, and the console shows them. With Task
 71, each task's total also lists its lines by kind and ref, so the review
 reads as `model review/review-frontier`.
 
-Stage 15 adds two refs outside any task (Ruling 252, design, not built,
-5.7): the project agent's calls book under `operator` and the pulse's under
-`pulse`, both on the project, capped together by the project file's
-`chat.monthly_eur`, and the status line's spend figure includes them.
+Stage 15 added two refs (Ruling 252, 5.7): the project agent's calls book
+under `operator` and the pulse's under `pulse`. Both book on the project's
+chat task of the month, `t-chat-<name>-<yyyy-mm>` (kind `chat`, no card and
+no workflow), whose budget is `chat.monthly_eur`, so one figure caps both.
+The design had them outside any task. The chat task carries the project's
+repository, so its spend counts in the project's month and in the status
+line's figure.
 
 Tool calls reach the gateway's `/mcp` endpoint, an MCP server over stateless
 streamable HTTP. It offers `web_scrape` and `web_search` (Firecrawl),
@@ -2027,17 +2034,20 @@ Forgejo's API.
   that log the detail instead of showing it. Forgejo has no token revocation
   API, so a refused login's tokens lapse within their hour.
 
-Stage 15's project screen (5.7, design, not built) supersedes this board's
-layout: the five columns beside the chat take the main view, and today's
-columns stay as the full-width board.
+Stage 15's project screen (5.7, built) superseded this board's layout:
+the five columns beside the chat take the main view, and these columns
+stay as the full-width board, the wide view.
 [board/proposal-v2.md](board/proposal-v2.md) is the board's spec from then
 on, and [board/proposal-v1.md](board/proposal-v1.md) stays as the record
 the click dummy implemented.
 
 ### 5.7 The project screen and the project agent
 
-Designed on 2026-10-10 for Stage 15 (Rulings 251 to 256), not built. The
-console today is the board of 5.6. The design baseline is Sebastian's
+Designed on 2026-10-10 for Stage 15 (Rulings 251 to 256) and built on
+2026-10-11 (Rulings 257 to 260), except members, approvers per project and
+GitHub import and export, which moved to the roadmap (151, 152). The exit
+test is pending. Where the build differs from the design, the paragraph
+says so. The design baseline is Sebastian's
 conversation on the human's side of the factory,
 [ai-software-factory-ux-conversation.md](ai-software-factory-ux-conversation.md),
 with his three answers of the same day, and the screen's visual spec is
@@ -2061,36 +2071,60 @@ sandbox becomes a card.
   there: the project's state (working, waiting on you, idle, paused), the
   cards working, the cards that need you, spend against the project's
   monthly cap, and the GitHub mirror's state. Each figure opens its page:
-  the costs, the needs-you list, the mirror panel.
+  the costs, the needs-you list, the mirror panel. Built: the state word is
+  "waiting on you" whenever a card waits on a human, else "working" while
+  a card runs, else "idle" (Ruling 260), and the project agent's snapshot
+  reads the same line. The spend is the project's ledger spend in the UTC
+  month against the project file's month cap, else the policy's. The
+  mirror's state waits for GitHub export.
 - **Pulse**: what to understand about it. One sentence under the status
   line, the single most useful thing to know now, which a click expands to
   three or four bullets. A cheap model writes it from the board snapshot
   and the last events, on every event (debounced 2 s, at most one call per
   10 s) and every 60 s as the fallback, with a typing indicator while it
   recomputes. It is subdued when all is well and prominent when something
-  needs a person. Its spend is the project's.
+  needs a person. Its spend is the project's. Built on the `pulse` alias:
+  the prompt is the project agent's snapshot and the last 20 events, the
+  answer a sentence and its bullets as JSON, and code, not the model, sets
+  the prominence from the status line. The 60 s fallback runs while the
+  newest event is under an hour old. A failing call backs off from 60 s,
+  doubling to 15 minutes, and pulses are kept for a day.
 - **Board**: what work exists and where it is. Five columns in the split
   view (below), with proposal-v1's card face. The spend figure on a card
   stays muted until 80 percent of its budget, then turns prominent with the
-  warning sign and the text, never colour alone.
+  warning sign and the text, never colour alone. Built with one project at
+  a time, and the human lane (approvals, escalations with their answer
+  forms, human tasks) folds into Needs you.
 - **Chat**: ask or change anything. The right half of the screen holds the
   project agent's conversation: streaming replies, tool calls as collapsed
   blocks with their arguments and duration, proposals as a list of changes
   with a Do-it button when a tool needs an OK, "applied" lines with undo
   where an undo exists, and a message queue that stays editable until a
   message lands. The conversation persists per project and per member. On a
-  narrow screen the chat and the board become two tabs.
+  narrow screen the chat and the board become two tabs. Built at 36 percent
+  of the width from 1200 px, two tabs below. A tool block shows the
+  result's first line, a proposal has Do it and Skip, and `#n` in a reply
+  opens the card's drawer. There is no message queue: the input waits
+  while a turn streams.
 - **Card drawer**: everything about one piece of work. It opens beside the
   board at 40 to 50 percent of the width, with the tabs Overview, Activity,
   Files and Chat. Chat is the default tab on a running card, as in the
   dummy's fourth iteration, and the per-card chat and its steering box stay
-  as proposal-v1 designed them.
+  as proposal-v1 designed them. Built with three tabs, Overview, Activity
+  and Files. The Chat tab is not built.
 
 **One event per act.** Every console action records one event, with the
 field `via` saying whether a button or the chat made it. The project's
 events are one feed at one endpoint, and SSE carries them to the board
 (Ruling 244), so the live badge replaces the 3-second poll and the pulse
-refreshes on events.
+refreshes on events. Built as the `events` table, with `via` one of
+`button`, `chat`, `webhook` and `factoryd`, the feed at
+`GET /projects/{name}/events` and the stream at its `/stream`, which
+replays from Last-Event-ID. A 30 s poll beside the stream keeps the
+counters right, 3 s when the stream fails. The build added event kinds:
+`task_status` on every status or gate change, `question_asked`,
+`card_commented`, `comment_deleted`, `card_steered`, and `pulse` and
+`pulse_computing`, which stay out of the feed and the agent's context.
 
 **The columns are a view** (Ruling 255). Each column is a fixed group of
 the task states the factory already has, not a new state machine:
@@ -2119,7 +2153,11 @@ only.
 **Inline answers.** An agent's question carries structured choices, and a
 needs-you card renders them as buttons beside a text box, so most human
 input needs no drawer. The escalation gains a `choices` field, and the
-agent's tool schema gains it too.
+agent's tool schema gains it too. Built: the gateway's `escalate_to_human`
+tool takes 2 to 5 choices of 1 to 60 characters, which factoryd validates
+at its boundary. It drops invalid choices and keeps the question. The card
+renders one button per choice above the text box, posting the same answer
+endpoint, and every question records a `question_asked` event.
 
 **Where the project agent runs** (Ruling 252). Two shapes were weighed:
 
@@ -2129,7 +2167,11 @@ agent's tool schema gains it too.
 | B | A worker session with an MCP tool server for the board. The chat becomes a task whose harness (opencode in a gVisor pod) gets the board as tools. It reuses the harness, the chat panel and the events, and could run code one day | A pod per conversation, a task identity and budget per chat, the human's identity proxied, more latency | Only when the agent should execute code, which the principle above rules out |
 
 A is chosen (Sebastian, 2026-10-10). The agent runs no code, so it needs no
-sandbox. B stays the escape hatch if it ever needs one.
+sandbox. B stays the escape hatch if it ever needs one. Built as A, with
+one difference: the calls bill the project's chat task of the month (5.4),
+a task with no card, no workflow and no pod. The gateway admits the
+purpose `operator` for that task's capability `chat` only. A turn makes at
+most 8 model calls, each after a budget check and within 2 minutes.
 
 **Identity and audit.** The agent acts as the human who is chatting. Its
 tool calls run the same console actions as the buttons, with that human's
@@ -2140,8 +2182,11 @@ no agent credential and no new trust boundary. An action's own checks, the
 approvers list among them, hold whichever door it came through.
 
 **Tools.** One typed tool per console action, plus reads. Some actions
-arrive with the round itself: the comment, the steer, the summary and the
-accent, and the GitHub mirror.
+arrived with the round itself: the comment, the steer, the summary and the
+accent. The round lifted 16 console handlers into shared functions
+(`internal/console/actions.go`), each with its checks inside, which the
+buttons and the tools both call. The agent has 6 read and 14 write tools,
+and the GitHub tools wait for export (roadmap 152).
 
 | Tool | Does | Default OK |
 |---|---|---|
@@ -2155,26 +2200,32 @@ accent, and the GitHub mirror.
 | `set_summary`, `set_accent` | metadata | none |
 | `github_export`, `github_sync` | mirror | confirm |
 
-`answer` and `steer` confirm by default because the text the agent reads
-from cards and events is untrusted and could ask for either; a project file
-may loosen it. Whether a tool needs a human's OK is a setting, not a rule
-baked into the
-agent: the OK column is the `chat` block of the policy or of the project's
-file (5.3). A tool in `chat.confirm` renders a proposal with a Do-it
-button. A tool not in the list applies at once and answers with an
-"applied, undo" line where an undo exists (a move, a comment, metadata). An
-empty list means the agent does everything it is told. Ruling 109, the
-approve button as the one door to a merge, becomes: the approve action is
-the one door, reachable by the button or by a confirmed tool call.
-Forgejo's whitelist stays the merge authority. A steer reaches the running
-session as a human message on the existing path (6.2, 6.6).
+`answer` and `steer` confirm by default (Ruling 259), because the text the
+agent reads from cards and events is untrusted and could ask for either. A
+project file may loosen it. Whether a tool needs a human's OK is a setting,
+not a rule baked into the agent: the OK column is the `chat` block of the
+policy or of the project's file (5.3). A tool in `chat.confirm` renders a
+proposal with a Do-it button. A tool not in the list applies at once and
+answers with an "applied, undo" line where an undo exists (a move, a
+comment, metadata). An empty list means the agent does everything it is
+told. A proposal and an undo token are the member's on that project, used
+once, for 30 minutes, and they live in factoryd's memory (roadmap 154). A
+move's undo works only while the card is still in the backlog, which
+intake leaves within a second. Ruling 109, the approve button as the one
+door to a merge, becomes: the approve action is the one door, reachable by
+the button or by a confirmed tool call. Forgejo's whitelist stays the
+merge authority. A steer reaches the running session as a human message on
+the existing path (6.2, 6.6).
 
 **Context.** Each turn gets a compact project snapshot (the status line's
 figures, the columns with card titles and states), the last 30 events, the
 human's conversation so far and the tool list. Details come through the
 read tools. Agent output that a tool returns (summaries, messages,
 comments) passes the existing inbound sanitiser before it enters the
-context, as briefs do today.
+context, as briefs do today. Built with the last 40 messages of the
+member's conversation, kept in `chat_messages` per project and member. The
+prompt says that only a tool call acts: a sentence that described a tool's
+effect in the imperative made the model narrate instead of calling.
 
 **Threat model** (Ruling 253). The new surface is the agent's context: an
 agent's or an outsider's text reaches the project agent through the read
@@ -2194,11 +2245,12 @@ gates judge the result.
 identity with the ledger ref `operator`, on the LiteLLM alias `operator` on
 the high tier, and the pulse's under the ref `pulse` on the low tier (5.4).
 The project file's `chat.monthly_eur` caps both, and the status line's
-spend figure includes them. factoryd's own model calls name a task today
-(5.3), so these two are its first calls booked to a project rather than to
-a task.
+spend figure includes them. The design booked them to the project outside
+any task. The build books them to the project's chat task of the month
+instead (5.4), so the gateway's budget check for a task caps them.
 
-**Members, approvers and GitHub** (Ruling 254). A member is a write
+**Members, approvers and GitHub** (Ruling 254, not built, roadmap 151 and
+152). A member is a write
 collaborator on the project's Forgejo repository. The console admits any
 project's writers, and a member sees only the projects they write. The
 factory-level pages (policy, alerts and costs across projects, the
@@ -2223,13 +2275,13 @@ the member names, set from the project's page or through the
 GitHub, the conversation's preference once the system matures, are a
 roadmap item.
 
-**Round 1** (Ruling 256) builds the status line, the pulse, the chat, the
-board beside the chat with fewer columns, inline answers on needs-you
-cards, and GitHub import and export. Its build sequence adds the event
-spine and members with approvers per project, and it ends with an exit test
-that builds an app through the chat (the plan's Stage 15). Messenger push
-and the mobile layout are roadmap items, and so is the project analytics
-page.
+**Round 1** (Ruling 256) built the event spine, the status line, the
+pulse, the chat, the board beside the chat with fewer columns, and inline
+answers on needs-you cards. Members with approvers per project and GitHub
+import and export moved to the roadmap (151, 152) for the round's budget.
+Its exit test, an app built through the chat (the plan's Stage 15), is
+pending. Messenger push and the mobile layout are roadmap items, and so is
+the project analytics page.
 
 ## 6. Chunk 4: the worker plane
 
@@ -2724,8 +2776,9 @@ message's time, and the session reads on. A message the worker cannot take
 redirect: the session stops with the guidance as a finding. A session gets
 at most `limits.supervisor_calls` calls (6 since Stage 12, 3 before),
 check-ins not counted, and the next trip escalates without one. The
-project agent's `steer` (5.7, Stage 15, design) will reach a session the
-same way, as a human message on this path under the human's name.
+project agent's `steer` (5.7, Stage 15) reaches a session the same way
+(`Runner.MessageSession`), as a human message on this path under the
+human's name, and does not arm the stuck rule.
 
 **The one stuck rule** (Rulings 216, 224). The model cannot choose a
 stronger model or a restart; one rule in code ends a session that does not
@@ -3870,7 +3923,7 @@ since Stage 6, but neither has run under load.
 | Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list. Servers and volumes, no buckets. SSH certificates bound to one server. Outbound tcp 53, 80 and 443. Deletion at the last tick before the lease ends | Built (Rulings 80, 83, 121, 122, 124, 125) |
 | Collector safety | A pass that sees a cluster node's IPv4 or another project's label deletes nothing | Decided (Ruling 123) |
 | Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Built (Rulings 81, 84) |
-| Project screen | One screen per project (5.7): status line, pulse, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export | Designed for Stage 15 (Rulings 251 to 256), not built |
+| Project screen | One screen per project (5.7): status line, pulse, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export | Built in Stage 15 (Rulings 251 to 260), except members, approvers per project and GitHub import and export (roadmap 151, 152). Exit test pending |
 | Merge authority | The `factory-merge` bot merges after a whitelisted human's approval, enforced by Forgejo's branch protection. Merge retries are capped at six. A project on `auto` merges class `normal` without a card after a proven reproduction or a strict improvement and an approving review; the factory's repositories stay on `human` | Built (Rulings 109, 129). `auto` built (Rulings 149, 167, 169) |
 | Intake lanes | Lanes backlog, plan and ready from the project's process, `moved_by` judging every entry. Every bug from any account or alert starts a task. Improvements wait in the backlog for a writer, with an analyzer's write-up. Outsiders' bug reports pass a screening stage. Outsiders' writer-only labels are stripped. The poster's text is untrusted information between random markers | Built (Rulings 148, 150, 182, 185) |
 | Projects | Each project its own Forgejo organisation with a CI user, runner registration, deploy key and deploy branch. Flux tenancy through a namespaced account. A default-deny network policy with the file's outside hosts only and a quota per environment. Stricter wins: a project file only tightens the policy's defaults. Reconciled hourly. Settings from the project's file, `objects: factory \| seed` and `agents: coder \| none`, so the factory's two repositories are projects like any. Registered by the reconcile with the admin's login from OpenBao. A cache volume per project for agents and pull request CI. Hostnames are an infra commit | Built (Rulings 146, 155, 156, 157, 164, 165, 166, 179) |
@@ -3926,11 +3979,12 @@ works `factory` and `demo-app`.
    lines, a template that works out of the box, registration without a
    human password and the sanitiser for outsiders only. The Stage 11 spec
    then built clean in under two hours.
-9. The project screen (Stage 15, designed 2026-10-10, not built, 5.7):
-   the status line, the pulse, five columns beside the project agent's
-   chat, inline answers, members with approvers per project, and GitHub
-   import and export, closed by an app built through the chat. What
-   follows is in the roadmap, scoped by Sebastian.
+9. The project screen (Stage 15, built 2026-10-11, 5.7): the event
+   spine and the live board, the status line, the pulse, five columns
+   beside the project agent's chat, and inline answers. Members with
+   approvers per project and GitHub import and export moved to the
+   roadmap (151, 152). The exit test, an app built through the chat, is
+   pending. What follows is in the roadmap, scoped by Sebastian.
 
 ## 12. Glossary
 
@@ -3967,7 +4021,7 @@ works `factory` and `demo-app`.
 | Approvers | The policy's list of Forgejo users who may authorise spend in the console |
 | Hold | A reservation of a call's or a resource's worst-case cost, taken before it runs and replaced by the real cost |
 | Push mirror | Forgejo's push of every commit to the GitHub copy of a repository |
-| Pulse | One sentence under the status line, the most useful thing to know now, written by a cheap model from the board and the last events, refreshed on every event and every 60 s, booked under `pulse` (5.7) |
+| Pulse | One sentence under the status line, the most useful thing to know now, written by a cheap model from the board and the last events, refreshed on events and every 60 s while the project is active, booked under `pulse` (5.7) |
 | Heal pass | factoryd's pass at boot and every minute that starts missing workflows and re-reads Forgejo for signals a webhook missed |
 | Timeline | A task's step-by-step record in S3 (`sessions/<id>/timeline.jsonl`), from intake to its final state |
 | Envelope | The resource and euro allowance per project for commissioned cloud resources: monthly euros, server types, count, lease length, volume size. A block of the project's file, the policy default when absent |

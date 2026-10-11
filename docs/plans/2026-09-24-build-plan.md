@@ -52,7 +52,7 @@ Each stage ends with an exit test. A stage starts only after the previous one pa
 | 12 Bugfix rounds | Round 1: agent time in hours with check-ins, the supervisor's message into the running session, finished work kept at every cap, cache volumes, a working template, registration without a password. Round 2: no Forgejo credential in the worker while the agent runs, machine accounts, Retry of a failed plan card, the project euro cap | The Stage 11 spec on a fresh project with no refile, the human's clicks only the plan and the approvals, in under three hours |
 | 13 Board UX | Research of the kanban field, proposal-v1, the board roadmap and a local click dummy over real card data | The dummy through Sebastian's click tests, with no cluster and no spend |
 | 14 Rebuild | The cluster rebuilt from the round 2 close's backups on a new address set, round 2's findings folded in through the factory's own lane | The step-zero gate passed, and three fold-in cards merged through the lane and rolled |
-| 15 Project chat | The project screen (status line, pulse, five columns, chat, drawer), the project agent inside factoryd, inline answers, members and approvers per project, GitHub import and export | An app built through the chat alone: uptime, about ten cards, a staging deployment and a smoke test, under 50 EUR for the round |
+| 15 Project chat | The event spine and the live board, the project screen (status line, pulse, five columns, chat, drawer), the project agent inside factoryd, inline answers. Built. Members, approvers per project and GitHub import and export moved to the roadmap | An app built through the chat alone: uptime, about ten cards, a staging deployment and a smoke test, under 50 EUR for the round. Pending |
 
 The stages map to the build order in architecture 11: Ranch is stages 0 to 3, First loop is 4 to 6, Teeth is 7, Customer is 8, Self is 9. Hardening, Spec and the bugfix rounds are its items 6 to 8, and the project screen its item 9.
 
@@ -3759,6 +3759,126 @@ The rulings, in the ledger:
 - 256. Round 1's scope with GitHub import and export, and the exit test
   through the chat. Messenger push and the mobile layout are roadmap items.
 
-After Stage 15: the next scope is Sebastian's. [The roadmap](../roadmap.md)
-holds every future topic, and its items 145 to 150 hold what this round
-leaves for later.
+Outcome (2026-10-11, the exit test pending). The eight code phases the
+round kept are on code main: 2a, 2b, 3a, 3b, 4a, 4b, 5 and 6. Phases 7
+(members and per-project approvers) and 8 (GitHub import and export)
+moved to the roadmap as items 151 and 152. At 01:16Z the lane's rate had
+projected 40 to 60 EUR more for the remaining phases against the round's
+50. What landed, and who built it:
+
+- 2a, the event spine (lane, two cards, six sessions, 6.11 EUR): an
+  `events` table with `via` (button, chat, webhook or factoryd), one row
+  per action whatever the input, and the project's feed at
+  `GET /projects/{name}/events`.
+- The migration runner's guard (lane, one cheap session): it strips `--`
+  comments and splits outside strings and dollar quotes, with a test over
+  every migration file. It followed an 11-minute outage from 23:56Z, when
+  a roll crash-looped factoryd on an agent's migration whose comment held
+  two semicolons.
+- 2b, the live board (controller, after three lane cards): an in-process
+  event bus, the project's stream as SSE with Last-Event-ID replay, one
+  card fragment swapped per event, a `task_status` event on every status
+  or gate change, and a 30 s poll beside the stream for the counters.
+- 3a, the card face (controller, after two lane cards): v1's tokens with
+  both themes and the toggle, the face's anatomy, the editable summary
+  and the accent.
+- 3b, the project screen (controller, after one lane card): one project
+  at a time, the status line with the project's month spend and "waiting
+  on you" winning over "working", five columns with the human lane folded
+  into Needs you, lane and fine-state chips, the wide view, and the card
+  drawer with Overview, Activity and Files.
+- 4a, the project agent (controller, after one lane card): `OperatorModel`
+  on the `operator` alias, a chat task per project and month that the
+  calls bill, `chat_messages`, 16 console actions lifted into shared
+  functions that the handlers and the tools both call, 6 read and 14
+  write tools, proposals and undo tokens bound to member and project for
+  30 minutes, and the `chat` policy block, whose confirm defaults include
+  `answer` and `steer`.
+- 4b, the chat panel (controller): 36 percent of the width beside the
+  board from 1200 px and two tabs below, streamed turns, proposals with Do
+  it and Skip, applied lines with Undo, and an escape-then-subset markdown
+  in which `#n` opens the card's drawer.
+- 5, the pulse (controller): a cheap model on the `pulse` alias writes one
+  sentence and three or four bullets from the agent's snapshot and 20
+  events. It runs 2 s after an event, at most once per 10 s, with a 60 s
+  fallback while the project is active. It backs off while the gateway
+  fails, code sets its prominence, and pulses are kept for a day.
+- 6, inline answers (controller): choices on an agent's question through
+  the gateway's `escalate_to_human` tool, validated at factoryd's
+  boundary, buttons on the card that post the same answer endpoint, and a
+  `question_asked` event.
+
+The lane started each phase on the cheap tier with the climb, as planned.
+From 00:55Z the code project started cards on the stronger tier (infra
+4e36213) after the cheap tier's failures. A phase that failed on the lane
+went to the controller: an Opus implementer in a worktree, a second Opus
+review, then a direct push to main (rulings 257 and 258). From 04:59Z the
+model provider, Dashscope, answered 429 "budget exhausted" on every tier
+and alias. The Alibaba Cloud account's own budget was spent, not LiteLLM's
+cap. The lane's cards for 4b, 5 and 6 closed at zero spend, and the
+controller built the three. Lane spend: 33.26 EUR of the round's 50. The
+controller's Opus subagents ran outside the factory's budget. The first
+rolls of 6 and 4b failed on gosec G706, a log line of phase 6, which the
+controller fixed on main (fab2249, 6350e9b).
+
+Exit test: pending, until the model provider answers again. Project uptime
+is ready: its repository from the ts-go template, its seed CI green and
+its staging pod running. The card's spec and the member's script are in
+the ledger (exit15-uptime-spec.md, exit15-chat-script.md). The script
+skips step 7, the export to GitHub, since phase 8 moved to the roadmap.
+
+The round's rulings, in the ledger:
+
+- 257. A controller-built phase lands by a direct push to main after a
+  local gofmt, vet and race-test pass and a second Opus review. Rolls stay
+  on the lane.
+- 258. When a card's remaining budget cannot cover its review's list, the
+  controller takes the phase without a second lane attempt.
+- 259. `answer` and `steer` join the `chat.confirm` defaults, since the
+  text the agent reads from cards is untrusted.
+- 260. The state word "waiting on you" wins over "working", and the
+  project agent's snapshot reads the screen's status line.
+
+Findings:
+
+- factoryd rolls with Recreate and one replica, so every roll stops the
+  running sessions, which resume on their branch with a fresh context.
+  Three restarts hit one 2b card, and from 00:33Z a roll waited for a gap
+  with no card in a session (roadmap 157).
+- A provider's 429 or budget refusal counted as an attempt, and one card
+  reached its session cap at zero spend. A refusal must not count
+  (roadmap 155).
+- The factory's model review reads 48 KiB of a diff, so a bigger pull
+  request came back as concerns and a wasted fix session. On a diff it
+  read in full, it missed a data race and a blocking send that the
+  controller's review caught. The review prompt should ask for a
+  concurrency reading (roadmap 156).
+- A prompt sentence that described a tool's effect in the imperative
+  ("say what you proposed") made the model narrate instead of calling the
+  tool, so the first live chat turns called none. The prompt now says
+  that words alone change nothing.
+- A wrong assistant answer in the replayed history teaches the model to
+  repeat it. A member needs "clear the chat", and the replay should drop
+  assistant turns that claimed an action without a tool call (roadmap
+  153).
+- A 5 EUR card on the frontier tier lasts about 18 minutes on the
+  factory's own code, at about 0.27 EUR a minute. A phase brief must fit
+  that or be split: 4a should have been three cards.
+- The 4a tests drove a fake gateway that scripts tool calls, and the first
+  live model call came after the push. The first live call of a model
+  loop must be part of its acceptance.
+- Pending proposals live in factoryd's memory. A restart loses them, and a
+  reload shows one without its Do it (roadmap 154).
+- Two factoryd replicas would double the pulse (roadmap 157).
+- Agents told to continue from a saved attempt branch checked it out and
+  silently reverted main's later commits, the hotfix and two rolls' image
+  pins among them. Briefs now say to cherry-pick the commit onto main.
+- The supervisor's repetition detector (24 tool calls without a file
+  change) trips on the stronger model's read loops: twice on 3b and on
+  the first sessions of 4b, 5 and 6.
+- One implementer did not run gosec, and two rolls failed on it. The
+  review brief should name `gosec ./...` beside the tests.
+
+After Stage 15: the exit test's result decides the next round, and the
+scope is Sebastian's. [The roadmap](../roadmap.md) holds every future
+topic, and its items 145 to 157 hold what this round leaves for later.

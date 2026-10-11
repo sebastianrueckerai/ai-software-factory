@@ -7,12 +7,33 @@ three answers of 2026-10-10. The architecture behind it is
 [architecture.md](../architecture.md) 5.7. The scope stays the console's
 server-rendered htmx shape, with SSE for the live parts (ruling 244). This
 document is the spec the dummy's iteration 5 implements and the console
-follows. It is design, not built: the console today is the board of
-architecture 5.6.
+follows. Stage 15 built it on 2026-10-11, with the deviations below.
 
 [proposal-v1.md](proposal-v1.md) stays as the record the click dummy
 implemented in its first four iterations. Where v2 says nothing, v1 still
 holds.
+
+## Built in Stage 15
+
+The console follows this spec except here:
+
+- The chat panel takes 36 percent of the width from 1200 px, not the
+  dummy's 45. Below 1200 px the board and the chat are two tabs.
+- A proposal's buttons are Do it and Skip, not Cancel.
+- No "new" button: a member cannot clear the chat yet (roadmap 153).
+- A tool block shows the result's first line beside the arguments and the
+  duration.
+- No message queue: the input waits while a turn streams.
+- The human lane (approvals, escalations, human tasks) folds into Needs
+  you.
+- The state word is "waiting on you" whenever a card waits on a human,
+  else "working" while a card runs, else "idle" (ruling 260).
+- The status line has no GitHub figure. Import and export moved to the
+  roadmap with members and per-project approvers (items 151 and 152).
+- The drawer has three tabs, Overview, Activity and Files. The Chat tab is
+  not built.
+- A 30-second poll runs beside the event stream for the counters.
+- Open: the status line spans the board column only, not the chat's.
 
 ## The screen
 
