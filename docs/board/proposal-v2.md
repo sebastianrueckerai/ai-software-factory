@@ -20,7 +20,8 @@ The console follows this spec except here:
 - The chat panel takes 36 percent of the width from 1200 px, not the
   dummy's 45. Below 1200 px the board and the chat are two tabs.
 - A proposal's buttons are Do it and Skip, not Cancel.
-- No "new" button: a member cannot clear the chat yet (roadmap 153).
+- Stage 15 had no "new" button. Since Stage 16 "New conversation" starts
+  afresh, and the old conversations stay readable but not writable.
 - A tool block shows the result's first line beside the arguments and the
   duration.
 - No message queue: the input waits while a turn streams.
@@ -28,8 +29,9 @@ The console follows this spec except here:
   you.
 - The state word is "waiting on you" whenever a card waits on a human,
   else "working" while a card runs, else "idle" (ruling 260).
-- The status line has no GitHub figure. Import and export moved to the
-  roadmap with members and per-project approvers (items 151 and 152).
+- Stage 15's status line had no GitHub figure. Since Stage 16 it ends with
+  "GitHub: <state>" for a project with an export.
+
 - The drawer has three tabs, Overview, Activity and Files. The Chat tab is
   not built.
 - A 30-second poll runs beside the event stream for the counters.
