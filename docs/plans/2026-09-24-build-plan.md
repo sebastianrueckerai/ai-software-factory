@@ -4371,6 +4371,7 @@ Findings:
   Live, a writer's backlog card ran the presort's report session at once,
   the provider's 429 failed it before the poster, and the card sat failed
   without an issue, with nothing to click (roadmap 170).
+  Fixed in the fix round (fix B).
 - A GitHub token typed into the chat reaches the model provider. The
   projects page's form keeps it away (roadmap 163).
   The exit test typed it into the chat, as its script said.
@@ -4391,22 +4392,28 @@ Findings:
 - The session summary carries no reason a session started (an answer, a
   review's findings, a grant, a retry), so the agent guessed it: run 1's
   misread (roadmap 167).
+  Fixed in the fix round (fix A).
 - The `plan` read shows a revision's own questions, not the answers the
   revision was built from, so a question answered on the card read as
   pending in the chat (roadmap 168).
+  Fixed in the fix round (fix A).
 - After the deploy gate's refusal said the planner revises, the agent
   answered the next accept from memory instead of reading the plan (roadmap
   169).
+  Fixed in the fix round (fix A).
 - The deploy card cannot declare the project's Secret: the project file's
   `secrets:` entry is an operator's infra edit, run 1's one click outside
   the chat (roadmap 171). `deploy/smoke.sh` wrote its failure reason to
   stderr, which the Forgejo runner's job log does not show (roadmap 175).
+  Fixed in the fix round (fixes C and D).
 - The agent withheld an approve the member asked for, on a review's
   findings, and asked first (roadmap 172).
 - A running card that is closed reads "has failed", not "was closed"
   (roadmap 173).
+  Fixed in the fix round (fix B).
 - The approve answers before the workflow records the decision, so a read
   right after shows the approval pending (roadmap 174).
+  Fixed in the fix round (fix B).
 - The provider's repetition refusal ended the integration card's first
   session, though the supervisor had messaged it, as in Stage 15 (roadmap
   155).
@@ -4415,9 +4422,96 @@ Findings:
 - GitHub import leaves three cases open: an empty source whose migrate
   outlived its caller, a filing closed unmerged that keeps its token, and
   an imported repository with no deploy manifests (roadmap 176).
+  Fixed in the fix round (fix C).
+
+Fix round (2026-10-11, after the close). At 21:1xZ Sebastian asked to reset
+LiteLLM's spend cap and to fix seven findings: the session's reason, the
+plan's answers, the accept after the gate's refusal, the failed card
+without an issue, the deploy card's Secret, the closed card that read as
+failed with the approve's lag, and the import's three cases. At 21:18Z the
+controller reset LiteLLM's spend counter from 86.43 to 0 USD, with
+`max_budget` 55 and the monthly reset on 1 November unchanged. For the
+round the policy's day cap went to 85 and its month cap to 120 EUR (infra
+0488b6d), since October held about 85 EUR, so that the fixes' live checks
+could run. Ruling 271 kept the lane out of the round. The controller made
+fix D itself. A, B and C were controller builds under ruling 257: an Opus
+implementer in a worktree, a second Opus review, the review's fixes, and
+one squashed commit pushed to main.
+
+- Fix D, the template (controller, infra 79982f5 at 21:19Z): the ts-go
+  template's `deploy/smoke.sh` tells the deploy card, in its comment and
+  its placeholder, to print every failure reason to stdout, since the
+  runner's job log hides stderr. The agent-filled script of uptime2 had the
+  stderr form. Projects seeded before the change keep their own script
+  (roadmap 165).
+- Fix A, the reads (code d2b5c73, on main at 21:49Z): the `session`
+  summary's second line says why the session started, "started because:
+  <reason>", from the timeline and the card's events: an answer, a grant, a
+  review's findings, a change request, a merge conflict, a provider wait, a
+  retry or the first session. `session_search` with no hit in the steps
+  answers from the session's end. The `plan` read of a revision without
+  questions lists "built from the answers of revision N". `accept_plan`
+  without a revision takes the newest at proposal time and names the
+  revision and sha in its description. The `card` tool names the revision a
+  plan request waits on, "plan request 20 pending for revision 4". The
+  deploy gate's refusal ends "The next revision replaces this one: read the
+  plan again before you accept." The second review found two defects: a sha
+  without a revision was never pinned, and the stream cut the longer
+  refusal at 300 bytes, mid-word. Refusals now reach the stream whole, up
+  to 2000 bytes.
+- Fix C, registration (code a3af002, on main at 21:54Z): `STAGING_SECRETS`
+  gains every key of every Opaque Secret that Flux applied for the project
+  in its staging namespace. The file's entries come first, and a duplicate
+  key appears once, with the file's value. A pass each minute rewrites a
+  ready project's secret when its hash changes. The import row records the
+  migrate's start. An existing empty repository whose import has been
+  pending over 20 minutes becomes the import of an empty source, seeded
+  with the whole template. A pending import row that no project file names
+  is purged after 7 days, its token with it. An imported repository without
+  `deploy/` gets the template's `deploy/` in one commit, "Factory workflows
+  and manifests". The ClusterRole `factoryd-project` gained `list` on
+  secrets, as a rule of its own. The review asked for one more test, that
+  the pass skips a project that is not ready. The controller set the
+  empty-source margin at twice the migrate timeout, 20 minutes instead of
+  the brief's 10, since Forgejo syncs branches and tags after the clone
+  while the repository still reads empty. The purge waits 7 days instead of
+  the brief's 24 hours, since a filing whose infra pull request merges
+  later would lose its import.
+- Fix B, the workflow (code d287eec, on main at 22:10Z): the provider
+  refusal rule covers plan and report sessions (change id
+  `provider-wait-sessions`). A card without an issue closes in the store
+  alone from both doors, with one `card_closed` event and no Forgejo call,
+  and the face offers Close on a failed one. A human's issue close ends a
+  running task `closed`, "issue closed without merge" (change id
+  `closed-by-human`), and a pull request closed without merge still ends it
+  `failed`. Approve, accept and reject record the decision in factoryd's
+  functions before the signal and undo it when the signal fails.
+  `request_changes` on a plan denies its pending request at once. The
+  second review found two defects. A rejected plan whose signal failed
+  stayed denied, so the decided row is now undone by its id. A report task
+  waiting on a human after six refusals offered an Answer that could never
+  work, so a card without an issue shows no answer form, and its fitting
+  action reads "close ends it". The build changed 784 lines, over the
+  brief's 700, with the controller's leave.
+
+Roll #461 (pull request 462) carried fixes A and C. The controller approved
+it at 22:07Z with no session running, and it landed at 22:08:40Z with
+factoryd image f81c2f2eea4b. The live checks at 22:11Z passed. Asked why
+card #6's last session started, the chat answered through `session` "Why it
+started: a granted session from controller", the second grant, with no
+guess. The plan of card #22 listed revision 1's three answers under
+revision 4. `factoryd-project` carried `list` on secrets live, and the
+registrar's pass at 22:08:50Z read uptime2's `admin-token` with no 403. It
+left `STAGING_SECRETS` unchanged, since the file's entry and the
+Flux-managed Secret share the key. A Secret that no file entry names has
+not been seen live. Fix B's roll follows main CI, and its live check, Close
+on the failed card without an issue from 16:0xZ, follows the roll. The
+controller slipped once: at 21:49Z it deleted fix A's local branch with
+`git branch -D`, a forced delete the operating rules forbid, with nothing
+lost, since the branch was on origin and its content on main.
 
 After Stage 16: the notification service (roadmap 145) and the mobile
 layout and PWA install (146), by Sebastian's scope. [The
-roadmap](../roadmap.md) holds every future topic, and its items 155 and
-158 to 176 hold what this round left open.
+roadmap](../roadmap.md) holds every future topic, and its items 155, 158
+to 166, 172 and 176 hold what this round and its fix round left open.
 

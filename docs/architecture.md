@@ -1045,9 +1045,10 @@ the same state (6.6).
 runs up to `limits.sessions` sessions (3 by default, 5.3), opens the pull request, waits for the checks
 (45 minutes at most), runs the gates and the model review, files an approval
 request (7) and then waits for a person: a merge finishes the task
-`done`, a pull request closed without merge or a closed issue finishes it
-`failed`, a trusted change request runs another session with the request as
-findings. Attempts start on `coding-cheap`; red checks or a repetition trip
+`done`, a pull request closed without merge finishes it `failed`, a closed
+issue finishes it `closed` (since the fix round after Stage 16, 7), a trusted
+change request runs another session with the request as findings.
+Attempts start on `coding-cheap`; red checks or a repetition trip
 move the next attempt to `coding-frontier` (Ruling 86), and since Stage 12
 so does the stuck rule (6.6). The wall-clock cap
 counts the agent's working time across attempts, not time since intake,
@@ -2021,7 +2022,8 @@ is the answer that grants the extra session, and the one cap card is the
 only other card a cap opens (5.1). The card had no close button until Stage
 16: in the round the human closed #348, an alert answered as noise, through
 Forgejo's API. Since Stage 16 the face offers Close on backlog and
-waiting-human cards, and the chat's `close` runs the same action (5.7).
+waiting-human cards, and since the fix round after it on a failed card
+without an issue. The chat's `close` runs the same action (5.7).
 
 - **Login.** Forgejo OAuth2, the authorisation code flow with PKCE (S256), a
   confidential client and an explicit scope list: `read:user`,
@@ -2334,9 +2336,15 @@ takes a GitHub source and an optional token, registration migrates the
 repository through Forgejo instead of creating an empty one and clears the
 token after, and the template's workflow files and AGENTS.md go in as one
 commit, "Factory workflows". A source without main gets main from its
-default branch. Its open cases are roadmap 176. Pull request workflows
-to GitHub, the conversation's preference once the system matures, are a
-roadmap item (148).
+default branch. Since the fix round after Stage 16 a repository without
+`deploy/` also gets the template's `deploy/`, and the commit reads "Factory
+workflows and manifests". An existing empty repository whose import has
+been pending over 20 minutes counts as the import of an empty source and is
+seeded with the whole template, and a pending import row that no project
+file names is purged after 7 days, its token with it. The migrate still
+holds up the other projects' reconciles, up to 10 minutes (roadmap 176).
+Pull request workflows to GitHub, the conversation's preference once the
+system matures, are a roadmap item (148).
 
 **Round 1** (Ruling 256) built the event spine, the status line, the
 pulse, the chat, the board beside the chat with fewer columns, and inline
@@ -2375,28 +2383,43 @@ events, and depth comes through a tool. What each part does:
   request points to `approve_merge` or `deny_merge`. Live, an answer to a
   failed card got "Card #446 has failed, not a question or a session cap to
   answer: the card is final: a new card continues the work."
+  Since the fix round the chat's stream shows a refusal whole, up to 2000
+  bytes, where it cuts other tool lines at 300.
 - **The reads.** `plan` gives a plan's rows, each child's state, and the
-  revision's questions with their answers. `card` gives a card in full: the
-  state in words, the gate, attempts against the cap, spend against the
-  budget, dependencies both ways, the pull request, and the newest checks,
-  review and audit. `pr` gives the checks, the review's and the audit's
-  text, the diff stat and, on request, the diff. `file` reads a file at a
-  ref through the member's token, its path cleaned so none climbs. For a
-  session the chat sees its summary by default (`session`) and fetches the
-  rest on demand: `session_steps` for the step list, `session_step` for one
-  step or a range in full, and `session_search` over the transcript on S3.
-  A transcript over 8 MiB is searched line by line but not parsed. Every
-  result passes `sanitize.Inbound`, and no read records an event. `ci`
-  gives a ref's or a commit's combined CI state and each job's state,
-  through the member's token. The exit test's first run found that no tool
-  read main's CI, and the round built `ci` the same evening.
+  revision's questions with their answers. Since the fix round a revision
+  without questions lists the answers it was built from, those of the
+  newest earlier revision that has them. `card` gives a card
+  in full: the state in words, the gate, attempts against the cap, spend
+  against the budget, dependencies both ways, the pull request, and the
+  newest checks, review and audit. On a plan card at its gate the pending
+  request names its revision. `pr` gives the checks, the review's and the
+  audit's text, the diff stat and, on request, the diff. `file` reads a
+  file at a ref through the member's token, its path cleaned so none
+  climbs. For a session the chat sees its summary by default (`session`)
+  and fetches the rest on demand: `session_steps` for the step list,
+  `session_step` for one step or a range in full, and `session_search` over
+  the transcript on S3. A transcript over 8 MiB is searched line by line
+  but not parsed. Since the fix round the summary's second line says why
+  the session started, from the timeline and the card's events: an answer,
+  a grant, a review's findings, a change request, a merge conflict, a
+  provider wait, a retry or the first session. A search with no hit in the
+  steps answers from the session's end. Every result passes
+  `sanitize.Inbound`, and no read records an event. `ci` gives a ref's or a
+  commit's combined CI state and each job's state, through the member's
+  token. The exit test's first run found that no tool read main's CI, and
+  the round built `ci` the same evening.
 - **The writes.** `close`, `edit`, `grant_session` and `set_dependency` run
   the lifted actions the board's buttons run, record one event each and
   confirm by default. The face offers Close on backlog and waiting-human
   cards, and a capped card's answer is a grant, which records
-  `session_granted` from either door. `set_dependency` refuses a process
-  without a dependencies block, reads Forgejo's list before it changes it,
-  and has an undo. `new_card` takes a size.
+  `session_granted` from either door. Since the fix round a card without an
+  issue closes in the store alone, with one `card_closed` event and no
+  Forgejo call, and the face offers Close on a failed one too. A card
+  without an issue shows no answer form, and its refusals name "close ends
+  it" as the fitting action. A human's close ends a running card `closed`,
+  "issue closed without merge", not `failed` (7). `set_dependency` refuses
+  a process without a dependencies block, reads Forgejo's list before it
+  changes it, and has an undo. `new_card` takes a size.
 - **The planner's questions** (Ruling 264). A plan carries up to five
   questions with 2 to 5 choices each, stored per revision and asked on the
   plan card with a button per choice. Accept is refused while one is open.
@@ -2404,14 +2427,18 @@ events, and depth comes through a tool. What each part does:
   takes the revision. After the last answer the plan's approval is
   superseded, and the planner runs once more with the answers in its brief.
   The planner's guide holds the format key and one sentence (Ruling 263).
+  Since the fix round `accept_plan` without a revision takes the newest at
+  proposal time, and its proposal names the revision and sha it accepts, so
+  a revision added after the proposal is refused as stale.
   In the exit test the planner asked three questions, and its next revision
   took the three answers.
 - **The deploy gate** (Ruling 265). Acceptance refuses a plan whose
   objective has a Deploy line or a Deployment heading and whose cards'
   directories own no deploy manifests. The member's accept gets a 409 that
-  says the planner is revising. The refused accept still signals the
-  workflow, so the planner revises by itself with the deploy-owner
-  finding, as after a change request.
+  says the planner is revising. Since the fix round it ends "The next
+  revision replaces this one: read the plan again before you accept." The
+  refused accept still signals the workflow, so the planner revises by
+  itself with the deploy-owner finding, as after a change request.
   In the exit test it refused a revision without a deploy card, and the
   planner's next revision put the card back.
 - **The smoke test.** The ts-go template's CI runs `deploy/smoke.sh` after
@@ -2420,20 +2447,28 @@ events, and depth comes through a tool. What each part does:
   project's CI runners reach its staging namespace on 80, 443 and 8080 and
   resolve its Service names by full name, staging admits only that
   project's runners on 8080, and registration writes the Actions secrets
-  `STAGING_URL` and `STAGING_SECRETS`. A missing Secret is a red check. A
-  project seeded before the template change keeps its old CI (roadmap
-  165), and a fork's pull-request run can reach staging on 8080, without
-  secrets (roadmap 162).
+  `STAGING_URL` and `STAGING_SECRETS`. `STAGING_SECRETS` holds the project
+  file's `secrets:` entries and, since the fix round, every key of every
+  Opaque Secret Flux applied for the project in the staging namespace, the
+  file's entries first and a duplicate key once. A pass each minute
+  rewrites it when its hash changes, so the deploy card declares its Secret
+  by creating it in the project's staging manifests. A missing Secret is a
+  red check, and the template tells the deploy card to print the script's
+  failure reasons to stdout, since the runner's job log hides stderr. A
+  project seeded before the template change keeps its old CI (roadmap 165),
+  and a fork's pull-request run can reach staging on 8080, without secrets
+  (roadmap 162).
   In the exit test the deploy card's Secret reached CI only after an
-  operator named it in the project file (roadmap 171).
+  operator named it in the project file, the gap the fix round closed.
 - **Budgets by size** (Rulings 266 and 268, 5.3): small 2, medium 5 and
   large 10 EUR, 15 at most. A pull request over 1000 changed lines is risk
   class large and needs a human (5.3).
 - **A provider refusal is no attempt** (Ruling 267, 6.6). A code session
   whose first call the provider refuses costs no attempt, no agent time
-  and no supervisor call. The card reads "waiting on the provider", and
-  the status line counts it as waiting, not working. Plan and report
-  sessions are not covered (roadmap 155).
+  and no supervisor call. Since the fix round the same holds for a plan or
+  report session. The card reads "waiting on the provider", and the status
+  line counts it as waiting, not working. The provider's repetition refusal
+  is not covered (roadmap 155).
 - **Rolls in a session gap** (Ruling 269, 7). A roll merges only when no
   session runs, and new sessions wait while it does, so a roll no longer
   stops a running session. The card's chip reads "waiting for a roll".
@@ -2448,8 +2483,9 @@ the chat alone in 2 h 45 min, ten cards merged for 3.50 EUR, with 1 click
 outside the chat, 1 misread and 1 chat gap: no tool read main's CI. So zero
 chat gaps was not met as run. The `ci` read, built after the run, closed
 that gap the same evening. Run 2 took each new path once in 48 minutes,
-with no gap and 2 misreads. What the round left open is in the roadmap (155
-and 158 to 176).
+with no gap and 2 misreads. A fix round the same evening built the fixes
+for seven of its findings (the plan's Stage 16), and what stays open is in
+the roadmap (155, 158 to 166, 172 and 176).
 
 ## 6. Chunk 4: the worker plane
 
@@ -3004,7 +3040,12 @@ refusal. The timeline records `provider_refused` at the gate `provider`,
 the task backs off 2, 4, 8, 16 and 30 minutes with one log line each way,
 and the sixth refusal in a row escalates to a human with the source
 `provider`. The card reads "waiting on the provider", unless it is held
-for a roll. Plan and report sessions are not covered (roadmap 155).
+for a roll. Since the fix round after Stage 16 the rule covers plan and
+report sessions too (change id `provider-wait-sessions`). A refused plan
+session counts no attempt, and a refused report session no longer fails its
+card. A report task has no issue, so after its sixth refusal it waits on a
+human with no comment, and Close ends it (5.7). The provider's repetition
+refusal is not covered (roadmap 155).
 
 **The loop nudge** (Rulings 188, 202, Task 88). factoryd counts identical
 calls in a row from the session's event stream: a call is the tool plus
@@ -3492,6 +3533,19 @@ only, and a new approval starts again (Ruling 129). This bounds the workflow
 history, and the human path stays open. A merge finishes the task `done` at
 once, without waiting for the `pr_merged` webhook. A human who merges in
 Forgejo is credited as the merger. The activity merges only into `main`.
+Since the fix round after Stage 16 a human's close of the issue ends a
+running task `closed`, "issue closed without merge" (change id
+`closed-by-human`), and a pull request closed without merge still ends it
+`failed`.
+
+**A decision before its signal** (the fix round after Stage 16). factoryd's
+`ApproveMerge`, `AcceptPlan` and `RejectPlan`, which every door calls,
+record the decision on the approval row before they signal the workflow,
+and undo exactly that row when the signal fails. So a read right after an
+approve shows it approved, a retry gets 409, and the workflow's own resolve
+leaves a decided row alone. A refused or failed merge, a red head or
+exhausted retries put the row back to pending, and a merge conflict leaves
+it approved. A change request on a plan denies its pending request at once.
 
 **Only a green head merges** (Task 95). Since Stage 11 `Merge`, the one
 activity every merge passes, approval, `auto` or roll, reads the gated
@@ -4122,7 +4176,7 @@ since Stage 6, but neither has run under load.
 | Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list. Servers and volumes, no buckets. SSH certificates bound to one server. Outbound tcp 53, 80 and 443. Deletion at the last tick before the lease ends | Built (Rulings 80, 83, 121, 122, 124, 125) |
 | Collector safety | A pass that sees a cluster node's IPv4 or another project's label deletes nothing | Decided (Ruling 123) |
 | Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Built (Rulings 81, 84) |
-| Project screen | One screen per project (5.7): status line, pulse, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export. Since Stage 16 the board's reads and actions are chat tools, the `system` tool is rendered from the code, refusals name the fitting action, and the planner asks its open questions before acceptance | Built in Stage 15 (Rulings 251 to 260), exit test passed. Stage 16 (Rulings 261 to 270) built the chat as the window, members, approvers per project and GitHub import and export on 2026-10-11. Its exit test's chat-only run had one gap, main's CI result, which the `ci` read built after the run closed |
+| Project screen | One screen per project (5.7): status line, pulse, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export. Since Stage 16 the board's reads and actions are chat tools, the `system` tool is rendered from the code, refusals name the fitting action, and the planner asks its open questions before acceptance | Built in Stage 15 (Rulings 251 to 260), exit test passed. Stage 16 (Rulings 261 to 270) built the chat as the window, members, approvers per project and GitHub import and export on 2026-10-11. Its exit test's chat-only run had one gap, main's CI result, which the `ci` read built after the run closed. A fix round the same evening built the fixes for seven of its findings |
 | Merge authority | The `factory-merge` bot merges after a whitelisted human's approval, enforced by Forgejo's branch protection. Merge retries are capped at six. A project on `auto` merges class `normal` without a card after a proven reproduction or a strict improvement and an approving review; the factory's repositories stay on `human` | Built (Rulings 109, 129). `auto` built (Rulings 149, 167, 169) |
 | Intake lanes | Lanes backlog, plan and ready from the project's process, `moved_by` judging every entry. Every bug from any account or alert starts a task. Improvements wait in the backlog for a writer, with an analyzer's write-up. Outsiders' bug reports pass a screening stage. Outsiders' writer-only labels are stripped. The poster's text is untrusted information between random markers | Built (Rulings 148, 150, 182, 185) |
 | Projects | Each project its own Forgejo organisation with a CI user, runner registration, deploy key and deploy branch. Flux tenancy through a namespaced account. A default-deny network policy with the file's outside hosts only and a quota per environment. Stricter wins: a project file only tightens the policy's defaults. Reconciled hourly. Settings from the project's file, `objects: factory \| seed` and `agents: coder \| none`, so the factory's two repositories are projects like any. Registered by the reconcile with the admin's login from OpenBao. A cache volume per project for agents and pull request CI. Hostnames are an infra commit | Built (Rulings 146, 155, 156, 157, 164, 165, 166, 179) |
