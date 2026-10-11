@@ -31,7 +31,6 @@ The console follows this spec except here:
   else "working" while a card runs, else "idle" (ruling 260).
 - Stage 15's status line had no GitHub figure. Since Stage 16 it ends with
   "GitHub: <state>" for a project with an export.
-
 - The drawer has three tabs, Overview, Activity and Files. The Chat tab is
   not built.
 - A 30-second poll runs beside the event stream for the counters.

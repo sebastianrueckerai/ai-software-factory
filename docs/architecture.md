@@ -2040,7 +2040,6 @@ Forgejo's API.
   the two disagree, Forgejo refuses the merge and the card shows why. Since
   Stage 16 a project file's `approvers:` replaces the policy's list for that
   project, and registration sets the project's whitelist from it (5.7).
-
 - **Actions run as the human.** A new task, an escalation answer, a review
   and a rejection go to Forgejo through the human's own token, so Forgejo
   records the human as their author.
@@ -2257,7 +2256,6 @@ Stage 16 the replay drops an assistant turn that claims an action, matched
 as whole words, without a tool call, and the stored Do-it row leaves out
 the proposal's description, so card text is never replayed as the agent's
 own words (Ruling 259).
-
 
 **Threat model** (Ruling 253). The new surface is the agent's context: an
 agent's or an outsider's text reaches the project agent through the read
@@ -4149,11 +4147,9 @@ works `factory` and `demo-app`.
    approvers per project and GitHub import and export moved to Stage 16.
    The exit test, an app built through the chat, passed on
    2026-10-11. Stage 16, the chat as the window, built most of its items
-
    the same day (5.7), with members, approvers per project and GitHub
    export, and its exit test is pending. The rest is in the roadmap,
    scoped by Sebastian.
-
 
 ## 12. Glossary
 

@@ -4144,9 +4144,8 @@ What landed, in order, and who built it:
   set through the chat's `github_export` (confirm by default) or the
   projects page. The token stays in memory until Do it, every stored row
   holds `[token]` in its place, events hold the remote only, and an
-  unconfirmed token expires with its proposal.
- The status line and the snapshot end with "GitHub:
-  <state>", which the registrar refreshes each minute. Seed projects are
+  unconfirmed token expires with its proposal. The status line and
+  the snapshot end with "GitHub: <state>", which the registrar refreshes each minute. Seed projects are
   refused, since ruling 126's job mirrors them.
 - 3.9, members and per-project approvers (controller, on main f5b0f83, its
   roll pending): any project's writer logs in and sees only their
