@@ -4234,9 +4234,12 @@ What landed, in order, and who built it:
 
 The lane ran seven cards on the code project's stronger tier, and none
 landed by itself. #431 (3.7a), #432 (3.1a), #433 (3.3a) and #443 (3.6a, a
-small card of 2 EUR) ended on the factory's own budget 402: each session
-read the tree, and every call carried the whole reading, from 257 to 491
-thousand input tokens. #433 pushed only because the supervisor cut its
+small card of 2 EUR) ended on the factory's own budget 402. The record
+here once said every call carried 257 to 491 thousand input tokens. That
+was wrong: the figures were the gateway's 402 refusal text, which counted
+the request body's bytes as input tokens. The calls carried at most
+141,907 prompt tokens, 94 percent of them from the provider's cache, and
+the cost came from the frontier tier (Stage 17 has the measure). #433 pushed only because the supervisor cut its
 first session after 7 minutes, so its second started fresh. #442 (3.2a)
 and #441 (3.1b) pushed pull requests that the controller's reviews sent
 back with sixteen and ten points, and #441's fix session added four new
@@ -4342,8 +4345,9 @@ The round's rulings, in the ledger:
   factory's own code keep their read-only view of every project.
 - 271. Abort and fix before the bill (Sebastian). When a card's session
   shows a cost pattern that will exhaust its budget before it lands (Stage
-  16: 250 to 490 thousand input tokens a call on the factory's own code, a
-  5 EUR card gone in one 17-minute session), the controller stops the lane
+  16: a 5 EUR card gone in one 17-minute session on the factory's own code;
+  the ruling's "250 to 490 thousand input tokens a call" was a byte count,
+  see Stage 17), the controller stops the lane
   at once, closes the cards running with the same pattern, fixes the cause
   (brief, tier, a session split after reading, size) and only then resumes.
   One lost card is the limit. The rule comes before ruling 258's "fails
