@@ -53,7 +53,7 @@ Each stage ends with an exit test. A stage starts only after the previous one pa
 | 13 Board UX | Research of the kanban field, proposal-v1, the board roadmap and a local click dummy over real card data | The dummy through Sebastian's click tests, with no cluster and no spend |
 | 14 Rebuild | The cluster rebuilt from the round 2 close's backups on a new address set, round 2's findings folded in through the factory's own lane | The step-zero gate passed, and three fold-in cards merged through the lane and rolled |
 | 15 Project chat | The event spine and the live board, the project screen (status line, pulse, five columns, chat, drawer), the project agent inside factoryd, inline answers. Built, exit test passed. Members, approvers per project and GitHub import and export moved to the roadmap | An app built through the chat alone: uptime, about ten cards, a staging deployment and a smoke test, under 50 EUR for the round. Passed |
-| 16 Chat as the window | Proposals and conversations kept in tables, every console read and action as a chat tool, the `system` tool rendered from code, refusals that name the fitting action, the planner's questions before acceptance, the deploy gate and a staging smoke test, budgets by plan size, a provider refusal as no attempt, the review's whole diff, rolls that keep sessions, members and per-project approvers, GitHub import and export | The uptime spec twice under 50 EUR for the round: through the chat alone with zero chat gaps, then each new path once against Stage 15's baseline |
+| 16 Chat as the window | Proposals and conversations kept in tables, every console read and action as a chat tool, the `system` tool rendered from code, refusals that name the fitting action, the planner's questions before acceptance, the deploy gate and a staging smoke test, budgets by plan size, a provider refusal as no attempt, the review's whole diff, rolls that keep sessions, members and per-project approvers, GitHub import and export. Built by the controller after the lane failed its cards, most of it live. The writes, the planner's questions and GitHub import in flight | The uptime spec twice under 50 EUR for the round: through the chat alone with zero chat gaps, then each new path once against Stage 15's baseline. Pending |
 
 The stages map to the build order in architecture 11: Ranch is stages 0 to 3, First loop is 4 to 6, Teeth is 7, Customer is 8, Self is 9. Hardening, Spec and the bugfix rounds are its items 6 to 8, and the project screen its item 9.
 
@@ -3993,13 +3993,22 @@ Then:
    Sebastian and the caps.
 
 Budget (Sebastian's ruling): 50 EUR on the factory's own code for the
-round. The caps are raised as in Stage 15: a card 5 EUR by default and 15
-at most, the day 40, the policy's month 80 and LiteLLM's proxy stop 88 USD,
-with the code project's month cap of 50 EUR as the round's stop. The close
+round, with a stop to ask at 40. The handover copied Stage 15's raises (the
+day 40, the month 80, LiteLLM 88 USD). But at the open October held 52.50
+EUR (32.11 that day) and LiteLLM 52.76 USD, so the month 80 would have
+stopped the factory after 27 EUR of the round, and the day 40 after 8. The
+round set its own caps instead (infra 8d75131): a card 5 EUR by default and
+15 at most, the day 85, the policy's month 110 and LiteLLM's proxy stop 118
+USD. The code project ran on the stronger tier with 3 hours of agent time,
+and its own month cap was the round's stop. That cap started at 50 EUR, as
+in Stage 15, but it counts the whole month, and the code project had spent
+37 EUR of October before the round. At 12:09Z it refused a card's call with
+2.70 EUR of project headroom, and it went to 90 (infra ba44609). The close
 restores the default card of 2, the day 20, the month 50 and LiteLLM's 55,
-and keeps the card maximum at 15 (ruling 268: ruling 266's large card needs
-10, and the factory's own code 15). The spend is reported at every item,
-and at 40 EUR the controller asks Sebastian.
+removes the code project's model, agent time and month lines, and keeps the
+card maximum at 15 (ruling 268: ruling 266's large card needs 10, and the
+factory's own code 15).
+
 
 Exit test. The same uptime spec and the same measures as Stage 15 (wall
 time, card spend, the project agent's and the pulse's lines, clicks outside
@@ -4031,6 +4040,228 @@ The round's rulings, in the ledger:
   for the factory's own code.
 - 267. A provider refusal at a session's first call is no attempt.
 
+Outcome (2026-10-11 at 15:05Z, three items in flight and the exit test
+pending). Fifteen of the round's eighteen slices are on main, and the
+controller built every one: eleven live in factoryd, the template's smoke
+job on infra main, and three waiting for their roll. The lane landed none.
+What landed, in order, and who built it:
+
+- 3.7a, budgets by size (controller, after lane card #431, live with roll
+  #435 at 12:51Z): small 2, medium 5 and large 10 EUR, held to the
+  policy's card maximum and to the project file's new
+  `budget.task_max_eur`. The plan format accepts large, and the planner's
+  guide says what each size means in lines. Plan acceptance files each
+  card at its size's budget. Intake reads a card's `Size:` and `Budget:`
+  lines, and the last valid one wins, so the new-card form's size select
+  beats a size word in the member's text. Live, wave two's cards took
+  10 EUR from their `Size: large` line.
+- 3.8a, the review and the audit per part (controller, roll #435): both
+  fetch the diff up to 1 MiB, split it per file, pack at most three parts
+  of 48 KiB, make one call per part and combine the verdicts. Each part
+  sees the whole file list. A bigger diff is "not reviewed", with no call
+  and no findings, and the audit "not audited in full", its secret scan
+  still over the whole diff. Both prompts carry the added lines'
+  goroutines, channels, locks, selects and atomics as context, not as a
+  rule. The two bounds follow from the parts: three times the supervisor
+  timeout plus 2 minutes, 20 minutes today, so infra deleted its two
+  bounds lines. Live, the factory's own review read PR #444 in full and
+  found the defect the controller's review found.
+- 3.8b, the roll's session gap (controller, ruling 269, roll #435): before
+  a roll's merge factoryd writes a `roll_holds` row and polls every 15 s
+  until no session runs. The bound is the longest agent time in force
+  plus 30 minutes, after which the merge goes ahead with a log line. While
+  the hold stands, a code or planner session waits before its agent time
+  starts, and its chip reads "waiting for a roll". Report sessions are
+  waited for but not held. The hold lasts 5 minutes past the merge, while
+  Flux applies main, and the wait holds for 3 minutes after factoryd
+  starts, when its count of sessions is still empty. Live, roll #437's
+  timeline carried `roll_gap` with 0 s waited, and wave two's three cards
+  waited at intake on roll #439's hold.
+- 3.1a, proposals in a table (controller, after lane card #432, roll #437
+  at 13:03Z): `chat_proposals` holds proposals and undo tokens with the
+  same binding and expiry. A take is one statement over the token, its
+  kind, the route's project and the login, so a token works once, and 50
+  rounds of 16 concurrent takes gave one success each. An undo is data,
+  the inverse that the tool's own run returned. The stored Do-it row
+  leaves out the proposal's description, since the replay would speak
+  card text as the agent's own words (ruling 259).
+- 3.3a, the `system` tool and the state in words (controller, from lane
+  card #433's PR #434 plus eleven review points, roll #439 at 13:14Z): the
+  agent's manual, rendered from the code at call time, with the card
+  states and their meanings beside the state list, the gates in order,
+  each tool with the states it fits, the project's process and the
+  policy's confirm list and limits. The `card` tool and the snapshot give
+  a card's state as a sentence. Live, the first turn opened the manual in
+  17 ms, listed the eleven states and named `answer` as the tool for a
+  card at its session cap, in 4.0 s.
+- 3.6a, the deploy gate (controller, after lane card #443, roll #447 at
+  14:11Z): acceptance refuses a plan whose objective has a Deploy line or
+  a Deployment heading and whose cards' directories own no deploy
+  manifests. The member gets a 409 that says the planner is revising. The
+  refused accept still signals the workflow, so the planner revises by
+  itself with the deploy-owner finding, as after a change request. The
+  plan comment gains a deploy column.
+- 3.6b and 3.6c, the smoke test (controller: the template's half on infra
+  main ca99101 for every project seeded after it, factoryd's half live
+  with roll #449 at 14:58Z): the ts-go template's CI runs
+  `deploy/smoke.sh` after staging (healthz, the app page's root element,
+  and an authenticated write that the deploy-owning card fills in), and
+  promotion needs it. The project's CI runners reach its staging namespace
+  on 80, 443 and 8080 and resolve its Service names by full name, since
+  Cilium's DNS allowlist refuses short ones. Staging admits only that
+  project's runners on 8080. Registration writes the Actions secrets
+  `STAGING_URL` and `STAGING_SECRETS`, every value single-quoted, and
+  rewrites them only when the project's staging hash changes. A missing
+  Secret is a red check.
+- 3.2a, the reads (controller, from lane card #442's PR #445 plus sixteen
+  review points, roll #449): `plan` (the rows and each child's state),
+  `card` in full (the state in words, the gate, attempts against the cap,
+  spend against the budget, dependencies both ways, the pull request and
+  the newest checks, review and audit), `pr` (checks, the review's and the
+  audit's text, the diff stat and the diff on request) and `file` (a file
+  at a ref through the member's token, its path cleaned so none climbs).
+  The review found that the lane's version would have shown wrong or
+  empty data: invented timeline field names, the merge-queue position as
+  the session count, a file read as the contents API's JSON.
+- 3.1b, the panel (controller, from lane card #441's PR #444 plus ten
+  review points, roll #449): a reload draws a pending proposal with its Do
+  it, and a used one no longer reads as expired. "New conversation" starts
+  afresh in `chat_conversations`, and the old ones stay readable but not
+  writable. The replay drops an assistant turn that claims an action
+  without a tool call, the claim matched as whole words.
+- 3.7b, the large class and the provider refusal (controller, roll #449,
+  `risk.large_lines: 1000` in infra 8c417b3): a pull request over 1000
+  changed lines is risk class large, which needs a human and ranks above
+  normal. A session whose first call the provider refuses (an upstream
+  429, 402 or 5xx, or LiteLLM unreachable, read from the gateway's audit
+  rows) costs no attempt, no agent time and no supervisor call. The task
+  backs off 2, 4, 8, 16 and 30 minutes, its chip says "waiting on the
+  provider", the status line counts it as waiting, and the sixth refusal
+  in a row goes to a human. The factory's own budget 402 is no provider
+  refusal.
+- 3.10a, the GitHub export (controller, roll #449): a Forgejo push mirror
+  from the project's repository to GitHub, kept in `project_mirrors` and
+  set through the chat's `github_export` (confirm by default) or the
+  projects page. The token stays in memory until Do it, every stored row
+  holds `[token]` in its place, events hold the remote only, and an
+  unconfirmed token expires with its proposal.
+ The status line and the snapshot end with "GitHub:
+  <state>", which the registrar refreshes each minute. Seed projects are
+  refused, since ruling 126's job mirrors them.
+- 3.9, members and per-project approvers (controller, on main f5b0f83, its
+  roll pending): any project's writer logs in and sees only their
+  projects, and the factory-level pages stay with the writers of the
+  factory's own code. A project file's `approvers:` replaces the policy's
+  list for that project in the console, the lane, notifications,
+  registration's collaborators and the branch protection's whitelist. The
+  chat's `invite` adds a collaborator (confirm by default, seed projects
+  refused). The build closed four routes that the wider login exposed
+  without a project-writer check (answer, request changes, reject plan and
+  the timeline page), and its security review two more: filing a card on
+  any project, and reading any project's board (ruling 270). Through a
+  Forgejo failure the last good writer list holds for 5 minutes.
+- 3.3b, refusals (controller, on main b66e4c5, its roll pending): the
+  seven refusals of a card action read "Card #N <state>, not <needs>:
+  <fitting action>." A pending merge or plan request comes before the
+  session cap, so a capped card at its merge request points to
+  `approve_merge` or `deny_merge`. The `card` tool's cap and request
+  lines come from the same facts.
+- 3.2b, the session reads (controller, on main 03729c0, its roll
+  pending): `session` (the summary), `session_steps`, `session_step` and
+  `session_search` over the transcript on S3. A transcript over 8 MiB is
+  searched line by line but not parsed, and a line over 1 MiB is marked
+  unreadable.
+
+In flight at 15:05Z: 3.4, the writes (`close`, `edit`, `grant_session`
+and `set_dependency`). 3.5, the planner's questions, whose lane card #446
+the provider outage cut in its first session. 3.10b, GitHub import, on its
+branch at its second review: the new-project form takes a GitHub source
+and an optional token, registration migrates the repository through
+Forgejo instead of creating an empty one, and the template's workflow
+files and AGENTS.md go in as one commit.
+
+The lane ran seven cards on the code project's stronger tier, and none
+landed by itself. #431 (3.7a), #432 (3.1a), #433 (3.3a) and #443 (3.6a, a
+small card of 2 EUR) ended on the factory's own budget 402: each session
+read the tree, and every call carried the whole reading, from 257 to 491
+thousand input tokens. #433 pushed only because the supervisor cut its
+first session after 7 minutes, so its second started fresh. #442 (3.2a)
+and #441 (3.1b) pushed pull requests that the controller's reviews sent
+back with sixteen and ten points, and #441's fix session added four new
+defects. #446 (3.5) met the provider outage. The controller took every
+item under rulings 257 and 258: an Opus implementer in a worktree, a
+second Opus review, a local gofmt, vet, race-test and gosec pass on the
+merged tree, and a direct push to main, with the rolls on the lane. 3.8a,
+3.8b and the template's half of 3.6 were controller work by design. From
+about 13:58Z the model provider, Dashscope, answered 429 "budget
+exhausted" on every alias, as at Stage 15's 04:59Z: the Alibaba Cloud
+account's own budget was spent, while LiteLLM's counter stood at 79.50 of
+118 USD. Under Stage 15's precedent the controller built on without lane
+cards: 3.7b, 3.6c, 3.9, 3.10a, 3.3b, 3.2b, 3.4 and 3.10b, and 3.5 after
+#446 closed. Lane spend:
+27.25 EUR of the round's 50 (#431 4.67, #432 4.74, #433 4.27, #443 1.80,
+#442 5.49, #441 5.26, #446 1.02), and nothing landed by it. The project
+agent spent 0.15 EUR by 14:01Z. The controller's Opus subagents ran
+outside the factory's budget.
+
+Exit test: pending. It waits for the model provider, the three items in
+flight and the rolls of main. The member's script is in the ledger
+(exit16-chat-script.md), on a fresh project, uptime2, which the new
+template seeds with the smoke job.
+
+The round's rulings, in the ledger:
+
+- 268. From Stage 16 the policy's card maximum is 15 EUR, and it stays so
+  after the close. The default stays 2, and a project file sets its own
+  maximum up to the policy's.
+- 269. A roll merges only in a session gap, in factoryd's own workflow. An
+  approved roll waits before its merge until no agent session is live,
+  and new sessions wait before any agent time while it does, up to the
+  longest agent time plus 30 minutes. A pod drain was rejected, since the
+  Service drops a terminating pod and the console and webhooks would be
+  down for the drain. So was a second replica, since the runner's live
+  sessions, the timeline lock, the event bus and twelve loops assume one
+  process.
+- 270. Under ruling 254, a member who writes no project and cannot read
+  its repository gets 404 on that project's board. The writers of the
+  factory's own code keep their read-only view of every project.
+
+Findings:
+
+- On the factory's own code a 5 EUR frontier card is one session of about
+  17 minutes in which every call carries the agent's whole reading, and a
+  2 EUR small card is one or two calls once the agent has read 250
+  thousand tokens. The lane's sizes assume a far smaller context
+  (roadmap 160).
+- The Postgres tests skip in the lane's CI, so a store defect reaches the
+  review unseen. PR #444's new conversation stored nothing, and Postgres
+  17 refused its proposal-state query, which the in-memory fake hid. The
+  brief's "run the Postgres tests locally" is not something the sandboxed
+  agent can do (roadmap 161).
+- A pull-request run of agent code from a fork can reach staging on 8080,
+  without secrets. A dedicated runner label for the smoke job would close
+  it (roadmap 162).
+- Plan and report sessions are not covered by the provider-refusal rule
+  (roadmap 155).
+- A GitHub token typed into the chat reaches the model provider. The
+  projects page's form keeps it away (roadmap 163).
+- The console's login sessions live in factoryd's memory, so every roll
+  logs the member out, twice in this round (roadmap 164).
+- An existing project keeps the template's CI from its seeding, so the
+  smoke test reaches only projects seeded after infra ca99101 (roadmap
+  165).
+- A project's month cap counts the whole month, so a round's raise must
+  add what the project spent before it.
+- Infra's schema copies follow every roll that adds a tool or a project
+  key by hand. `factoryd config check` compares them byte for byte, while
+  the live loader does not read them, and they were behind at the open.
+  An infra key that a roll brings waits for the roll, since the live
+  decoder refuses an unknown key (roadmap 166).
+- The supervisor's repetition detector cut the first sessions of #433 and
+  #442 at 24 reads, as in Stage 15.
+
 After Stage 16: the notification service (roadmap 145) and the mobile
 layout and PWA install (146), by Sebastian's scope. [The
-roadmap](../roadmap.md) holds every future topic.
+roadmap](../roadmap.md) holds every future topic, and its items 160 to 166
+hold what this round found.
+
