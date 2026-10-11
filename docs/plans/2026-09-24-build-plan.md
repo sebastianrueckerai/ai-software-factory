@@ -52,7 +52,7 @@ Each stage ends with an exit test. A stage starts only after the previous one pa
 | 12 Bugfix rounds | Round 1: agent time in hours with check-ins, the supervisor's message into the running session, finished work kept at every cap, cache volumes, a working template, registration without a password. Round 2: no Forgejo credential in the worker while the agent runs, machine accounts, Retry of a failed plan card, the project euro cap | The Stage 11 spec on a fresh project with no refile, the human's clicks only the plan and the approvals, in under three hours |
 | 13 Board UX | Research of the kanban field, proposal-v1, the board roadmap and a local click dummy over real card data | The dummy through Sebastian's click tests, with no cluster and no spend |
 | 14 Rebuild | The cluster rebuilt from the round 2 close's backups on a new address set, round 2's findings folded in through the factory's own lane | The step-zero gate passed, and three fold-in cards merged through the lane and rolled |
-| 15 Project chat | The event spine and the live board, the project screen (status line, pulse, five columns, chat, drawer), the project agent inside factoryd, inline answers. Built. Members, approvers per project and GitHub import and export moved to the roadmap | An app built through the chat alone: uptime, about ten cards, a staging deployment and a smoke test, under 50 EUR for the round. Pending |
+| 15 Project chat | The event spine and the live board, the project screen (status line, pulse, five columns, chat, drawer), the project agent inside factoryd, inline answers. Built, exit test passed. Members, approvers per project and GitHub import and export moved to the roadmap | An app built through the chat alone: uptime, about ten cards, a staging deployment and a smoke test, under 50 EUR for the round. Pending |
 
 The stages map to the build order in architecture 11: Ranch is stages 0 to 3, First loop is 4 to 6, Teeth is 7, Customer is 8, Self is 9. Hardening, Spec and the bugfix rounds are its items 6 to 8, and the project screen its item 9.
 
@@ -3821,11 +3821,30 @@ controller's Opus subagents ran outside the factory's budget. The first
 rolls of 6 and 4b failed on gosec G706, a log line of phase 6, which the
 controller fixed on main (fab2249, 6350e9b).
 
-Exit test: pending, until the model provider answers again. Project uptime
-is ready: its repository from the ts-go template, its seed CI green and
-its staging pod running. The card's spec and the member's script are in
-the ledger (exit15-uptime-spec.md, exit15-chat-script.md). The script
-skips step 7, the export to GitHub, since phase 8 moved to the roadmap.
+Exit test (2026-10-11, 07:08 to 10:22Z): passed. The uptime app was built
+through the chat alone, on project uptime from the ts-go template. The spec
+went in as one chat message, the planner made seven cards (foundation,
+targets API, checker, incidents and webhook, stats, frontend, integration
+with A1 to A9), and every card was accepted, started, steered and merged by
+a chat proposal and Do it: 12 chat actions, 0 clicks outside the chat, 1
+misread (the agent chose deny_merge for a card at its session cap; the
+rephrased "Answer card #5" granted the session), 1 chat gap (the card tool
+shows no plan rows, so the plan was read on the issue). The steer "latency
+is the p95, not the mean" reached the running stats session and its pull
+request carried the change. "What happened since this morning" and "Why
+is card #4 waiting" matched the board. The pulse computed 208 times and was
+right each time it was read. Wall time 3 h 13 min against Stage 12's
+1 h 43 min, the long poles the foundation's truncated review and the stats
+card's rewrite after the steer. Spend: 2.64 EUR on the cards (cheap tier,
+14 sessions), 0.30 EUR the project agent, 0.06 EUR the pulse. The
+factory's own costs on the way: the 48 KiB review cap wasted one session,
+the incidents card hit its session cap and needed the human's
+request-changes answer, the planner chose the default check interval itself
+instead of asking (so no inline-answer question came), and no card owned
+the deploy manifests, so staging runs without the admin token's Secret
+(writes answer 401; the smoke test's reads pass). The GitHub export step
+was skipped (phase 8 on the roadmap). The round's total: 38.54 EUR of the
+50, of which 35.55 on the factory's own code.
 
 The round's rulings, in the ledger:
 

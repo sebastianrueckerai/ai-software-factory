@@ -19,9 +19,9 @@ Each item says what and why, where it comes from, where it stands, a size where 
 
 ## Next
 
-Stage 15, the project chat round, is built except its exit test (rulings 251 to 260, the [build plan](plans/2026-09-24-build-plan.md)'s Stage 15 section, the design in architecture 5.7, the spec in the ledger's local [proposal-project-chat.md](../.superpowers/sdd/2026-09-24-build-plan/proposal-project-chat.md)). The exit test, the uptime app through the chat, waits for the model provider, and its result decides the next round. The likely candidates in five lines:
+Stage 15, the project chat round, is built and its exit test passed (rulings 251 to 260, the [build plan](plans/2026-09-24-build-plan.md)'s Stage 15 section, the design in architecture 5.7, the spec in the ledger's local [proposal-project-chat.md](../.superpowers/sdd/2026-09-24-build-plan/proposal-project-chat.md)). The exit test's findings decide the next round. The likely candidates in five lines:
 
-1. The exit test's findings first. Project uptime is ready with its seed on staging, and the member's script is in the ledger.
+1. The exit test passed on 2026-10-11 (the uptime app through the chat alone: 3 h 13 min, 2.64 EUR on the cards, 0 clicks outside the chat). Its findings first: the card tool shows no plan rows, the planner answers an open choice itself instead of asking, and no planned card owns the deploy manifests.
 2. Members and per-project approvers (item 151), moved out of Stage 15.
 3. GitHub import and export (item 152), moved out of Stage 15, with pull request workflows (item 148) after them.
 4. The notification service (item 145), with the mobile layout and PWA install (item 146) beside it.
