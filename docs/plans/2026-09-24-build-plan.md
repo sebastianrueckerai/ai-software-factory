@@ -4317,9 +4317,11 @@ and GitHub held the branches within a minute. The measures: 0 chat gaps. 2
 misreads: a question answered inline read as pending (roadmap 168), and an
 accept answered from memory after the gate's refusal (roadmap 169). 2
 clicks outside the chat: the planned inline answer, and the project file's
-approvers line that let the member approve. Card spend stood at 1.30 EUR at
-20:25Z, with two cards still running. The plan's four planner runs had cost
-1.04 EUR by 19:57Z.
+approvers line that let the member approve. The run's last merge was
+approved at 20:51Z, 1 h 6 min after its first message, and main went green
+with the smoke job at 21:00Z. Card spend 1.53 EUR: the plan's four planner
+runs 1.04, the five cards 0.49. Both runs together: 4 h 15 min and 5.03 EUR
+on the cards.
 
 The round's rulings, in the ledger:
 
