@@ -54,6 +54,7 @@ Each stage ends with an exit test. A stage starts only after the previous one pa
 | 14 Rebuild | The cluster rebuilt from the round 2 close's backups on a new address set, round 2's findings folded in through the factory's own lane | The step-zero gate passed, and three fold-in cards merged through the lane and rolled |
 | 15 Project chat | The event spine and the live board, the project screen (status line, pulse, five columns, chat, drawer), the project agent inside factoryd, inline answers. Built, exit test passed. Members, approvers per project and GitHub import and export moved to the roadmap | An app built through the chat alone: uptime, about ten cards, a staging deployment and a smoke test, under 50 EUR for the round. Passed |
 | 16 Chat as the window | Proposals and conversations kept in tables, every console read and action as a chat tool, the `system` tool rendered from code, refusals that name the fitting action, the planner's questions before acceptance, the deploy gate and a staging smoke test, budgets by plan size, a provider refusal as no attempt, the review's whole diff, rolls that keep sessions, members and per-project approvers, GitHub import and export. Built by the controller after the lane failed its cards, all of it live, and a `ci` read after the exit test's first run | The uptime spec twice under 50 EUR for the round: through the chat alone with zero chat gaps, then each new path once against Stage 15's baseline. Run 1 built the app through the chat alone in 2 h 45 min with one chat gap, main's CI result, so zero gaps was not met as run. The `ci` read built the same evening closed the gap. Run 2 took the six new paths in 48 minutes with no gap |
+| 17 The lane back | Every finding Stage 16 left open: the lane's cost on the factory's own code (the corrected record on 160, the default tier, a repository map in the brief, the hold's cached input, a cost line), Postgres tests in CI and the sandbox, console logins kept in a table, staging admitting only the smoke job, no GitHub token through the chat, a looping session ended before the provider refuses it, approve proposals with the review's findings, an import that blocks no project, template updates and schema copies as pull requests, every console page a chat tool, a large pull request split by a planner, GitHub pull request mode, the drawer's Chat tab, the message queue and no poll. Then the cluster shut down | The lane probe and two more lane cards land within their size budgets with no budget 402 and ruling 271 never triggered; every item's live check; one chat run on uptime2 through the new paths, against Stage 16's run 2. In progress |
 
 The stages map to the build order in architecture 11: Ranch is stages 0 to 3, First loop is 4 to 6, Teeth is 7, Customer is 8, Self is 9. Hardening, Spec and the bugfix rounds are its items 6 to 8, and the project screen its item 9.
 
@@ -4515,4 +4516,59 @@ After Stage 16: the notification service (roadmap 145) and the mobile
 layout and PWA install (146), by Sebastian's scope. [The
 roadmap](../roadmap.md) holds every future topic, and its items 155, 158
 to 166, 172 and 176 hold what this round and its fix round left open.
+
+### Stage 17: the lane back, every open fix, the screen as specified
+
+Planned on 2026-10-11 after Stage 16's fix round. Sebastian started it the
+same night and approved the cluster's teardown at its end. The spec is the
+ledger's proposal-stage17.md. The goal: every finding Stage 16 left open is
+fixed, the lane builds the factory's own code again within its budgets, and
+the project screen matches its visual spec. The notification service and
+the mobile layout (roadmap 145 and 146) stay out.
+
+The record on roadmap 160 was wrong. LiteLLM's spend logs show the Stage 16
+lane's frontier calls carried at most 141,907 prompt tokens, 72,433 on
+average, 94 percent from the provider's cache, at 0.0204 USD a call. The
+"250 to 490 thousand input tokens a call" came from a counter that sums
+across calls. The cost driver was the frontier tier, 10 to 20 times a cheap
+call, times about 200 calls in a 17-minute session. So the code project
+runs on its default tier, and the frontier tier comes only through the
+climb (`retry_stronger`).
+
+Items, each under about 700 changed lines with hand-derived tests and one
+live check:
+
+- 4.1 The lane's cost: the corrected record, the default tier, a repository
+  map in the brief, the gateway hold's cached input, compaction, and a cost
+  line on the `card` and `session` reads.
+- 4.2 Postgres tests in CI and the sandbox through `scripts/pg-test.sh`.
+- 4.3 Console logins in a table.
+- 4.4 Staging admits only a per-project smoke runner.
+- 4.5 The chat scrubs GitHub tokens.
+- 4.6 A looping session ends after three nudges.
+- 4.7 An `approve_merge` proposal carries the review's open findings.
+- 4.8 The import's migrate runs in its own goroutine.
+- 4.9 Template updates reach projects as pull requests.
+- 4.10 Infra's schema copies follow the code as a pull request.
+- 4.11 Every console page is a chat tool.
+- 4.12 A planner splits a large pull request.
+- 4.13 GitHub pull request mode.
+- 4.14 The drawer's Chat tab, the status line across both columns, a
+  message queue, and the event stream instead of the 30-second poll.
+- 4.15 The fix round's checks still owed.
+
+Order: the controller builds 4.1 and 4.2 first, since both unblock the
+lane. Then one lane probe card (4.3, medium) runs under ruling 271. If it
+lands within 5 EUR the lane takes 4.9, 4.10 and 4.11, while the controller
+builds the rest in parallel. The close folds the round into this plan, the
+roadmap, architecture and proposal-v2, restores the caps (card 2 and 15,
+day 40, month 120, LiteLLM 55), and the round ends with the cluster shut
+down: backups, the next WAL generation, `tofu destroy`, every Hetzner
+project at zero.
+
+Budget: 50 EUR on the factory's own code, at most 30 of it on lane cards,
+the lane stopped at 40. Caps for the round (infra 8a8f52e, policy version
+478): card 2 by default and 15 at most, day 60, month 141.25 (October's
+ledger at the open, 86.25 EUR, plus 55), LiteLLM `max_budget` 60.07 USD (its
+counter, 0.07, plus 60).
 
