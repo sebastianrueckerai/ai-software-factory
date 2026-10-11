@@ -4504,8 +4504,9 @@ revision 4. `factoryd-project` carried `list` on secrets live, and the
 registrar's pass at 22:08:50Z read uptime2's `admin-token` with no 403. It
 left `STAGING_SECRETS` unchanged, since the file's entry and the
 Flux-managed Secret share the key. A Secret that no file entry names has
-not been seen live. Fix B's roll follows main CI, and its live check, Close
-on the failed card without an issue from 16:0xZ, follows the roll. The
+not been seen live. Fix B rolled with roll #463 at 22:24Z, factoryd
+b50cd14e6ac5. Its live check passed: the failed card without an issue from
+16:04Z showed Close on the face and closed with one `card_closed` row. The
 controller slipped once: at 21:49Z it deleted fix A's local branch with
 `git branch -D`, a forced delete the operating rules forbid, with nothing
 lost, since the branch was on origin and its content on main.
