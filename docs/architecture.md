@@ -26,7 +26,7 @@ became hours, the supervisor began to message the running session instead
 of ending it, finished work survived every cap, and the sandbox gained what
 CI runs. Stage 15 built the project screen and the project agent (5.7)
 on 2026-10-11, without members, approvers per project and GitHub import
-and export, and its exit test is pending. Sections that describe built behaviour
+and export, and its exit test passed the same day. Sections that describe built behaviour
 say so. The rest is still design. We amend this file as the design moves, so it always holds the
 current design plus the explanations behind it. Rulings live in the build
 ledger and are cited here by number.
@@ -1458,7 +1458,11 @@ task requires capability X in environment E
 Besides its `version`, `policy.yaml` holds eleven sections:
 
 - `budget`: the task default, the task maximum, the day cap and, since
-  Stage 10, the month cap `month_eur` (5.4), in euros.
+  Stage 10, the month cap `month_eur` (5.4), in euros. Stage 16, the next
+  round and not built, sets a card's budget from its plan row's size
+  instead (Ruling 266): small 2, medium 5 and large 10 EUR, a hand-filed
+  card 2 unless its brief names a size, and 15 at most on the factory's own
+  code.
 - `classes`: per capability class, the allowed model aliases and tools, each
   tool with `max_requests` and `max_eur`, and the `review_model` and
   `supervisor_model` factoryd may call for a task of that class (Task 71),
@@ -2046,8 +2050,8 @@ the click dummy implemented.
 Designed on 2026-10-10 for Stage 15 (Rulings 251 to 256) and built on
 2026-10-11 (Rulings 257 to 260), except members, approvers per project and
 GitHub import and export, which moved to the roadmap (151, 152). The exit
-test is pending. Where the build differs from the design, the paragraph
-says so. The design baseline is Sebastian's
+test passed the same day. Where the build differs from the design, the
+paragraph says so. The design baseline is Sebastian's
 conversation on the human's side of the factory,
 [ai-software-factory-ux-conversation.md](ai-software-factory-ux-conversation.md),
 with his three answers of the same day, and the screen's visual spec is
@@ -2279,9 +2283,34 @@ roadmap item.
 pulse, the chat, the board beside the chat with fewer columns, and inline
 answers on needs-you cards. Members with approvers per project and GitHub
 import and export moved to the roadmap (151, 152) for the round's budget.
-Its exit test, an app built through the chat (the plan's Stage 15), is
-pending. Messenger push and the mobile layout are roadmap items, and so is
-the project analytics page.
+Its exit test, an app built through the chat (the plan's Stage 15),
+passed on 2026-10-11. Messenger push and the mobile layout are roadmap
+items, and so is the project analytics page.
+
+**Stage 16** (Rulings 261 to 267, approved 2026-10-11, the next round's
+design and not built). The round makes the chat the window: a member steers
+a project through the chat alone, with the board and the status line
+optional. Parity is its principle: every read the console offers is a read
+tool, never behind an OK (Ruling 261), and every action a write tool, so
+the chat is never blinder than the screen. No rule goes into a prompt that
+a tool, a result, a structured field or a deterministic step can carry
+(Ruling 263). A turn's default context stays the snapshot and the last
+events, and depth comes through a tool. For a session the chat sees its
+summary by default and fetches the rest on demand: `session_steps` for the
+step list, `session_step` for one step or a range in full, and
+`session_search` over the transcript. The `system` tool is the agent's
+manual, rendered from the code at call time: the card states, the gates in
+order, each tool with the states it fits, the project's process, and the
+policy's confirm list and limits (Ruling 262). A refusal names the card's
+state and the fitting action, from the lifted actions every caller routes
+through, so a wrong tool corrects itself in the next turn. The planner's
+open questions become escalations with 2 to 5 choices on the plan card,
+answered before the plan can be accepted (Ruling 264). Acceptance refuses a
+plan whose spec has a Deploy line and whose rows have no card owning the
+deploy manifests (Ruling 265). A card's budget follows its plan row's size,
+2, 5 or 10 EUR, with 15 at most on the factory's own code (Ruling 266,
+5.3). Inviting a member becomes the chat's confirmed `invite` too, in place
+of "never the chat's" above.
 
 ## 6. Chunk 4: the worker plane
 
@@ -3923,7 +3952,7 @@ since Stage 6, but neither has run under load.
 | Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list. Servers and volumes, no buckets. SSH certificates bound to one server. Outbound tcp 53, 80 and 443. Deletion at the last tick before the lease ends | Built (Rulings 80, 83, 121, 122, 124, 125) |
 | Collector safety | A pass that sees a cluster node's IPv4 or another project's label deletes nothing | Decided (Ruling 123) |
 | Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Built (Rulings 81, 84) |
-| Project screen | One screen per project (5.7): status line, pulse, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export | Built in Stage 15 (Rulings 251 to 260), except members, approvers per project and GitHub import and export (roadmap 151, 152). Exit test pending |
+| Project screen | One screen per project (5.7): status line, pulse, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export | Built in Stage 15 (Rulings 251 to 260), except members, approvers per project and GitHub import and export (roadmap 151, 152). Exit test passed |
 | Merge authority | The `factory-merge` bot merges after a whitelisted human's approval, enforced by Forgejo's branch protection. Merge retries are capped at six. A project on `auto` merges class `normal` without a card after a proven reproduction or a strict improvement and an approving review; the factory's repositories stay on `human` | Built (Rulings 109, 129). `auto` built (Rulings 149, 167, 169) |
 | Intake lanes | Lanes backlog, plan and ready from the project's process, `moved_by` judging every entry. Every bug from any account or alert starts a task. Improvements wait in the backlog for a writer, with an analyzer's write-up. Outsiders' bug reports pass a screening stage. Outsiders' writer-only labels are stripped. The poster's text is untrusted information between random markers | Built (Rulings 148, 150, 182, 185) |
 | Projects | Each project its own Forgejo organisation with a CI user, runner registration, deploy key and deploy branch. Flux tenancy through a namespaced account. A default-deny network policy with the file's outside hosts only and a quota per environment. Stricter wins: a project file only tightens the policy's defaults. Reconciled hourly. Settings from the project's file, `objects: factory \| seed` and `agents: coder \| none`, so the factory's two repositories are projects like any. Registered by the reconcile with the admin's login from OpenBao. A cache volume per project for agents and pull request CI. Hostnames are an infra commit | Built (Rulings 146, 155, 156, 157, 164, 165, 166, 179) |
@@ -3983,8 +4012,9 @@ works `factory` and `demo-app`.
    spine and the live board, the status line, the pulse, five columns
    beside the project agent's chat, and inline answers. Members with
    approvers per project and GitHub import and export moved to the
-   roadmap (151, 152). The exit test, an app built through the chat, is
-   pending. What follows is in the roadmap, scoped by Sebastian.
+   roadmap (151, 152). The exit test, an app built through the chat,
+   passed on 2026-10-11. Stage 16, the chat as the window, follows (5.7),
+   and the rest is in the roadmap, scoped by Sebastian.
 
 ## 12. Glossary
 

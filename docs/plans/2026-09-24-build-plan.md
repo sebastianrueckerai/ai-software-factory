@@ -52,7 +52,8 @@ Each stage ends with an exit test. A stage starts only after the previous one pa
 | 12 Bugfix rounds | Round 1: agent time in hours with check-ins, the supervisor's message into the running session, finished work kept at every cap, cache volumes, a working template, registration without a password. Round 2: no Forgejo credential in the worker while the agent runs, machine accounts, Retry of a failed plan card, the project euro cap | The Stage 11 spec on a fresh project with no refile, the human's clicks only the plan and the approvals, in under three hours |
 | 13 Board UX | Research of the kanban field, proposal-v1, the board roadmap and a local click dummy over real card data | The dummy through Sebastian's click tests, with no cluster and no spend |
 | 14 Rebuild | The cluster rebuilt from the round 2 close's backups on a new address set, round 2's findings folded in through the factory's own lane | The step-zero gate passed, and three fold-in cards merged through the lane and rolled |
-| 15 Project chat | The event spine and the live board, the project screen (status line, pulse, five columns, chat, drawer), the project agent inside factoryd, inline answers. Built, exit test passed. Members, approvers per project and GitHub import and export moved to the roadmap | An app built through the chat alone: uptime, about ten cards, a staging deployment and a smoke test, under 50 EUR for the round. Pending |
+| 15 Project chat | The event spine and the live board, the project screen (status line, pulse, five columns, chat, drawer), the project agent inside factoryd, inline answers. Built, exit test passed. Members, approvers per project and GitHub import and export moved to the roadmap | An app built through the chat alone: uptime, about ten cards, a staging deployment and a smoke test, under 50 EUR for the round. Passed |
+| 16 Chat as the window | Proposals and conversations kept in tables, every console read and action as a chat tool, the `system` tool rendered from code, refusals that name the fitting action, the planner's questions before acceptance, the deploy gate and a staging smoke test, budgets by plan size, a provider refusal as no attempt, the review's whole diff, rolls that keep sessions, members and per-project approvers, GitHub import and export | The uptime spec twice under 50 EUR for the round: through the chat alone with zero chat gaps, then each new path once against Stage 15's baseline |
 
 The stages map to the build order in architecture 11: Ranch is stages 0 to 3, First loop is 4 to 6, Teeth is 7, Customer is 8, Self is 9. Hardening, Spec and the bugfix rounds are its items 6 to 8, and the project screen its item 9.
 
@@ -3898,6 +3899,137 @@ Findings:
 - One implementer did not run gosec, and two rolls failed on it. The
   review brief should name `gosec ./...` beside the tests.
 
-After Stage 15: the exit test's result decides the next round, and the
-scope is Sebastian's. [The roadmap](../roadmap.md) holds every future
-topic, and its items 145 to 157 hold what this round leaves for later.
+After Stage 15: Stage 16 below, which Sebastian approved on 2026-10-11 from
+the exit test's findings. [The roadmap](../roadmap.md) holds every future
+topic, and its items 145 to 157 hold what this round left for later, 151 to
+157 of them now Stage 16's.
+
+### Stage 16: the chat as the window
+
+Approved by Sebastian on 2026-10-11, after the Stage 15 exit test (rulings
+261 to 267). The spec is the ledger's proposal-stage16.md, and the design
+is in architecture 5.7. His decisions with the OK: the `system` tool is
+generated from code, the planner's open questions are asked with choices
+before a plan can be accepted, a plan without a deploy owner is refused
+when its spec has a Deploy line, budgets follow the plan's size, the chat
+sees a session's summary by default and fetches its depth on demand, and
+the scope is the maximum, members, approvers and GitHub included. The
+notification service and the mobile layout (roadmap 145 and 146) come after
+the round.
+
+The goal: steering a project through the chat alone is a complete, smooth
+experience, with the board and the status line optional. Four principles
+shape every item:
+
+1. No rule goes into a prompt that a tool, a richer result, a structured
+   field or a deterministic step can carry instead. Prompts hold context,
+   not rules.
+2. Parity: every read the console can show is a read tool, never blocked by
+   an OK. The agent gathers what the member needs, not only what it needs.
+3. Self-correction over prevention: the conversation keeps every tool call,
+   result and refusal, a card's trail is one read away, the agent can open
+   the manual (`system`), and every refusal names the state and the fitting
+   action. A wrong move corrects itself in the next turn.
+4. Context hygiene: a turn's default context stays the compact snapshot and
+   the last events. Depth comes through a tool when a question asks for it.
+
+The items. Each is one or more cards on the factory's own code project,
+sized to land under about 1000 changed lines, with the budget following the
+size (item 7). The controller takes an item when the lane fails it twice,
+or at once under ruling 258, and lands it under ruling 257.
+
+1. Persistence (roadmap 153, 154): proposals and undo tokens move to a
+   `chat_proposals` table with the same binding and expiry, so a restart
+   loses nothing and a reload keeps Do it. "New conversation" starts afresh
+   beside the old one, and the replay drops an assistant turn that claimed
+   an action without a tool call.
+2. The reads: a parity audit maps every read the console offers to a tool.
+   The missing ones land: `plan`, `card` in full, `pr`, `file`, and
+   `session` (the summary) with `session_steps`, `session_step` and
+   `session_search` over the transcript on S3.
+3. Self-knowledge and refusals: `system`, a read tool rendered from the
+   code at call time, with the card states, the gates in order, each tool
+   with the states it fits, the project's process and the policy's limits.
+   A refusal names the card's state and the fitting action.
+4. The writes: the same audit for actions, each a write tool with its OK as
+   the `chat.confirm` setting. New: `close`, `edit`, `grant_session` and
+   `set_dependency`, each running the button's lifted action.
+5. The planner's questions: the plan format gains `questions` with 2 to 5
+   choices each, filed as escalations on the plan card before acceptance.
+   The next revision reads the answers as a structured block.
+6. The deploy gate and the smoke test: acceptance refuses a plan with a
+   Deploy line and no card owning the deploy manifests. The ts-go
+   template's CI runs a smoke test against staging after each merge to
+   main, and a missing Secret is a red check.
+7. Budgets by size, and a refusal is no attempt (roadmap 155): a card's
+   budget follows its plan row's size (2, 5 or 10 EUR, a hand-filed card
+   2), and the policy gate holds a pull request over about 1000 changed
+   lines for a human as risk class large. A provider's 429, 402 or 5xx at a
+   session's first call pauses the task with a backoff and costs no
+   attempt.
+8. The factory's weak spots, controller work (roadmap 156, 157): the model
+   review and the audit read a diff per file and answer "not reviewed" when
+   they cannot read it all. Rolls drain running sessions, or a second
+   replica takes over with a lock on the loops, whichever is smaller.
+9. Members and per-project approvers (roadmap 151): a member is a write
+   collaborator on the project's Forgejo repository, approvers move into
+   the project's file, and the chat's confirmed `invite` adds a
+   collaborator.
+10. GitHub import and export (roadmap 152): a new project can start from a
+    GitHub repository, and a push mirror exports to GitHub through the
+    chat's confirmed `github_export` or the project page.
+11. The exit test below.
+
+The build order. Budgets by size land first, so every later card uses them.
+Then:
+
+1. Persistence, self-knowledge and refusals, and the reads (three to five
+   cards): the chat becomes the window first.
+2. The writes, the planner's questions, the deploy gate and the smoke test,
+   and the rest of item 7 (the large risk class and the refusal rule).
+3. The factory's weak spots, by the controller.
+4. Members and approvers, then GitHub import and export.
+5. The exit test, then the close: the documents, the plain summary for
+   Sebastian and the caps.
+
+Budget (Sebastian's ruling): 50 EUR on the factory's own code for the
+round. The caps are raised as in Stage 15: a card 5 EUR by default and 15
+at most, the day 40, the policy's month 80 and LiteLLM's proxy stop 88 USD,
+with the code project's month cap of 50 EUR as the round's stop. The close
+restores Stage 15's values (2, 5, 20, 50 and 55), except the card maximum:
+ruling 266's large card needs 10, and the factory's own code 15. The spend
+is reported at every item, and at 40 EUR the controller asks Sebastian.
+
+Exit test. The same uptime spec and the same measures as Stage 15 (wall
+time, card spend, the project agent's and the pulse's lines, clicks outside
+the chat, misreads and chat gaps), run twice:
+
+1. Chat only. The member reads nothing but the chat's answers and the
+   pulse, never opens the board, and makes every decision from what the
+   chat says. The round passes on zero chat gaps in this run.
+2. The new paths, each once: a planner question answered inline, the deploy
+   gate refusing a plan, a self-corrected refusal (the agent picks the
+   wrong tool, reads the refusal and acts right in the next turn without a
+   rephrase), a session search ("why did card n's second session stop"), an
+   invited member who approves one merge, and the export to GitHub.
+
+Stage 15's result is the baseline: 3 h 13 min, 2.64 EUR on the cards, 0
+clicks outside the chat, 1 misread and 1 chat gap.
+
+The round's rulings, in the ledger:
+
+- 261. Every read the console offers is a read tool, never behind an OK.
+- 262. The `system` tool is rendered from the code at call time.
+- 263. No rule goes into a prompt that a tool, a result, a structured field
+  or a deterministic step can carry.
+- 264. The planner's open questions are escalations with choices on the
+  plan card, answered before acceptance.
+- 265. A plan with a Deploy line and no deploy owner is refused at
+  acceptance.
+- 266. Budgets by plan size: 2, 5 and 10 EUR, with a project maximum of 15
+  for the factory's own code.
+- 267. A provider refusal at a session's first call is no attempt.
+
+After Stage 16: the notification service (roadmap 145) and the mobile
+layout and PWA install (146), by Sebastian's scope. [The
+roadmap](../roadmap.md) holds every future topic.
