@@ -3996,9 +3996,10 @@ Budget (Sebastian's ruling): 50 EUR on the factory's own code for the
 round. The caps are raised as in Stage 15: a card 5 EUR by default and 15
 at most, the day 40, the policy's month 80 and LiteLLM's proxy stop 88 USD,
 with the code project's month cap of 50 EUR as the round's stop. The close
-restores Stage 15's values (2, 5, 20, 50 and 55), except the card maximum:
-ruling 266's large card needs 10, and the factory's own code 15. The spend
-is reported at every item, and at 40 EUR the controller asks Sebastian.
+restores the default card of 2, the day 20, the month 50 and LiteLLM's 55,
+and keeps the card maximum at 15 (ruling 268: ruling 266's large card needs
+10, and the factory's own code 15). The spend is reported at every item,
+and at 40 EUR the controller asks Sebastian.
 
 Exit test. The same uptime spec and the same measures as Stage 15 (wall
 time, card spend, the project agent's and the pulse's lines, clicks outside
