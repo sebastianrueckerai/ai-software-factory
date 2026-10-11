@@ -26,7 +26,13 @@ became hours, the supervisor began to message the running session instead
 of ending it, finished work survived every cap, and the sandbox gained what
 CI runs. Stage 15 built the project screen and the project agent (5.7)
 on 2026-10-11, without members, approvers per project and GitHub import
-and export, and its exit test passed the same day. Sections that describe built behaviour
+and export, and its exit test passed the same day. Stage 16 made the chat
+the window the same day (5.7): every console read as a tool, the `system`
+tool, refusals that name the fitting action, budgets by plan size, the
+deploy gate, a provider refusal that costs no attempt, rolls in a session
+gap, members with approvers per project and GitHub export. Its writes, the
+planner's questions and GitHub import were in flight at 15:05Z, and its
+exit test is pending. Sections that describe built behaviour
 say so. The rest is still design. We amend this file as the design moves, so it always holds the
 current design plus the explanations behind it. Rulings live in the build
 ledger and are cited here by number.
@@ -1310,21 +1316,18 @@ that runs the digest but is not rolled out, its pod starting or crash
 looping, each answer `rollout_not_ready`, and the digest is part of the
 cache key. The template's staging job waits on it.
 
-**Members, approvers per project and GitHub** (Rulings 254 and 256,
-design, not built, 5.7). Stage 15 moved them to the roadmap (151, 152).
-A member will be a write collaborator on the
-project's Forgejo repository, admitted to the console for the projects they
-write and to no other, while the factory-level pages stay with the writers
-of the factory's own code repository. Approvers move from the policy into
-the project's file as `approvers:`, with the policy's list as the default
-and as the factory's own, and the operator invites a member in Forgejo or
-on the project's page, never through the chat. The new-project panel gains
-a start from an existing GitHub repository, cloned into the new Forgejo
-repository in place of the template before the normal registration, with a
-private source's token stored in the mirror row and never given to an
-agent. Export is a push mirror to a GitHub repository the member names,
-kept by the push-mirrors job (Ruling 126), and the chat never creates or
-manages a project.
+**Members, approvers per project and GitHub** (Rulings 254, 256 and 270,
+built in Stage 16, 5.7). A member is a write collaborator on the project's
+Forgejo repository, admitted to the console for the projects they write
+and to no other, while the factory-level pages stay with the writers of
+the factory's own code repository. A project file's `approvers:` replaces
+the policy's list for that project, and registration gives Forgejo's
+whitelist the same names. A member is invited in Forgejo or through the
+chat's confirmed `invite`. Export is a Forgejo push mirror to a GitHub
+repository the member names, kept in `project_mirrors`. Import, in flight
+at the round's 15:05Z, migrates a GitHub repository into the new Forgejo
+repository in place of the template, before the normal registration. The
+chat never creates or manages a project.
 
 The demo app, the first project, is a Go link shortener with Postgres
 (Rulings 145, 153), repository `demo-app/demo-app`. `POST /links` needs a
@@ -1458,11 +1461,13 @@ task requires capability X in environment E
 Besides its `version`, `policy.yaml` holds eleven sections:
 
 - `budget`: the task default, the task maximum, the day cap and, since
-  Stage 10, the month cap `month_eur` (5.4), in euros. Stage 16, the next
-  round and not built, sets a card's budget from its plan row's size
-  instead (Ruling 266): small 2, medium 5 and large 10 EUR, a hand-filed
-  card 2 unless its brief names a size, and 15 at most on the factory's own
-  code.
+  Stage 10, the month cap `month_eur` (5.4), in euros. Since Stage 16
+  (Ruling 266) a card's budget follows its plan row's size: small 2, medium
+  5 and large 10 EUR, held to the policy's maximum and to a project file's
+  `budget.task_max_eur`. A hand-filed card gets the default unless a
+  `Size:` or `Budget:` line in its text names one, and the last valid line
+  wins, so the new-card form's size select beats a size word in the text.
+  The maximum is 15 from Stage 16 on (Ruling 268).
 - `classes`: per capability class, the allowed model aliases and tools, each
   tool with `max_requests` and `max_eur`, and the `review_model` and
   `supervisor_model` factoryd may call for a task of that class (Task 71),
@@ -1472,7 +1477,9 @@ Besides its `version`, `policy.yaml` holds eleven sections:
   Replicate rates per hardware SKU with a model to SKU map, fal's
   `max_megapixels`).
 - `risk`: the risk classes of changed paths for the policy gate (7), each
-  with its outcome.
+  with its outcome. Since Stage 16 `large_lines` (1000) makes a pull
+  request over that many changed lines class large, which needs a human
+  and ranks above normal. 0 switches it off.
 - `envelope_default`: the standard resource envelope (5.5).
 - `project_default`: a new project's quota and standing block (5.1, 5.5).
   Every project file names its own merge rule since Stage 9.
@@ -1521,13 +1528,13 @@ chat:
   monthly_eur: 5           # the project agent's own line
   confirm: [new_card, move_card, answer, steer, start_plan, retry,
             accept_plan, request_changes, reject_plan, approve_merge,
-            deny_merge]
+            deny_merge, invite, github_export]
 ```
 
 A tool in `confirm` renders a proposal with a Do-it button, a tool outside
 it applies at once, and an empty list lets the agent do everything it is
-told. `github_export` and `github_sync` join the list with GitHub export
-(roadmap 152). `monthly_eur` is the budget of the project's chat task each
+told. Stage 16 added `invite` and `github_export` to the defaults, and no
+read tool is ever in them (Ruling 261). `monthly_eur` is the budget of the project's chat task each
 month, which the agent's and the pulse's calls share (5.4).
 `confirm` is a preference, not a cap, so stricter wins (below) does not
 bind it: a project file's list replaces the policy's, shorter or longer,
@@ -2020,7 +2027,8 @@ Forgejo's API.
   checked at login and again on every request. factoryd caches
   the writer list for a minute and shares one fetch between requests. When
   Forgejo fails, the last list serves for up to 5 minutes, then the console
-  answers 503.
+  answers 503. Since Stage 16 the writers of any project get in and see
+  only their projects (5.7).
 - **Who authorises spend.** Resource approval, envelope edits, promotion and
   the merge approve button need a user on the policy's `approvers` list
   (Ruling 128). Other writers see the cards without those buttons, and a POST
@@ -2029,7 +2037,10 @@ Forgejo's API.
   the list, but only a repository admin can read branch protections, and
   factoryd holds no admin token. So the list lives in policy, versioned in
   Git with the rest, and Forgejo's whitelist stays the merge authority. When
-  the two disagree, Forgejo refuses the merge and the card shows why.
+  the two disagree, Forgejo refuses the merge and the card shows why. Since
+  Stage 16 a project file's `approvers:` replaces the policy's list for that
+  project, and registration sets the project's whitelist from it (5.7).
+
 - **Actions run as the human.** A new task, an escalation answer, a review
   and a rejection go to Forgejo through the human's own token, so Forgejo
   records the human as their author.
@@ -2049,9 +2060,10 @@ the click dummy implemented.
 
 Designed on 2026-10-10 for Stage 15 (Rulings 251 to 256) and built on
 2026-10-11 (Rulings 257 to 260), except members, approvers per project and
-GitHub import and export, which moved to the roadmap (151, 152). The exit
-test passed the same day. Where the build differs from the design, the
-paragraph says so. The design baseline is Sebastian's
+GitHub import and export. The exit test passed the same day. Stage 16
+(Rulings 261 to 270) built members, approvers per project and GitHub export
+the same day and made the chat the window (below). Where the build differs
+from the design, the paragraph says so. The design baseline is Sebastian's
 conversation on the human's side of the factory,
 [ai-software-factory-ux-conversation.md](ai-software-factory-ux-conversation.md),
 with his three answers of the same day, and the screen's visual spec is
@@ -2079,8 +2091,10 @@ sandbox becomes a card.
   "waiting on you" whenever a card waits on a human, else "working" while
   a card runs, else "idle" (Ruling 260), and the project agent's snapshot
   reads the same line. The spend is the project's ledger spend in the UTC
-  month against the project file's month cap, else the policy's. The
-  mirror's state waits for GitHub export.
+  month against the project file's month cap, else the policy's. Stage 16
+  added a Waiting count, where a card waiting on the provider counts, and
+  "GitHub: <state>" at the end for a project with an export, which the
+  registrar refreshes each minute.
 - **Pulse**: what to understand about it. One sentence under the status
   line, the single most useful thing to know now, which a click expands to
   three or four bullets. A cheap model writes it from the board snapshot
@@ -2109,7 +2123,8 @@ sandbox becomes a card.
   of the width from 1200 px, two tabs below. A tool block shows the
   result's first line, a proposal has Do it and Skip, and `#n` in a reply
   opens the card's drawer. There is no message queue: the input waits
-  while a turn streams.
+  while a turn streams. Since Stage 16 "New conversation" starts afresh,
+  and the old conversations stay readable but not writable.
 - **Card drawer**: everything about one piece of work. It opens beside the
   board at 40 to 50 percent of the width, with the tabs Overview, Activity,
   Files and Chat. Chat is the default tab on a running card, as in the
@@ -2189,12 +2204,16 @@ approvers list among them, hold whichever door it came through.
 arrived with the round itself: the comment, the steer, the summary and the
 accent. The round lifted 16 console handlers into shared functions
 (`internal/console/actions.go`), each with its checks inside, which the
-buttons and the tools both call. The agent has 6 read and 14 write tools,
-and the GitHub tools wait for export (roadmap 152).
+buttons and the tools both call. Stage 15 built 6 read and 14 write tools.
+Stage 16 added 8 reads and 2 writes (below), and its writes item adds
+`close`, `edit`, `grant_session` and `set_dependency`, in flight at the
+round's 15:05Z. `github_sync` is not built (roadmap 148).
 
 | Tool | Does | Default OK |
 |---|---|---|
 | `board`, `card`, `history`, `card_history`, `costs`, `diff` | read | none |
+| `system`, `plan`, `pr`, `file` (Stage 16) | read | none |
+| `session`, `session_steps`, `session_step`, `session_search` (Stage 16) | read | none |
 | `new_card`, `move_card`, `start_plan` | file and move | confirm |
 | `answer` (a needs-you question) | answer | confirm |
 | `comment` | comment | none |
@@ -2202,7 +2221,8 @@ and the GitHub tools wait for export (roadmap 152).
 | `retry`, `accept_plan`, `request_changes`, `reject_plan` | decide | confirm |
 | `approve_merge`, `deny_merge` | merge decisions | confirm |
 | `set_summary`, `set_accent` | metadata | none |
-| `github_export`, `github_sync` | mirror | confirm |
+| `invite` (Stage 16) | add a member | confirm |
+| `github_export` (Stage 16) | mirror | confirm |
 
 `answer` and `steer` confirm by default (Ruling 259), because the text the
 agent reads from cards and events is untrusted and could ask for either. A
@@ -2213,7 +2233,10 @@ proposal with a Do-it button. A tool not in the list applies at once and
 answers with an "applied, undo" line where an undo exists (a move, a
 comment, metadata). An empty list means the agent does everything it is
 told. A proposal and an undo token are the member's on that project, used
-once, for 30 minutes, and they live in factoryd's memory (roadmap 154). A
+once, for 30 minutes. Since Stage 16 they live in `chat_proposals`, so a
+restart loses none and a reload draws a pending proposal with its Do it. A
+take is one statement over the token, its kind, the route's project and
+the login. An undo is data, the inverse the tool's own run returned. A
 move's undo works only while the card is still in the backlog, which
 intake leaves within a second. Ruling 109, the approve button as the one
 door to a merge, becomes: the approve action is the one door, reachable by
@@ -2229,7 +2252,12 @@ comments) passes the existing inbound sanitiser before it enters the
 context, as briefs do today. Built with the last 40 messages of the
 member's conversation, kept in `chat_messages` per project and member. The
 prompt says that only a tool call acts: a sentence that described a tool's
-effect in the imperative made the model narrate instead of calling.
+effect in the imperative made the model narrate instead of calling. Since
+Stage 16 the replay drops an assistant turn that claims an action, matched
+as whole words, without a tool call, and the stored Do-it row leaves out
+the proposal's description, so card text is never replayed as the agent's
+own words (Ruling 259).
+
 
 **Threat model** (Ruling 253). The new surface is the agent's context: an
 agent's or an outsider's text reaches the project agent through the read
@@ -2253,64 +2281,140 @@ spend figure includes them. The design booked them to the project outside
 any task. The build books them to the project's chat task of the month
 instead (5.4), so the gateway's budget check for a task caps them.
 
-**Members, approvers and GitHub** (Ruling 254, not built, roadmap 151 and
-152). A member is a write
-collaborator on the project's Forgejo repository. The console admits any
-project's writers, and a member sees only the projects they write. The
-factory-level pages (policy, alerts and costs across projects, the
-new-project panel) stay with the writers of the factory's own code
-repository, as the login rule is today (5.6). Approvers move into the
-project's file as `approvers:`, with the policy's list as the default and
-as the factory's own. Identity stays Forgejo OAuth2, and Keycloak stays
-deferred (roadmap 51). Inviting a member is the operator's act in Forgejo
-or on the project's page, never the chat's.
+**Members, approvers and GitHub** (Rulings 254 and 270, built in Stage
+16). A member is a write collaborator on the project's Forgejo repository.
+The console admits any project's writers, and a member sees only the
+projects they write. The factory-level pages (policy, alerts and costs
+across projects, the new-project panel, the new-card form) stay with the
+writers of the factory's own code repository, as the login rule was (5.6).
+A member who writes no project and cannot read its repository gets 404 on
+that project's board, while the factory's writers keep a read-only view of
+every project (Ruling 270). Approvers moved into the project's file as
+`approvers:`, which replaces the policy's list for that project in the
+console, the lane and notifications, and gives registration its
+collaborators and Forgejo's whitelist. The policy's list stays the default
+and the factory's own. A member who is no approver cannot merge, since
+Forgejo's whitelist holds the project's approvers and `factory-merge`.
+Identity stays Forgejo OAuth2, and Keycloak stays deferred (roadmap 51).
+Inviting a member is a Forgejo collaboration, made on Forgejo or through
+the chat's confirmed `invite`, which seed projects refuse. The build closed
+four routes that the wider login exposed without a project-writer check
+(answer, request changes, reject plan and the timeline page), and its
+security review two more (filing a card on any project, and reading any
+project's board). Through a Forgejo failure the last good writer list
+holds for 5 minutes, so a member is not logged out. On main at the round's
+15:05Z, its roll pending.
 
 Project creation stays where it is: the operator's new-project panel,
 registered by the reconcile (Ruling 219, 5.1). The chat does not create
-projects. The panel gains "start from an existing GitHub repository": the
-factory clones it into the new Forgejo repository in place of the template,
-then the normal registration runs. A private source needs a token that the
-operator pastes once and that is stored in the mirror row, as the factory's
-own mirrors' token is, and that is never given to an agent. Export is a
-push mirror from the project's Forgejo repository to a GitHub repository
-the member names, set from the project's page or through the
-`github_export` tool and kept by the existing push-mirrors mechanism
-(Ruling 126). The status line shows its state. Pull request workflows to
-GitHub, the conversation's preference once the system matures, are a
-roadmap item.
+projects. Export, built in Stage 16, is a Forgejo push mirror from the
+project's repository to a GitHub repository the member names, made through
+the projects token and kept in `project_mirrors`. The chat's confirmed
+`github_export` or the projects page sets it. The chat holds the token in
+memory until Do it, every stored row holds `[token]` in its place, events
+hold the remote only, and an unconfirmed token expires with its proposal.
+A token typed into the chat still reaches the model provider, and the
+projects page's form keeps it away (roadmap 163). The status line and the
+snapshot end with the mirror's state. Seed projects are refused, since the
+push-mirrors job mirrors them (Ruling 126). Import was in flight at the
+round's 15:05Z: the new-project form takes a GitHub source and an optional
+token, registration migrates the repository through Forgejo instead of
+creating an empty one and clears the token after, and the template's
+workflow files and AGENTS.md go in as one commit. Pull request workflows
+to GitHub, the conversation's preference once the system matures, are a
+roadmap item (148).
 
 **Round 1** (Ruling 256) built the event spine, the status line, the
 pulse, the chat, the board beside the chat with fewer columns, and inline
 answers on needs-you cards. Members with approvers per project and GitHub
-import and export moved to the roadmap (151, 152) for the round's budget.
-Its exit test, an app built through the chat (the plan's Stage 15),
-passed on 2026-10-11. Messenger push and the mobile layout are roadmap
-items, and so is the project analytics page.
+import and export moved to Stage 16 for the round's budget. Its exit test,
+an app built through the chat (the plan's Stage 15), passed on 2026-10-11.
+Messenger push and the mobile layout are roadmap items, and so is the
+project analytics page.
 
-**Stage 16** (Rulings 261 to 267, approved 2026-10-11, the next round's
-design and not built). The round makes the chat the window: a member steers
-a project through the chat alone, with the board and the status line
-optional. Parity is its principle: every read the console offers is a read
-tool, never behind an OK (Ruling 261), and every action a write tool, so
-the chat is never blinder than the screen. No rule goes into a prompt that
-a tool, a result, a structured field or a deterministic step can carry
-(Ruling 263). A turn's default context stays the snapshot and the last
-events, and depth comes through a tool. For a session the chat sees its
-summary by default and fetches the rest on demand: `session_steps` for the
-step list, `session_step` for one step or a range in full, and
-`session_search` over the transcript. The `system` tool is the agent's
-manual, rendered from the code at call time: the card states, the gates in
-order, each tool with the states it fits, the project's process, and the
-policy's confirm list and limits (Ruling 262). A refusal names the card's
-state and the fitting action, from the lifted actions every caller routes
-through, so a wrong tool corrects itself in the next turn. The planner's
-open questions become escalations with 2 to 5 choices on the plan card,
-answered before the plan can be accepted (Ruling 264). Acceptance refuses a
-plan whose spec has a Deploy line and whose rows have no card owning the
-deploy manifests (Ruling 265). A card's budget follows its plan row's size,
-2, 5 or 10 EUR, with 15 at most on the factory's own code (Ruling 266,
-5.3). Inviting a member becomes the chat's confirmed `invite` too, in place
-of "never the chat's" above.
+**Stage 16, the chat as the window** (Rulings 261 to 270, built on
+2026-10-11, the exit test pending). A member steers a project through the
+chat alone, with the board and the status line optional. The lane failed
+every card it ran, so the controller built each item (the plan's Stage
+16). Four principles shape every prompt and tool. No rule goes into a
+prompt that a tool, a result, a structured field or a deterministic step
+can carry (Ruling 263). Every read the console offers is a read tool, never
+behind an OK (Ruling 261), so the chat is never blinder than the screen.
+Self-correction comes before prevention: the conversation keeps every tool
+call, result and refusal, the agent can open its manual, and every refusal
+names the state and the fitting action, so a wrong move corrects itself
+in the next turn. A turn's default context stays the snapshot and the last
+events, and depth comes through a tool. What each part does:
+
+- **The manual.** `system` renders the agent's manual from the code at
+  call time (Ruling 262): the card states, each with its meaning beside
+  the state list, the gates in order, each tool with the states it fits,
+  the project's process, the policy's confirm list and limits, and one
+  written paragraph on the overall flow. Nothing in it can drift from the
+  code. The `card` tool and the snapshot give a card's state as a
+  sentence. In its first live turn the agent opened the manual in 17 ms
+  and named `answer` as the tool for a card at its session cap.
+- **Refusals.** A card action on the wrong state answers "Card #N
+  <state>, not <needs>: <fitting action>.", from the lifted actions every
+  caller routes through, for all seven refusals. A pending merge or plan
+  request comes before the session cap, so a capped card at its merge
+  request points to `approve_merge` or `deny_merge`. On main at the
+  round's 15:05Z, its roll pending.
+- **The reads.** `plan` gives a plan's rows and each child's state. `card`
+  gives a card in full: the state in words, the gate, attempts against
+  the cap, spend against the budget, dependencies both ways, the pull
+  request, and the newest checks, review and audit. `pr` gives the checks,
+  the review's and the audit's text, the diff stat and, on request, the
+  diff. `file` reads a file at a ref through the member's token, its path
+  cleaned so none climbs. For a session the chat sees its summary by
+  default (`session`) and fetches the rest on demand: `session_steps` for
+  the step list, `session_step` for one step or a range in full, and
+  `session_search` over the transcript on S3. A transcript over 8 MiB is
+  searched line by line but not parsed. Every result passes
+  `sanitize.Inbound`, and no read records an event. The session reads were
+  on main at the round's 15:05Z, their roll pending.
+- **The planner's questions** (Ruling 264), in flight at the round's
+  15:05Z. The plan format gains `questions`, each with 2 to 5 choices,
+  filed as escalations on the plan card before the plan can be accepted,
+  and the planner's next revision reads the answers as a structured
+  block. The lane's card for it met the provider outage, and the
+  controller builds it.
+- **The deploy gate** (Ruling 265). Acceptance refuses a plan whose
+  objective has a Deploy line or a Deployment heading and whose cards'
+  directories own no deploy manifests. The member's accept gets a 409 that
+  says the planner is revising. The refused accept still signals the
+  workflow, so the planner revises by itself with the deploy-owner
+  finding, as after a change request.
+- **The smoke test.** The ts-go template's CI runs `deploy/smoke.sh` after
+  staging: healthz, the app page's root element, and an authenticated
+  write that the deploy-owning card fills in. Promotion needs it. The
+  project's CI runners reach its staging namespace on 80, 443 and 8080 and
+  resolve its Service names by full name, staging admits only that
+  project's runners on 8080, and registration writes the Actions secrets
+  `STAGING_URL` and `STAGING_SECRETS`. A missing Secret is a red check. A
+  project seeded before the template change keeps its old CI (roadmap
+  165), and a fork's pull-request run can reach staging on 8080, without
+  secrets (roadmap 162).
+- **Budgets by size** (Rulings 266 and 268, 5.3): small 2, medium 5 and
+  large 10 EUR, 15 at most. A pull request over 1000 changed lines is risk
+  class large and needs a human (5.3).
+- **A provider refusal is no attempt** (Ruling 267, 6.6). A code session
+  whose first call the provider refuses costs no attempt, no agent time
+  and no supervisor call. The card reads "waiting on the provider", and
+  the status line counts it as waiting, not working. Plan and report
+  sessions are not covered (roadmap 155).
+- **Rolls in a session gap** (Ruling 269, 7). A roll merges only when no
+  session runs, and new sessions wait while it does, so a roll no longer
+  stops a running session. The card's chip reads "waiting for a roll".
+- **The review per part** (7). The model review and the audit read a diff
+  per file in up to three parts, answer "not reviewed" when they cannot
+  read it all, and carry the added lines' concurrency sites as context.
+- **Persistence.** Proposals and undo tokens in `chat_proposals`, a new
+  conversation beside the old ones, and the replay rule (above).
+
+The round's writes, `close`, `edit`, `grant_session` and `set_dependency`,
+were in flight at 15:05Z with the planner's questions and GitHub import.
+What the round left open is in the roadmap (155 and 158 to 166).
 
 ## 6. Chunk 4: the worker plane
 
@@ -2856,6 +2960,17 @@ ended it. A `retry_stronger` on the last attempt is recorded as a climb
 too, so a new run after a factoryd restart starts on the stronger rung
 (backlog 58, the Stage 10 lane's first merge).
 
+**A provider refusal** (Ruling 267, Stage 16). A code session whose first
+call the provider refuses counts neither an attempt nor agent time nor a
+supervisor call. The refusal is an upstream 429, 402 or 5xx, or LiteLLM
+unreachable, read from the gateway's audit rows. An upstream 400, 401 or
+404 stays `no_push`, and the factory's own budget 402 is no provider
+refusal. The timeline records `provider_refused` at the gate `provider`,
+the task backs off 2, 4, 8, 16 and 30 minutes with one log line each way,
+and the sixth refusal in a row escalates to a human with the source
+`provider`. The card reads "waiting on the provider", unless it is held
+for a roll. Plan and report sessions are not covered (roadmap 155).
+
 **The loop nudge** (Rulings 188, 202, Task 88). factoryd counts identical
 calls in a row from the session's event stream: a call is the tool plus
 its input hash, a command its command line, a file change its path and
@@ -2928,8 +3043,8 @@ of the ruling, else the policy's `default`, else 120 seconds:
 | RunSession | 7260 | The limits' agent time plus 60 s (1260 under the 20-minute cap before Stage 12): a session at the cap is stopped by the cap, so the bound catches a stuck runner (Ruling 154). A class, process or project with a longer agent time gets a longer session, while the bound stays the limits' and only alerts |
 | WaitChecks | 600 | Main CI took about 7.7 minutes at the step-zero gate |
 | GateReproduction | 900 | Task 66 runs the command twice, at the base and the head, and sets 1800 in the policy |
-| ModelReview | 360 | Ruling 194: a review of a 100-line diff by glm-5.3 took 210 s on 2026-09-29, and the first default of 180 s (Ruling 140) cut a correct review twice |
-| GateAudit | 360 | The security audit (7), one frontier call like the review; it answered in 2 s to 85 s in Stage 10 |
+| ModelReview | 3 × the supervisor timeout + 120 (1200 today) | Since Stage 16 the review makes one call per part, up to three, so its bound follows from the parts. Before, 360 s (Ruling 194: a review of a 100-line diff by glm-5.3 took 210 s on 2026-09-29, and the first default of 180 s, Ruling 140, cut a correct review twice) |
+| GateAudit | The same as ModelReview | The security audit (7), one frontier call per part like the review. One call answered in 2 s to 85 s in Stage 10 |
 | Merge | 90 | One API call under a 2-minute timeout, so the first default of 300 s could never fire (Ruling 163) |
 | every other activity | 120 | One API call each, seconds (Ruling 140) |
 
@@ -3067,7 +3182,17 @@ commit folds into the open roll as a second commit and withdraws the
 pending card, so one card covers both. factoryd refuses a branch head it did
 not write, because any agent task's token can push the fork's branches. One
 roll is open per repository, and a failed roll is not retried: the next
-green commit opens the next. Change id `roll`. From 13:10Z on 2026-09-29
+green commit opens the next. Change id `roll`. Since Stage 16 (Ruling 269)
+an approved roll merges only in a session gap. Before the merge factoryd
+writes a `roll_holds` row and polls every 15 s until no session runs, up
+to the longest agent time in force plus 30 minutes, after which it merges
+with a log line. While the hold stands, a code or planner session waits
+before its agent time starts, with the chip "waiting for a roll", and a
+report session is waited for but not held. The hold lasts 5 minutes past
+the merge while Flux applies main, and the wait holds for 3 minutes after
+factoryd starts, when its count of sessions is still empty. The first
+live roll after it waited 0 s. A pod drain and a second replica were
+rejected (Ruling 269). From 13:10Z on 2026-09-29
 every roll of the factory went this way, six in the session, each with an
 issue, a pull request, an approval, a merge and roll rows, and a fold was
 seen live at 14:06Z. The first live roll found two defects: Forgejo 15
@@ -3217,7 +3342,7 @@ closed as real.
   it on the pull request, and the timeline records `not_reproduced`
   instead of `skipped`.
 - **Model review.** `review-frontier` reads the brief, the diff (cut at
-  48 KiB) and the gate results, and answers strict JSON: a verdict of
+  48 KiB until Stage 16, per part since) and the gate results, and answers strict JSON: a verdict of
   `approve` or `concerns`, a summary and findings. The call runs under a
   per-task key with a hold, like the supervisor's. A review the headroom
   cannot pay for, a failed call and an unreadable answer become a note on
@@ -3247,7 +3372,14 @@ closed as real.
   verdict and the migration finding. A planted 2-second review bound did
   not produce a review without a verdict, since the review finished before
   the gate supervisor answered (Ruling 171's race); the rule is proven by
-  its tests and by the same rule on the audit stage, live below.
+  its tests and by the same rule on the audit stage, live below. Since
+  Stage 16 the review fetches the diff up to 1 MiB, splits it per file,
+  packs at most three parts of 48 KiB, makes one call per part and
+  combines the verdicts. Each part sees the whole file list. A bigger diff
+  is "not reviewed", with no call and no findings. The prompt carries the
+  added lines' goroutines, channels, locks, selects and atomics as context,
+  not as a rule (Ruling 263). Live, it read a lane pull request in full and
+  found the defect the controller's review found.
 - **Security audit** (Ruling 188, Task 85). After the review, for a project
   whose file says `audit: true` (the code repository's does), a stage
   `audit` with `on_findings: human` only: its findings go to the card,
@@ -3261,11 +3393,14 @@ closed as real.
   against a fixed checklist of six items: secrets, network egress, RBAC
   and service accounts, policy and workflow files, migrations that drop or
   widen, and the sandbox contract. It answers `clear` or `findings`. No
-  verdict, a cut diff (48 KiB), a refused or failed call are findings too.
+  verdict, a diff too large to read, a refused or failed call are findings
+  too. Since Stage 16 the audit reads the diff per part like the review,
+  and a diff over three parts is "not audited in full", while its secret
+  pre-check still scans the whole diff.
   Every finding's text passes the scrubber, fed with the secret values the
   diff itself holds, so the card and the timeline never show one. It posts
-  no pull request comment. A roll skips it. Bound `GateAudit`, 360 s, under
-  the gate supervisor. Live: a PEM key planted in a test file reached the
+  no pull request comment. A roll skips it. Bound `GateAudit`, derived
+  like the review's since Stage 16, under the gate supervisor. Live: a PEM key planted in a test file reached the
   card with the pre-check's finding and the model's, a clean doc comment
   passed as `clear` in 2 seconds, and on the lane it flagged a
   collaborator delete, a changed push path and protection re-asserted for
@@ -3913,7 +4048,7 @@ since Stage 6, but neither has run under load.
 | Message-in | A `Message` call in the adapter contract; opencode as a server in the pod, one port only factoryd reaches, a per-session bearer; the restart as the fallback for a harness without it. First user: the loop nudge, counted from the event stream; since Stage 12 the supervisor's guidance | Built (Rulings 188, 202, 216) |
 | Untrusted text | One sanitiser: into the brief for outsiders' text only, hidden comments stripped outside code blocks; out to Forgejo, hidden comments stripped, mentions and closing keywords neutralised, off-list links defanged; agent commits squashed under a sanitised subject | Built (Task 89, Ruling 214) |
 | Answer chain for questions | `questions: [self, model:<tier>, human]` per stage (queue item B), on top of the message call | Not built, waits for Sebastian's scoping |
-| Rolls | The code repository rolls through a roll task: a digest pull request from factoryd, a card, the bot's merge, a row per image. Infra changes stay human commits | Built (Ruling 178) |
+| Rolls | The code repository rolls through a roll task: a digest pull request from factoryd, a card, the bot's merge, a row per image. Infra changes stay human commits. The merge waits for a session gap, and new sessions wait while it does | Built (Rulings 178, 269) |
 | Model routing | Three LiteLLM tiers, membership by quality, latency order inside a tier, no fallback across tiers, the answering deployment in the audit row; one provider, Alibaba, one deployment per tier, retries without cooldown | Built (Rulings 181, 189, 192, 204) |
 | Capability classes | `coder`, `analyzer` with a report session mode for the improvement presort and the screening stage, and `planner` with a plan session mode. The release is the roll task, no class | Built (Rulings 182, 185, 191, 208) |
 | Task analytics | Four task metrics, a revert mark and four panels, no report task | Built (Ruling 185) |
@@ -3952,13 +4087,13 @@ since Stage 6, but neither has run under load.
 | Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list. Servers and volumes, no buckets. SSH certificates bound to one server. Outbound tcp 53, 80 and 443. Deletion at the last tick before the lease ends | Built (Rulings 80, 83, 121, 122, 124, 125) |
 | Collector safety | A pass that sees a cluster node's IPv4 or another project's label deletes nothing | Decided (Ruling 123) |
 | Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Built (Rulings 81, 84) |
-| Project screen | One screen per project (5.7): status line, pulse, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export | Built in Stage 15 (Rulings 251 to 260), except members, approvers per project and GitHub import and export (roadmap 151, 152). Exit test passed |
+| Project screen | One screen per project (5.7): status line, pulse, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export. Since Stage 16 every console read is a tool, the `system` tool is rendered from the code, and refusals name the fitting action | Built in Stage 15 (Rulings 251 to 260), exit test passed. Stage 16 (Rulings 261 to 270) built the chat as the window, members, approvers per project and GitHub export. Its writes, the planner's questions and GitHub import were in flight at 15:05Z on 2026-10-11, and its exit test is pending |
 | Merge authority | The `factory-merge` bot merges after a whitelisted human's approval, enforced by Forgejo's branch protection. Merge retries are capped at six. A project on `auto` merges class `normal` without a card after a proven reproduction or a strict improvement and an approving review; the factory's repositories stay on `human` | Built (Rulings 109, 129). `auto` built (Rulings 149, 167, 169) |
 | Intake lanes | Lanes backlog, plan and ready from the project's process, `moved_by` judging every entry. Every bug from any account or alert starts a task. Improvements wait in the backlog for a writer, with an analyzer's write-up. Outsiders' bug reports pass a screening stage. Outsiders' writer-only labels are stripped. The poster's text is untrusted information between random markers | Built (Rulings 148, 150, 182, 185) |
 | Projects | Each project its own Forgejo organisation with a CI user, runner registration, deploy key and deploy branch. Flux tenancy through a namespaced account. A default-deny network policy with the file's outside hosts only and a quota per environment. Stricter wins: a project file only tightens the policy's defaults. Reconciled hourly. Settings from the project's file, `objects: factory \| seed` and `agents: coder \| none`, so the factory's two repositories are projects like any. Registered by the reconcile with the admin's login from OpenBao. A cache volume per project for agents and pull request CI. Hostnames are an infra commit | Built (Rulings 146, 155, 156, 157, 164, 165, 166, 179) |
 | Resource kinds | `task` (leased, agent-requested) and `standing` (no lease, registration or a human) in one envelope | Built (Ruling 147) |
 | Hand steps | OpenBao configuration, push mirrors and the console's OAuth app as converging CronJobs. The unseal and the OpenBao bootstrap, once and again after a change to its engines, policies or roles, stay by hand | Built (Ruling 143) |
-| Spend approvers | The policy's `approvers` list gates resource approval, envelope edits, promotion and the merge approve button | Decided (Ruling 128) |
+| Spend approvers | The policy's `approvers` list gates resource approval, envelope edits, promotion and the merge approve button. A project file's `approvers:` replaces it for that project since Stage 16 | Decided (Ruling 128), per project built (Ruling 254) |
 | Git remotes | Forgejo is primary and push-mirrors both repositories to GitHub with a fine-grained token limited to the two repositories. Sharing code with people moves to admin-created Forgejo accounts | Decided (Rulings 126, 144) |
 | Demo app | A Go link shortener with Postgres, `demo-app/demo-app`, with its own CI/CD: staging, 15 minutes without an alert, prod | Built (Rulings 145, 153) |
 
@@ -4011,10 +4146,14 @@ works `factory` and `demo-app`.
 9. The project screen (Stage 15, built 2026-10-11, 5.7): the event
    spine and the live board, the status line, the pulse, five columns
    beside the project agent's chat, and inline answers. Members with
-   approvers per project and GitHub import and export moved to the
-   roadmap (151, 152). The exit test, an app built through the chat,
-   passed on 2026-10-11. Stage 16, the chat as the window, follows (5.7),
-   and the rest is in the roadmap, scoped by Sebastian.
+   approvers per project and GitHub import and export moved to Stage 16.
+   The exit test, an app built through the chat, passed on
+   2026-10-11. Stage 16, the chat as the window, built most of its items
+
+   the same day (5.7), with members, approvers per project and GitHub
+   export, and its exit test is pending. The rest is in the roadmap,
+   scoped by Sebastian.
+
 
 ## 12. Glossary
 
