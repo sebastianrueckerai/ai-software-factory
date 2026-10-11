@@ -53,7 +53,7 @@ Each stage ends with an exit test. A stage starts only after the previous one pa
 | 13 Board UX | Research of the kanban field, proposal-v1, the board roadmap and a local click dummy over real card data | The dummy through Sebastian's click tests, with no cluster and no spend |
 | 14 Rebuild | The cluster rebuilt from the round 2 close's backups on a new address set, round 2's findings folded in through the factory's own lane | The step-zero gate passed, and three fold-in cards merged through the lane and rolled |
 | 15 Project chat | The event spine and the live board, the project screen (status line, pulse, five columns, chat, drawer), the project agent inside factoryd, inline answers. Built, exit test passed. Members, approvers per project and GitHub import and export moved to the roadmap | An app built through the chat alone: uptime, about ten cards, a staging deployment and a smoke test, under 50 EUR for the round. Passed |
-| 16 Chat as the window | Proposals and conversations kept in tables, every console read and action as a chat tool, the `system` tool rendered from code, refusals that name the fitting action, the planner's questions before acceptance, the deploy gate and a staging smoke test, budgets by plan size, a provider refusal as no attempt, the review's whole diff, rolls that keep sessions, members and per-project approvers, GitHub import and export. Built by the controller after the lane failed its cards, most of it live. The writes, the planner's questions and GitHub import in flight | The uptime spec twice under 50 EUR for the round: through the chat alone with zero chat gaps, then each new path once against Stage 15's baseline. Pending |
+| 16 Chat as the window | Proposals and conversations kept in tables, every console read and action as a chat tool, the `system` tool rendered from code, refusals that name the fitting action, the planner's questions before acceptance, the deploy gate and a staging smoke test, budgets by plan size, a provider refusal as no attempt, the review's whole diff, rolls that keep sessions, members and per-project approvers, GitHub import and export. Built by the controller after the lane failed its cards, all of it live, and a `ci` read after the exit test's first run | The uptime spec twice under 50 EUR for the round: through the chat alone with zero chat gaps, then each new path once against Stage 15's baseline. Run 1 built the app through the chat alone in 2 h 45 min with one chat gap, main's CI result, so zero gaps was not met as run. The `ci` read built the same evening closed the gap. Run 2 took the six new paths in 48 minutes with no gap |
 
 The stages map to the build order in architecture 11: Ranch is stages 0 to 3, First loop is 4 to 6, Teeth is 7, Customer is 8, Self is 9. Hardening, Spec and the bugfix rounds are its items 6 to 8, and the project screen its item 9.
 
@@ -4040,10 +4040,9 @@ The round's rulings, in the ledger:
   for the factory's own code.
 - 267. A provider refusal at a session's first call is no attempt.
 
-Outcome (2026-10-11 at 15:05Z, three items in flight and the exit test
-pending). Fifteen of the round's eighteen slices are on main, and the
-controller built every one: eleven live in factoryd, the template's smoke
-job on infra main, and three waiting for their roll. The lane landed none.
+Outcome (2026-10-11, the close). All eighteen of the round's slices are on
+main and live, and the controller built every one. The lane landed none.
+After the exit test's first run the controller built one more read, `ci`.
 What landed, in order, and who built it:
 
 - 3.7a, budgets by size (controller, after lane card #431, live with roll
@@ -4066,6 +4065,8 @@ What landed, in order, and who built it:
   timeout plus 2 minutes, 20 minutes today, so infra deleted its two
   bounds lines. Live, the factory's own review read PR #444 in full and
   found the defect the controller's review found.
+  In the exit test a webhook card's review named the goroutine per
+  notification and the WaitGroup drain it read.
 - 3.8b, the roll's session gap (controller, ruling 269, roll #435): before
   a roll's merge factoryd writes a `roll_holds` row and polls every 15 s
   until no session runs. The bound is the longest agent time in force
@@ -4077,6 +4078,8 @@ What landed, in order, and who built it:
   starts, when its count of sessions is still empty. Live, roll #437's
   timeline carried `roll_gap` with 0 s waited, and wave two's three cards
   waited at intake on roll #439's hold.
+  Roll #459 waited for a card's session to end and merged in the gap at
+  20:10Z.
 - 3.1a, proposals in a table (controller, after lane card #432, roll #437
   at 13:03Z): `chat_proposals` holds proposals and undo tokens with the
   same binding and expiry. A take is one statement over the token, its
@@ -4101,6 +4104,8 @@ What landed, in order, and who built it:
   refused accept still signals the workflow, so the planner revises by
   itself with the deploy-owner finding, as after a change request. The
   plan comment gains a deploy column.
+  In the exit test's second run it refused a revision without a deploy card
+  with its full reason, and the planner's next revision put the card back.
 - 3.6b and 3.6c, the smoke test (controller: the template's half on infra
   main ca99101 for every project seeded after it, factoryd's half live
   with roll #449 at 14:58Z): the ts-go template's CI runs
@@ -4113,6 +4118,9 @@ What landed, in order, and who built it:
   `STAGING_URL` and `STAGING_SECRETS`, every value single-quoted, and
   rewrites them only when the project's staging hash changes. A missing
   Secret is a red check.
+  Live, uptime2 was seeded with the smoke job. In the exit test main's
+  first smoke run failed because uptime2's file had no `secrets:` entry,
+  and it passed at 18:30Z once the file had one (roadmap 171).
 - 3.2a, the reads (controller, from lane card #442's PR #445 plus sixteen
   review points, roll #449): `plan` (the rows and each child's state),
   `card` in full (the state in words, the gate, attempts against the cap,
@@ -4123,6 +4131,8 @@ What landed, in order, and who built it:
   The review found that the lane's version would have shown wrong or
   empty data: invented timeline field names, the merge-queue position as
   the session count, a file read as the contents API's JSON.
+  In the exit test the `plan` read showed every row, size and dependency,
+  the gap of Stage 15's run.
 - 3.1b, the panel (controller, from lane card #441's PR #444 plus ten
   review points, roll #449): a reload draws a pending proposal with its Do
   it, and a used one no longer reads as expired. "New conversation" starts
@@ -4139,6 +4149,9 @@ What landed, in order, and who built it:
   provider", the status line counts it as waiting, and the sixth refusal
   in a row goes to a human. The factory's own budget 402 is no provider
   refusal.
+  Live, card #456's first call met the provider's 429, and the card went to
+  the gate `provider` with 0 attempts and 0 EUR. In the exit test a
+  frontend pull request of +1133 -33 lines went to a human as class large.
 - 3.10a, the GitHub export (controller, roll #449): a Forgejo push mirror
   from the project's repository to GitHub, kept in `project_mirrors` and
   set through the chat's `github_export` (confirm by default) or the
@@ -4147,37 +4160,76 @@ What landed, in order, and who built it:
   unconfirmed token expires with its proposal. The status line and
   the snapshot end with "GitHub: <state>", which the registrar refreshes each minute. Seed projects are
   refused, since ruling 126's job mirrors them.
-- 3.9, members and per-project approvers (controller, on main f5b0f83, its
-  roll pending): any project's writer logs in and sees only their
-  projects, and the factory-level pages stay with the writers of the
-  factory's own code. A project file's `approvers:` replaces the policy's
-  list for that project in the console, the lane, notifications,
-  registration's collaborators and the branch protection's whitelist. The
-  chat's `invite` adds a collaborator (confirm by default, seed projects
-  refused). The build closed four routes that the wider login exposed
-  without a project-writer check (answer, request changes, reject plan and
-  the timeline page), and its security review two more: filing a card on
-  any project, and reading any project's board (ruling 270). Through a
-  Forgejo failure the last good writer list holds for 5 minutes.
-- 3.3b, refusals (controller, on main b66e4c5, its roll pending): the
-  seven refusals of a card action read "Card #N <state>, not <needs>:
-  <fitting action>." A pending merge or plan request comes before the
-  session cap, so a capped card at its merge request points to
-  `approve_merge` or `deny_merge`. The `card` tool's cap and request
-  lines come from the same facts.
-- 3.2b, the session reads (controller, on main 03729c0, its roll
-  pending): `session` (the summary), `session_steps`, `session_step` and
-  `session_search` over the transcript on S3. A transcript over 8 MiB is
-  searched line by line but not parsed, and a line over 1 MiB is marked
-  unreadable.
-
-In flight at 15:05Z: 3.4, the writes (`close`, `edit`, `grant_session`
-and `set_dependency`). 3.5, the planner's questions, whose lane card #446
-the provider outage cut in its first session. 3.10b, GitHub import, on its
-branch at its second review: the new-project form takes a GitHub source
-and an optional token, registration migrates the repository through
-Forgejo instead of creating an empty one, and the template's workflow
-files and AGENTS.md go in as one commit.
+  In the exit test the chat set uptime2's export to
+  sebastianrueckerai/ai-factory-export, and GitHub held its branches within
+  a minute.
+- 3.9, members and per-project approvers (controller, roll #451 at 15:30Z):
+  any project's writer logs in and sees only their projects, and the
+  factory-level pages stay with the writers of the factory's own code. A
+  project file's `approvers:` replaces the policy's list for that project
+  in the console, the lane, notifications, registration's collaborators and
+  the branch protection's whitelist. The chat's `invite` adds a
+  collaborator (confirm by default, seed projects refused). The build
+  closed four routes that the wider login exposed without a project-writer
+  check (answer, request changes, reject plan and the timeline page), and
+  its security review two more: filing a card on any project, and reading
+  any project's board (ruling 270). Through a Forgejo failure the last good
+  writer list holds for 5 minutes. Live, exit16-member, who wrote no
+  project, was refused at the console's login with 403. In the exit test
+  the chat's `invite` made them a member of uptime2. They logged in within
+  a minute and saw only uptime2: the factory's own board answered 404, the
+  policy page 403 and hello-import's board 404. Once uptime2's file named
+  them an approver, they approved one merge through their own chat.
+- 3.3b, refusals (controller, roll #451): the seven refusals of a card
+  action read "Card #N <state>, not <needs>: <fitting action>." A pending
+  merge or plan request comes before the session cap, so a capped card at
+  its merge request points to `approve_merge` or `deny_merge`. The `card`
+  tool's cap and request lines come from the same facts. Live, an answer to
+  the failed card #446 got the 409 "Card #446 has failed, not a question or
+  a session cap to answer: the card is final: a new card continues the
+  work."
+- 3.2b, the session reads (controller, roll #451): `session` (the summary),
+  `session_steps`, `session_step` and `session_search` over the transcript
+  on S3. A transcript over 8 MiB is searched line by line but not parsed,
+  and a line over 1 MiB is marked unreadable. In the exit test a session
+  read answered why the integration card's first session stopped.
+- 3.10b, GitHub import (controller, roll #453 at 15:51Z): the new-project
+  form takes a GitHub source and an optional token, kept in an import row.
+  Registration migrates the repository through Forgejo instead of creating
+  an empty one, makes main from the source's default branch when the source
+  has none, and clears the token after the migrate. The seed adds only the
+  template's `.forgejo/` files and AGENTS.md, as one commit "Factory
+  workflows". A repository that an earlier migrate finished counts as the
+  import, and the seed refuses while the copy is unfinished. Live,
+  hello-import from octocat/Hello-World, with no token, got main from
+  master and one "Factory workflows" commit on top of the source's three
+  commits.
+- 3.4, the writes (controller, roll #453 with 3.10b): `close`, `edit`,
+  `grant_session` and `set_dependency` run the lifted actions the board's
+  buttons run, record one event each and confirm by default. The face
+  offers Close on backlog and waiting-human cards, and a capped card's
+  answer button reads "Grant one session with this answer". A grant records
+  `session_granted` from either door. `edit` rebuilds the card's objective
+  from Forgejo's answer. `set_dependency` refuses a process without a
+  dependencies block, reads Forgejo's list before it changes it, and has an
+  undo. `new_card` takes a size. Live, Close through the face's route ended
+  card #456 at 16:06:53Z with one `card_closed` row, and in the exit test
+  the chat granted two capped cards a session and edited a card's body.
+- 3.5, the planner's questions (controller, after lane card #446, roll #457
+  at 16:18Z): a plan carries up to five questions with 2 to 5 choices each.
+  factoryd stores them per revision, lists them in the plan comment and
+  asks them on the plan card with a button per choice, and accept is
+  refused while one is open. The member answers on the card or through the
+  chat's `answer`, which takes the revision. After the last answer the
+  plan's approval is superseded, and the planner runs once more with the
+  answers in its brief. The `plan` read lists a revision's questions with
+  their answers. Live, in the exit test's second run the planner asked
+  three questions, and its next revision took the three answers.
+- `ci`, the read the exit test's first run asked for (controller, roll #459
+  at 20:10Z): a ref's or a commit's combined CI state and each job's state,
+  read through the member's token. At 20:22Z the chat answered run 1's gap
+  question with it alone: main green, with the checks, image, staging and
+  smoke jobs passed and promote skipped.
 
 The lane ran seven cards on the code project's stronger tier, and none
 landed by itself. #431 (3.7a), #432 (3.1a), #433 (3.3a) and #443 (3.6a, a
@@ -4191,22 +4243,83 @@ defects. #446 (3.5) met the provider outage. The controller took every
 item under rulings 257 and 258: an Opus implementer in a worktree, a
 second Opus review, a local gofmt, vet, race-test and gosec pass on the
 merged tree, and a direct push to main, with the rolls on the lane. 3.8a,
-3.8b and the template's half of 3.6 were controller work by design. From
-about 13:58Z the model provider, Dashscope, answered 429 "budget
-exhausted" on every alias, as at Stage 15's 04:59Z: the Alibaba Cloud
-account's own budget was spent, while LiteLLM's counter stood at 79.50 of
-118 USD. Under Stage 15's precedent the controller built on without lane
-cards: 3.7b, 3.6c, 3.9, 3.10a, 3.3b, 3.2b, 3.4 and 3.10b, and 3.5 after
-#446 closed. Lane spend:
-27.25 EUR of the round's 50 (#431 4.67, #432 4.74, #433 4.27, #443 1.80,
-#442 5.49, #441 5.26, #446 1.02), and nothing landed by it. The project
-agent spent 0.15 EUR by 14:01Z. The controller's Opus subagents ran
-outside the factory's budget.
+3.8b and the template's half of 3.6 were controller work by design. The
+controller read ruling 258 per item, so each card got its own try at the
+same cause. The first card's failure at 12:13Z was the moment to stop, and
+ruling 271 (below) now says so. From about 13:58Z to 16:45Z the model
+provider, Dashscope, answered 429 "budget exhausted" on every alias, as at
+Stage 15's 04:59Z: the Alibaba Cloud account's own budget was spent, while
+LiteLLM's counter stood at 79.50 of 118 USD. Under Stage 15's precedent the
+controller built on without lane cards: 3.7b, 3.6c, 3.9, 3.10a, 3.3b, 3.2b,
+3.4 and 3.10b, and 3.5 after #446 closed. Sebastian raised the account's
+budget, and the provider answered again at 16:45Z.
 
-Exit test: pending. It waits for the model provider, the three items in
-flight and the rolls of main. The member's script is in the ledger
-(exit16-chat-script.md), on a fresh project, uptime2, which the new
-template seeds with the smoke job.
+Spend on the factory's own code: 27.25 EUR by the lane, of the round's 50
+(#431 4.67, #432 4.74, #433 4.27, #443 1.80, #442 5.49, #441 5.26, #446
+1.02), and nothing landed by it. The live-check cards spent 0, and the
+project agent's chat 0.15 EUR by 14:01Z. The 40 EUR checkpoint was not
+reached. The controller's Opus subagents ran outside the factory's budget.
+
+Exit test (2026-10-11, 16:45 to 20:33Z): run 1 had one chat gap, and the
+`ci` read built after the run closed it. Both runs went on a fresh project,
+uptime2, seeded from the ts-go template with the smoke job, with the
+controller as the member through the chat.
+
+Run 1, chat only, with the Stage 15 uptime spec. The board was never
+opened. The spec went in as one chat message, and the planner's first
+revision made ten cards (foundation, targets, checker, incidents, stats,
+webhook, admin-auth, a large frontend, deploy and integration) for 0.42
+EUR, with a deploy card that owned the manifests and no questions. Every
+write went through a chat proposal and its Do it: the plan's accept and
+start, 10 merge approvals, 2 denies with reasons, 2 answers, 2 grants, 1
+steer and 1 edit. The steer "p95, not the mean" reached the stats card,
+whose agent then asked, since its brief said mean. The member answered p95
+and edited the integration card's body to match. The two denies (a cookie's
+SameSite=Strict, two test defects) went into fix sessions, and
+`grant_session` gave two capped cards one session each. The measures: 2 h
+45 min from the first message (16:45:49Z) to the last merge approval
+(19:30:48Z), and 2 h 54 min to the smoke test green on main (19:39:58Z).
+Ten cards merged for 3.50 EUR on the cards, of which the plan took 0.42 and
+the fix sessions of three cards 2.01. The agent's and the pulse's lines
+took 1.30 EUR. 43 member turns. 1 click outside the chat: the operator's
+infra edit of the project file's `secrets:` entry, without which the smoke
+test's authenticated write had no token (roadmap 171). 1 misread: the
+session read guessed why a session started (roadmap 167). 1 chat gap: no
+tool read main's CI or the smoke result, so the agent pointed to Forgejo.
+Stage 15's baseline was 3 h 13 min, 2.64 EUR on the cards, 0 clicks, 1
+misread and 1 gap.
+
+So run 1 did not meet the round's pass criterion of zero chat gaps as run.
+The controller built the `ci` read the same evening, reviewed, landed and
+rolled at 20:10Z, and at 20:22Z the chat alone answered the same question:
+main green, the smoke job passed. Zero gaps holds only with that read,
+built after the run.
+
+Run 2, the new paths, each once, on the same project with a second spec,
+maintenance windows: 48 minutes from the first message (19:45:17Z) to the
+last path (20:33:23Z). The planner asked three questions with choices. The
+member answered one inline on the plan card, the planned click, and two
+through the chat, and the next revision took all three. A change request
+dropped the deploy card, the deploy gate refused that revision at accept
+with its full reason, and the planner revised by itself with the card back.
+The agent proposed `answer` for a card at its merge gate, the member did
+not confirm it, and "Do what fits." drew `approve_merge` with the reason
+and no rephrase: a self-correction at the proposal stage, before any
+refusal. Later the agent picked the right tool at once, so a server refusal
+through the chat could not be forced in this conversation. It was seen live
+on #446 before the run. A session read answered why the integration card's
+first session stopped. A session search for the provider's refusal text
+found nothing, since that text is in the session's summary, not in a step
+(roadmap 167). The chat's `invite` made exit16-member a member, who logged
+in within a minute, saw only uptime2 and approved one merge through their
+own chat. The chat set the export to sebastianrueckerai/ai-factory-export,
+and GitHub held the branches within a minute. The measures: 0 chat gaps. 2
+misreads: a question answered inline read as pending (roadmap 168), and an
+accept answered from memory after the gate's refusal (roadmap 169). 2
+clicks outside the chat: the planned inline answer, and the project file's
+approvers line that let the member approve. Card spend stood at 1.30 EUR at
+20:25Z, with two cards still running. The plan's four planner runs had cost
+1.04 EUR by 19:57Z.
 
 The round's rulings, in the ledger:
 
@@ -4224,6 +4337,16 @@ The round's rulings, in the ledger:
 - 270. Under ruling 254, a member who writes no project and cannot read
   its repository gets 404 on that project's board. The writers of the
   factory's own code keep their read-only view of every project.
+- 271. Abort and fix before the bill (Sebastian). When a card's session
+  shows a cost pattern that will exhaust its budget before it lands (Stage
+  16: 250 to 490 thousand input tokens a call on the factory's own code, a
+  5 EUR card gone in one 17-minute session), the controller stops the lane
+  at once, closes the cards running with the same pattern, fixes the cause
+  (brief, tier, a session split after reading, size) and only then resumes.
+  One lost card is the limit. The rule comes before ruling 258's "fails
+  twice": the item count does not matter when the cause is the same across
+  cards. The stop and its reason go to Sebastian at once in their own
+  message.
 
 Findings:
 
@@ -4231,7 +4354,8 @@ Findings:
   17 minutes in which every call carries the agent's whole reading, and a
   2 EUR small card is one or two calls once the agent has read 250
   thousand tokens. The lane's sizes assume a far smaller context
-  (roadmap 160).
+  (roadmap 160). Ruling 271 stops the lane at the first card that shows
+  the pattern.
 - The Postgres tests skip in the lane's CI, so a store defect reaches the
   review unseen. PR #444's new conversation stored nothing, and Postgres
   17 refused its proposal-state query, which the in-memory fake hid. The
@@ -4242,10 +4366,14 @@ Findings:
   it (roadmap 162).
 - Plan and report sessions are not covered by the provider-refusal rule
   (roadmap 155).
+  Live, a writer's backlog card ran the presort's report session at once,
+  the provider's 429 failed it before the poster, and the card sat failed
+  without an issue, with nothing to click (roadmap 170).
 - A GitHub token typed into the chat reaches the model provider. The
   projects page's form keeps it away (roadmap 163).
-- The console's login sessions live in factoryd's memory, so every roll
-  logs the member out, twice in this round (roadmap 164).
+  The exit test typed it into the chat, as its script said.
+- The console's login sessions live in factoryd's memory, so a roll logs
+  the member out, as five of this round's rolls did (roadmap 164).
 - An existing project keeps the template's CI from its seeding, so the
   smoke test reaches only projects seeded after infra ca99101 (roadmap
   165).
@@ -4258,9 +4386,36 @@ Findings:
   decoder refuses an unknown key (roadmap 166).
 - The supervisor's repetition detector cut the first sessions of #433 and
   #442 at 24 reads, as in Stage 15.
+- The session summary carries no reason a session started (an answer, a
+  review's findings, a grant, a retry), so the agent guessed it: run 1's
+  misread (roadmap 167).
+- The `plan` read shows a revision's own questions, not the answers the
+  revision was built from, so a question answered on the card read as
+  pending in the chat (roadmap 168).
+- After the deploy gate's refusal said the planner revises, the agent
+  answered the next accept from memory instead of reading the plan (roadmap
+  169).
+- The deploy card cannot declare the project's Secret: the project file's
+  `secrets:` entry is an operator's infra edit, run 1's one click outside
+  the chat (roadmap 171). `deploy/smoke.sh` wrote its failure reason to
+  stderr, which the Forgejo runner's job log does not show (roadmap 175).
+- The agent withheld an approve the member asked for, on a review's
+  findings, and asked first (roadmap 172).
+- A running card that is closed reads "has failed", not "was closed"
+  (roadmap 173).
+- The approve answers before the workflow records the decision, so a read
+  right after shows the approval pending (roadmap 174).
+- The provider's repetition refusal ended the integration card's first
+  session, though the supervisor had messaged it, as in Stage 15 (roadmap
+  155).
+- No read showed main's CI result, on the board or in the chat: run 1's
+  gap. The `ci` read covers it now (roadmap 158).
+- GitHub import leaves three cases open: an empty source whose migrate
+  outlived its caller, a filing closed unmerged that keeps its token, and
+  an imported repository with no deploy manifests (roadmap 176).
 
 After Stage 16: the notification service (roadmap 145) and the mobile
 layout and PWA install (146), by Sebastian's scope. [The
-roadmap](../roadmap.md) holds every future topic, and its items 160 to 166
-hold what this round found.
+roadmap](../roadmap.md) holds every future topic, and its items 155 and
+158 to 176 hold what this round left open.
 
