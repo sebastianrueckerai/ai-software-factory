@@ -24,7 +24,10 @@ the badge stays below.
   Conductor's composer and cline/kanban's diff panel ([conductor],
   [cline-kanban]).
 - **Stop button on the card** (old 26): closes the issue, the one way to
-  stop a task; today's close-then-heal becomes one click.
+  stop a task; today's close-then-heal becomes one click. Since Stage 16
+  the face offers Close on backlog and waiting-human cards and on a failed
+  card without an issue, and the chat's `close` also ends a running card,
+  which then reads closed. Left: Close on a running card's face.
 - **Approval scopes** (old 27): once, per task, or per class of future
   request, bounded by policy - Atlassian Rovo and the AWS sample show the
   shape.
@@ -43,7 +46,8 @@ the badge stays below.
   "where are my decisions" assistant ([wekan]).
 - **Session search over history** (Agent HQ): natural-language search over
   the session log store - cheap on our timeline logs, high value
-  ([github-agent-hq]).
+  ([github-agent-hq]). Since Stage 16 the chat's `session_search` searches
+  one session's transcript. Left: a search across sessions and cards.
 - **Context gauge on the session header** (Vibe Kanban):
   `total_tokens / context_window` as the earliest stuck-agent warning
   ([vibe-kanban]).
