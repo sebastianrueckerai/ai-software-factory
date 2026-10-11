@@ -1513,9 +1513,9 @@ defaults:
 chat:
   model: operator          # LiteLLM alias, tier-high
   monthly_eur: 5           # the project agent's own line
-  confirm: [new_card, move_card, start_plan, retry, accept_plan,
-            request_changes, reject_plan, approve_merge, deny_merge,
-            github_export, github_sync]
+  confirm: [new_card, move_card, start_plan, answer, steer, retry,
+            accept_plan, request_changes, reject_plan, approve_merge,
+            deny_merge, github_export, github_sync]
 ```
 
 A tool in `confirm` renders a proposal with a Do-it button, a tool outside
@@ -2147,14 +2147,18 @@ accent, and the GitHub mirror.
 |---|---|---|
 | `board`, `card`, `history`, `card_history`, `costs`, `diff` | read | none |
 | `new_card`, `move_card`, `start_plan` | file and move | confirm |
-| `answer` (a needs-you question), `comment` | answer | none |
-| `steer` (message a running agent) | message | none |
+| `answer` (a needs-you question) | answer | confirm |
+| `comment` | comment | none |
+| `steer` (message a running agent) | message | confirm |
 | `retry`, `accept_plan`, `request_changes`, `reject_plan` | decide | confirm |
 | `approve_merge`, `deny_merge` | merge decisions | confirm |
 | `set_summary`, `set_accent` | metadata | none |
 | `github_export`, `github_sync` | mirror | confirm |
 
-Whether a tool needs a human's OK is a setting, not a rule baked into the
+`answer` and `steer` confirm by default because the text the agent reads
+from cards and events is untrusted and could ask for either; a project file
+may loosen it. Whether a tool needs a human's OK is a setting, not a rule
+baked into the
 agent: the OK column is the `chat` block of the policy or of the project's
 file (5.3). A tool in `chat.confirm` renders a proposal with a Do-it
 button. A tool not in the list applies at once and answers with an
