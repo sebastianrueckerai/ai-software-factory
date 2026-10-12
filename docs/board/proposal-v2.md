@@ -7,7 +7,8 @@ three answers of 2026-10-10. The architecture behind it is
 [architecture.md](../architecture.md) 5.7. The scope stays the console's
 server-rendered htmx shape, with SSE for the live parts (ruling 244). This
 document is the spec the dummy's iteration 5 implements and the console
-follows. Stage 15 built it on 2026-10-11, with the deviations below.
+follows. Stage 15 built it on 2026-10-11, with the deviations below, and
+Stage 17 closed four of them on 2026-10-12.
 
 [proposal-v1.md](proposal-v1.md) stays as the record the click dummy
 implemented in its first four iterations. Where v2 says nothing, v1 still
@@ -15,7 +16,8 @@ holds.
 
 ## Built in Stage 15
 
-The console follows this spec except here:
+The console follows this spec except here. An item marked closed was a
+deviation until the stage it names:
 
 - The chat panel takes 36 percent of the width from 1200 px, not the
   dummy's 45. Below 1200 px the board and the chat are two tabs.
@@ -24,17 +26,25 @@ The console follows this spec except here:
   afresh, and the old conversations stay readable but not writable.
 - A tool block shows the result's first line beside the arguments and the
   duration.
-- No message queue: the input waits while a turn streams.
+- Closed in Stage 17: the message queue. Until then the input waited while
+  a turn streamed. Since Stage 17 the member's next messages wait in a
+  visible queue under the input, each editable and removable, and go out
+  in order when the turn ends.
 - The human lane (approvals, escalations, human tasks) folds into Needs
   you.
 - The state word is "waiting on you" whenever a card waits on a human,
   else "working" while a card runs, else "idle" (ruling 260).
 - Stage 15's status line had no GitHub figure. Since Stage 16 it ends with
   "GitHub: <state>" for a project with an export.
-- The drawer has three tabs, Overview, Activity and Files. The Chat tab is
-  not built.
-- A 30-second poll runs beside the event stream for the counters.
-- Open: the status line spans the board column only, not the chat's.
+- Closed in Stage 17: the drawer's Chat tab. Stage 15 built three tabs,
+  Overview, Activity and Files. Since Stage 17 Chat is the fourth and the
+  default on a running card: the session's messages, the member's steers
+  and a steer box.
+- Closed in Stage 17: the poll. Stage 15 ran a 30-second poll beside the
+  event stream for the counters. Since Stage 17 the event stream carries
+  them through a server heartbeat, and a reconnect refreshes them once.
+- Closed in Stage 17: the status line spans both columns, the board's and
+  the chat's. Stage 15 drew it over the board column only.
 - Open: the drawer's Overview is a headline and always-open sections, not
   the top block of task, status, budget and agent with collapsed sections
   below it. The face shows normal states at full weight: a done card's raw
