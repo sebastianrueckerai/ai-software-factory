@@ -35,6 +35,11 @@ The console follows this spec except here:
   not built.
 - A 30-second poll runs beside the event stream for the counters.
 - Open: the status line spans the board column only, not the chat's.
+- Open: the drawer's Overview is a headline and always-open sections, not
+  the top block of task, status, budget and agent with collapsed sections
+  below it. The face shows normal states at full weight: a done card's raw
+  last event, the model badge on every card, a done card's spend. There is
+  no hover peek. The main roadmap's item 177 holds the spec and the gap.
 
 ## The screen
 
