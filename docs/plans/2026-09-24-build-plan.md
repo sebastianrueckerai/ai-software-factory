@@ -54,7 +54,7 @@ Each stage ends with an exit test. A stage starts only after the previous one pa
 | 14 Rebuild | The cluster rebuilt from the round 2 close's backups on a new address set, round 2's findings folded in through the factory's own lane | The step-zero gate passed, and three fold-in cards merged through the lane and rolled |
 | 15 Project chat | The event spine and the live board, the project screen (status line, pulse, five columns, chat, drawer), the project agent inside factoryd, inline answers. Built, exit test passed. Members, approvers per project and GitHub import and export moved to the roadmap | An app built through the chat alone: uptime, about ten cards, a staging deployment and a smoke test, under 50 EUR for the round. Passed |
 | 16 Chat as the window | Proposals and conversations kept in tables, every console read and action as a chat tool, the `system` tool rendered from code, refusals that name the fitting action, the planner's questions before acceptance, the deploy gate and a staging smoke test, budgets by plan size, a provider refusal as no attempt, the review's whole diff, rolls that keep sessions, members and per-project approvers, GitHub import and export. Built by the controller after the lane failed its cards, all of it live, and a `ci` read after the exit test's first run | The uptime spec twice under 50 EUR for the round: through the chat alone with zero chat gaps, then each new path once against Stage 15's baseline. Run 1 built the app through the chat alone in 2 h 45 min with one chat gap, main's CI result, so zero gaps was not met as run. The `ci` read built the same evening closed the gap. Run 2 took the six new paths in 48 minutes with no gap |
-| 17 The lane back | Every finding Stage 16 left open: the lane's cost on the factory's own code (the corrected record on 160, the default tier, a repository map in the brief, the hold's cached input, a cost line), Postgres tests in CI and the sandbox, console logins kept in a table, staging admitting only the smoke job, no GitHub token through the chat, a looping session ended before the provider refuses it, approve proposals with the review's findings, an import that blocks no project, template updates and schema copies as pull requests, every console page a chat tool, a large pull request split by a planner, GitHub pull request mode, the drawer's Chat tab, the message queue and no poll. Then the cluster shut down. Built by the controller, 4.10 and 4.11 from lane pull requests, and the lane probe's 4.3 with a controller follow-up. By 08:57Z every item but 4.11 was on main | The lane probe and two more lane cards land within their size budgets with no budget 402 and ruling 271 never triggered; every item's live check; one chat run on uptime2 through the new paths, against Stage 16's run 2. The probe landed at 4.92 EUR of 5, ruling 271 triggered once, and no later lane card landed through the lane, so the lane's criterion is not met. Live checks passed for 4.4, 4.5, 4.8, 4.9, 4.14 and two of 4.15's. In progress. TODO(close): the exit run's result, the open live checks and the shutdown |
+| 17 The lane back | Every finding Stage 16 left open: the lane's cost on the factory's own code (the corrected record on 160, the default tier, a repository map in the brief, the hold's cached input, a cost line), Postgres tests in CI and the sandbox, console logins kept in a table, staging admitting only the smoke job, no GitHub token through the chat, a looping session ended before the provider refuses it, approve proposals with the review's findings, an import that blocks no project, template updates and schema copies as pull requests, every console page a chat tool, a large pull request split by a planner, GitHub pull request mode, the drawer's Chat tab, the message queue and no poll. Then the cluster shut down. Built by the controller, 4.10 and 4.11 from lane pull requests, and the lane probe's 4.3 with a controller follow-up. Every item is on main, 4.11 last at 09:13Z | The lane probe and two more lane cards land within their size budgets with no budget 402 and ruling 271 never triggered; every item's live check; one chat run on uptime2 through the new paths, against Stage 16's run 2. The probe landed at 4.92 EUR of 5, ruling 271 triggered once, and no later lane card landed through the lane, so the lane's criterion is not met. Live checks passed for 4.1a, 4.2, 4.3, 4.4, 4.5, 4.7, 4.8, 4.9, 4.10, 4.11, 4.13's push and Sync latest, 4.14 and three of 4.15's. In progress. TODO(close): the exit run's result, 4.12's live split, the open cases of 4.6 and 4.15, and the shutdown |
 
 The stages map to the build order in architecture 11: Ranch is stages 0 to 3, First loop is 4 to 6, Teeth is 7, Customer is 8, Self is 9. Hardening, Spec and the bugfix rounds are its items 6 to 8, and the project screen its item 9.
 
@@ -4585,13 +4585,15 @@ on its own runner label (infra 14bb1bb, version 486), and
 infra 4bb7feb). factoryd's reading threshold went from 24 to 60 in its
 manifest (ruling 298, code 085cdaf).
 
-Outcome (2026-10-12, drafted at 08:57Z while the exit test ran).
+Outcome (2026-10-12, drafted at 08:57Z while the exit test ran, brought
+to the report's 10:17Z entry).
 TODO(close): the close's time, and a check that every line below still
 holds.
 
-By 08:57Z every item but 4.11 was on main, and every item on main
-but 4.10 was live. The controller built eleven items, and two more (4.10
-and 4.11) from lane pull requests. The lane probe built 4.3, which landed
+Every item is on main and live. 4.11 landed last, as eeb8912 at
+09:13:16Z, and rolled with roll #488 at 09:28:15Z. The controller built
+eleven items, and two more (4.10 and 4.11) from lane pull requests. The
+lane probe built 4.3, which landed
 with one controller follow-up. Each controller build followed ruling 257:
 an Opus implementer in a worktree off origin/main, a second Opus review,
 the fixes, the controller's read of the fix diff, then a rebase onto
@@ -4623,8 +4625,13 @@ landed, and its live check:
   byte bound of a first call holds 0.154644 EUR against a booking of
   0.007818. It landed at about 780 lines with the alias pin (ruling 284),
   as 14bc7fd at 23:42:38Z. Live: the probe's per-call figures (below)
-  came from the new columns.
-  TODO(close): whether a `card` or `session` read showed the cost line live, else "not checked live".
+  came from the new columns. Live check passed at 09:16Z in the exit run.
+  Asked to read card #36 again, the agent called `card`, whose result
+  carried one cost line per alias: `coding-cheap` 390 calls, a median of
+  82,233 and a maximum of 175,847 prompt tokens, 98 percent cached, 0.0017
+  EUR a call, `coding-frontier` 37 calls at 0.0108, the review's
+  `review-frontier` 2 calls at 0.0130 and the supervisor 2 calls at
+  0.0648. The answer quoted them right, with 1.23 of 5.00 EUR spent.
 - 4.1b, the repository map and the tier (controller, roll #465, factoryd
   a1b4fdaf4fe5 ready at 23:44:29Z): the agent worker writes the map from
   its clone after the checkout and before opencode, with no Forgejo or
@@ -4665,9 +4672,13 @@ landed, and its live check:
   TestPGStoreConsoleSessions` and worked on a Postgres store test, which
   would have skipped before. In CI the probe's PR #474 went green with a
   test job of 368 s, but the controller's wait on the job log never
-  matched the log's format, so nobody read the skip count.
-  TODO(close): the skip count from a PR #474 test log, else "the CI half not checked
-  live".
+  matched the log's format, so nobody read the skip count. The CI half was
+  seen at 09:42Z on PR #485's CI (run 707, 08:54Z to about 08:59Z). Its
+  test job logged pg-test.sh's start line for PostgreSQL 17.11 and then
+  ok for all 16 packages, `internal/factoryd` in 96.5 s and `cmd/factoryd`
+  in 14.4 s, where the race suite skipped every Postgres test before 4.2.
+  The log holds no skip count, since `go test` runs without `-v`. So the
+  start line and the package times show that the Postgres tests ran.
 - 4.3, console logins in a table (the lane probe #471 and a controller
   follow-up, roll #481, factoryd 09be1095b33d ready at 07:29:26Z): the
   table `console_sessions` holds the session id as a SHA-256 hash, the
@@ -4680,9 +4691,10 @@ landed, and its live check:
   refresh, so two requests with one cookie no longer refresh with one
   token, which Forgejo invalidates on use (ruling 300). Main d068d12
   carried both into the roll. Live: the login at 07:29:42Z wrote the
-  first row.
-  TODO(close): the live check, the board answering 200 without
-  a new login after roll #486.
+  first row. Live check passed at 09:01Z. factoryd restarted at about
+  09:00Z with roll #486, and at 09:03Z the controller's cookie from the
+  07:29:42Z login got 200 on `/` and `/board` without a new login. The
+  same requests without the cookie got 303 to `/login`.
 - 4.4, staging admits only the smoke job (controller, roll #481):
   staging's ingress on 8080 admits only pods of its own project labelled
   `factory.ai/ci-role: smoke`, and `pr-untrusted` pods lost their staging
@@ -4757,10 +4769,13 @@ landed, and its live check:
   prompt states one fact: the member decides, and a proposal shows them
   the facts (ruling 263). A proposal for `approve_merge` without a pending
   merge request is refused, as Do it refuses. It landed with 4.5 as
-  19a2ae3.
-  TODO(close): the live check, "Approve the merge of card #n" on
-  a card with review concerns drawing the proposal with the warning in 3
-  of 3 turns.
+  19a2ae3. Live check passed at 09:17Z. Three chat turns "Approve the
+  merge of card #36." at 09:15:36Z, 09:15:39Z and 09:15:43Z each drew an
+  `approve_merge` proposal with the warning "The review has 1 open
+  finding", a compiled binary (10c01da) committed at the repository's
+  root. That is 3 of 3, and none was confirmed. Once the review found the
+  finding addressed, the same request at 09:28:22Z drew the proposal with
+  no warning.
 - 4.8, the import's own goroutine (controller, roll #469, factoryd
   2495239ea510 ready at 00:18:32Z): the copy runs in a goroutine of its
   own, one per project, checked and stored under one lock. The row reads
@@ -4817,13 +4832,22 @@ landed, and its live check:
   lane's PR #484 wrote with the projects token, which cannot reach infra
   (ruling 164), because the controller's brief named that token. The
   controller's build took the card's two commits and the review's eight
-  points, and landed as f7a588e at 08:29Z. Roll #486 (PR #487) was
-  approved at 08:44:55Z and waits for a session gap. Infra 4042f85 adds
+  points, and landed as f7a588e at 08:29Z. Before the roll the controller
+  regenerated the copies by hand once (infra cdef94e at 06:57Z, with
+  `github_sync` and `split_card` in the confirm list). Infra 4042f85 added
   one trailing newline to `factory/schema/policy.schema.json` for the live
-  check. Until then the controller regenerated the copies by hand once
-  (infra cdef94e at 06:57Z, with `github_sync` and `split_card` in the
-  confirm list).
-  TODO(close): the roll's time, and whether the bot opened "Schema copies for <id>" from its fork.
+  check. Roll #486 (PR #487) was approved at 08:44:55Z and merged at
+  08:58:59Z in the session gap that #36's first session's end left. Live
+  check passed at 09:01Z. factoryd 603f98909614 started at about 09:00Z
+  and at 09:00:21Z logged "schema copies: created pull request #38". Infra
+  PR #38 "Schema copies for f51974d71455" came from factory-agent's fork,
+  mergeable, its body naming the differing file and saying that an
+  approver merges it, and its diff removed exactly 4042f85's newline. It
+  stayed open on purpose for the replace path, which passed at 09:29Z.
+  After roll #488 the new factoryd opened infra #39 at 09:29:16Z, with the
+  seven `chat.confirm` values of 4.11 in both schemas, and at 09:29:17Z
+  closed #38 with "Closed by factoryd: #39 replaces it." The controller
+  reviewed #39 and merged it at 09:37:33Z (1bce0eb).
 - 4.11, every console page a chat tool (lane cards #478 and #483, then the
   controller under ruling 306): #483's PR #485 added the reads, the writes
   and the parity test. The review found a hole: the chat's write tools
@@ -4831,11 +4855,35 @@ landed, and its live check:
   factory-writer check the pages make, and a test showed a writer of
   demo/demo only releasing factory resource 11 from that project's chat.
   The parity test did not take the routes from the mux, and the costs read
-  grouped by ledger kind, not by alias. The controller builds the ten
+  grouped by ledger kind, not by alias. The controller built the ten
   points on the PR's commits (branch stage17/411-controller from aeab7d4).
-  TODO(close): the landing commit and its roll, one live turn for each new
-  read (`alerts`, `resources`, `projects`, `policy`, and `costs` by day,
-  card and tier), and the card's approval denied naming the landed commit.
+  The chat's factory writes now pass the factory-writer check through the
+  action functions, and the promote, release and verdict routes hold the
+  check alone. The console's GET routes come from one table, which the
+  parity test reads, and each route names its tool or the reason it has
+  none. `costs` by tier groups by alias, the pulse tool went, and the
+  pulse route is a named exception. A test tries each write as a
+  non-writer. A scoped Opus re-review at 09:09Z found every point
+  addressed and sent back three minor ones, fixed in a98bcf0. It landed as
+  eeb8912 at 09:13:16Z (4bdd152 and 831a1e7 by card #483, 1ba05bb and
+  eeb8912 by the controller). Approval 490 of #483 was denied (reject),
+  naming the landed commits (ruling 306). Roll #488 (PR #489) was approved
+  at 09:28Z (approval 493) and merged at 09:28:15Z in a session gap,
+  factoryd 9657f451205b. Live check passed at 09:38Z on the factory's own
+  chat, one turn for each new read, each answered from its tool. `alerts`
+  showed one open alert, #596 "CI queue p95 above 5 minutes" on the
+  rejected #479, and with state all the last three resolved. `resources`
+  answered "No commissioned resources.", which is right, since the only
+  live rows are CI build machines and firewalls, which the page does not
+  list either. `projects` listed 14 with sqlite-import, only uptime2
+  exporting. `policy` gave infra's values: task 2.00 (max 15.00), 3
+  sessions, 2h, a 45m check-in, `stronger_after` 3, day 60.00, month
+  141.25. `costs` by day gave 17.79 EUR today, 65.85, 7.42 and 12.98,
+  which sum to the month's ledger. By card it gave the month's top five,
+  and the agent said the tool has no window for today, a gap (roadmap
+  158). By tier it gave the aliases: `coding-frontier` 82.13,
+  `coding-cheap` 13.56, supervisor 5.37, operator 3.18, `review-frontier`
+  2.77, pulse 0.60, resource 0.02, tool 0.01 and settlement -3.46.
 - 4.12, the split (controller, roll #475): on a card whose large pull
   request waits for approval, an approver's Split or a confirmed
   `split_card` runs a planner session (ruling 292). factoryd checks its
@@ -4848,8 +4896,11 @@ landed, and its live check:
   split runs. The split session spends from the large card's budget
   outside its session cap. Every new command sits behind the change id
   `split`, and 28 recorded histories replay. It landed as be86f74 at
-  00:38:25Z.
-  TODO(close): the live check, one large card on uptime2 split
+  00:38:25Z. No exit card's pull request crossed `large_lines` 400, since
+  #36 to #39 merged small. So at 10:11Z the controller filed uptime2#48
+  "Public status page" (t-12db1ae81145, budget 2 EUR), a server-rendered
+  `/status` page with its JSON twin, sized to cross 400 lines.
+  TODO(close): the live check, #48 split through a confirmed `split_card`
   and its children landed.
 - 4.13, pull request mode to GitHub (controller, roll #472, factoryd
   f6b95da50f2b at about 01:20Z): an export's mode is `mirror` or
@@ -4873,9 +4924,23 @@ landed, and its live check:
   with 403 "Resource not accessible by personal access token" (ruling
   278). In the exit run at 08:07Z the chat set uptime2's export to
   `pull_requests` mode with no token in the chat, and the status line read
-  "GitHub: 0 open pull requests".
-  TODO(close): whether a merged card's branch reached GitHub, whether a GitHub pull request opened (it needs the
-  token's "Pull requests: read and write"), and Sync latest.
+  "GitHub: 0 open pull requests". The push's live check passed at 09:29Z.
+  #36 merged at 09:28:29Z (PR #42), and by 09:29:05Z the pass had pushed
+  branch factory/t-fe37611fcddb to sebastianrueckerai/ai-factory-export,
+  its head 1ac02216aa43, PR #42's head. GitHub refused the pull request,
+  and the card's GitHub line read "failed: factory/t-fe37611fcddb is on
+  GitHub, but the export's token may not open pull requests: it needs the
+  permission "Pull requests: read and write"", as ruling 278 expected.
+  Sync latest's live check passed at 09:36Z. A commit 4bfef69 adding
+  SYNC-CHECK.md went onto GitHub's main through the contents API at 09:29Z.
+  The chat turn "GitHub's main has a new commit. Bring it into this
+  project." drew `github_sync`, and Do it at 09:29:55Z started the sync.
+  The export row then named pull request #43, which brings 4bfef69 to
+  main. uptime2 PR #43 "Sync from GitHub 4bfef69" came from
+  factory-agent's fork (head `github/sync-4bfef69`), its diff exactly
+  SYNC-CHECK.md's one line. It passed its CI, and the controller merged it
+  at 09:36:52Z after an approving review, since main's protection asks for
+  one approval. Forgejo main and GitHub main now both hold 4bfef69.
 - 4.14, the screen (controller, roll #472): factoryd publishes a running
   session's agent text as `session_said` on the event bus, to the
   project's writers only, never stored. The drawer's Chat tab is the
@@ -4906,8 +4971,14 @@ landed, and its live check:
 - 4.15, the fix round's checks: an approval read approved 0.34 s after its
   POST answered 303 at 23:43Z, where Stage 16 saw about 10 s of pending
   (passed). An accept with no revision after a change request drew
-  `accept_plan` pinned to revision 3 and its sha at 08:06:26Z (passed).
-  TODO(close): a running card closed by a human reads "was closed".
+  `accept_plan` pinned to revision 3 and its sha at 08:06:26Z (passed). A
+  running card closed by a human reads "was closed" (passed at 09:40Z).
+  The probe card uptime#17 (one README line) ran its session from
+  09:39:28Z. "Close card #17, it is not needed." drew `close`, and Do it
+  closed it. The events card_closed,
+  closing, closed and task_ended came from 09:40:05Z to 09:40:11Z, at
+  0.002 EUR. The card read answers "closed (was closed), EUR 0.00 of EUR
+  2.00".
   TODO(close): a plan or report session's first-call refusal waits on the
   provider, or "not seen" if no outage occurred.
   TODO(close): the import's empty-source and purge cases, or "no fixture allowed it".
@@ -4960,9 +5031,11 @@ was four frontier cards at about 4.7 EUR each, none landed.
   circle of writes. Its second session ran on `coding-frontier` (ruling
   304) and pushed PR #485 at 08:35Z at 3.45 EUR: 0.71 cheap, about 2.65
   frontier and 0.10 supervisor. The review found ten points, one of them a
-  security hole (4.11 above). Outcome: not merged, and the controller
-  builds its points (ruling 306).
-  TODO(close): the card's end and its final spend.
+  security hole (4.11 above). Outcome: not merged. The controller built
+  its points and landed them as eeb8912, and approval 490 was denied
+  naming the landed commits (ruling 306). The card ended at 4.40 EUR:
+  0.71 cheap, about 2.65 frontier, 0.10 supervisor and about 0.94 for its
+  review gate.
 
 Ruling 299 set the policy's `stronger_after` from 1 to 3, the session cap,
 so returning findings no longer climb a card. With ruling 298 both
@@ -4971,11 +5044,12 @@ frontier tier comes only through `retry_stronger`.
 
 Spend: at 08:28Z the gateway ledger held 13.25 EUR on the factory's own
 code for the round (13.45 on models, -0.20 in settlements) and 1.62 EUR on
-uptime2. The four lane cards spent 11.97 EUR by 08:36Z (#471 4.92, #478
-1.38, #477 2.22, #483 3.45) of the 30 allowed. The alert card #479 spent
+uptime2. The four lane cards spent 12.92 EUR in all (#471 4.92, #478
+1.38, #477 2.22, #483 4.40) of the 30 allowed. The alert card #479 spent
 1.47 EUR (see the findings). The 40 EUR stop was not reached by 08:28Z.
-TODO(close): the final figures for the code project, the lane and uptime2,
-and October's ledger.
+At 09:53Z the day's ledger held 18.05 EUR.
+TODO(close): the final figures for the code project and uptime2, and
+October's ledger.
 
 Exit test (from 07:32Z on uptime2, the controller as the member through
 the chat).
@@ -5002,6 +5076,41 @@ to pull request mode at 08:07Z. The drawer's Chat tab and the queue passed
 on #36 (4.14 above). At 08:54Z #36 had spent 0.76 EUR in 47 minutes of its
 first session. Each turn took 3 to 12 s. The report counts 1 misread and
 no chat gap or click outside the chat by 08:57Z.
+
+After 08:57Z the run went on like this. #36's first session ended at
+08:58:44Z on the supervisor's stuck rule, not at its 45-minute check-in,
+as the report's 09:00Z line first said and its 09:11Z line corrected. A
+`same_failure` trip at 08:39:22Z drew the supervisor's message, and a
+`flip_flop` on `cmd/server/main.go` then took `retry_stronger` (390 cheap
+calls, 0.68 EUR, supervisor 0.13). Roll #486 merged in the gap. The second
+session ran on `coding-frontier` from 09:04:05Z. At 09:14:23Z the member
+asked what #36 had cost so far and on which models. The agent called no
+tool and answered "EUR 0.02 so far, all on coding-cheap (31 calls ...)"
+from a `session` read of 08:10Z in the conversation, while the card had
+cost 1.12 EUR on three aliases: misread 2. Asked to read the card again,
+it quoted the cost lines right (4.1a above). The same read showed #36 at
+approval with PR #42, risk class migration, and the review's open
+finding, a compiled binary at the repository's root. The approve warning
+followed (4.7 above). The member then asked the chat to tell #36's agent
+to remove the binary, and the agent proposed `steer`, a wrong tool for a
+card at its approval gate: misread 3. Do it answered with the server's
+refusal, which named `approve_merge` and `deny_merge`, and the next turn
+drew `deny_merge` with request changes. Do it at 09:17:23Z denied PR #42,
+and #36 ran its next session from 09:17:25Z. It came back to approval
+after one session at 1.37 EUR, the binary gitignored. "Approve the merge
+of card #36." at 09:28:22Z drew `approve_merge` with no warning, Do it
+approved PR #42 at 09:28:26Z, and #36 merged at 09:28:29Z. The pushes to
+GitHub and Sync latest followed (4.13 above). #37 and #38 waited on roll
+#488's hold and were in their first sessions at 09:39Z. #38 (PR #45, 0.06
+EUR) was approved through the chat by 09:53Z, its `approve_merge` without
+a warning, and merged. #37 (PR #44, 0.06 EUR) went back through checks
+after #38's merge, reached approval 495 at 10:00:10Z at risk class high
+for an admin route, and was approved through the chat, again without a
+warning. #39 (PR #46, 0.05 EUR) reached approval 496 by 10:06Z, was
+approved through the chat, and merged. #40 (PR #47, 0.03 EUR, risk class
+high for `deploy/`) was approved through the chat at about 10:18Z
+(approval 497). At 10:17Z #41 waited on #40, and #48 (4.12 above) ran its
+first session at 0.05 EUR. The report names 3 misreads by 10:17Z.
 
 At 01:15Z Sebastian asked whether the card's information hierarchy from
 the UX conversation is built. It is planned and built in part. Roadmap 177
@@ -5040,8 +5149,8 @@ The round's rulings, in the ledger:
   Repository is empty" is an empty source, seeded whole. A commit means a
   cut or refused copy: the empty repository is deleted as admin and copied
   again. A migrate's 409 never leads to a delete.
-- 282. TODO(close): ruling 282 is not in the report. Name it, or record
-  the number as unused.
+- 282. Never issued. The numbers went from 281 to 283, a skipped number,
+  not a lost ruling.
 - 283. The step line shows no EUR, since opencode's step cost is always 0.
   The median of an even count is the lower middle value.
 - 284. 4.1a lands whole at about 780 lines, over the bound of about 700,
@@ -5095,7 +5204,8 @@ The round's rulings, in the ledger:
   EUR without a push.
 - 305. The alert card #479's PR #480 is rejected.
 - 306. PR #485 is not merged with a known security hole. The controller
-  builds every review point on its commits and credits the card.
+  builds every review point on its commits and credits the card. The
+  card's approval is then denied, naming the landed commit.
 
 Findings:
 
@@ -5133,6 +5243,20 @@ Findings:
   08:24:51Z (roadmap 182).
 - The export's GitHub token has no pull-request permission and was not
   rotated (rulings 272 and 278, roadmap 148 and 163).
+- The chat answered a question about a card's current cost from a tool
+  result 64 minutes old in its history instead of reading again, misread
+  2 (roadmap 180).
+- The agent proposed `steer` for a card at its approval gate, misread 3,
+  and the server's refusal named the fitting tools (roadmap 183).
+- Two of the round's long sessions, #483 and #36, climbed to the frontier
+  tier the same way, a `flip_flop` after the supervisor's message. Whether
+  each was a real circle or an agent undoing its own trial edit was not
+  judged (roadmap 184).
+- The lane's PR #485 gave the chat write tools that skipped the
+  factory-writer check, while the card's brief stated that check in
+  prose (ruling 306, roadmap 185 and 186).
+- The `costs` read by card covers the month only, with no window for
+  today (roadmap 158).
 
 The controller slipped seven times. At 23:27Z the first landing of 4.5 and
 4.7 failed in `land.sh` itself, on a log path with the branch's slash.
@@ -5153,8 +5277,13 @@ stage17/stronger with `git branch -D`, which the operating rules forbid,
 with nothing lost, since its commit was on main as ab54e8b. Its brief for
 #477 named the projects token, which cannot reach infra. At 08:31Z it
 found the alert card #479's approval waiting since 06:31Z, since its watch
-listed only uptime2's approvals. A 30-minute heartbeat now lists every
-open card and every pending approval across projects. A reviewer's cleanup
+listed only uptime2's approvals. The controller's operating rules now
+carry a heartbeat, written after the idle slip. Every wait is bounded at
+9 minutes and prints a final line, match or not, and `scripts/heartbeat.sh
+1800` always runs in the background. After 30 minutes it lists every open
+card and every pending approval across all projects and ends. Each wake
+reads it, acts on it and starts the next one, and no turn ends without a
+heartbeat running. A reviewer's cleanup
 also killed every `go test` binary on the machine at about 00:04Z, and the
 other agents ran their tests again.
 
@@ -5166,8 +5295,18 @@ TODO(close): the shutdown: the CNPG backup and its WAL generation, the
 OpenBao snapshot and the Forgejo dump in S3, `tofu destroy`, every Hetzner
 project at zero, and the open pull requests and agent issues left.
 
+On 2026-10-12, at 09:56Z during the exit run, Sebastian set the design
+principle for every AI step (docs master 10e3992). Each step has a
+limited scope, all the context it needs, including the history of its
+steps, all the tools it needs and tools to gather more, a clear goal,
+and checks to correct itself. A weak spot is fixed by construction, and a
+rule in a prompt is the last resort. The principle stands in CLAUDE.md,
+architecture.md section 1 and the roadmap's third guiding idea. His
+standing instruction since 10:01Z: every new finding goes into the
+roadmap as it appears, with its structural fix.
+
 After Stage 17: [the roadmap](../roadmap.md) holds every future topic. Its
 item 177, the card's information hierarchy, is first for the next round
-by Sebastian's word of 2026-10-12. Its items 148, 158 to 160, 163, 164,
-166, 172 and 176 hold what this round left open, and 178 to 182 its new
-findings.
+by Sebastian's word of 2026-10-12. Its items 148, 158 to 160, 163 and 176
+hold what this round left open, and 178 to 186 its new findings, each
+with its fix by construction (docs master 36adae9).
