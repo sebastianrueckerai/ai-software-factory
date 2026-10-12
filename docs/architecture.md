@@ -35,8 +35,11 @@ with approvers per project and GitHub import and export. In its exit test
 the chat alone built an app with one gap, main's CI result, and a read
 built the same evening closed it. Stage 17 put the lane on its default
 tier with each call's cost on the ledger, closed most of what Stage 16 left
-open, and built the screen's open points (5.7) on 2026-10-12.
-TODO(close): Stage 17's exit test result.
+open, and built the screen's open points (5.7) on 2026-10-12. In its exit
+test the chat took one spec through a plan of six cards to the last merge
+with one gap: a pull request the factory opens outside a card merges only
+in Forgejo. Its lane criterion failed, since no lane card after the probe
+landed through the lane.
 Sections that describe built behaviour say so. The rest is still design. We amend this file as the design moves,
 so it always holds the current design plus the explanations behind it.
 Rulings live in the build ledger and are cited here by number.
@@ -2167,7 +2170,7 @@ Designed on 2026-10-10 for Stage 15 (Rulings 251 to 256) and built on
 GitHub import and export. The exit test passed the same day. Stage 16
 (Rulings 261 to 270) built members, approvers per project and GitHub import
 and export the same day and made the chat the window (below). Stage 17
-(Rulings 272 to 306) built the screen's open points on 2026-10-12 and
+(Rulings 272 to 307) built the screen's open points on 2026-10-12 and
 closed most of what Stage 16 left open (below). Where the
 build differs from the design, the paragraph says so. The design baseline
 is Sebastian's conversation on the human's side of the factory,
@@ -2498,7 +2501,9 @@ pull requests: it needs the permission "Pull requests: read and write"",
 as Ruling 278 expected. Sync latest, asked for in the chat, brought a
 GitHub commit back as uptime2 pull request #43 from the bot's fork, its
 diff exactly that commit's one line, and it merged after its CI and an
-approving review (Stage 17, 09:29Z and 09:36Z).
+approving review (Stage 17, 09:29Z and 09:36Z). The review and the merge
+took place in Forgejo: a pull request the factory opens outside a card
+has no merge request on a card, so the chat cannot reach it (roadmap 187).
 
 Import, built in Stage 16, starts a project from a GitHub repository: the new-project form
 takes a GitHub source and an optional token, registration migrates the
@@ -2668,7 +2673,7 @@ for seven of its findings (the plan's Stage 16), and the rest was in the
 roadmap (155, 158 to 166, 172 and 176) until Stage 17.
 
 **Stage 17, the lane back and the screen as specified** (Rulings 272 to
-306, built on 2026-10-11 and 2026-10-12). The round closed most of what
+307, built on 2026-10-11 and 2026-10-12). The round closed most of what
 Stage 16 left open and built the screen's open points: the drawer's Chat tab, the
 message queue, the status line across both columns and the event stream
 without a poll (above). The controller built eleven items, and two more
@@ -2708,14 +2713,31 @@ table (5.6). What it adds to the chat besides:
   A failed check gets one more planner session, and a second failure
   escalates while the approval waits. Approve is refused while the split
   runs. The split session spends from the large card's budget outside its
-  session cap. The change id is `split`.
-  TODO(close): the live split's result (uptime2#48, filed at 10:11Z).
+  session cap. The change id is `split`. Live in Stage 17 with
+  `large_lines` at 400 (Ruling 301), uptime2#48's pull request changed
+  918 lines, and a confirmed `split_card` ran the planner twice. The check
+  refused both answers, since one test file alone changed 458 lines, over
+  the bound, and a split cuts along files. The card escalated, and the
+  member approved it whole (Ruling 307), so the children's landing was
+  not seen live. The sizes a card may take (small 300, medium 600, large
+  1000 lines) are fixed and not derived from the bound (roadmap 159).
 
 What stays open is in the roadmap (148, 158 to 160, 163, 176 and 178 to
-186).
+188).
 
-TODO(close): the exit test's result and its measures against Stage 16's
-run 2.
+**The exit test** (the plan's Stage 17). One spec, response times and an
+SLA report for uptime2, went in through the chat at 07:33Z and became plan
+#35 with six cards. All seven cards of the plan were done at about
+10:44Z, for 2.88 EUR on the cards and 0.88 EUR on the chat, with 28
+member messages. Against Stage 16's run 2 (2 misreads, 0 gaps, 2 clicks
+outside the chat, 1.53 EUR on the cards) it had 3 misreads, 1 chat gap
+and 2 clicks outside the chat. In two misreads the agent answered from
+memory or from an old read (roadmap 180). In the third it proposed
+`steer` for a card at its approval gate, and the server refused it,
+naming the fitting tools (roadmap 183). The gap: the Sync pull request that the factory opened has
+no merge request on a card, so it took a review and a merge in Forgejo
+(roadmap 187). The lane's criterion failed: after the probe no lane card
+landed through the lane, and Ruling 271 triggered once (roadmap 160).
 
 ## 6. Chunk 4: the worker plane
 
@@ -3356,9 +3378,12 @@ detected" refusal, matched without regard to case and together with
 model quotes the phrase stays `no_push`. The worker pushes the work of
 every failed session, where Stage 15 lost a diff, and the next brief reads
 "previous session ended unfinished: ..." when the failed session pushed.
-No workflow command changed. Tests carry the acceptance, and by 08:57Z on
-2026-10-12 no live session had ended this way.
-TODO(close): what the exit test saw.
+No workflow command changed. Tests carry the acceptance. In Stage 17 no
+live session ended this way, and no provider refused a session as
+repetitive. The supervisor tripped 16 times on repetition, 4 on
+`flip_flop`, 5 on `same_failure` and 4 on `no_progress`, so its message
+and the stuck rule's climb met each loop before a third nudge could end
+it.
 
 The answers are a part of the next session's brief in their own section,
 newest first, each one tagged with the question it answers (Ruling 118). The
@@ -4499,7 +4524,7 @@ since Stage 6, but neither has run under load.
 | Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list. Servers and volumes, no buckets. SSH certificates bound to one server. Outbound tcp 53, 80 and 443. Deletion at the last tick before the lease ends | Built (Rulings 80, 83, 121, 122, 124, 125) |
 | Collector safety | A pass that sees a cluster node's IPv4 or another project's label deletes nothing | Decided (Ruling 123) |
 | Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Built (Rulings 81, 84) |
-| Project screen | One screen per project (5.7): status line, pulse, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export. Since Stage 16 the board's reads and actions are chat tools, the `system` tool is rendered from the code, refusals name the fitting action, and the planner asks its open questions before acceptance. Stage 17 built the drawer's Chat tab, the message queue, the status line across both columns, the event stream without a poll, the split, the approve warning and GitHub pull request mode | Built in Stage 15 (Rulings 251 to 260), exit test passed. Stage 16 (Rulings 261 to 270) built the chat as the window, members, approvers per project and GitHub import and export on 2026-10-11. Its exit test's chat-only run had one gap, main's CI result, which the `ci` read built after the run closed. A fix round the same evening built the fixes for seven of its findings. Stage 17 (Rulings 272 to 306) built its items on 2026-10-12, 4.11 last, live since roll #488. TODO(close): the exit test result |
+| Project screen | One screen per project (5.7): status line, pulse, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export. Since Stage 16 the board's reads and actions are chat tools, the `system` tool is rendered from the code, refusals name the fitting action, and the planner asks its open questions before acceptance. Stage 17 built the drawer's Chat tab, the message queue, the status line across both columns, the event stream without a poll, the split, the approve warning and GitHub pull request mode | Built in Stage 15 (Rulings 251 to 260), exit test passed. Stage 16 (Rulings 261 to 270) built the chat as the window, members, approvers per project and GitHub import and export on 2026-10-11. Its exit test's chat-only run had one gap, main's CI result, which the `ci` read built after the run closed. A fix round the same evening built the fixes for seven of its findings. Stage 17 (Rulings 272 to 307) built its items on 2026-10-12, 4.11 last, live since roll #488. Its exit test's chat run had one gap, a pull request the factory opened outside a card (roadmap 187), and its lane criterion failed |
 | Merge authority | The `factory-merge` bot merges after a whitelisted human's approval, enforced by Forgejo's branch protection. Merge retries are capped at six. A project on `auto` merges class `normal` without a card after a proven reproduction or a strict improvement and an approving review; the factory's repositories stay on `human` | Built (Rulings 109, 129). `auto` built (Rulings 149, 167, 169) |
 | Intake lanes | Lanes backlog, plan and ready from the project's process, `moved_by` judging every entry. Every bug from any account or alert starts a task. Improvements wait in the backlog for a writer, with an analyzer's write-up. Outsiders' bug reports pass a screening stage. Outsiders' writer-only labels are stripped. The poster's text is untrusted information between random markers | Built (Rulings 148, 150, 182, 185) |
 | Projects | Each project its own Forgejo organisation with a CI user, runner registration, deploy key and deploy branch. Flux tenancy through a namespaced account. A default-deny network policy with the file's outside hosts only and a quota per environment. Stricter wins: a project file only tightens the policy's defaults. Reconciled hourly. Settings from the project's file, `objects: factory \| seed` and `agents: coder \| none`, so the factory's two repositories are projects like any. Registered by the reconcile with the admin's login from OpenBao. A cache volume per project for agents and pull request CI. Hostnames are an infra commit. Since Stage 17 a Template update pull request per project keeps the template's files in step | Built (Rulings 146, 155, 156, 157, 164, 165, 166, 179, 296) |
@@ -4566,8 +4591,10 @@ works `factory` and `demo-app`.
    and the `ci` read built after the run closed it. Stage 17, built on
    2026-10-12, put the lane on its default tier with each call's cost on
    the ledger, closed most of what Stage 16 left open and built the
-   screen's open points.
-   TODO(close): Stage 17's exit test result.
+   screen's open points. Its exit test's chat run took a plan of six
+   cards to the last merge with one gap, a pull request the factory
+   opened outside a card, and after the probe no lane card landed through
+   the lane.
    The rest is in the roadmap, scoped by Sebastian.
 
 ## 12. Glossary
