@@ -82,6 +82,17 @@ The fixed principles from the design conversation (see
   result (Ruling 253, which amended "agents exchange artifacts, not chat").
 - Human approval is a workflow state. No process waits three days for a person.
 - Everything is immutable and re-seedable from Git plus object storage.
+- Reliability comes from how an AI step is built, not from its prompt
+  (Sebastian, 2026-10-12). Each step has a limited scope. It gets all the
+  context it needs, including the history of the steps before it, all the
+  tools it needs, tools to gather more, and a clear view of its goal. It
+  checks its own work and corrects itself, and every refusal it meets names
+  the state and the fitting action, so it can. A weak spot gets its fix in
+  code, in a tool's shape, in a check or in the configuration, and a step
+  that is too large is made smaller by construction. A prompt rule stays the
+  last resort: needed at times, but brittle, and such rules accumulate.
+  Stage 16's four principles for the project agent (5.7) apply this idea to
+  the chat.
 
 ## 2. Three ways to build it
 
