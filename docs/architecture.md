@@ -1483,9 +1483,12 @@ pull request "Schema copies for <id>" from its fork, as a roll does, cuts
 its branch fresh each time and closes an older one naming the new. An
 approver merges it like a project file (Ruling 303). The lane's first
 version wrote with the projects token, which cannot reach infra (Ruling
-164).
-TODO(close): whether the bot opened "Schema copies for <id>" live after
-roll #486.
+164). Live in Stage 17 (09:01Z): after roll #486 factoryd opened infra
+pull request #38 "Schema copies for f51974d71455" from factory-agent's
+fork at 09:00:21Z, its diff exactly the byte infra main lacked. After roll
+#488 it opened #39 at 09:29:16Z with 4.11's seven new `chat.confirm`
+values and closed #38 at 09:29:17Z with "Closed by factoryd: #39 replaces
+it." An approver merged #39 at 09:37:33Z.
 A refused commit logs `CONFIG REJECTED`, keeps the old version
 current and raises an alert of kind `config_rejected`, which files an issue
 in the infra repository's human lane. The next valid commit closes that
@@ -2121,9 +2124,10 @@ without an issue. The chat's `close` runs the same action (5.7).
   invalidates a refresh token on use and two requests with one cookie
   would otherwise both refresh with it. So a roll no longer logs a member
   out. The lane probe built it, and a controller follow-up fixed the
-  refresh.
-  TODO(close): the live check, the board answering 200 without a new
-  login after roll #486.
+  refresh. Live in Stage 17 (09:01Z): after roll #486 restarted factoryd,
+  a cookie from a login before the roll got 200 on `/` and `/board`
+  without a new login, and the same requests without it got 303 to
+  `/login`.
 - **Who gets in.** Only users with write access or more on the repository,
   checked at login and again on every request. factoryd caches
   the writer list for a minute and shares one fetch between requests. When
@@ -2331,12 +2335,20 @@ accent. The round lifted 16 console handlers into shared functions
 (`internal/console/actions.go`), each with its checks inside, which the
 buttons and the tools both call, and Stage 16 four more for its writes.
 Stage 15 built 6 read and 14 write tools. Stage 16 added 9 reads and 6
-writes, and Stage 17 two writes, `split_card` and `github_sync` (below),
-so the chat has 15 reads and 22 writes.
-TODO(close): Stage 17's reads `alerts`, `resources`, `projects` and
-`policy`, `costs` by day, card and tier, and the writes `alert_verdict`,
-`promote_resource` and `release_resource` (roadmap 158), once they land,
-with the parity test and the new-project panel as its named exception.
+writes. Stage 17 added the reads `alerts`, `resources`, `projects` and
+`policy`, `costs` by day, card and tier over the month's whole ledger
+for the factory's writers, and five writes, `split_card`, `github_sync`
+(below), `alert_verdict`, `promote_resource` and `release_resource`
+(roadmap 158, Ruling 306). So the chat has 19 reads and 25 writes. The factory pages'
+reads and writes check the factory writer inside the shared functions,
+so a page and a tool refuse in the same words. The console's GET routes
+come from one table, and each names its tool or the reason it has none,
+such as the new project's form, since the chat creates no project, and
+the pulse sentence, which every turn's context carries. A parity test
+reads the table and fails on a route with neither, and on a GET route
+registered beside it. Live in Stage 17 (09:39Z), one chat turn per new
+read was answered from its tool. One gap showed: `costs` by card reads
+the month only (roadmap 158).
 
 | Tool | Does | Default OK |
 |---|---|---|
@@ -2479,9 +2491,14 @@ card and the status line show the GitHub pull request's state. The
 export's token has no pull-request permission, so the GitHub step needs
 the rotated token with "Pull requests: read and write". In the exit test
 the chat set uptime2's export to pull request mode with no token in the
-chat.
-TODO(close): whether a merged card reached GitHub as a pull request, and
-whether Sync latest brought a GitHub commit back.
+chat. A merged card's branch reached GitHub within 36 s of its merge, and
+GitHub refused its pull request. The card's GitHub line then read "failed:
+factory/t-fe37611fcddb is on GitHub, but the export's token may not open
+pull requests: it needs the permission "Pull requests: read and write"",
+as Ruling 278 expected. Sync latest, asked for in the chat, brought a
+GitHub commit back as uptime2 pull request #43 from the bot's fork, its
+diff exactly that commit's one line, and it merged after its CI and an
+approving review (Stage 17, 09:29Z and 09:36Z).
 
 Import, built in Stage 16, starts a project from a GitHub repository: the new-project form
 takes a GitHub source and an optional token, registration migrates the
@@ -2666,16 +2683,19 @@ table (5.6). What it adds to the chat besides:
   opencode's step cost is always 0: the factory's provider config
   publishes no price. The two tools' descriptions name the cost line, so
   the agent picks them for cost questions. The session read's spend sum, a
-  sum of those zeros, went.
-  TODO(close): whether a read showed the cost line live in the exit run.
+  sum of those zeros, went. Live in Stage 17's exit run (09:16Z), a
+  `card` read carried one cost line per alias, and the agent quoted them
+  right. A question asked before that read was answered from a `session`
+  read 64 minutes old in the conversation (roadmap 180).
 - **The approve warning** (roadmap 172). An `approve_merge` proposal
   carries the review's open findings, five and then "and N more", and the
   failing checks, or "Checks: <state>." for a red run with no failing job
   listed, as a warning in its description. The prompt states one fact: the
   member decides, and a proposal shows them the facts (Ruling 263). A
   proposal for `approve_merge` without a pending merge request is refused,
-  as Do it refuses.
-  TODO(close): the live check's result.
+  as Do it refuses. Live in Stage 17's exit run (09:17Z), three turns
+  "Approve the merge of card #36." each drew the proposal with the
+  review's open finding as its warning, and none was confirmed.
 - **The split** (roadmap 159, Rulings 277 and 292). On a card whose large
   pull request waits for approval, an approver's Split or a confirmed
   `split_card` runs a planner session on the large branch, read through
@@ -2689,10 +2709,10 @@ table (5.6). What it adds to the chat besides:
   escalates while the approval waits. Approve is refused while the split
   runs. The split session spends from the large card's budget outside its
   session cap. The change id is `split`.
-  TODO(close): the live split's result.
+  TODO(close): the live split's result (uptime2#48, filed at 10:11Z).
 
-What stays open is in the roadmap (148, 158 to 160, 163, 164, 166, 172,
-176 and 178 to 182).
+What stays open is in the roadmap (148, 158 to 160, 163, 176 and 178 to
+186).
 
 TODO(close): the exit test's result and its measures against Stage 16's
 run 2.
@@ -4479,7 +4499,7 @@ since Stage 6, but neither has run under load.
 | Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list. Servers and volumes, no buckets. SSH certificates bound to one server. Outbound tcp 53, 80 and 443. Deletion at the last tick before the lease ends | Built (Rulings 80, 83, 121, 122, 124, 125) |
 | Collector safety | A pass that sees a cluster node's IPv4 or another project's label deletes nothing | Decided (Ruling 123) |
 | Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Built (Rulings 81, 84) |
-| Project screen | One screen per project (5.7): status line, pulse, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export. Since Stage 16 the board's reads and actions are chat tools, the `system` tool is rendered from the code, refusals name the fitting action, and the planner asks its open questions before acceptance. Stage 17 built the drawer's Chat tab, the message queue, the status line across both columns, the event stream without a poll, the split, the approve warning and GitHub pull request mode | Built in Stage 15 (Rulings 251 to 260), exit test passed. Stage 16 (Rulings 261 to 270) built the chat as the window, members, approvers per project and GitHub import and export on 2026-10-11. Its exit test's chat-only run had one gap, main's CI result, which the `ci` read built after the run closed. A fix round the same evening built the fixes for seven of its findings. Stage 17 (Rulings 272 to 306) built its items but 4.11 on 2026-10-12. TODO(close): 4.11's landing and the exit test result |
+| Project screen | One screen per project (5.7): status line, pulse, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export. Since Stage 16 the board's reads and actions are chat tools, the `system` tool is rendered from the code, refusals name the fitting action, and the planner asks its open questions before acceptance. Stage 17 built the drawer's Chat tab, the message queue, the status line across both columns, the event stream without a poll, the split, the approve warning and GitHub pull request mode | Built in Stage 15 (Rulings 251 to 260), exit test passed. Stage 16 (Rulings 261 to 270) built the chat as the window, members, approvers per project and GitHub import and export on 2026-10-11. Its exit test's chat-only run had one gap, main's CI result, which the `ci` read built after the run closed. A fix round the same evening built the fixes for seven of its findings. Stage 17 (Rulings 272 to 306) built its items on 2026-10-12, 4.11 last, live since roll #488. TODO(close): the exit test result |
 | Merge authority | The `factory-merge` bot merges after a whitelisted human's approval, enforced by Forgejo's branch protection. Merge retries are capped at six. A project on `auto` merges class `normal` without a card after a proven reproduction or a strict improvement and an approving review; the factory's repositories stay on `human` | Built (Rulings 109, 129). `auto` built (Rulings 149, 167, 169) |
 | Intake lanes | Lanes backlog, plan and ready from the project's process, `moved_by` judging every entry. Every bug from any account or alert starts a task. Improvements wait in the backlog for a writer, with an analyzer's write-up. Outsiders' bug reports pass a screening stage. Outsiders' writer-only labels are stripped. The poster's text is untrusted information between random markers | Built (Rulings 148, 150, 182, 185) |
 | Projects | Each project its own Forgejo organisation with a CI user, runner registration, deploy key and deploy branch. Flux tenancy through a namespaced account. A default-deny network policy with the file's outside hosts only and a quota per environment. Stricter wins: a project file only tightens the policy's defaults. Reconciled hourly. Settings from the project's file, `objects: factory \| seed` and `agents: coder \| none`, so the factory's two repositories are projects like any. Registered by the reconcile with the admin's login from OpenBao. A cache volume per project for agents and pull request CI. Hostnames are an infra commit. Since Stage 17 a Template update pull request per project keeps the template's files in step | Built (Rulings 146, 155, 156, 157, 164, 165, 166, 179, 296) |
