@@ -33,8 +33,11 @@ questions before acceptance, budgets by plan size, the deploy gate, a
 provider refusal that costs no attempt, rolls in a session gap, members
 with approvers per project and GitHub import and export. In its exit test
 the chat alone built an app with one gap, main's CI result, and a read
-built the same evening closed it. Sections that describe built behaviour
-say so. The rest is still design. We amend this file as the design moves,
+built the same evening closed it. Stage 17 put the lane on its default
+tier with each call's cost on the ledger, closed most of what Stage 16 left
+open, and built the screen's open points (5.7) on 2026-10-12.
+TODO(close): Stage 17's exit test result.
+Sections that describe built behaviour say so. The rest is still design. We amend this file as the design moves,
 so it always holds the current design plus the explanations behind it.
 Rulings live in the build ledger and are cited here by number.
 
@@ -1061,7 +1064,9 @@ issue finishes it `closed` (since the fix round after Stage 16, 7), a trusted
 change request runs another session with the request as findings.
 Attempts start on `coding-cheap`; red checks or a repetition trip
 move the next attempt to `coding-frontier` (Ruling 86), and since Stage 12
-so does the stuck rule (6.6). The wall-clock cap
+so does the stuck rule (6.6).
+Since Stage 17 these climbs are the only way to `coding-frontier`: the
+gateway refuses an agent's call on any alias other than its task's (5.3). The wall-clock cap
 counts the agent's working time across attempts, not time since intake,
 because a PR image build alone takes longer than a session (Ruling 93);
 human waits have no timer, since a Temporal wait costs nothing. Terminal
@@ -1293,6 +1298,20 @@ app registered live after roll 7914efb:
   `internal/server/server.go` and spent a short session merging `main`:
   the template has one registration point where each feature needs its
   own (roadmap).
+  Since Stage 17 template updates reach existing projects. A template
+  pass 5 minutes after factoryd starts, hourly and on each new config
+  version compares each project's `.forgejo/` files and `deploy/smoke.sh`
+  with the template's render, and keeps one "Template update" pull request
+  per project in step: it opens it, updates it, or closes it with a
+  comment. The branch lives on a fork that `factory-projects` owns, since
+  a same-repository pull request's job token can write and the template's
+  `job-env-audit` refuses that. The pass writes only `.forgejo/` and
+  `deploy/`, adds `deploy/smoke.sh` only when main lacks it, merges main
+  into a pull request that no longer merges, and leaves a person's close
+  without a merge standing until the render changes (Ruling 296). The pull
+  request passes the project's normal gates. Live, the pass opened
+  uptime's and hello-import's pull requests and, once the template moved
+  the smoke job to a runner of its own (7.1), uptime2's, which merged.
 
 Per-project settings are a file since Stage 9, `factory/projects/<name>.yaml`
 in the infra repository (Rulings 146, 179, 183, Task 73): the repository,
@@ -1339,9 +1358,11 @@ the factory's own code repository. A project file's `approvers:` replaces
 the policy's list for that project, and registration gives Forgejo's
 whitelist the same names. A member is invited in Forgejo or through the
 chat's confirmed `invite`. Export is a Forgejo push mirror to a GitHub
-repository the member names, kept in `project_mirrors`. Import migrates a
+repository the member names, kept in `project_mirrors`, or since Stage 17
+a GitHub pull request for each merged card (5.7). Import migrates a
 GitHub repository into the new Forgejo repository at registration, through
-Forgejo, in place of the empty one, and the seed adds only the template's
+Forgejo, in place of the empty one, since Stage 17 in a goroutine of its
+own, and the seed adds only the template's
 workflow files and AGENTS.md. The chat never creates or manages a project.
 
 The demo app, the first project, is a Go link shortener with Postgres
@@ -1400,7 +1421,9 @@ secrets, and any run of 32 or more token characters. The gateway's audit
 records, the worker's git errors and the gate supervisor's bundle (6.6) all
 use it. The 32-character rule masked commit ids, digests and long paths as
 well, until the bug lane fixed it (backlog 32, #197, merged as daf16c8):
-commit ids, sha256 digests and lowercase repository paths now pass. Proven live on task t-c4e5c525334f: 31 spans under its id (10
+commit ids, sha256 digests and lowercase repository paths now pass. Since
+Stage 17 one pattern there, `redact.GitHubToken`, finds GitHub tokens for
+the chat's scrub (5.7) and the audit's diff scan (7). Proven live on task t-c4e5c525334f: 31 spans under its id (10
 from factoryd, 14 from the gateway, 7 from the worker), 5 audit records equal
 to its 5 audit rows, and none of 37 gateway records holding `sk-`, `Bearer`,
 `BEGIN` or a fragment of the gateway's own keys. The live data found one
@@ -1452,7 +1475,18 @@ options. A CI job on the infra repository runs `factoryd config check` on
 every push to `main`, with the loader's own judgement, so a tree factoryd
 would refuse turns the check red; a schema change needs the regenerated
 `factory/schema/` and the check's `FACTORYD_IMAGE` in the same infra
-commit. A refused commit logs `CONFIG REJECTED`, keeps the old version
+commit. Since Stage 17 `factoryd config check` validates against the
+schemas built into the binary: a stale copy in `factory/schema/` exits 0
+with a warning that names the directory, and a foreign file exits 1. When
+factoryd's schemas differ from infra main's copies, the bot opens one infra
+pull request "Schema copies for <id>" from its fork, as a roll does, cuts
+its branch fresh each time and closes an older one naming the new. An
+approver merges it like a project file (Ruling 303). The lane's first
+version wrote with the projects token, which cannot reach infra (Ruling
+164).
+TODO(close): whether the bot opened "Schema copies for <id>" live after
+roll #486.
+A refused commit logs `CONFIG REJECTED`, keeps the old version
 current and raises an alert of kind `config_rejected`, which files an issue
 in the infra repository's human lane. The next valid commit closes that
 issue, ends its task and judges the alert real. Ten failed reads in a row
@@ -1495,6 +1529,8 @@ Besides its `version`, `policy.yaml` holds eleven sections:
   with its outcome. Since Stage 16 `large_lines` (1000) makes a pull
   request over that many changed lines class large, which needs a human
   and ranks above normal. 0 switches it off.
+  Since Stage 17 an approver can have a planner split such a pull request
+  into two or three cards (5.7).
 - `envelope_default`: the standard resource envelope (5.5).
 - `project_default`: a new project's quota and standing block (5.1, 5.5).
   Every project file names its own merge rule since Stage 9.
@@ -1531,6 +1567,9 @@ Besides its `version`, `policy.yaml` holds eleven sections:
   becomes 0. The class `planner` sets 30 minutes and no check-in. Every
   session kind, plan and report sessions included, takes its time from
   the task's class, process and project.
+  Since Stage 17 `stronger_after` is 3, the session cap, so returning
+  findings never climb a card, and the frontier tier comes only through
+  `retry_stronger` (Ruling 299).
 
 Stage 15 added a twelfth section, `chat` (Rulings 252 and 259, 5.7),
 which a project's file may set as well: the project agent's model alias,
@@ -1544,13 +1583,14 @@ chat:
   confirm: [new_card, move_card, answer, steer, start_plan, retry,
             accept_plan, request_changes, reject_plan, approve_merge,
             deny_merge, invite, github_export, close, edit,
-            grant_session, set_dependency]
+            grant_session, set_dependency, split_card, github_sync]
 ```
 
 A tool in `confirm` renders a proposal with a Do-it button, a tool outside
 it applies at once, and an empty list lets the agent do everything it is
 told. Stage 16 added `invite`, `github_export`, `close`, `edit`,
-`grant_session` and `set_dependency` to the defaults, and no read tool is
+`grant_session` and `set_dependency` to the defaults, Stage 17
+`split_card` and `github_sync`, and no read tool is
 ever in them (Ruling 261). `monthly_eur` is the budget of the project's
 chat task each month, which the agent's and the pulse's calls share (5.4).
 `confirm` is a preference, not a cap, so stricter wins (below) does not
@@ -1613,7 +1653,11 @@ task headroom (else 402 `refused_budget`) and the day headroom (else 402
 `refused_day_cap`). It refuses routing overrides in the request body, such as
 LiteLLM's client-side `fallbacks`, which would reach any model under an
 allowed alias. It admits function tools and text parts only. Each minted key
-carries the class's model list, so LiteLLM refuses other models as well.
+carries the class's model list, so LiteLLM refuses other models as well. Since
+Stage 17 the gateway refuses with 403 an agent's call on an alias other
+than its task's `model_alias` and names both aliases (Ruling 279). Before,
+an agent could call any alias its class lists, `coding-frontier` included.
+factoryd's own identities keep the aliases of their purposes.
 Since Stage 10 one admission check serves the tool list and the call (Task
 89): `tools/list` shows a session only the tools its classes may call, the
 brief names the same tools, and a hidden tool called anyway is refused
@@ -1740,6 +1784,21 @@ model review, tool calls and commissioned resources take holds in the same
 table. LiteLLM's `fail_closed_budget_enforcement` and the per-key
 `max_budget` stay the backstop.
 
+The worst case for a call's input was its request body's bytes, each
+priced as an uncached token. On the factory's own code that bound refused
+calls whose real cost had headroom. Stage 16's 402 text "at most N input
+tokens" carried N as the body's bytes plus 64, from 257,335 to 491,845,
+while the call before the largest refusal carried 141,907 prompt tokens,
+141,312 of them cached. Since Stage 17 the hold calibrates from the task's
+earlier call on the same ref (Ruling 274): tokens = bytes x its prompt
+tokens / its bytes, up to its prompt tokens at the cache-read price and the
+rest at the input price, plus 25 percent. A first call keeps the byte
+bound. A missing cache-read price falls back to the input price. An
+underestimate is bounded per call in flight, and `max_budget` stays the
+backstop. The review recomputed one hold by hand: 139,218.75 tokens and
+0.02190103125 EUR held, where the byte bound of a first call holds 0.154644
+EUR against a booking of 0.007818.
+
 A real cost above its hold is booked in full and flagged `allowed_over_hold`
 in the audit (Ruling 117). The cap then holds by refusing the next call. A
 call cut mid-flight, because the issue closed or the session stopped, books
@@ -1766,6 +1825,13 @@ spend and take nothing from the day's headroom. factoryd serves the sums
 per task and per day at `GET /costs`, and the console shows them. With Task
 71, each task's total also lists its lines by kind and ref, so the review
 reads as `model review/review-frontier`.
+
+Since Stage 17 a model call's row carries its prompt, cached and output
+tokens and its request body's bytes (`prompt_tokens`, `cached_tokens`,
+`output_tokens`, `body_bytes`), and the `card` and `session` reads turn
+them into a cost line (5.7). The booking was right before: the gateway
+books LiteLLM's own cost, cached tokens at the cache-read price, and the
+ledger rows checked equal their LiteLLM spend log rows.
 
 Stage 15 added two refs (Ruling 252, 5.7): the project agent's calls book
 under `operator` and the pulse's under `pulse`. Both book on the project's
@@ -2044,6 +2110,20 @@ without an issue. The chat's `close` runs the same action (5.7).
   cookie signed with HMAC-SHA256, so an anonymous `/login` keeps no state on
   the server. The human's tokens stay in factoryd and never reach the
   browser.
+  Since Stage 17 the login sessions live in the table `console_sessions`
+  (roadmap 164, Ruling 276): the session id as a SHA-256 hash, the login,
+  the CSRF token, the created and last-seen times, and the member's
+  Forgejo access and refresh tokens, sealed with AES-256-GCM under a key
+  derived from the console's session key, with the id hash as additional
+  data. The cookie is unchanged. An expired row is refused and deleted,
+  logout deletes the row, and a store error answers 503 and keeps the
+  stream. A token refresh reads the row again first, since Forgejo
+  invalidates a refresh token on use and two requests with one cookie
+  would otherwise both refresh with it. So a roll no longer logs a member
+  out. The lane probe built it, and a controller follow-up fixed the
+  refresh.
+  TODO(close): the live check, the board answering 200 without a new
+  login after roll #486.
 - **Who gets in.** Only users with write access or more on the repository,
   checked at login and again on every request. factoryd caches
   the writer list for a minute and shares one fetch between requests. When
@@ -2082,7 +2162,9 @@ Designed on 2026-10-10 for Stage 15 (Rulings 251 to 256) and built on
 2026-10-11 (Rulings 257 to 260), except members, approvers per project and
 GitHub import and export. The exit test passed the same day. Stage 16
 (Rulings 261 to 270) built members, approvers per project and GitHub import
-and export the same day and made the chat the window (below). Where the
+and export the same day and made the chat the window (below). Stage 17
+(Rulings 272 to 306) built the screen's open points on 2026-10-12 and
+closed most of what Stage 16 left open (below). Where the
 build differs from the design, the paragraph says so. The design baseline
 is Sebastian's conversation on the human's side of the factory,
 [ai-software-factory-ux-conversation.md](ai-software-factory-ux-conversation.md),
@@ -2115,6 +2197,9 @@ sandbox becomes a card.
   added a Waiting count, where a card waiting on the provider counts, and
   "GitHub: <state>" at the end for a project with an export, which the
   registrar refreshes each minute.
+  Since Stage 17 the status line spans both columns, the board's and the
+  chat's, and for a project in pull request mode it counts the open GitHub
+  pull requests, live "GitHub: 0 open pull requests".
 - **Pulse**: what to understand about it. One sentence under the status
   line, the single most useful thing to know now, which a click expands to
   three or four bullets. A cheap model writes it from the board snapshot
@@ -2142,15 +2227,27 @@ sandbox becomes a card.
   narrow screen the chat and the board become two tabs. Built at 36 percent
   of the width from 1200 px, two tabs below. A tool block shows the
   result's first line, a proposal has Do it and Skip, and `#n` in a reply
-  opens the card's drawer. There is no message queue: the input waits
-  while a turn streams. Since Stage 16 "New conversation" starts afresh,
-  and the old conversations stay readable but not writable.
+  opens the card's drawer. Since Stage 16 "New conversation" starts
+  afresh, and the old conversations stay readable but not writable. Until
+  Stage 17 the input waited while a turn streamed. Since then the
+  member's next messages wait in a queue under the input, each editable in
+  place and removable, and go out in order as their own turns when the
+  turn ends. Live, two messages typed during a turn went out in order.
 - **Card drawer**: everything about one piece of work. It opens beside the
   board at 40 to 50 percent of the width, with the tabs Overview, Activity,
   Files and Chat. Chat is the default tab on a running card, as in the
   dummy's fourth iteration, and the per-card chat and its steering box stay
-  as proposal-v1 designed them. Built with three tabs, Overview, Activity
-  and Files. The Chat tab is not built.
+  as proposal-v1 designed them. Stage 15 built three tabs, Overview,
+  Activity and Files. Stage 17 built the Chat tab, the default on a
+  running card: the newest session's agent text and its steers, and a
+  steer box that posts to `POST /tasks/{id}/steer`, which runs `doSteer`
+  with the chat's token scrub. factoryd publishes a running session's
+  agent text as `session_said` on the event bus, to the project's writers
+  only, with a 16-event buffer that never blocks, and never stores it. The
+  tab reloads on a reconnect and when the session ends, and a steer being
+  typed survives the reload. Live, the drawer of a running card opened on
+  Chat with its session's messages and the steer box. Overview's top block
+  and collapsed sections are roadmap 177.
 
 **One event per act.** Every console action records one event, with the
 field `via` saying whether a button or the chat made it. The project's
@@ -2159,11 +2256,19 @@ events are one feed at one endpoint, and SSE carries them to the board
 refreshes on events. Built as the `events` table, with `via` one of
 `button`, `chat`, `webhook` and `factoryd`, the feed at
 `GET /projects/{name}/events` and the stream at its `/stream`, which
-replays from Last-Event-ID. A 30 s poll beside the stream keeps the
-counters right, 3 s when the stream fails. The build added event kinds:
-`task_status` on every status or gate change, `question_asked`,
-`card_commented`, `comment_deleted`, `card_steered`, and `pulse` and
-`pulse_computing`, which stay out of the feed and the agent's context.
+replays from Last-Event-ID. Stage 15 ran a 30 s poll beside the stream for
+the counters, 3 s when the stream failed. Since Stage 17 no client timer
+runs (Ruling 288). The stream's server heartbeat every 25 s reads the
+counters and sends a board event when a card's fingerprint (the stale
+ring, a provider wait, the checks, the minute ages) or the pulse's spend
+changes, and a reconnect reads the board once. A writer's stream reads the
+board at the heartbeat, and a reader's stream carries no event rows. Live,
+a 156 s network trace of a board held one EventSource and no request after
+0.4 s. Stage 15's build added event kinds: `task_status` on every status or gate
+change, `question_asked`, `card_commented`, `comment_deleted`,
+`card_steered`, and `pulse` and `pulse_computing`, which stay out of the
+feed and the agent's context. Stage 17 added `session_said`, on the bus
+only, and `card_steered` carries the steer's text.
 
 **The columns are a view** (Ruling 255). Each column is a fixed group of
 the task states the factory already has, not a new state machine:
@@ -2226,8 +2331,12 @@ accent. The round lifted 16 console handlers into shared functions
 (`internal/console/actions.go`), each with its checks inside, which the
 buttons and the tools both call, and Stage 16 four more for its writes.
 Stage 15 built 6 read and 14 write tools. Stage 16 added 9 reads and 6
-writes (below), so the chat has 15 reads and 20 writes. `github_sync` is
-not built (roadmap 148).
+writes, and Stage 17 two writes, `split_card` and `github_sync` (below),
+so the chat has 15 reads and 22 writes.
+TODO(close): Stage 17's reads `alerts`, `resources`, `projects` and
+`policy`, `costs` by day, card and tier, and the writes `alert_verdict`,
+`promote_resource` and `release_resource` (roadmap 158), once they land,
+with the parity test and the new-project panel as its named exception.
 
 | Tool | Does | Default OK |
 |---|---|---|
@@ -2242,10 +2351,12 @@ not built (roadmap 148).
 | `approve_merge`, `deny_merge` | merge decisions | confirm |
 | `set_summary`, `set_accent` | metadata | none |
 | `invite` (Stage 16) | add a member | confirm |
-| `github_export` (Stage 16) | mirror | confirm |
+| `github_export` (Stage 16) | mirror, or since Stage 17 pull requests | confirm |
 | `close`, `edit` (Stage 16) | close a card, edit its title or body | confirm |
 | `grant_session` (Stage 16) | one more session for a capped card | confirm |
 | `set_dependency` (Stage 16) | add or remove a dependency | confirm |
+| `split_card` (Stage 17) | split a large card's pull request | confirm |
+| `github_sync` (Stage 17) | Sync latest from GitHub | confirm |
 
 `answer` and `steer` confirm by default (Ruling 259), because the text the
 agent reads from cards and events is untrusted and could ask for either. A
@@ -2334,28 +2445,68 @@ registered by the reconcile (Ruling 219, 5.1). The chat does not create
 projects. Export, built in Stage 16, is a Forgejo push mirror from the
 project's repository to a GitHub repository the member names, made through
 the projects token and kept in `project_mirrors`. The chat's confirmed
-`github_export` or the projects page sets it. The chat holds the token in
-memory until Do it, every stored row holds `[token]` in its place, events
-hold the remote only, and an unconfirmed token expires with its proposal.
-A token typed into the chat still reaches the model provider, and the
-projects page's form keeps it away (roadmap 163). The status line and the
+`github_export` or the projects page sets it. Since Stage 17
+`github_export` takes no token: it uses the token the projects page's form
+stored and, without one, refuses with the form's link. The chat's POST
+scrubs GitHub token shapes (`gh[pousr]_` with 36 base62 characters,
+`github_pat_` with 22) to `[token]` before the store and the provider, and
+the reply carries a server line that links the form. A steer from the
+drawer passes the same scrub. Live, a dummy token reached neither a stored
+row nor LiteLLM's spend log. The token that Stage 16's exit run typed into
+the chat waits for Sebastian's rotation (roadmap 163). The status line and the
 snapshot end with the mirror's state. Seed projects are refused, since the
 push-mirrors job mirrors them (Ruling 126). In the exit test the chat set
-an export, and GitHub held the branches within a minute. Import, built in
-Stage 16, starts a project from a GitHub repository: the new-project form
+an export, and GitHub held the branches within a minute.
+
+Since Stage 17 (roadmap 148, Rulings 278 and 285) an export's mode is
+`mirror` or `pull_requests`. In `pull_requests` mode there is no push
+mirror. A pass each minute pushes each card done since the export was set,
+from `refs/pull/<n>/head`, to GitHub, opens a GitHub pull request to the
+default branch with the export's stored token, and keeps its number, URL
+and state on the card, read again at most every 5 minutes while it is
+open. A read of the GitHub repository comes before any fetch, and a 401 or
+404 fails the card with a plain line. Sync latest, the chat's
+`github_sync`, runs asynchronously: it fetches GitHub's default branch,
+capped by GitHub's size, and brings it back as `github/sync-<sha>`, and the
+bot opens its Forgejo pull request from its fork, so its CI gets no
+secrets and a read-only token. A GitHub head that changes `.forgejo`,
+`.gitea` or `.github` is refused (Rulings 90 and 100). git runs inside
+factoryd, one operation at a time, with low-memory settings, a 200 MiB
+cap before any fetch and a 4-minute pass deadline, the token in git's
+environment only (6.4). A Kubernetes Job would need the token in a Secret
+plus RBAC and policy, and Forgejo's push mirror would force every ref. The
+card and the status line show the GitHub pull request's state. The
+export's token has no pull-request permission, so the GitHub step needs
+the rotated token with "Pull requests: read and write". In the exit test
+the chat set uptime2's export to pull request mode with no token in the
+chat.
+TODO(close): whether a merged card reached GitHub as a pull request, and
+whether Sync latest brought a GitHub commit back.
+
+Import, built in Stage 16, starts a project from a GitHub repository: the new-project form
 takes a GitHub source and an optional token, registration migrates the
 repository through Forgejo instead of creating an empty one and clears the
 token after, and the template's workflow files and AGENTS.md go in as one
 commit, "Factory workflows". A source without main gets main from its
 default branch. Since the fix round after Stage 16 a repository without
 `deploy/` also gets the template's `deploy/`, and the commit reads "Factory
-workflows and manifests". An existing empty repository whose import has
-been pending over 20 minutes counts as the import of an empty source and is
-seeded with the whole template, and a pending import row that no project
-file names is purged after 7 days, its token with it. The migrate still
-holds up the other projects' reconciles, up to 10 minutes (roadmap 176).
-Pull request workflows to GitHub, the conversation's preference once the
-system matures, are a roadmap item (148).
+workflows and manifests". A pending import row that no project file names
+is purged after 7 days, its token with it. The fix round took an existing
+empty repository whose import had been pending over 20 minutes as the
+import of an empty source, seeded with the whole template. Since Stage 17
+(roadmap 176) the copy runs in a goroutine of its own per project, so no
+other project's reconcile waits on it. The row reads "copying since
+<time>", the end writes imported and reconciles that project at once, and
+a failure writes failed. Forgejo 15.0.9 keeps the repository when it
+refuses a migrate. So a pending or copying row over an empty repository
+older than 20 minutes asks GitHub whether the source has a commit: a 409
+"Git Repository is empty" makes it an empty source, and a commit makes the
+site admin delete the empty repository, after a second read, and copy
+again (Ruling 281). A failed row's repository is deleted and copied again
+after 20 minutes without that call (Ruling 289), and failed rows join the
+7-day purge. Live, sqlite/sqlite's 577 MB copied in 67 s while the other
+projects' reconciles went on. A filing whose infra pull request merges
+after the purge still loses its import (roadmap 176).
 
 **Round 1** (Ruling 256) built the event spine, the status line, the
 pulse, the chat, the board beside the chat with fewer columns, and inline
@@ -2466,9 +2617,10 @@ events, and depth comes through a tool. What each part does:
   by creating it in the project's staging manifests. A missing Secret is a
   red check, and the template tells the deploy card to print the script's
   failure reasons to stdout, since the runner's job log hides stderr. A
-  project seeded before the template change keeps its old CI (roadmap 165),
-  and a fork's pull-request run can reach staging on 8080, without secrets
-  (roadmap 162).
+  project seeded before the template change kept its old CI, and a fork's
+  pull-request run could reach staging on 8080, without secrets. Since
+  Stage 17 template updates reach existing projects (5.1), and staging
+  admits only the project's smoke runner on 8080 (7.1).
   In the exit test the deploy card's Secret reached CI only after an
   operator named it in the project file, the gap the fix round closed.
 - **Budgets by size** (Rulings 266 and 268, 5.3): small 2, medium 5 and
@@ -2478,8 +2630,8 @@ events, and depth comes through a tool. What each part does:
   whose first call the provider refuses costs no attempt, no agent time
   and no supervisor call. Since the fix round the same holds for a plan or
   report session. The card reads "waiting on the provider", and the status
-  line counts it as waiting, not working. The provider's repetition refusal
-  is not covered (roadmap 155).
+  line counts it as waiting, not working. Since Stage 17 the provider's
+  repetition refusal ends a session with its work pushed (6.6).
 - **Rolls in a session gap** (Ruling 269, 7). A roll merges only when no
   session runs, and new sessions wait while it does, so a roll no longer
   stops a running session. The card's chip reads "waiting for a roll".
@@ -2495,8 +2647,55 @@ outside the chat, 1 misread and 1 chat gap: no tool read main's CI. So zero
 chat gaps was not met as run. The `ci` read, built after the run, closed
 that gap the same evening. Run 2 took each new path once in 48 minutes,
 with no gap and 2 misreads. A fix round the same evening built the fixes
-for seven of its findings (the plan's Stage 16), and what stays open is in
-the roadmap (155, 158 to 166, 172 and 176).
+for seven of its findings (the plan's Stage 16), and the rest was in the
+roadmap (155, 158 to 166, 172 and 176) until Stage 17.
+
+**Stage 17, the lane back and the screen as specified** (Rulings 272 to
+306, built on 2026-10-11 and 2026-10-12). The round closed most of what
+Stage 16 left open and built the screen's open points: the drawer's Chat tab, the
+message queue, the status line across both columns and the event stream
+without a poll (above). The controller built eleven items, and two more
+from lane pull requests, and the lane probe built the console's login
+table (5.6). What it adds to the chat besides:
+
+- **The cost line** (Rulings 275 and 283, 5.4). The `card` and `session`
+  reads carry a cost line: the tier, the calls, the prompt tokens per call
+  (median and maximum, the median of an even count the lower middle value),
+  the cached share and the EUR per call, from the ledger's columns. A step
+  line shows its prompt tokens with the cached share and no EUR, since
+  opencode's step cost is always 0: the factory's provider config
+  publishes no price. The two tools' descriptions name the cost line, so
+  the agent picks them for cost questions. The session read's spend sum, a
+  sum of those zeros, went.
+  TODO(close): whether a read showed the cost line live in the exit run.
+- **The approve warning** (roadmap 172). An `approve_merge` proposal
+  carries the review's open findings, five and then "and N more", and the
+  failing checks, or "Checks: <state>." for a red run with no failing job
+  listed, as a warning in its description. The prompt states one fact: the
+  member decides, and a proposal shows them the facts (Ruling 263). A
+  proposal for `approve_merge` without a pending merge request is refused,
+  as Do it refuses.
+  TODO(close): the live check's result.
+- **The split** (roadmap 159, Rulings 277 and 292). On a card whose large
+  pull request waits for approval, an approver's Split or a confirmed
+  `split_card` runs a planner session on the large branch, read through
+  `refs/pull/<n>/head`, which Forgejo 15.0.9 keeps after the pull request
+  closes. factoryd checks the answer: 2 or 3 cards, each size's line
+  figure under `large_lines`, dependencies acyclic among the children, and
+  every changed file covered by a child's directories, where `.` covers
+  nothing. A pass files the children in lane ready and closes the card
+  with "split into #a, #b", a closed card with a reason, not a new state.
+  A failed check gets one more planner session, and a second failure
+  escalates while the approval waits. Approve is refused while the split
+  runs. The split session spends from the large card's budget outside its
+  session cap. The change id is `split`.
+  TODO(close): the live split's result.
+
+What stays open is in the roadmap (148, 158 to 160, 163, 164, 166, 172,
+176 and 178 to 182).
+
+TODO(close): the exit test's result and its measures against Stage 16's
+run 2.
 
 ## 6. Chunk 4: the worker plane
 
@@ -2559,6 +2758,18 @@ policy, enforced by the gateway, not something the harness is told. Since
 Stage 10 the brief names the factory tools the task's classes may call, so
 the model is not tempted by tools it would be refused (5.3); the gateway
 still decides every call.
+
+Since Stage 17 (Ruling 273) a code session's brief carries a repository
+map, a deterministic step in place of reading calls (Ruling 263). factoryd
+passes the card's directories, from its plan row or from the last
+`Directories:` line of a writer's issue body. The agent worker writes the
+map from its clone after the checkout and before the harness starts, with
+no Forgejo or model call: for each directory each file's first doc line,
+at most 4 KiB in all, every line with its control characters dropped and
+cut at 120 characters, `.git` refused. A card without directories gets no
+map. The brief also tells the agent to run `bash check` when the
+repository has a `check` file, and the factory's own code has one since
+Stage 17 (6.4).
 
 `Message` (Ruling 188, Task 88) puts text into the running session as the
 next user turn. A harness without such a mode answers `ErrNotSupported`,
@@ -2768,6 +2979,19 @@ Sandbox hardening:
   through `go run` at a pinned version in the repository's `check`, over
   the module proxy, and the checks finding carries the failing job's log
   lines (7).
+  Since Stage 17 the sandbox and runner images carry the PostgreSQL 17
+  server from PGDG, its key pinned by fingerprint. `scripts/pg-test.sh
+  <command>` in the factory's code repository starts a throwaway cluster
+  for one command: initdb into a temp directory, a unix socket and no TCP,
+  the server as nobody when started as root. It exports the DSNs the
+  factoryd tests read, runs the command, returns its status and cleans up
+  on every exit. The CI test jobs, `make test` and the repository's `bash
+  check` run `go test` through it, so the Postgres tests no longer skip,
+  where 82 skipped before (roadmap 161). Under gVisor 1932 Postgres tests
+  passed, and `bash check` took 274 s cold and 64 s warm. The runner image
+  grew from 1.08 to 1.39 GB, and the sandbox's /tmp peaks at 793 MB of its
+  1 GiB. Live, the lane probe's agent ran its Postgres store test through
+  the script in the sandbox.
 - Per-task namespace with a ResourceQuota and LimitRange, container limits,
   and size-capped emptyDir volumes. Since 2026-09-29 the sandbox
   container's memory limit is 4Gi and the namespace ceiling 8Gi (1cd22b8):
@@ -2839,6 +3063,13 @@ Sandbox hardening:
   the files idle for 3 days do; claim stamps live outside the caches,
   where a pod cannot forge them, and a 0755 directory the kubelet recreated
   is repaired to 0777.
+  Since Stage 17 every pod command names its binary by absolute path
+  (`/bin/sh`, `forgejo-runner`, `agent-worker`). With `/cache/go/bin`
+  first on `PATH`, a pull-request job could plant a binary that the next
+  smoke pod, main's staging job with `DEPLOY_KEY` or the next agent pod
+  ran, a hole older than the round that Stage 17's review found. Smoke
+  runners mount no cache (7.1), and the reproduction gate runs without it
+  (7).
 - factoryd creates task namespaces through a narrow ClusterRole, and a
   ValidatingAdmissionPolicy confines it to `factory-agents-*` namespaces with
   the restricted Pod Security label, gVisor pods without an automounted API
@@ -2868,6 +3099,11 @@ Sandbox hardening:
   have opened this pod, the one with the master keys, to any public IPv4
   on 1234. The review refused it, and an init container reports the ready
   time instead (7.1).
+  Stage 17 added api.github.com and github.com on 443, for GitHub import
+  and pull request mode (5.7). The factoryd pod also gained a 512Mi memory
+  limit, a 1Gi /tmp emptyDir for git and `shareProcessNamespace`, so the
+  pause container reaps the git helpers a timeout kills, since factoryd
+  runs as PID 1.
 - The worker pod has an ingress rule since Stage 10: only factoryd, on
   8091, the message port (6.2). Every other ingress to a sandbox is denied.
 - factory-gateway has an ingress policy since 2026-09-29 (backlog 26, fixed
@@ -2950,7 +3186,11 @@ As built (Stage 6), with the defaults that tuning starts from:
   diff every 15 seconds from a repository of its own, never running git in
   the agent's repository, so an agent's git config cannot run code there.
 - **Reading without writing** is 24 tool calls and commands without a file
-  change. **Stall** is five minutes without an event.
+  change. Since Stage 17 it is 60 for factoryd, set as
+  `SUPERVISE_READING_WITHOUT_WRITING` in its manifest (Ruling 298): at 24,
+  normal reading on a large card tripped twice within minutes, and the
+  stuck rule moved the card to the frontier tier. A message comes at 60
+  reads, the climb at 120. **Stall** is five minutes without an event.
 - The **check-in** trips at every `check_in` interval (45 minutes by
   default, 5.3) counted from the task's anchor, the deadline minus the
   agent time, so it continues across sessions without a stored flag; a
@@ -3041,6 +3281,9 @@ into the repetition detector twice at the same rung before a roll restart
 ended it. A `retry_stronger` on the last attempt is recorded as a climb
 too, so a new run after a factoryd restart starts on the stronger rung
 (backlog 58, the Stage 10 lane's first merge).
+Since Stage 17 `stronger_after` is 3, the session cap, so returning
+findings never climb a card (Ruling 299). With 1, the lane probe's third
+session ran on the frontier tier for 3.08 EUR in 20 minutes.
 
 **A provider refusal** (Ruling 267, Stage 16). A code session whose first
 call the provider refuses counts neither an attempt nor agent time nor a
@@ -3055,8 +3298,8 @@ for a roll. Since the fix round after Stage 16 the rule covers plan and
 report sessions too (change id `provider-wait-sessions`). A refused plan
 session counts no attempt, and a refused report session no longer fails its
 card. A report task has no issue, so after its sixth refusal it waits on a
-human with no comment, and Close ends it (5.7). The provider's repetition
-refusal is not covered (roadmap 155).
+human with no comment, and Close ends it (5.7). Since Stage 17 the
+provider's repetition refusal ends a session with its work pushed (below).
 
 **The loop nudge** (Rulings 188, 202, Task 88). factoryd counts identical
 calls in a row from the session's event stream: a call is the tool plus
@@ -3079,6 +3322,23 @@ model answered its nudge with "Continuing with a different command form",
 then kept looping in varied forms until `no_write` tripped. A `same_call`
 trip after a nudge rests on unit tests: in the planted proof the model
 reasoned its way out instead of repeating.
+
+**A loop ends the session** (roadmap 155, Ruling 280, Stage 17). Three
+delivered nudges since the last new file change, counted across all
+calls, end the session as a redirect on the trip kind `loop`, with no
+supervisor call. A new file change is a content the session has not seen:
+a file change by its sha256, a moved checkpoint by its diff numbers and
+patch, and an event without a hash counts as new. So a write back to an
+earlier content does not reset the count. The work is pushed, and the next
+session's brief names the loop. The provider's "Repetitive tool calls
+detected" refusal, matched without regard to case and together with
+`(status 400)`, ends a session the same way, so a summary in which the
+model quotes the phrase stays `no_push`. The worker pushes the work of
+every failed session, where Stage 15 lost a diff, and the next brief reads
+"previous session ended unfinished: ..." when the failed session pushed.
+No workflow command changed. Tests carry the acceptance, and by 08:57Z on
+2026-10-12 no live session had ended this way.
+TODO(close): what the exit test saw.
 
 The answers are a part of the next session's brief in their own section,
 newest first, each one tagged with the question it answers (Ruling 118). The
@@ -3428,6 +3688,11 @@ closed as real.
   with a `not_reproduced` note naming the fault and why, the gate comments
   it on the pull request, and the timeline records `not_reproduced`
   instead of `skipped`.
+  Since Stage 17 the gate's pod runs without the agents' shared cache
+  (Ruling 291): Go and npm cold in an 8Gi emptyDir at `/build`, `PATH`
+  without `/cache`, `/bin/sh` by its absolute path. So an earlier session
+  cannot plant `/cache/go/bin/sh` or poison `/cache/go-build` and fake the
+  base's result.
 - **Model review.** `review-frontier` reads the brief, the diff (cut at
   48 KiB until Stage 16, per part since) and the gate results, and answers strict JSON: a verdict of
   `approve` or `concerns`, a summary and findings. The call runs under a
@@ -3474,7 +3739,9 @@ closed as real.
   pre-check scans the diff's added lines for secret shapes (private keys,
   credentials in URLs, bearer tokens, JWTs, provider token prefixes, a
   password or token assigned a literal) and reports file and line, never
-  the value. Then one call on the task class's `audit_model`
+  the value. Since Stage 17 it finds GitHub tokens with
+  `redact.GitHubToken`, which the chat's scrub shares, so `github_pat_` and
+  a token glued to a word no longer pass. Then one call on the task class's `audit_model`
   (coding-frontier on the stronger rung; the gateway admits factoryd only
   the aliases the task's own class names, Ruling 200) reads the diff
   against a fixed checklist of six items: secrets, network egress, RBAC
@@ -3740,6 +4007,26 @@ deploy-key push, and factoryd's port 8080, for the alerts endpoint. Since
 Task 73 the spawner serves every project with `agents: coder`, the
 factory's code repository included, through the same project path.
 
+**The smoke runner** (roadmap 162, Rulings 286, 287 and 295, Stage 17).
+Staging admits only the project's smoke pods on 8080, labelled
+`factory.ai/ci-role: smoke`, and `pr-untrusted` pods have no egress to
+staging. The template's smoke job runs on `<project>-smoke`, and its step
+waits up to 2 minutes for staging. Forgejo 15.0.9's jobs API names no run,
+event or ref for a waiting job. So the spawner binds a smoke runner to its
+one job by handle and starts it without staging. Once the runner has the
+job, the spawner reads the run's index, event and ref from the runner's
+task, and opens staging only for a push to `refs/heads/main`, read from the
+run's `event_payload`, since the run object shows a tag named main as
+`main` too. It tears down any other run's runner with one log line, so a
+pull request's smoke job gets a pod for at most one tick inside the
+`pr-untrusted` egress. Smoke runners mount no cache. The template's update
+pull requests (5.1) moved the smoke job onto the label before the
+spawner's change rolled, so a main smoke job queued on its label until the
+spawner served it, instead of failing (Ruling 295). Live, uptime2's
+main smoke job passed on `uptime2-smoke` in 11 s, and a pull-request job's
+request to staging on 8080 timed out after 15 s and its name did not
+resolve.
+
 The Stage 9 bug lane found three defects here, backlog 61, 62 and 65,
 which the Stage 10 lane fixed (7). A spawn that failed after creating its namespace, on Hetzner's
 "Primary IP limit exceeded" while earlier build VMs' firewalls still
@@ -3779,6 +4066,11 @@ Task 86 and seen live). Since Stage 10 the check fails if either is ever
 non-empty. Workflow files
 come from the head, which is why the worker and factoryd refuse any change
 to the workflow directories.
+Stage 17 read how Forgejo 15.0.9 runs a `pull_request` workflow: from the
+head's workflow file, except that a fork's pull request with an untrusted
+poster and a trusted doer runs the base's. A fork's pull request gets no
+secrets and a read-only token, and a branch of the same repository gets
+every secret and a write token.
 
 Image builds need root somewhere. Every rootless BuildKit path fails under
 gVisor: writing a wide uid map through `newuidmap` is refused, with any
@@ -4140,7 +4432,7 @@ since Stage 6, but neither has run under load.
 | Instrumentation | OTel traces, metrics and logs from factoryd, the gateway and the worker. Audit rows as scrubbed log records, Postgres authoritative. One redact package. CI, build VM and roll metrics. Bounds in policy | Built (Rulings 140, 158) |
 | UI style | Server-rendered Go with htmx | Decided |
 | Policy engine | Go code now, OPA sidecar when rules multiply | Decided |
-| Policy source | The tree `factory/` in the infra repository (policy, projects, processes, templates), read by factoryd, the commit as the version, pinned per task, a generated JSON Schema and a CI check, the console read-only. Runtime decisions are Postgres rows. Kubernetes is the substrate only | Built (Rulings 107, 183, 184) |
+| Policy source | The tree `factory/` in the infra repository (policy, projects, processes, templates), read by factoryd, the commit as the version, pinned per task, a generated JSON Schema and a CI check, the console read-only. Runtime decisions are Postgres rows. Kubernetes is the substrate only. Since Stage 17 the check validates against the binary's schemas, and factoryd opens a pull request for stale copies | Built (Rulings 107, 183, 184, 303) |
 | Workflow | An ordered list of stages, each with one `on_findings` setting (agent, human or fail); a repeat from one stage takes the stronger rung; the session cap is the round cap for every exhaustion; a review without a verdict is a finding on the card; a red head the agent left unchanged re-runs its checks once. Since Stage 11 only a green head merges. Since Stage 12 a pushed head is verified at every cap instead of failing, one cap card, a change request at the cap is the answer, the failing job's log lines in the checks finding | Built (Rulings 177, 190, 193, 201, 221, 225) |
 | Processes | No fixed process: lanes, dependencies, stages and the merge queue as YAML blocks in a process file a project names. A mechanical check (schema, names, needs, graph, floor rules) shared by the loader and `config check`, and `config explain`. Two shipped processes, `maintenance` and `spec`. The later blocks are roadmap 27a | Built (Rulings 206, 208) |
 | Building from a spec | A plan lane whose planner answers a plan, which approvers accept and factoryd turns into cards with their dependencies. Start plan, cards that wait on their dependencies, a merge queue per project, and a new project from the console seeded from a template. Since Stage 12 the template works out of the box with its own `check`, a deployable app and a staging job that waits for the rollout, and registration needs no human password | Built (Rulings 205, 209, 210, 212, 219, 222) |
@@ -4166,7 +4458,7 @@ since Stage 6, but neither has run under load.
 | Hold-out scenarios | Acceptance scenarios a step is graded against, kept outside that step's read access (StrongDM). Would belong to a spec stage of the configurable pipelines | Revisit later, not any time soon (Sebastian, 2026-09-29) |
 | Reader and writer split | A read-only agent for untrusted text, a writer that never sees it (GitLab). Rejected: every agent keeps the exact input, an optional scan for injection attempts guards it instead | Rejected (Sebastian, 2026-09-29) |
 | Command-level policy | Allowlisting commands inside the sandbox (Codex execpolicy, Ona exec-gate, OpenShell binary pins). Rejected: allowlisting every legitimate command is an endless race, so the sandbox allows everything and the blast radius stays contained | Rejected (Sebastian, 2026-09-29) |
-| Hard caps | A hold for each call's worst case under an advisory lock, the output clamped to the headroom, the real cost booked in full, a cut call books its hold until the settle window ends; caps per task, day and UTC month, the month over all projects, with LiteLLM's proxy budget behind it | Decided (Rulings 113, 115, 117, 196, 204) |
+| Hard caps | A hold for each call's worst case under an advisory lock, the output clamped to the headroom, the real cost booked in full, a cut call books its hold until the settle window ends; caps per task, day and UTC month, the month over all projects, with LiteLLM's proxy budget behind it. Since Stage 17 the hold for a call's input calibrates from the task's earlier call on the same ref | Decided (Rulings 113, 115, 117, 196, 204), calibrated (Ruling 274) |
 | Human identity | Forgejo OAuth2 now, Keycloak only if SSO story demands. A project's members are the writers on its Forgejo repository (Ruling 254) | Decided |
 | Sandbox runtime | gVisor on cloud VMs now; microVMs (Kata or Firecracker) on bare-metal KVM nodes when build volume pays for them, for CI jobs and agent sandboxes alike (7.2) | Decided |
 | Worker harness | opencode first. The adapter contract lets several harnesses run side by side, pi and goose are the next to try, the choice is per task class and by measurement | Decided |
@@ -4174,23 +4466,23 @@ since Stage 6, but neither has run under load.
 | Management access | Talos nftables firewall allowlisting your home IP, headscale VPN later | Decided |
 | Repository layout | `ai-software-factory-infra` and `ai-software-factory-code` now, `demo-app` in Phase 3 | Decided |
 | Public DNS | Namecheap DNS stays, HTTP-01 certificates, Cloudflare as the named upgrade | Decided |
-| Untrusted CI runner | factoryd's CI spawner: one ephemeral gVisor pod per job, repository-scoped ephemeral registration, read-only job token, no secrets; the privileged dind runner serves protected `main` only | Decided (Rulings 78, 89) |
+| Untrusted CI runner | factoryd's CI spawner: one ephemeral gVisor pod per job, repository-scoped ephemeral registration, read-only job token, no secrets; the privileged dind runner serves protected `main` only. Since Stage 17 a smoke job runs on a runner bound to its one job, the only pod staging admits on 8080 | Decided (Rulings 78, 89, 286) |
 | PR image builds | A throwaway Hetzner Cloud build VM per job in a CI project of its own, `buildkitd` over mutual TLS, no credential on the VM, cx23 by measurement. The gVisor build pod is gone | Decided (Rulings 103, 106, 110, 127) |
 | PR build speed | Changed images only, parallel builds, no warm step, build VMs, and an in-cluster read-only cache that only `main` writes, streamed to the VM through the runner pod | Built (Rulings 106, 111, 119) |
 | Go module egress | `storage.googleapis.com` joins the CI, build and sandbox allowlists by name, no mirror | Decided (Ruling 114) |
 | Agent pull requests | From a `factory-agent` fork, so PR jobs get a read-only token; two session tokens, read upstream and write the fork; workflow-directory guard in the worker and factoryd | Decided (Rulings 97, 100) |
 | CI registrar | Dedicated `factory-ci` account, organisation owner because the runner API demands it, token scoped to the code repository, `main` protected with `apply_to_admins` | Decided (Rulings 101, 101a) |
 | Missed webhooks | The heal pass re-reads Forgejo every minute and signals what webhooks missed; `Reconcile` at the start of every workflow run | Decided |
-| Supervision | Cheap trace detectors over the event stream, the strongest model as supervisor under its own alias, inside the session activity, at most six calls per session plus a scheduled check-in, paid from the task's remaining budget, choosing continue, message into the running session or escalate; one stuck rule in code ends a session that ignores a message and climbs a rung. Agent time and check-in per class, process and project. Human answers are kept across attempts in their own brief section. A `no_write` progress detector, and a gate supervisor for the six long gates with wait, retry, cancel or escalate. A 6-minute supervisor timeout, every exhausted task to the card, a repeated trip to the stronger rung. A nudge into the running session before the same-call trip | Built (Rulings 82, 86, 87, 118, 120, 141, 154, 161, 162, 163, 186, 193, 202, 216, 217, 218, 224) |
+| Supervision | Cheap trace detectors over the event stream, the strongest model as supervisor under its own alias, inside the session activity, at most six calls per session plus a scheduled check-in, paid from the task's remaining budget, choosing continue, message into the running session or escalate; one stuck rule in code ends a session that ignores a message and climbs a rung. Agent time and check-in per class, process and project. Human answers are kept across attempts in their own brief section. A `no_write` progress detector, and a gate supervisor for the six long gates with wait, retry, cancel or escalate. A 6-minute supervisor timeout, every exhausted task to the card, a repeated trip to the stronger rung. A nudge into the running session before the same-call trip. Since Stage 17 three nudges without new content end the session, the provider's repetition refusal ends it the same way, and the reading threshold is 60 | Built (Rulings 82, 86, 87, 118, 120, 141, 154, 161, 162, 163, 186, 193, 202, 216, 217, 218, 224, 280, 298) |
 | Alerts | An `alerts` table with a verdict per alert, counted in SigNoz, with a precision panel. Alerts on the factory's own namespaces route by the namespace label like a project's | Built (Rulings 140, 180) |
 | Factory model calls | The review and both supervisors call through the gateway with factoryd's token and purpose headers, audited and booked like an agent's | Built (Task 71) |
 | Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list. Servers and volumes, no buckets. SSH certificates bound to one server. Outbound tcp 53, 80 and 443. Deletion at the last tick before the lease ends | Built (Rulings 80, 83, 121, 122, 124, 125) |
 | Collector safety | A pass that sees a cluster node's IPv4 or another project's label deletes nothing | Decided (Ruling 123) |
 | Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Built (Rulings 81, 84) |
-| Project screen | One screen per project (5.7): status line, pulse, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export. Since Stage 16 the board's reads and actions are chat tools, the `system` tool is rendered from the code, refusals name the fitting action, and the planner asks its open questions before acceptance | Built in Stage 15 (Rulings 251 to 260), exit test passed. Stage 16 (Rulings 261 to 270) built the chat as the window, members, approvers per project and GitHub import and export on 2026-10-11. Its exit test's chat-only run had one gap, main's CI result, which the `ci` read built after the run closed. A fix round the same evening built the fixes for seven of its findings |
+| Project screen | One screen per project (5.7): status line, pulse, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export. Since Stage 16 the board's reads and actions are chat tools, the `system` tool is rendered from the code, refusals name the fitting action, and the planner asks its open questions before acceptance. Stage 17 built the drawer's Chat tab, the message queue, the status line across both columns, the event stream without a poll, the split, the approve warning and GitHub pull request mode | Built in Stage 15 (Rulings 251 to 260), exit test passed. Stage 16 (Rulings 261 to 270) built the chat as the window, members, approvers per project and GitHub import and export on 2026-10-11. Its exit test's chat-only run had one gap, main's CI result, which the `ci` read built after the run closed. A fix round the same evening built the fixes for seven of its findings. Stage 17 (Rulings 272 to 306) built its items but 4.11 on 2026-10-12. TODO(close): 4.11's landing and the exit test result |
 | Merge authority | The `factory-merge` bot merges after a whitelisted human's approval, enforced by Forgejo's branch protection. Merge retries are capped at six. A project on `auto` merges class `normal` without a card after a proven reproduction or a strict improvement and an approving review; the factory's repositories stay on `human` | Built (Rulings 109, 129). `auto` built (Rulings 149, 167, 169) |
 | Intake lanes | Lanes backlog, plan and ready from the project's process, `moved_by` judging every entry. Every bug from any account or alert starts a task. Improvements wait in the backlog for a writer, with an analyzer's write-up. Outsiders' bug reports pass a screening stage. Outsiders' writer-only labels are stripped. The poster's text is untrusted information between random markers | Built (Rulings 148, 150, 182, 185) |
-| Projects | Each project its own Forgejo organisation with a CI user, runner registration, deploy key and deploy branch. Flux tenancy through a namespaced account. A default-deny network policy with the file's outside hosts only and a quota per environment. Stricter wins: a project file only tightens the policy's defaults. Reconciled hourly. Settings from the project's file, `objects: factory \| seed` and `agents: coder \| none`, so the factory's two repositories are projects like any. Registered by the reconcile with the admin's login from OpenBao. A cache volume per project for agents and pull request CI. Hostnames are an infra commit | Built (Rulings 146, 155, 156, 157, 164, 165, 166, 179) |
+| Projects | Each project its own Forgejo organisation with a CI user, runner registration, deploy key and deploy branch. Flux tenancy through a namespaced account. A default-deny network policy with the file's outside hosts only and a quota per environment. Stricter wins: a project file only tightens the policy's defaults. Reconciled hourly. Settings from the project's file, `objects: factory \| seed` and `agents: coder \| none`, so the factory's two repositories are projects like any. Registered by the reconcile with the admin's login from OpenBao. A cache volume per project for agents and pull request CI. Hostnames are an infra commit. Since Stage 17 a Template update pull request per project keeps the template's files in step | Built (Rulings 146, 155, 156, 157, 164, 165, 166, 179, 296) |
 | Resource kinds | `task` (leased, agent-requested) and `standing` (no lease, registration or a human) in one envelope | Built (Ruling 147) |
 | Hand steps | OpenBao configuration, push mirrors and the console's OAuth app as converging CronJobs. The unseal and the OpenBao bootstrap, once and again after a change to its engines, policies or roles, stay by hand | Built (Ruling 143) |
 | Spend approvers | The policy's `approvers` list gates resource approval, envelope edits, promotion and the merge approve button. A project file's `approvers:` replaces it for that project since Stage 16 | Decided (Ruling 128), per project built (Ruling 254) |
@@ -4251,8 +4543,12 @@ works `factory` and `demo-app`.
    2026-10-11. Stage 16, the chat as the window, built all of its items the
    same day (5.7), with members, approvers per project and GitHub import
    and export. Its exit test's chat-only run had one gap, main's CI result,
-   and the `ci` read built after the run closed it. The rest is in the
-   roadmap, scoped by Sebastian.
+   and the `ci` read built after the run closed it. Stage 17, built on
+   2026-10-12, put the lane on its default tier with each call's cost on
+   the ledger, closed most of what Stage 16 left open and built the
+   screen's open points.
+   TODO(close): Stage 17's exit test result.
+   The rest is in the roadmap, scoped by Sebastian.
 
 ## 12. Glossary
 
