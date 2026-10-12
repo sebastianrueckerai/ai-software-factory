@@ -54,7 +54,7 @@ Each stage ends with an exit test. A stage starts only after the previous one pa
 | 14 Rebuild | The cluster rebuilt from the round 2 close's backups on a new address set, round 2's findings folded in through the factory's own lane | The step-zero gate passed, and three fold-in cards merged through the lane and rolled |
 | 15 Project chat | The event spine and the live board, the project screen (status line, pulse, five columns, chat, drawer), the project agent inside factoryd, inline answers. Built, exit test passed. Members, approvers per project and GitHub import and export moved to the roadmap | An app built through the chat alone: uptime, about ten cards, a staging deployment and a smoke test, under 50 EUR for the round. Passed |
 | 16 Chat as the window | Proposals and conversations kept in tables, every console read and action as a chat tool, the `system` tool rendered from code, refusals that name the fitting action, the planner's questions before acceptance, the deploy gate and a staging smoke test, budgets by plan size, a provider refusal as no attempt, the review's whole diff, rolls that keep sessions, members and per-project approvers, GitHub import and export. Built by the controller after the lane failed its cards, all of it live, and a `ci` read after the exit test's first run | The uptime spec twice under 50 EUR for the round: through the chat alone with zero chat gaps, then each new path once against Stage 15's baseline. Run 1 built the app through the chat alone in 2 h 45 min with one chat gap, main's CI result, so zero gaps was not met as run. The `ci` read built the same evening closed the gap. Run 2 took the six new paths in 48 minutes with no gap |
-| 17 The lane back | Every finding Stage 16 left open: the lane's cost on the factory's own code (the corrected record on 160, the default tier, a repository map in the brief, the hold's cached input, a cost line), Postgres tests in CI and the sandbox, console logins kept in a table, staging admitting only the smoke job, no GitHub token through the chat, a looping session ended before the provider refuses it, approve proposals with the review's findings, an import that blocks no project, template updates and schema copies as pull requests, every console page a chat tool, a large pull request split by a planner, GitHub pull request mode, the drawer's Chat tab, the message queue and no poll. Then the cluster shut down. Built by the controller, 4.10 and 4.11 from lane pull requests, and the lane probe's 4.3 with a controller follow-up. Every item is on main, 4.11 last at 09:13Z | The lane probe and two more lane cards land within their size budgets with no budget 402 and ruling 271 never triggered; every item's live check; one chat run on uptime2 through the new paths, against Stage 16's run 2. The probe landed at 4.92 EUR of 5, ruling 271 triggered once, and no later lane card landed through the lane, so the lane's criterion is not met. Live checks passed for 4.1a, 4.2, 4.3, 4.4, 4.5, 4.7, 4.8, 4.9, 4.10, 4.11, 4.13's push and Sync latest, 4.14 and three of 4.15's. In progress. TODO(close): the exit run's result, 4.12's live split, the open cases of 4.6 and 4.15, and the shutdown |
+| 17 The lane back | Every finding Stage 16 left open: the lane's cost on the factory's own code (the corrected record on 160, the default tier, a repository map in the brief, the hold's cached input, a cost line), Postgres tests in CI and the sandbox, console logins kept in a table, staging admitting only the smoke job, no GitHub token through the chat, a looping session ended before the provider refuses it, approve proposals with the review's findings, an import that blocks no project, template updates and schema copies as pull requests, every console page a chat tool, a large pull request split by a planner, GitHub pull request mode, the drawer's Chat tab, the message queue and no poll. Then the cluster shut down. Built by the controller, 4.10 and 4.11 from lane pull requests, and the lane probe's 4.3 with a controller follow-up. Every item is on main, 4.11 last at 09:13Z | The lane probe and two more lane cards land within their size budgets with no budget 402 and ruling 271 never triggered; every item's live check; one chat run on uptime2 through the new paths, against Stage 16's run 2. The probe landed at 4.92 EUR of 5, ruling 271 triggered once, and no later lane card landed through the lane, so the lane's criterion failed. Live checks passed for 4.1a, 4.2, 4.3, 4.4, 4.5, 4.7, 4.8, 4.9, 4.10, 4.11, 4.13's push and Sync latest, 4.14 and three of 4.15's. 4.12's split ran live, and its check refused both answers, since one file alone was over the bound, so the member approved #48 whole (ruling 307). Not seen live: 4.6's loop end, 4.15's first-call refusal, and the import's empty-source and purge cases. The chat run passed: the seven cards of plan #35 were done from 07:33Z to about 10:44Z, with 3 misreads, 1 chat gap, 2 clicks outside the chat and 2.88 EUR on the cards, against run 2's 2 misreads, 0 gaps, 2 clicks and 1.53 EUR. Closed at about 11:30Z on 2026-10-12. TODO(close): the shutdown |
 
 The stages map to the build order in architecture 11: Ranch is stages 0 to 3, First loop is 4 to 6, Teeth is 7, Customer is 8, Self is 9. Hardening, Spec and the bugfix rounds are its items 6 to 8, and the project screen its item 9.
 
@@ -4585,10 +4585,7 @@ on its own runner label (infra 14bb1bb, version 486), and
 infra 4bb7feb). factoryd's reading threshold went from 24 to 60 in its
 manifest (ruling 298, code 085cdaf).
 
-Outcome (2026-10-12, drafted at 08:57Z while the exit test ran, brought
-to the report's 10:17Z entry).
-TODO(close): the close's time, and a check that every line below still
-holds.
+Outcome (the close, at about 11:30Z on 2026-10-12).
 
 Every item is on main and live. 4.11 landed last, as eeb8912 at
 09:13:16Z, and rolled with roll #488 at 09:28:15Z. The controller built
@@ -4758,10 +4755,16 @@ landed, and its live check:
   the same way. The worker pushes the work of every failed session, and
   the next brief reads "previous session ended unfinished: ..." when the
   failed session pushed. No workflow command changed. It landed as c77c9f1
-  at 23:38:25Z. Live: by 08:57Z no session ended on three nudges or on the
-  provider's refusal, and tests carry the acceptance, as the plan said.
-  #471's third session pushed at its end on this path.
-  TODO(close): what the exit run saw.
+  at 23:38:25Z. #471's third session pushed at its end on this path.
+  Live: in the whole round no session ended on three nudges, and no
+  provider refused a session as repetitive. From 22:40Z on 2026-10-11 the
+  supervisor tripped 16 times on repetition (13 messages, 3
+  `retry_stronger`), 4 on `flip_flop` (2 messages, 2 `retry_stronger`), 5
+  on `same_failure` (4 messages, 1 continue) and 4 on `no_progress`
+  (continue), and the session cap brought 3 escalations. So the
+  supervisor's message and the stuck rule's climb met each loop before a
+  third nudge could end it. The loop end and the refusal path rest on
+  their tests, as the plan said.
 - 4.7, the approve warning (controller, with 4.5, roll #465): an
   `approve_merge` proposal carries the review's open findings (five, then
   "and N more") and the failing checks, or "Checks: <state>." for a red
@@ -4899,9 +4902,27 @@ landed, and its live check:
   00:38:25Z. No exit card's pull request crossed `large_lines` 400, since
   #36 to #39 merged small. So at 10:11Z the controller filed uptime2#48
   "Public status page" (t-12db1ae81145, budget 2 EUR), a server-rendered
-  `/status` page with its JSON twin, sized to cross 400 lines.
-  TODO(close): the live check, #48 split through a confirmed `split_card`
-  and its children landed.
+  `/status` page with its JSON twin, sized to cross 400 lines. #48 opened
+  PR #49 with +918 -3 in 7 files and reached approval 499 at 0.42 EUR,
+  with "risk class large: a human decides the merge" and the review's
+  approve. The chat turn "Card #48's pull request is too large to review.
+  Split it." drew `split_card`, and Do it started the split at 11:12:52Z.
+  The planner ran twice (sessions s-5f6e9e9c6749 and s-ea70766a2462), and
+  factoryd's check refused both answers: "split: card
+  status-tests-and-link is medium, up to 600 changed lines; each card
+  stays under 400". At 11:15:17Z the card escalated with "The split failed
+  its check twice; approve, deny or split the pull request again." The
+  cause is by construction. `internal/server/routes_status_test.go` alone
+  changed 458 lines, over the bound of 400 (ruling 301), and a split cuts
+  along files, so no split could meet it. The sizes a card may take (small
+  300, medium 600, large 1000 lines) are fixed and not derived from the
+  bound (roadmap 159). The member approved #48 whole through the chat
+  (ruling 307), and it was done at 0.59 EUR. So the planner, the check and
+  the escalation ran live, and the children's landing was not seen live.
+  At 11:13:54Z, between two sessions of #48, factoryd logged one lease
+  admission write refused as forbidden, since the previous session's
+  namespace was being deleted. The next session ran, and no effect was
+  seen (roadmap 188).
 - 4.13, pull request mode to GitHub (controller, roll #472, factoryd
   f6b95da50f2b at about 01:20Z): an export's mode is `mirror` or
   `pull_requests`, and the second has no push mirror. A pass each minute
@@ -4978,14 +4999,14 @@ landed, and its live check:
   closed it. The events card_closed,
   closing, closed and task_ended came from 09:40:05Z to 09:40:11Z, at
   0.002 EUR. The card read answers "closed (was closed), EUR 0.00 of EUR
-  2.00".
-  TODO(close): a plan or report session's first-call refusal waits on the
-  provider, or "not seen" if no outage occurred.
-  TODO(close): the import's empty-source and purge cases, or "no fixture allowed it".
+  2.00". A plan or report session's first-call refusal was not seen, since
+  no provider refused in the round. The import's empty-source and purge
+  cases were not checked live: no empty GitHub repository was at hand, so
+  no fixture allowed it.
 
 The lane ran four cards on the factory's own code. The probe landed within
 its budget, ruling 271 triggered once, and no later card landed through
-the lane, so the exit test's lane criterion is not met. Stage 16's baseline
+the lane, so the exit test's lane criterion failed. Stage 16's baseline
 was four frontier cards at about 4.7 EUR each, none landed.
 
 - #471, the probe (4.3, medium, 5 EUR, filed at 00:20:51Z): its first
@@ -5042,20 +5063,38 @@ so returning findings no longer climb a card. With ruling 298 both
 automatic climbs that cost Stage 16 and this round are closed, and the
 frontier tier comes only through `retry_stronger`.
 
-Spend: at 08:28Z the gateway ledger held 13.25 EUR on the factory's own
-code for the round (13.45 on models, -0.20 in settlements) and 1.62 EUR on
-uptime2. The four lane cards spent 12.92 EUR in all (#471 4.92, #478
-1.38, #477 2.22, #483 4.40) of the 30 allowed. The alert card #479 spent
-1.47 EUR (see the findings). The 40 EUR stop was not reached by 08:28Z.
-At 09:53Z the day's ledger held 18.05 EUR.
-TODO(close): the final figures for the code project and uptime2, and
-October's ledger.
+Spend: the gateway ledger since 2026-10-11 22:40Z, all of it on
+2026-10-12, holds 19.28 EUR for the round. The factory's own code took
+14.78 EUR of its 50, so the 40 EUR stop was never reached. The four lane
+cards spent 12.92 EUR of the 30 allowed (#471 4.92, #478 1.38, #477 2.22,
+#483 4.40), and the alert card #479 1.47 EUR (see the findings). Rolls,
+the factory's chat and reviews took the rest. uptime2 took 4.45 EUR: the
+exit run's 3.76 with its chat, #48's 0.59 and other chat turns. uptime
+took 0.05 EUR and sqlite-import 0.01. October's ledger held 105.52 EUR at
+the close, under the month cap of 120 restored below.
 
-Exit test (from 07:32Z on uptime2, the controller as the member through
-the chat).
-TODO(close): the end time, the result, and the measures against
-Stage 16's run 2: misreads, chat gaps, clicks outside the chat and card
-spend.
+Exit test (2026-10-12, 07:33Z to about 10:44Z on uptime2, the controller
+as the member through the chat): the chat run passed, and the lane's
+criterion failed (above). One spec became plan
+#35 with six cards, and all seven cards of the plan were done when #41
+merged at about 10:44Z. The measures, against Stage 16's run 2 (2
+misreads, 0 chat gaps, 2 clicks outside the chat, 1.53 EUR on the cards):
+
+- About 3 h 11 min from the first message (07:33:01Z) to the last merge,
+  with 28 member messages. Run 2 took 1 h 6 min to its last merge
+  approval, with five cards.
+- 3 misreads: at 07:57Z the card's state from memory, at 09:14Z a cost
+  answer from a read 64 minutes old, and at 09:17Z `steer` proposed for a
+  card at its approval gate, which the server refused and the next turn
+  corrected (roadmap 180 and 183).
+- 1 chat gap with 2 clicks outside the chat: the Sync pull request #43,
+  which the factory opened outside a card, has no merge in the chat, so it
+  took an approving review and a merge in Forgejo (roadmap 187).
+- Card spend 2.88 EUR over 874 calls, 1.01 of it on the plan's runs, and
+  0.88 EUR on the chat over 253 calls: 3.76 EUR in all.
+
+The drawer's steer and the queue in a browser were 4.14's checks, not
+needs of the run.
 
 By 08:57Z the run went like this. The spec "Response times and an
 SLA report for Uptime" (C1 to C4 and a Deploy line) went in at 07:33:01Z
@@ -5074,8 +5113,7 @@ EUR. "Accept the plan of card #35." drew `accept_plan` pinned to revision
 3 at 08:06:26Z, and `start_plan` labelled 6 cards. The chat set the export
 to pull request mode at 08:07Z. The drawer's Chat tab and the queue passed
 on #36 (4.14 above). At 08:54Z #36 had spent 0.76 EUR in 47 minutes of its
-first session. Each turn took 3 to 12 s. The report counts 1 misread and
-no chat gap or click outside the chat by 08:57Z.
+first session. Each turn took 3 to 12 s.
 
 After 08:57Z the run went on like this. #36's first session ended at
 08:58:44Z on the supervisor's stuck rule, not at its 45-minute check-in,
@@ -5109,8 +5147,10 @@ for an admin route, and was approved through the chat, again without a
 warning. #39 (PR #46, 0.05 EUR) reached approval 496 by 10:06Z, was
 approved through the chat, and merged. #40 (PR #47, 0.03 EUR, risk class
 high for `deploy/`) was approved through the chat at about 10:18Z
-(approval 497). At 10:17Z #41 waited on #40, and #48 (4.12 above) ran its
-first session at 0.05 EUR. The report names 3 misreads by 10:17Z.
+(approval 497), and merged. #41 (PR #50, the acceptance tests for C1 to
+C4, 0.29 EUR, one `no_write` supervisor message, risk class normal, the
+review's approve) was approved through the chat (approval 498) and merged
+at about 10:44Z, the run's end.
 
 At 01:15Z Sebastian asked whether the card's information hierarchy from
 the UX conversation is built. It is planned and built in part. Roadmap 177
@@ -5206,6 +5246,11 @@ The round's rulings, in the ledger:
 - 306. PR #485 is not merged with a known security hole. The controller
   builds every review point on its commits and credits the card. The
   card's approval is then denied, naming the landed commit.
+- 307. #48 is accepted as one pull request, since its review approved it,
+  and no second large card is filed. The split's planner, check and
+  escalation ran live, and the children's filing is the plan's filing,
+  which the exit run showed live. The children's landing after a split
+  stays unseen live.
 
 Findings:
 
@@ -5257,6 +5302,16 @@ Findings:
   prose (ruling 306, roadmap 185 and 186).
 - The `costs` read by card covers the month only, with no window for
   today (roadmap 158).
+- The pull requests the factory opens outside a card (Sync from GitHub,
+  schema copies, template updates) have no merge in the chat. The Sync
+  pull request uptime2#43 and the schema copies #39 on infra took a review
+  and a merge in Forgejo, the exit run's one gap, and the template updates
+  uptime#16 and hello-import#1 stayed open all round (roadmap 187).
+- A split cannot meet the bound when one file alone is over it, and the
+  sizes a card may take are fixed, not derived from the bound (4.12,
+  ruling 307, roadmap 159).
+- The lease admission wrote into an agent namespace that was being
+  deleted, once, with no effect seen (4.12, roadmap 188).
 
 The controller slipped seven times. At 23:27Z the first landing of 4.5 and
 4.7 failed in `land.sh` itself, on a log path with the branch's slash.
@@ -5287,9 +5342,14 @@ heartbeat running. A reviewer's cleanup
 also killed every `go test` binary on the machine at about 00:04Z, and the
 other agents ran their tests again.
 
-TODO(close): the caps restored in infra (card 2 by default and 15 at
-most, day 40, month 120, LiteLLM `max_budget` 55, `risk.large_lines`
-1000), with the commit and the policy version.
+The close restored the caps in infra 09d748b on both remotes: day 40,
+month 120, LiteLLM `max_budget` 55 and `risk.large_lines` 1000. The card's
+2 by default and 15 at most stay, and so do `stronger_after` 3 and
+factoryd's `SUPERVISE_READING_WITHOUT_WRITING` 60. `factoryd config check`
+on the tree exited 0 with "13 projects, 2 processes, 1 template", and
+factoryd loaded config version 496 at 11:25:45Z. sqlite-import, the 4.8
+check's project of 577 MB, stays in infra, so a rebuild imports it again
+unless its project file goes.
 
 TODO(close): the shutdown: the CNPG backup and its WAL generation, the
 OpenBao snapshot and the Forgejo dump in S3, `tofu destroy`, every Hetzner
@@ -5308,5 +5368,6 @@ roadmap as it appears, with its structural fix.
 After Stage 17: [the roadmap](../roadmap.md) holds every future topic. Its
 item 177, the card's information hierarchy, is first for the next round
 by Sebastian's word of 2026-10-12. Its items 148, 158 to 160, 163 and 176
-hold what this round left open, and 178 to 186 its new findings, each
-with its fix by construction (docs master 36adae9).
+hold what this round left open, and 178 to 188 its new findings, each
+with its fix by construction (docs master 36adae9, 1310ed9 and 2d5473a).
+Item 159 holds the live split's result and its two open defects.
