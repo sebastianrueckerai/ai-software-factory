@@ -16,8 +16,8 @@ The control direction: a Linear or Height product screen, monochrome cool greys,
 | --bg-hover / --bg-active | #1a1b1f / #202227 | #f0f1f3 / #e8eaed | hover, the active nav item, pressed |
 | --line, --line-2, --line-3 | #222429, #2d3036, #3a3d44 | #e4e6e9, #d6d9de, #c3c7ce | hairlines, control borders, hover borders |
 | --text | #e6e7ea | #17181b | titles, the pulse sentence, chat text |
-| --text-2 | #b0b4bc | #3f434a | secondary text, column titles |
-| --text-muted | #8a8e98 | #565a63 | meta, done rows and their icons, the status figures (at least 5.5:1 on its ground) |
+| --text-2 | #b0b4bc | #34373d | secondary text, column titles |
+| --text-muted | #8a8e98 | #4b4f58 | meta, done rows and their icons, the status figures, the composer's helper line (light: 8.2:1 on the card and the panel, 7.7:1 on the page, 7.8:1 on the Needs you fill) |
 | --accent | #7ea6f8 | #2a5fd6 | links on hover, focus ring |
 | --accent-bg | #3b6ee0 | #2f64dc | the primary button (Do it, Approve as you, Send with text), white text 4.6:1 |
 | --need | #f0a24a | #df8d2c | the Needs you treatment: outline, the pulse rule, the waiting dot |
@@ -26,8 +26,9 @@ The control direction: a Linear or Height product screen, monochrome cool greys,
 | --st-running | oklch(0.72 0.14 250) | oklch(0.52 0.15 250) | the running icon |
 | --st-waiting | = --need | = --need | waiting on a human |
 | --st-review | oklch(0.72 0.15 305) | oklch(0.52 0.18 305) | in review |
-| --st-done | oklch(0.74 0.14 155) | oklch(0.52 0.13 155) | the Done column icon only; done rows stay grey |
-| --st-failed | oklch(0.70 0.18 25) | oklch(0.53 0.19 25) | failed icon and word, spend over the cap |
+| --st-done | oklch(0.74 0.14 155) | oklch(0.52 0.13 155) | the applied check and a passed gate; the Done column and its rows stay grey |
+| --st-failed | oklch(0.70 0.18 25) | oklch(0.53 0.19 25) | a failed card face, spend over the cap |
+| --st-failed-muted | oklch(0.64 0.12 25) | oklch(0.50 0.13 25) | the failed done row's mark and word only |
 | --st-closed, --st-queued | #8a8e98 | #626670, #8b8f98 | closed, backlog, queued |
 
 The state hues sit on Linear-style status icons (dashed circle queued, half pie running, three-quarter pie in review, filled check done, filled cross failed, slashed circle closed), never on fills, so the shape and the word carry the state and the hue only confirms it. The state word stays grey, except waiting on a human (warm) and failed (red).
@@ -37,7 +38,7 @@ The state hues sit on Linear-style status icons (dashed circle queued, half pie 
 - One grotesk: `Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui`. Mono: `ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, "Roboto Mono"`.
 - Scale: 11.5 (kickers, chips), 12 (meta, state rows, status figures, buttons), 13 (body, card titles, nav), 14 (chat messages, the composer), 15 (the pulse sentence, weight 500), 17 (the drawer title, weight 600).
 - Weights 400, 500, 600 only. Tabular numerals everywhere except chat prose.
-- Activity line: mono 11 px, muted, up to two lines (breaking after a slash) before the ellipsis.
+- Activity line: mono 11 px, muted. A path splits before its file name: the head and the file share one line when they fit, else the file name takes the second line and the head ellipsises, so the file always shows. Text without a path wraps to two lines.
 
 ## Layout at 1440 and 1920
 
@@ -51,7 +52,7 @@ The state hues sit on Linear-style status icons (dashed circle queued, half pie 
 
 ## The pulse
 
-A raised band with a hairline. The sentence first at 15 px/500 in --text, "more" at the right end opening the bullets. Under it the status figures in one 12 px tabular row: state dot and word, n working (`workingCount`), n waiting on the provider (when any), n need you (warm, links to the column), spend / cap with a 36 px meter, GitHub. Prominent: a 3 px --need rule on the left edge and the warm warning sign. Subdued: no rule, no sign. Spend over the cap turns the figure and its meter red. Three dots after the sentence while it recomputes.
+A raised band with a hairline. The sentence first at 15 px/500 in --text, "more" at the right end on the sentence's first baseline, opening the bullets. Under it the status figures in one 12 px tabular row: state dot and word, n working (`workingCount`), n waiting on the provider (when any), n need you (warm, links to the column), spend / cap with a 36 px meter, GitHub. Prominent: a 3 px --need rule on the left edge and the warm warning sign. Subdued: no rule, no sign. Spend over the cap turns the figure and its meter red. Three dots after the sentence while it recomputes.
 
 ## The chat
 
@@ -62,7 +63,7 @@ The main region and the brightest surface: raised panel, hairline, a soft drop s
 - Column header: status icon, sentence-case title 12.5/500, count muted. Needs you title in --need-text.
 - Card: --bg-card, hairline, padding 8/10. Title 13/500 clamped to two lines with the ref in muted tabular. State row 12 px: icon and word, elapsed, n/n checks, gate and age, spend from 80 percent with "⚠ near its budget" in --text, fine states, PR link. Activity line in mono only on working and waiting cards. Chips 11.5 px hairline. Actions: 22 px buttons, Close quiet.
 - Stale card: a dashed --line-3 border.
-- Done, failed, closed: no box, a row with the state icon, ref and title; one line where the column is 170 px or wider, two below that. Failed and closed add an 11.5 px line with the state word and elapsed. The elapsed of a done row appears when the column is 200 px or wider. At most 12 rows, then one quiet link "and n earlier"; the column never needs its own long scroller.
+- Done, failed, closed: no box, 12 px muted text, outline glyphs in --text-muted (check, slashed ring; the failed row a cross and its word in --st-failed-muted), never brighter than a Working card; a row with the glyph, ref and title; one line where the column is 170 px or wider, two below that. Failed and closed add an 11.5 px line with the state word and elapsed. The elapsed of a done row appears when the column is 200 px or wider. At most 12 rows, then one quiet link "and n earlier"; the column never needs its own long scroller.
 - Hover: border to --line-3, background to --bg-hover. Open card: --accent border.
 
 ## Needs you

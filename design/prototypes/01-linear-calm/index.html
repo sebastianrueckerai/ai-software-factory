@@ -52,6 +52,7 @@ html[data-theme="dark"] {
   --st-review: oklch(0.72 0.15 305);
   --st-done: oklch(0.74 0.14 155);
   --st-failed: oklch(0.70 0.18 25);
+  --st-failed-muted: oklch(0.64 0.12 25);
   --st-closed: #8a8e98;
   --st-queued: #8a8e98;
   --add: oklch(0.76 0.14 155);
@@ -75,8 +76,8 @@ html[data-theme="light"] {
   --line-2: #d6d9de;
   --line-3: #bfc3ca;
   --text: #17181b;
-  --text-2: #3f434a;
-  --text-muted: #565a63;
+  --text-2: #34373d;
+  --text-muted: #4b4f58;
   --text-faint: #a8acb3;
   --accent: #2a5fd6;
   --accent-bg: #2f64dc;
@@ -93,7 +94,8 @@ html[data-theme="light"] {
   --st-review: oklch(0.52 0.18 305);
   --st-done: oklch(0.52 0.13 155);
   --st-failed: oklch(0.53 0.19 25);
-  --st-closed: #565a63;
+  --st-failed-muted: oklch(0.50 0.13 25);
+  --st-closed: #4b4f58;
   --st-queued: #8b8f98;
   --add: oklch(0.50 0.13 155);
   --del: oklch(0.52 0.19 25);
@@ -231,6 +233,7 @@ body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; ove
   background: var(--need); border-radius: var(--r) 0 0 var(--r);
 }
 .pulse-line { display: flex; align-items: flex-start; gap: 9px; }
+.pulse-line > .pulse-sentence, .pulse-line > .more { align-self: baseline; }
 .pulse-line > .warn { color: var(--need); width: 16px; height: 16px; margin-top: 3px; }
 .pulse-sentence { font-size: 15px; line-height: 22px; font-weight: 500; letter-spacing: -0.008em; color: var(--text); }
 .recompute { display: inline-flex; gap: 3px; margin-left: 8px; vertical-align: 2px; }
@@ -338,7 +341,7 @@ a.fig.fig-need:hover { text-decoration: underline; text-underline-offset: 3px; }
 #chat-input:focus-visible { outline: none; }
 #chat-input::placeholder { color: var(--text-muted); }
 .composer-bar { display: flex; align-items: center; gap: 12px; padding: 4px 8px 8px 13px; }
-.own { flex: 1; min-width: 0; font-size: 11.5px; line-height: 16px; color: var(--text-muted); }
+.own { flex: 1; min-width: 0; font-size: 12px; line-height: 16px; color: var(--text-muted); }
 .composer-box:has(#chat-input:not(:placeholder-shown)) .send { background: var(--accent-bg); border-color: transparent; color: var(--on-accent); }
 .send { height: 28px; padding: 0 14px; font-size: 12.5px; }
 .queue { margin-top: 8px; display: grid; gap: 4px; }
@@ -394,6 +397,8 @@ a.fig.fig-need:hover { text-decoration: underline; text-underline-offset: 3px; }
 a.it.pr { position: relative; z-index: 1; color: var(--text-muted); text-decoration: underline; text-decoration-color: var(--line-3); text-underline-offset: 2px; }
 a.it.pr:hover { color: var(--text); }
 .c-act { margin-top: 5px; font: 11px/16px var(--mono); color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.c-act.path { display: flex; flex-wrap: wrap; }
+.c-act.path span { min-width: 0; max-width: 100%; white-space: pre; overflow: hidden; text-overflow: ellipsis; }
 .chips { position: relative; display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
 .chip { display: inline-flex; align-items: center; height: 18px; padding: 0 6px; border: 1px solid var(--line-2); border-radius: 4px; font-size: 11.5px; color: var(--text-2); white-space: nowrap; }
 .chip-risk { border-color: var(--need-line); color: var(--need-text); }
@@ -407,18 +412,18 @@ a.it.pr:hover { color: var(--text); }
 .done-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1px; margin: 0 -2px; }
 .d-open {
   display: flex; align-items: flex-start; gap: 7px; width: 100%; padding: 4px 6px; border: 0; border-radius: var(--r);
-  background: none; text-align: left; color: var(--text-muted); font-size: 12.5px; line-height: 18px; transition: background-color .12s, color .12s;
+  background: none; text-align: left; color: var(--text-muted); font-size: 12px; line-height: 18px; transition: background-color .12s, color .12s;
 }
 .d-open:hover { background: var(--bg-hover); color: var(--text-2); }
 .d-open .si { margin-top: 2px; width: 13px; height: 13px; }
-.done-row.st-done .si { color: var(--text-muted); }
-.done-row.st-closed .si { color: var(--text-muted); }
+.done-row .si { color: var(--text-muted); }
+.done-row.st-failed .si { color: var(--st-failed-muted); }
 .d-text { flex: 1; min-width: 0; }
 .d-line { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .d-line .ref { color: inherit; font-weight: 400; margin-right: 3px; }
 .d-state { display: block; font-size: 11.5px; line-height: 16px; }
-.done-row.st-failed .d-line { color: var(--text-2); }
-.done-row.st-failed .d-state { color: var(--st-failed); }
+.d-state b { font-weight: 400; }
+.done-row.st-failed .d-state b { color: var(--st-failed-muted); }
 .d-time { display: none; flex: none; font-size: 11.5px; color: var(--text-muted); }
 @container (min-width: 200px) { .d-time { display: inline; } }
 @container (max-width: 169px) { .d-line { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; } }
@@ -723,6 +728,12 @@ footer { flex: none; }
     closed: ring + '<path d="m3.2 10.8 7.6-7.6" stroke="currentColor" stroke-width="1.4"/>',
     idle: ring,
   };
+  // done rows whisper: outline glyphs only
+  const ROW = {
+    done: ring + '<path d="m4.6 7.1 1.7 1.7 3.2-3.3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>',
+    failed: ring + '<path d="m5.1 5.1 3.8 3.8m0-3.8-3.8 3.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',
+    closed: SI.closed,
+  };
   const si = (k) => `<svg class="si si-${k}" viewBox="0 0 14 14" aria-hidden="true">${SI[k] || SI.queued}</svg>`;
 
   // the issue refs in prose open their card when the card is on the board
@@ -917,16 +928,23 @@ footer { flex: none; }
       ${I.grip}
       <button type="button" class="c-open" data-open title="${esc(c.title)}"><span class="c-title"><span class="ref">#${c.issue}</span>${c.accent ? `<span class="accent-dot" style="background:${ACCENTS[c.accent] || 'var(--text-muted)'}" title="accent ${esc(c.accent)}"></span>` : ''}${esc(c.title)}</span></button>
       ${stateRow(c)}
-      ${act ? `<p class="c-act" title="${esc(c.activity)}">${esc(c.activity).replace(/\//g, '/<wbr>')}</p>` : ''}
+      ${act ? actLine(c.activity) : ''}
       ${chipsHTML(c)}
       ${conf ? confirmLine(conf) : cardActions(c)}
     </article>`;
   }
+  // a path splits before its file name: head and file share a line when they fit, else the file takes the second line
+  function actLine(a) {
+    const m = /^(.*\/)([^/]+)$/.exec(a);
+    return m
+      ? `<p class="c-act path" title="${esc(a)}"><span>${esc(m[1])}</span><span>${esc(m[2])}</span></p>`
+      : `<p class="c-act" title="${esc(a)}">${esc(a)}</p>`;
+  }
   function doneHTML(c) {
     const k = stKey(c.status), loud = k !== 'done';
     return `<li class="done-row st-${k}" data-card="${c.issue}">
-      <button type="button" class="d-open" data-open title="${esc(`#${c.issue} ${c.title} · ${c.status} · ${c.elapsed}`)}">${si(k)}
-        <span class="d-text"><span class="d-line"><span class="ref">#${c.issue}</span>${esc(c.title)}</span>${loud ? `<span class="d-state">${esc(c.status)} · ${esc(c.elapsed.replace(/ in all$/, ''))}</span>` : ''}</span>
+      <button type="button" class="d-open" data-open title="${esc(`#${c.issue} ${c.title} · ${c.status} · ${c.elapsed}`)}"><svg class="si" viewBox="0 0 14 14" aria-hidden="true">${ROW[k]}</svg>
+        <span class="d-text"><span class="d-line"><span class="ref">#${c.issue}</span>${esc(c.title)}</span>${loud ? `<span class="d-state"><b>${esc(c.status)}</b> · ${esc(c.elapsed.replace(/ in all$/, ''))}</span>` : ''}</span>
         ${loud ? '' : `<span class="d-time">${esc(c.elapsed.replace(/ in all$/, ''))}</span>`}
       </button></li>`;
   }
@@ -1052,7 +1070,7 @@ footer { flex: none; }
         ${col('queued', 'Queued', 'queued', q.length, q.map((c) => cardHTML(c, 'queued')).join(''))}
         ${col('working', 'Working', 'running', w.length, w.map((c) => cardHTML(c, 'working')).join(''))}
         ${col('verifying', 'Verifying', 'review', v.length, v.map((c) => cardHTML(c, 'verifying')).join(''))}
-        ${col('done', 'Done', 'done', doneCount, d.length ? `<ul class="done-list">${d.slice(0, 12).map(doneHTML).join('')}</ul>${doneCount > Math.min(d.length, 12) ? `<a href="#" class="done-more">and ${doneCount - Math.min(d.length, 12)} earlier</a>` : ''}` : '',
+        ${col('done', 'Done', 'idle', doneCount, d.length ? `<ul class="done-list">${d.slice(0, 12).map(doneHTML).join('')}</ul>${doneCount > Math.min(d.length, 12) ? `<a href="#" class="done-more">and ${doneCount - Math.min(d.length, 12)} earlier</a>` : ''}` : '',
           `<button type="button" class="icon-btn sm done-toggle" data-act="done-toggle" aria-expanded="false" aria-controls="col-done-body" aria-label="Done">${I.down}</button>`)}
       </div>`;
     markOpen();
