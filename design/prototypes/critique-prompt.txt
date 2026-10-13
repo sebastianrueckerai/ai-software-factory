@@ -1,0 +1,13 @@
+You are an independent design critic judging a BUILT prototype of the project screen of an AI software factory console against its design target.
+
+The first image is the design target from the image round (a mockup). The next images are real screenshots of the built prototype: the busy moment in dark at 1440 wide, the same in light, the idle moment in dark, the drawer open on a running card, and the phone at 390 wide (busy, dark).
+
+The brief: a tool a member uses to steer a software project that agents build, and a screen a non-technical visitor finds slick, modern and professional, like a product of a top tech company (Linear, Vercel, Raycast, Stripe). Three elements in strict order of weight: the pulse sentence on top, the chat with the project agent as the main affordance, the kanban board quiet. Normal states whisper, exceptional states speak: the two Needs you items must be the loudest things on the busy screen; done cards quiet. Dark and light are one design in two moods. The drawer docks at the right edge over the board and never over the chat. The phone is one column: pulse, chat, then the board sections.
+
+Answer as JSON:
+- "match": 1 to 10, how well the built screens carry the target's design (hierarchy, mood, type, colour, density), with one sentence.
+- "craft": a list of concrete defects a product designer would fix, each as {"where": screenshot name, "what": one sentence, "severity": "high"|"medium"|"low"}. Look for: cut-off or overlapping text, a wall of text, inconsistent spacing or type sizes, a board louder than the chat, Needs you not the loudest, done cards too loud, unreadable contrast, a drawer covering the chat, a light theme that is only an inversion, phone layout faults, misaligned buttons, orphan elements.
+- "hierarchy": for each screenshot, which element reads first (pulse, chat, board, needs-you).
+- "wow": 1 to 10, would a non-technical visitor say "that looks slick and professional"? One sentence on what would raise it.
+- "keep": the three best things about this prototype, one sentence each.
+- "verdict": "ship as is", "fix and keep", or "drop", with one sentence.
