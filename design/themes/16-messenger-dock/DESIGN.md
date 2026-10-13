@@ -17,19 +17,20 @@ A messaging app with the board above it: the pulse as a band under the top bar, 
 | --line | #34363b | #e3e0da | hairlines |
 | --line-strong | #474950 | #cfcbc3 | inputs, quiet buttons |
 | --text | #ececee | #1c1c1e | |
-| --text-muted | #a3a3aa | #64625c | meta, the state row, done rows |
+| --text-muted | #a3a3aa | #55534e | meta, the state words, done rows |
 | --accent | #5cc98d text, #237a4b fill | #1b7a48 text and fill | the agent (avatar dot, header dot), Do it, Send with text, focus ring |
-| --link | #6fd19b | #1b7a48 | every text link (more, answer on the issue, Or in your words, Undo); 4.5:1 on white, the need tint and the columns |
+| --link | #6fd19b | #15663b | every text link (more, answer on the issue, Or in your words, Undo); 4.5:1 on white, the need tint and the columns |
 | --ink | #ececee on #1b1c1f | #1c1c1e on #fff | the human's decisions: Approve as you, Answer, Grant one session |
-| --need | #f4a85e on #2c2319, rule #d9821b | #a4490a on #fdf2e3, rule #e0861d | the Needs you column, the prominent pulse, the "n need you" figure |
+| --need | #f4a85e on #2a2219, rule #d9821b | #86390a on #fdf2e3, rule #e0861d | the Needs you column, the prominent pulse, the "n need you" figure as warm text |
+| --need-card | #32281d | #fffaf2 | a Needs you card's fill, with the need border and the 3 px rule |
 | --st-running | #5cc98d | #1b7a48 | the state dot only; the state word is --text-muted |
-| --st-waiting | #f4a85e | #a4490a | waiting on a human, the provider, dependencies |
+| --st-waiting | #f4a85e | #b4560f | the dot of waiting on a human, the provider, dependencies |
 | --st-review | #b8a6ff | #6447c9 | in review |
 | --st-queued | #93b4dc | #46648a | backlog, queued |
-| --st-done, --st-closed | #a3a3aa | #64625c | quiet |
-| --st-failed | #f58a80 | #b8322a | failed, blocked, high risk, over the cap |
+| --st-done, --st-closed | #a3a3aa | #55534e | quiet |
+| --st-failed | #f58a80 | #9a2620 | failed, blocked, high risk, over the cap (text on #fbe9e6 at 6.7:1) |
 
-Every text pair passes 4.5:1, every pill fill 3:1. Colour never carries a state alone: the state word or a glyph (✓, ✕, ⚠) sits beside it.
+Every text pair passes 4.5:1, measured over every rendered text node in both themes; in light the lowest is 5.35:1 (white on the green Do it). Every pill fill 3:1. The status figures are text on a plain pill: the exceptional ones (n need you, n waiting on the provider, spend over the cap with ⚠) change only their text colour, so the Needs you cards stay the loudest. Colour never carries a state alone: the state word or a glyph (✓, ✕, ⚠) sits beside it.
 
 ## Type
 
@@ -74,7 +75,7 @@ The first band under the top bar, the sentence at 17 px with "more" after it, th
 
 ## Needs you
 
-The column takes the warm tint and its header the need hue. Each item is a white (raised) card with a need border and a 3 px need rule left, a kind line ("Merge approval · 1 h 10 min"), a 15 px headline, chips, two short lines, and full 32 px buttons: the primary in ink, the rest outlined. Deny opens the reason box with "Deny by" in place. Choice buttons wrap and go full width on the phone. A capped escalation opens its text box and offers "Grant one session with this answer". This is the only warm colour on the board, so it is the loudest.
+The column takes the warm tint and its header the need hue. Each item is a --need-card card (desktop and phone alike) with a need border and a 3 px need rule left, a kind line ("Merge approval · 1 h 10 min"), a 15 px headline, chips, two short lines, and full 32 px buttons: the primary in ink, the rest outlined. Deny opens the reason box with "Deny by" in place. Choice buttons wrap and go full width on the phone. A capped escalation opens its text box and offers "Grant one session with this answer". This is the only warm colour on the board, so it is the loudest.
 
 ## The drawer
 

@@ -2,7 +2,7 @@
 
 ## Where we are
 
-Ten working prototypes of the console exist, one per carried direction, each in dark and light, each switchable between the four real moments (busy, idle, fire, quiet), with the drawer, the chat with a proposal, every Needs you action and a phone layout. Behind them: a model probe, a round of 16 directions in both themes, a depth round with the drawer, the phone and the idle state, and two or three critique loops per prototype. Estimated spend on images and critiques: $12.43 of the $100 cap. Everything is committed on the `console-design` branches of the two worktrees. Nothing touched `main`, nothing deployed.
+Ten working prototypes of the console exist, one per carried direction, each in dark and light, each switchable between the four real moments (busy, idle, fire, quiet), with the drawer, the chat with a proposal, every Needs you action and a phone layout. Behind them: a model probe, a round of 16 directions in both themes, a depth round with the drawer, the phone and the idle state, and two or three critique loops per prototype; the final `check.js` run passed on all ten. Estimated spend on images and critiques: $12.58 of the $100 cap. Everything is committed on the `console-design` branches of the two worktrees. Nothing touched `main`, nothing deployed.
 
 Nothing is decided. Every pick in this run is the director's and provisional until you fill in [PICKS.md](../PICKS.md).
 
@@ -55,8 +55,8 @@ Every prototype follows [ia.md](../ia.md): the pulse band on top with the status
 | Round 00, model probe | 11 | $1.35 |
 | Round 01, 16 directions, dark on two models and light | 48 | $5.60 |
 | Round 02, depth and hybrids | 33 | $4.95 |
-| Critiques, 2 rounds plus 25 prototype passes | | $0.80 |
-| Total | | about $12.43 of $100 |
+| Critiques, 2 round sheets plus 26 prototype passes | | $0.84 |
+| Total | | about $12.58 of $100 |
 
 The fal dashboard has the real number; the key cannot read it.
 

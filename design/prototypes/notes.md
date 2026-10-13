@@ -8,16 +8,16 @@ Judged on the busy screen in both themes, the idle screen, the drawer and the ph
 
 | # | Direction | Critic match/wow per loop | Why it sits here |
 |---|---|---|---|
-| 1 | 06 Mission control | 7/6, 7/6 | The one most likely to get "wow": the amber tray, the instrument strip, the ticker, and it stays readable. The light theme took a loop to find its day mood. |
-| 2 | 11 Terminal | 8/7, 9/8 | The critic's top score. A deliberate instrument, not a retro joke; the inverted Needs you header is the clearest "act here" of the set. Risk: a visitor who is not technical reads it as "for developers". |
+| 1 | 06 Mission control | 7/6, 7/6, 6/6 | The one most likely to get "wow": the amber tray, the instrument strip, the ticker, and it stays readable. The light theme took a loop to find its day mood. |
+| 2 | 11 Terminal | 8/7, 9/8, 7/6 | The critic's top score. A deliberate instrument, not a retro joke; the inverted Needs you header is the clearest "act here" of the set. Risk: a visitor who is not technical reads it as "for developers". |
 | 3 | 10 Command palette | 9/8, 7/7 | The chat as a command bar is the strongest reading of "chat as the main affordance". The sheet under the bar costs the board its first screen; the fix keeps the first Needs you item above the fold. |
 | 4 | 02 Geist contrast | 7/6, 8/7 | Sharp, exact, one warm colour. The closest to Vercel. Nothing to apologise for. |
 | 5 | 09 Inbox first | 8/7, 8/7, 7/7 | The clearest "what needs me". The board as a strip that unfolds is a real idea; the critic misreads the drawer (it shrinks the page, it never covers the chat). |
-| 6 | 16 Messenger dock | 7/6, 8/7 | The friendliest for a visitor. The pulse moved to the top in loop 1; the chat dock reads as the product. |
+| 6 | 16 Messenger dock | 7/6, 8/7, 9/8 | The friendliest for a visitor. The pulse moved to the top in loop 1; the chat dock reads as the product. |
 | 7 | 03 Soft SaaS | 8/7, 6/6, 6/7 | Warm and rounded; the light theme is its real form. The chat-above-board layout needs a tall screen; at 900 px the fold cuts the board. |
 | 8 | 01 Linear calm | 6/5, 7/6 | The control. Correct, calm, forgettable. It shows how much the shared IA alone improves on today. |
-| 9 | 04 Swiss grid | 7/6, 8/6 | The most "design studio" and the hardest to use at 1440: equal halves leave 101 px columns. Strong at 1920. |
-| 10 | 13 Factory floor | 7/6, 6/5 | The theme carries, the board stays louder than the chat after two loops. A good second skin, not the first. |
+| 9 | 04 Swiss grid | 7/6, 8/6, 7/5 | The most "design studio" and the hardest to use at 1440: equal halves leave 101 px columns. Strong at 1920. |
+| 10 | 13 Factory floor | 7/6, 6/5, 8/7 | The theme carries, the board stays louder than the chat after two loops. A good second skin, not the first. |
 
 ## What the round settled
 
