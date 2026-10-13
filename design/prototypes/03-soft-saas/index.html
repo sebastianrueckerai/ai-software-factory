@@ -44,7 +44,7 @@
   --line: #34312E; --line-strong: #423E3A; --line-hover: #524D48; --card-edge: #34312E;
   --text: #EDEAE5; --text-muted: #A39C93;
   --ink: #EDEAE5; --on-ink: #1B1A18; --ink-hover: #FFFFFF; --focus: #EDEAE5; --halo: rgb(237 234 229 / .14);
-  --need-text: #F6AE95; --need-tint: #2B2421; --need-edge: rgb(242 140 110 / .45); --need-well: rgb(242 140 110 / .065); --need-sign: rgb(242 140 110 / .2);
+  --need-text: #F6AE95; --need-tint: #2B2421; --need-edge: rgb(242 140 110 / .55); --need-well: rgb(242 140 110 / .10); --need-card-bg: linear-gradient(rgb(242 140 110 / .10), rgb(242 140 110 / .10)), #252321; --need-rule: inset 3px 0 0 #F08A6C; --need-sign: rgb(242 140 110 / .2);
   --need-count-bg: #F6AE95; --need-count-text: #1B1A18;
   --pulse-bg: linear-gradient(90deg, rgb(242 140 110 / .17), rgb(242 140 110 / .06) 45%, rgb(242 140 110 / .03)), #252321;
   --sh-card: 0 1px 2px rgb(0 0 0 / .3);
@@ -240,6 +240,7 @@ details.tool pre, .mono-block { margin: 0; padding: 4px 12px 10px 32px; font: 12
 .col-toggle { display: none; }
 .col-body { display: flex; flex-direction: column; gap: 10px; }
 .col-needs.loud { background: var(--need-well); border-radius: 18px; padding: 12px 10px 10px; margin-top: -12px; }
+[data-theme="dark"] .col-needs.loud, [data-theme="dark"] .lane-group.human.loud .lane { box-shadow: inset 0 0 0 1px rgb(242 140 110 / .22); }
 .col-needs.loud h3 { color: var(--need-text); padding: 0 6px; }
 .col-needs.loud .count { background: var(--need-count-bg); color: var(--need-count-text); }
 .empty { display: grid; place-items: center; min-height: 48px; border: 1.5px dashed var(--line); border-radius: 12px; color: var(--text-muted); font-size: 13px; }
@@ -271,7 +272,8 @@ details.tool pre, .mono-block { margin: 0; padding: 4px 12px 10px 32px; font: 12
 .done-row:hover { background: var(--bg-hover); }
 .done-row .g { padding-top: 2px; color: var(--done-dot); opacity: .75; }
 .done-row .g .i { width: 12px; height: 12px; stroke-width: 1.5; vertical-align: 0; }
-.done-row.k-fail .g { color: var(--fail-quiet); opacity: 1; }
+.done-row.k-fail .g { color: var(--fail-quiet); opacity: .6; }
+.done-row.k-fail .g .i { width: 11px; height: 11px; stroke-width: 1.4; }
 .done-row.k-closed .g { color: var(--neu-dot); }
 .done-row .open { color: var(--text-muted); }
 .done-row .open:hover { color: var(--text); }
@@ -281,7 +283,7 @@ details.tool pre, .mono-block { margin: 0; padding: 4px 12px 10px 32px; font: 12
 .k-closed .dmeta .word { color: var(--text-muted); }
 
 /* needs you */
-.need-card { background: var(--bg-raised); border: 1px solid var(--need-edge); border-radius: 14px; padding: 13px 15px 15px; box-shadow: var(--sh-need); font-size: 14.5px; line-height: 1.5; }
+.need-card { background: var(--need-card-bg, var(--bg-raised)); border: 1px solid var(--need-edge); border-radius: 14px; padding: 13px 15px 15px; box-shadow: var(--need-rule, 0 0 0 transparent), var(--sh-need); font-size: 14.5px; line-height: 1.5; }
 .need-ref { display: flex; align-items: baseline; gap: 10px; font-size: 13px; color: var(--text-muted); }
 .need-ref .open { color: var(--text-muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
 .need-ref .open:hover { color: var(--text); }
@@ -398,7 +400,7 @@ kbd { font: 600 12px var(--mono); padding: 2px 7px; border-radius: 6px; border: 
 
 @media (min-width: 900px) and (max-width: 1699px) {
   .desk.has-needs .chat { height: auto; }
-  .desk.has-needs .chat-log { flex: none; height: min(36vh, calc(100vh - 640px)); min-height: 220px; }
+  .desk.has-needs .chat-log { flex: none; height: min(36vh, calc(100vh - 640px)); min-height: 150px; }
 }
 /* big screens: the shelf beside the chat */
 @media (min-width: 1700px) {
@@ -455,8 +457,8 @@ kbd { font: 600 12px var(--mono); padding: 2px 7px; border-radius: 6px; border: 
   .col-toggle .i { transition: transform .15s; }
   .col-toggle[aria-expanded="false"] .i { transform: rotate(-90deg); }
   .col:not(.col-needs) { border-top: 1px solid var(--line); padding-top: 6px; }
-  .choices .btn { flex: 1 1 100%; height: 42px; }
-  .need-acts .btn { flex: 1 1 auto; height: 42px; }
+  .choices, .need-acts { flex-direction: column; gap: 8px; }
+  .choices .btn, .need-acts .btn { width: 100%; height: auto; min-height: 44px; padding: 12px 16px; font-size: 15px; line-height: 20px; white-space: normal; }
   .lane.c3, .lane.c4 { grid-template-columns: minmax(0, 1fr); }
   .drawer { inset: 0; width: auto; border-radius: 0; border: 0; z-index: 50; }
   .d-head { padding: 16px 16px 0; }
@@ -711,6 +713,16 @@ kbd { font: 600 12px var(--mono); padding: 2px 7px; border-radius: 6px; border: 
   }
   var input = $("#chat-input");
   function stick() { var log = $("#chat-log"); log.scrollTop = log.scrollHeight; }
+  function fitLog() {
+    var log = $("#chat-log"); log.style.height = "";
+    if (!S.needs.length || innerWidth < 900 || innerWidth >= 1700) return;
+    var row = $(".col-needs .need-card .need-acts, .col-needs .need-card .choices, .col-needs .need-card .own-foot .btn");
+    if (!row) return;
+    var over = row.getBoundingClientRect().bottom + scrollY + 14 - innerHeight;
+    if (over > 0) log.style.height = Math.max(150, log.getBoundingClientRect().height - over) + "px";
+    stick();
+  }
+  addEventListener("resize", fitLog);
   function grow() { input.style.height = ""; if (input.scrollHeight > input.clientHeight) input.style.height = Math.min(input.scrollHeight, 144) + "px"; stick(); }
   input.addEventListener("input", grow);
   input.addEventListener("keydown", function (e) {
@@ -801,7 +813,7 @@ kbd { font: 600 12px var(--mono); padding: 2px 7px; border-radius: 6px; border: 
   }
   function answerBox(n, id) {
     var lab = (n.choices && n.choices.length ? "Or your own answer" : "Your answer") + ", posted on the issue as you";
-    var box = '<label class="lbl" for="ans-' + id + '">' + lab + '</label><textarea class="field" id="ans-' + id + '" rows="3"></textarea>' +
+    var box = '<label class="lbl" for="ans-' + id + '">' + lab + '</label><textarea class="field" id="ans-' + id + '" rows="2"></textarea>' +
       '<div class="own-foot"><button type="button" class="btn ' + (n.capped ? "primary " : "") + 'lg" data-act="own-answer" data-for="' + id + '" data-capped="' + (n.capped ? 1 : 0) + '">' + (n.capped ? "Grant one session with this answer" : "Answer") + "</button>" +
       '<a class="issue-link" href="#">answer on the issue</a></div>';
     if (n.choices && n.choices.length) return '<details class="own"><summary>' + icon("chevr", "s") + "Or in your words</summary>" + box + "</details>";
@@ -1109,6 +1121,7 @@ kbd { font: 600 12px var(--mono); padding: 2px 7px; border-radius: 6px; border: 
     $("#scenario").value = scenario;
     $(".desk").classList.toggle("has-needs", S.needs.length > 0);
     renderPulse(recompute); renderChat(); renderQueue(); renderBoard();
+    fitLog();
     if (recompute) { var tk = ui.token; setTimeout(function () { if (tk === ui.token) renderPulse(false); }, 600); }
   }
   $("#scenario").addEventListener("change", function (e) {

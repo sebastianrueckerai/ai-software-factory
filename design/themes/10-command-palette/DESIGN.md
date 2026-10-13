@@ -52,7 +52,7 @@ One frosted panel. The bar: a violet prompt glyph, a 16 px textarea ("Ask or tel
 
 ## The board and the card
 
-Column wells with a 12 px semibold header and a count in a mono capsule; Needs you's header and filled count in violet. An empty column is a faint hatched slot. Card: #ref (muted, tabular) inline with the 13 px title, two lines at most, the title opens the drawer. State row 12 px: a dot and the state word in its hue, elapsed, then only the exceptional: n/n checks, spend from 80 percent with ⚠ near its budget, the gate and its age, stale words, on the provider. Activity line mono, one line, on working cards; on a verifying card only with a gate or a failing check, a failing one red over two lines. Chips only when exceptional: blocked by n (names on hover), part of plan #n, waiting on #n, the accent. Actions: a row of 22 px quiet buttons, always visible. Done, failed, closed: no tile, two faint lines (title; glyph, state word, elapsed); a failed card's word is red.
+Column wells with a 12 px semibold header and a count in a mono capsule; Needs you's header and filled count in violet. An empty column is a faint hatched slot. Card: #ref (muted, tabular) inline with the 13 px title, two lines at most, the title opens the drawer. State row 12 px: a dot and the state word in its hue, elapsed, then only the exceptional: n/n checks, spend from 80 percent with ⚠ near its budget, the gate and its age, stale words, on the provider. Activity line mono, one line, on working cards; on a verifying card only with a gate or a failing check, a failing one red over two lines. Chips only when exceptional: blocked by n (names on hover), part of plan #n, waiting on #n, the accent. Actions: a row of 22 px quiet buttons, always visible. Done, failed, closed: no tile, two faint lines (title; glyph, state word, elapsed), all in --text-faint, no green, so Done sits behind Working; a failed row's mark and word take a muted red (70 percent --st-failed into --text-faint).
 
 ## Needs you
 
@@ -64,7 +64,7 @@ Raised panel, 12 px left radius, a deep shadow. Header: #ref (link to the issue)
 
 ## The phone
 
-Under 900 px one column: the top bar (home, project, a Menu key that opens the links, theme, user, Log out, scenario), the pulse strip, the bar with its sheet at 55 percent of the viewport, then the board as stacked sections in the order Needs you, Working, Verifying, Queued, Done, Done collapsed. Needs you actions (Approve as you, Deny, Split, the choices, Answer or Grant) one per row, full width, 44 px tall, on both items. The drawer takes the full screen.
+Under 900 px one column: the top bar (home, project, a Menu key that opens the links, theme, user, Log out, scenario), the pulse strip, the bar with its sheet at 55 percent of the viewport, then the board as stacked sections in the order Needs you, Working, Verifying, Queued, Done, Done collapsed. Needs you actions (Approve as you, Deny, Split, the choices, "Or in your words" and its Answer or Grant) one per row, full width, 44 px tall, the label left-aligned at 16 px, on both items; the answer box full width, 88 px. The drawer takes the full screen.
 
 ## Motion
 

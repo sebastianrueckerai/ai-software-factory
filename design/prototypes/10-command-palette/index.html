@@ -358,7 +358,8 @@ select.field { appearance: none; background: var(--bg-input) var(--chev) no-repe
 .done-item:hover .c-title, .done-item .c-title:focus-visible { color: var(--text); }
 .d-meta { display: flex; align-items: center; gap: 5px; margin-top: 1px; font-size: 11.5px; color: var(--text-faint); }
 .d-meta .g { display: inline-grid; place-items: center; }
-.done-item.s-failed .d-meta .sw { color: var(--st-failed); font-weight: 500; }
+.done-item .d-meta .g, .done-item .d-meta .sw { color: var(--text-faint); font-weight: 400; }
+.done-item.s-failed .d-meta .g, .done-item.s-failed .d-meta .sw { color: color-mix(in srgb, var(--st-failed) 70%, var(--text-faint)); font-weight: 500; }
 
 /* needs you */
 .need {
@@ -552,7 +553,11 @@ dialog#keys::backdrop { background: rgba(8, 8, 12, .45); }
   .col.folded .col-b { display: none; }
   .col-h { cursor: pointer; }
   .need .n-acts, .need .choices, .need .own .row, .need .deny-form .row { flex-direction: column; align-items: stretch; gap: 6px; }
-  .need .n-acts .btn, .need .choices .btn, .need .own .row .btn, .need .deny-form .row .btn { width: 100%; height: 44px; font-size: 13px; }
+  .need .n-acts .btn, .need .choices .btn, .need .own .row .btn, .need .deny-form .row .btn { width: 100%; height: 44px; padding: 0 16px; justify-content: flex-start; font-size: 13px; white-space: normal; text-align: left; }
+  .need .own { margin-top: 6px; }
+  .need .own > summary { display: flex; width: 100%; height: 44px; padding: 0 16px; border-radius: 6px; font-size: 13px; color: var(--text); background: var(--btn); box-shadow: inset 0 0 0 1px var(--btn-line), var(--hi); }
+  .need .own form { margin-top: 6px; gap: 6px; }
+  .need .own textarea.field, .need .deny-form textarea.field { min-height: 88px; padding: 11px 16px; font-size: 13px; }
   .lanes .cols.human { display: flex; }
   #drawer { top: 0; width: 100%; border-radius: 0; z-index: 60; }
   .dr-h { padding: 12px 14px 10px; }

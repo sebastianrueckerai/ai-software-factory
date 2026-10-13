@@ -17,15 +17,15 @@ The console as a full-screen terminal program: one monospace face, panels drawn 
 | --line-strong | #a8792f | #4a4031 | the header box, the chat box, the drawer |
 | --text | #ffb238 | #1c1813 | body, 11.1:1 / 14.7:1 |
 | --text-hi | #ffd27a | #000000 | the pulse sentence, the prompt |
-| --text-muted | #a8792f | #665842 | muted text, done cards, labels, 5.0:1 / 5.1:1 at least |
-| --accent | #5fd7e6 | #00687a | links only (anything that leaves the view), 11.4:1 / 5.0:1 |
+| --text-muted | #a8792f | #4d4130 | muted text, done cards, labels, 5.0:1 / 6.9:1 at least |
+| --accent | #5fd7e6 | #005a69 | links only (anything that leaves the view), 11.4:1 / 6.1:1 |
 | --need-bg / --need-fg | #ffb238 / #0b0906 | #1c1813 / #f6f0e0 | inverse video: Needs you headers, primary buttons, selected tab, hover |
 | --tint | amber at 7 % | ochre at 8 % | the prominent pulse band, a focused card row |
-| --st-running | #ffd27a | #8a4f00 | `[running]` |
+| --st-running | #ffd27a | #7a4600 | `[running]` |
 | --st-waiting | inverse | inverse | `[waiting on a human]` inside Needs you |
 | --st-review | #ffb238 | #1c1813 | `[in review]` |
-| --st-done, --st-closed | #a8792f | #665842 | `[done]`, `[closed]` |
-| --st-failed | #ff6a55 | #b02a1c | `[failed]`, over the cap, provider down, 6.9:1 / 5.1:1 |
+| --st-done, --st-closed | #a8792f | #4d4130 | `[done]`, `[closed]` |
+| --st-failed | #ff6a55 | #9a2418 | `[failed]`, over the cap, provider down, 6.9:1 / 6.2:1 |
 
 Colour never carries a state alone: every state is a bracketed word, every warning has ⚠.
 
@@ -57,11 +57,11 @@ The first line after the status line. Prominent (a card needs a person): ⚠, a 
 
 ## The chat
 
-A REPL. The box title in the top border: `Chat ─ project agent · project`, `[New conversation]` and the old-conversations select at the right. The log is IRC-style: `14:21 you:` and `14:21 agent:` prefixes in a fixed gutter, text at most 96 characters wide. Tool blocks are one line `▸ read card #603 · 0.4 s`, opening to arguments and result. A proposal is an indented block with a strong left rule: `I will:`, the changes as `·` lines, the detail muted, then `[ Do it ]` in inverse video and `[ Skip ]` muted. Applied: `✓ applied: … [undo]`. The composer is the last line: a `>` prompt, a one-line textarea that grows to six lines, `[ Send ]`. The queue lists under it as `queued:` lines with `[edit]` `[remove]`. The bottom border carries "This is your own conversation with the project agent; other members have theirs."
+A REPL. Output starts at the top of the box and grows down, as in a terminal; past the box's height it scrolls and keeps the newest line in view. The box title in the top border: `Chat ─ project agent · project`, `[New conversation]` and the old-conversations select at the right. The log is IRC-style: `14:21 you:` and `14:21 agent:` prefixes in a fixed gutter, text at most 96 characters wide. Tool blocks are one line `▸ read card #603 · 0.4 s`, opening to arguments and result. A proposal is an indented block with a strong left rule: `I will:`, the changes as `·` lines, the detail muted, then `[ Do it ]` in inverse video and `[ Skip ]` muted. Applied: `✓ applied: … [undo]`. The composer is the last line: a `>` prompt, a one-line textarea that grows to six lines, `[ Send ]`. The queue lists under it as `queued:` lines with `[edit]` `[remove]`. The bottom border carries "This is your own conversation with the project agent; other members have theirs."
 
 ## The board and the card
 
-Box titles in the border: `Queued 4`, muted. A box whose content runs past its height scrolls on its own and shows `▾ more` cut into its bottom border until it is scrolled to the end. A card is a few lines with no box of its own, cards separated by a dashed rule:
+Box titles in the border: `Queued 4`, muted. A box whose content runs past its height scrolls on its own and shows `▾ more` cut into its bottom border until it is scrolled to the end; the scroll area stops half a line above the border so the mark never touches text. A card is a few lines with no box of its own, cards separated by a dashed rule:
 
 1. `#601` bold and the title, two lines at most; the whole line is the button that opens the drawer.
 2. `[running] · 23 min · 3/4 checks`, then only the exceptional: `€1.72 / €2.00 ⚠ near its budget` from 80 %, the gate and its age, fine states as boxed chips.
@@ -78,6 +78,8 @@ Buttons: brackets drawn around the label, hover in inverse video, focus a 2 px o
 The loudest thing while it holds an item: the box is a 3 px double line (`╔═╗` in CSS) in `--text`, its title `Needs you 2` in inverse video. Each item opens with an inverse header strip: the headline (a button that opens the drawer) and the waiting time at the right.
 
 - Merge approval: `Merge PR #612`, then `[high risk] [migration]` as inverse-outlined chips, `Model review: approve. Adds the column safely.`, `Recommendation: …`, then `[ Approve as you ]` (inverse) `[ Deny ]` `[ Split ]`. Deny unfolds the reason box: a textarea, `Deny by` request changes / reject, and the submit that reads the chosen way.
+All lines of an item share one left edge: chips, review lines, choices, the elapsed line, the verdict buttons.
+
 - Escalation: `#603 Which store for the session table?` as the strip, the full question under it, the choices as bracket buttons, `[ Or in your words ]` unfolding the answer box with `[ Answer ]`, a muted line with the elapsed time and "answer on the issue" (the state word `[waiting on a human]` only in the drawer: the column already says it), the verdict buttons `[real problem] [false alarm]` small at the end, the question "Was this escalation a real problem?" as their group label.
 - Capped: the answer box is open and its button reads `[ Grant one session with this answer ]`.
 - Plan approval and resource approval (no scenario carries one): the same strip and body; Accept plan / Approve in inverse, Request changes and Reject behind bracket disclosures.
@@ -88,11 +90,13 @@ Empty (idle, quiet), Needs you whispers like any other box: single line, muted t
 
 ## The drawer
 
-A pane with a strong line, docked right. Header: `#601` (link to the issue), the title, `[ Esc ]` to close (`[ Close ]` on the phone); the facts line `[running] · 23 min · 3/4 checks · €1.72 / €2.00 ⚠ · lane ready · coding-cheap`. Tabs as bracket buttons, the selected one in inverse video. Overview: the four-line top block as a `Task / Status / Budget / Agent` table with the labels muted, the Open block (a Needs you item in the same strip-and-body form, the merge with its Decision note; a failure reason with Retry; a stale line), then the sections as `▸` disclosures. The merge headline on the board opens the drawer with "Reviews and audit" unfolded. Activity: the gates with a `█░` meter against the longest, the steps table. Files: a table with a git-style `+++−−` stat. Chat: `Session 2 · coding-cheap · running`, the messages in the same gutter as the REPL, the steer prompt.
+A pane with a strong line, docked right. Its content follows the REPL's grammar: a label column of 11 characters (the top block's `Task / Status / Budget / Agent`, the speaker and time in Chat), a blank line between turns and between sections, section heads drawn as rules: `── Open ────`, `─▸ Objective ────` (`─▾` when open), `── Gates ────`. Header: `#601` (link to the issue), the title wrapping to two lines, never cut, `[ Esc ]` to close (`[ Close ]` on the phone); the facts line `[running] · 23 min · 3/4 checks · €1.72 / €2.00 ⚠ · lane ready · coding-cheap`. Tabs as bracket buttons, the selected one in inverse video. Overview: the four-line top block as a `Task / Status / Budget / Agent` table with the labels muted, the Open block (a Needs you item in the same strip-and-body form, the merge with its Decision note; a failure reason with Retry; a stale line), then the sections as `▸` disclosures. The merge headline on the board opens the drawer with "Reviews and audit" unfolded. Activity: the gates with a `█░` meter against the longest, the steps table. Files: a table with a git-style `+++−−` stat. Chat: `Session 2 · coding-cheap · running`, the messages in the same gutter as the REPL, the steer prompt.
 
 ## The phone
 
-Under 900 px one column and normal page scroll. The title row: `Factory console`, the project select, `[menu]` that unfolds the page links, theme, user, Log out and the scenario switch. Then the status line (wraps), the pulse, the chat REPL with its log at 55 % of the viewport height and the composer under it, then the board boxes stacked: Needs you, Working, Verifying, Queued, Done (folded, its title a button). Choice buttons full width. The drawer takes the full screen.
+Under 900 px one column and normal page scroll. The title row: `Factory console`, the project select, `[menu]` that unfolds the page links, theme, user, Log out and the scenario switch. Then the status line (wraps), the pulse, the chat REPL with its log at 55 % of the viewport height and the composer under it, then the board boxes stacked: Needs you, Working, Verifying, Queued, Done (folded, its title a button). The drawer takes the full screen.
+
+Tap targets are 44 px tall with a 1 px frame, the label left and the closing bracket at the right edge: Needs you actions and choices full width, one per row; Do it and Skip side by side in two equal halves; the verdict pair and a card's lane moves in one row of equal cells; Send.
 
 ## Motion
 

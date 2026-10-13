@@ -22,11 +22,11 @@
   color-scheme: light;
   --bg: #f2ead6; --bg-raised: #f8f3e6; --bg-sunken: #ebe2ca;
   --line: #a3946f; --line-strong: #4a4031;
-  --text: #1c1813; --text-hi: #000; --text-muted: #665842;
-  --accent: #00687a;
+  --text: #1c1813; --text-hi: #000; --text-muted: #4d4130;
+  --accent: #005a69;
   --need-bg: #1c1813; --need-fg: #f6f0e0; --need-hover: #3b3226;
   --tint: rgba(150, 100, 0, .08);
-  --st-running: #8a4f00; --st-review: #1c1813; --st-done: #665842; --st-failed: #b02a1c;
+  --st-running: #7a4600; --st-review: #1c1813; --st-done: #4d4130; --st-failed: #9a2418;
   --acc-red: #b02a1c; --acc-orange: #a14a00; --acc-amber: #8a5a00; --acc-green: #2f6b1f;
   --acc-teal: #00695c; --acc-blue: #1f4fa3; --acc-violet: #5a3fa0; --acc-pink: #a3266b;
 }
@@ -172,7 +172,7 @@ body.drawer-open #chat { grid-column: 1; margin-right: 14px; }
 .col { position: relative; border: 1px solid var(--line); background: var(--bg-sunken); min-height: 0; display: flex; flex-direction: column; min-width: 0; }
 .col .lg { color: var(--text-muted); background: linear-gradient(var(--bg) 50%, var(--bg-sunken) 50%); }
 .col .lg .n { color: var(--text); margin-left: .6ch; }
-.col-body { flex: 1; min-height: 0; overflow: auto; margin-top: .8em; padding: .15em 1.1ch .6em; }
+.col-body { flex: 1; min-height: 0; overflow: auto; margin: .8em 0 .7em; padding: .15em 1.1ch .2em; }
 .col-needs { border: 3px double var(--text); }
 .col-needs .lg { top: calc(-.75em - 1.5px); background: var(--need-bg); color: var(--need-fg); font-weight: 700; }
 .col-needs .lg .n { color: var(--need-fg); }
@@ -220,12 +220,12 @@ body.drawer-open #chat { grid-column: 1; margin-right: 14px; }
 .need-head .open:hover { text-decoration: underline; }
 .need-head .open::after { content: " ›"; }
 .need-head .since { font-weight: 400; white-space: nowrap; }
-.need-body { padding: .35em .9ch .1em; border-left: 1px solid var(--text); margin-left: 0; }
-.need-body > * + * { margin-top: .2em; }
+.need-body { padding: .35em .9ch .1em; }
+.need-body > * + * { margin-top: .3em; }
 .need-body .lbl { color: var(--text-muted); }
-.need .acts { margin-top: .45em; }
+.need .acts { margin-top: .3em; }
 .need .q { color: var(--text-hi); }
-.need .verdict { color: var(--text-muted); font-size: 12.5px; }
+.need .verdict { display: flex; flex-wrap: wrap; gap: .3em 1ch; color: var(--text-muted); font-size: 12.5px; }
 .need .verdict .btn { font-size: 12.5px; }
 .need textarea, #drawer textarea, #drawer input[type="text"] {
   display: block; width: 100%; background: var(--bg); border: 1px solid var(--line-strong); color: var(--text);
@@ -245,8 +245,7 @@ input[type="radio"] { accent-color: var(--text); margin: 0; }
 .chat-lg .sub { color: var(--text-muted); }
 .chat-lg .spacer { flex: 1; background: none; padding: 0; }
 .chat-foot { position: absolute; bottom: calc(-.75em - .5px); left: 1.2ch; font-size: 12.5px; line-height: 1.5; color: var(--text-muted); background: linear-gradient(var(--bg-raised) 50%, var(--bg) 50%); padding: 0 .7ch; max-width: calc(100% - 2.4ch); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.log { flex: 1; min-height: 0; overflow: auto; padding: 1em 1.6ch .6em; display: flex; flex-direction: column; gap: .45em; }
-.log > :first-child { margin-top: auto; }
+.log { flex: 1; min-height: 0; overflow: auto; margin-top: .9em; padding: .2em 1.6ch .6em; display: flex; flex-direction: column; gap: .45em; }
 .start { color: var(--text-muted); max-width: 110ch; }
 .msg { display: grid; grid-template-columns: 6ch 7ch minmax(0, 96ch); column-gap: 1ch; }
 .msg .t { color: var(--text-muted); }
@@ -285,7 +284,7 @@ input[type="radio"] { accent-color: var(--text); margin: 0; }
 #drawer { position: relative; border: 1px solid var(--line-strong); border-right: 0; margin-right: -16px; background: var(--bg-raised); display: flex; flex-direction: column; min-height: 0; box-shadow: -14px 0 0 var(--bg); }
 #drawer[hidden] { display: none; }
 .dr-head { padding: .7em 1.6ch .5em; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto; gap: .15em 2ch; }
-.dr-head h2 { font-size: 15px; font-weight: 700; color: var(--text-hi); line-height: 1.4; }
+.dr-head h2 { font-size: 15px; font-weight: 700; color: var(--text-hi); line-height: 1.4; min-width: 0; overflow-wrap: anywhere; white-space: normal; }
 .dr-head h2:focus { outline: none; }
 .dr-head h2:focus-visible { outline: 2px solid var(--text-hi); }
 .dr-head .c-state { grid-column: 1 / -1; }
@@ -293,19 +292,17 @@ input[type="radio"] { accent-color: var(--text); margin: 0; }
 .tabs { display: flex; gap: 1.2ch; padding: .45em 1.6ch; border-bottom: 1px solid var(--line); flex: none; }
 .tabs [role="tab"][aria-selected="true"] { background: var(--need-bg); color: var(--need-fg); font-weight: 700; }
 .tp { flex: 1; min-height: 0; overflow: auto; padding: .8em 1.6ch 1.2em; }
-.top-block { display: grid; grid-template-columns: 8ch 1fr; gap: .15em 1ch; padding-bottom: .7em; border-bottom: 1px dashed var(--line); }
+.top-block { display: grid; grid-template-columns: 11ch 1fr; gap: .15em 1ch; margin-bottom: 1.5em; }
 .top-block dt { color: var(--text-muted); }
-.open-block { margin-top: .8em; padding-bottom: .8em; border-bottom: 1px dashed var(--line); }
-.open-block > h3 { font-size: inherit; color: var(--text-muted); font-weight: 400; margin-bottom: .3em; }
-.sec { border-bottom: 1px dashed var(--line); }
-.sec > summary { cursor: pointer; padding: .35em 0; list-style: none; }
+.open-block { margin-bottom: 1.5em; }
+.sec > summary { cursor: pointer; list-style: none; margin: 0; padding: .2em 0; }
 .sec > summary::-webkit-details-marker { display: none; }
-.sec > summary::before { content: "▸ "; color: var(--text-muted); }
-.sec[open] > summary::before { content: "▾ "; }
-.sec > summary:hover { background: var(--tint); }
-.sec .body { padding: 0 0 .7em 2ch; }
+.sec > summary::before { content: "─▸"; color: var(--line-strong); }
+.sec[open] > summary::before { content: "─▾"; color: var(--text); }
+.sec > summary:hover .hi { text-decoration: underline; text-underline-offset: 3px; }
+.sec .body { padding: .3em 0 1.2em 12ch; }
 .sec .body > * + * { margin-top: .4em; }
-.facts { display: grid; grid-template-columns: 17ch 1fr; gap: .2em 1.5ch; }
+.facts { display: grid; grid-template-columns: 17ch 1fr; gap: .2em 1.5ch; margin-left: -12ch; }
 .facts dt { color: var(--text-muted); }
 .facts dd { overflow-wrap: anywhere; }
 .tbl-wrap { overflow-x: auto; }
@@ -316,14 +313,20 @@ td.num { text-align: right; white-space: nowrap; }
 .meter { white-space: nowrap; letter-spacing: -.5px; }
 .meter .off { color: var(--line); }
 .plus { color: var(--text-hi); } .minus { color: var(--st-failed); }
-.tp h3 { font-size: inherit; color: var(--text-muted); font-weight: 400; margin: .2em 0 .3em; }
-.tp h3 + .tbl-wrap { margin-bottom: 1.2em; }
-.steer { margin-top: 1em; border-top: 1px solid var(--line); padding-top: .6em; }
+.hd-rule { display: flex; align-items: center; gap: 1ch; font-size: 13px; color: var(--text-muted); font-weight: 400; margin: 0 0 .6em; white-space: nowrap; }
+.hd-rule::before { content: "──"; color: var(--line-strong); }
+.hd-rule::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+.hd-rule .hi { color: var(--text); }
+.tbl-wrap + .hd-rule { margin-top: 1.5em; }
+.steer { margin-top: 1.5em; }
 .steer .row { display: flex; gap: 1ch; align-items: flex-start; }
 .steer .row textarea { margin: 0; }
 .rel li { display: flex; gap: 1ch; align-items: baseline; flex-wrap: wrap; }
-#drawer .msg { grid-template-columns: 6ch 11ch minmax(0, 1fr); }
-#drawer .log-said { display: flex; flex-direction: column; gap: .45em; margin-top: .5em; }
+#drawer .msg { grid-template-columns: 11ch minmax(0, 1fr); }
+#drawer .msg .who { grid-column: 1; grid-row: 1; }
+#drawer .msg .t { grid-column: 1; grid-row: 2; font-size: 12.5px; }
+#drawer .msg .tx { grid-column: 2; grid-row: 1 / span 2; }
+#drawer .log-said { display: flex; flex-direction: column; gap: 1.5em; }
 
 /* keys overlay */
 .overlay { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; background: rgba(0, 0, 0, .55); }
@@ -373,10 +376,10 @@ td.num { text-align: right; white-space: nowrap; }
   .chat-lg { flex-wrap: nowrap; right: 1ch; left: 1ch; }
   .chat-lg .sub { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .chat-lg .old { display: none; }
-  .log { height: 55vh; flex: none; padding: 1em 1ch .6em; }
+  .log { height: 55vh; flex: none; padding: .2em 1ch .6em; }
+  .composer .btn { display: flex; align-items: center; min-height: 44px; padding: 0 1ch; border: 1px solid var(--line-strong); }
   .msg { grid-template-columns: 7ch minmax(0, 1fr); }
   .msg .t { display: none; }
-  #drawer .msg { grid-template-columns: 11ch minmax(0, 1fr); }
   .proposal { margin-left: 0; }
   .composer { padding: .55em 1ch .9em; }
   .composer textarea { min-height: 4.5em; }
@@ -390,10 +393,20 @@ td.num { text-align: right; white-space: nowrap; }
   .fold .mark { display: inline; }
   .col-done.folded .lg { position: static; display: block; background: none; padding: .45em 1.2ch; }
   .none { padding: .4em 0 .2em; }
-  .choices { flex-direction: column; align-items: stretch; }
-  .choices .btn { display: flex; padding: .35em 0; }
-  .choices .btn::after { margin-left: auto; }
-  .need .acts .btn { padding-top: .2em; padding-bottom: .2em; }
+  .need .acts { flex-direction: column; align-items: stretch; gap: .5em; }
+  .need .acts .btn, .need form .btn, .need .verdict .btn, .proposal .acts .btn, .card .acts .btn {
+    display: flex; align-items: center; min-height: 44px; padding: 0 1ch; border: 1px solid var(--line-strong); font-size: 14px;
+  }
+  .need .acts .btn::after, .need form .btn::after, .need .verdict .btn::after, .proposal .acts .btn::after, .card .acts .btn::after { margin-left: auto; }
+  .need .acts .btn.primary, .need form .btn.primary, .proposal .acts .btn.primary { border-color: var(--need-bg); }
+  .need form .btn { width: 100%; }
+  .need .verdict { display: grid; grid-template-columns: 1fr 1fr; gap: .5em; }
+  .need fieldset label { min-height: 44px; align-items: center; }
+  .proposal .acts { display: grid; grid-template-columns: 1fr 1fr; gap: .5em; margin-right: 1ch; }
+  .card .acts { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5em; }
+  .card.end .c-state .btn { min-height: 44px; padding: 0 1ch; }
+  .sec .body { padding-left: 0; }
+  .facts { margin-left: 0; }
   #drawer { position: fixed; inset: 0; z-index: 50; margin: 0; box-shadow: none; border: 0; }
   .dr-head { padding-top: .6em; }
   #dr-close .k { display: none; } #dr-close .ph { display: inline; }
@@ -496,8 +509,6 @@ td.num { text-align: right; white-space: nowrap; }
   const ACCENTS = ['red', 'orange', 'amber', 'green', 'teal', 'blue', 'violet', 'pink'];
   const START = "Ask or tell the project agent. It reads, explains, moves, answers, steers and approves as you, through the console's own actions; it runs no code.";
   const END = ['done', 'failed', 'closed'];
-  // scenarios.js declares `working` twice per scenario (a count, then the card list); the list wins, so count from it
-  const nWorking = (s) => (Array.isArray(s.working) ? s.working.filter((c) => !c.provider).length : s.working);
 
   let name = S[qs.get('scenario')] ? qs.get('scenario') : 'busy';
   let sc = S[name];
@@ -521,7 +532,7 @@ td.num { text-align: right; white-space: nowrap; }
   function renderStatus() {
     const s = sc, sep = '<span class="sep" aria-hidden="true">·</span>';
     const cls = s.state === 'waiting on you' ? 'need' : s.state === 'idle' ? 'muted' : '';
-    const p = [`<span class="state ${cls}"><span aria-hidden="true">${s.state === 'idle' ? '○' : '●'}</span> ${esc(s.state)}</span>`, `<span>${nWorking(s)} working</span>`];
+    const p = [`<span class="state ${cls}"><span aria-hidden="true">${s.state === 'idle' ? '○' : '●'}</span> ${esc(s.state)}</span>`, `<span>${s.workingCount} working</span>`];
     if (s.provider) p.push(`<span class="bad">⚠ ${s.provider} waiting on the provider</span>`);
     p.push(`<a class="fig${s.needYou ? ' need' : ''}" href="#col-needs">${s.needYou} need you</a>`);
     const over = s.spend > s.cap;
@@ -572,7 +583,7 @@ td.num { text-align: right; white-space: nowrap; }
     typing = true;
     const el = append(`<div class="msg agent"><span class="t">${now()}</span><span class="who">agent:</span><div class="tx"><p><span class="cursor">▍</span></p></div></div>`);
     setTimeout(() => {
-      el.querySelector('p').textContent = `The board now: ${nWorking(sc)} working, ${sc.needYou} need you, ${eur(sc.spend)} of ${eur(sc.cap)} this month.`;
+      el.querySelector('p').textContent = `The board now: ${sc.workingCount} working, ${sc.needYou} need you, ${eur(sc.spend)} of ${eur(sc.cap)} this month.`;
       typing = false; log.scrollTop = log.scrollHeight;
       if (queue.length) { const next = queue.shift(); renderQueue(); send(next); }
     }, 700);
@@ -656,7 +667,7 @@ td.num { text-align: right; white-space: nowrap; }
       <p class="acts"><button type="button" class="btn quiet" data-act="own" aria-expanded="false" aria-controls="ans-${id}">Or in your words</button></p>` : ''}
       <form class="answer" data-form="answer" data-capped="${n.capped ? 1 : 0}"${has ? ' hidden' : ''}><label for="ans-${id}">${has ? 'Or your own answer' : 'Your answer'}, posted on the issue as you</label><textarea id="ans-${id}" rows="2"></textarea><button type="submit" class="btn primary">${n.capped ? 'Grant one session with this answer' : 'Answer'}</button></form>
       <p class="c-state">${bits.join(' · ')}</p>
-      ${n.alert ? `<p class="verdict" role="group" aria-label="Was this escalation a real problem?" title="Was this escalation a real problem?">${where === 'd' ? 'Was this escalation a real problem? ' : ''}<button type="button" class="btn sm quiet" data-act="verdict">real problem</button> <button type="button" class="btn sm quiet" data-act="verdict">false alarm</button></p>` : ''}
+      ${n.alert ? `<p class="verdict" role="group" aria-label="Was this escalation a real problem?" title="Was this escalation a real problem?">${where === 'd' ? 'Was this escalation a real problem? ' : ''}<button type="button" class="btn quiet" data-act="verdict">real problem</button><button type="button" class="btn quiet" data-act="verdict">false alarm</button></p>` : ''}
       <p class="confirm" role="status" hidden></p></div></article>`;
   }
   const needHTML = (n, where) => (n.kind === 'merge' ? mergeHTML(n, where) : escalationHTML(n, where));
@@ -765,7 +776,7 @@ td.num { text-align: right; white-space: nowrap; }
   function durS(d) { let s = 0; String(d).replace(/(\d+)\s*(h|min|s)/g, (_, n, u) => { s += +n * (u === 'h' ? 3600 : u === 'min' ? 60 : 1); }); return s; }
   function meter(v, max) { const w = 16, on = Math.max(1, Math.round(w * v / max)); return `<span class="meter" aria-hidden="true">${'█'.repeat(on)}<span class="off">${'░'.repeat(w - on)}</span></span>`; }
   function stat(a, d) { const t = a + d, w = 10, p = t ? Math.round(w * a / t) : 0; return `<span class="plus">${'+'.repeat(p)}</span><span class="minus">${'−'.repeat(t ? w - p : 0)}</span>`; }
-  const sec = (title, body, open) => `<details class="sec"${open ? ' open' : ''}><summary>${title}</summary><div class="body">${body}</div></details>`;
+  const sec = (title, body, open) => `<details class="sec"${open ? ' open' : ''}><summary class="hd-rule"><span class="hi">${title}</span></summary><div class="body">${body}</div></details>`;
 
   function drawerHTML(card, need, D, tab, focus) {
     const ov = D && D.overview;
@@ -783,9 +794,10 @@ td.num { text-align: right; white-space: nowrap; }
 
     const top = `<dl class="top-block"><dt>Task</dt><dd>${esc(ov ? ov.task : card.title)}</dd><dt>Status</dt><dd>${esc(ov ? ov.status : `${card.status}, ${card.elapsed}`)}</dd><dt>Budget</dt><dd class="${near ? 'warn' : 'muted'}">${near ? '⚠ ' : ''}${esc(ov ? ov.budget : `${eur(card.spent)} of ${eur(card.budget)}, ${pct} percent`)}</dd><dt>Agent</dt><dd class="muted">${esc(ov ? ov.agent : (card.model || 'none'))}</dd></dl>`;
     let open = '';
-    if (need) open = `<div class="open-block"><h3>Open</h3>${needHTML(need, 'd')}</div>`;
-    else if (card.status === 'failed' && card.reason) open = `<div class="open-block"><h3>Open</h3><p class="bad">${esc(card.reason)}</p><p class="acts"><button type="button" class="btn" data-act="retry-d">Retry</button></p></div>`;
-    else if (card.stale) open = `<div class="open-block"><h3>Open</h3><p class="bad">${esc(card.activity)} — ${esc(card.staleText)}</p></div>`;
+    const head = (t) => `<h3 class="hd-rule"><span class="hi">${t}</span></h3>`;
+    if (need) open = `<div class="open-block">${head('Open')}${needHTML(need, 'd')}</div>`;
+    else if (card.status === 'failed' && card.reason) open = `<div class="open-block">${head('Open')}<p class="bad">${esc(card.reason)}</p><p class="acts"><button type="button" class="btn" data-act="retry-d">Retry</button></p></div>`;
+    else if (card.stale) open = `<div class="open-block">${head('Open')}<p class="bad">${esc(card.activity)} — ${esc(card.staleText)}</p></div>`;
 
     const s = [];
     if (ov) s.push(sec('Objective', `<p>${esc(ov.objective)}</p><p class="muted">${esc(ov.provenance)}</p>`));
@@ -816,12 +828,12 @@ td.num { text-align: right; white-space: nowrap; }
     let activity = '<p class="muted">No session yet</p>', files = `<p class="muted">${pr ? 'No session yet' : 'no pull request yet'}</p>`;
     if (D) {
       const max = Math.max(...D.gates.map((g) => durS(g.duration)));
-      activity = `<h3>Gates</h3><div class="tbl-wrap"><table><thead><tr><th>gate</th><th>attempt</th><th>start</th><th>duration</th><th>outcome</th><th><span class="vh">against the longest</span></th></tr></thead><tbody>${D.gates.map((g) => `<tr><td>${esc(g.gate)}</td><td class="num">${g.attempt}</td><td>${esc(g.start)}</td><td>${esc(g.duration)}</td><td>${stateWord(g.outcome)}</td><td>${meter(durS(g.duration), max)}</td></tr>`).join('')}</tbody></table></div>
-        <h3>Steps</h3><div class="tbl-wrap"><table><thead><tr><th>time</th><th>step</th><th>supervisor</th><th>detail</th></tr></thead><tbody>${D.steps.map((st) => `<tr><td>${esc(st.time)}</td><td>${esc(st.step)}</td><td class="muted">${esc(st.supervisor || '—')}</td><td>${esc(st.detail)}</td></tr>`).join('')}</tbody></table></div>`;
-      files = `<h3>Changed files</h3><div class="tbl-wrap"><table><thead><tr><th>file</th><th>change</th><th class="num">added</th><th class="num">deleted</th><th><span class="vh">stat</span></th></tr></thead><tbody>${D.files.map((x) => `<tr><td><code>${esc(x.file)}</code></td><td class="muted">${esc(x.change)}</td><td class="num plus">+${x.added}</td><td class="num minus">−${x.deleted}</td><td>${stat(x.added, x.deleted)}</td></tr>`).join('')}</tbody></table></div>`;
+      activity = `<h3 class="hd-rule"><span class="hi">Gates</span></h3><div class="tbl-wrap"><table><thead><tr><th>gate</th><th>attempt</th><th>start</th><th>duration</th><th>outcome</th><th><span class="vh">against the longest</span></th></tr></thead><tbody>${D.gates.map((g) => `<tr><td>${esc(g.gate)}</td><td class="num">${g.attempt}</td><td>${esc(g.start)}</td><td>${esc(g.duration)}</td><td>${stateWord(g.outcome)}</td><td>${meter(durS(g.duration), max)}</td></tr>`).join('')}</tbody></table></div>
+        <h3 class="hd-rule"><span class="hi">Steps</span></h3><div class="tbl-wrap"><table><thead><tr><th>time</th><th>step</th><th>supervisor</th><th>detail</th></tr></thead><tbody>${D.steps.map((st) => `<tr><td>${esc(st.time)}</td><td>${esc(st.step)}</td><td class="muted">${esc(st.supervisor || '—')}</td><td>${esc(st.detail)}</td></tr>`).join('')}</tbody></table></div>`;
+      files = `<h3 class="hd-rule"><span class="hi">Changed files</span></h3><div class="tbl-wrap"><table><thead><tr><th>file</th><th>change</th><th class="num">added</th><th class="num">deleted</th><th><span class="vh">stat</span></th></tr></thead><tbody>${D.files.map((x) => `<tr><td><code>${esc(x.file)}</code></td><td class="muted">${esc(x.change)}</td><td class="num plus">+${x.added}</td><td class="num minus">−${x.deleted}</td><td>${stat(x.added, x.deleted)}</td></tr>`).join('')}</tbody></table></div>`;
     }
     const ses = D && D.session;
-    let chat = ses ? `<p class="muted">Session ${ses.n} · ${esc(ses.model)} · ${esc(ses.outcome)}</p><div class="log-said" id="dr-said">${ses.said.map(msgHTML).join('')}</div>` : '<p class="muted">No session yet</p><div id="dr-said"></div>';
+    let chat = ses ? `<h3 class="hd-rule"><span class="hi">Session ${ses.n} · ${esc(ses.model)} · ${esc(ses.outcome)}</span></h3><div class="log-said" id="dr-said">${ses.said.map(msgHTML).join('')}</div>` : '<p class="muted">No session yet</p><div id="dr-said"></div>';
     if (card.status === 'running') chat += `<form class="steer" data-form="steer"><label class="vh" for="steer-${card.issue}">Your message to the running session</label><div class="row"><span class="hi" aria-hidden="true">&gt;</span><textarea id="steer-${card.issue}" rows="2" maxlength="8192" placeholder="Message the running session; it reads it at its next step"></textarea><button type="submit" class="btn">Send</button></div></form>`;
 
     const tabs = [['overview', 'Overview', overview], ['chat', 'Chat', chat], ['activity', 'Activity', activity], ['files', 'Files', files]];

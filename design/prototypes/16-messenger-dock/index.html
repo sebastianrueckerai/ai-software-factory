@@ -16,8 +16,8 @@
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", "Noto Sans", system-ui, sans-serif;
   --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Noto Sans Mono", "DejaVu Sans Mono", monospace;
   --top-h: 56px;
-  --figs-h: 46px;
-  --board-h: clamp(300px, 44vh, 520px);
+  --figs-h: 42px;
+  --board-h: clamp(300px, 40vh, 520px);
   --drawer-w: min(46vw, 720px);
   --conv-w: 1180px;
   --r: 10px;
@@ -40,6 +40,7 @@ html[data-theme="dark"] {
   --accent-fill: #237a4b;
   --accent-fill-hover: #2a8a56;
   --accent-soft: #1d3326;
+  --link: #6fd19b;
   --ink: #ececee;
   --ink-on: #19191c;
   --ink-hover: #ffffff;
@@ -79,6 +80,7 @@ html[data-theme="light"] {
   --accent-fill: #1b7a48;
   --accent-fill-hover: #166a3e;
   --accent-soft: #e4f2e9;
+  --link: #1b7a48;
   --ink: #1c1c1e;
   --ink-on: #ffffff;
   --ink-hover: #3a3a3d;
@@ -150,10 +152,10 @@ code, .mono { font-family: var(--mono); font-size: .86em; }
 .btn.sm { height: 26px; padding: 0 9px; border-radius: 7px; font-size: 12.5px; }
 .btn[disabled] { opacity: .5; cursor: not-allowed; }
 .link {
-  background: none; border: 0; padding: 0; color: var(--text-muted); font: 500 13px/1.4 var(--font);
-  text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px;
+  background: none; border: 0; padding: 0; color: var(--link); font: 500 13px/1.4 var(--font);
+  text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--link) 40%, transparent); text-underline-offset: 3px;
 }
-.link:hover { color: var(--text); text-decoration-color: currentColor; }
+.link:hover { text-decoration-color: currentColor; }
 .icon-btn {
   display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 9px;
   border: 1px solid transparent; background: transparent; color: var(--text-muted);
@@ -205,10 +207,11 @@ button.ref:hover { text-decoration-color: currentColor; }
 /* main grid */
 main {
   flex: 1; min-height: 0; display: grid;
-  grid-template-rows: var(--figs-h) var(--board-h) minmax(0, 1fr);
+  grid-template-rows: auto var(--figs-h) var(--board-h) minmax(0, 1fr);
   grid-template-columns: minmax(0, 1fr);
-  grid-template-areas: "figs" "board" "dock";
+  grid-template-areas: "pulse" "figs" "board" "dock";
 }
+#pulse { grid-area: pulse; }
 #status, #board, #chat { min-width: 0; }
 #status { grid-area: figs; }
 #board { grid-area: board; }
@@ -242,7 +245,7 @@ a.fig:hover { border-color: var(--line-strong); color: var(--text); }
 .tool.key { width: 30px; padding: 0; font-weight: 600; border-color: var(--line); }
 
 /* board */
-#board { min-height: 0; padding: 2px 24px 24px; position: relative; display: flex; flex-direction: column; }
+#board { min-height: 0; padding: 2px 24px 14px; position: relative; display: flex; flex-direction: column; }
 #board-in { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .cols {
   flex: 1; min-height: 0; display: grid; gap: 12px;
@@ -285,9 +288,10 @@ a.fig:hover { border-color: var(--line-strong); color: var(--text); }
 .sep { margin: 0 4px 0 5px; opacity: .7; }
 .b { white-space: nowrap; }
 .b:has(.near) { white-space: normal; }
-.st { display: inline-flex; align-items: center; gap: 5px; font-weight: 500; }
+.st { display: inline-flex; align-items: center; gap: 5px; color: var(--text-muted); }
 .st-run { color: var(--st-run); } .st-wait { color: var(--st-wait); } .st-rev { color: var(--st-rev); }
 .st-que { color: var(--st-que); } .st-done { color: var(--st-done); } .st-fail { color: var(--st-fail); }
+.glyph { color: var(--text-muted); } .glyph.st-fail { color: var(--st-fail); }
 .near { color: var(--need); font-weight: 500; }
 .bad { color: var(--st-fail); font-weight: 500; }
 .activity {
@@ -366,25 +370,24 @@ textarea.field:focus, input.field:focus { outline: none; border-color: var(--acc
 /* chat dock */
 #chat {
   margin: 0 16px; min-height: 0; min-width: 0; display: grid; position: relative; z-index: 2;
-  grid-template-rows: auto auto minmax(0, 1fr) auto auto; grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto; grid-template-columns: minmax(0, 1fr);
   background: var(--bg-raised); border: 1px solid var(--line); border-bottom: 0; border-radius: 16px 16px 0 0;
   box-shadow: var(--shadow-dock);
   transition: margin-right .2s var(--ease);
 }
 .drawer-open #chat { margin-right: calc(var(--drawer-w) + 16px); }
 #pulse {
-  justify-self: center; margin-top: -22px; width: max-content; max-width: min(900px, calc(100% - 40px));
-  border-radius: 12px; padding: 10px 14px 10px 14px; position: relative; z-index: 3;
-  background: var(--bg-raised); border: 1px solid var(--line-strong); box-shadow: var(--shadow-float);
+  margin: 10px 24px 0; border-radius: 12px; padding: 9px 16px;
+  background: var(--bg-raised); border: 1px solid var(--line);
 }
-#pulse.prominent { background: var(--need-bg); border-color: var(--need-line); box-shadow: inset 3px 0 0 var(--need-rule), var(--shadow-float); padding-left: 16px; }
+#pulse.prominent { background: var(--need-bg); border-color: var(--need-line); box-shadow: inset 3px 0 0 var(--need-rule); padding-left: 18px; }
 .pulse-line { display: flex; align-items: flex-start; gap: 10px; }
 .pulse-icon { flex: none; width: 18px; height: 22px; display: grid; place-items: center; color: var(--text-muted); }
 #pulse.prominent .pulse-icon { color: var(--need); }
 .pulse-icon svg { width: 18px; height: 18px; }
 .pulse-icon .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sthue, var(--text-muted)); }
 .pulse-text { font: 500 17px/23px var(--font); letter-spacing: -.005em; color: var(--text); font-variant-numeric: tabular-nums; }
-.pulse-more { flex: none; align-self: center; margin-left: 4px; }
+.pulse-more { flex: none; align-self: center; margin-left: 2px; font-size: 13.5px; }
 .pulse-bullets { margin: 8px 0 2px 28px; display: grid; gap: 4px; }
 .pulse-bullets li { font-size: 14px; line-height: 20px; color: var(--text); position: relative; padding-left: 14px; }
 .pulse-bullets li::before { content: ""; position: absolute; left: 0; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: var(--text-muted); }
@@ -394,15 +397,18 @@ textarea.field:focus, input.field:focus { outline: none; border-color: var(--acc
 @keyframes blink { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-2px); } }
 
 .dock-row { width: 100%; max-width: var(--conv-w); margin: 0 auto; padding: 0 24px; }
-.dock-head { display: flex; align-items: center; gap: 12px; padding-top: 6px; padding-bottom: 10px; flex-wrap: wrap; }
+.dock-head { display: flex; align-items: center; gap: 12px; padding-top: 10px; padding-bottom: 10px; flex-wrap: wrap; }
 .dock-head h2 { font: 650 17px/22px var(--font); letter-spacing: -.01em; }
 .who { display: inline-flex; align-items: center; gap: 7px; font: 400 13.5px/1 var(--font); color: var(--text-muted); min-width: 0; }
 .agent-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); flex: none; }
 .dock-actions { margin-left: auto; display: flex; gap: 6px; align-items: center; }
-.log { overflow-y: auto; min-height: 0; border-top: 1px solid var(--line); -webkit-mask-image: linear-gradient(transparent, #000 28px); mask-image: linear-gradient(transparent, #000 28px); }
-.log-in { padding-top: 14px; padding-bottom: 14px; display: flex; flex-direction: column; justify-content: flex-end; gap: 12px; min-height: 100%; }
-.sys { align-self: center; text-align: center; max-width: 64ch; font-size: 12.5px; line-height: 18px; color: var(--text-muted); }
-.sys + .sys { margin-top: -8px; }
+.log { overflow-y: auto; min-height: 0; border-top: 1px solid var(--line); -webkit-mask-image: linear-gradient(transparent, #000 16px); mask-image: linear-gradient(transparent, #000 16px); }
+.log-in { padding-top: 12px; padding-bottom: 12px; display: flex; flex-direction: column; justify-content: flex-end; gap: 12px; min-height: 100%; }
+.log-in.fresh { justify-content: center; }
+.intro { align-self: center; display: grid; justify-items: center; gap: 6px; text-align: center; max-width: 60ch; padding: 6px 0 4px; color: var(--text-muted); }
+.intro .avatar { margin-bottom: 2px; }
+.intro p { font-size: 13.5px; line-height: 20px; }
+.intro p + p { font-size: 12.5px; line-height: 18px; }
 .msg { display: flex; gap: 10px; align-items: flex-start; }
 .msg.you { justify-content: flex-end; }
 .msg .stack { display: grid; gap: 6px; justify-items: start; max-width: min(76ch, 80%); min-width: 0; }
@@ -449,7 +455,7 @@ textarea.field:focus, input.field:focus { outline: none; border-color: var(--acc
 .applied { font: 400 13px/20px var(--font); color: var(--text-muted); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .applied .ok { color: var(--accent); font-weight: 600; }
 .applied .undo { margin-left: 2px; }
-.composer-row { padding-top: 10px; padding-bottom: 14px; }
+.composer-row { padding-top: 8px; padding-bottom: 12px; }
 .composer {
   display: flex; align-items: flex-end; gap: 8px; padding: 6px 6px 6px 16px; border-radius: 14px;
   border: 1px solid var(--line-strong); background: var(--bg-sunken); transition: border-color .12s, box-shadow .12s, background-color .12s;
@@ -471,7 +477,7 @@ textarea.field:focus, input.field:focus { outline: none; border-color: var(--acc
 
 /* drawer */
 #drawer {
-  position: fixed; top: var(--top-h); right: 0; bottom: 0; width: var(--drawer-w); z-index: 30;
+  grid-area: 3 / 1 / 5 / 2; justify-self: end; min-height: 0; overflow: hidden; width: var(--drawer-w); z-index: 30;
   background: var(--bg-raised); border-left: 1px solid var(--line); box-shadow: var(--shadow-drawer);
   display: flex; flex-direction: column; animation: slide .18s var(--ease);
 }
@@ -568,13 +574,12 @@ kbd { font: 500 12px/1 var(--mono); padding: 3px 6px; border-radius: 5px; border
   .home { font-size: 16px; }
   #project { flex: 1 1 auto; min-width: 0; width: 0; max-width: 220px; }
   main { display: flex; flex-direction: column; }
-  #status { order: 0; flex-wrap: wrap; padding: 10px 12px 12px; gap: 8px; }
-  #chat { order: 1; }
-  #board { order: 2; }
+  #pulse { order: 0; margin: 12px 12px 0; }
+  #status { order: 1; flex-wrap: wrap; padding: 10px 12px 12px; gap: 8px; }
+  #chat { order: 2; }
+  #board { order: 3; }
   .tools { margin-left: 0; }
   #chat { margin: 0; border-radius: 16px 16px 0 0; border-left: 0; border-right: 0; border-bottom: 1px solid var(--line); }
-  #pulse { margin: 12px 12px 0; justify-self: stretch; width: auto; max-width: none; box-shadow: none; }
-  #pulse.prominent { box-shadow: inset 3px 0 0 var(--need-rule); }
   .pulse-text { font-size: 16px; }
   .dock-row { padding: 0 14px; }
   .dock-actions { margin-left: 0; width: 100%; }
@@ -596,10 +601,9 @@ kbd { font: 500 12px/1 var(--mono); padding: 3px 6px; border-radius: 5px; border
   .col-fold { display: inline-grid; width: 30px; height: 30px; }
   .col.folded .col-body { display: none; }
   .col.folded .col-fold svg { transform: rotate(-90deg); }
-  .choices .btn, .need-actions .btn { flex: 1 1 100%; height: 40px; font-size: 14.5px; }
-  .need-actions .btn.ink { flex-basis: 100%; }
-  .need-actions .btn:not(.ink) { flex: 1 1 0; }
-  #drawer { top: 0; left: 0; width: 100%; }
+  .choices, .need-actions { flex-direction: column; }
+  .choices .btn, .need-actions .btn { width: 100%; height: 44px; font-size: 14.5px; }
+  #drawer { position: fixed; inset: 0; width: 100%; }
   .lane-head { display: none; }
 }
 
@@ -634,9 +638,9 @@ kbd { font: 500 12px/1 var(--mono); padding: 3px 6px; border-radius: 5px; border
 </header>
 <p class="flash" id="flash" role="alert" hidden></p>
 <main id="main">
+  <div id="pulse" role="region" aria-label="Pulse" aria-live="polite"></div>
   <div id="status" role="region" aria-label="Status"></div>
   <section id="chat" aria-labelledby="chat-title">
-    <div id="pulse" role="region" aria-label="Pulse" aria-live="polite"></div>
     <header class="dock-row dock-head">
       <h2 id="chat-title">Chat</h2>
       <span class="who"><span class="agent-dot" aria-hidden="true"></span><span id="chat-who"></span></span>
@@ -659,9 +663,9 @@ kbd { font: 500 12px/1 var(--mono); padding: 3px 6px; border-radius: 5px; border
     <h2 class="vh" id="board-title">Board</h2>
     <div id="board-in"></div>
   </section>
+  <aside id="drawer" role="dialog" aria-labelledby="drawer-title" hidden></aside>
 </main>
 <p class="live-end" id="live-end" role="status" hidden>The live stream ended: reload the page to follow the board</p>
-<aside id="drawer" role="dialog" aria-labelledby="drawer-title" hidden></aside>
 <div id="keys" class="overlay" role="dialog" aria-modal="true" aria-labelledby="keys-title" hidden>
   <div class="overlay-box">
     <h2 id="keys-title">Keys</h2>
@@ -743,8 +747,7 @@ function renderTop() {
 function renderStatus() {
   var f = [];
   f.push('<li class="fig fig-state" style="--sthue:' + STATE_HUE[D.state] + '"><i class="dot" aria-hidden="true"></i>' + esc(D.state) + '</li>');
-  var working = D.working.filter(function (c) { return !c.provider; }).length;
-  f.push('<li class="fig"><span><b>' + working + '</b> working</span></li>');
+  f.push('<li class="fig"><span><b>' + D.workingCount + '</b> working</span></li>');
   if (D.provider) f.push('<li class="fig fig-warn"><span><b>' + D.provider + '</b> waiting on the provider</span></li>');
   f.push('<li><a href="#col-needs" class="fig fig-need' + (D.needYou ? ' on' : '') + '" data-reveal-col="needs"><span><b>' + D.needYou + '</b> need you</span></a></li>');
   var over = D.spend > D.cap;
@@ -775,7 +778,7 @@ function renderPulse() {
 /* ---------- board ---------- */
 function stateBits(c, col) {
   var hue = HUE[c.status] || 'que', b = [];
-  b.push('<span class="st st-' + hue + '"><i class="dot" aria-hidden="true"></i>' + esc(c.status) + '</span>');
+  b.push('<span class="st"><i class="dot st-' + hue + '" aria-hidden="true"></i>' + esc(c.status) + '</span>');
   b.push('<span>' + esc(c.elapsed) + '</span>');
   if (c.checks) {
     var parts = c.checks.split('/'), failing = col === 'verifying' && +parts[0] < +parts[1];
@@ -816,7 +819,7 @@ function doneRow(c) {
   var glyph = c.status === 'failed' ? '✕' : c.status === 'closed' ? '–' : '✓';
   return '<article class="done-row" data-card="' + c.issue + '">' +
     '<button type="button" class="card-title" data-open="' + c.issue + '" title="' + esc(c.title) + '"><span class="r">#' + c.issue + '</span> <span class="t">' + esc(c.title) + '</span></button>' +
-    '<p class="meta">' + bits(['<span class="st st-' + hue + '"><span class="glyph" aria-hidden="true">' + glyph + '</span>' + esc(c.status) + '</span>', esc(c.elapsed)]) + '</p></article>';
+    '<p class="meta">' + bits(['<span class="st"><span class="glyph' + (hue === 'fail' ? ' st-fail' : '') + '" aria-hidden="true">' + glyph + '</span>' + esc(c.status) + '</span>', esc(c.elapsed)]) + '</p></article>';
 }
 function mergeActions(n, where) {
   var id = where + '-' + n.issue, open = st.open['deny-' + id];
@@ -933,10 +936,11 @@ function msgHTML(m, i) {
 function renderChat() {
   $('#chat-who').textContent = 'project agent · ' + D.project;
   var msgs = st.viewing != null ? st.convs[st.viewing].msgs : chat.msgs;
-  var h = '<p class="sys">Ask or tell the project agent. It reads, explains, moves, answers, steers and approves as you, through the console\'s own actions; it runs no code.</p>' +
-    '<p class="sys">This is your own conversation with the project agent; other members have theirs.</p>';
+  var h = '<div class="intro"><span class="avatar" aria-hidden="true"></span><p>Ask or tell the project agent. It reads, explains, moves, answers, steers and approves as you, through the console\'s own actions; it runs no code.</p>' +
+    '<p>This is your own conversation with the project agent; other members have theirs.</p></div>';
   h += msgs.map(msgHTML).join('');
   $('#chat-log').innerHTML = h;
+  $('#chat-log').classList.toggle('fresh', !msgs.length);
   var sel = $('#chat-conversations');
   sel.innerHTML = '<option value="">Current conversation</option>' + st.convs.map(function (c, i) {
     return '<option value="' + i + '"' + (st.viewing === i ? ' selected' : '') + '>Conversation ' + (i + 1) + ' · ' + esc(c.at) + ' · ' + c.msgs.length + ' messages</option>';
@@ -1042,7 +1046,7 @@ function drawerBody(n, tab) {
     if (merge) s += sec('reviews', 'Reviews and audit of PR #' + merge.pr, mergeFacts(merge) + '<div><button type="button" class="btn sm" data-act="split" data-issue="' + n + '">Split</button></div>', st.drawer && st.drawer.section === 'reviews');
     if (dr && dr.overview.related) s += sec('related', 'Related cards', '<ul class="related">' + dr.overview.related.map(function (r) {
       var hue = HUE[r.status] || 'que', label = '#' + r.issue + ' ' + esc(r.title);
-      return '<li><span class="why">' + esc(r.why) + '</span><span class="st st-' + hue + ' meta"><i class="dot" aria-hidden="true"></i>' + esc(r.status) + '</span>' +
+      return '<li><span class="why">' + esc(r.why) + '</span><span class="st meta"><i class="dot st-' + hue + '" aria-hidden="true"></i>' + esc(r.status) + '</span>' +
         (IDX.has(r.issue) ? '<button type="button" data-open="' + r.issue + '">' + label + '</button>' : '<span>' + label + '</span>') + '</li>';
     }).join('') + '</ul>');
     if (c.blocked) s += sec('related', 'Related cards', '<p>blocked by ' + refs(c.blockedOn) + '</p>');
