@@ -24,6 +24,7 @@ Vercel's Geist: pure black or pure white, greys for everything normal, one warm 
 | --need | #ffb224 (11.6:1) | #a35200 (5.6:1) | Needs you headings, the pulse's warning sign, "waiting on you", "n need you" |
 | --need-fill | #ffb224, text #0a0a0a | #ffb224, text #171717 (9.9:1), border #d18a0a | Approve as you, Grant one session, Accept plan |
 | --need-tint / --need-line | amber 7 % / amber 38 % | #fff6e5 / #f0c987 | the Needs you item's ground and edge |
+| --need-muted | #b0b0b0 | #4a4a4a (8.3:1 on #fff6e5) | replaces --text-muted and --text-faint inside Needs you items and the drawer's open need |
 | state hues | greyscale | greyscale | running: filled dot in --text, pulsing; in review: filled dot in --text-muted; queued, backlog, waiting on dependencies: hollow ring; waiting on a human: amber dot; done: check; failed: cross in --text; closed: slashed circle. The word always follows the glyph, so colour is never the only signal |
 
 Elevation: dark uses hairlines only; light adds soft shadows (drawer `-12px 0 40px rgb(0 0 0 / .08)`, composer and proposal `0 1px 2px rgb(0 0 0 / .04)`). That and the grey board tray make light a day mood, not an inversion.
@@ -56,6 +57,7 @@ Prominent (a card needs a person): the amber warning sign before the sentence, w
 
 - No panel box: the chat is the page's own black or white; it reads as the main region by width, the 15 px type and the large composer.
 - Header: "Chat", "project agent · project", old conversations select, New conversation (secondary button).
+- The start line tops every log, centred, 14 px muted, a 1 px rule under it: "Ask or tell the project agent. It reads, explains, moves, answers, steers and approves as you, through the console's own actions; it runs no code." The messages sit at the bottom of the log, by the composer, so the start line fills the space above a short history.
 - Yours: right-aligned bubble on --bg-sub, radius 14/14/4/14, time under it in --text-faint.
 - Agent: label "project agent · 14:21" in 12 px muted, text plain at full measure (72 ch).
 - Tool block: one quiet row, chevron, mono name, "· 0.4 s"; opens to arguments and result.
@@ -65,9 +67,10 @@ Prominent (a card needs a person): the amber warning sign before the sentence, w
 ## The board and the card
 
 - Column heads: small capitals, --text-muted, the count in --text-faint; a 1 px rule under each.
-- Card: no box. Rows divided by 1 px --line, 10 px vertical padding. Line 1 a button: ref in --text-muted, title in --text, two lines at most. State row: glyph, state word, elapsed, then only the exceptional: n/n checks, gate and its age, PR, spend with the warning sign from 80 percent, in --text. Activity line in mono --text-faint on working and waiting cards only.
+- Card: no box. Rows divided by 1 px --line, 10 px vertical padding. Line 1 a button: ref in --text-muted, title in --text, two lines at most. State row: glyph, state word, elapsed, then only the exceptional: n/n checks, gate and its age, PR, spend with the warning sign from 80 percent, in --text. Activity line in mono 11.5 px --text-muted on working and waiting cards only.
 - Chips: 11 px on --bg-sub, radius 4. Exceptional chips (stale, on the provider, at its cap) are outlined in --text instead. The accent chip is the accent's name only: no hue, the board stays monochrome.
 - Stale card: an inset 1 px ring in --text-faint and "nothing for 40 min" in --text.
+- Done shows at most 12 rows, then one faint line "and n earlier" linking to the full list.
 - Done, closed: one line, glyph, ref, title, ellipsis, all --text-faint; the state word is in the glyph's label, the time in the row's title. Failed: two lines, the cross and title in --text, "failed · elapsed" under it.
 - Actions: 24 px ghost buttons, 1 px --line-strong, radius 6, visible always.
 - Hover: the row takes --hover; the title underlines. The open card keeps --hover-strong.
@@ -75,7 +78,7 @@ Prominent (a card needs a person): the amber warning sign before the sentence, w
 ## Needs you
 
 - The only boxes on the board: --need-tint ground, 1 px --need-line, radius 8, padding 14/16. Heading in --text 14 px 600; the band head "Needs you" in --need.
-- Merge: "Merge PR #n" (opens the drawer at Reviews and audit), the risk and migration as amber-outlined chips, the waiting time right; the task title; "Model review: verdict. summary"; "Recommendation: …"; Approve as you (amber fill), Deny (opens the reason box and the "Deny by" choice), Split.
+- Merge: "Merge PR #n" (opens the drawer at Reviews and audit), the risk and migration as amber-outlined chips, the waiting time right; the task title; "Model review: verdict. summary"; "Recommendation: …"; Approve as you (amber fill), Deny (opens the reason box and the "Deny by" choice), Split. Deny and Split are outlined in --need-line-strong, the same 32 px box as the primary.
 - Escalation: the ref and title as heading, the question, the choices as amber-outlined buttons, "Or in your words" (opens the box) and the small verdict buttons at the end. Capped: the box is open and its button reads "Grant one session with this answer" in amber fill.
 - Plan and resource approvals follow the merge's pattern (heading, two fact lines, amber primary first); no scenario carries one.
 - What makes them loudest: the only amber on the board, the only boxes, the only filled buttons.
@@ -90,7 +93,7 @@ Prominent (a card needs a person): the amber warning sign before the sentence, w
 
 ## The phone
 
-Under 900 px one column: top bar (the home word over the project select, a menu button for the links, the switch, theme, user and Log out), the pulse, the chat with its log at 55 percent of the viewport height and the composer, then the board: Needs you in full with full-width buttons, then Working, Verifying, Queued, Done, each a section whose head toggles it; Done starts collapsed. The drawer takes the full screen.
+Under 900 px one column: top bar (the home word over the project select, a menu button for the links, the switch, theme, user and Log out), the pulse, the chat with its log at 55 percent of the viewport height and the composer, then the board: Needs you in full, every button in it full width, one per row, 44 px tall, then Working, Verifying, Queued, Done, each a section whose head toggles it; Done starts collapsed. The drawer takes the full screen.
 
 ## Motion
 

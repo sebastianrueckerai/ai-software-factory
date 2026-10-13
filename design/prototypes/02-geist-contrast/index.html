@@ -27,7 +27,7 @@
   --text: #ededed; --text-muted: #a1a1a1; --text-faint: #808080;
   --primary-bg: #ededed; --primary-fg: #0a0a0a; --primary-hover: #ffffff;
   --need: #ffb224; --need-fill: #ffb224; --need-fill-hover: #ffc554; --need-fg: #0a0a0a; --need-fill-line: #ffb224;
-  --need-tint: rgb(255 178 36 / .07); --need-line: rgb(255 178 36 / .38); --need-line-strong: rgb(255 178 36 / .6);
+  --need-tint: rgb(255 178 36 / .07); --need-line: rgb(255 178 36 / .38); --need-line-strong: rgb(255 178 36 / .6); --need-muted: #b0b0b0;
   --shadow-drawer: -24px 0 48px rgb(0 0 0 / .5); --scrim: rgb(0 0 0 / .55); --shadow-soft: none; --ring: rgb(255 255 255 / .08);
 }
 [data-theme="light"] {
@@ -38,7 +38,7 @@
   --text: #171717; --text-muted: #5c5c5c; --text-faint: #707070;
   --primary-bg: #171717; --primary-fg: #fff; --primary-hover: #383838;
   --need: #a35200; --need-fill: #ffb224; --need-fill-hover: #ffa70a; --need-fg: #171717; --need-fill-line: #d18a0a;
-  --need-tint: #fff6e5; --need-line: #f0c987; --need-line-strong: #d9a24a;
+  --need-tint: #fff6e5; --need-line: #f0c987; --need-line-strong: #d9a24a; --need-muted: #4a4a4a;
   --shadow-drawer: -12px 0 40px rgb(0 0 0 / .08); --scrim: rgb(250 250 250 / .6); --shadow-soft: 0 1px 2px rgb(0 0 0 / .04), 0 2px 8px rgb(0 0 0 / .03); --ring: rgb(0 0 0 / .06);
 }
 * { box-sizing: border-box; }
@@ -69,8 +69,9 @@ ul, ol { padding: 0; list-style: none; }
 .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
 .btn-need { background: var(--need-fill); color: var(--need-fg); border-color: var(--need-fill-line); font-weight: 600; }
 .btn-need:hover { background: var(--need-fill-hover); border-color: var(--need-fill-line); }
-.btn-choice { border-color: var(--need-line-strong); }
-.btn-choice:hover { background: var(--need-tint); border-color: var(--need); }
+.btn-choice, .need .btn:not(.btn-need):not(.btn-ghost), .open.is-need .btn:not(.btn-need) { border-color: var(--need-line-strong); }
+.btn-choice:hover, .need .btn:not(.btn-need):not(.btn-ghost):hover, .open.is-need .btn:not(.btn-need):hover { background: var(--need-tint); border-color: var(--need); }
+.need .acts, .need .choices, .need .row { align-items: center; }
 .btn-ghost { border-color: transparent; color: var(--text-muted); }
 .btn-ghost:hover { color: var(--text); background: var(--hover-strong); border-color: transparent; }
 .icon-btn { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: var(--r-ctl); border: 0; background: transparent; color: var(--text-muted); transition: background var(--t), color var(--t); }
@@ -151,14 +152,12 @@ label.lbl { display: block; font-size: 12px; color: var(--text-muted); margin: 0
 .chat-tools { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 .log { overflow-y: auto; min-height: 0; padding: 24px 24px 16px; scroll-behavior: smooth; }
 .col-c { max-width: 680px; margin: 0 auto; }
-.log .col-c { display: grid; gap: 20px; min-height: 100%; align-content: end; }
-.log .col-c:has(.empty-chat) { align-content: stretch; }
-.start { display: flex; align-items: center; gap: 12px; color: var(--text-faint); font-size: 12px; }
-.start::before, .start::after { content: ""; flex: 1; height: 1px; background: var(--line); }
-.empty-chat { display: grid; place-items: center; align-self: stretch; }
-.empty-chat p { max-width: 46ch; text-align: center; color: var(--text-muted); font-size: 15px; line-height: 1.6; }
+.log .col-c { display: flex; flex-direction: column; gap: 20px; min-height: 100%; }
+.log .col-c > .msg-agent { align-self: flex-start; }
+.start { align-self: center; max-width: 52ch; padding: 4px 0 20px; text-align: center; color: var(--text-muted); font-size: 14px; line-height: 22px; border-bottom: 1px solid var(--line); }
+.log .col-c > .start { margin-bottom: auto; }
 .msg { font-size: 15px; line-height: 24px; }
-.msg-you { justify-self: end; max-width: 80%; display: grid; justify-items: end; gap: 4px; }
+.msg-you { align-self: flex-end; max-width: 80%; display: grid; justify-items: end; gap: 4px; }
 .bubble { background: var(--bg-sub); padding: 8px 14px; border-radius: 14px 14px 4px 14px; }
 .msg-meta { font-size: 12px; line-height: 16px; color: var(--text-faint); }
 .msg-agent { display: grid; gap: 10px; max-width: 72ch; }
@@ -225,6 +224,8 @@ label.lbl { display: block; font-size: 12px; color: var(--text-muted); margin: 0
 .cols .col:last-child { padding-right: 0; }
 .cols .col-h { border-bottom: 1px solid var(--line); height: 32px; align-items: flex-start; }
 .col-empty { padding: 10px 0; color: var(--text-faint); }
+.earlier { display: inline-block; padding: 10px 0 0; font-size: 12px; color: var(--text-faint); text-decoration: none; transition: color var(--t); }
+.earlier:hover { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
 
 .card { position: relative; padding: 10px 8px; margin: 0 -8px; border-bottom: 1px solid var(--line); border-radius: 0; display: grid; gap: 4px; transition: background var(--t); }
 .card:hover { background: var(--hover); }
@@ -237,7 +238,7 @@ label.lbl { display: block; font-size: 12px; color: var(--text-muted); margin: 0
 .meta > .spend { flex-basis: 100%; white-space: normal; flex-wrap: wrap; gap: 0 5px; }
 .meta .hi { color: var(--text); }
 .meta .st-need { color: var(--need); }
-.activity { font: 11.5px/16px var(--mono); color: var(--text-faint); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.activity { font: 11.5px/16px var(--mono); color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
 .activity .hi { color: var(--text); }
 .chips { display: flex; flex-wrap: wrap; gap: 4px; }
 .chip { display: inline-flex; align-items: center; height: 18px; padding: 0 6px; border-radius: 4px; background: var(--bg-sub); color: var(--text-muted); font-size: 11px; line-height: 1; white-space: nowrap; }
@@ -257,6 +258,7 @@ label.lbl { display: block; font-size: 12px; color: var(--text-muted); margin: 0
 .card-done.is-failed .meta { padding-left: 21px; }
 
 /* needs you */
+.need, .open.is-need { --text-muted: var(--need-muted); --text-faint: var(--need-muted); }
 .need { background: var(--need-tint); border: 1px solid var(--need-line); border-radius: var(--r-box); padding: 14px 16px 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
 .need-h { display: flex; align-items: flex-start; gap: 8px; }
 .need-title { text-align: left; border: 0; background: none; padding: 0; font-size: 14px; line-height: 20px; font-weight: 600; letter-spacing: -.005em; }
@@ -414,7 +416,11 @@ kbd { font: 12px/1 var(--mono); padding: 3px 6px; border: 1px solid var(--line-s
   .col-h { height: auto; }
   .col-needs { margin-bottom: 0; border-bottom: 1px solid var(--line-region); padding-bottom: 16px; }
   .needs-grid { grid-template-columns: 1fr; }
-  .need .acts .btn, .need .choices .btn { flex: 1 1 100%; height: 44px; font-size: 15px; }
+  .need .acts .btn, .need .choices .btn, .need .row .btn, .need .verdict .btn { flex: 1 1 100%; width: 100%; height: 44px; font-size: 15px; }
+  .need .verdict { display: grid; gap: 6px; margin: 0; }
+  .need .verdict .btn { border: 1px solid var(--need-line-strong); color: var(--text); font-weight: 500; }
+  .need-foot { flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 6px; }
+  .need-foot .link { display: flex; align-items: center; justify-content: center; height: 44px; font-size: 15px; }
   .need .acts .btn-need { order: -1; }
   .cols { display: flex; flex-direction: column; }
   .cols .col { padding: 0; border-left: 0; border-bottom: 1px solid var(--line-region); }
@@ -624,10 +630,9 @@ function renderPulse(computing) {
   el.classList.toggle('is-prominent', !!p.prominent);
   const stateK = sc.state === 'waiting on you' ? 'need' : sc.state === 'working' ? 'run' : 'idle';
   const over = sc.spend > sc.cap;
-  const working = sc.working.filter((c) => !c.provider).length;
   const figs = [
     `<li class="fig-state"><span class="dot" data-s="${stateK}"></span>${esc(sc.state)}</li>`,
-    `<li>${working} working</li>`,
+    `<li>${sc.workingCount} working</li>`,
     sc.provider ? `<li>${sc.provider} waiting on the provider</li>` : '',
     `<li><a href="#needs" data-act="to-needs" class="${sc.needYou ? 'is-need' : ''}">${sc.needYou} ${sc.needYou === 1 ? 'needs' : 'need'} you</a></li>`,
     `<li><a href="#" class="${over ? 'is-over' : ''}" title="Costs">${over ? ic('warn', 'i-s') + ' ' : ''}${eur(sc.spend)} / ${eur(sc.cap)}</a></li>`,
@@ -661,13 +666,10 @@ function renderChat() {
   $('#chat-sub').textContent = 'project agent · ' + sc.project;
   const log = ui.chat;
   const col = $('#log-col');
-  if (!log.length) {
-    col.innerHTML = '<div class="empty-chat"><p>Ask or tell the project agent. It reads, explains, moves, answers, steers and approves as you, through the console\'s own actions; it runs no code.</p></div>';
-  } else {
-    col.innerHTML = `<p class="start">${esc(log[0].at || '')}</p>` + log.map((m, i) => m.who === 'you'
+  col.innerHTML = '<p class="start">Ask or tell the project agent. It reads, explains, moves, answers, steers and approves as you, through the console\'s own actions; it runs no code.</p>'
+    + log.map((m, i) => m.who === 'you'
       ? `<div class="msg msg-you"><p class="bubble">${esc(m.text)}</p><p class="msg-meta">${esc(m.at || '')}</p></div>`
       : agentMsg(m, i)).join('');
-  }
   $('#old-conv').innerHTML = '<option value="">Old conversations</option>' + ui.old.map((o, i) => `<option value="${i}">${esc(o[0].at)} · ${esc(o[0].text)}</option>`).join('');
   const q = $('#queue');
   q.hidden = !ui.queue.length;
@@ -772,6 +774,7 @@ function face(c, col) {
   return `<article class="card${c.stale ? ' is-stale' : ''}${open}" data-card="${c.issue}">
     ${titleBtn(c)}${stateRow(c, col)}${act}${chipsOf(c)}${acts.length ? `<div class="acts" data-confirm>${acts.join('')}</div>` : ''}</article>`;
 }
+const DONE_ROWS = 12;
 const COLS = [['queued', 'Queued'], ['working', 'Working'], ['verifying', 'Verifying'], ['done', 'Done']];
 function colHead(key, title, count) {
   const exp = !ui.collapsed[key];
@@ -784,10 +787,12 @@ function renderBoard() {
   let html = `<section class="col col-needs${needs.length ? '' : ' is-empty'}" id="needs" aria-labelledby="h-needs" tabindex="-1">${colHead('needs', 'Needs you', needs.length)}
     <div class="needs-grid col-list" id="list-needs"${hidden('needs')}>${needs.map((n) => needItem(n)).join('')}</div></section><div class="cols">`;
   for (const [key, title] of COLS) {
-    const list = f(sc[key]);
-    const count = key === 'done' && sc.doneCount && !ui.accent ? sc.doneCount : list.length;
+    const all = f(sc[key]);
+    const count = key === 'done' && sc.doneCount && !ui.accent ? sc.doneCount : all.length;
+    const list = key === 'done' ? all.slice(0, DONE_ROWS) : all;
+    const earlier = key === 'done' && count > list.length ? `<a class="earlier" href="#">and ${count - list.length} earlier</a>` : '';
     html += `<section class="col" data-col="${key}" aria-labelledby="h-${key}">${colHead(key, title, count)}
-      <div class="col-list" id="list-${key}"${hidden(key)}>${list.length ? list.map((c) => face(c, key)).join('') : '<p class="col-empty" aria-label="none">—</p>'}</div></section>`;
+      <div class="col-list" id="list-${key}"${hidden(key)}>${list.length ? list.map((c) => face(c, key)).join('') : '<p class="col-empty" aria-label="none">—</p>'}${earlier}</div></section>`;
   }
   $('#board-scroll').innerHTML = html + '</div>';
 }
