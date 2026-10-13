@@ -26,7 +26,9 @@ An email client: Needs you is the inbox on the left, the chat is the reading pan
 | --st-waiting | #f0b357 | #955700 | waiting on a human (= need) |
 | --st-review | #ad9ff7 | #6a4bd6 | in review |
 | --st-done, --st-closed | #8e9199 | #66696f | grey; the word and the glyph tell them apart |
-| --st-failed | #f47e73 | #c0362a | |
+| --st-failed | #f47e73 | #c0362a | failed on a working face, the risk chip in dark |
+| --failed-muted | #c08079 | #9c5048 | the failed mark and word in Done: muted, still 4.5:1 |
+| chips | high risk #f47e73, migration #f0b357 on their tints | high risk #9f2a20 on #fbe9e6, migration #7a4500 on #fbecd2 | above 6:1 in light |
 | queued, backlog, waiting on dependencies | --text-muted | --text-muted | neutral: nothing exceptional |
 
 Dark is layered greys and hairlines, no shadows. Light is white panels on warm paper with a 1 px ring and a soft 1–2 px shadow. Same layout, same hues, two moods.
@@ -43,7 +45,7 @@ An app shell, one viewport tall. Top bar 48 px. Under it, 20 px side margins: th
 
 The drawer docks at the right edge under the top bar, 46 percent wide, at most 720 px, full height. When it opens the page beside it shrinks by its width: the chat narrows, nothing is covered.
 
-Empty inbox (idle, quiet): the inbox shrinks to one quiet line above the chat, "Nothing needs you.", the chat takes the width with its log and composer in a centred 960 px column, and the strip unfolds by itself (with no decision waiting, the board is what there is to scan). A click on the strip is remembered and overrides that default.
+Empty inbox (idle, quiet): the Needs you column of the board says so in one quiet line, "Nothing needs you", the inbox pane goes, the chat takes the width with its log and composer in a centred 960 px column, and the strip unfolds by itself (with no decision waiting, the board is what there is to scan). A click on the strip is remembered and overrides that default.
 
 The workspace never gets shorter than 380 px: when the unfolded board needs more, the page scrolls instead of squeezing the chat.
 
@@ -59,13 +61,13 @@ The main region: a raised panel, header "Chat", "project agent · project", New 
 
 ## The board and the card
 
-Folded (default): five equal segments in one bordered strip, hairlines between. Each segment: the column name at 13 px semibold, the count as a pill, then up to three items at 12 px: ref and title on one line, ellipsis, an exceptional mark on the right (⚠ spend, stale, on the provider). Done shows failed cards as lines with ✕ and the rest as a row of refs. Every item opens the drawer; its hover title and its accessible name carry the whole face. More than three items: "+n" in the segment's header, its hover title lists the rest. A click on a segment name or on "Board" unfolds the strip: each segment grows its column of full faces below its header, the columns scroll inside at most 40 percent of the viewport (420 px); a second click folds it back.
+Folded (default): five equal segments in one bordered strip, hairlines between. Each segment: the column name at 13 px semibold, the count as a pill, then up to three items at 12 px: ref and title on one line, ellipsis, an exceptional mark on the right (⚠ spend, stale, on the provider). Done shows failed cards as lines with a muted red ✕ and the rest as a row of refs in the faint colour; no bright icon anywhere in Done. Every item opens the drawer; its hover title and its accessible name carry the whole face. More than three items: "+n" in the segment's header, its hover title lists the rest. A click on a segment name or on "Board" unfolds the strip: each segment grows its column of full faces below its header, the columns scroll inside at most 40 percent of the viewport (420 px); a second click folds it back.
 
-The card face (unfolded): ref and title (13 px, two lines, the title opens the drawer); the state row (12 px: dot and state word in its hue, elapsed, then only the exceptional: n/n checks, spend with ⚠ near its budget, the gate and its age, PR link); the activity line (12 px mono, one line) on a working or waiting card; chips only when exceptional; actions as small quiet buttons. A stale card has a need-coloured 1 px ring. Done, failed and closed cards are one line without a box: glyph, ref, title, state word, elapsed; they whisper in the faint colour, failed keeps its red word and a Retry. The Done column shows four and "+n" for the rest.
+The card face (unfolded): ref and title (13 px, two lines, the title opens the drawer); the state row (12 px: dot and state word in its hue, elapsed, then only the exceptional: n/n checks, spend with ⚠ near its budget, the gate and its age, PR link); the activity line (12 px mono, one line) on a working or waiting card; chips only when exceptional; actions as small quiet buttons. A stale card has a need-coloured 1 px ring. Done, failed and closed cards are one line without a box: glyph, ref, title, state word, elapsed; they whisper in muted and faint text with a grey glyph; failed keeps its word and ✕ in muted red and a Retry. The Done column shows four and "+n" for the rest.
 
 ## Needs you
 
-The inbox panel holds every Needs you item as a mail row: a 3 px need rule on the left, the subject at 14 px semibold with its chips, the age on the right (12 px tabular), the preview lines at 13 px, then the actions inline. Merge: "Merge PR #n", chips "high risk" (failed tint) and "migration" (need tint), the model review and the recommendation as two preview lines, Approve as you (blue), Deny (opens the reason box with the request-changes or reject choice), Split, Details (opens the drawer at Reviews and audit). Escalation: "#n title" as the subject, the question as the preview, the choices as buttons, "Or in your words" opening the box, the verdict buttons small at the end. Capped: the box is open and the button reads "Grant one session with this answer". What makes them loudest: the only need rule, the only filled count, the only blue buttons outside the chat, and the top-left place.
+The inbox panel holds every Needs you item as a mail row: a 3 px need rule on the left, the subject at 14 px semibold with its chips, the age on the right (12 px tabular), the preview lines at 13 px, then the actions inline. Merge: "Merge PR #n", chips "high risk" (failed tint) and "migration" (need tint), the model review and the recommendation as two preview lines, Approve as you (blue), Deny (opens the reason box with the request-changes or reject choice), Split, Details (opens the drawer at Reviews and audit). Escalation: the question once as the subject ("#n title"), one muted context line (the rest of the question), the choices as outlined buttons with "Or in your words" opening the box, then one small muted line: the state, elapsed, "answer on the issue" and the verdict links "real problem · noise" (the question "Was this escalation a real problem?" is their group label and hover title). Capped: the box is open and the button reads "Grant one session with this answer". Every secondary button is outlined (transparent fill, strong hairline), so Approve as you is the one filled button in the row. What makes them loudest: the only need rule, the only filled count, the only blue buttons outside the chat, and the top-left place.
 
 ## The drawer
 
@@ -73,7 +75,7 @@ Header: close ✕, ref and title at 16 px, the facts row (state, elapsed, checks
 
 ## The phone
 
-Under 900 px one column: the top bar (home word, project select, a menu for the rest), the pulse, the chat with its log at 55 percent of the viewport height and the composer, the inbox with the choice buttons full width and 44 px tall, then the board as stacked sections Working, Verifying, Queued, Done, Done folded. The drawer is full screen.
+Under 900 px one column: the top bar (home word, project select, a menu for the rest), the pulse, the chat with its log at 55 percent of the viewport height and the composer, then the board as stacked sections: Needs you first (the inbox moves in as that section, choice buttons full width and 44 px tall), Working, Verifying, Queued, Done, Done folded. No line clamps and no ellipsis: titles and activity lines wrap at word boundaries. The drawer is full screen.
 
 ## Motion
 

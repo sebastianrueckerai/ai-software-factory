@@ -28,8 +28,8 @@
   --accent: #2f6fec; --accent-hover: #2a64d8; --link: #8db4ff; --focus: #5b95ff; --focus-ring: rgba(91,149,255,.28);
   --need: #f0b357; --need-fill: #f0b357; --on-need: #1d1405; --need-tint: rgba(240,179,87,.07); --need-tint2: rgba(240,179,87,.13); --need-line: rgba(240,179,87,.32);
   --st-running: #52c48f; --st-waiting: #f0b357; --st-review: #ad9ff7; --st-done: #8e9199; --st-failed: #f47e73; --st-queued: #a3a6ad;
-  --failed-tint: rgba(244,126,115,.13);
-  --btn-bg: #1b1c21; --input-bg: #101114; --count-bg: #24262c;
+  --failed-tint: rgba(244,126,115,.13); --failed-muted: #c08079; --risk-text: #f47e73; --mig-text: #f0b357;
+  --btn-bg: transparent; --input-bg: #101114; --count-bg: #24262c;
   --panel-shadow: none; --drawer-shadow: -24px 0 48px rgba(0,0,0,.35);
   --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4.5 6.5 3.5 3.5 3.5-3.5' fill='none' stroke='%23a3a6ad' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
@@ -41,8 +41,8 @@
   --accent: #2459d6; --accent-hover: #1e4ec0; --link: #1f53cc; --focus: #2459d6; --focus-ring: rgba(36,89,214,.18);
   --need: #955700; --need-fill: #b45f06; --on-need: #ffffff; --need-tint: #fdf5e7; --need-tint2: #fbecd2; --need-line: #efd3a2;
   --st-running: #157a47; --st-waiting: #955700; --st-review: #6a4bd6; --st-done: #66696f; --st-failed: #c0362a; --st-queued: #575a61;
-  --failed-tint: #fbe9e6;
-  --btn-bg: #ffffff; --input-bg: #ffffff; --count-bg: #eeeeeb;
+  --failed-tint: #fbe9e6; --failed-muted: #9c5048; --risk-text: #9f2a20; --mig-text: #7a4500;
+  --btn-bg: transparent; --input-bg: #ffffff; --count-bg: #eeeeeb;
   --panel-shadow: 0 1px 2px rgba(24,24,20,.05), 0 2px 8px -4px rgba(24,24,20,.06); --drawer-shadow: -16px 0 40px rgba(24,24,20,.10);
   --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4.5 6.5 3.5 3.5 3.5-3.5' fill='none' stroke='%23575a61' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
@@ -88,8 +88,8 @@ textarea::placeholder, input::placeholder { color: var(--text-faint); }
 .count { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--count-bg); color: var(--text-muted); font-size: 11px; line-height: 1; font-weight: 600; }
 .count.need { background: var(--need-fill); color: var(--on-need); }
 .chip { display: inline-flex; align-items: center; gap: 5px; height: 20px; padding: 0 7px; border-radius: 5px; border: 1px solid var(--line); color: var(--text-muted); font-size: 11px; line-height: 1; font-weight: 500; white-space: nowrap; }
-.chip.risk { color: var(--st-failed); background: var(--failed-tint); border-color: transparent; }
-.chip.mig { color: var(--need); background: var(--need-tint2); border-color: transparent; }
+.chip.risk { color: var(--risk-text); background: var(--failed-tint); border-color: transparent; }
+.chip.mig { color: var(--mig-text); background: var(--need-tint2); border-color: transparent; }
 .chip.warn { color: var(--need); border-color: var(--need-line); }
 .chip.lane { display: none; }
 .wide .chip.lane { display: inline-flex; }
@@ -127,7 +127,7 @@ textarea::placeholder, input::placeholder { color: var(--text-faint); }
 
 /* the shell */
 .app { height: calc(100vh - var(--top-h)); min-height: 600px; display: grid; grid-template-columns: clamp(300px, 30%, 420px) minmax(0, 1fr); grid-template-rows: auto auto minmax(380px, 1fr); grid-template-areas: "pulse pulse" "board board" "inbox chat"; gap: 12px; padding: 12px 20px 16px; }
-.app.calm { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto minmax(380px, 1fr); grid-template-areas: "pulse" "board" "inbox" "chat"; }
+.app.calm { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(380px, 1fr); grid-template-areas: "pulse" "board" "chat"; }
 body.has-drawer .app { margin-right: var(--dw); }
 .panel { background: var(--raised); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--panel-shadow); }
 #flash { position: fixed; top: calc(var(--top-h) + 8px); left: 50%; transform: translateX(-50%); z-index: 70; padding: 8px 14px; border-radius: 8px; background: var(--failed-tint); color: var(--st-failed); border: 1px solid var(--st-failed); font-size: 13px; }
@@ -189,12 +189,12 @@ body.has-drawer .app { margin-right: var(--dw); }
 .mk.warn { color: var(--need); }
 .col.needs .pk { color: var(--text); }
 .peek .fail .pk { color: var(--text-muted); }
-.peek .fail .g { color: var(--st-failed); display: inline-flex; }
-.peek .fail .mk { color: var(--st-failed); }
+.peek .fail .g { color: var(--failed-muted); display: inline-flex; }
+.peek .fail .mk { color: var(--failed-muted); }
 .refs { display: flex; flex-wrap: wrap; gap: 0 10px; }
 .rf { padding: 0; border: 0; background: none; color: var(--text-faint); font-size: 12px; line-height: 18px; border-radius: 3px; }
 .rf:hover { color: var(--text); }
-.rf.failed { color: var(--st-failed); }
+.rf.failed { color: var(--failed-muted); }
 .peek .more { color: var(--text-faint); }
 .peek .none { color: var(--text-faint); }
 .cards { display: none; }
@@ -209,7 +209,7 @@ body.has-drawer .app { margin-right: var(--dw); }
 .card { display: grid; gap: 5px; padding: 8px 10px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); min-width: 0; transition: border-color .12s; }
 .card:hover { border-color: var(--line-strong); }
 .card.stale { border-color: var(--need-line); box-shadow: 0 0 0 1px var(--need-line); }
-.c-l1 { font-size: 13px; line-height: 18px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.c-l1 { font-size: 13px; line-height: 18px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: break-word; }
 .c-l1 .ref { color: var(--text-faint); margin-right: 2px; }
 .c-title { color: var(--text); font-weight: 500; border-radius: 3px; }
 .c-title:hover { text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--line-hover); }
@@ -226,9 +226,9 @@ body.has-drawer .app { margin-right: var(--dw); }
 .done-row:hover { background: var(--hover); border-color: transparent; }
 .done-row .c-l1 { -webkit-line-clamp: 1; color: var(--text-faint); display: flex; gap: 6px; align-items: baseline; white-space: nowrap; }
 .done-row .c-l1 .c-title { color: var(--text-muted); font-weight: 400; overflow: hidden; text-overflow: ellipsis; }
-.done-row .g { display: inline-flex; color: var(--st-done); align-self: center; }
+.done-row .g { display: inline-flex; color: var(--text-faint); align-self: center; }
 .done-row .g .i { width: 12px; height: 12px; }
-.done-row.failed .g { color: var(--st-failed); }
+.done-row.failed .g, .done-row .st.failed { color: var(--failed-muted); }
 .done-row .c-l2 { padding-left: 18px; color: var(--text-faint); }
 .done-line { display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 18px; color: var(--st-running); }
 .done-line span { color: var(--text-muted); }
@@ -252,7 +252,11 @@ body.has-drawer .app { margin-right: var(--dw); }
 .r-age { margin-left: auto; padding-left: 8px; flex: none; align-self: flex-start; font-size: 12px; line-height: 20px; color: var(--text-faint); white-space: nowrap; }
 .r-pre { font-size: 13px; line-height: 19px; color: var(--text-muted); }
 .r-pre.strong { color: var(--text); }
-.r-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; font-size: 12px; line-height: 16px; color: var(--text-faint); }
+.r-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; margin-top: 2px; font-size: 12px; line-height: 16px; color: var(--text-faint); }
+.r-meta a { color: var(--text-muted); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 2px; }
+.r-meta a:hover { color: var(--text); }
+.r-meta .warn { display: inline-flex; align-items: center; gap: 4px; }
+.sep { color: var(--text-faint); }
 .r-meta .i { width: 12px; height: 12px; }
 .r-foot { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
 .r-decide { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
@@ -266,13 +270,15 @@ body.has-drawer .app { margin-right: var(--dw); }
 .box fieldset label { display: flex; align-items: center; gap: 6px; color: var(--text); font-size: 13px; }
 .box fieldset legend { margin-bottom: 4px; }
 .box .btn { justify-self: start; }
-.verdict { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; font-size: 12px; line-height: 16px; color: var(--text-faint); }
+.verdict { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .verdict .link { font-size: 12px; color: var(--text-muted); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 2px; }
 .verdict .link:hover { color: var(--text); }
-.inbox.empty { flex-direction: row; align-items: center; gap: 8px; padding: 0 2px; background: none; border: 0; box-shadow: none; overflow: visible; }
-.inbox.empty h2 { font-size: 13px; line-height: 18px; font-weight: 500; color: var(--text-muted); }
-.inbox.empty p { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-faint); }
-.inbox.empty p .i { color: var(--st-running); }
+.verdict .done-line { display: inline-flex; }
+.calm-line { display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 18px; color: var(--text-faint); }
+.calm-line .i { width: 12px; height: 12px; color: var(--text-faint); }
+.cards > .calm-line { padding: 4px 4px 0; }
+.inbox.empty .calm-line { padding: 12px 18px 14px; }
+.app.calm > .inbox { display: none; }
 
 /* chat */
 .chat { grid-area: chat; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
@@ -430,6 +436,15 @@ kbd { display: inline-block; min-width: 20px; padding: 2px 6px; border: 1px soli
   .col { border: 1px solid var(--line); border-radius: 10px; background: var(--raised); box-shadow: var(--panel-shadow); }
   .col:first-child { border-left: 1px solid var(--line); }
   .col.needs { display: none; }
+  #cols > .inbox { order: 0; }
+  .i-head { height: 46px; padding: 0 14px; border-bottom: 0; }
+  .i-head h2 { font-size: 13px; line-height: 18px; }
+  .i-list .row:first-child { border-top: 1px solid var(--line); }
+  .inbox.empty .calm-line { padding: 0 14px 14px; }
+  .c-l1 { display: block; -webkit-line-clamp: none; overflow: visible; }
+  .done-row .c-l1 { white-space: normal; }
+  .done-row .c-l1 .c-title { overflow: visible; text-overflow: clip; }
+  .c-act { white-space: normal; overflow-wrap: break-word; }
   .col.working { order: 1; } .col.verifying { order: 2; } .col.queued { order: 3; } .col.done { order: 4; }
   .seg { padding: 12px 14px; border-radius: 10px; }
   .seg .chev { opacity: 1; transform: rotate(90deg); }
@@ -626,11 +641,10 @@ kbd { display: inline-block; min-width: 20px; padding: 2px 6px; border: 1px soli
 
   /* ---------- pulse ---------- */
   function renderPulse() {
-    /* scenarios.js names "working" twice (the count, then the cards); the cards win, so the figure counts the cards not waiting on the provider */
     var p = s.pulse, st = s.state === 'waiting on you' ? 'waiting' : s.state === 'working' ? 'running' : 'done';
     var over = s.spend > s.cap;
     var figs = '<span class="st ' + st + ' state"><i class="dot"></i><span>' + esc(s.state) + '</span></span>' +
-      '<span>' + (s.working || []).filter(function (c) { return !c.provider; }).length + ' working</span>' +
+      '<span>' + s.workingCount + ' working</span>' +
       (s.provider ? '<span class="warn">' + s.provider + ' waiting on the provider</span>' : '') +
       '<a href="#inbox" data-focus-inbox class="' + (s.needYou ? 'need' : '') + '">' + s.needYou + ' need you</a>' +
       '<a href="#" title="spend this UTC month against the project\'s month cap"' + (over ? ' class="over"' : '') + '>' + (over ? I.warn : '') + eur(s.spend) + ' / ' + eur(s.cap) + '</a>' +
@@ -665,10 +679,15 @@ kbd { display: inline-block; min-width: 20px; padding: 2px 6px; border: 1px soli
   }
   function escDecision(n, w) {
     var id = w + '-e' + n.issue, has = n.choices && n.choices.length;
-    var near = isNear(n);
-    var meta = '<p class="r-meta"><span class="st waiting"><i class="dot"></i>' + esc(n.status) + '</span><span>' + esc(n.elapsed) + '</span>' +
+    var near = isNear(n), rest = n.question.match(/^[^?]*\?\s+(.+)$/);
+    var context = rest ? rest[1] : n.question.indexOf('?') < 0 ? n.question : '';
+    var sep = '<span class="sep" aria-hidden="true">·</span>';
+    var verdict = n.alert ? '<span class="verdict" data-resolve role="group" aria-label="Was this escalation a real problem?" title="Was this escalation a real problem?">' +
+      '<button type="button" class="link" data-act data-done="Alert ' + n.alert + ': a real problem" aria-label="Alert ' + n.alert + ': a real problem">real problem</button>' + sep +
+      '<button type="button" class="link" data-act data-done="Alert ' + n.alert + ': noise" aria-label="Alert ' + n.alert + ': noise">noise</button></span>' : '';
+    var meta = '<div class="r-meta"><span>' + esc(n.status) + '</span><span>' + esc(n.elapsed) + '</span>' +
       (near ? '<span class="warn">' + eur(n.spent) + ' / ' + eur(n.budget) + ' ' + I.warn + ' near its budget</span>' : '') +
-      '<a href="#">answer on the issue</a></p>';
+      '<a href="#">answer on the issue</a>' + verdict + '</div>';
     var choices = has ? '<div class="r-decide choices" data-resolve role="group" aria-label="Answer with one click, posted on the issue as you">' +
       n.choices.map(function (c) { return '<button type="button" class="btn" data-act data-done="' + esc(c) + ', posted on the issue as you">' + esc(c) + '</button>'; }).join('') +
       '<button type="button" class="link r-own" data-toggle="' + id + '-own" aria-expanded="false" aria-controls="' + id + '-own">Or in your words</button></div>' : '<div class="r-decide" data-resolve hidden></div>';
@@ -676,10 +695,7 @@ kbd { display: inline-block; min-width: 20px; padding: 2px 6px; border: 1px soli
       '<label for="' + id + '-ta">' + (has ? 'Or your own answer' : 'Your answer') + ', posted on the issue as you</label>' +
       '<textarea id="' + id + '-ta" rows="3" required></textarea>' +
       '<button type="submit" class="btn sm primary">' + (n.capped ? 'Grant one session with this answer' : 'Answer') + '</button></form>';
-    var verdict = n.alert ? '<p class="verdict" data-resolve><span>Was this escalation a real problem?</span>' +
-      '<button type="button" class="link" data-act data-done="Alert ' + n.alert + ': a real problem" aria-label="Alert ' + n.alert + ': a real problem">real problem</button>' +
-      '<button type="button" class="link" data-act data-done="Alert ' + n.alert + ': noise" aria-label="Alert ' + n.alert + ': noise">noise</button></p>' : '';
-    return '<p class="r-pre strong">' + esc(n.question) + '</p>' + meta + '<div class="r-foot">' + choices + '</div>' + form + verdict;
+    return (context ? '<p class="r-pre">' + esc(context) + '</p>' : '') + '<div class="r-foot">' + choices + '</div>' + form + meta;
   }
   function needRow(n) {
     var subj = n.kind === 'merge'
@@ -694,8 +710,8 @@ kbd { display: inline-block; min-width: 20px; padding: 2px 6px; border: 1px soli
     var el = $('#inbox'), needs = s.needs || [];
     $('#app').classList.toggle('calm', !needs.length);
     if (!needs.length) {
-      el.className = 'inbox empty';
-      el.innerHTML = '<h2 id="inbox-title">Needs you</h2><span class="count">0</span><p>' + I.check + 'Nothing needs you.</p>';
+      el.className = 'inbox panel empty';
+      el.innerHTML = '<header class="i-head"><h2 id="inbox-title">Needs you</h2><span class="count">0</span></header><p class="calm-line">' + I.check + 'Nothing needs you</p>';
       return;
     }
     el.className = 'inbox panel';
@@ -789,7 +805,7 @@ kbd { display: inline-block; min-width: 20px; padding: 2px 6px; border: 1px soli
   function renderBoard() {
     var needs = s.needs || [], done = s.done || [], doneTotal = s.doneCount || done.length;
     var cols = [
-      { key: 'needs', title: 'Needs you', count: needs.length, peek: needs.length ? needs.map(peekNeed).join('') : '<li class="none" aria-hidden="true">—</li>', cards: needs.map(needCard).join('') },
+      { key: 'needs', title: 'Needs you', count: needs.length, peek: needs.length ? needs.map(peekNeed).join('') : '<li class="calm-line">' + I.check + 'Nothing needs you</li>', cards: needs.length ? needs.map(needCard).join('') : '<p class="calm-line">' + I.check + 'Nothing needs you</p>' },
       { key: 'queued', title: 'Queued', count: (s.queued || []).length, more: segMore(s.queued || [], 3), peek: peekList(s.queued || [], 3), cards: (s.queued || []).map(face).join('') },
       { key: 'working', title: 'Working', count: (s.working || []).length, more: segMore(s.working || [], 3), peek: peekList(s.working || [], 3), cards: (s.working || []).map(face).join('') },
       { key: 'verifying', title: 'Verifying', count: (s.verifying || []).length, more: segMore(s.verifying || [], 3), peek: peekList(s.verifying || [], 3), cards: (s.verifying || []).map(face).join('') },
@@ -1002,8 +1018,15 @@ kbd { display: inline-block; min-width: 20px; padding: 2px 6px; border: 1px soli
   }
 
   /* ---------- the whole screen ---------- */
+  /* under 900 px the inbox is the first of the stacked board sections */
+  function placeInbox() {
+    var inbox = $('#inbox');
+    if (phone.matches) $('#cols').prepend(inbox); else $('#chat').after(inbox);
+  }
   function render() {
+    $('#chat').after($('#inbox'));
     renderTop(); renderPulse(); renderChat(); renderInbox(); renderBoard();
+    placeInbox();
   }
   function setScenario(n) {
     name = n; s = S[n];
@@ -1021,7 +1044,7 @@ kbd { display: inline-block; min-width: 20px; padding: 2px 6px; border: 1px soli
     if (!box && row) box = $('[data-resolve]', row);
     if (!box) return;
     box.hidden = false;
-    box.innerHTML = '<p class="done-line" role="status">' + I.check + '<span>' + esc(text) + '</span></p>';
+    box.innerHTML = '<span class="done-line" role="status">' + I.check + '<span>' + esc(text) + '</span></span>';
     if (row && !box.classList.contains('verdict')) {
       row.classList.add('resolved');
       $$('form', row).forEach(function (f) { f.hidden = true; });
@@ -1148,7 +1171,7 @@ kbd { display: inline-block; min-width: 20px; padding: 2px 6px; border: 1px soli
     }
   });
   $('#keys').addEventListener('click', function (e) { if (e.target.id === 'keys') closeKeys(); });
-  phone.addEventListener('change', applyBoard);
+  phone.addEventListener('change', function () { placeInbox(); applyBoard(); });
 
   render();
 })();
