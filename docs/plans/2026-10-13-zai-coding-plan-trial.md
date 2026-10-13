@@ -19,6 +19,13 @@ Sebastian's decision of 2026-10-13: try the factory's coding sessions on his z.a
 
 ## The switch (infra only, no code change)
 
+Landed 2026-10-13, infra commit 31c55da, pushed to GitHub (the Forgejo origin returns
+with the re-seed): steps 2, 3, 5 and 6 below. Step 1 takes the plan's one-key branch:
+`Z_AI_KEY` seeds `ZAI_CODING_KEY` until a second key exists. Step 4 needed no change:
+no egress policy selects the LiteLLM pod (Cilium default allow; only the k8s-infra
+collectors and build-cache pods carry policies), and the bundled price map of v1.102.1
+(the deployed chart pin) already prices both zai models at the pay-as-you-go figures.
+
 1. Sebastian, on the z.ai console: create a second API key for the factory (if the console holds one key only, the trial uses the existing key and rotation replaces it), put it in `.env.tools` as `ZAI_CODING_KEY`, and bookmark the subscription page (quota) and Plan Overview (notices).
 2. Secret `platform/litellm-zai` (key `ZAI_CODING_KEY`), seeded by the pattern of `litellm-qwen` (`scripts/seed-secrets.sh:39`), applied before the commit; `environmentSecrets` gains `litellm-zai` in `k8s/platform/litellm/helmrelease.yaml`.
 3. Deployments in `model_list`: `glm-frontier` (`zai/glm-5.3`) and `glm-cheap` (`zai/glm-5.3-flash`), `api_base https://api.z.ai/api/coding/paas/v4`, `api_key os.environ/ZAI_CODING_KEY`, `drop_params true`. No `enable_thinking` (Qwen-specific).
