@@ -19,7 +19,7 @@ Raycast for a software project: one large frosted command bar under the pulse is
 | --text-muted | #a1a1aa | #5b5b66 | meta, figures |
 | --text-faint | #8a8a94 | #60606b | done cards (4.5:1 on the well) |
 | --accent | #6e56cf fill, #b3a4ff text | #6e56cf fill, #5b43c4 text | links, focus ring, the primary button, the bar's caret |
-| --need | the accent: violet ring, violet tint rgba(139,116,255,.10) | violet ring, tint #f6f3ff | Needs you items and their column |
+| --need | the accent: violet ring, violet tint rgba(139,116,255,.075) | 1 px violet rule rgba(110,86,207,.85), violet fill rgba(110,86,207,.085), the column well #e9e5f5 | Needs you items and their column |
 | --warn | #e8b14a | #935700 | the prominent pulse, near budget, stale |
 | --st-running | #6cb4ff | #1d68c7 | blue |
 | --st-waiting | #e8b14a | #935700 | amber: on a human, on dependencies, on the provider |
@@ -37,7 +37,7 @@ One family, the system sans (`-apple-system, Segoe UI, Inter, Noto Sans, system-
 ## Layout at 1440 and 1920
 
 - Top bar, 48 px, one row: "Factory console / project ▾" left, the page links centre-right, the theme key, the user, Log out, the scenario select last.
-- 900 to 1699 px: one centred column of 820 px holds the pulse strip, the command bar and its sheet; the board spans the full width below, never under the sheet. The sheet is at most 40 percent of the viewport high and scrolls inside; a chevron collapses it to the bar alone.
+- 900 to 1699 px: one centred column of 820 px holds the pulse strip, the command bar and its sheet; the board spans the full width below, never under the sheet. The sheet is at most 34 percent of the viewport high and scrolls inside, so the first Needs you item and its buttons sit on the first screen at 1440×900; a chevron collapses it to the bar alone.
 - 1700 px and wider: the column docks left at 560 px, sticky, the sheet filling the height; the board takes the rest on the right.
 - The drawer docks at the right edge below the top bar, 46 percent wide, at most 720 px, over the board. While it is open the centred column slides left into the free space, so it never covers the bar or the sheet.
 - Wide view (w): the board becomes two swimlanes, the Human lane (Approvals, Escalations, Human tasks) above the Agent lane (Backlog, Plan, Ready, Review, Done), lane badges and drag handles on.
@@ -48,7 +48,7 @@ A strip as wide as the bar, directly above it. The sentence first at 15 px/600, 
 
 ## The chat
 
-One frosted panel. The bar: a violet prompt glyph, a 16 px textarea ("Ask or tell the project…") that grows to five lines, the `/` key cap while unfocused, Send with its ↵ cap, the collapse chevron. Focus rings the whole palette in violet. The sheet under it: header "Chat", "project agent · project", New conversation, the old conversations select. The sheet is at most 42 percent of the viewport and opens on the last exchange; an empty conversation shows no log at all. Your message is a raised bubble on the right; the agent reply is plain text on the panel at a 72-character measure; a tool block is one mono line with a disclosure; a proposal is a violet-ringed card, "I will:" and the changes, Do it (violet, primary) and Skip (quiet). Do it turns it into a green "applied" line with undo, and the board shows the change on the cards it names ("Answered: Postgres" on #603, "Moved to ready" on #620); undo restores both. Footer: "This is your own conversation…" left, the key hints right (Enter send, Shift Enter break the line, Esc leave). The queue of waiting messages sits between the bar and the log, each with edit and remove.
+One frosted panel. The bar: a violet prompt glyph, a 16 px textarea ("Ask or tell the project…") that grows to five lines, the `/` key cap while unfocused, Send with its ↵ cap, the collapse chevron. Focus rings the whole palette in violet. The sheet under it: header "Chat", "project agent · project", New conversation, the old conversations select. The sheet is at most 34 percent of the viewport, fades out at its top edge and opens on the last exchange; an empty conversation shows no log at all. Your message is a raised bubble on the right; the agent reply is plain text on the panel at a 72-character measure; a tool block is one mono line with a disclosure; a proposal is a violet-ringed card, "I will:" and the changes, Do it (violet, primary) and Skip (quiet). Do it turns it into a green "applied" line with undo, and the board shows the change on the cards it names ("Answered: Postgres" on #603, "Moved to ready" on #620); undo restores both. Footer: "This is your own conversation…" left, the key hints right (Enter send, Shift Enter break the line, Esc leave). The queue of waiting messages sits between the bar and the log, each with edit and remove.
 
 ## The board and the card
 
@@ -60,11 +60,11 @@ Raised cards with a violet ring and tint, the only coloured surfaces on the boar
 
 ## The drawer
 
-Raised panel, 12 px left radius, a deep shadow. Header: #ref (link to the issue), the title 17 px, close with the Esc cap; a facts row (state, elapsed, checks, spend, lane badge, PR). Tabs Overview, Chat, Activity, Files as an underlined segmented row. Overview: the top block as a four-row definition list (Task, Status, Budget muted under 80 percent, Agent muted), the open need in a violet card, then the collapsed sections Objective, The agent's summary, The plan, Reviews and audit, Related cards, Edit, Links.
+Raised panel, 12 px left radius, a deep shadow. Header: #ref (link to the issue), the title 17 px, close with the Esc cap; a facts row (state, elapsed, checks, spend, lane badge, PR). Tabs Overview, Chat, Activity, Files as an underlined segmented row. Overview: the top block as a four-row definition list (Task, Status, Budget muted under 80 percent, Agent muted), the open need in a violet card, then the collapsed sections Objective, The agent's summary, The plan, Reviews and audit, Related cards, Edit, Links. Chat tab: the turns as in the main sheet (the agent with its mark and a name line, the member as a bubble), 8 px between turns with a hairline; the steer box docks at the drawer's foot as a small command bar (frosted, 12 px radius, violet focus ring, Send with ↵).
 
 ## The phone
 
-Under 900 px one column: the top bar (home, project, a Menu key that opens the links, theme, user, Log out, scenario), the pulse strip, the bar with its sheet at 55 percent of the viewport, then the board as stacked sections in the order Needs you, Working, Verifying, Queued, Done, Done collapsed. Choice buttons full width. The drawer takes the full screen.
+Under 900 px one column: the top bar (home, project, a Menu key that opens the links, theme, user, Log out, scenario), the pulse strip, the bar with its sheet at 55 percent of the viewport, then the board as stacked sections in the order Needs you, Working, Verifying, Queued, Done, Done collapsed. Needs you actions (Approve as you, Deny, Split, the choices, Answer or Grant) one per row, full width, 44 px tall, on both items. The drawer takes the full screen.
 
 ## Motion
 

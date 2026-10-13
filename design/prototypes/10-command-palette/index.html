@@ -30,7 +30,7 @@ html[data-theme="dark"] {
   --text: #ececf0; --text-muted: #a1a1aa; --text-faint: #8a8a94;
   --accent: #6e56cf; --accent-hover: #7b64db; --accent-text: #b3a4ff; --accent-ring: #9d8bff;
   --accent-soft: rgba(139, 116, 255, .11); --accent-line: rgba(157, 139, 255, .42);
-  --need-tint: rgba(139, 116, 255, .075); --need-ring: rgba(157, 139, 255, .55); --need-halo: rgba(139, 116, 255, .09);
+  --need-tint: rgba(139, 116, 255, .075); --need-ring: rgba(157, 139, 255, .55); --need-halo: rgba(139, 116, 255, .09); --need-well: var(--bg-sunken);
   --warn: #e8b14a; --warn-soft: rgba(232, 177, 74, .085); --warn-line: rgba(232, 177, 74, .26);
   --st-running: #6cb4ff; --st-waiting: #e8b14a; --st-review: #4cc4ae; --st-done: #63c587; --st-failed: #f2705f; --st-closed: #8b8b95;
   --danger-soft: rgba(242, 112, 95, .11); --danger-line: rgba(242, 112, 95, .3);
@@ -54,7 +54,7 @@ html[data-theme="light"] {
   --text: #18181c; --text-muted: #5b5b66; --text-faint: #60606b;
   --accent: #6e56cf; --accent-hover: #5e46c2; --accent-text: #5b43c4; --accent-ring: #6e56cf;
   --accent-soft: rgba(110, 86, 207, .075); --accent-line: rgba(110, 86, 207, .38);
-  --need-tint: rgba(110, 86, 207, .035); --need-ring: rgba(110, 86, 207, .55); --need-halo: rgba(110, 86, 207, .09);
+  --need-tint: rgba(110, 86, 207, .085); --need-ring: rgba(110, 86, 207, .85); --need-halo: rgba(110, 86, 207, .07); --need-well: #e9e5f5;
   --warn: #935700; --warn-soft: #fcf3dd; --warn-line: rgba(147, 87, 0, .22);
   --st-running: #1d68c7; --st-waiting: #935700; --st-review: #0a7466; --st-done: #1f6e3c; --st-failed: #b3301f; --st-closed: #66666f;
   --danger-soft: #fdecea; --danger-line: rgba(179, 48, 31, .25);
@@ -179,7 +179,7 @@ select.field { appearance: none; background: var(--bg-input) var(--chev) no-repe
 .flash { margin: 12px 24px 0; padding: 8px 12px; border-radius: 8px; background: var(--danger-soft); color: var(--st-failed); box-shadow: inset 0 0 0 1px var(--danger-line); }
 
 /* shell */
-.shell { padding: 18px 24px 48px; overflow-x: clip; }
+.shell { padding: 14px 24px 48px; overflow-x: clip; }
 .hero {
   position: relative; display: flex; flex-direction: column; gap: 10px;
   max-width: var(--col); margin-left: max(0px, calc((100% - var(--col)) / 2)); margin-right: auto;
@@ -187,7 +187,7 @@ select.field { appearance: none; background: var(--bg-input) var(--chev) no-repe
 }
 
 /* pulse */
-.pulse { position: relative; border-radius: 10px; padding: 12px 16px 11px 14px; box-shadow: inset 0 0 0 1px var(--line); }
+.pulse { position: relative; border-radius: 10px; padding: 9px 16px 8px 14px; box-shadow: inset 0 0 0 1px var(--line); }
 .pulse.prominent { background: var(--warn-soft); box-shadow: inset 3px 0 0 var(--warn), inset 0 0 0 1px var(--warn-line); padding-left: 17px; }
 .p-line { display: flex; align-items: flex-start; gap: 10px; }
 .p-sign { flex: none; width: 16px; height: 21px; display: grid; place-items: center; }
@@ -200,7 +200,7 @@ select.field { appearance: none; background: var(--bg-input) var(--chev) no-repe
 .p-bullets { margin: 8px 0 2px 26px; padding: 0 0 0 14px; color: var(--text); font-size: 13px; line-height: 1.5; }
 .p-bullets li { margin: 2px 0; }
 .p-bullets li::marker { color: var(--text-faint); }
-.figs-wrap { margin: 7px 0 0 26px; overflow: clip; overflow-clip-margin: 4px; }
+.figs-wrap { margin: 4px 0 0 26px; overflow: clip; overflow-clip-margin: 4px; }
 .figs { list-style: none; margin: 0 0 0 -19px; padding: 0; display: flex; flex-wrap: wrap; align-items: center; row-gap: 4px; font-size: 12px; color: var(--text-muted); }
 .figs li { display: inline-flex; align-items: center; height: 22px; white-space: nowrap; }
 .figs li::before { content: ""; flex: none; width: 3px; height: 3px; border-radius: 50%; background: var(--text-faint); opacity: .75; margin: 0 8px; }
@@ -244,22 +244,22 @@ select.field { appearance: none; background: var(--bg-input) var(--chev) no-repe
 .queue { list-style: none; margin: 0; padding: 6px 10px 8px 50px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
 .queue:empty { display: none; }
 .queue li { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-muted); }
-.queue .q-label { font-size: 11px; color: var(--text-faint); }
+.queue .q-label { font-size: 11px; color: var(--text-muted); }
 .queue .q-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
-.sheet { border-top: 1px solid var(--line); display: flex; flex-direction: column; max-height: 42vh; min-height: 0; }
+.sheet { border-top: 1px solid var(--line); display: flex; flex-direction: column; max-height: 34vh; min-height: 0; }
 .sheet-h { flex: none; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 10px 0 18px; border-bottom: 1px solid var(--line); }
 .sheet-h h2 { font-size: 12px; font-weight: 600; }
 .sheet-h .who { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .sheet-h select { appearance: none; height: 26px; border: 0; border-radius: 6px; padding: 0 24px 0 9px; font-size: 12px; font-weight: 500; color: var(--text-muted); background: transparent var(--chev) no-repeat right 5px center / 15px; cursor: pointer; max-width: 200px; text-overflow: ellipsis; }
 .sheet-h select:hover { background-color: var(--btn); color: var(--text); }
-.log { position: relative; flex: 1; min-height: 0; overflow-y: auto; list-style: none; margin: 0; padding: 14px 18px 6px; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+.log { position: relative; flex: 1; min-height: 0; overflow-y: auto; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 14px); mask-image: linear-gradient(to bottom, transparent 0, #000 14px); list-style: none; margin: 0; padding: 14px 18px 6px; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
 .log > li { margin: 0 0 14px; }
-.log .start { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--text-faint); }
+.log .start { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--text-muted); }
 .log .start::before, .log .start::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 .log .empty { color: var(--text-muted); font-size: 12.5px; text-align: center; padding: 6px 0 2px; }
 .msg-you { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
 .bubble { max-width: min(72ch, 86%); padding: 7px 12px; border-radius: 12px 12px 4px 12px; background: var(--bubble); box-shadow: var(--hi), inset 0 0 0 1px var(--line); font-size: 14px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
-.m-meta { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-faint); margin-bottom: 5px; }
+.m-meta { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; }
 .msg-you .m-meta { margin: 0; order: -1; }
 .log.is-empty { display: none; }
 .m-meta b { font-weight: 600; color: var(--text-muted); }
@@ -294,15 +294,16 @@ select.field { appearance: none; background: var(--bg-input) var(--chev) no-repe
 .link-btn { all: unset; color: var(--accent-text); font-weight: 500; cursor: pointer; border-radius: 3px; }
 .link-btn:hover { text-decoration: underline; text-underline-offset: 2px; }
 .link-btn:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 2px; }
-.log .typing-row { display: flex; align-items: center; gap: 8px; color: var(--text-faint); font-size: 11px; }
-.sheet-f { flex: none; display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; padding: 8px 12px 8px 18px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--text-muted); }
+.log .typing-row { display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 11px; }
+.sheet-f { flex: none; display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; padding: 8px 12px 8px 18px; border-top: 1px solid var(--line); font-size: 12px; color: var(--text-muted); }
+.sheet-f kbd { color: var(--text-muted); }
 .sheet-f .own { flex: 1 1 260px; min-width: 0; }
 .sheet-f .keys-hint { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
 .sheet-f .keys-hint span { display: inline-flex; align-items: center; gap: 4px; }
 
 /* board */
-#board { margin-top: 28px; }
-.board-h { display: flex; align-items: center; gap: 8px; margin: 0 2px 12px; }
+#board { margin-top: 14px; }
+.board-h { display: flex; align-items: center; gap: 8px; margin: 0 2px 6px; }
 .board-h h2 { font-size: 13px; font-weight: 600; }
 .board-h .b-meta { color: var(--text-faint); font-size: 12px; }
 .board-h select { appearance: none; height: 26px; border: 0; border-radius: 6px; padding: 0 24px 0 9px; font-size: 12px; font-weight: 500; color: var(--text-muted); background: transparent var(--chev) no-repeat right 5px center / 15px; cursor: pointer; }
@@ -313,6 +314,7 @@ select.field { appearance: none; background: var(--bg-input) var(--chev) no-repe
 .col-h h3 { font-size: 12px; font-weight: 600; color: var(--text-muted); letter-spacing: .005em; }
 .count { font: 600 10.5px/1 var(--mono); color: var(--text-muted); background: var(--chip); padding: 3px 5px; border-radius: 4px; min-width: 18px; text-align: center; box-shadow: inset 0 0 0 1px var(--line); }
 .col[data-col="needs"] .col-h h3 { color: var(--accent-text); }
+.col[data-col="needs"] { background: var(--need-well); }
 .col[data-col="needs"] .count.on { background: var(--accent); color: #fff; box-shadow: none; }
 .col-tog { display: none; margin-left: auto; }
 .col-tog svg { transition: transform .15s; }
@@ -462,10 +464,16 @@ select.field { appearance: none; background: var(--bg-input) var(--chev) no-repe
 .meter i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: var(--accent); }
 .add { color: var(--st-done); } .del { color: var(--st-failed); }
 .d-sess { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); padding-bottom: 10px; border-bottom: 1px solid var(--line); }
-.d-msgs { list-style: none; margin: 0; padding: 12px 0 4px; display: flex; flex-direction: column; gap: 12px; }
-.d-msgs .m-text { font-size: 13px; }
-.steer { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
-.steer .row { display: flex; justify-content: flex-end; gap: 6px; }
+.d-msgs { list-style: none; margin: 0; padding: 12px 0 4px; display: flex; flex-direction: column; gap: 8px; }
+.d-msgs > li + li { padding-top: 8px; border-top: 1px solid var(--line); }
+.d-msgs .m-text, .d-msgs .bubble { font-size: 13.5px; }
+.d-msgs .msg-you { justify-content: flex-end; }
+.dr-foot { flex: none; padding: 12px 18px 16px 22px; border-top: 1px solid var(--line); }
+.steer { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 8px 8px 8px 14px; border-radius: 12px; background: var(--bg-glass); box-shadow: var(--palette-shadow); transition: box-shadow .15s; }
+.steer:focus-within { box-shadow: var(--palette-shadow), 0 0 0 1px var(--accent-line), 0 0 0 5px var(--accent-soft); }
+.steer textarea { flex: 1; min-width: 0; display: block; resize: none; border: 0; outline: none; background: transparent; color: var(--text); font: 400 14px/22px var(--font); padding: 4px 0; height: 30px; max-height: 110px; caret-color: var(--accent-text); }
+.steer textarea::placeholder { color: var(--text-muted); opacity: 1; }
+.steer .btn { flex: none; height: 30px; padding: 0 8px 0 12px; }
 .empty-note { color: var(--text-muted); padding: 10px 0; }
 .dr-h-acts { display: flex; align-items: center; gap: 4px; }
 
@@ -543,9 +551,8 @@ dialog#keys::backdrop { background: rgba(8, 8, 12, .45); }
   .col-tog { display: inline-grid; }
   .col.folded .col-b { display: none; }
   .col-h { cursor: pointer; }
-  .choices { flex-direction: column; }
-  .choices .btn, .n-acts .btn { height: 34px; }
-  .choices .btn { width: 100%; }
+  .need .n-acts, .need .choices, .need .own .row, .need .deny-form .row { flex-direction: column; align-items: stretch; gap: 6px; }
+  .need .n-acts .btn, .need .choices .btn, .need .own .row .btn, .need .deny-form .row .btn { width: 100%; height: 44px; font-size: 13px; }
   .lanes .cols.human { display: flex; }
   #drawer { top: 0; width: 100%; border-radius: 0; z-index: 60; }
   .dr-h { padding: 12px 14px 10px; }
@@ -710,7 +717,7 @@ dialog#keys::backdrop { background: rgba(8, 8, 12, .45); }
       </div></div>
       <div class="figs-wrap"><ul class="figs" aria-label="Status">
         <li class="f-state"><i class="dot h-${stateHue}"></i>${esc(sc.state)}</li>
-        <li>${sc.working.filter((c) => !c.provider).length} working</li>
+        <li>${sc.workingCount} working</li>
         ${sc.provider ? `<li class="f-prov">${sc.provider} waiting on the provider</li>` : ''}
         <li>${sc.needYou ? `<a class="f-need" href="#col-needs" data-act="goto-needs">${sc.needYou} need you</a>` : `${sc.needYou} need you`}</li>
         <li><a href="#" class="${over ? 'f-over' : ''}" title="Costs">${over ? W + ' ' : ''}${eur(sc.spend)} / ${eur(sc.cap)}</a></li>
@@ -1005,8 +1012,14 @@ dialog#keys::backdrop { background: rgba(8, 8, 12, .45); }
     if (!s) return `<p class="empty-note">No session yet</p>`;
     const msgs = s.said.concat(st.session);
     return `<div class="d-sess"><span class="agent-mark" aria-hidden="true"></span><span>Session ${s.n} · ${esc(s.model)} · <span class="h-${hue(s.outcome)}">${esc(s.outcome)}</span></span></div>
-      <ol class="d-msgs">${msgs.map((x) => `<li><div class="m-meta"><b>${esc(x.who)}</b>${esc(x.at)}</div><div class="m-text">${refs(x.text)}</div></li>`).join('')}</ol>
-      ${s.outcome === 'running' ? `<form class="steer" data-form="steer"><label class="sr" for="steer">Your message to the running session</label><textarea class="field" id="steer" rows="2" placeholder="Your message to the running session"></textarea><div class="row"><button class="btn primary sm" type="submit">Send</button></div></form>` : ''}`;
+      <ol class="d-msgs">${msgs.map((x) => x.who === 'agent'
+        ? `<li class="msg-agent"><div class="m-meta"><span class="agent-mark" aria-hidden="true"></span><b>${esc(x.who)}</b>${esc(x.at)}</div><div class="m-text">${refs(x.text)}</div></li>`
+        : `<li class="msg-you"><div class="bubble">${refs(x.text)}</div><div class="m-meta">${esc(x.who)} · ${esc(x.at)}</div></li>`).join('')}</ol>`;
+  }
+  function steerHTML(m) {
+    const s = m.D && m.D.session;
+    if (st.tab !== 'chat' || !s || s.outcome !== 'running') return '';
+    return `<div class="dr-foot"><form class="steer" data-form="steer"><label class="sr" for="steer">Your message to the running session</label><textarea id="steer" rows="1" placeholder="Your message to the running session"></textarea><button class="btn primary" type="submit">Send <kbd aria-hidden="true">↵</kbd></button></form></div>`;
   }
   function activityHTML(m) {
     const D = m.D;
@@ -1046,7 +1059,8 @@ dialog#keys::backdrop { background: rgba(8, 8, 12, .45); }
         ${stateRow(c, { spend: true, lane: true, pr: true })}
       </header>
       <div class="tabs" role="tablist" aria-label="Card">${TABS.map(([k, l]) => `<button class="tab" role="tab" type="button" id="tab-${k}" data-act="tab" data-tab="${k}" aria-selected="${st.tab === k}" aria-controls="dr-panel" tabindex="${st.tab === k ? 0 : -1}">${l}</button>`).join('')}</div>
-      <div class="dr-body" id="dr-panel" role="tabpanel" aria-labelledby="tab-${st.tab}" tabindex="0">${panel}</div>`;
+      <div class="dr-body" id="dr-panel" role="tabpanel" aria-labelledby="tab-${st.tab}" tabindex="0">${panel}</div>${steerHTML(m)}`;
+    if (st.tab === 'chat') { const b = $('#dr-panel'); b.scrollTop = b.scrollHeight; }
   }
   function openDrawer(issue, opts) {
     opts = opts || {};
@@ -1197,6 +1211,15 @@ dialog#keys::backdrop { background: rgba(8, 8, 12, .45); }
         renderDrawer(); $('#steer').focus();
       } break;
     }
+  });
+  document.addEventListener('keydown', (ev) => {
+    if (ev.target.id === 'steer' && ev.key === 'Enter' && !ev.shiftKey && !ev.isComposing) {
+      ev.preventDefault();
+      ev.target.form.requestSubmit();
+    }
+  });
+  document.addEventListener('input', (ev) => {
+    if (ev.target.id === 'steer') { const t = ev.target; t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 110) + 'px'; }
   });
 
   document.addEventListener('change', (ev) => {
