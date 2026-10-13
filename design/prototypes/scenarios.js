@@ -1,10 +1,10 @@
-// The four moments every prototype shows. Loaded with <script src="../scenarios.js">
+// The four moments every prototype shows. workingCount is the status figure; working is the card list. Loaded with <script src="../scenarios.js">
 // (file:// cannot fetch JSON). Every string is page copy; nothing here is invented
 // by a builder. A builder may add plausible detail of the same kinds, never new kinds.
 window.SCENARIOS = {
   busy: {
     project: "ai-software-factory-code",
-    state: "waiting on you", working: 3, provider: 0, needYou: 2, spend: 61.40, cap: 120, github: "1 open pull request",
+    state: "waiting on you", workingCount: 3, provider: 0, needYou: 2, spend: 61.40, cap: 120, github: "1 open pull request",
     pulse: { prominent: true, sentence: "Two cards need your decision; #612's merge carries a migration.",
       bullets: ["Merge PR #612 waits for you: high risk, one migration, the audit found a missing default.",
                 "#603 asks which store the session table should use; the plan said Postgres.",
@@ -78,7 +78,7 @@ window.SCENARIOS = {
   },
   idle: {
     project: "ai-software-factory-code",
-    state: "idle", working: 0, provider: 0, needYou: 0, spend: 144.16, cap: 120, github: "",
+    state: "idle", workingCount: 0, provider: 0, needYou: 0, spend: 144.16, cap: 120, github: "",
     pulse: { prominent: false, sentence: "Factory is idle with no active work; spend of €144.16 has exceeded the monthly budget of €120.00.",
       bullets: ["Nothing runs and nothing waits for you.", "Two backlog cards wait for a lane: #455 and #178.", "The month cap is passed; new sessions wait until it is raised or the month turns."] },
     needs: [],
@@ -107,7 +107,7 @@ window.SCENARIOS = {
   },
   fire: {
     project: "ai-software-factory-code",
-    state: "waiting on you", working: 1, provider: 2, needYou: 1, spend: 97.20, cap: 120, github: "1 open pull request",
+    state: "waiting on you", workingCount: 1, provider: 2, needYou: 1, spend: 97.20, cap: 120, github: "1 open pull request",
     pulse: { prominent: true, sentence: "The model provider refuses every call since 13:22; two cards wait on it and #538 is at its cap.",
       bullets: ["LiteLLM answers 429 from the provider's account budget; nothing can run until it is raised.", "#538 burned its budget on failed calls and asks for a decision.", "#531 has had no event for 40 minutes.", "Two cards failed today: #607 and #535."] },
     needs: [
@@ -142,7 +142,7 @@ window.SCENARIOS = {
   },
   quiet: {
     project: "ai-software-factory-code",
-    state: "working", working: 1, provider: 0, needYou: 0, spend: 4.10, cap: 120, github: "0 open pull requests",
+    state: "working", workingCount: 1, provider: 0, needYou: 0, spend: 4.10, cap: 120, github: "0 open pull requests",
     pulse: { prominent: false, sentence: "One card is working; nothing needs you.", bullets: ["#622 started 6 minutes ago on the costs read's date window.", "Three cards finished this morning.", "Spend this month is €4.10 of €120."] },
     needs: [], queued: [],
     working: [{ issue: 622, task: "t-c0ffee123456", title: "Costs read: a from and a to date", status: "running", elapsed: "6 min", spent: 0.08, budget: 2, model: "coding-cheap", activity: "Reading internal/console/ledger.go", lane: "ready" }],

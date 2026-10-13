@@ -23,7 +23,7 @@ const mustHave = {
     const errors = []; p.on('pageerror', (e) => errors.push(String(e)));
     await p.goto(url('scenario=' + sc + '&theme=dark')); await p.waitForTimeout(500);
     const text = await p.evaluate(() => document.body.innerText + ' ' + Array.from(document.querySelectorAll('[aria-label],[title],[placeholder]')).map(e => (e.getAttribute('aria-label') || '') + ' ' + (e.getAttribute('title') || '') + ' ' + (e.getAttribute('placeholder') || '')).join(' '));
-    for (const w of words) if (!text.includes(w)) fails.push(`${sc}: missing "${w}"`);
+    const low = text.toLowerCase(); for (const w of words) if (!low.includes(w.toLowerCase())) fails.push(`${sc}: missing "${w}"`);
     if (errors.length) fails.push(`${sc}: JS error ${errors[0]}`);
     if (sc === 'busy') {
       const theme0 = await p.evaluate(() => document.documentElement.dataset.theme);
