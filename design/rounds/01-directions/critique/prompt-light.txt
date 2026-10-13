@@ -1,0 +1,12 @@
+You are an independent design critic. Judge the LIGHT THEME contact sheet of the same 16 design directions (you saw the dark sheet before; judge this one on its own) for the project screen of an AI software factory console. Each tile is one direction, labelled.
+
+The brief: a tool a member uses to steer a software project that agents build, and a screen that non-technical visitors should find slick, modern and professional, like a product of a top tech company (Linear, Vercel, Raycast, Stripe). Three elements in strict order of weight: the pulse sentence on top (what to know now), the chat with the project agent as the main affordance (where the person acts), the kanban board for the granular task state (quiet, scanned not read). Normal states whisper, exceptional states speak: the two Needs you items (a merge approval and a question with three choices) must be the loudest things on the screen; a done card must be quiet. The content is identical on every tile; only the design differs. The screen must look like a real, usable product, not a poster.
+
+Answer as JSON with these keys:
+- "ranking": the 16 labels from best to worst.
+- "top5": for each of the best five, two sentences: why it leads and its one risk.
+- "bottom3": the three worst with one sentence each.
+- "hierarchy": for each tile, which element reads as the main one at a glance (pulse, chat or board) and whether Needs you is the loudest thing (yes or no).
+- "usable": the tiles that look like a real product a person could use today, and the tiles that look like a poster or a concept.
+- "text": tiles with garbled or misspelled text that a viewer would notice.
+- "wild_but_worth_it": any direction outside the safe range that still deserves to go forward, and why.
