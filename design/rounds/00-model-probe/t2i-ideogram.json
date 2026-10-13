@@ -1,0 +1,18 @@
+{
+  "model": "ideogram/v4",
+  "prompt": "UI design mockup of a project control console for an AI software factory, desktop browser viewport, 16:9, flat, no browser chrome, no device frame.\n\nContent, spelled exactly. Top bar: \"Factory console\", links \"Board\", \"New task\", \"Projects\", \"Resources\", \"Costs\", \"Policy\", \"Alerts\", a theme toggle, \"sebastian\", \"Log out\". Status line: \"ai-software-factory-code\", \"idle\", \"0 working\", \"0 need you\", \"\u20ac144.16 / \u20ac120.00\". Pulse sentence: \"Factory is idle with no active work; spend of \u20ac144.16 has exceeded the monthly budget of \u20ac120.00.\" A kanban board with five columns: \"Needs you 0\", \"Queued 2\", \"Working 0\", \"Verifying 0\", \"Done 139\". Queued cards: \"#455 Live check: close (Stage 16, 3.4)\" and \"#178 Console: show the configuration version\", each with a \"backlog\" chip, a time \"53 h 1 min in all\", a spend \"\u20ac0.00 / \u20ac2.00\" and small buttons \"Plan\", \"Ready\", \"Close\". Done cards: \"#490 README.md: extend the intro\", \"#616 Chat form: center the Send button\", \"#610 Fresh-context and aged-read acceptance tests\", \"#607 Live check 3.11: split pre-check\" marked \"failed\", \"#608 Console polish: clamp board chip objectives\", each with a \"done\" chip and a time. A chat panel titled \"Chat\", \"project agent \u00b7 ai-software-factory-code\", a \"New conversation\" button, the line \"Ask or tell the project agent. It reads, explains, moves, answers, steers and approves as you, through the console's own actions; it runs no code.\", a message box \"Ask or tell the project\u2026 (Enter sends, Shift+Enter breaks the line)\" and a \"Send\" button.\n\nDirection \"Linear calm\": the look of Linear or Height. Monochrome cool greys, one blue accent, hairline borders, a 13 px grotesk typeface, exact spacing, generous whitespace. The chat is the main region, wide and central, the board is quiet and compact beside it, and a done card is a single line. Dark theme.\n\nLegible UI text with exact spelling. Made by a top product design studio. Not a template, not a slide.",
+  "refs": [],
+  "video": null,
+  "params": {
+    "image_size": "landscape_16_9",
+    "rendering_speed": "BALANCED"
+  },
+  "seed": 969607028,
+  "description": null,
+  "label": "t2i \u00b7 ideogram v4",
+  "est_cost_usd": 0.09,
+  "created": "2026-10-14T00:11:54",
+  "outputs": [
+    "t2i-ideogram.png"
+  ]
+}

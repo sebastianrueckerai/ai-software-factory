@@ -1,0 +1,20 @@
+{
+  "model": "blackforestlabs/flux-3/edit-image",
+  "prompt": "UI design mockup of the same screen as the reference screenshot: the project control console of an AI software factory. Keep the screen's structure and its text: the top bar, the status line, the pulse sentence, the five kanban columns Needs you, Queued, Working, Verifying, Done with their cards, and the chat panel on the right with its message box. Redesign the visual style completely.\n\nDirection \"Linear calm\": the look of Linear or Height. Monochrome cool greys, one blue accent, hairline borders, a 13 px grotesk typeface, exact spacing, generous whitespace. The chat is the main region and reads as the centre of the screen; the board is quiet and compact; a done card is one line. Dark theme.\n\nDesktop browser viewport, flat, no browser chrome, no device frame. Legible UI text with exact spelling. Made by a top product design studio. Not a template, not a slide.",
+  "refs": [
+    "design/assets/live-2026-10-13-idle-dark.png"
+  ],
+  "video": null,
+  "params": {
+    "aspect_ratio": "16:9",
+    "resolution": "1k"
+  },
+  "seed": null,
+  "description": null,
+  "label": "key test \u00b7 flux-3 edit \u00b7 Linear calm",
+  "est_cost_usd": 0.05,
+  "created": "2026-10-14T00:10:50",
+  "outputs": [
+    "flux-3-edit.png"
+  ]
+}

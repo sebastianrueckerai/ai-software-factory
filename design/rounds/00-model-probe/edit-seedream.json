@@ -1,0 +1,19 @@
+{
+  "model": "bytedance/seedream/v5/pro/edit",
+  "prompt": "Redesign the user interface in the reference screenshot. The reference is only the content and the structure: a project control console for an AI software factory with a top bar, a status line, a pulse sentence, five kanban columns named Needs you, Queued, Working, Verifying and Done with their cards, and a chat panel with a message box. Keep all of that content and its wording. Change everything about the visual design: the layout proportions, the typography, the colours, the card shapes, the spacing. Do not copy the look of the screenshot.\n\nDirection \"Linear calm\": the look of Linear or Height. Monochrome cool greys, one blue accent, hairline borders, a 13 px grotesk typeface, exact spacing, generous whitespace. The chat is the main region, wide and central, the board is quiet and compact beside it, and a done card is a single line. Dark theme.\n\nDesktop browser viewport, 16:9, flat, no browser chrome, no device frame. Legible UI text with exact spelling. Made by a top product design studio. Not a template, not a slide.",
+  "refs": [
+    "design/assets/live-2026-10-13-idle-dark.png"
+  ],
+  "video": null,
+  "params": {
+    "image_size": "landscape_16_9"
+  },
+  "seed": null,
+  "description": null,
+  "label": "edit \u00b7 seedream v5 pro",
+  "est_cost_usd": 0.07,
+  "created": "2026-10-14T00:14:06",
+  "outputs": [
+    "edit-seedream.png"
+  ]
+}
