@@ -25,7 +25,7 @@ Vercel's Geist: pure black or pure white, greys for everything normal, one warm 
 | --need-fill | #ffb224, text #0a0a0a | #ffb224, text #171717 (9.9:1), border #d18a0a | Approve as you, Grant one session, Accept plan |
 | --need-tint / --need-line | amber 7 % / amber 38 % | #fff6e5 / #f0c987 | the Needs you item's ground and edge |
 | --need-muted | #b0b0b0 | #4a4a4a (8.3:1 on #fff6e5) | replaces --text-muted and --text-faint inside Needs you items and the drawer's open need |
-| state hues | greyscale | greyscale | running: filled dot in --text, pulsing; in review: filled dot in --text-muted; queued, backlog, waiting on dependencies: hollow ring; waiting on a human: amber dot; done: check; failed: cross in --text; closed: slashed circle. The word always follows the glyph, so colour is never the only signal |
+| state hues | greyscale | greyscale | running: filled dot in --text, pulsing; in review: filled dot in --text-muted; queued, backlog, waiting on dependencies: hollow ring; waiting on a human: amber dot; done: check in --text-muted; failed: cross in --fail (#d9726f dark, 6.6:1; #b54a46 light, 5.2:1), the only red; closed: slashed circle. The word always follows the glyph, so colour is never the only signal |
 
 Elevation: dark uses hairlines only; light adds soft shadows (drawer `-12px 0 40px rgb(0 0 0 / .08)`, composer and proposal `0 1px 2px rgb(0 0 0 / .04)`). That and the grey board tray make light a day mood, not an inversion.
 
@@ -60,9 +60,9 @@ Prominent (a card needs a person): the amber warning sign before the sentence, w
 - The start line tops every log, centred, 14 px muted, a 1 px rule under it: "Ask or tell the project agent. It reads, explains, moves, answers, steers and approves as you, through the console's own actions; it runs no code." The messages sit at the bottom of the log, by the composer, so the start line fills the space above a short history.
 - Yours: right-aligned bubble on --bg-sub, radius 14/14/4/14, time under it in --text-faint.
 - Agent: label "project agent · 14:21" in 12 px muted, text plain at full measure (72 ch).
-- Tool block: one quiet row, chevron, mono name, "· 0.4 s"; opens to arguments and result.
+- Tool block: one quiet row, chevron, mono name, "· 0.4 s"; opens to arguments and result. Every part of a turn (label, text, tool rows, proposal) is 10 px apart.
 - Proposal: --bg-raised, 1 px --line-strong, radius 8: "I will:" 600, the changes as a list, the detail in muted 13 px, Do it (primary) and Skip (ghost). Applied: one muted line with a check, the changes, "undo".
-- Composer: --bg-raised box, radius 12, three rows, Send primary at the bottom right, the own-conversation line at the bottom left in 12 px faint. Focus: border --text-muted plus a 3 px soft ring. The queue lists under the box, each line an editable field and a remove button.
+- Composer: --bg-raised box, radius 12, three rows, Send primary at the bottom right, the own-conversation line at the bottom left in 12 px --text-muted. Focus: border --text-muted plus a 3 px soft ring. The queue lists under the box, each line an editable field and a remove button.
 
 ## The board and the card
 
@@ -71,7 +71,7 @@ Prominent (a card needs a person): the amber warning sign before the sentence, w
 - Chips: 11 px on --bg-sub, radius 4. Exceptional chips (stale, on the provider, at its cap) are outlined in --text instead. The accent chip is the accent's name only: no hue, the board stays monochrome.
 - Stale card: an inset 1 px ring in --text-faint and "nothing for 40 min" in --text.
 - Done shows at most 12 rows, then one faint line "and n earlier" linking to the full list.
-- Done, closed: one line, glyph, ref, title, ellipsis, all --text-faint; the state word is in the glyph's label, the time in the row's title. Failed: two lines, the cross and title in --text, "failed · elapsed" under it.
+- Done, closed: one line, a 12 px glyph, ref, title, ellipsis, all --text-muted at weight 400; the state word is in the glyph's label, the time in the row's title. Failed: two lines, the cross in --fail, "failed" and the elapsed time under the title, all else --text-muted.
 - Actions: 24 px ghost buttons, 1 px --line-strong, radius 6, visible always.
 - Hover: the row takes --hover; the title underlines. The open card keeps --hover-strong.
 
@@ -93,7 +93,7 @@ Prominent (a card needs a person): the amber warning sign before the sentence, w
 
 ## The phone
 
-Under 900 px one column: top bar (the home word over the project select, a menu button for the links, the switch, theme, user and Log out), the pulse, the chat with its log at 55 percent of the viewport height and the composer, then the board: Needs you in full, every button in it full width, one per row, 44 px tall, then Working, Verifying, Queued, Done, each a section whose head toggles it; Done starts collapsed. The drawer takes the full screen.
+Under 900 px one column: top bar (the home word over the project select, a menu button for the links, the switch, theme, user and Log out), the pulse, the chat with its log at 55 percent of the viewport height and the composer, then the board: Needs you in full, every button in it full width, one per row, 44 px tall, its label left-aligned at 16 px, then Working, Verifying, Queued, Done, each a section whose head toggles it; Done starts collapsed. The drawer takes the full screen.
 
 ## Motion
 
