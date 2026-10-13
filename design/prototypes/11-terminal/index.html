@@ -13,19 +13,19 @@
   --text: #ffb238; --text-hi: #ffd27a; --text-muted: #a8792f;
   --accent: #5fd7e6;
   --need-bg: #ffb238; --need-fg: #0b0906; --need-hover: #ffd27a;
-  --tint: rgba(255, 178, 56, .07);
+  --tint: rgba(255, 178, 56, .07); --scrim: rgba(0, 0, 0, .62);
   --st-running: #ffd27a; --st-review: #ffb238; --st-done: #a8792f; --st-failed: #ff6a55;
   --acc-red: #ff6a55; --acc-orange: #ff9a4a; --acc-amber: #ffc04a; --acc-green: #8fd46a;
   --acc-teal: #4fd1b8; --acc-blue: #6fb0ff; --acc-violet: #b79bff; --acc-pink: #ff8fc8;
 }
 [data-theme="light"] {
   color-scheme: light;
-  --bg: #f2ead6; --bg-raised: #f8f3e6; --bg-sunken: #ebe2ca;
+  --bg: #f2ead6; --bg-raised: #f8f3e6; --bg-sunken: #f2ead6;
   --line: #a3946f; --line-strong: #4a4031;
   --text: #1c1813; --text-hi: #000; --text-muted: #4d4130;
   --accent: #005a69;
   --need-bg: #1c1813; --need-fg: #f6f0e0; --need-hover: #3b3226;
-  --tint: rgba(150, 100, 0, .08);
+  --tint: rgba(150, 100, 0, .08); --scrim: rgba(28, 24, 19, .3);
   --st-running: #7a4600; --st-review: #1c1813; --st-done: #4d4130; --st-failed: #9a2418;
   --acc-red: #b02a1c; --acc-orange: #a14a00; --acc-amber: #8a5a00; --acc-green: #2f6b1f;
   --acc-teal: #00695c; --acc-blue: #1f4fa3; --acc-violet: #5a3fa0; --acc-pink: #a3266b;
@@ -123,8 +123,8 @@ option { background: var(--bg-raised); color: var(--text); }
 #scenario button:hover { background: var(--need-bg); color: var(--need-fg); }
 #scenario button[aria-pressed="true"] { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
 .statusrow { display: flex; justify-content: space-between; align-items: baseline; gap: 2ch; padding: .15em 1.2ch .35em; font-size: 13px; }
-.status { display: flex; flex-wrap: wrap; gap: 0 1.2ch; align-items: baseline; }
-.status .sep { color: var(--line-strong); }
+.status .it { white-space: nowrap; }
+.status .sep { color: var(--line-strong); margin: 0 .5ch 0 1ch; }
 .status .state { font-weight: 700; }
 .status .state.need { color: var(--text-hi); }
 .status .state.muted { color: var(--text-muted); font-weight: 400; }
@@ -246,7 +246,8 @@ input[type="radio"] { accent-color: var(--text); margin: 0; }
 .chat-lg .spacer { flex: 1; background: none; padding: 0; }
 .chat-foot { position: absolute; bottom: calc(-.75em - .5px); left: 1.2ch; font-size: 12.5px; line-height: 1.5; color: var(--text-muted); background: linear-gradient(var(--bg-raised) 50%, var(--bg) 50%); padding: 0 .7ch; max-width: calc(100% - 2.4ch); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .log { flex: 1; min-height: 0; overflow: auto; margin-top: .9em; padding: .2em 1.6ch .6em; display: flex; flex-direction: column; gap: .45em; }
-.start { color: var(--text-muted); max-width: 110ch; }
+.start { color: var(--text-muted); max-width: 110ch; padding-left: 2ch; text-indent: -2ch; }
+.start::before { content: "# "; }
 .msg { display: grid; grid-template-columns: 6ch 7ch minmax(0, 96ch); column-gap: 1ch; }
 .msg .t { color: var(--text-muted); }
 .msg .who { color: var(--text-muted); }
@@ -281,7 +282,9 @@ input[type="radio"] { accent-color: var(--text); margin: 0; }
 .queue .qt { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 
 /* drawer */
-#drawer { position: relative; border: 1px solid var(--line-strong); border-right: 0; margin-right: -16px; background: var(--bg-raised); display: flex; flex-direction: column; min-height: 0; box-shadow: -14px 0 0 var(--bg); }
+#drawer { position: relative; border: 3px double var(--text); margin-right: -16px; background: var(--bg-raised); display: flex; flex-direction: column; min-height: 0; }
+#board { position: relative; }
+body.drawer-open #board::after { content: ""; position: absolute; inset: 0 0 -6px; background: var(--scrim); z-index: 4; pointer-events: none; }
 #drawer[hidden] { display: none; }
 .dr-head { padding: .7em 1.6ch .5em; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto; gap: .15em 2ch; }
 .dr-head h2 { font-size: 15px; font-weight: 700; color: var(--text-hi); line-height: 1.4; min-width: 0; overflow-wrap: anywhere; white-space: normal; }
@@ -348,24 +351,27 @@ td.num { text-align: right; white-space: nowrap; }
 [data-theme="light"] .titlebar option { color: var(--text); }
 [data-theme="light"] .statusrow { padding-top: .35em; }
 [data-theme="light"] .col { border-color: var(--line); }
-[data-theme="light"] .cols:not(.calm) .col-needs { border: 4px double var(--text); background: var(--bg-raised); }
+[data-theme="light"] .cols:not(.calm) .col-needs { border: 4px double var(--text); }
 [data-theme="light"] .cols:not(.calm) .col-needs .lg { top: calc(-.75em - 2px); }
 [data-theme="light"] .proposal { background: var(--bg); }
-[data-theme="light"] #drawer { box-shadow: -14px 0 0 var(--bg); }
 
 /* the phone: one column, the REPL first, the board stacked under it */
 @media (max-width: 899px) {
   body { height: auto; overflow: visible; display: block; padding: 10px 10px 24px; }
-  .hd { padding-top: 0; }
-  .titlebar { position: static; flex-wrap: wrap; gap: .4em 1ch; padding: .3em 1ch; border-bottom: 1px solid var(--line); }
+  .hd { padding-top: 0; border: 0; }
+  .titlebar { position: static; flex-wrap: wrap; align-items: center; gap: 0 1ch; padding: 0 0 0 1ch; min-height: 44px; border: 1px solid var(--line-strong); }
   .titlebar > *, .topnav > * { background: none; padding: 0; }
-  .titlebar .sel { max-width: 38vw; overflow: hidden; text-overflow: ellipsis; }
-  .menu-btn { display: inline-block; margin-left: auto; }
+  .titlebar .selwrap { flex: 1; min-width: 0; }
+  .titlebar .sel { field-sizing: fixed; width: 100%; overflow: hidden; text-overflow: ellipsis; }
+  .menu-btn { display: flex; align-items: center; min-height: 44px; padding: 0 1ch; margin-left: auto; }
   .topnav { display: none; flex-basis: 100%; flex-direction: column; align-items: flex-start; gap: .5em; padding: .4em 0 .2em; white-space: normal; }
   .topnav.open { display: flex; }
   .topnav nav { display: flex; flex-wrap: wrap; gap: .4em 1.5ch; }
   .topnav .spacer { display: none; }
-  .statusrow { display: block; padding: .4em 1ch; }
+  .statusrow { display: block; padding: .4em 1ch .45em; border: 1px solid var(--line-strong); border-top: 0; }
+  .status { line-height: 1.75; }
+  .flash { margin: 8px 0 0; }
+  #pulse { border: 1px solid var(--line-strong); margin-top: 12px; }
   .hints { display: none; }
   .pulse { padding: .5em 1ch .6em; }
   .pulse.prominent { padding-left: calc(1ch + 3px); }
@@ -377,12 +383,13 @@ td.num { text-align: right; white-space: nowrap; }
   .chat-lg .sub { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .chat-lg .old { display: none; }
   .log { height: 55vh; flex: none; padding: .2em 1ch .6em; }
-  .composer .btn { display: flex; align-items: center; min-height: 44px; padding: 0 1ch; border: 1px solid var(--line-strong); }
+  .composer { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .5em 1ch; }
+  .composer .btn { grid-column: 2; justify-self: end; display: flex; align-items: center; min-height: 44px; padding: 0 1.5ch; border: 1px solid var(--line-strong); }
   .msg { grid-template-columns: 7ch minmax(0, 1fr); }
   .msg .t { display: none; }
   .proposal { margin-left: 0; }
   .composer { padding: .55em 1ch .9em; }
-  .composer textarea { min-height: 4.5em; }
+  .composer textarea { min-height: 3em; }
   .chat-foot { white-space: normal; position: static; background: none; padding: .2em 1ch .6em; border-top: 1px dashed var(--line); }
   .queue { padding-left: 3ch; }
   .board-head { flex-wrap: wrap; gap: .3em 2ch; padding-bottom: .4em; }
@@ -538,7 +545,7 @@ td.num { text-align: right; white-space: nowrap; }
     const over = s.spend > s.cap;
     p.push(`<a class="fig${over ? ' bad' : ''}" href="#" title="Costs">${over ? '⚠ ' : ''}${eur(s.spend)} / ${eur(s.cap)}</a>`);
     if (s.github) p.push(`<span>GitHub: ${esc(s.github)}</span>`);
-    $('#status').innerHTML = p.join(sep);
+    $('#status').innerHTML = p.map((x, i) => `<span class="it">${x}${i < p.length - 1 ? sep : ''}</span>`).join(' ');
   }
   function renderPulse() {
     const p = sc.pulse, el = $('#pulse');

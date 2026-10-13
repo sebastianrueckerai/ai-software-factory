@@ -122,10 +122,10 @@ a { color: var(--accent); }
 
 /* status panel: the pulse and the instrument strip */
 .status { margin: 10px 12px 0; background: var(--bg-panel); border: 1px solid var(--line-strong); flex: none; }
-.pulse-row { display: flex; align-items: center; gap: 12px; min-height: 50px; padding: 8px 16px; }
+.pulse-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
 .status.prominent .pulse-row { background: linear-gradient(90deg, color-mix(in srgb, var(--need) 11%, transparent), color-mix(in srgb, var(--need) 3%, transparent) 70%, transparent); box-shadow: inset 3px 0 0 var(--need); }
 .pulse-sign { color: var(--need-text); font-size: 19px; line-height: 1; }
-.pulse-text { flex: 1; min-width: 0; margin: 0; font-size: 20px; font-weight: 500; line-height: 1.3; letter-spacing: -.012em; }
+.pulse-text { flex: 1; min-width: 0; margin: 0; font-size: 20px; font-weight: 500; line-height: 26px; letter-spacing: -.012em; }
 .status:not(.prominent) .pulse-text { color: var(--text-muted); font-weight: 400; }
 .pulse-text .ref-link, .pulse-text .ref-plain { color: inherit; font-size: .9em; }
 .status.prominent .pulse-text .ref-link { color: var(--text); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--need) 60%, transparent); text-underline-offset: 4px; }
@@ -174,7 +174,7 @@ a.cell.needs.on:hover { background: color-mix(in srgb, var(--need) 16%, transpar
 .log { flex: 1; min-height: 0; overflow: auto; padding: 18px 16px 16px; }
 .log.scrolled { -webkit-mask: linear-gradient(transparent, #000 18px); mask: linear-gradient(transparent, #000 18px); }
 .log-inner { display: flex; flex-direction: column; gap: 16px; max-width: calc(72ch + 100px); }
-.start { max-width: 60ch; margin: 0 0 4px 100px; padding-bottom: 14px; border-bottom: 1px solid var(--line); color: var(--text-faint); font-size: 12.5px; line-height: 1.55; }
+.start { flex: none; margin: 0; padding: 0 14px; overflow: hidden; border-bottom: 1px solid var(--line); color: var(--text-faint); font-size: 12px; line-height: 28px; white-space: nowrap; text-overflow: ellipsis; }
 .msg { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 0 10px; font-size: 14.5px; line-height: 1.55; }
 .msg .g { font: 11.5px/22.5px var(--font-mono); color: var(--text-faint); white-space: nowrap; }
 .msg .g .who { color: var(--text-muted); margin-left: 6px; }
@@ -279,7 +279,8 @@ a.cell.needs.on:hover { background: color-mix(in srgb, var(--need) 16%, transpar
 /* columns and cards */
 .cols { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, .88fr); gap: 6px; }
 .col { display: flex; flex-direction: column; min-height: 0; min-width: 0; background: var(--bg-panel); border: 1px solid var(--line-strong); }
-.col-head { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border-bottom: 1px solid var(--line); flex: none; }
+.col-head { display: flex; align-items: baseline; gap: 8px; height: 32px; padding: 0 10px; border-bottom: 1px solid var(--line); flex: none; }
+.col-head h3, .col-head .cnt { line-height: 31px; }
 .col-head h3 { margin: 0; color: var(--text-muted); font-size: 13.5px; font-weight: 600; font-variant-caps: all-small-caps; letter-spacing: .08em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .col-head .cnt { margin-left: auto; color: var(--text); font: 12px var(--font-mono); }
 .col[data-col="working"] .col-head .cnt { color: var(--st-running); }
@@ -504,7 +505,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   .log { flex: none; height: auto; max-height: 62vh; }
   .log { padding: 12px 12px 12px; }
   .log-inner { gap: 14px; }
-  .start { margin: 0; padding-bottom: 10px; }
+  .start { padding: 0 12px; }
   .msg { grid-template-columns: 1fr; }
   .msg .g { line-height: 1.6; }
   .chat-head { height: auto; min-height: 42px; flex-wrap: wrap; padding: 8px 12px; }
@@ -513,10 +514,12 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   .board-head #view-toggle { display: none; }
   .tray { max-height: none; }
   .tray-items { overflow: visible; }
-  .need .acts { flex-direction: column; align-items: stretch; }
+  .need .acts { flex-direction: column; align-items: stretch; gap: 8px; }
+  .need, .own-box, .deny { gap: 8px; }
   .need .acts .btn { width: 100%; height: 44px; font-size: 14px; }
   .verdict { flex-direction: column; align-items: stretch; }
-  .verdict .vb { flex-direction: column; }
+  .verdict { gap: 8px; }
+  .verdict .vb { flex-direction: column; gap: 8px; }
   .verdict .btn-xs { width: 100%; height: 44px; font-size: 13px; }
   .prop .acts .btn { height: 44px; min-width: 96px; }
   .prompt .btn-primary { height: 44px; }
@@ -525,6 +528,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   .col[data-col="working"] { order: 1; } .col[data-col="verifying"] { order: 2; } .col[data-col="queued"] { order: 3; } .col[data-col="done"] { order: 4; }
   .col-body { overflow: visible; }
   .col-head { height: 44px; }
+  .col-head h3, .col-head .cnt { line-height: 43px; }
   .col-tog { display: flex; align-items: center; gap: 10px; cursor: pointer; }
   .col-tog::before { content: ""; width: 0; height: 0; border-left: 5px solid var(--text-muted); border-top: 4px solid transparent; border-bottom: 4px solid transparent; transition: transform .12s; }
   .col-tog[aria-expanded="true"]::before { transform: rotate(90deg); }
@@ -701,7 +705,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   }
   function renderLog() {
     var log = $('#chat-log'); if (!log) return;
-    var h = '<p class="start">' + START + '</p>' + st.chat.map(msgHTML).join('');
+    var h = st.chat.map(msgHTML).join('');
     if (st.typing) h += '<div class="msg agent"><span class="g"><time>' + now() + '</time><span class="who">agent</span></span><div class="b"><span class="typing" role="status" aria-label="the project agent is typing"><i></i><i></i><i></i></span></div></div>';
     $('.log-inner', log).innerHTML = h;
     log.scrollTop = log.scrollHeight;
@@ -721,6 +725,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
         '<span class="sel sm"' + (st.old.length ? '' : ' hidden') + '><select id="chat-old" aria-label="Old conversations"><option value="">Old conversations</option>' +
           st.old.map(function (o, i) { return '<option value="' + i + '">' + esc(o.label) + '</option>'; }).join('') + '</select></span>' +
         '<button type="button" class="btn btn-xs" id="chat-new">New conversation</button></div>' +
+      '<p class="start" title="' + esc(START) + '">' + esc(START) + '</p>' +
       '<div class="log" id="chat-log" aria-live="polite"><div class="log-inner"></div></div>' +
       '<form class="composer" id="chat-form">' +
         '<div class="prompt"><span class="ps" aria-hidden="true">&gt;</span><label class="vh" for="chat-input">Your message to the project agent</label>' +

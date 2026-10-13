@@ -26,11 +26,13 @@
 [data-theme="light"] {
   color-scheme: light;
   --bg: #ffffff; --bg-sunken: #f4f4f4; --line: #dcdcdc; --rule: #111111; --rule-w: 2px;
+  --red-muted: #b84a44;
   --edge: #595959; --text: #0d0d0d; --muted: #5f5f5f; --faint: #767676; --ink: #000000; --paper: #ffffff;
 }
 [data-theme="dark"] {
   color-scheme: dark;
   --bg: #000000; --bg-sunken: #141414; --line: #2b2b2b; --rule: #e8e8e8; --rule-w: 1px;
+  --red-muted: #cf6a64;
   --edge: #6e6e6e; --text: #ededed; --muted: #a3a3a3; --faint: #7d7d7d; --ink: #ededed; --paper: #000000;
 }
 html, body { margin: 0; height: 100%; }
@@ -210,13 +212,12 @@ a.fig:hover .lab { color: var(--text); text-decoration: underline; text-underlin
 .c-done h3 { color: var(--muted); }
 .lane { grid-column: 1 / -1; padding: 16px 0 8px; font-size: 12px; line-height: 16px; color: var(--muted); }
 .lane:first-child { padding-top: 4px; }
-.none { padding: 8px 0; font-size: 12px; color: var(--faint); }
 
 .card { position: relative; padding: 12px 0; box-shadow: inset 0 -1px var(--line); }
 .ttl { display: block; width: 100%; font-size: 13px; line-height: 16px; color: var(--text); overflow-wrap: anywhere; }
 .ttl .tt { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .ttl .ref { font-weight: 700; }
-.ttl:hover .tt, .ttl:hover .tx { text-decoration: underline; text-underline-offset: 3px; }
+.ttl:hover .tt { text-decoration: underline; text-underline-offset: 3px; }
 .facts { margin-top: 8px; font-size: 12px; line-height: 16px; color: var(--muted); }
 .facts li { display: inline-block; max-width: 100%; }
 .facts li:has(+ li:not(.warn)):not(.warn)::after { content: " ·"; }
@@ -226,7 +227,11 @@ a.fig:hover .lab { color: var(--text); text-decoration: underline; text-underlin
 .chips { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
 .chip { font-size: 11px; line-height: 14px; padding: 0 4px; border: 1px solid var(--edge); white-space: nowrap; }
 .chip.k { border-color: var(--ink); font-weight: 700; }
-.acts { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+.acts { margin-top: 8px; display: flex; flex-wrap: nowrap; gap: 10px; font-size: 12px; line-height: 16px; white-space: nowrap; }
+@media (min-width: 1320px) and (max-width: 1679px) { .acts { font-size: 11px; gap: 8px; } }
+.acts.confirm { flex-wrap: wrap; gap: 4px 10px; color: var(--muted); }
+.ab { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; color: var(--text); }
+.ab:hover { text-decoration-thickness: 2px; }
 .card.stale::before { content: ""; position: absolute; left: calc(var(--gut) / -2 - 1px); top: 12px; bottom: 12px; width: 2px; background: var(--ink); }
 .grip { display: none; position: absolute; right: 0; top: 12px; line-height: 16px; color: var(--faint); cursor: grab; }
 .cols.wide .grip { display: block; }
@@ -234,15 +239,14 @@ a.fig:hover .lab { color: var(--text); text-decoration: underline; text-underlin
 .card[draggable="true"] { cursor: grab; }
 .col.drop > summary { box-shadow: inset 0 2px var(--ink); }
 
-.card.dn { padding: 6px 0; }
-.card.dn .ttl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; line-height: 16px; color: var(--muted); }
-.card.dn .ttl .ref { font-weight: 400; }
+.card.dn { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 6px; padding: 6px 0; font-size: 12px; line-height: 16px; color: var(--faint); }
+.card.dn .ttl { flex: 0 1 auto; width: auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; line-height: 16px; color: var(--faint); }
+.card.dn .ttl:hover { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+.card.dn .ref { font-weight: 400; }
+.card.dn .dt { flex: none; }
 .card.dn .mkt { position: absolute; left: -14px; width: 12px; text-align: center; }
-.card.dn.ex .ttl { color: var(--text); }
-.dl2 { font-size: 11px; line-height: 16px; color: var(--faint); }
-.card.dn.ex .dl2 { color: var(--muted); }
-.dl2 .lnk { margin-left: 4px; color: var(--text); }
-
+.card.dn.w-failed .mkt, .card.dn.w-failed .wd { color: var(--red-muted); }
+.card.dn .lnk { color: var(--muted); margin-left: 4px; }
 .need { padding: 12px 0 16px; box-shadow: inset 0 -1px var(--rule); }
 .need .nm { margin-top: 4px; font-size: 12px; line-height: 16px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .need .nctx { margin-top: 4px; font-size: 12px; line-height: 16px; color: var(--muted); }
@@ -381,7 +385,8 @@ input[type="radio"] { accent-color: var(--ink); margin: 0; }
   .bullets { display: block; }
   .bullets li { margin-top: 8px; }
   .figs { grid-template-columns: 1fr 1fr; row-gap: 12px; padding-bottom: 20px; }
-  .figs .fig { grid-column: auto; display: grid; grid-template-columns: auto 1fr; column-gap: 4px; justify-content: start; align-items: baseline; white-space: normal; }
+  .figs .fig { grid-column: auto; display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 4px; justify-content: start; align-items: baseline; white-space: nowrap; }
+  .figs .lab { overflow: hidden; text-overflow: ellipsis; }
   .figs .s-a { grid-column: 1 / -1; display: block; }
   .figs .num { grid-column: 1 / -1; grid-row: 1; font-size: 22px; line-height: 28px; }
   .figs .lab, .figs .sign { grid-row: 2; }
@@ -405,7 +410,9 @@ input[type="radio"] { accent-color: var(--ink); margin: 0; }
   .need .nb { font-size: 15px; line-height: 20px; }
   .need .nm, .need .nctx { font-size: 13px; line-height: 20px; }
   .ttl { font-size: 15px; line-height: 20px; }
-  .card.dn .ttl { font-size: 13px; line-height: 20px; }
+  .card.dn, .card.dn .ttl { font-size: 13px; line-height: 20px; }
+  .acts { gap: 20px; font-size: 13px; line-height: 20px; }
+  .ab { padding: 10px 0; }
   .facts { font-size: 13px; line-height: 20px; }
   .act { font-size: 12px; line-height: 20px; }
   .btn.sm { min-height: 32px; padding: 6px 12px; font-size: 13px; }
@@ -602,24 +609,20 @@ input[type="radio"] { accent-color: var(--ink); margin: 0; }
   /* ---------- board ---------- */
   function warnFact(c) { return pct(c) >= 0.8 ? '<li class="warn">' + SIGN + eur(c.spent) + ' / ' + eur(c.budget) + ' near its budget</li>' : ''; }
   function cardHTML(c, col) {
-    var row = ['<li class="st">' + mark(c.status) + esc(c.status) + '</li>'];
+    var state = c.blocked ? 'blocked by ' + c.blocked : (c.gate || c.status);
+    var row = ['<li class="st"' + (c.blockedOn ? ' title="' + esc(c.blockedOn) + '"' : '') + '>' + mark(c.status) + esc(state) + '</li>'];
     if (c.elapsed) row.push('<li>' + keep(c.elapsed) + '</li>');
     if (c.checks) row.push('<li>' + esc(c.checks) + ' checks</li>');
-    if (c.gate) row.push('<li>' + esc(c.gate) + ' ' + keep(c.gateAge || '') + '</li>');
-    if (c.provider) row.push('<li>on the provider</li>');
-    if (c.pr) row.push('<li><a href="#">PR #' + c.pr + '</a></li>');
     var facts = row.join(' ') + warnFact(c) + (c.stale ? '<li class="warn">' + SIGN + esc(c.staleText) + '</li>' : '');
     var chips = '';
-    if (c.accent) chips += '<span class="chip" title="Accent">' + esc(c.accent) + '</span>';
-    if (c.blocked) chips += '<span class="chip k" title="' + esc(c.blockedOn || '') + '">blocked by ' + c.blocked + '</span>';
     if (c.waitingOn) chips += '<span class="chip k">waiting on #' + c.waitingOn + '</span>';
     if (c.plan) chips += '<span class="chip">part of plan #' + c.plan + '</span>';
     if (ui.wide) chips += '<span class="chip">' + esc(laneOf(c)) + '</span>';
     var acts = '';
-    if (c.backlog) acts += '<button class="btn sm" type="button" data-act="ok" data-label="Start plan" aria-label="Start plan #' + c.issue + ': ' + c.backlog + ' in backlog">Start plan (' + c.backlog + ' in backlog)</button>';
-    (c.moves || []).forEach(function (l) { acts += '<button class="btn sm" type="button" data-act="ok" data-label="→ ' + esc(l) + '" aria-label="Move #' + c.issue + ' to lane ' + esc(l.toLowerCase()) + '">' + esc(l) + '</button>'; });
-    if (c.status === 'failed') acts += '<button class="btn sm" type="button" data-act="ok" data-label="Retry" aria-label="Retry #' + c.issue + '">Retry</button>';
-    if (c.closes) acts += '<button class="btn sm" type="button" data-act="close" aria-label="Close #' + c.issue + '">Close</button>';
+    if (c.backlog) acts += '<button class="ab" type="button" data-act="ok" data-label="Start plan" aria-label="Start plan #' + c.issue + ': ' + c.backlog + ' in backlog">Start plan</button>';
+    (c.moves || []).forEach(function (l) { acts += '<button class="ab" type="button" data-act="ok" data-label="→ ' + esc(l) + '" aria-label="Move #' + c.issue + ' to lane ' + esc(l.toLowerCase()) + '" title="Move to ' + esc(l.toLowerCase()) + '">' + esc(l) + '</button>'; });
+    if (c.status === 'failed') acts += '<button class="ab" type="button" data-act="ok" data-label="Retry" aria-label="Retry #' + c.issue + '">Retry</button>';
+    if (c.closes) acts += '<button class="ab" type="button" data-act="close" aria-label="Close #' + c.issue + '">Close</button>';
     var drag = ui.wide && c.moves && c.moves.length;
     return '<article class="card' + (c.stale ? ' stale' : '') + '" data-card="' + c.issue + '"' + (drag ? ' draggable="true"' : '') + '>' +
       (drag ? '<span class="grip" aria-hidden="true">⠿</span>' : '') +
@@ -629,13 +632,15 @@ input[type="radio"] { accent-color: var(--ink); margin: 0; }
       (chips ? '<p class="chips">' + chips + '</p>' : '') +
       (acts ? '<div class="acts">' + acts + '</div>' : '') + '</article>';
   }
+
   function doneHTML(c) {
-    var w = c.status;
-    return '<article class="card dn' + (w !== 'done' ? ' ex' : '') + '" data-card="' + c.issue + '">' +
-      '<button class="ttl" type="button" data-open="' + c.issue + '" title="' + esc(c.title) + '">' + (w === 'done' ? '' : mark(w)) + '<span class="ref">#' + c.issue + '</span> <span class="tx">' + esc(c.title) + '</span></button>' +
-      '<p class="dl2">' + esc(w) + ' · ' + esc(c.elapsed) + (w === 'failed' ? ' · <button class="lnk" type="button" data-act="ok" data-label="Retry" aria-label="Retry #' + c.issue + '">Retry</button>' : '') + '</p>' +
-      '</article>';
+    var w = c.status, ex = w !== 'done';
+    return '<article class="card dn' + (ex ? ' ex w-' + w : '') + '" data-card="' + c.issue + '">' + (ex ? mark(w) : '') +
+      '<button class="ttl" type="button" data-open="' + c.issue + '" title="' + esc(c.title) + '"><span class="ref">#' + c.issue + '</span> ' + esc(c.title) + '</button>' +
+      '<span class="dt">' + (ex ? '<span class="wd">' + esc(w) + '</span> ' : '') + keep(c.elapsed) +
+      (w === 'failed' ? ' <button class="lnk" type="button" data-act="ok" data-label="Retry" aria-label="Retry #' + c.issue + '">Retry</button>' : '') + '</span></article>';
   }
+
   function denyForm(id) {
     return '<form class="deny" data-form="deny" hidden><label class="fl" for="dr-' + id + '">Reason</label><textarea class="field" id="dr-' + id + '" rows="2"></textarea>' +
       '<fieldset class="radios"><legend class="sr">Deny by</legend><label><input type="radio" name="how-' + id + '" value="request changes" checked> request changes</label>' +
@@ -710,7 +715,7 @@ input[type="radio"] { accent-color: var(--ink); margin: 0; }
   function colHTML(key, title, n, body, extra) {
     var open = !ui.closed[key];
     return '<details class="col c-' + key + ((key === 'needs' || key === 'esc' || key === 'human') && n ? ' on' : '') + '" id="col-' + key + '"' + (open ? ' open' : '') + (extra || '') + '><summary><h3>' + esc(title) + '<span class="n">' + n + '</span></h3></summary>' +
-      '<div class="cl">' + (body || '<p class="none">none</p>') + '</div></details>';
+      '<div class="cl">' + (body || '') + '</div></details>';
   }
   function renderBoard() {
     var acc = function (a) { return ui.accent ? a.filter(function (c) { return c.accent === ui.accent; }) : a; };
@@ -770,7 +775,10 @@ input[type="radio"] { accent-color: var(--ink); margin: 0; }
     var facts = '<li class="st">' + mark(c.status) + esc(c.status) + '</li>';
     if (c.elapsed) facts += '<li>' + esc(c.elapsed) + '</li>';
     if (c.checks) facts += '<li>' + esc(c.checks) + ' checks</li>';
+    if (c.gate) facts += '<li>' + esc(c.gate) + ' ' + esc(c.gateAge || '') + '</li>';
+    if (c.blocked) facts += '<li>blocked by ' + esc(c.blockedOn || c.blocked) + '</li>';
     if (c.lane) facts += '<li>lane ' + esc(c.lane) + '</li>';
+    if (c.accent) facts += '<li>accent ' + esc(c.accent) + '</li>';
     if (c.provider) facts += '<li>on the provider</li>';
     if (c.stale) facts += '<li>' + esc(c.staleText) + '</li>';
     facts += c.pr ? '<li><a href="#">PR #' + c.pr + '</a></li>' : '<li>no pull request yet</li>';
@@ -904,7 +912,7 @@ input[type="radio"] { accent-color: var(--ink); margin: 0; }
 
   /* ---------- confirmations in place ---------- */
   function confirmIn(el, label) {
-    var scope = el.closest('.decide') || el.closest('.acts') || el.closest('.dl2') || el.closest('.formrow') || el.parentElement;
+    var scope = el.closest('.decide') || el.closest('.acts') || el.closest('.dt') || el.closest('.formrow') || el.parentElement;
     var p = document.createElement('p');
     p.className = 'okl'; p.setAttribute('role', 'status');
     p.innerHTML = '✓ ' + esc(label) + ' <span>· sent</span>';
@@ -957,15 +965,14 @@ input[type="radio"] { accent-color: var(--ink); margin: 0; }
       f.hidden = !show; a.setAttribute('aria-expanded', String(show));
       if (show) f.querySelector('textarea').focus();
     } else if (act === 'close') {
-      var wrap = document.createElement('span');
-      wrap.className = 'confirm';
-      wrap.innerHTML = 'Close #' + a.closest('[data-card]').dataset.card + '? <button class="btn sm out" type="button" data-act="ok" data-label="Close">Close</button><button class="lnk" type="button" data-act="cancel">Cancel</button>';
-      a.replaceWith(wrap); wrap.querySelector('button').focus();
+      var row = a.closest('.acts');
+      row.dataset.html = row.innerHTML; row.classList.add('confirm');
+      row.innerHTML = 'Close #' + a.closest('[data-card]').dataset.card + '? <button class="ab" type="button" data-act="ok" data-label="Close">Close</button> <button class="ab" type="button" data-act="cancel">Cancel</button>';
+      row.querySelector('button').focus();
     } else if (act === 'cancel') {
-      var span = a.closest('.confirm'), id = span.closest('[data-card]').dataset.card;
-      var btn = document.createElement('button');
-      btn.className = 'btn sm'; btn.type = 'button'; btn.dataset.act = 'close'; btn.setAttribute('aria-label', 'Close #' + id); btn.textContent = 'Close';
-      span.replaceWith(btn); btn.focus();
+      var r = a.closest('.acts');
+      r.innerHTML = r.dataset.html; r.classList.remove('confirm');
+      r.querySelector('[data-act="close"]').focus();
     } else if (act === 'doit' || act === 'skip' || act === 'undo') {
       D.chat[i].proposal.state = act === 'doit' ? 'applied' : act === 'skip' ? 'skipped' : '';
       renderChat();

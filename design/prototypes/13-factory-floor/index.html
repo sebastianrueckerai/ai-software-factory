@@ -67,6 +67,7 @@ button, select, input, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
 a { color: inherit; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+::placeholder { color: var(--muted); opacity: 1; }
 .vh { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .caps { font-family: var(--cond); font-weight: 700; font-variant-caps: all-small-caps; letter-spacing: .08em; }
 .mono { font-family: var(--mono); }
@@ -196,6 +197,7 @@ main { display: grid; grid-template-columns: 42% minmax(0, 1fr); min-height: 0; 
 .tool dt { color: var(--muted); }
 .tool dd { margin: 0; font-family: var(--mono); font-size: 12px; overflow-wrap: anywhere; }
 .prop { max-width: 520px; }
+.wo.prop { box-shadow: inset 0 0 0 1px var(--line), var(--shadow); }
 .prop .ph { margin: 0 0 4px; font: 700 15px/1.3 var(--cond); letter-spacing: .01em; }
 .prop ul { margin: 0 0 8px; padding-left: 16px; font-size: 14px; }
 .prop li + li { margin-top: 6px; }
@@ -239,7 +241,7 @@ main { display: grid; grid-template-columns: 42% minmax(0, 1fr); min-height: 0; 
 .lt .n { min-width: 20px; height: 18px; padding: 0 5px; border-radius: 2px; display: inline-flex; align-items: center; justify-content: center; font: 600 12px/1 var(--sans); background: var(--line); color: var(--text); }
 .lane[data-lane="needs"].has .lt .n { background: var(--need); color: var(--need-ink); }
 .lane[data-lane="done"] .lt .caps, .lane[data-lane="done"] .lt .n { color: var(--muted); }
-.fold { display: none; margin-left: auto; align-self: center; width: 7px; height: 7px; border-right: 1.5px solid var(--muted); border-bottom: 1.5px solid var(--muted); transform: rotate(45deg); }
+.fold { display: none; margin-left: auto; align-self: baseline; width: 7px; height: 7px; border-right: 1.5px solid var(--muted); border-bottom: 1.5px solid var(--muted); transform: translateY(-3px) rotate(45deg); }
 .lb { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; align-content: start; }
 .empty { height: 64px; border: 1px dashed var(--line-2); border-radius: 2px; }
 
@@ -479,7 +481,7 @@ footer#live { padding: 6px 24px; color: var(--muted); border-top: 1px solid var(
   .lane[data-lane="queued"] { order: 4; } .lane[data-lane="done"] { order: 5; }
   .lt { cursor: pointer; padding-bottom: 2px; }
   .fold { display: block; }
-  .lane.folded .fold { transform: rotate(-45deg); }
+  .lane.folded .fold { transform: translateY(-1px) rotate(-45deg); }
   .lane.folded .lb { display: none; }
   .lane.folded .lh { margin-bottom: 0; }
   .lane.folded { padding-bottom: 8px; }

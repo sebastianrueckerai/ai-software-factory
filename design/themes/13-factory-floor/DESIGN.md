@@ -15,12 +15,12 @@ Materials keep their colour across the two moods: paper stays light, the radio f
 | --bar, --band | #0e0f11, #111214 | #f3f3ef, #f3f3ef | top bar, pulse band |
 | --bg | #18191b | #dcdbd5 | the floor (concrete) |
 | --bg-raised | #222326 | #fafaf8 | the chat panel, the drawer (opaque; a scrim dims the board while the drawer is open) |
-| --turn | #1a1b1d | #f0f0ec | the agent's turn in the chat, a faint faceplate panel |
+| --turn | #2a2b2e | #ffffff | the agent's turn in the chat, a faceplate panel one step lighter than the chat |
 | --plate | #0c0d0e | #26282b | faceplates: the chat header, the drawer header (dark in both) |
 | --bg-sunken | #141517 | #d2d1ca | the board's lanes (columns) |
 | --card | #26272a | #ecebe5 | a queued slip (order not yet on the line) |
 | --paper | #dcdbd5 | #ffffff | Needs you bodies, the chat's proposal, the drawer's open need |
-| --paper-dim | #bdbcb6 | #f2f2ef | a work order on the line (working, verifying): dimmed so the yellow stays the only bright thing on the board; darker paper inks (#0f4f29, #6c3a00, #1a4285, #8a1b15, muted #45463f) keep 4.5:1 |
+| --paper-dim | #bdbcb6 | #f2f2ef | a work order on the line (working, verifying): dimmed so the yellow stays the only bright thing on the board; in dark its ink is a dark grey #3a3a36 (6.0:1), muted #4a4b45 (4.6:1), state inks #0f4f29, #6c3a00, #1a4285, #8a1b15 |
 | --line, --line-2 | #2c2e31, #3d4044 | #c4c3bc, #a9a8a0 | hairlines, card top rule |
 | --text | #ebeae5 (14.2:1) | #161719 | ink |
 | --text-muted | #a09f99 (6.3:1) | #50514b | meta, the done ledger |
@@ -30,7 +30,7 @@ Materials keep their colour across the two moods: paper stays light, the radio f
 | --st-waiting | #f2a53c / on paper #7a4200 | #7a4200 | waiting on a human or dependencies, near budget |
 | --st-review | #84b5ff / on paper #1d4a92 | #1d4a92 | in review |
 | --st-done, --st-closed | #a09f99 | #50514b | stamp ink: muted text in a --line-2 outline |
-| --fail-muted | #d98478 | #9a3b30 | the failed stamp, outline at 55 percent |
+| --fail-muted | #b58a84 | #744842 | the failed stamp: a low-chroma red, outline at 55 percent |
 | --st-failed | #ff7b6c / on paper #98201a | #98201a | stamp, over-cap spend, provider down |
 | andon | lit #39d07a, #ffab2e, #ff4d3d; unlit = 1 px ring | same | the lamp stack |
 
@@ -41,7 +41,7 @@ Every state text pair is 4.5:1 or better on its surface (paper hues 5.3 to 5.7:1
 - Sans (body, 13 px director's rule): Inter, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial.
 - Condensed (section heads, card titles, stamps, the home word): Roboto Condensed, Helvetica Neue Condensed, Arial Narrow, Liberation Sans Narrow. Heads are bold with `font-variant-caps: all-small-caps` and 0.08 em tracking: a stencil feel without a stencil face, and the words stay in their real case for assistive tech.
 - Mono (activity line, tool blocks, file paths): JetBrains Mono, SF Mono, Menlo, Consolas, Noto Sans Mono.
-- Scale: 11 (stamps, labels), 12 (state row, chips), 13 (card body), 14 (card title, condensed 600), 15 (chat message), 16 (Needs you band headline, condensed 700), pulse sentence clamp(21 px, 1.75 vw, 30 px) at 700.
+- Scale: 10 (stamp caps), 11 (labels), 12 (state row, chips), 13 (card body and card title, the title in sans 500), 15 (chat message), 16 (Needs you band headline, condensed 700), pulse sentence clamp(21 px, 1.75 vw, 30 px) at 700.
 - Numerals tabular everywhere a figure sits: status row, state rows, tables, times.
 
 ## Layout at 1440 and 1920
@@ -49,7 +49,7 @@ Every state text pair is 4.5:1 or better on its surface (paper hues 5.3 to 5.7:1
 - Top bar 44 px, pulse band under it across the full width.
 - Below: the chat as a full-height panel on the LEFT at 42 percent (director's note: the mockup's bottom radio panel moves left so the drawer never covers it), the board on the floor at the right.
 - The chat faceplate and the board's header row are both 56 px: one line runs across the screen under the pulse.
-- Light theme: the top bar uses the full text ink, never the muted one.
+- Light theme: the top bar and the state word use the full text ink; the figures use the muted token (7:1 on the band). A contrast audit of every text node in both themes, four scenarios, phone and drawer finds nothing under 4.5:1.
 - Board columns: Needs you 1.5 fr, the other four 1 fr each, min 132 px; under that the lanes scroll sideways inside the board, never the page.
 - Drawer: right edge, min(46 vw, 720 px), from the pulse band to the bottom, over the board only; 42 + 46 percent leaves the chat free.
 - Wide view: the board takes the full width (the chat folds away until Five columns), Human lane over Needs you, Agent lane over the rest, lane badges and drag handles on the cards.
@@ -89,7 +89,7 @@ An opaque panel at the right edge, the board under it dimmed by a scrim (a click
 
 ## The phone
 
-Under 900 px one column: the top bar with a menu, the pulse, the status row as one line of 12 px small caps with the lamps at 8 px in a row and the figures as plain text under it, the chat (log 55 vh, composer), then the board as stacked lanes: Needs you, Working, Verifying, Queued, Done (collapsed). Every Needs you button and choice is 44 px tall, full width, one per row, ink-filled (primary) or outlined; the Deny choices are two outlined 44 px rows. The drawer full screen.
+Under 900 px one column: the top bar with a menu, the pulse, the pulse sentence wrapping at 16 px (never cut), the status row as one line of 12 px small caps with the lamps at 8 px in a row and the figures as plain text under it, the chat (log 55 vh, composer), then the board as stacked lanes: Needs you, Working, Verifying, Queued, Done (collapsed). Every Needs you button and choice is 44 px tall, full width, one per row, ink-filled (primary) or outlined; the Deny choices are two outlined 44 px rows. The drawer full screen.
 
 ## Motion
 
