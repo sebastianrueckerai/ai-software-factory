@@ -63,6 +63,7 @@ a:hover { text-decoration: underline; text-underline-offset: 2px; }
 code { font: 12px/16px var(--mono); }
 .i { width: 14px; height: 14px; flex: none; vertical-align: -2px; }
 .sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+#live { top: 0; left: 0; }
 
 /* buttons */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 6px; border: 1px solid var(--line-strong); background: var(--btn-bg); color: var(--text); font-size: 13px; line-height: 18px; font-weight: 500; white-space: nowrap; transition: background-color .12s, border-color .12s, color .12s; }
@@ -204,6 +205,7 @@ body.has-drawer .app { margin-right: var(--dw); }
 .cards { display: none; }
 .board.open .peek { display: none; }
 .board.open .cards { display: flex; flex-direction: column; gap: 6px; padding: 2px 8px 10px; max-height: var(--board-max); overflow: auto; overscroll-behavior: contain; }
+.board.open .cards.scrolls { padding-bottom: 22px; -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent); }
 .earlier { padding: 4px 6px 0; font-size: 12px; line-height: 16px; color: var(--text-faint); }
 
 /* card face */
@@ -843,6 +845,7 @@ kbd { display: inline-block; min-width: 20px; padding: 2px 6px; border: 1px soli
       var open = phone.matches ? !col.classList.contains('folded') : boardOpen;
       $('.seg', col).setAttribute('aria-expanded', String(open));
     });
+    $$('.cards', b).forEach(function (c) { c.classList.remove('scrolls'); c.classList.toggle('scrolls', boardOpen && !phone.matches && c.scrollHeight > c.clientHeight + 1); });
     var v = $('#view-toggle');
     v.textContent = wide ? 'Five columns' : 'Wide view';
     v.setAttribute('aria-pressed', String(wide));
@@ -1011,7 +1014,7 @@ kbd { display: inline-block; min-width: 20px; padding: 2px 6px; border: 1px soli
     if (from && !$('#drawer').contains(from)) opener = from;
     paintDrawer();
     var dr = $('#drawer');
-    keepLogPinned(function () { dr.hidden = false; document.body.classList.add('has-drawer'); });
+    keepLogPinned(function () { dr.hidden = false; document.body.classList.add('has-drawer'); applyBoard(); });
     $$('.row.is-open').forEach(function (r) { r.classList.remove('is-open'); });
     $$('#inbox .row[data-card="' + issue + '"]').forEach(function (r) { r.classList.add('is-open'); });
     $('#d-title').focus({ preventScroll: true });
@@ -1021,7 +1024,7 @@ kbd { display: inline-block; min-width: 20px; padding: 2px 6px; border: 1px soli
   function closeDrawer() {
     var dr = $('#drawer');
     if (dr.hidden) return;
-    keepLogPinned(function () { dr.hidden = true; dr.innerHTML = ''; document.body.classList.remove('has-drawer'); });
+    keepLogPinned(function () { dr.hidden = true; dr.innerHTML = ''; document.body.classList.remove('has-drawer'); applyBoard(); });
     drawerState = null;
     $$('.row.is-open').forEach(function (r) { r.classList.remove('is-open'); });
     if (opener && document.contains(opener)) opener.focus();
@@ -1182,6 +1185,7 @@ kbd { display: inline-block; min-width: 20px; padding: 2px 6px; border: 1px soli
   });
   $('#keys').addEventListener('click', function (e) { if (e.target.id === 'keys') closeKeys(); });
   phone.addEventListener('change', function () { placeInbox(); applyBoard(); });
+  window.addEventListener('resize', applyBoard);
 
   render();
 })();
