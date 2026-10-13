@@ -33,6 +33,11 @@ The next round:
 
 After that round: the card's information hierarchy (177), then the notification service (145) with the mobile layout and PWA install (146).
 
+The restart round runs long (Sebastian, 2026-10-13): once the cluster is established it
+keeps working for 48 hours (72 the failsafe wall, a dead z.ai API the early end), and
+after the set tasks it pulls backlog, fixes first then new items, skipping anything that
+needs his OK or is not completely settled.
+
 Stage 12's round 2 and the Stage 14 rebuild are recorded in the plan's Stage 12 paragraphs.
 
 The board's own backlog now lives in its own roadmap: [docs/board/roadmap.md](board/roadmap.md) (the old UX items 22 to 31 moved there, with this round's research behind them in [docs/board/](board/)). The board UX round of 2026-10-01/02 decided its v1 shape (rulings 243 to 248: the chat behind a click with a hover peek, htmx plus SSE kept, system lanes only, buttons for moves, two colour channels that never mix, replay and live from one log). Stage 15's [proposal-v2](board/proposal-v2.md) supersedes v1's layout.
