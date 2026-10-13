@@ -289,6 +289,7 @@ input[type="radio"] { accent-color: var(--text); margin: 0; }
 .dr-head h2:focus { outline: none; }
 .dr-head h2:focus-visible { outline: 2px solid var(--text-hi); }
 .dr-head .c-state { grid-column: 1 / -1; }
+#dr-close .ph { display: none; }
 .tabs { display: flex; gap: 1.2ch; padding: .45em 1.6ch; border-bottom: 1px solid var(--line); flex: none; }
 .tabs [role="tab"][aria-selected="true"] { background: var(--need-bg); color: var(--need-fg); font-weight: 700; }
 .tp { flex: 1; min-height: 0; overflow: auto; padding: .8em 1.6ch 1.2em; }
@@ -395,6 +396,7 @@ td.num { text-align: right; white-space: nowrap; }
   .need .acts .btn { padding-top: .2em; padding-bottom: .2em; }
   #drawer { position: fixed; inset: 0; z-index: 50; margin: 0; box-shadow: none; border: 0; }
   .dr-head { padding-top: .6em; }
+  #dr-close .k { display: none; } #dr-close .ph { display: inline; }
   .tabs { flex-wrap: wrap; }
   .facts { grid-template-columns: 1fr; gap: 0; }
   .facts dd { margin-bottom: .4em; }
@@ -823,7 +825,7 @@ td.num { text-align: right; white-space: nowrap; }
     if (card.status === 'running') chat += `<form class="steer" data-form="steer"><label class="vh" for="steer-${card.issue}">Your message to the running session</label><div class="row"><span class="hi" aria-hidden="true">&gt;</span><textarea id="steer-${card.issue}" rows="2" maxlength="8192" placeholder="Message the running session; it reads it at its next step"></textarea><button type="submit" class="btn">Send</button></div></form>`;
 
     const tabs = [['overview', 'Overview', overview], ['chat', 'Chat', chat], ['activity', 'Activity', activity], ['files', 'Files', files]];
-    return `<div class="dr-head"><h2 id="dr-title" tabindex="-1"><a class="link" href="#">#${card.issue}</a> ${esc(card.title)}</h2><button type="button" class="btn quiet" id="dr-close" aria-label="Close the drawer (Escape)">Esc</button><p class="c-state">${facts.join(' · ')}</p></div>
+    return `<div class="dr-head"><h2 id="dr-title" tabindex="-1"><a class="link" href="#">#${card.issue}</a> ${esc(card.title)}</h2><button type="button" class="btn quiet" id="dr-close" aria-label="Close the drawer (Escape)"><span class="k">Esc</span><span class="ph">Close</span></button><p class="c-state">${facts.join(' · ')}</p></div>
       <div class="tabs" role="tablist" aria-label="The card">${tabs.map(([k, t]) => `<button type="button" class="btn" role="tab" id="tab-${k}" aria-controls="tp-${k}" aria-selected="${k === tab}" tabindex="${k === tab ? 0 : -1}">${t}</button>`).join('')}</div>
       ${tabs.map(([k, , body]) => `<div class="tp" role="tabpanel" id="tp-${k}" aria-labelledby="tab-${k}"${k === tab ? '' : ' hidden'}>${body}</div>`).join('')}`;
   }

@@ -61,7 +61,7 @@ A REPL. The box title in the top border: `Chat ─ project agent · project`, `[
 
 ## The board and the card
 
-Box titles in the border: `Queued 4`, muted. A card is a few lines with no box of its own, cards separated by a dashed rule:
+Box titles in the border: `Queued 4`, muted. A box whose content runs past its height scrolls on its own and shows `▾ more` cut into its bottom border until it is scrolled to the end. A card is a few lines with no box of its own, cards separated by a dashed rule:
 
 1. `#601` bold and the title, two lines at most; the whole line is the button that opens the drawer.
 2. `[running] · 23 min · 3/4 checks`, then only the exceptional: `€1.72 / €2.00 ⚠ near its budget` from 80 %, the gate and its age, fine states as boxed chips.
@@ -75,18 +75,20 @@ Buttons: brackets drawn around the label, hover in inverse video, focus a 2 px o
 
 ## Needs you
 
-The loudest thing: the box is a 3 px double line (`╔═╗` in CSS) in `--text`, its title `Needs you 2` in inverse video. Each item opens with an inverse header strip: the headline (a button that opens the drawer) and the waiting time at the right.
+The loudest thing while it holds an item: the box is a 3 px double line (`╔═╗` in CSS) in `--text`, its title `Needs you 2` in inverse video. Each item opens with an inverse header strip: the headline (a button that opens the drawer) and the waiting time at the right.
 
 - Merge approval: `Merge PR #612`, then `[high risk] [migration]` as inverse-outlined chips, `Model review: approve. Adds the column safely.`, `Recommendation: …`, then `[ Approve as you ]` (inverse) `[ Deny ]` `[ Split ]`. Deny unfolds the reason box: a textarea, `Deny by` request changes / reject, and the submit that reads the chosen way.
-- Escalation: `#603 Which store for the session table?` as the strip, the full question under it, the choices as bracket buttons, `[ Or in your words ]` unfolding the answer box with `[ Answer ]`, the state row with "answer on the issue", the verdict buttons `[real problem] [false alarm]` small at the end.
+- Escalation: `#603 Which store for the session table?` as the strip, the full question under it, the choices as bracket buttons, `[ Or in your words ]` unfolding the answer box with `[ Answer ]`, a muted line with the elapsed time and "answer on the issue" (the state word `[waiting on a human]` only in the drawer: the column already says it), the verdict buttons `[real problem] [false alarm]` small at the end, the question "Was this escalation a real problem?" as their group label.
 - Capped: the answer box is open and its button reads `[ Grant one session with this answer ]`.
 - Plan approval and resource approval (no scenario carries one): the same strip and body; Accept plan / Approve in inverse, Request changes and Reject behind bracket disclosures.
 
-An action answers in place with one `✓` line in `--text-hi`.
+An action answers in place with one `✓` line in `--text-hi`, and the pulse shows its recompute cursor.
+
+Empty (idle, quiet), Needs you whispers like any other box: single line, muted title, equal width with the other four columns.
 
 ## The drawer
 
-A pane with a strong line, docked right. Header: `#601` (link to the issue), the title, `[ Esc ]` to close; the facts line `[running] · 23 min · 3/4 checks · €1.72 / €2.00 ⚠ · lane ready · coding-cheap`. Tabs as bracket buttons, the selected one in inverse video. Overview: the four-line top block as a `Task / Status / Budget / Agent` table with the labels muted, the Open block, then the sections as `▸` disclosures. Activity: the gates with a `█░` meter against the longest, the steps table. Files: a table with a git-style `+++−−` stat. Chat: `Session 2 · coding-cheap · running`, the messages in the same gutter as the REPL, the steer prompt.
+A pane with a strong line, docked right. Header: `#601` (link to the issue), the title, `[ Esc ]` to close (`[ Close ]` on the phone); the facts line `[running] · 23 min · 3/4 checks · €1.72 / €2.00 ⚠ · lane ready · coding-cheap`. Tabs as bracket buttons, the selected one in inverse video. Overview: the four-line top block as a `Task / Status / Budget / Agent` table with the labels muted, the Open block (a Needs you item in the same strip-and-body form, the merge with its Decision note; a failure reason with Retry; a stale line), then the sections as `▸` disclosures. The merge headline on the board opens the drawer with "Reviews and audit" unfolded. Activity: the gates with a `█░` meter against the longest, the steps table. Files: a table with a git-style `+++−−` stat. Chat: `Session 2 · coding-cheap · running`, the messages in the same gutter as the REPL, the steer prompt.
 
 ## The phone
 
