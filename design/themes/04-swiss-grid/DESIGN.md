@@ -1,6 +1,6 @@
 # Theme: Swiss grid
 
-Read off round 01 `04-swiss-grid-dark.png`, `04-swiss-grid-light.png`, the round 02 images and the director's notes of 2026-10-14. The images are the target; this file is the rule set a builder follows when the image is ambiguous. Where the notes and the image disagree, the notes win (modest numerals, chat and board side by side). Fix list 1 of the coordinator is folded in.
+Read off round 01 `04-swiss-grid-dark.png`, `04-swiss-grid-light.png`, the round 02 images and the director's notes of 2026-10-14. The images are the target; this file is the rule set a builder follows when the image is ambiguous. Where the notes and the image disagree, the notes win (modest numerals, chat and board side by side). Fix lists 1 and 2 of the coordinator are folded in.
 
 ## Idea in one line
 
@@ -20,6 +20,7 @@ A Müller-Brockmann poster that works: one strict 12-column grid that every edge
 | --text-muted | #a3a3a3 | #5f5f5f | labels, meta, the state row |
 | --text-faint | #7d7d7d | #767676 | done cards (still 4.5:1) |
 | --accent | --ink | --ink (#000) | links are ink with an underline; focus is a 2 px ink outline, offset 2 px |
+| --red-muted | #cf6a64 (5.9:1) | #b84a44 (5.1:1) | the word "failed" and its × on a Done row, nothing else |
 | --need | #eb0f0f | #eb0f0f | the one red: the warning sign, the Needs you header and its 4 px rule, the primary button. 4.61:1 on black, 4.56:1 on white, 4.56:1 under white text |
 | --st-* | all ink | all ink | no state hues. The state word carries the state, a mark gives the shape: ● running, ◐ in review, ○ queued or backlog, ◇ waiting on a human, ✓ done, × failed, – closed |
 
@@ -59,8 +60,9 @@ A Müller-Brockmann poster that works: one strict 12-column grid that every edge
 ## The board and the card
 
 - Column head: 16 px bold title, count regular muted, a 1 px rule above. Needs you: red title and a red 4 px rule, only while something waits; "Needs you 0" is ink like the rest.
-- Card: no box. Ref and title 13/16 as one button (three lines in the narrow columns, two when stacked), then the state row in 12 px as middot-separated items that wrap as units ("running · 23 min · 3/4 checks"), then the spend line on its own only from 80 percent, with the red sign, the activity line in mono 11 px on working and waiting cards, chips (1 px edge, 11 px) only when exceptional, quiet 24 px buttons. A hairline under each card.
-- Done card: two lines. The ref and title in muted 12 px, one line; then the state word and the time in faint 11 px. Failed and closed rows set the title in ink, hang × or – in the gutter and add Retry when failed.
+- Card: no box. Ref and title 13/16 as one button (three lines in the narrow columns, two when stacked). One state row in 12 px, middot-separated items that wrap as units: state · time · checks. The state word is the most precise one: the gate when in one ("merge queue"), "blocked by n" when blocked. Then, each on its own line and only when true: the spend from 80 percent and "nothing for n min" when stale, both with the red sign. The activity line in mono 11 px on a running card. Chips only for part of plan and waiting on; the lane badge only in the wide view. Actions as one row of underlined text buttons (11 px in the 1320 to 1679 px range, 12 px otherwise). The PR link, the gate's age, the accent and the model sit in the drawer header. A hairline under each card.
+- Done card: no icon, no "done". The ref and title in faint 12 px, then the elapsed time in the same faint, on one line when it fits, else the time on a second line and the title cut with an ellipsis. A failed row hangs × in the gutter and sets "failed" in muted red before the time, with Retry. A closed row hangs – and says "closed".
+- Empty column: only its header with the count 0.
 - Stale card: a 2 px ink bar in the gutter left of the card and the red sign before "nothing for 40 min".
 
 ## Needs you
@@ -78,7 +80,7 @@ A Müller-Brockmann poster that works: one strict 12-column grid that every edge
 
 ## The phone
 
-- Under 900 px one column: the top bar (home word, project select, Menu for the rest), the pulse (22/28), the state word, then the figures as a 2×2 grid with the numeral at 22 px and its label under it, the chat with its log at 55 percent of the viewport and the composer, then the board sections: Needs you open, Working, Verifying, Queued, Done collapsed.
+- Under 900 px one column: the top bar (home word, project select, Menu for the rest), the pulse (22/28), the state word on its own line, then the figures as a grid of equal cells, two across (2×2 in busy, 2×3 in fire), the numeral at 22 px, its label under it, nothing wrapping inside a cell, the chat with its log at 55 percent of the viewport and the composer, then the board sections: Needs you open, Working, Verifying, Queued, Done collapsed.
 - Choices and the primary actions full width, 40 px tall. The drawer takes the full screen.
 
 ## Motion
