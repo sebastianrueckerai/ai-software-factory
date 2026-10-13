@@ -36,7 +36,7 @@ def prototype(slug):
 
 def main():
     r1, r2 = D / "rounds/01-directions", D / "rounds/02-depth"
-    total = cost(D / "rounds")
+    total = cost(D / "rounds", D / "prototypes")
     dirs = "".join(f'<figure class="{"carried" if s in CARRIED else "dropped"}">{img(f"rounds/01-directions/{s}-dark.png")}{img(f"rounds/01-directions/{s}-light.png")}<figcaption>{s}{"" if s in CARRIED else " · dropped"}</figcaption></figure>' for s in ALL)
     depth = "".join(f'<figure>{img(f"rounds/02-depth/{s}-drawer.png")}{img(f"rounds/02-depth/{s}-idle.png")}{img(f"rounds/02-depth/{s}-phone.png", "phone")}<figcaption>{s}: drawer, idle, phone</figcaption></figure>' for s in CARRIED)
     hybrids = "".join(f'<figure>{img(f"rounds/02-depth/{h}")}<figcaption>{h[:-9]}</figcaption></figure>' for h in sorted(p.name for p in r2.glob("h-*.png")))
@@ -49,7 +49,7 @@ h1{{margin:0 0 4px}} h2{{margin:36px 0 10px;font-size:20px}} h3{{margin:0 0 6px;
 .meta{{color:#666}} a{{color:#1a3fbf}} .open{{font-weight:600}}
 section{{background:#fff;padding:14px 16px;border-radius:6px;margin-bottom:18px}} .missing{{background:#f6f6f3;color:#777}}
 .shots{{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}} figure{{margin:0}} figcaption{{font-size:12px;color:#666;margin-top:3px}}
-img{{width:100%;display:block;border:1px solid #ddd;background:#222}} img.thumb{{width:120px;display:inline-block;vertical-align:middle}} img.phone{{max-width:160px}}
+img{{width:100%;display:block;border:1px solid #ddd;background:#222}} .shots img[src*="phone"]{{max-height:440px;object-fit:cover;object-position:top}} img.thumb{{width:120px;display:inline-block;vertical-align:middle}} img.phone{{max-width:160px}}
 .grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:14px}} .grid figure img{{display:inline-block;width:49%}} .dropped{{opacity:.55}}
 .depth figure{{display:grid;grid-template-columns:3fr 3fr 1fr;gap:6px}} .depth figcaption{{grid-column:1/-1}}
 pre{{white-space:pre-wrap;font-size:12px;background:#f7f7f7;padding:8px}} .hy figure img{{width:100%}}
