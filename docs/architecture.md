@@ -39,7 +39,13 @@ open, and built the screen's open points (5.7) on 2026-10-12. In its exit
 test the chat took one spec through a plan of six cards to the last merge
 with one gap: a pull request the factory opens outside a card merges only
 in Forgejo. Its lane criterion failed, since no lane card after the probe
-landed through the lane.
+landed through the lane. Stage 18 closed that gap on 2026-10-13: with a
+card's scope bounded at filing, access declared in one table, the briefs'
+rules carried by checks and the factory's own work filed through the
+planner, the probe and 17 lane cards landed on the factory's own code at
+0.019 to 1.24 EUR with no controller rebuild; a two-hour provider budget
+refusal parked every model step at no spend and no failed attempt while
+the merge queue drained on its deterministic gates.
 Sections that describe built behaviour say so. The rest is still design. We amend this file as the design moves,
 so it always holds the current design plus the explanations behind it.
 Rulings live in the build ledger and are cited here by number.

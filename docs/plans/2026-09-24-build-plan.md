@@ -55,6 +55,7 @@ Each stage ends with an exit test. A stage starts only after the previous one pa
 | 15 Project chat | The event spine and the live board, the project screen (status line, pulse, five columns, chat, drawer), the project agent inside factoryd, inline answers. Built, exit test passed. Members, approvers per project and GitHub import and export moved to the roadmap | An app built through the chat alone: uptime, about ten cards, a staging deployment and a smoke test, under 50 EUR for the round. Passed |
 | 16 Chat as the window | Proposals and conversations kept in tables, every console read and action as a chat tool, the `system` tool rendered from code, refusals that name the fitting action, the planner's questions before acceptance, the deploy gate and a staging smoke test, budgets by plan size, a provider refusal as no attempt, the review's whole diff, rolls that keep sessions, members and per-project approvers, GitHub import and export. Built by the controller after the lane failed its cards, all of it live, and a `ci` read after the exit test's first run | The uptime spec twice under 50 EUR for the round: through the chat alone with zero chat gaps, then each new path once against Stage 15's baseline. Run 1 built the app through the chat alone in 2 h 45 min with one chat gap, main's CI result, so zero gaps was not met as run. The `ci` read built the same evening closed the gap. Run 2 took the six new paths in 48 minutes with no gap |
 | 17 The lane back | Every finding Stage 16 left open: the lane's cost on the factory's own code (the corrected record on 160, the default tier, a repository map in the brief, the hold's cached input, a cost line), Postgres tests in CI and the sandbox, console logins kept in a table, staging admitting only the smoke job, no GitHub token through the chat, a looping session ended before the provider refuses it, approve proposals with the review's findings, an import that blocks no project, template updates and schema copies as pull requests, every console page a chat tool, a large pull request split by a planner, GitHub pull request mode, the drawer's Chat tab, the message queue and no poll. Then the cluster shut down. Built by the controller, 4.10 and 4.11 from lane pull requests, and the lane probe's 4.3 with a controller follow-up. Every item is on main, 4.11 last at 09:13Z | The lane probe and two more lane cards land within their size budgets with no budget 402 and ruling 271 never triggered, every item's live check, and one chat run on uptime2 through the new paths, against Stage 16's run 2. The probe landed at 4.92 EUR of 5, ruling 271 triggered once, and no later lane card landed through the lane, so the lane's criterion failed. Live checks passed for 4.1a, 4.2, 4.3, 4.4, 4.5, 4.7, 4.8, 4.9, 4.10, 4.11, 4.13's push and Sync latest, 4.14 and three of 4.15's. 4.12's split ran live, and its check refused both answers, since one file alone was over the bound, so the member approved #48 whole (ruling 307). Not seen live: 4.6's loop end, 4.15's first-call refusal, and the import's empty-source and purge cases. The chat run passed: the seven cards of plan #35 were done from 07:33Z to about 10:44Z, with 3 misreads, 1 chat gap, 2 clicks outside the chat and 2.88 EUR on the cards, against run 2's 2 misreads, 0 gaps, 2 clicks and 1.53 EUR. Closed at about 11:30Z on 2026-10-12, shut down at 11:33Z: backup 20261012T112654 in generation v13, `tofu destroy` of 12 resources, every Hetzner project at zero. |
+| 18 The lane works | The lane's preparation built by the controller: a card's scope bounded at filing by a validating plan tool (184, with 178), every console route and chat tool's access in one table with one generic write test (185), the briefs' prose rules moved into checks and tools (186), and the factory's own work filed through the planner as a project's spec (160). The probe doubled as the checkpoint tolerance fix (182) and landed with its roll. Then the lane's ten plans: the costs read's date window (158), the lease admission's read layer and wait (188), the alert burst rule (181), the import's purge cut (176), the CI sweep's read layer (189), and the chat's fixes (180, 183, 179, 187) and the split pre-check (159) frozen mid-build by the provider's budget refusal (DashScope, Sebastian's account, from 01:36Z on 13 Oct) | The probe and two more lane cards land within their budgets with no controller rebuild, no budget 402 and ruling 271 never triggered: passed. The probe (0.13) and 17 lane cards landed at 0.019 to 1.24 EUR, ten of them root plans on their first attempt; the controller answered two provider-refusal escalations as the writer and the merge queue drained on its deterministic gates through the outage. Frozen by the outage: the chat fixes, the split pre-check and the tails of 181, 188, 189 and 176, with the two never-run live checks (a plan over the bound, a split's window) named in the summary; the GitHub pull request stayed blocked by the rotated token (190). Closed and shut down under the outage's two-hour rule |
 
 The stages map to the build order in architecture 11: Ranch is stages 0 to 3, First loop is 4 to 6, Teeth is 7, Customer is 8, Self is 9. Hardening, Spec and the bugfix rounds are its items 6 to 8, and the project screen its item 9.
 
@@ -5388,3 +5389,75 @@ by Sebastian's word of 2026-10-12. Its items 148, 158 to 160, 163 and 176
 hold what this round left open, and 178 to 188 its new findings, each
 with its fix by construction (docs master 36adae9, 1310ed9 and 2d5473a).
 Item 159 holds the live split's result and its two open defects.
+
+### Stage 18: the lane works
+
+Planned on 2026-10-12 from the roadmap's Next after Stage 17's close. The
+spec is the ledger's proposal-stage18.md. The goal, Sebastian's word of
+2026-10-12: finish what Stage 17 started and build the fixes it found, no
+new features, and above all the factory's agents build the factory's own
+changes within budget, with the controller only planning, reviewing and
+dispatching. Not every factory change must come from the factory, but it
+must be possible.
+
+The round rebuilt the cluster from Stage 17's backups first: generation
+v14 from v13's close backup, re-seeded, the export re-set, policy 530 at
+open (caps raised for the round: day 60, month 160.07, LiteLLM 79.35).
+
+The controller built the lane's preparation (ruling 257's shape, Opus
+implementer, second Opus review, controller reads the fix diff, land,
+roll): the validating plan tool that bounds every card at filing against
+`large_lines` and answers the planner in-session (184, with 178), the one
+access table every route and chat tool declares into, with the generic
+non-writer write test (185), the briefs' prose rules moved into checks
+and tools (186), and the factory's own project taking a spec through the
+chat like any project (160, with the planner filing the round's ten
+plans). Ruling 310 measured the model per class and confirmed the live
+assignment: planner on coding-frontier at 0.190 EUR a card, coder on
+coding-cheap at 0.086 to 0.134.
+
+The probe doubled as the checkpoint tolerance fix (182): three cards
+through the planner, the fix landed and rolled at 0.134 EUR for the
+integration card, one escalation answered by ruling (a verify-only card
+lands its verification as a test). Then the lane's ten plans (27 cards)
+ran as the exit test.
+
+At 01:36:32Z on 13 October the model provider refused every call:
+DashScope's Budget Management was exhausted (Sebastian's Alibaba account,
+provider side). The lane held exactly as built: every model step parked
+at gate `provider` with no spend and no failed attempt, the supervisor
+escalated to waiting-human at its ten-minute bound, and the merge queue
+drained on its deterministic gates. The controller answered both
+WaitChecks escalations as the writer (the checks were green both times;
+the trip was the provider), approved the merges, and the exit test
+closed: the probe and 17 lane cards landed at 0.019 to 1.24 EUR, ten
+root plans on their first attempt, no controller rebuild of any card, no
+budget 402 beyond the one uptime2 card named at 17:00Z on 12 October, and
+ruling 271 never triggered. The criterion Stage 17 failed was met.
+
+The outage froze what only model steps could finish: the chat's fixes
+(180 fresh reads, 183 tell-card, 179 batched answers, 187 orphan-pull-
+request cards), the split pre-check (159), and the tails of 181, 188,
+189 and 176. The two live checks that need a plan (a plan over the bound
+corrected in-session under 3.11's split window) never ran; the window
+never opened, so `large_lines` stayed 1000. The GitHub pull request with
+the rotated token stayed blocked: the token authenticates and reads but
+its write is refused (finding 190, Sebastian holds the rotation). The
+provider's refusal itself was seen live, the owed Stage 17 check.
+
+Findings 190 to 196 went into the roadmap as they appeared, each with
+its fix by construction: a token's rotation proved by its write duty
+(190), a review gate that runs the reproduction pair (191), no bounce on
+an adjudicated finding (192), the sandbox refusing directory-changing
+reproductions (193), a verify-only card's true base (194), the checks
+gate knowing a red that is also red on main (195), and a roll that dies
+in a merge queue advanced past it (196, the round's last roll card, at
+zero cost).
+
+The round closed under the outage's two-hour rule: caps restored (day
+40, month 120, LiteLLM 55, card 2/15), the shutdown stopped the CI
+spawner and swept before the backups (the controller's sweep, since the
+lane's own card 3.15 was frozen), backup sf-cluster-stage18-close in
+generation v14, cluster.yaml archive v15, `tofu destroy`, every Hetzner
+project at zero. The unfinished items are listed first in
+stage18-summary.md.
