@@ -25,6 +25,10 @@ with the re-seed): steps 2, 3, 5 and 6 below. Step 1 takes the plan's one-key br
 no egress policy selects the LiteLLM pod (Cilium default allow; only the k8s-infra
 collectors and build-cache pods carry policies), and the bundled price map of v1.102.1
 (the deployed chart pin) already prices both zai models at the pay-as-you-go figures.
+The trial grew into a 72-hour intense-test window the same evening (Sebastian): day_eur
+100, month_eur 500, card default 5, LiteLLM proxy 500 USD, the month and proxy high
+because the restore brings October's bookings back; back to 40 / 120 / 2 and 55 at the
+close. The handover (ledger, handover-next-round.md) carries the window's rules.
 
 1. Sebastian, on the z.ai console: create a second API key for the factory (if the console holds one key only, the trial uses the existing key and rotation replaces it), put it in `.env.tools` as `ZAI_CODING_KEY`, and bookmark the subscription page (quota) and Plan Overview (notices).
 2. Secret `platform/litellm-zai` (key `ZAI_CODING_KEY`), seeded by the pattern of `litellm-qwen` (`scripts/seed-secrets.sh:39`), applied before the commit; `environmentSecrets` gains `litellm-zai` in `k8s/platform/litellm/helmrelease.yaml`.
