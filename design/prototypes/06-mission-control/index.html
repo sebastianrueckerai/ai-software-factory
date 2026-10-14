@@ -314,6 +314,10 @@ a.cell.needs.on:hover { background: color-mix(in srgb, var(--need) 16%, transpar
 .st { display: inline-flex; align-items: center; gap: 5px; }
 .st .dot { width: 6px; height: 6px; }
 .s-running { color: var(--st-running); } .s-review { color: var(--st-review); } .s-waiting { color: var(--st-waiting); }
+/* live dots: a working card's dot breathes with a soft ring, an in-review card's dot slower and smaller */
+.st.s-running .dot { animation: live 2.2s ease-in-out infinite; }
+.st.s-review .dot { animation: live 3.6s ease-in-out infinite; }
+@keyframes live { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent); } 60% { opacity: .55; box-shadow: 0 0 0 4px transparent; } }
 .s-done { color: var(--st-done); } .s-failed { color: var(--st-failed); } .s-closed, .s-idle { color: var(--st-closed); }
 .warn { color: var(--need-text); }
 .bad { color: var(--st-failed); }

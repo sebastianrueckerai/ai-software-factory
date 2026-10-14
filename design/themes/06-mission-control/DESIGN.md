@@ -98,3 +98,5 @@ Under 900 px one column, no tabs: the top bar (home, project, theme, Menu with t
 ## Motion
 
 Hover: 120 ms colour and border changes, never movement. Focus: a 2 px cyan outline, 2 px offset, on everything. The typing indicator: three dots stepping. The drawer slides 16 px in while fading. The ticker is quiet: 12 px mono in the faint colour, no state colours but the failed tag; it scrolls at about 28 px a second and stops on hover or focus. Under `prefers-reduced-motion` nothing moves: the ticker is a still line, the dots stand, the drawer appears, replies arrive whole.
+
+Live dots (Sebastian, 2026-10-14): the state dot of a running card breathes every 2.2 s with a soft expanding ring in its own colour; an in-review card's dot does the same every 3.6 s. Under reduced motion both stand still.
