@@ -128,7 +128,7 @@ Declined, with the reason:
 - The project switch has no submit button without JavaScript, as the IA chose.
 - The escalation's Tab order follows the DOM (title, Close, then the choices) while the eye reads the choices first. Moving the face's transitions out of the DOM would split the face from its fragment; the order stays, and a note here records it.
 
-Sebastian's decisions after the round, from the live board (2026-10-14): C11, one time on a card, its age, the gate line gone (design-decisions.md); the accent filter removed; the ticker on the last day; the board ticking beside an open drawer. The wide view's removal is open: its column model also feeds the chat agent's board text until 225.
+Sebastian's decisions after the round, from the live board (2026-10-14): C11, one time on a card, its age, the gate line gone (design-decisions.md); the accent filter removed; the ticker on the last day; the board ticking beside an open drawer. The wide view stays (Sebastian, 2026-10-14) until 225 folds the lanes; it hides the chat to give the lane columns the width, and w or "Four columns" brings the chat back.
 
 The merge queue wait, measured on 2026-10-14 for C8's condition (a Verifying column comes back if the queue still takes tens of minutes), from a roll's pull request filing to its merge on the code repository: before the speed round's items landed, #638 15 min, #647 26 min, #657 54 min, #683 34 min; after them, #695 3 min, #697 3 min. The four columns stand; no Verifying column comes back.
 
