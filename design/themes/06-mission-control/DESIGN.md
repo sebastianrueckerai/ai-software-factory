@@ -17,14 +17,14 @@ The control room of a factory: a near-black blue room of thin-bordered instrumen
 | --bg-hover | #15212f | #f3eee2 | hover on cards, rows, quiet buttons |
 | --line | #1a2636 | #d9d4c6 | hairlines inside a panel |
 | --line-strong | #263649 | #b4b9c2 | panel borders |
-| --mark | #5a8aa3 | #1d3557 | the 7 px corner marks of every panel (amber on the tray) |
+| --mark | #5a8aa3 | #1d3557 | the 7 px corner marks of every panel (amber on the Needs you column) |
 | --text | #dfe7f1 | #0f1d33 | body (15.2:1 / 15.3:1) |
 | --text-muted | #93a1b5 | #46536a | meta, labels (6.9:1 / 7.3:1) |
 | --text-faint | #75849a | #5b6678 | done rows, the ticker (5.0:1 / 4.9:1) |
 | --accent | #4fcbe2 | #0a6a80 | the system colour: links, focus, Do it, Send, the gauge, running |
-| --need | #f4b13e | #f0a62a | the signal colour: the tray, Approve as you, warnings |
-| --need-text | #f6bd5a | #8a4f00 | amber text on the page or the tray tint |
-| --need-tint | amber 6 % | #fff3d6 | the tray body |
+| --need | #f4b13e | #f0a62a | the signal colour: the Needs you column, Approve as you, warnings |
+| --need-text | #f6bd5a | #8a4f00 | amber text on the page or the Needs you fill |
+| --need-tint | amber 6 % | #fff3d6 | the Needs you column's fill |
 | --failed-quiet | #c98a8a | #a14b43 | the failed tag in done rows and the ticker (6.8:1 / 5.3:1) |
 | --st-running | #4fcbe2 | #0a6a80 | dot and word, the card's left rule |
 | --st-waiting | #f4b13e | #8a4f00 | waiting on a human, stale, on the provider |
@@ -33,12 +33,12 @@ The control room of a factory: a near-black blue room of thin-bordered instrumen
 | --st-failed | #f26d6d | #b8322a | failed, blocked |
 | --st-closed | #93a1b5 | #5b6678 | closed, backlog, queued |
 
-Every state shows its word next to its hue; colour is never the only signal. In light every metadata text clears 4.5:1 on every surface it sits on: faint on the card 5.7, on the tray 5.3, on the page 4.9; amber text on the tray 6.0, on the high-risk chip 5.0. Fills: dark ink on cyan 9.8:1, dark ink on amber 9.9:1 (dark), white on teal 6.2:1, navy on amber 8.2:1 (light).
+Every state shows its word next to its hue; colour is never the only signal. In light every metadata text clears 4.5:1 on every surface it sits on: faint on the card 5.7, on the Needs you fill 5.3, on the page 4.9; amber text on the Needs you fill 6.0, on the high-risk chip 5.0. Fills: dark ink on cyan 9.8:1, dark ink on amber 9.9:1 (dark), white on teal 6.2:1, navy on amber 8.2:1 (light).
 
 ## Type
 
 - Text: the system UI stack (`-apple-system, "Segoe UI Variable", "Segoe UI", "Noto Sans", system-ui`). Figures, refs, times, the activity line, chips: the monospace stack (`ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", "Noto Sans Mono", monospace`) with tabular numerals.
-- Scale: 11 (chips, labels in small capitals), 12 (meta, the ticker), 13 (the board, the body of the drawer), 14 (the chat's log), 16 (a tray headline, the drawer title), 20 (the pulse sentence). Weights 400 and 600 only.
+- Scale: 11 (chips, labels in small capitals), 12 (meta, the ticker), 13 (the board, the body of the drawer), 14 (the chat's log), 16 (a Needs you headline, the drawer title), 20 (the pulse sentence). Weights 400 and 600 only.
 - Column and section labels in small capitals (`font-variant-caps: all-small-caps`, +0.06 em), never uppercase transforms.
 
 ## Layout at 1440 and 1920
@@ -48,22 +48,22 @@ top bar 44   home · project ▾ · Board New task Projects Resources Costs Poli
 status panel  ⚠ pulse sentence, 20 px ......................................................... more
               ● waiting on you | 3 working | 2 need you | €61.40 / €120.00 ▬▬▬▬▭▭ 51 % | GitHub: …
 main          CHAT 40 %, full height            | Board header: Board · accent ▾ · Wide view · ?
-              log anchored to the prompt        | NEEDS YOU tray, amber, the items side by side
-              > composer ................ Send  | Queued | Working | Verifying | Done
+              start line, then the log          | NEEDS YOU (lit) | Queued | Working | Verifying | Done
+              > composer ................ Send  | 1.5             | 1.04   | 1.12    | 0.96      | 0.86
 ticker 28     20:37 ✓ #616 Chat form: center the Send button · 20:30 ✓ #610 … (scrolls slowly)
 ```
 
 - The screen is one viewport high on a desktop; the log and the columns scroll inside.
-- Chat left at 40 percent, board right at 60 percent, 10 px gutter, 12 px page margin (14 and 18 from 1700 px). The four columns weigh 1.1 : 1.2 : 1 : 0.88 (Queued, Working, Verifying, Done), so the busiest state row fits one line. A column that scrolls fades at its foot. At 900 to 1279 px the four columns go two by two and the board scrolls as one.
-- The Needs you tray is the board's first column turned on its side: full width of the board, above the four columns. Nothing is shown twice.
+- Chat left at 40 percent, board right at 60 percent, 10 px gutter, 12 px page margin (14 and 18 from 1700 px). The five columns weigh 1.5 : 1.04 : 1.12 : 0.96 : 0.86 (Needs you, Queued, Working, Verifying, Done): at 1440 that is 224, 156, 168, 144, 129 px; at 1920 about 298 px for Needs you. A column that scrolls fades at its foot. At 900 to 1279 px Needs you spans the full board width, the four others go two by two, and the board scrolls as one.
+- Needs you is the board's first column, never a tray or band across the top (C4): five columns, Needs you about 1.5 times as wide as the others, its items stacked and growing downward, scrolling like any column. With nothing waiting it goes calm and narrows to 0.9.
 - The drawer docks at the right edge of the main area, `min(46 %, 720 px)` wide, from the top of the main area to the ticker: over the board, never over the chat (the chat ends at 40 percent).
-- Wide view ("Wide view" / "Five columns", key w): the tray becomes the Human lane (Approvals, Escalations, Human tasks), the four columns become the Agent lane, one column per process lane (Backlog, Plan, Ready, Running, Waiting on a human, Waiting on the author, In review, Done, Failed, Closed), scrolling sideways inside the board. Lane badges show on cards; backlog cards drag onto Plan and Ready.
+- Wide view ("Wide view" / "Five columns", key w): one row of columns scrolling sideways inside the board. First the Human lane, three lit columns like Needs you (Approvals, Escalations, Human tasks, 300 px when they hold items), then the Agent lane, one column per process lane (Backlog, Plan, Ready, Running, Waiting on a human, Waiting on the author, In review, Done, Failed, Closed). Lane badges show on cards; backlog cards drag onto Plan and Ready.
 
 ## The pulse
 
 One panel with the instrument strip under it; 12 px above and below the sentence (line height 26 px). Prominent (a card needs a person): a 3 px amber left rule, an amber 6 percent tint and the amber ⚠ before the sentence. Subdued: no rule, no tint, no sign, the sentence in the muted text colour. "more" opens the bullets as a short list under the sentence. While it recomputes, three dots after the sentence.
 
-The strip: cells split by vertical hairlines, each a mono numeral and a word ("3 working"). The state word with its dot (amber waiting, cyan working with a slow breathing dot, grey idle). "n need you" in amber when above zero, links to the tray. Spend links to Costs and carries the gauge: 120 px by 4 px, cyan, amber from 80 percent, red and full past the cap, the percent in mono after it.
+The strip: cells split by vertical hairlines, each a mono numeral and a word ("3 working"). The state word with its dot (amber waiting, cyan working with a slow breathing dot, grey idle). "n need you" in amber when above zero, links to the Needs you column. Spend links to Costs and carries the gauge: 120 px by 4 px, cyan, amber from 80 percent, red and full past the cap, the percent in mono after it.
 
 ## The chat
 
@@ -77,15 +77,15 @@ Done, failed and closed cards are two-line rows without a box, all in the faint 
 
 ## Needs you
 
-The loudest thing on the screen and the only place with a glow: a 1 px amber border, the amber tint, amber corner marks and a faint amber halo (dark); in light a pale amber body (#fff3d6) with a 1 px amber rule, dark-amber corner marks and the header in amber text, no solid band. The header: "Needs you" in small capitals and the count on an amber pill. The items side by side, each with a 3 px amber left rule and a 16 px headline.
+The first column of the board, and the loudest thing on the screen: the only place with a glow. A 1 px amber border, the amber tint, amber corner marks and a faint amber halo (dark); in light a pale amber fill (#fff3d6) with a 1 px amber rule, dark-amber corner marks and the header in amber text. The header: "Needs you" in small capitals and the count on an amber pill, on one baseline. The items stack one under the other, 8 px apart, each with a 3 px amber left rule and a 16 px headline; the text wraps as the column needs, and the column scrolls when it overflows, like the others.
 
-- The items share the tray's width by weight: a merge item from 280 px, an escalation from 400 px, so the decision with the most to read gets the room.
+- The column is a size container. From 272 px of content (1920, the mid-width layout) the merge actions sit on one row. Narrower (1440: 224 px column) Approve as you takes its own full row and Deny and Split share the second. Below 440 px the escalation's choices and "Or in your words" go one per row, full width; wider they flow in a row.
 - Merge approval: "Merge PR #n", chips high risk and migration, the model review line, the recommendation line, then Approve as you (amber fill), Deny, Split; a foot line with the waiting time (◷) and a Details link that opens the drawer on Reviews and audit. Deny opens the reason box and "requesting changes / rejecting (closes the pull request)" in place.
 - Escalation: ref and title as the headline with the waiting time at its right, the question under it, the choices as amber-outlined buttons with "Or in your words" (dashed) in the same row, opening the answer box, then the state row with "answer on the issue", the verdict buttons small at the end.
 - Capped card: the answer box open, "Grant one session with this answer" as the amber primary.
 - Plan and resource approvals follow the same item: headline, two fact lines, the primary first.
 - Every action answers with a one-line confirmation in place.
-- With nothing waiting the tray goes dark: one quiet line, "Needs you 0".
+- With nothing waiting the column goes calm: the panel colour, the plain count "0", no amber, no halo.
 
 ## The drawer
 
@@ -93,7 +93,7 @@ The raised panel with a cyan left edge and a deep shadow to its left, slides in 
 
 ## The phone
 
-Under 900 px one column, no tabs: the top bar (home, project, theme, Menu with the rest), the status panel with the strip wrapping to two rows, the chat (the log as tall as its content and at most 62 percent of the viewport height, so the busy conversation shows whole from the start line to Do it; the composer under it, Do it and Skip side by side at 44 px), then the board as stacked sections: Needs you in full with every button full width, one per row, 44 px, 8 px between rows (the verdict buttons too), then Working, Verifying, Queued, Done collapsed, its titles wrapping to two lines. The ticker closes the page and clips inside itself: the page is exactly 390 wide in every scenario. The drawer takes the full screen.
+Under 900 px one column, no tabs: the top bar (home, project, theme, Menu with the rest), the status panel with the strip wrapping to two rows, the chat (the log as tall as its content and at most 62 percent of the viewport height, so the busy conversation shows whole from the start line to Do it; the composer under it, Do it and Skip side by side at 44 px), then the board as stacked sections: the lit Needs you column first, in full, never collapsible with every button full width, one per row, 44 px, 8 px between rows (the verdict buttons too), then Working, Verifying, Queued, Done collapsed, its titles wrapping to two lines. The ticker closes the page and clips inside itself: the page is exactly 390 wide in every scenario. The drawer takes the full screen.
 
 ## Motion
 

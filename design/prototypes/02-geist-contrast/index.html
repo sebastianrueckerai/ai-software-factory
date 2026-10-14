@@ -206,9 +206,9 @@ label.lbl { display: block; font-size: 12px; color: var(--text-muted); margin: 0
 .kbd-btn { width: 24px; height: 24px; border-radius: var(--r-ctl); border: 1px solid var(--line-strong); background: transparent; color: var(--text-muted); font-size: 12px; transition: color var(--t), border-color var(--t); }
 .kbd-btn:hover { color: var(--text); border-color: var(--text-faint); }
 .wide-btn[aria-pressed="true"] { color: var(--text); background: var(--hover-strong); }
-.board-scroll { overflow-y: auto; min-height: 0; padding: 16px 20px 28px; }
+.board-scroll { overflow-y: auto; min-height: 0; padding: 16px 16px 28px 20px; }
 .live { padding: 8px 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--line); }
-.col-h { display: flex; align-items: center; height: 28px; }
+.col-h { display: flex; align-items: center; height: 36px; }
 .col-tog { display: inline-flex; align-items: baseline; gap: 8px; border: 0; background: none; padding: 0; font-size: 14px; font-weight: 600; letter-spacing: .05em; font-variant-caps: all-small-caps; color: var(--text-muted); cursor: default; }
 .col-tog .count { color: var(--text-faint); font-weight: 500; letter-spacing: 0; font-size: 12px; font-variant-caps: normal; }
 .col-needs .col-tog { font-size: 15px; }
@@ -216,13 +216,17 @@ label.lbl { display: block; font-size: 12px; color: var(--text-muted); margin: 0
 .col-needs .col-tog { color: var(--need); }
 .col-needs .col-tog .count { color: var(--need); }
 .col-needs.is-empty .col-tog, .col-needs.is-empty .col-tog .count { color: var(--text-faint); }
-.col-needs { margin-bottom: 20px; }
-.needs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(272px, 1fr)); gap: 12px; margin-top: 6px; }
-.cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.2fr); }
-.cols .col { padding: 0 12px; border-left: 1px solid var(--line-region); min-width: 0; }
+/* Needs you is the first column, 1.5 times the others and never narrower than its action row. */
+.cols { display: grid; grid-template-columns: minmax(auto, 1.5fr) repeat(4, minmax(0, 1fr)); align-items: start; }
+.cols:not(.has-needs) { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.cols .col { padding: 0 8px; border-left: 1px solid var(--line-region); min-width: 0; align-self: stretch; }
 .cols .col:first-child { padding-left: 0; border-left: 0; }
 .cols .col:last-child { padding-right: 0; }
-.cols .col-h { border-bottom: 1px solid var(--line); height: 32px; align-items: flex-start; }
+.cols .col-h { border-bottom: 1px solid var(--line); }
+.card-done .card-title .i { margin-top: 2px; }
+.cols .col-needs.has-items { min-width: auto; align-self: start; padding: 0; margin-right: 8px; background: var(--need-tint); box-shadow: inset 0 0 0 1px var(--need-line); border-radius: var(--r-box); }
+.cols .col-needs.has-items + .col { border-left: 0; padding-left: 0; }
+.col-needs.has-items .col-h { padding: 0 12px; border-bottom: 1px solid var(--need-line); }
 .col-empty { padding: 10px 0; color: var(--text-faint); }
 .earlier { display: inline-block; padding: 10px 0 0; font-size: 12px; color: var(--text-faint); text-decoration: none; transition: color var(--t); }
 .earlier:hover { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
@@ -234,38 +238,50 @@ label.lbl { display: block; font-size: 12px; color: var(--text-muted); margin: 0
 .card-title:hover .t { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--text-faint); }
 .ref { color: var(--text-muted); font-weight: 400; }
 .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; font-size: 12px; line-height: 16px; color: var(--text-muted); }
-.meta > span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.meta > span { display: block; }
+.meta .dot, .meta .i { margin-right: 5px; vertical-align: middle; }
+.meta .dot { top: -1px; }
+.meta .chip { vertical-align: 1px; }
 .meta > .spend { flex-basis: 100%; white-space: normal; flex-wrap: wrap; gap: 0 5px; }
 .meta .hi { color: var(--text); }
 .meta .st-need { color: var(--need); }
 .activity { font: 11.5px/16px var(--mono); color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
 .activity .hi { color: var(--text); }
 .chips { display: flex; flex-wrap: wrap; gap: 4px; }
-.chip { display: inline-flex; align-items: center; height: 18px; padding: 0 6px; border-radius: 4px; background: var(--bg-sub); color: var(--text-muted); font-size: 11px; line-height: 1; white-space: nowrap; }
+.chip { display: inline-flex; align-items: center; min-height: 18px; padding: 2px 6px; border-radius: 4px; background: var(--bg-sub); color: var(--text-muted); font-size: 11px; line-height: 14px; }
 .chip-x { background: transparent; box-shadow: inset 0 0 0 1px var(--text-muted); color: var(--text); }
 .chip-need { background: transparent; box-shadow: inset 0 0 0 1px var(--need-line-strong); color: var(--need); }
 .chip-lane { display: none; }
 .is-wide .chip-lane { display: inline-flex; }
 .acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-.card .acts .btn-sm { gap: 4px; padding: 0 7px; }
+.card .acts { gap: 4px; }
+.card .acts .btn-sm { gap: 3px; height: 22px; padding: 0 6px; font-size: 11.5px; }
+.card .acts .btn-sm .i { width: 10px; height: 10px; }
 .card.is-stale { box-shadow: inset 0 0 0 1px var(--text-faint); border-radius: var(--r-ctl); border-bottom-color: transparent; margin-bottom: 1px; }
 .card-done { padding: 7px 8px; }
-.card-done .card-title { display: flex; align-items: center; gap: 7px; -webkit-line-clamp: unset; white-space: nowrap; font-weight: 400; color: var(--text-muted); font-size: 12.5px; }
+.card-done .card-title { display: flex; align-items: flex-start; gap: 7px; -webkit-line-clamp: unset; font-weight: 400; color: var(--text-muted); font-size: 12.5px; line-height: 17px; }
 .card-done .card-title .i { width: 12px; height: 12px; color: var(--text-muted); }
-.card-done .card-title .t-wrap { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.card-done .card-title .t-wrap { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-width: 0; }
 .card-done .ref { color: var(--text-muted); }
 .card-done.is-failed .card-title .i { color: var(--fail); }
 .card-done .meta { padding-left: 19px; }
 
 /* needs you */
 .need, .open.is-need { --text-muted: var(--need-muted); --text-faint: var(--need-muted); }
-.need { background: var(--need-tint); border: 1px solid var(--need-line); border-radius: var(--r-box); padding: 14px 16px 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.need { position: relative; padding: 12px 10px 14px 12px; display: grid; gap: 8px; align-content: start; }
+.need + .need { border-top: 1px solid var(--need-line); }
+.need::before { content: ""; position: absolute; left: 0; top: 12px; bottom: 14px; width: 2px; border-radius: 1px; background: var(--need); }
+.need .btn { height: 28px; padding: 0 8px; font-size: 12px; }
+.need .acts { flex-wrap: nowrap; gap: 5px; margin-top: 2px; }
+.need .choices { gap: 5px; }
+.need .verdict .btn-sm { height: 22px; padding: 0 6px; font-size: 12px; }
 .need-h { display: flex; align-items: flex-start; gap: 8px; }
 .need-title { text-align: left; border: 0; background: none; padding: 0; font-size: 14px; line-height: 20px; font-weight: 600; letter-spacing: -.005em; }
 .need-title:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--need); }
-.need-h .chips { padding-top: 1px; }
+
 .need-h .since { margin-left: auto; font-size: 12px; line-height: 20px; color: var(--text-muted); white-space: nowrap; }
 .need-sub { font-size: 12px; color: var(--text-muted); margin-top: -4px; }
+.need-title { min-width: 0; }
 .need-line { font-size: 13px; line-height: 19px; }
 .need-line .k { color: var(--text-muted); }
 .need-q { font-size: 13px; line-height: 19px; max-width: 72ch; }
@@ -283,16 +299,14 @@ label.lbl { display: block; font-size: 12px; color: var(--text-muted); margin: 0
 /* wide view */
 .is-wide #chat { display: none; }
 .is-wide.split { grid-template-columns: 1fr; }
-.is-wide .board-scroll { display: grid; grid-template-columns: 1.4fr repeat(4, minmax(0, 1fr)); }
-.is-wide .cols { display: contents; }
-.is-wide .col-needs { margin: 0; padding-right: 12px; }
-.is-wide .needs-grid { grid-template-columns: 1fr; }
-.is-wide .cols .col:first-child { padding-left: 12px; border-left: 1px solid var(--line-region); }
-.is-wide .col-needs .col-h { border-bottom: 1px solid var(--line); height: 32px; align-items: flex-start; }
 
+@container board (max-width: 800px) {
+  .card .acts .btn-sm .i { display: none; }
+}
 @container board (max-width: 560px) {
-  .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 20px; }
-  .cols .col:nth-child(odd) { padding-left: 0; border-left: 0; }
+  .cols, .cols:not(.has-needs) { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 20px; }
+  .cols .col-needs { grid-column: 1 / -1; margin-right: 0 !important; }
+  .cols .col:nth-child(even) { padding-left: 0; border-left: 0; }
 }
 
 /* drawer */
@@ -414,9 +428,11 @@ kbd { font: 12px/1 var(--mono); padding: 3px 6px; border: 1px solid var(--line-s
   .col-tog .chev { display: inline-flex; align-self: center; margin-left: auto; color: var(--text-faint); transition: transform var(--t); }
   .col-tog[aria-expanded="false"] .chev { transform: rotate(-90deg); }
   .col-h { height: auto; }
-  .col-needs { margin-bottom: 0; border-bottom: 1px solid var(--line-region); padding-bottom: 16px; }
-  .needs-grid { grid-template-columns: 1fr; }
-  .need .acts .btn, .need .choices .btn, .need .row .btn, .need .verdict .btn { flex: 1 1 100%; width: 100%; height: 44px; font-size: 15px; justify-content: flex-start; padding: 0 16px; }
+  .cols .col-needs.has-items { margin: 8px 0 16px; border-bottom: 0; }
+  .col-needs.has-items .col-tog { height: 48px; }
+  .need { padding: 14px 14px 16px 16px; }
+  .need .acts { flex-wrap: wrap; }
+  .need .acts .btn, .need .choices .btn, .need .row .btn, .need .verdict .btn, .need .verdict .btn-sm { flex: 1 1 100%; width: 100%; height: 44px; font-size: 15px; justify-content: flex-start; padding: 0 16px; }
   .need .verdict { display: grid; gap: 6px; margin: 0; }
   .need .verdict .btn { border: 1px solid var(--need-line-strong); color: var(--text); font-weight: 500; }
   .need-foot { flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 6px; }
@@ -431,7 +447,8 @@ kbd { font: 12px/1 var(--mono); padding: 3px 6px; border: 1px solid var(--line-s
   .card-title { font-size: 15px; line-height: 21px; }
   .card-done .card-title { font-size: 14px; }
   .meta { font-size: 13px; line-height: 18px; }
-  .acts .btn-sm { height: 36px; padding: 0 14px; font-size: 13px; }
+  .card .acts .btn-sm { height: 36px; padding: 0 14px; font-size: 13px; }
+  .card .acts .btn-sm .i { display: inline-block; width: 12px; height: 12px; }
   #drawer { position: fixed; inset: 0; width: auto; z-index: 50; border-left: 0; }
   .dr-head { padding: 12px 16px; }
   .dr-body { padding: 16px 16px 32px; }
@@ -529,6 +546,7 @@ kbd { font: 12px/1 var(--mono); padding: 3px 6px; border: 1px solid var(--line-s
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const span = (t) => esc(t).replace(/(\d) (h|min|s)\b/g, '$1\u00a0$2');
 const eur = (n) => '€' + Number(n).toFixed(2);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const phone = matchMedia('(max-width: 899px)');
@@ -602,8 +620,8 @@ function spendSpan(c) {
 function stateRow(c, col) {
   const k = kindOf(c.status);
   const parts = [`<span class="${k === 'need' ? 'st-need' : k === 'run' ? 'hi' : ''}">${glyph(c.status)}${esc(c.status)}</span>`];
-  if (c.gate) parts.push(`<span>${esc(c.gate)} for ${esc(c.gateAge)}</span>`);
-  parts.push(`<span>${esc(c.elapsed)}</span>`);
+  if (c.gate) parts.push(`<span>${esc(c.gate)} for ${span(c.gateAge)}</span>`);
+  parts.push(`<span>${span(c.elapsed)}</span>`);
   if (c.checks) parts.push(`<span>${esc(c.checks)} checks</span>`);
   if (c.pr && col === 'verifying') parts.push(`<span>PR #${c.pr}</span>`);
   if (near(c)) parts.push(spendSpan(c));
@@ -716,9 +734,9 @@ function needItem(n, pre = '') {
   if (n.kind === 'merge') {
     return `<article class="need" data-card="${n.issue}" aria-labelledby="${id}-h">
       <div class="need-h"><button type="button" class="need-title" id="${id}-h" data-open="${n.issue}" data-section="reviews">Merge PR #${n.pr}</button>
-        <p class="chips"><span class="chip chip-need">${esc(n.risk)} risk</span>${n.migration ? '<span class="chip chip-need">migration</span>' : ''}</p>
         <span class="since" title="waiting since">${esc(n.since)}</span></div>
       <p class="need-sub">#${n.issue} ${esc(n.title)}</p>
+      <p class="chips"><span class="chip chip-need">${esc(n.risk)} risk</span>${n.migration ? '<span class="chip chip-need">migration</span>' : ''}</p>
       <p class="need-line"><span class="k">Model review:</span> ${esc(n.review.verdict)}. ${esc(n.review.summary)}</p>
       <p class="need-line"><span class="k">Recommendation:</span> ${esc(n.recommendation)}</p>
       <div class="acts" data-confirm>
@@ -755,7 +773,7 @@ function needItem(n, pre = '') {
       <div class="row" data-confirm><button type="button" class="btn ${n.capped ? 'btn-need' : ''}" data-act="confirm" data-msg="${n.capped ? 'Granted one session with this answer.' : 'Answered, posted on the issue as you.'}">${n.capped ? 'Grant one session with this answer' : 'Answer'}</button></div>
     </div>
     ${own ? '' : foot}
-    </div></article>`;
+    </article>`;
 }
 function face(c, col) {
   const k = kindOf(c.status);
@@ -764,7 +782,7 @@ function face(c, col) {
     const g = k === 'failed' ? 'x' : k === 'closed' ? 'slash' : 'check';
     return `<article class="card card-done${k === 'failed' ? ' is-failed' : ''}${open}" data-card="${c.issue}" title="${esc(c.status)} · ${esc(c.elapsed)} · ${esc(c.at)}">
       <button type="button" class="card-title" data-open="${c.issue}">${ic(g)}<span class="t-wrap"><span class="ref">#${c.issue}</span> <span class="t">${esc(c.title)}</span></span>${k === 'failed' ? '' : `<span class="sr-only">, ${esc(c.status)}</span>`}</button>
-      ${k === 'failed' ? `<p class="meta"><span>failed</span><span>${esc(c.elapsed)}</span></p>` : ''}</article>`;
+      ${k === 'failed' ? `<p class="meta"><span>failed</span><span>${span(c.elapsed)}</span></p>` : ''}</article>`;
   }
   const act = (k === 'run' || c.provider || c.stale) && c.activity
     ? `<p class="activity" title="${esc(c.activity)}">${esc(c.activity)}</p>` : '';
@@ -784,8 +802,8 @@ function renderBoard() {
   const f = (list) => (ui.accent ? list.filter((c) => c.accent === ui.accent) : list);
   const needs = f(sc.needs);
   const hidden = (key) => (phone.matches && ui.collapsed[key] ? ' hidden' : '');
-  let html = `<section class="col col-needs${needs.length ? '' : ' is-empty'}" id="needs" aria-labelledby="h-needs" tabindex="-1">${colHead('needs', 'Needs you', needs.length)}
-    <div class="needs-grid col-list" id="list-needs"${hidden('needs')}>${needs.map((n) => needItem(n)).join('')}</div></section><div class="cols">`;
+  let html = `<div class="cols${needs.length ? ' has-needs' : ''}"><section class="col col-needs${needs.length ? ' has-items' : ' is-empty'}" id="needs" aria-labelledby="h-needs" tabindex="-1">${colHead('needs', 'Needs you', needs.length)}
+    <div class="col-list" id="list-needs"${hidden('needs')}>${needs.length ? needs.map((n) => needItem(n)).join('') : '<p class="col-empty" aria-label="none">—</p>'}</div></section>`;
   for (const [key, title] of COLS) {
     const all = f(sc[key]);
     const count = key === 'done' && sc.doneCount && !ui.accent ? sc.doneCount : all.length;
