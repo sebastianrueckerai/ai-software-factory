@@ -74,6 +74,7 @@ What landed, in order, on the code repository's `main` by the controller's direc
 | Item 3, the board | 692 | f6cbe93 |
 | Item 4, the Needs you items | 700 | 9c69c61 (rebased on a roll that landed first; CI green on 07fe7c6, the same change) |
 | Items 7 and 8, the New task page and the secondary pages | 701 | e9c6378 |
+| The review's fix pass | 711 | open |
 
 The structural check's lines after item 2: two, both item 3's (the whole card opens the drawer, the PR link on a verifying card's face). After item 3: none, `ok: every control present, the mechanics work`.
 
@@ -96,6 +97,33 @@ Rulings taken in item 4:
 Contrast, measured from the stylesheet's tokens at the end of the round: every text pair items 3 and 4 introduced (the risk and migration chips, the need lines, the waiting time, the done row's faint text and its hover, the failed row's word, the Retry and PR text links, the Deny button) reads at 5.1:1 or better in both themes; the lowest is the waiting time in the light Needs you column at 5.1:1.
 
 The round's state at the end of 2026-10-14: every item of the handover's order is on main (1, 2, 5, 6, 3, 4, 8; 7 as a ruling), the structural check reads `ok: every control present, the mechanics work` on the final main, the shots of every item are in `design/rounds/01-mission-control/` with the sheet page `index.html`. Open: 225 (lanes), which item 7's Track and the plan item's Accept plan wait for; 177's hover peek and model rule; no roll asked for the controller's approval during the round (the factory merged its rolls itself after the speed round).
+
+## The final review
+
+A fresh reviewer (a subagent on the strongest model, with the IA, the theme, this plan's rulings and C8 to C10) read the round's whole diff. No Critical finding. Fixed in the fix pass (pull request 711), each with a hand-derived test where one applies:
+
+- The four-column grid kept a fifth, empty track from the five-column days; from 1280 px it took a fifth of the board. Visible in items 3 and 4's shots; `repeat(3, …)` on both grid lines.
+- The time in the stage counted from the card's first admission (`AdmittedAt` is set once), so a card run again after review showed the wrong number. It now counts from the card's newest status row when that row is the newest event. Limit: when a later event (a question, a merge row) is newer than the status row, the face falls back to the admission or the gate's start; a `status_since` column in factoryd would settle it.
+- The status panel's In progress list read the column titled "In progress", so the wide view showed "none" while the strip counted n; its Needs you links sent a human task and a waiting-poster card to `#need-<id>`, an article the card template has not. The list reads the stage now, and the links send such cards to their drawer.
+- The ticker listed oldest first against its own doc comment and its live events went in front; the keep-one-copy step sliced nothing, so a live event duplicated the set. Newest first now, with the item count kept on the track, the filler copies hidden from assistive tech, and the ticker focusable so a keyboard user can pause it.
+- The disclosure handler matched the status chevron, so one click toggled it twice (the structural check hid it by clicking every closed disclosure). The handler acts on the Deny and "Or in your words" buttons only, and the check opens those only.
+- A reader's click on a card asked for a drawer the reader may not open (a 404 flash). The click needs the title's link.
+- An escalation's title link had no visible focus ring (the face is `display: contents` inside the item). The ring is on the item.
+- The phone's Done fold refolded on every board swap and its title was not focusable. The fold's state lives outside the swapped DOM; on the phone the title is a button for the keyboard. The phone's order is Needs you, In progress, Queued, Done.
+- The counters' swap replaced the status line under the keyboard's focus; it waits while the focus is inside. An open Deny or own-answer box counts as busy, so a swap keeps it. A malformed card hash closes the drawer instead of leaving it open and empty.
+- "The month cap is passed" showed when the cap was 0 (policy unread); the gauges overflowed past 100 percent. The note needs a cap; the gauges clamp.
+- The drawer's empty sections were `summary` elements outside `details`; they are paragraphs. The drawer's need showed the question twice.
+- A lab-only branch built the GitHub URL from a full remote; the mirror validates `owner/name`, so the lab and the figures test seed that and the branch is gone.
+- The lab seeded its objects map while a stream read it, and the fake ledger recorded its window under a read lock. Both are under locks.
+- A test had been loosened to accept any number of pings or counters before the board event; it asserts the exact sequence again. The wide view's done rows assert no lane badge, with the ruling: a done row carries no badge in either view.
+
+Declined, with the reason:
+
+- The status panel's lists follow the accent filter while the strip's counts do not. The lists are the filtered board's; the strip is the project's. Both are right for their reader; a note in the IA would settle it.
+- A waiting-deps card in Queued speaks (its activity line shows). The IA's "a card that waits" covers it; the line tells what it waits on.
+- The drawer's need checks `approver(r)` where the board checks `Factory && approver(r)`. Approvers are factory writers in every policy the console serves.
+- The project switch has no submit button without JavaScript, as the IA chose.
+- The escalation's Tab order follows the DOM (title, Close, then the choices) while the eye reads the choices first. Moving the face's transitions out of the DOM would split the face from its fragment; the order stays, and a note here records it.
 
 The merge queue wait, measured on 2026-10-14 for C8's condition (a Verifying column comes back if the queue still takes tens of minutes), from a roll's pull request filing to its merge on the code repository: before the speed round's items landed, #638 15 min, #647 26 min, #657 54 min, #683 34 min; after them, #695 3 min, #697 3 min. The four columns stand; no Verifying column comes back.
 
