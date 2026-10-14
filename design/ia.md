@@ -67,7 +67,7 @@ Overview, top to bottom:
 
 1. The top block, four lines: Task (the objective's first sentence), Status (the state and the time in it), Budget (spend of budget and the percent, muted under 80 percent), Agent (the model alias, muted).
 2. Open: the one thing that needs the member, if any (the question with its choices, the review's open findings, a failing check, a refusal), with its actions.
-3. Collapsed sections, in this order: Objective (the full text with provenance), The agent's summary, The plan (summary and the cards table), Reviews and audit (the merge facts and Split), Related cards, Edit (the summary and accent forms, writers only), Links (issue, PR, timeline).
+3. Collapsed sections, in this order: Time (how the card's life went: one row per run of a stage with its start, duration, cost and the note that ended it, the at-a-glance line as the section's hint; C10), Objective (the full text with provenance), The agent's summary, The plan (summary and the cards table), Reviews and audit (the merge facts and Split), Related cards, Edit (the summary and accent forms, writers only), Links (issue, PR, timeline).
 
 Activity and Files stay as they are. Chat stays as it is, with the steer box.
 

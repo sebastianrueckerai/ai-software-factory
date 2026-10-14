@@ -39,7 +39,7 @@ Read off the templates in `internal/console/templates/` on 2026-10-13 (code comm
 
 - Close (Escape). Title with issue link. Facts: status pill, lane badge, fine pills, model chip, spend / budget, PR link.
 - Tabs: Overview, Chat, Activity, Files, Files last (226); Chat is the default on a running card.
-- Overview: headline; provenance; objective body; the agent's summary; the plan (summary, cards table); reviews and audit of PR #n (merge facts, Split); related cards (why, pill, title, opens its drawer); issue and full timeline links.
+- Overview: headline; provenance; objective body; the agent's summary; the plan (summary, cards table); reviews and audit of PR #n (merge facts, Split); related cards (why, pill, title, opens its drawer); issue and full timeline links; the Time section (C10): one row per run of a stage (start, stage, duration, cost, note), the at-a-glance line as its hint.
 - Activity: gates table (gate, attempt, start, duration, outcome, meter against the longest); steps table (time, step, supervisor action and diagnosis, detail).
 - Chat: "Session n · model · outcome"; messages (who, time, text); steer form while running.
 - Files: the changed files of PR #n (file, change, added, deleted), "no pull request yet".

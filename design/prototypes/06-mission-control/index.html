@@ -436,6 +436,20 @@ a.cell.needs.on:hover { background: color-mix(in srgb, var(--need) 16%, transpar
 .sec-body { padding: 0 0 16px 15px; font-size: 13px; line-height: 1.55; }
 .sec-body p { margin: 0 0 8px; }
 .sec-body .prov { color: var(--text-muted); font: 12px var(--font-mono); }
+.sec[data-sec="time"] > summary .hint { color: var(--text-muted); }
+.sec[data-sec="time"] > summary { height: auto; min-height: 38px; flex-wrap: wrap; }
+.sec[data-sec="time"] > summary .hint { color: var(--text-muted); text-align: right; }
+.life { display: grid; grid-template-columns: auto auto auto auto 1fr; column-gap: 12px; row-gap: 3px; margin-top: 4px; font-size: 12.5px; line-height: 1.45; align-items: baseline; }
+.life .mono { font: 12px var(--font-mono); color: var(--text-muted); white-space: nowrap; }
+.life .num { text-align: right; }
+.life .k { font-weight: 600; white-space: nowrap; }
+.life .note { color: var(--text-muted); }
+@media (max-width: 720px) {
+  .life { grid-template-columns: auto auto auto auto; row-gap: 1px; }
+  .life .note { grid-column: 1 / -1; margin: 0 0 8px; }
+  .life .note:empty { margin: 0; }
+}
+
 .facts { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 6px 14px; margin: 0 0 12px; }
 .facts dt { color: var(--text-muted); font-size: 12.5px; }
 .facts dd { margin: 0; overflow-wrap: anywhere; }
@@ -718,7 +732,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     var since = d.inprogress.filter(function (c) { return c.provider; }).map(function (c) { return (/since (\d\d:\d\d)/.exec(c.activity) || [])[1]; }).filter(Boolean).sort()[0];
     var working = d.inprogress.length ? '<ul>' + d.inprogress.map(function (c) {
       return '<li><button type="button" class="sp-link" data-open="' + c.issue + '"><span class="ref-plain">#' + c.issue + '</span> ' + esc(c.title) +
-        ' · <span class="s-' + hueOf(c.status) + '">' + esc(c.stage || c.status) + '</span> · <span class="mono">' + esc(c.elapsed) + '</span></button></li>'; }).join('') + '</ul>' : none;
+        ' · <span class="s-' + hueOf(c.status) + '">' + esc(c.stage || c.status) + '</span> · <span class="mono">' + esc(elapsedOf(c)) + '</span></button></li>'; }).join('') + '</ul>' : none;
     var needs = d.needs.length ? '<ul>' + d.needs.map(function (n) {
       return '<li><button type="button" class="sp-link" data-goto="' + n.issue + '">' + (n.kind === 'merge' ? 'Merge PR #' + n.pr : '<span class="ref-plain">#' + n.issue + '</span> ' + esc(n.title)) + '</button></li>'; }).join('') + '</ul>' : none;
     var spend = gaugeRow('today', d.spendToday, d.dayCap, ' day cap') + gaugeRow('this month', d.spend, d.cap, '') +
@@ -829,9 +843,40 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
 
   /* board: a card face */
   function confirmOr(key, html) { return st.done[key] ? '<p class="confirm" role="status">' + esc(st.done[key]) + '</p>' : html; }
+  /* the card's life: one run per stage it went through, the card's time derived from them */
+  var NOW = '15:32', RUN_HUE = { queued: 'idle', building: 'running', planning: 'running', verifying: 'review', 'waiting on you': 'waiting' };
+  function mins(m) { return m >= 60 ? Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + m % 60 + ' min' : '') : m + ' min'; }
+  function hhmm(m) { m = ((m % 1440) + 1440) % 1440; return (m < 600 ? '0' : '') + Math.floor(m / 60) + ':' + (m % 60 < 10 ? '0' : '') + m % 60; }
+  function toMin(t) { var p = t.split(':'); return +p[0] * 60 + +p[1]; }
+  function sumRuns(c, f) { return c.runs.reduce(function (a, r) { return a + (f(r) ? r.m : 0); }, 0); }
+  function elapsedOf(c) {
+    if (!c.runs) return c.elapsed || '';
+    if (/^(done|failed|closed)$/.test(c.status)) return mins(sumRuns(c, function () { return true; })) + ' in all';
+    var k = c.stage || c.status, i = c.runs.length - 1;
+    while (i > 0 && c.runs[i].k !== k) i--;
+    return mins(c.runs.slice(i).reduce(function (a, r) { return a + r.m; }, 0));
+  }
+  function timeLine(c) {
+    var factory = sumRuns(c, function (r) { return RUN_HUE[r.k] === 'running' || RUN_HUE[r.k] === 'review'; }),
+        waiting = sumRuns(c, function (r) { return RUN_HUE[r.k] !== 'running' && RUN_HUE[r.k] !== 'review'; }),
+        n = c.runs.filter(function (r) { return RUN_HUE[r.k] === 'running'; }).length, parts = [];
+    if (n) parts.push(mins(factory) + ' factory in ' + n + ' attempt' + (n > 1 ? 's' : ''));
+    if (waiting) parts.push(mins(waiting) + ' waiting');
+    if (c.spent) parts.push(eur(c.spent));
+    return parts.join(' · ');
+  }
+  function timeTable(c) {
+    if (!c.runs) return '';
+    var t = toMin(c.at || NOW) - sumRuns(c, function () { return true; });
+    return '<div class="life">' + c.runs.map(function (r) {
+      var row = '<span class="mono">' + hhmm(t) + '</span><span class="k s-' + RUN_HUE[r.k] + '">' + esc(r.k) + '</span><span class="mono num">' + mins(r.m) + '</span>' +
+        '<span class="mono num">' + (r.eur != null ? eur(r.eur) : '') + '</span><span class="note">' + refs(r.note || '') + '</span>';
+      t += r.m; return row;
+    }).join('') + '</div>';
+  }
   function stateRow(c, col) {
     var hue = hueOf(c.status), r = '<span class="st s-' + hue + '"><i class="dot" aria-hidden="true"></i>' + esc(c.stage || c.status) + '</span>';
-    if (c.elapsed) r += '<span>' + esc(c.elapsed) + '</span>';
+    if (elapsedOf(c)) r += '<span>' + esc(elapsedOf(c)) + '</span>';
     if (c.checks) r += '<span>' + esc(c.checks) + ' checks</span>';
     if (isNear(c)) r += '<span class="warn">' + eur(c.spent) + ' / ' + eur(c.budget) + ' ⚠ near its budget</span>';
     if (c.gate) r += '<span class="warn">' + esc(c.gate) + ' ' + esc(c.gateAge) + '</span>';
@@ -862,7 +907,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     var g = { done: '✓', failed: '✕', closed: '⊘' }[c.status] || '·', key = 'card-' + c.issue;
     return '<article class="drow d-' + esc(c.status).replace(/ /g, '-') + '" data-card="' + c.issue + '">' +
       '<button type="button" class="open" data-open="' + c.issue + '"' + (c.reason ? ' title="' + esc(c.reason) + '"' : '') + '><span class="clamp1"><span class="ref">#' + c.issue + '</span> <span class="ttl">' + esc(c.title) + '</span></span></button>' +
-      '<p class="dmeta"><span class="st"><span class="g" aria-hidden="true">' + g + '</span>' + esc(c.status) + '</span><span>' + esc(c.elapsed) + '</span>' +
+      '<p class="dmeta"><span class="st"><span class="g" aria-hidden="true">' + g + '</span>' + esc(c.status) + '</span><span>' + esc(elapsedOf(c)) + '</span>' +
       (c.status === 'failed' ? (st.done[key] ? '<span class="confirm">' + esc(st.done[key]) + '</span>' : '<button type="button" class="textlink" data-act="retry" data-key="' + key + '">Retry</button>') : '') +
       '</p></article>';
   }
@@ -994,7 +1039,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     var d = D(), full = d.drawer && d.drawer.card.issue === c.issue ? d.drawer : null, ov = full && full.overview;
     var hue = hueOf(c.status), near = isNear(c), tab = st.drawer.tab, n = c.need;
     var facts = '<span class="st s-' + hue + '"><i class="dot" aria-hidden="true"></i>' + esc(c.stage || c.status) + '</span>' +
-      (c.elapsed ? '<span class="sep"></span><span>' + esc(c.elapsed) + '</span>' : '') +
+      (elapsedOf(c) ? '<span class="sep"></span><span>' + esc(elapsedOf(c)) + '</span>' : '') +
       (c.checks ? '<span class="sep"></span><span>' + esc(c.checks) + ' checks</span>' : '') +
       (c.budget ? '<span class="sep"></span><span class="' + (near ? 'warn' : '') + '">' + eur(c.spent) + ' / ' + eur(c.budget) + (near ? ' ⚠ near its budget' : '') + '</span>' : '') +
       (c.track === 'plan' ? '<span class="chip track">plan</span>' : '') +
@@ -1007,7 +1052,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
       var pct = c.budget ? Math.round(c.spent / c.budget * 100) : 0;
       body += '<dl class="top-block">' +
         '<dt>Task</dt><dd>' + refs(ov ? ov.task : c.title) + '</dd>' +
-        '<dt>Status</dt><dd>' + esc(ov ? ov.status : (c.stage || c.status) + (c.elapsed ? ', ' + c.elapsed : '')) + '</dd>' +
+        '<dt>Status</dt><dd>' + esc(ov ? ov.status : (c.stage || c.status) + (elapsedOf(c) ? ', ' + elapsedOf(c) : '')) + '</dd>' +
         '<dt>Budget</dt><dd class="' + (near ? 'warn' : 'muted') + '"><span class="mono">' + esc(ov ? ov.budget : eur(c.spent) + ' of ' + eur(c.budget) + ', ' + pct + ' percent') + '</span>' + (near ? ' ⚠' : '') + '</dd>' +
         '<dt>Agent</dt><dd class="muted"><span class="mono">' + esc(ov ? ov.agent : (c.model || '—')) + '</span></dd></dl>';
       var open = '';
@@ -1025,7 +1070,8 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
         '<form class="edit" data-edit="accent"><div class="row"><span class="sel sm"><select aria-label="Accent colour (never a state\'s colour, never in an agent\'s brief)"><option value="">none</option>' +
         ACCENTS.map(function (a) { return '<option' + (a === c.accent ? ' selected' : '') + '>' + a + '</option>'; }).join('') + '</select></span><button type="submit" class="btn btn-xs">Set accent</button></div></form>';
       var links = '<div class="links"><a href="#">issue #' + c.issue + '</a>' + (c.pr ? '<a href="#">PR #' + c.pr + '</a>' : '') + '<a href="#">the full timeline</a>' + (c.task ? '<span class="ref-plain">' + esc(c.task) + '</span>' : '') + '</div>';
-      body += sec('objective', 'Objective', ov ? '<p>' + refs(ov.objective) + '</p><p class="prov">' + esc(ov.provenance) + '</p>' : '') +
+      body += sec('time', 'Time', timeTable(c), c.runs ? timeLine(c) : '', st.drawer.sec === 'time') +
+        sec('objective', 'Objective', ov ? '<p>' + refs(ov.objective) + '</p><p class="prov">' + esc(ov.provenance) + '</p>' : '') +
         sec('summary', "The agent's summary", ov ? '<p>' + refs(ov.summary) + '</p>' : '') +
         sec('plan', 'The plan', c.fromPlan ? '<p>from plan <span class="ref-plain">#' + c.fromPlan + '</span></p>' : '') +
         sec('reviews', 'Reviews and audit', n && n.kind === 'merge' ? mergeFacts(n) : '', n && n.kind === 'merge' ? 'PR #' + n.pr : '', st.drawer.sec === 'reviews') +
