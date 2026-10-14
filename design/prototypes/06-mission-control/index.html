@@ -133,7 +133,7 @@ a { color: var(--accent); }
 #pulse { cursor: pointer; }
 #pulse a, #pulse button { cursor: pointer; }
 #pulse:hover .pulse-row, #pulse:hover .strip { background: color-mix(in srgb, var(--text) 3%, transparent); }
-.bullets { margin: 0; padding: 0 16px 12px 46px; list-style: none; color: var(--text-muted); font-size: 13px; }
+.bullets { margin: 0; padding: 10px 16px 10px 46px; border-top: 1px solid var(--line); list-style: none; color: var(--text-muted); font-size: 13px; }
 .status:not(.prominent) .bullets { padding-left: 16px; }
 .bullets li { position: relative; padding: 2px 0; }
 .bullets li::before { content: ""; position: absolute; left: -14px; top: 11px; width: 6px; height: 1px; background: var(--text-faint); }
@@ -692,7 +692,6 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
         '<p class="pulse-text">' + (p.prominent ? '<span class="vh">Warning: </span>' : '') + refs(p.sentence) +
           '<span class="typing pulse-typing" hidden role="status" aria-label="recomputing"><i></i><i></i><i></i></span></p>' +
       '</div>' +
-      '<ul class="bullets" id="pulse-bullets"' + (st.statusOpen ? '' : ' hidden') + '>' + p.bullets.map(function (b) { return '<li>' + refs(b) + '</li>'; }).join('') + '</ul>' +
       '<div class="strip" role="group" aria-label="Status of the project">' +
         '<span class="cell state s-' + stateWord(d.state) + '"><i class="dot" aria-hidden="true"></i>' + esc(d.state) + '</span>' +
         '<span class="cell"><span><b class="n">' + d.workingCount + '</b> working</span></span>' +
@@ -704,7 +703,9 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
         (d.github ? '<span class="cell gh">GitHub: ' + esc(d.github) + '</span>' : '') +
         '<button type="button" class="cell xp" id="status-toggle" aria-expanded="' + st.statusOpen + '" aria-controls="status-panel" aria-label="The status in detail" title="The status in detail">' +
           '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>' +
-      '</div>' + statusPanelHTML();
+      '</div>' +
+      '<ul class="bullets" id="pulse-bullets"' + (st.statusOpen ? '' : ' hidden') + '>' + p.bullets.map(function (b) { return '<li>' + refs(b) + '</li>'; }).join('') + '</ul>' +
+      statusPanelHTML();
     $('.strip', el).classList.toggle('xp-open', st.statusOpen);
   }
   function gaugeRow(label, spent, cap, note) {
