@@ -175,12 +175,16 @@ a.cell.needs.on:hover { background: color-mix(in srgb, var(--need) 16%, transpar
 .log.scrolled { -webkit-mask: linear-gradient(transparent, #000 18px); mask: linear-gradient(transparent, #000 18px); }
 .log-inner { display: flex; flex-direction: column; gap: 16px; max-width: calc(72ch + 100px); }
 .start { flex: none; margin: 0; padding: 0 14px; overflow: hidden; border-bottom: 1px solid var(--line); color: var(--text-faint); font-size: 12px; line-height: 28px; white-space: nowrap; text-overflow: ellipsis; }
-.msg { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 0 10px; font-size: 14.5px; line-height: 1.55; }
-.msg .g { font: 11.5px/22.5px var(--font-mono); color: var(--text-faint); white-space: nowrap; }
-.msg .g .who { color: var(--text-muted); margin-left: 6px; }
-.msg.you .g .who { color: var(--accent); }
+.msg { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 0 10px; font-size: 14.5px; line-height: 1.55; }
+/* a small avatar marks who speaks; the name and the time sit above the text, so the text keeps the width */
+.av { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; margin-top: 1px; border-radius: 50%; border: 1px solid var(--accent); color: var(--accent); font: 600 11px/1 var(--font-mono); flex: none; }
+.av::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.you .av { background: var(--accent); color: var(--bg); }
+.you .av::before, .me .av::before { content: none; }
+.meta { display: flex; gap: 8px; align-items: baseline; margin: 0 0 3px; color: var(--text-faint); font: 11.5px/1.4 var(--font-mono); }
+.meta .who { color: var(--text-muted); }
+.you .meta .who, .me .meta .who { color: var(--accent); }
 .msg .txt { overflow-wrap: anywhere; }
-.msg.you .txt::before { content: "› "; color: var(--accent); font-family: var(--font-mono); }
 .cursor { display: inline-block; width: .55em; height: 1.05em; margin-left: 2px; vertical-align: -2px; background: var(--accent); animation: blink 1s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 .tool { margin-top: 8px; border: 1px solid var(--line); background: var(--bg-panel); font: 12px/1.5 var(--font-mono); color: var(--text-muted); }
@@ -425,10 +429,9 @@ table.t td.num { text-align: right; }
 .bar i { position: absolute; inset: 0 auto 0 0; background: var(--accent); }
 .add { color: var(--st-done); } .del { color: var(--st-failed); }
 .sess { margin: 0 0 12px; color: var(--text-muted); font: 12px var(--font-mono); }
-.dmsg { display: grid; grid-template-columns: 124px minmax(0, 1fr); gap: 0 10px; margin-bottom: 12px; font-size: 13.5px; line-height: 1.55; }
-.dmsg .g { color: var(--text-faint); font: 11.5px/21px var(--font-mono); white-space: nowrap; }
-.dmsg .g .who { margin-left: 6px; color: var(--text-muted); }
-.dmsg.me .g .who { color: var(--accent); }
+.dmsg { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 0 10px; margin-bottom: 12px; font-size: 13.5px; line-height: 1.55; }
+.dmsg .av { width: 20px; height: 20px; }
+.me .av { background: var(--accent); color: var(--bg); }
 .steer { margin-top: 16px; }
 .none { margin: 0; color: var(--text-faint); font: 12.5px var(--font-mono); }
 
@@ -509,8 +512,6 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   .log { padding: 12px 12px 12px; }
   .log-inner { gap: 14px; }
   .start { padding: 0 12px; }
-  .msg { grid-template-columns: 1fr; }
-  .msg .g { line-height: 1.6; }
   .chat-head { height: auto; min-height: 42px; flex-wrap: wrap; padding: 8px 12px; }
   .composer { padding: 10px 12px 12px; }
   .board { gap: 10px; }
@@ -539,7 +540,6 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   .dr-body { padding: 14px 14px 28px; }
   .facts { grid-template-columns: 1fr; gap: 2px; }
   .facts dd { margin-bottom: 8px; }
-  .dmsg { grid-template-columns: 1fr; }
   .ticker { margin-top: 4px; }
 }
 
@@ -702,12 +702,12 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
         b += '<p class="applied" role="status"><span class="' + m.pstate + '">' + (m.pstate === 'undone' ? '↶ undone' : 'skipped') + '</span><span>' + list + '</span></p>';
       }
     }
-    return '<div class="msg ' + who + '"><span class="g"><time>' + esc(m.at) + '</time><span class="who">' + who + '</span></span><div class="b">' + b + '</div></div>';
+    return '<div class="msg ' + who + '"><span class="av" aria-hidden="true">' + (who === 'you' ? 'S' : '') + '</span><div class="b"><p class="meta"><span class="who">' + (who === 'you' ? 'sebastian' : 'project agent') + '</span><time>' + esc(m.at) + '</time></p>' + b + '</div></div>';
   }
   function renderLog() {
     var log = $('#chat-log'); if (!log) return;
     var h = st.chat.map(msgHTML).join('');
-    if (st.typing) h += '<div class="msg agent"><span class="g"><time>' + now() + '</time><span class="who">agent</span></span><div class="b"><span class="typing" role="status" aria-label="the project agent is typing"><i></i><i></i><i></i></span></div></div>';
+    if (st.typing) h += '<div class="msg agent"><span class="av" aria-hidden="true"></span><div class="b"><p class="meta"><span class="who">project agent</span><time>' + now() + '</time></p><span class="typing" role="status" aria-label="the project agent is typing"><i></i><i></i><i></i></span></div></div>';
     $('.log-inner', log).innerHTML = h;
     log.scrollTop = log.scrollHeight;
     log.classList.toggle('scrolled', log.scrollTop > 0);
@@ -998,7 +998,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
       body += s ? '<p class="sess">Session ' + s.n + ' · ' + esc(s.model) + ' · ' + esc(s.outcome) + '</p>' : '<p class="none">no session yet</p>';
       body += (s ? s.said : []).concat(mine).map(function (m) {
         var me = m.who !== 'agent';
-        return '<div class="dmsg' + (me ? ' me' : '') + '"><span class="g"><time>' + esc(m.at) + '</time><span class="who">' + esc(m.who) + '</span></span><div>' + refs(m.text) + '</div></div>';
+        return '<div class="dmsg' + (me ? ' me' : '') + '"><span class="av" aria-hidden="true">' + (me ? esc(m.who.charAt(0).toUpperCase()) : '') + '</span><div><p class="meta"><span class="who">' + esc(m.who) + '</span><time>' + esc(m.at) + '</time></p>' + refs(m.text) + '</div></div>';
       }).join('');
       if (c.status === 'running') body += '<form class="steer" id="steer-form"><div class="prompt"><span class="ps" aria-hidden="true">&gt;</span><label class="vh" for="steer-input">Message the running session</label>' +
         '<textarea id="steer-input" rows="2" placeholder="Message the running session; it reads it at its next step"></textarea><button type="submit" class="btn btn-primary">Send</button></div></form>';

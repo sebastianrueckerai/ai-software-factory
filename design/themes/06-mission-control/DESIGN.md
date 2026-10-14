@@ -100,3 +100,5 @@ Under 900 px one column, no tabs: the top bar (home, project, theme, Menu with t
 Hover: 120 ms colour and border changes, never movement. Focus: a 2 px cyan outline, 2 px offset, on everything. The typing indicator: three dots stepping. The drawer slides 16 px in while fading. The ticker is quiet: 12 px mono in the faint colour, no state colours but the failed tag; it scrolls at about 28 px a second and stops on hover or focus. Under `prefers-reduced-motion` nothing moves: the ticker is a still line, the dots stand, the drawer appears, replies arrive whole.
 
 Live dots (Sebastian, 2026-10-14): the state dot of a running card breathes every 2.2 s with a soft expanding ring in its own colour; an in-review card's dot does the same every 3.6 s. Under reduced motion both stand still.
+
+Chat turns (Sebastian, 2026-10-14): a 22 px avatar at the left (the agent a cyan ring with a dot, the member a filled circle with the initial), the name and the time on one small line above the text, the text taking the full width. No gutter column. The drawer's session log uses the same turn.
