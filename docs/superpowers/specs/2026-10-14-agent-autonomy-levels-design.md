@@ -121,7 +121,7 @@ The escalation is the reach-out, and it is one mechanism, not a new alert. The
 agent files it on its own chat task, so the record stays out of the product
 repository: the project chat shows the message with its choices beside a text
 box, the Needs you column shows the card, and the pulse counts it. Sebastian
-answers in the thread, and the thread continues in the one transcript. That
+answers in the thread, and the thread continues in the one transcript. (Multi-chat, 2026-10-14: with several threads per member the escalation lands in the member's inbox thread and continues there; the card, the choices and the pulse are unchanged, [the plan](../../plans/2026-10-14-multi-chat.md).) That
 covers both asks: new tasks and help in refining existing ones. A wish he
 names in a reply goes where the ready check sends it: a ready statement
 becomes a labelled card at once, a fuzzy one becomes a plain issue on the
