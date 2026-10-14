@@ -11,7 +11,7 @@ const url = (v, q) => 'file://' + path.join(__dirname, v, 'index.html') + '?' + 
 const text = (p) => p.evaluate(() => document.body.innerText);
 const title = (p) => p.evaluate(() => document.title);
 const openTitle = (p) => p.evaluate(() => document.querySelector('.thead .ttl').textContent.trim());
-const CONTRAST_EL = '.trow .ttitle, .trow .tat, .tarch-l, .tarch summary, .trow.arch .ttitle, .restore, .badge, .thint, .decider, .esc-l, .answer-l, .answer-or, .cmd, .palette button span, .palette button b, .lampset button, .lvlseg button, .lvl select, .tline, .msg.sum .txt, .archived-note, .msg.poke .who, .thead .ttl, .thr span, .cell.lamps .lbl, .tacts .btn, .tmenu button, .overlay-box p, .overlay-box h2, .btn-choice, .btn-danger';
+const CONTRAST_EL = '.trow .ttitle, .trow .tat, .tarch-l, .tarch summary, .trow.arch .ttitle, .restore, .badge, .thint, .decider, .esc-l, .answer-l, .answer-or, .cmd, .palette button span, .palette button b, #level-btn, .lvlpop b, .lvlpop .lw, .lvlpop .lp-head span, .lvl-confirm p, .tline, .msg.sum .txt, .archived-note, .msg.poke .who, .thead .ttl, .thr span, .cell.lamps .lbl, .tacts .btn, .tmenu button, .overlay-box p, .overlay-box h2, .btn-choice, .btn-danger';
 
 (async () => {
   const browser = await chromium.launch();
@@ -26,7 +26,7 @@ const CONTRAST_EL = '.trow .ttitle, .trow .tat, .tarch-l, .tarch summary, .trow.
     const m = p.locator('.tmenu-btn'); if (await m.count()) { await m.click(); await p.waitForTimeout(150); }
     await p.locator('[data-tmenu="' + what + '"]').click(); await p.waitForTimeout(250);
   };
-  const setLevel = async (p, l) => { const b = p.locator('[data-lvl="' + l + '"]'); if (await b.count()) await b.click(); else await p.locator('#level').selectOption(l); await p.waitForTimeout(250); };
+  const setLevel = async (p, l) => { await p.locator('#level-btn').click(); await p.waitForTimeout(150); await p.locator('.lvlpop [data-lvl="' + l + '"]').click(); await p.waitForTimeout(250); };
   process.on('unhandledRejection', (e) => { console.log(fails.join('\n')); console.log('CRASH', e.message.split('\n').slice(0, 4).join(' / ')); process.exit(1); });
   for (const v of V) {
     console.log('checking', v);
@@ -34,7 +34,12 @@ const CONTRAST_EL = '.trow .ttitle, .trow .tat, .tarch-l, .tarch summary, .trow.
     const s = await open(v, 'scenario=busy&theme=dark'); const p = s.p;
     if (s.errors.length) fails.push(v + ': JS error ' + s.errors[0]);
     const fold = p.locator('.tarch summary'); if (await fold.count()) { await fold.click(); await p.waitForTimeout(100); }
+    await p.locator('#level-btn').click(); await p.waitForTimeout(100);
+    if ((await p.locator('.lvlpop [data-lvl]').count()) !== 4) fails.push(v + ': the level control does not list the four levels');
+    if ((await p.locator('.lvlpop .lw').count()) !== 4) fails.push(v + ': the levels lack their words');
     const t0 = await text(p);
+    await p.keyboard.press('Escape'); await p.waitForTimeout(100);
+    if (await p.locator('.lvlpop').isVisible()) fails.push(v + ': Escape does not close the level menu');
     for (const w of ['Needs you', 'Queued', 'In progress', 'Done', 'Merge PR #612', 'Inbox', 'Plan: the members page', 'Session store: Postgres', 'Costs read: the date window', 'Export in pull request mode', 'restore', '/compact', '/new', 'New', 'manual', 'assisted', 'autonomous', 'full auto'])
       if (!t0.includes(w)) fails.push(v + ': missing "' + w + '"');
     if (await p.locator('#ticker').count()) fails.push(v + ': the ticker is still there (C12)');
@@ -93,7 +98,7 @@ const CONTRAST_EL = '.trow .ttitle, .trow .tat, .tarch-l, .tarch summary, .trow.
     const ld = await p.locator('#dialog').textContent().catch(() => '');
     for (const w of ['autonomy to autonomous?', 'policy change', 'audit']) if (!ld.includes(w)) fails.push(v + ': the level confirm lacks "' + w + '"');
     await p.locator('[data-dlg="close"]').click(); await p.waitForTimeout(200);
-    const lvl = async () => p.evaluate(() => { var b = document.querySelector('[data-lvl][aria-pressed="true"]'); return b ? b.dataset.lvl : document.querySelector('#level').value; });
+    const lvl = async () => p.evaluate(() => document.querySelector('#level-btn').dataset.level);
     if ((await lvl()) !== 'manual') fails.push(v + ': Keep does not keep the level (' + (await lvl()) + ')');
     await setLevel(p, 'autonomous'); await p.locator('[data-dlg="level"]').click(); await p.waitForTimeout(250);
     if ((await lvl()) !== 'autonomous') fails.push(v + ': Set does not set the level (' + (await lvl()) + ')');
@@ -135,7 +140,7 @@ const CONTRAST_EL = '.trow .ttitle, .trow .tat, .tarch-l, .tarch summary, .trow.
     for (const sc of ['busy', 'escalation']) {
       const ph = await open(v, 'scenario=' + sc + '&theme=dark', 390, 844);
       const sw = await ph.p.evaluate(() => document.documentElement.scrollWidth); if (sw > 390) fails.push(v + ': horizontal scroll at 390 in ' + sc + ' (' + sw + ')');
-      const small = await ph.p.evaluate(() => Array.from(document.querySelectorAll('.trow, .btn-choice, .tmenu-btn, .tacts .btn, .cmd, .restore, .lampset button, .lvlseg button, #level, .open-arch')).filter((b) => b.offsetParent).map((b) => [b.className || b.id, b.getBoundingClientRect().height]).filter((x) => x[1] < 44));
+      const small = await ph.p.evaluate(() => Array.from(document.querySelectorAll('.trow, .btn-choice, .tmenu-btn, .tacts .btn, .cmd, .restore, #level-btn, .lvlpop [data-lvl], .open-arch')).filter((b) => b.offsetParent).map((b) => [b.className || b.id, b.getBoundingClientRect().height]).filter((x) => x[1] < 44));
       if (small.length) fails.push(v + ': phone targets under 44 px in ' + sc + ': ' + small.map((x) => x[0] + ' ' + Math.round(x[1])).join(', '));
       await ph.p.close();
     }
@@ -144,7 +149,7 @@ const CONTRAST_EL = '.trow .ttitle, .trow .tat, .tarch-l, .tarch summary, .trow.
       const c = await open(v, 'scenario=' + sc + '&theme=' + theme); const cp = c.p;
       if (action === 'delete') await act(cp, 'delete');
       if (action === 'palette') { await cp.locator('#chat-input').click(); await cp.keyboard.type('/'); await cp.waitForTimeout(100); }
-      if (action === 'level') await setLevel(cp, 'full auto');
+      if (action === 'level') { await cp.locator('#level-btn').click(); await cp.waitForTimeout(100); }
       const low = await cp.evaluate((sel) => {
         const cv = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
         const rgb = (s) => { cv.clearRect(0, 0, 1, 1); cv.fillStyle = s; cv.fillRect(0, 0, 1, 1); const d = cv.getImageData(0, 0, 1, 1).data; return [d[0], d[1], d[2], d[3] / 255]; };

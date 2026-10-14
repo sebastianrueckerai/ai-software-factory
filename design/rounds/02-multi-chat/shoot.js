@@ -13,7 +13,10 @@ const common = [
   ['escalation-light-1440', 'scenario=escalation&theme=light', 1440, 900],
   ['busy-dark-1440-delete', 'scenario=busy&theme=dark', 1440, 900, false, 'delete'],
   ['busy-dark-1440-palette', 'scenario=busy&theme=dark', 1440, 900, false, 'palette'],
+  ['busy-dark-1440-levels', 'scenario=busy&theme=dark', 1440, 900, false, 'levels'],
+  ['busy-light-1440-levels', 'scenario=busy&theme=light', 1440, 900, false, 'levels'],
   ['busy-dark-1440-level', 'scenario=busy&theme=dark', 1440, 900, false, 'level'],
+  ['phone-busy-dark-390-levels', 'scenario=busy&theme=dark', 390, 844, false, 'levels'],
   ['phone-escalation-dark-390', 'scenario=escalation&theme=dark', 390, 844, true],
   ['phone-threads-light-390', 'scenario=threads&theme=light', 390, 844, true],
 ];
@@ -37,7 +40,8 @@ const shots = {
       if (action === 'menu' || action === 'delete') { const m = p.locator('.tmenu-btn'); if (await m.count()) { await m.click(); await p.waitForTimeout(200); } }
       if (action === 'delete') { await p.locator('[data-tmenu="delete"]').click(); await p.waitForTimeout(300); }
       if (action === 'palette') { await p.locator('#chat-input').click(); await p.keyboard.type('/'); await p.waitForTimeout(300); }
-      if (action === 'level') { const b = p.locator('[data-lvl="autonomous"]'); if (await b.count()) await b.click(); else await p.locator('#level').selectOption('autonomous'); await p.waitForTimeout(300); }
+      if (action === 'levels' || action === 'level') { await p.locator('#level-btn').click(); await p.waitForTimeout(200); }
+      if (action === 'level') { await p.locator('.lvlpop [data-lvl="autonomous"]').click(); await p.waitForTimeout(300); }
       await p.screenshot({ path: path.join(out, name + '.png'), fullPage: !!full });
       if (errors.length) console.log(v, name, 'JS errors:', errors.join(' | '));
       await p.close();

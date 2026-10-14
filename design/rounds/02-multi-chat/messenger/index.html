@@ -318,12 +318,24 @@ a.cell.needs.on:hover { background: color-mix(in srgb, var(--need) 16%, transpar
 .palette button b { color: var(--accent); font: 600 12.5px var(--font-mono); }
 .palette button[aria-selected="true"], .palette button:hover { background: var(--bg-hover); color: var(--text); }
 .archived-note { margin: 0; padding: 12px 14px; border-top: 1px solid var(--line); color: var(--text-muted); font-size: 12.5px; }
-.lvl select { font-family: var(--font-mono); }
-.lvlseg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 3px; overflow: hidden; }
-.lvlseg button { height: 22px; padding: 0 8px; border: 0; background: none; color: var(--text-muted); font: 11px/1 var(--font-mono); cursor: pointer; }
-.lvlseg button + button { border-left: 1px solid var(--line-strong); }
-.lvlseg button:hover { color: var(--text); background: var(--bg-hover); }
-.lvlseg button[aria-pressed="true"] { color: var(--accent-ink); background: var(--accent); }
+.lvlctl { position: relative; margin-left: auto; }
+#level-btn { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border: 1px solid var(--line-strong); border-radius: 3px; background: none; color: var(--text-muted); font: 11.5px var(--font-mono); cursor: pointer; }
+#level-btn i { width: 8px; height: 8px; border-radius: 1px; background: var(--accent); box-shadow: 0 0 5px color-mix(in srgb, var(--accent) 70%, transparent); }
+#level-btn:hover, #level-btn[aria-expanded="true"] { color: var(--text); border-color: var(--text-faint); }
+.lvlpop { position: absolute; right: 0; bottom: calc(100% + 6px); z-index: 20; width: 330px; padding: 6px; background: var(--bg-raised); border: 1px solid var(--line-strong); box-shadow: 0 12px 32px rgba(0, 0, 0, .4); }
+.lvlpop .lp-head { display: flex; justify-content: space-between; margin: 0; padding: 4px 8px 6px; color: var(--text-faint); font: 11px var(--font-mono); font-variant-caps: all-small-caps; letter-spacing: .06em; }
+.lvlpop [data-lvl] { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 1px 8px; width: 100%; padding: 7px 8px; border: 0; border-radius: 2px; background: none; color: var(--text); font-family: var(--font-ui); text-align: left; cursor: pointer; }
+.lvlpop [data-lvl] i { grid-row: 1 / 3; margin-top: 5px; width: 9px; height: 9px; border: 1px solid var(--line-strong); border-radius: 1px; }
+.lvlpop [data-lvl][aria-checked="true"] i { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 5px color-mix(in srgb, var(--accent) 70%, transparent); }
+.lvlpop [data-lvl] b { font-size: 12.5px; font-weight: 600; }
+.lvlpop [data-lvl] .ck { color: var(--accent); font: 12px var(--font-mono); }
+.lvlpop [data-lvl] .lw { grid-column: 2 / 4; color: var(--text-muted); font-size: 11.5px; line-height: 1.4; }
+.lvlpop [data-lvl]:hover, .lvlpop [data-lvl]:focus-visible { background: var(--bg-hover); }
+.lvlpop [data-lvl][aria-checked="true"] { background: color-mix(in srgb, var(--accent) 9%, transparent); }
+.lvl-confirm { padding: 6px 8px 4px; }
+.lvl-confirm h2 { margin: 0 0 6px; font-size: 13px; font-weight: 600; }
+.lvl-confirm p { margin: 0 0 10px; color: var(--text-muted); font-size: 12px; line-height: 1.45; }
+.archived-note { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
 .overlay-box p { margin: 0 0 14px; color: var(--text-muted); font-size: 13px; line-height: 1.5; }
 @media (max-width: 899px) {
   .trow { min-height: 44px; font-size: 14px; }
@@ -331,7 +343,9 @@ a.cell.needs.on:hover { background: color-mix(in srgb, var(--need) 16%, transpar
   .answer .btn, .msg .choices .btn { width: 100%; height: 44px; }
   .msg .choices { flex-direction: column; align-items: stretch; }
   .palette button { height: 44px; }
-  .lvlseg button { height: 44px; }
+  #level-btn { height: 44px; padding: 0 12px; }
+  .lvlpop { width: min(330px, calc(100vw - 48px)); }
+  .lvlpop [data-lvl] { min-height: 44px; }
   .cmd, .restore, .open-arch { min-height: 44px; }
   .cmds { gap: 8px; }
 }
@@ -356,16 +370,10 @@ a.cell.needs.on:hover { background: color-mix(in srgb, var(--need) 16%, transpar
 .mlist .tarch > summary::before { content: "▸"; font: 10px var(--font-mono); }
 .mlist .tarch[open] > summary::before { content: "▾"; }
 .chat-main { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
-#top .lvl { order: 2; margin-left: 10px; }
-.chat-head .lvl { display: none; }
-#top .lvl::before { content: "level"; margin-right: 6px; color: var(--text-faint); font: 11px var(--font-mono); }
 @media (max-width: 899px) {
   .chat { display: flex; }
   .mlist { border-right: 0; border-bottom: 1px solid var(--line); overflow: visible; }
   .mlist .tarch { margin-top: 0; }
-  #top .lvl { display: none; }
-  .chat-head .lvl { display: inline-flex; }
-  .chat-head .lvl select { height: 44px; }
 }
 
 /* Needs you: the first column, lit amber */
@@ -757,7 +765,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
 
   var MC = window.MULTICHAT, MOMENTS = ['busy', 'threads', 'poke', 'assisted', 'escalation'];
   var st = { sc: MOMENTS.indexOf(params.get('scenario')) >= 0 ? params.get('scenario') : 'busy', wide: false, accent: '', pulseOpen: false, statusOpen: false,
-    mc: null, queue: [], typing: false, drawer: null, done: {}, steer: {}, cols: {}, idx: null, palette: -1, dialog: null, menu: false };
+    mc: null, queue: [], typing: false, drawer: null, done: {}, steer: {}, cols: {}, idx: null, palette: -1, dialog: null, menu: false, lvlOpen: false };
   var D = function () { return S.busy; };
   var drawerEl = $('#drawer'), keysEl = $('#keys');
   var lastFocus = null, keysFocus = null;
@@ -846,7 +854,6 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     $('#status-toggle').setAttribute('aria-expanded', String(st.statusOpen));
     $('.strip').classList.toggle('xp-open', st.statusOpen);
   }
-  var renderPulse0 = renderPulse; renderPulse = function () { renderPulse0(); if (typeof afterPulse === 'function') afterPulse(); };
   function pulseRecompute() {
     var t = $('.pulse-typing'); if (!t) return;
     t.hidden = false; setTimeout(function () { t.hidden = true; }, 1400);
@@ -887,14 +894,20 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     return '<div class="tarch"><span class="tarch-l">archived</span>' + a.map(function (t) {
       return '<span class="trow arch' + (t.id === st.mc.open ? ' on' : '') + '"><button type="button" class="ttitle open-arch" data-thread="' + t.id + '">' + esc(t.title) + '</button><button type="button" class="linkbtn restore" data-restore="' + t.id + '">restore</button></span>'; }).join('') + '</div>';
   }
-  function levelSelectHTML(cls, id) {
-    return '<span class="sel sm lvl ' + (cls || '') + '"><select id="' + (id || 'level') + '" aria-label="The project\'s autonomy level">' + MC.levels.map(function (l) {
-      return '<option value="' + esc(l) + '"' + (l === st.mc.level ? ' selected' : '') + '>' + esc(l) + '</option>'; }).join('') + '</select></span>';
+  /* the level: a control under Send, in the composer's foot; it opens the four levels with their words; a change confirms in place */
+  function levelCtlHTML() {
+    var cur = st.mc.level;
+    return '<span class="lvlctl"><button type="button" id="level-btn" data-lvlbtn data-level="' + esc(cur) + '" aria-haspopup="menu" aria-expanded="' + st.lvlOpen + '" aria-label="The project\'s autonomy level: ' + esc(cur) + '"><i aria-hidden="true"></i>' + esc(cur) + '</button>' +
+      '<div class="lvlpop" role="menu" aria-label="Autonomy"' + (st.lvlOpen ? '' : ' hidden') + '>' + (st.dialog && st.dialog.kind === 'level' ? dialogHTML() : levelMenuHTML()) + '</div></span>';
   }
-  function levelSegHTML() {
-    return '<span class="lvlseg" role="group" aria-label="The project\'s autonomy level">' + MC.levels.map(function (l) {
-      return '<button type="button" data-lvl="' + esc(l) + '" aria-pressed="' + (l === st.mc.level) + '">' + esc(l) + '</button>'; }).join('') + '</span>';
+  function levelMenuHTML() {
+    return '<p class="lp-head"><span>autonomy</span><span>a change confirms</span></p>' + MC.levels.map(function (l) {
+      var on = l === st.mc.level;
+      return '<button type="button" role="menuitemradio" aria-checked="' + on + '" data-lvl="' + esc(l) + '"><i aria-hidden="true"></i><b>' + esc(l) + '</b><span class="ck" aria-hidden="true">' + (on ? '✓' : '') + '</span><span class="lw">' + esc(MC.levelWords[l]) + '</span></button>'; }).join('');
   }
+  function renderLevel() { var c = $('.lvlctl'); if (c) c.outerHTML = levelCtlHTML(); }
+  function toggleLevel() { st.lvlOpen = !st.lvlOpen; st.dialog = null; renderLevel(); var f = st.lvlOpen ? $('.lvlpop [aria-checked="true"]') : $('#level-btn'); if (f) f.focus(); }
+  function closeLevel() { st.lvlOpen = false; st.dialog = null; renderLevel(); var b = $('#level-btn'); if (b) b.focus(); }
   function msgHTML(m, i) {
     var who = m.who === 'you' ? 'you' : 'agent';
     var b = '<div class="txt">' + refs(m.text) + (m.streaming ? '<span class="cursor" aria-hidden="true"></span>' : '') + '</div>';
@@ -957,12 +970,12 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   }
   function composerHTML() {
     var t = open();
-    if (t.archived) return '<p class="archived-note">This thread is archived: read it, or <button type="button" class="linkbtn" data-restore="' + t.id + '">restore</button> it to write.</p>';
+    if (t.archived) return '<div class="archived-note"><span>This thread is archived: read it, or <button type="button" class="linkbtn" data-restore="' + t.id + '">restore</button> it to write.</span>' + levelCtlHTML() + '</div>';
     return escalationRowHTML() + '<form class="composer" id="chat-form"><div id="palette" class="palette" role="listbox" aria-label="Commands" hidden></div>' +
       '<div class="prompt"><span class="ps" aria-hidden="true">&gt;</span><label class="vh" for="chat-input">Your message to the project agent</label>' +
       '<textarea id="chat-input" rows="3" maxlength="8192" placeholder="' + (t.inbox ? 'Reply to the factory, or ask… (Enter sends)' : 'Ask or tell the project… (Enter sends, Shift+Enter breaks the line)') + '" aria-keyshortcuts="/"></textarea>' +
       '<button type="submit" class="btn btn-primary">Send</button></div>' +
-      '<p class="own"><span class="cmds"><button type="button" class="cmd" data-cmd="/compact" title="compact this thread: the older turns become a summary">/compact</button><button type="button" class="cmd" data-cmd="/new" title="a new thread">/new</button></span>This is your own thread with the project agent; other members have theirs.</p>' +
+      '<div class="own"><span class="cmds"><button type="button" class="cmd" data-cmd="/compact" title="compact this thread: the older turns become a summary">/compact</button><button type="button" class="cmd" data-cmd="/new" title="a new thread">/new</button></span>This is your own thread with the project agent; other members have theirs.' + levelCtlHTML() + '</div>' +
       '<ol class="queue" id="chat-queue" aria-label="Your messages waiting for the turn to end" hidden></ol></form>';
   }
   function dialogHTML() {
@@ -973,13 +986,18 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
       body = '<h2 id="dlg-title">Delete “' + esc(t.title) + '”?</h2><p>Its ' + t.messages.length + ' messages go for good: a hard delete, no archive. One event will name you, the thread and the count. What the chat did stays in the events, the audit and git, so no decision and no merged card goes with it.</p>' +
         '<div class="acts"><button type="button" class="btn btn-danger" data-dlg="delete">Delete the thread</button><button type="button" class="btn" data-dlg="close">Keep it</button></div>';
     } else {
-      body = '<h2 id="dlg-title">Set the project\'s autonomy to ' + esc(d.level) + '?</h2><p>This writes a policy change and lands in the audit like every decision. From then on: ' + esc(MC.levelWords[d.level]) + '.</p>' +
-        '<div class="acts"><button type="button" class="btn btn-need" data-dlg="level">Set ' + esc(d.level) + '</button><button type="button" class="btn" data-dlg="close">Keep ' + esc(st.mc.level) + '</button></div>';
+      return '<div id="dialog" class="lvl-confirm" role="dialog" aria-labelledby="dlg-title"><h2 id="dlg-title">Set the project\'s autonomy to ' + esc(d.level) + '?</h2><p>This writes a policy change and lands in the audit like every decision. From then on: ' + esc(MC.levelWords[d.level]) + '.</p>' +
+        '<div class="acts"><button type="button" class="btn btn-need" data-dlg="level">Set ' + esc(d.level) + '</button><button type="button" class="btn" data-dlg="close">Keep ' + esc(st.mc.level) + '</button></div></div>';
     }
     return '<div id="dialog" class="overlay" role="dialog" aria-modal="true" aria-labelledby="dlg-title"><div class="overlay-box">' + body + '</div></div>';
   }
-  function renderDialog() { var old = $('#dialog'); if (old) old.remove(); if (st.dialog) { document.body.insertAdjacentHTML('beforeend', dialogHTML()); $('#dialog .btn').focus(); } }
-  function closeDialog() { st.dialog = null; renderDialog(); var b = $('#level') || $('.tmenu-btn'); if (b) b.focus(); renderChat(); }
+  function renderDialog() {
+    var old = $('#dialog'); if (old) old.remove();
+    if (!st.dialog) return;
+    if (st.dialog.kind === 'level') { st.lvlOpen = true; renderLevel(); $('.lvlpop .btn').focus(); return; }
+    document.body.insertAdjacentHTML('beforeend', dialogHTML()); $('#dialog .btn').focus();
+  }
+  function closeDialog() { var k = st.dialog && st.dialog.kind; st.dialog = null; if (k === 'level') { closeLevel(); return; } renderDialog(); var b = $('.tmenu-btn'); if (b) b.focus(); renderChat(); }
   function dialogAct(a) {
     var d = st.dialog;
     if (a === 'close') { closeDialog(); return; }
@@ -993,10 +1011,10 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
       var from = st.mc.level; st.mc.level = d.level;
       byId('inbox').messages.push({ who: 'agent', at: now(), poke: true, text: 'Autonomy set to ' + d.level + ' by sebastian, from ' + from + '. Policy version 5; the audit has the change.' });
       if (st.mc.open !== 'inbox') { byId('inbox').unread = (byId('inbox').unread || 0) + 1; byId('inbox').at = now(); }
-      st.dialog = null; renderDialog(); renderChat(); renderPulse(); return;
+      st.dialog = null; st.lvlOpen = false; renderChat(); return;
     }
   }
-  function askLevel(level) { if (level === st.mc.level) return; st.dialog = { kind: 'level', level: level }; renderDialog(); }
+  function askLevel(level) { if (level === st.mc.level) { closeLevel(); return; } st.dialog = { kind: 'level', level: level }; renderDialog(); }
   function threadAct(a) {
     var t = open();
     if (a === 'toggle') { st.menu = !st.menu; renderChat(); if (st.menu) { var m = $('.tmenu [role="menuitem"]'); if (m) m.focus(); } return; }
@@ -1053,7 +1071,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   function renderChat() {
     var d = D();
     $('#chat').innerHTML = chatLayout({
-      head: '<div class="chat-head"><h2 id="chat-title">Chat</h2><span class="chat-who">project agent · ' + esc(d.project) + '</span><span class="grow"></span>' + levelSelectHTML('', 'level-phone') + '' +
+      head: '<div class="chat-head"><h2 id="chat-title">Chat</h2><span class="chat-who">project agent · ' + esc(d.project) + '</span><span class="grow"></span>' +
         '<button type="button" class="btn btn-xs" id="chat-new">New</button></div>',
       switcher: switcherHTML(),
       thread: threadHeadHTML(),
@@ -1078,10 +1096,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
         return '<span class="trow arch' + (t.id === st.mc.open ? ' on' : '') + '"><button type="button" class="ttitle open-arch" data-thread="' + t.id + '">' + esc(t.title) + '</button><button type="button" class="linkbtn restore" data-restore="' + t.id + '">restore</button></span>'; }).join('') + '</details>' : '') + '</nav>';
   }
   function chatLayout(p) { return p.head + p.switcher + '<div class="chat-main">' + p.thread + p.start + p.log + p.composer + '</div>'; }
-  function afterChat() {
-    var old = $('#top .lvl'); if (old) old.remove();
-    $('#top .proj').insertAdjacentHTML('afterend', levelSelectHTML());
-  }
+  function afterChat() {}
   function threadActionsHTML() {
     return '<button type="button" class="icon-btn tmenu-btn" data-tmenu="toggle" aria-haspopup="menu" aria-expanded="' + st.menu + '" aria-label="This thread">⋯</button>' +
       '<div class="tmenu" role="menu"' + (st.menu ? '' : ' hidden') + '><button type="button" role="menuitem" data-tmenu="archive">Archive</button><button type="button" role="menuitem" class="danger" data-tmenu="delete">Delete…</button></div>';
@@ -1381,7 +1396,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   function load(name) {
     st.sc = name; var d = D();
     st.idx = buildIndex();
-    st.mc = MC.threadsOf(name); st.queue = []; st.typing = false; st.done = {}; st.steer = {}; st.pulseOpen = false; st.palette = -1; st.dialog = null; st.menu = false;
+    st.mc = MC.threadsOf(name); st.queue = []; st.typing = false; st.done = {}; st.steer = {}; st.pulseOpen = false; st.palette = -1; st.dialog = null; st.menu = false; st.lvlOpen = false;
     closeDrawer(false);
     $('#project').innerHTML = '<option>' + esc(d.project) + '</option>';
     document.querySelectorAll('#scenario [data-sc]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.sc === name)); });
@@ -1407,6 +1422,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
       if (it) { it.scrollIntoView({ block: 'nearest', behavior: RM.matches ? 'auto' : 'smooth' }); $('.open-h', it).focus({ preventScroll: true }); }
       return;
     }
+    if (st.lvlOpen && !e.target.closest('.lvlctl')) { st.lvlOpen = false; st.dialog = null; renderLevel(); }
     if (t.dataset.chat) {
       var m = open().messages[+t.dataset.i];
       m.pstate = { do: 'applied', skip: 'skipped', undo: 'undone' }[t.dataset.chat];
@@ -1415,6 +1431,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     if (t.dataset.thread) { openThread(t.dataset.thread); return; }
     if (t.dataset.choice != null) { answer(+t.dataset.i, t.dataset.choice); return; }
     if (t.dataset.cmd) { runCommand(t.dataset.cmd); return; }
+    if (t.dataset.lvlbtn != null) { toggleLevel(); return; }
     if (t.dataset.lvl) { askLevel(t.dataset.lvl); return; }
     if (t.dataset.dlg) { dialogAct(t.dataset.dlg); return; }
     if (t.dataset.tmenu) { threadAct(t.dataset.tmenu); return; }
@@ -1451,7 +1468,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   });
   document.addEventListener('change', function (e) {
     var t = e.target;
-    if (t.id === 'level' || t.id === 'level-phone') { askLevel(t.value); }
+
   });
   document.addEventListener('input', function (e) {
     if (e.target.dataset.q != null) st.queue[+e.target.dataset.q] = e.target.value;
@@ -1462,6 +1479,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     if (e.key === 'Escape') {
       if (!keysEl.hidden) { closeKeys(); return; }
       if (st.dialog) { closeDialog(); return; }
+      if (st.lvlOpen) { closeLevel(); return; }
       if (st.palette >= 0) { st.palette = -1; renderPalette(); return; }
       if (st.menu) { st.menu = false; renderChat(); return; }
       if (!drawerEl.hidden) { closeDrawer(); return; }
@@ -1473,6 +1491,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
       var tabs = Array.from(drawerEl.querySelectorAll('[role="tab"]')), i = tabs.indexOf(t);
       tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length].click(); return;
     }
+    if (st.lvlOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) { e.preventDefault(); var ls = Array.prototype.slice.call(document.querySelectorAll('.lvlpop [data-lvl]')), li = ls.indexOf(document.activeElement); if (ls.length) ls[(li + (e.key === 'ArrowDown' ? 1 : ls.length - 1) + ls.length) % ls.length].focus(); return; }
     if (field) {
       if (t.id === 'chat-input' && st.palette >= 0 && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) { e.preventDefault(); st.palette = (st.palette + (e.key === 'ArrowDown' ? 1 : COMMANDS.length - 1)) % COMMANDS.length; renderPalette(); return; }
       if ((t.id === 'chat-input' || t.id === 'steer-input') && e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); t.form.requestSubmit(); }

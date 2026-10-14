@@ -73,6 +73,10 @@ Craft notes taken in the one fix loop: the thread head's title ends in an ellips
 
 Messenger's rows with instrument's lamps for the level, the thread's actions behind the ⋯. If one variant as built: messenger. The reasons are on [the round page](index.html).
 
+## The pick: C14
+
+Sebastian picked B, instrument ("smaller dots look nicer"), and set the level's place himself, after the three placements the images drew: a control under the Send button in the Claude Code pattern, which opens a menu of the four levels with a short explanation each, the current one checked. Built into the shared engine, so all three variants carry it and differ in the switcher alone; the segments, the lamps and the top-bar select are gone. Choosing a level turns the menu into the confirm in place. Two things the build taught: a popover with block elements cannot live inside a `<p>` (the parser closes the paragraph at the first `<div>`, and a re-render doubled the popover), so the composer's foot is a `<div>`; and the prototype's own `.confirm` class is the green "applied" style, so the level's confirm has its own class. Recorded as C14 in [design-decisions.md](../../design-decisions.md), with [ia.md](../../ia.md) and [the theme](../../themes/06-mission-control/DESIGN.md) updated.
+
 ## Cost
 
 | What | Count | Each $ | Total $ |

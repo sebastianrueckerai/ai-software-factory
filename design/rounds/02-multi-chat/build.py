@@ -48,7 +48,6 @@ def shell(t):
     t = sub(t, "  .tk-track { animation: none !important; }\n", "")
     t = rsub(t, r"  /\* the ticker: the done cards' times and titles \*/\n.*?\n  \}\n\n  /\* the drawer \*/", "  /* the drawer */")
     t = sub(t, "renderPulse(); renderChat(); renderBoard(); renderTicker();", "renderPulse(); renderChat(); renderBoard();")
-    t = sub(t, "  function pulseRecompute() {", "  var renderPulse0 = renderPulse; renderPulse = function () { renderPulse0(); if (typeof afterPulse === 'function') afterPulse(); };\n  function pulseRecompute() {")
     t = sub(t, "$('#top').classList.remove('menu-open'); renderBoard(); renderTicker(); });", "$('#top').classList.remove('menu-open'); renderBoard(); renderChat(); });")
     t = sub(t, "rt = setTimeout(function () { renderTicker(); markOverflow(); }, 200);", "rt = setTimeout(function () { markOverflow(); }, 200);")
     t = sub(t, '''    if (t.id === 'accent') { st.accent = t.value; renderBoard(); $('#accent').focus(); }
@@ -56,7 +55,7 @@ def shell(t):
       var o = st.old.splice(+t.value, 1)[0];
       if (st.chat.length) { var f = st.chat[0]; st.old.unshift({ label: f.at + ' ' + (f.text.length > 40 ? f.text.slice(0, 40) + '…' : f.text), chat: st.chat }); }
       st.chat = o.chat; renderChat();
-    }''', '''    if (t.id === 'level' || t.id === 'level-phone') { askLevel(t.value); }''')
+    }''', '''''')
     t = sub(t, '''    var acc = '<span class="sel sm"><select id="accent" aria-label="Accent"><option value="">every accent</option>' +
       ACCENTS.map(function (a) { return '<option' + (a === st.accent ? ' selected' : '') + '>' + a + '</option>'; }).join('') + '</select></span>';
     $('#board').innerHTML = '<div class="board-head"><h2 id="board-title">Board</h2>' + acc +''',
@@ -72,9 +71,9 @@ def shell(t):
     t = sub(t, '''<button type="button" data-sc="busy">busy</button><button type="button" data-sc="idle">idle</button><button type="button" data-sc="fire">fire</button><button type="button" data-sc="quiet">quiet</button>''',
            '''<button type="button" data-sc="busy">busy</button><button type="button" data-sc="threads">threads</button><button type="button" data-sc="poke">poke</button><button type="button" data-sc="assisted">assisted</button><button type="button" data-sc="escalation">escalation</button>''')
     t = sub(t, "var st = { sc: S[params.get('scenario')] ? params.get('scenario') : 'busy', wide: false, accent: '', pulseOpen: false, statusOpen: false,\n    chat: [], old: [], queue: [], typing: false, drawer: null, done: {}, steer: {}, cols: {}, idx: null };\n  var D = function () { return S[st.sc]; };",
-           "var MC = window.MULTICHAT, MOMENTS = ['busy', 'threads', 'poke', 'assisted', 'escalation'];\n  var st = { sc: MOMENTS.indexOf(params.get('scenario')) >= 0 ? params.get('scenario') : 'busy', wide: false, accent: '', pulseOpen: false, statusOpen: false,\n    mc: null, queue: [], typing: false, drawer: null, done: {}, steer: {}, cols: {}, idx: null, palette: -1, dialog: null, menu: false };\n  var D = function () { return S.busy; };")
+           "var MC = window.MULTICHAT, MOMENTS = ['busy', 'threads', 'poke', 'assisted', 'escalation'];\n  var st = { sc: MOMENTS.indexOf(params.get('scenario')) >= 0 ? params.get('scenario') : 'busy', wide: false, accent: '', pulseOpen: false, statusOpen: false,\n    mc: null, queue: [], typing: false, drawer: null, done: {}, steer: {}, cols: {}, idx: null, palette: -1, dialog: null, menu: false, lvlOpen: false };\n  var D = function () { return S.busy; };")
     t = sub(t, "    st.chat = JSON.parse(JSON.stringify(d.chat)); st.old = []; st.queue = []; st.typing = false; st.done = {}; st.steer = {}; st.pulseOpen = false;",
-           "    st.mc = MC.threadsOf(name); st.queue = []; st.typing = false; st.done = {}; st.steer = {}; st.pulseOpen = false; st.palette = -1; st.dialog = null; st.menu = false;")
+           "    st.mc = MC.threadsOf(name); st.queue = []; st.typing = false; st.done = {}; st.steer = {}; st.pulseOpen = false; st.palette = -1; st.dialog = null; st.menu = false; st.lvlOpen = false;")
     t = sub(t, "      case 'chat-new': newConversation(); break;", "      case 'chat-new': newThread(); break;")
     t = sub(t, "    if (f.id === 'chat-form') { var ta = $('#chat-input'); send(ta.value); ta.value = ''; return; }",
            "    if (f.id === 'chat-form') { var ta = $('#chat-input'); if (st.palette >= 0) { runCommand(COMMANDS[st.palette].name); return; } send(ta.value); ta.value = ''; return; }")
@@ -85,7 +84,8 @@ def shell(t):
       var m = st.chat[+t.dataset.i];
       m.pstate = { do: 'applied', skip: 'skipped', undo: 'undone' }[t.dataset.chat];
       renderLog(); if (t.dataset.chat !== 'skip') pulseRecompute(); return;
-    }''', '''    if (t.dataset.chat) {
+    }''', '''    if (st.lvlOpen && !e.target.closest('.lvlctl')) { st.lvlOpen = false; st.dialog = null; renderLevel(); }
+    if (t.dataset.chat) {
       var m = open().messages[+t.dataset.i];
       m.pstate = { do: 'applied', skip: 'skipped', undo: 'undone' }[t.dataset.chat];
       renderLog(); if (t.dataset.chat !== 'skip') pulseRecompute(); return;
@@ -93,6 +93,7 @@ def shell(t):
     if (t.dataset.thread) { openThread(t.dataset.thread); return; }
     if (t.dataset.choice != null) { answer(+t.dataset.i, t.dataset.choice); return; }
     if (t.dataset.cmd) { runCommand(t.dataset.cmd); return; }
+    if (t.dataset.lvlbtn != null) { toggleLevel(); return; }
     if (t.dataset.lvl) { askLevel(t.dataset.lvl); return; }
     if (t.dataset.dlg) { dialogAct(t.dataset.dlg); return; }
     if (t.dataset.tmenu) { threadAct(t.dataset.tmenu); return; }
@@ -102,9 +103,9 @@ def shell(t):
       <dt><kbd>Ctrl</kbd>+<kbd>k</kbd></dt><dd>the threads: open one, or the inbox</dd>
 ''')
     t = sub(t, "    if (e.key === 'Escape') {\n      if (!keysEl.hidden) { closeKeys(); return; }",
-           "    if (e.key === 'Escape') {\n      if (!keysEl.hidden) { closeKeys(); return; }\n      if (st.dialog) { closeDialog(); return; }\n      if (st.palette >= 0) { st.palette = -1; renderPalette(); return; }\n      if (st.menu) { st.menu = false; renderChat(); return; }")
+           "    if (e.key === 'Escape') {\n      if (!keysEl.hidden) { closeKeys(); return; }\n      if (st.dialog) { closeDialog(); return; }\n      if (st.lvlOpen) { closeLevel(); return; }\n      if (st.palette >= 0) { st.palette = -1; renderPalette(); return; }\n      if (st.menu) { st.menu = false; renderChat(); return; }")
     t = sub(t, "    if (field) {\n      if ((t.id === 'chat-input' || t.id === 'steer-input') && e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); t.form.requestSubmit(); }\n      return;\n    }",
-           "    if (field) {\n      if (t.id === 'chat-input' && st.palette >= 0 && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) { e.preventDefault(); st.palette = (st.palette + (e.key === 'ArrowDown' ? 1 : COMMANDS.length - 1)) % COMMANDS.length; renderPalette(); return; }\n      if ((t.id === 'chat-input' || t.id === 'steer-input') && e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); t.form.requestSubmit(); }\n      return;\n    }\n    if (e.ctrlKey && e.key === 'k') { e.preventDefault(); var sw = $('#switcher [data-thread]'); if (sw) sw.focus(); return; }")
+           "    if (st.lvlOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) { e.preventDefault(); var ls = Array.prototype.slice.call(document.querySelectorAll('.lvlpop [data-lvl]')), li = ls.indexOf(document.activeElement); if (ls.length) ls[(li + (e.key === 'ArrowDown' ? 1 : ls.length - 1) + ls.length) % ls.length].focus(); return; }\n    if (field) {\n      if (t.id === 'chat-input' && st.palette >= 0 && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) { e.preventDefault(); st.palette = (st.palette + (e.key === 'ArrowDown' ? 1 : COMMANDS.length - 1)) % COMMANDS.length; renderPalette(); return; }\n      if ((t.id === 'chat-input' || t.id === 'steer-input') && e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); t.form.requestSubmit(); }\n      return;\n    }\n    if (e.ctrlKey && e.key === 'k') { e.preventDefault(); var sw = $('#switcher [data-thread]'); if (sw) sw.focus(); return; }")
     t = sub(t, "  document.addEventListener('input', function (e) { if (e.target.dataset.q != null) st.queue[+e.target.dataset.q] = e.target.value; });",
            "  document.addEventListener('input', function (e) {\n    if (e.target.dataset.q != null) st.queue[+e.target.dataset.q] = e.target.value;\n    if (e.target.id === 'chat-input') { var v = e.target.value; st.palette = v.charAt(0) === '/' && v.indexOf(' ') < 0 ? Math.max(0, COMMANDS.findIndex(function (c) { return c.name.indexOf(v) === 0; })) : -1; renderPalette(); }\n  });")
     return t
@@ -145,14 +146,20 @@ ENGINE = r'''  /* the threads (roadmap 239): the open thread's log, the switcher
     return '<div class="tarch"><span class="tarch-l">archived</span>' + a.map(function (t) {
       return '<span class="trow arch' + (t.id === st.mc.open ? ' on' : '') + '"><button type="button" class="ttitle open-arch" data-thread="' + t.id + '">' + esc(t.title) + '</button><button type="button" class="linkbtn restore" data-restore="' + t.id + '">restore</button></span>'; }).join('') + '</div>';
   }
-  function levelSelectHTML(cls, id) {
-    return '<span class="sel sm lvl ' + (cls || '') + '"><select id="' + (id || 'level') + '" aria-label="The project\'s autonomy level">' + MC.levels.map(function (l) {
-      return '<option value="' + esc(l) + '"' + (l === st.mc.level ? ' selected' : '') + '>' + esc(l) + '</option>'; }).join('') + '</select></span>';
+  /* the level: a control under Send, in the composer's foot; it opens the four levels with their words; a change confirms in place */
+  function levelCtlHTML() {
+    var cur = st.mc.level;
+    return '<span class="lvlctl"><button type="button" id="level-btn" data-lvlbtn data-level="' + esc(cur) + '" aria-haspopup="menu" aria-expanded="' + st.lvlOpen + '" aria-label="The project\'s autonomy level: ' + esc(cur) + '"><i aria-hidden="true"></i>' + esc(cur) + '</button>' +
+      '<div class="lvlpop" role="menu" aria-label="Autonomy"' + (st.lvlOpen ? '' : ' hidden') + '>' + (st.dialog && st.dialog.kind === 'level' ? dialogHTML() : levelMenuHTML()) + '</div></span>';
   }
-  function levelSegHTML() {
-    return '<span class="lvlseg" role="group" aria-label="The project\'s autonomy level">' + MC.levels.map(function (l) {
-      return '<button type="button" data-lvl="' + esc(l) + '" aria-pressed="' + (l === st.mc.level) + '">' + esc(l) + '</button>'; }).join('') + '</span>';
+  function levelMenuHTML() {
+    return '<p class="lp-head"><span>autonomy</span><span>a change confirms</span></p>' + MC.levels.map(function (l) {
+      var on = l === st.mc.level;
+      return '<button type="button" role="menuitemradio" aria-checked="' + on + '" data-lvl="' + esc(l) + '"><i aria-hidden="true"></i><b>' + esc(l) + '</b><span class="ck" aria-hidden="true">' + (on ? '✓' : '') + '</span><span class="lw">' + esc(MC.levelWords[l]) + '</span></button>'; }).join('');
   }
+  function renderLevel() { var c = $('.lvlctl'); if (c) c.outerHTML = levelCtlHTML(); }
+  function toggleLevel() { st.lvlOpen = !st.lvlOpen; st.dialog = null; renderLevel(); var f = st.lvlOpen ? $('.lvlpop [aria-checked="true"]') : $('#level-btn'); if (f) f.focus(); }
+  function closeLevel() { st.lvlOpen = false; st.dialog = null; renderLevel(); var b = $('#level-btn'); if (b) b.focus(); }
   function msgHTML(m, i) {
     var who = m.who === 'you' ? 'you' : 'agent';
     var b = '<div class="txt">' + refs(m.text) + (m.streaming ? '<span class="cursor" aria-hidden="true"></span>' : '') + '</div>';
@@ -215,12 +222,12 @@ ENGINE = r'''  /* the threads (roadmap 239): the open thread's log, the switcher
   }
   function composerHTML() {
     var t = open();
-    if (t.archived) return '<p class="archived-note">This thread is archived: read it, or <button type="button" class="linkbtn" data-restore="' + t.id + '">restore</button> it to write.</p>';
+    if (t.archived) return '<div class="archived-note"><span>This thread is archived: read it, or <button type="button" class="linkbtn" data-restore="' + t.id + '">restore</button> it to write.</span>' + levelCtlHTML() + '</div>';
     return escalationRowHTML() + '<form class="composer" id="chat-form"><div id="palette" class="palette" role="listbox" aria-label="Commands" hidden></div>' +
       '<div class="prompt"><span class="ps" aria-hidden="true">&gt;</span><label class="vh" for="chat-input">Your message to the project agent</label>' +
       '<textarea id="chat-input" rows="3" maxlength="8192" placeholder="' + (t.inbox ? 'Reply to the factory, or ask… (Enter sends)' : 'Ask or tell the project… (Enter sends, Shift+Enter breaks the line)') + '" aria-keyshortcuts="/"></textarea>' +
       '<button type="submit" class="btn btn-primary">Send</button></div>' +
-      '<p class="own"><span class="cmds"><button type="button" class="cmd" data-cmd="/compact" title="compact this thread: the older turns become a summary">/compact</button><button type="button" class="cmd" data-cmd="/new" title="a new thread">/new</button></span>This is your own thread with the project agent; other members have theirs.</p>' +
+      '<div class="own"><span class="cmds"><button type="button" class="cmd" data-cmd="/compact" title="compact this thread: the older turns become a summary">/compact</button><button type="button" class="cmd" data-cmd="/new" title="a new thread">/new</button></span>This is your own thread with the project agent; other members have theirs.' + levelCtlHTML() + '</div>' +
       '<ol class="queue" id="chat-queue" aria-label="Your messages waiting for the turn to end" hidden></ol></form>';
   }
   function dialogHTML() {
@@ -231,13 +238,18 @@ ENGINE = r'''  /* the threads (roadmap 239): the open thread's log, the switcher
       body = '<h2 id="dlg-title">Delete “' + esc(t.title) + '”?</h2><p>Its ' + t.messages.length + ' messages go for good: a hard delete, no archive. One event will name you, the thread and the count. What the chat did stays in the events, the audit and git, so no decision and no merged card goes with it.</p>' +
         '<div class="acts"><button type="button" class="btn btn-danger" data-dlg="delete">Delete the thread</button><button type="button" class="btn" data-dlg="close">Keep it</button></div>';
     } else {
-      body = '<h2 id="dlg-title">Set the project\'s autonomy to ' + esc(d.level) + '?</h2><p>This writes a policy change and lands in the audit like every decision. From then on: ' + esc(MC.levelWords[d.level]) + '.</p>' +
-        '<div class="acts"><button type="button" class="btn btn-need" data-dlg="level">Set ' + esc(d.level) + '</button><button type="button" class="btn" data-dlg="close">Keep ' + esc(st.mc.level) + '</button></div>';
+      return '<div id="dialog" class="lvl-confirm" role="dialog" aria-labelledby="dlg-title"><h2 id="dlg-title">Set the project\'s autonomy to ' + esc(d.level) + '?</h2><p>This writes a policy change and lands in the audit like every decision. From then on: ' + esc(MC.levelWords[d.level]) + '.</p>' +
+        '<div class="acts"><button type="button" class="btn btn-need" data-dlg="level">Set ' + esc(d.level) + '</button><button type="button" class="btn" data-dlg="close">Keep ' + esc(st.mc.level) + '</button></div></div>';
     }
     return '<div id="dialog" class="overlay" role="dialog" aria-modal="true" aria-labelledby="dlg-title"><div class="overlay-box">' + body + '</div></div>';
   }
-  function renderDialog() { var old = $('#dialog'); if (old) old.remove(); if (st.dialog) { document.body.insertAdjacentHTML('beforeend', dialogHTML()); $('#dialog .btn').focus(); } }
-  function closeDialog() { st.dialog = null; renderDialog(); var b = $('#level') || $('.tmenu-btn'); if (b) b.focus(); renderChat(); }
+  function renderDialog() {
+    var old = $('#dialog'); if (old) old.remove();
+    if (!st.dialog) return;
+    if (st.dialog.kind === 'level') { st.lvlOpen = true; renderLevel(); $('.lvlpop .btn').focus(); return; }
+    document.body.insertAdjacentHTML('beforeend', dialogHTML()); $('#dialog .btn').focus();
+  }
+  function closeDialog() { var k = st.dialog && st.dialog.kind; st.dialog = null; if (k === 'level') { closeLevel(); return; } renderDialog(); var b = $('.tmenu-btn'); if (b) b.focus(); renderChat(); }
   function dialogAct(a) {
     var d = st.dialog;
     if (a === 'close') { closeDialog(); return; }
@@ -251,10 +263,10 @@ ENGINE = r'''  /* the threads (roadmap 239): the open thread's log, the switcher
       var from = st.mc.level; st.mc.level = d.level;
       byId('inbox').messages.push({ who: 'agent', at: now(), poke: true, text: 'Autonomy set to ' + d.level + ' by sebastian, from ' + from + '. Policy version 5; the audit has the change.' });
       if (st.mc.open !== 'inbox') { byId('inbox').unread = (byId('inbox').unread || 0) + 1; byId('inbox').at = now(); }
-      st.dialog = null; renderDialog(); renderChat(); renderPulse(); return;
+      st.dialog = null; st.lvlOpen = false; renderChat(); return;
     }
   }
-  function askLevel(level) { if (level === st.mc.level) return; st.dialog = { kind: 'level', level: level }; renderDialog(); }
+  function askLevel(level) { if (level === st.mc.level) { closeLevel(); return; } st.dialog = { kind: 'level', level: level }; renderDialog(); }
   function threadAct(a) {
     var t = open();
     if (a === 'toggle') { st.menu = !st.menu; renderChat(); if (st.menu) { var m = $('.tmenu [role="menuitem"]'); if (m) m.focus(); } return; }
@@ -383,12 +395,24 @@ COMMON_CSS = r'''/* the threads: the rows, the marks, the badge, the inbox, the 
 .palette button b { color: var(--accent); font: 600 12.5px var(--font-mono); }
 .palette button[aria-selected="true"], .palette button:hover { background: var(--bg-hover); color: var(--text); }
 .archived-note { margin: 0; padding: 12px 14px; border-top: 1px solid var(--line); color: var(--text-muted); font-size: 12.5px; }
-.lvl select { font-family: var(--font-mono); }
-.lvlseg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 3px; overflow: hidden; }
-.lvlseg button { height: 22px; padding: 0 8px; border: 0; background: none; color: var(--text-muted); font: 11px/1 var(--font-mono); cursor: pointer; }
-.lvlseg button + button { border-left: 1px solid var(--line-strong); }
-.lvlseg button:hover { color: var(--text); background: var(--bg-hover); }
-.lvlseg button[aria-pressed="true"] { color: var(--accent-ink); background: var(--accent); }
+.lvlctl { position: relative; margin-left: auto; }
+#level-btn { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border: 1px solid var(--line-strong); border-radius: 3px; background: none; color: var(--text-muted); font: 11.5px var(--font-mono); cursor: pointer; }
+#level-btn i { width: 8px; height: 8px; border-radius: 1px; background: var(--accent); box-shadow: 0 0 5px color-mix(in srgb, var(--accent) 70%, transparent); }
+#level-btn:hover, #level-btn[aria-expanded="true"] { color: var(--text); border-color: var(--text-faint); }
+.lvlpop { position: absolute; right: 0; bottom: calc(100% + 6px); z-index: 20; width: 330px; padding: 6px; background: var(--bg-raised); border: 1px solid var(--line-strong); box-shadow: 0 12px 32px rgba(0, 0, 0, .4); }
+.lvlpop .lp-head { display: flex; justify-content: space-between; margin: 0; padding: 4px 8px 6px; color: var(--text-faint); font: 11px var(--font-mono); font-variant-caps: all-small-caps; letter-spacing: .06em; }
+.lvlpop [data-lvl] { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 1px 8px; width: 100%; padding: 7px 8px; border: 0; border-radius: 2px; background: none; color: var(--text); font-family: var(--font-ui); text-align: left; cursor: pointer; }
+.lvlpop [data-lvl] i { grid-row: 1 / 3; margin-top: 5px; width: 9px; height: 9px; border: 1px solid var(--line-strong); border-radius: 1px; }
+.lvlpop [data-lvl][aria-checked="true"] i { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 5px color-mix(in srgb, var(--accent) 70%, transparent); }
+.lvlpop [data-lvl] b { font-size: 12.5px; font-weight: 600; }
+.lvlpop [data-lvl] .ck { color: var(--accent); font: 12px var(--font-mono); }
+.lvlpop [data-lvl] .lw { grid-column: 2 / 4; color: var(--text-muted); font-size: 11.5px; line-height: 1.4; }
+.lvlpop [data-lvl]:hover, .lvlpop [data-lvl]:focus-visible { background: var(--bg-hover); }
+.lvlpop [data-lvl][aria-checked="true"] { background: color-mix(in srgb, var(--accent) 9%, transparent); }
+.lvl-confirm { padding: 6px 8px 4px; }
+.lvl-confirm h2 { margin: 0 0 6px; font-size: 13px; font-weight: 600; }
+.lvl-confirm p { margin: 0 0 10px; color: var(--text-muted); font-size: 12px; line-height: 1.45; }
+.archived-note { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
 .overlay-box p { margin: 0 0 14px; color: var(--text-muted); font-size: 13px; line-height: 1.5; }
 @media (max-width: 899px) {
   .trow { min-height: 44px; font-size: 14px; }
@@ -396,7 +420,9 @@ COMMON_CSS = r'''/* the threads: the rows, the marks, the badge, the inbox, the 
   .answer .btn, .msg .choices .btn { width: 100%; height: 44px; }
   .msg .choices { flex-direction: column; align-items: stretch; }
   .palette button { height: 44px; }
-  .lvlseg button { height: 44px; }
+  #level-btn { height: 44px; padding: 0 12px; }
+  .lvlpop { width: min(330px, calc(100vw - 48px)); }
+  .lvlpop [data-lvl] { min-height: 44px; }
   .cmd, .restore, .open-arch { min-height: 44px; }
   .cmds { gap: 8px; }
 }
@@ -412,7 +438,7 @@ def variant(name, css, js, head_level):
     print(out.relative_to(HERE.parent.parent.parent), len(t.splitlines()), "lines")
 
 
-# ---- variant rail: the threads as a rail at the chat's left edge, the level as a segmented control in the chat's head ----
+# ---- variant rail: the threads as a rail at the chat's left edge ----
 
 RAIL_CSS = r'''.chat { display: grid; grid-template-columns: 196px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
 .chat > .chat-head { grid-column: 1 / -1; }
@@ -420,7 +446,6 @@ RAIL_CSS = r'''.chat { display: grid; grid-template-columns: 196px minmax(0, 1fr
 .rail .trow { flex: none; }
 .rail .tarch { margin-top: auto; }
 .chat-main { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
-.chat .lvlseg { flex: none; margin-right: 4px; }
 @media (max-width: 899px) {
   .chat { display: flex; }
   .rail { padding: 8px; border-right: 0; border-bottom: 1px solid var(--line); overflow: visible; }
@@ -435,7 +460,7 @@ RAIL_JS = r'''  function switcherHTML() {
   function afterChat() {}
 '''
 
-# ---- variant instrument: the threads as a mono table at the chat's left, the level as four lamps in the instrument strip, the thread's actions as text buttons ----
+# ---- variant instrument: the threads as a mono table at the chat's left, the thread's actions as text buttons ----
 
 INSTRUMENT_CSS = r'''.chat { display: grid; grid-template-columns: 212px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
 .chat > .chat-head { grid-column: 1 / -1; }
@@ -460,22 +485,11 @@ INSTRUMENT_CSS = r'''.chat { display: grid; grid-template-columns: 212px minmax(
 .thead .tacts { display: inline-flex; gap: 2px; }
 .thead .tacts .btn { height: 22px; padding: 0 7px; font-size: 11.5px; }
 .thead .tacts .btn.danger { color: var(--st-failed); }
-.cell.lamps { gap: 10px; }
-.cell.lamps .lbl { font: 10.5px var(--font-mono); font-variant-caps: all-small-caps; letter-spacing: .06em; color: var(--text-faint); }
-.lampset { display: inline-flex; gap: 10px; }
-.lampset button { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 2px; border: 0; background: none; color: var(--text-faint); font: 11px var(--font-mono); cursor: pointer; }
-.lampset button i { width: 9px; height: 9px; border: 1px solid var(--line-strong); border-radius: 1px; background: transparent; }
-.lampset button:hover { color: var(--text); }
-.lampset button[aria-pressed="true"] { color: var(--text); }
-.lampset button[aria-pressed="true"] i { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 6px color-mix(in srgb, var(--accent) 70%, transparent); }
 @media (max-width: 899px) {
   .chat { display: flex; }
   .ttable { border-right: 0; border-bottom: 1px solid var(--line); overflow: visible; }
   .ttable .trow { min-height: 44px; }
   .ttable .tarch { margin-top: 0; }
-  .cell.lamps { flex-basis: 100%; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 12px; }
-  .lampset { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 0 10px; }
-  .lampset button { height: 44px; }
   .thead .tacts .btn { height: 44px; }
 }
 '''
@@ -487,16 +501,10 @@ INSTRUMENT_JS = r'''  function switcherHTML() {
     return '<span class="tacts"><button type="button" class="btn btn-ghost" data-tmenu="archive">Archive</button><button type="button" class="btn btn-ghost danger" data-tmenu="delete">Delete…</button></span>';
   }
   function chatLayout(p) { return p.head + p.switcher + '<div class="chat-main">' + p.thread + p.start + p.log + p.composer + '</div>'; }
-  function afterChat() { afterPulse(); }
-  function afterPulse() {
-    var old = $('#pulse .cell.lamps'); if (old) old.remove();
-    var gh = $('#pulse .cell.gh') || $('#pulse .cell.xp');
-    gh.insertAdjacentHTML('beforebegin', '<span class="cell lamps"><span class="lbl">autonomy</span><span class="lampset" role="group" aria-label="The project\'s autonomy level">' + MC.levels.map(function (l) {
-      return '<button type="button" data-lvl="' + esc(l) + '" aria-pressed="' + (l === st.mc.level) + '"><i aria-hidden="true"></i>' + esc(l) + '</button>'; }).join('') + '</span></span>');
-  }
+  function afterChat() {}
 '''
 
-# ---- variant messenger: two-line rows with the newest line, round marks, the archived folded, the level as a select in the top bar ----
+# ---- variant messenger: two-line rows with the newest line, round marks, the archived folded ----
 
 MESSENGER_CSS = r'''.chat { display: grid; grid-template-columns: 236px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
 .chat > .chat-head { grid-column: 1 / -1; }
@@ -519,16 +527,10 @@ MESSENGER_CSS = r'''.chat { display: grid; grid-template-columns: 236px minmax(0
 .mlist .tarch > summary::before { content: "▸"; font: 10px var(--font-mono); }
 .mlist .tarch[open] > summary::before { content: "▾"; }
 .chat-main { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
-#top .lvl { order: 2; margin-left: 10px; }
-.chat-head .lvl { display: none; }
-#top .lvl::before { content: "level"; margin-right: 6px; color: var(--text-faint); font: 11px var(--font-mono); }
 @media (max-width: 899px) {
   .chat { display: flex; }
   .mlist { border-right: 0; border-bottom: 1px solid var(--line); overflow: visible; }
   .mlist .tarch { margin-top: 0; }
-  #top .lvl { display: none; }
-  .chat-head .lvl { display: inline-flex; }
-  .chat-head .lvl select { height: 44px; }
 }
 '''
 MESSENGER_JS = r'''  function newest(t) { var m = t.messages[t.messages.length - 1]; if (!m) return 'nothing yet'; var s = (m.who === 'you' ? 'you: ' : '') + m.text.replace(/\s+/g, ' '); return s.length > 48 ? s.slice(0, 48) + '…' : s; }
@@ -546,16 +548,13 @@ MESSENGER_JS = r'''  function newest(t) { var m = t.messages[t.messages.length -
         return '<span class="trow arch' + (t.id === st.mc.open ? ' on' : '') + '"><button type="button" class="ttitle open-arch" data-thread="' + t.id + '">' + esc(t.title) + '</button><button type="button" class="linkbtn restore" data-restore="' + t.id + '">restore</button></span>'; }).join('') + '</details>' : '') + '</nav>';
   }
   function chatLayout(p) { return p.head + p.switcher + '<div class="chat-main">' + p.thread + p.start + p.log + p.composer + '</div>'; }
-  function afterChat() {
-    var old = $('#top .lvl'); if (old) old.remove();
-    $('#top .proj').insertAdjacentHTML('afterend', levelSelectHTML());
-  }
+  function afterChat() {}
 '''
 
 def main():
-    variant("rail", RAIL_CSS, RAIL_JS + MENU_JS, "' + levelSegHTML() + '")
+    variant("rail", RAIL_CSS, RAIL_JS + MENU_JS, "")
     variant("instrument", INSTRUMENT_CSS, INSTRUMENT_JS, "")
-    variant("messenger", MESSENGER_CSS, MESSENGER_JS + MENU_JS, "' + levelSelectHTML('', 'level-phone') + '")
+    variant("messenger", MESSENGER_CSS, MESSENGER_JS + MENU_JS, "")
 
 
 if __name__ == "__main__":
