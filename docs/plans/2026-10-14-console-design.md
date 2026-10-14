@@ -93,6 +93,10 @@ Rulings taken in item 4:
 - The wide view keeps the merge item's full facts and the resource request's facts list. It is the record view; the four-column board is the brief.
 - The structural check opens every disclosure before it reads the page, so the deny form's choices and the own-answer box count as present.
 
+Contrast, measured from the stylesheet's tokens at the end of the round: every text pair items 3 and 4 introduced (the risk and migration chips, the need lines, the waiting time, the done row's faint text and its hover, the failed row's word, the Retry and PR text links, the Deny button) reads at 5.1:1 or better in both themes; the lowest is the waiting time in the light Needs you column at 5.1:1.
+
+The round's state at the end of 2026-10-14: every item of the handover's order is on main (1, 2, 5, 6, 3, 4, 8; 7 as a ruling), the structural check reads `ok: every control present, the mechanics work` on the final main, the shots of every item are in `design/rounds/01-mission-control/` with the sheet page `index.html`. Open: 225 (lanes), which item 7's Track and the plan item's Accept plan wait for; 177's hover peek and model rule; no roll asked for the controller's approval during the round (the factory merged its rolls itself after the speed round).
+
 The merge queue wait, measured on 2026-10-14 for C8's condition (a Verifying column comes back if the queue still takes tens of minutes), from a roll's pull request filing to its merge on the code repository: before the speed round's items landed, #638 15 min, #647 26 min, #657 54 min, #683 34 min; after them, #695 3 min, #697 3 min. The four columns stand; no Verifying column comes back.
 
 Rulings taken in items 7 and 8:
