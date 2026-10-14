@@ -73,6 +73,7 @@ What landed, in order, on the code repository's `main` by the controller's direc
 | Item 6, the chat | 685 | 74e06c5 |
 | Item 3, the board | 692 | f6cbe93 |
 | Item 4, the Needs you items | 700 | 9c69c61 (rebased on a roll that landed first; CI green on 07fe7c6, the same change) |
+| Items 7 and 8, the New task page and the secondary pages | 701 | open |
 
 The structural check's lines after item 2: two, both item 3's (the whole card opens the drawer, the PR link on a verifying card's face). After item 3: none, `ok: every control present, the mechanics work`.
 
@@ -91,6 +92,11 @@ Rulings taken in item 4:
 - The plan item keeps Accept plan, Request changes and Reject: 225 is not built, and without them a plan could not be accepted.
 - The wide view keeps the merge item's full facts and the resource request's facts list. It is the record view; the four-column board is the brief.
 - The structural check opens every disclosure before it reads the page, so the deny form's choices and the own-answer box count as present.
+
+Rulings taken in items 7 and 8:
+
+- Item 7: the New task page keeps its Lane field. Track (direct or plan) replaces Lane with item 225, which is not built; a relabel without the model would mislead. The page wears the shell from item 2.
+- Item 8: the secondary pages already wear the shell and the tokens from items 1 and 2 (the layout is shared). The item fixes what the shots showed: table cells that split task ids and dates, and the policy page's bare facts list.
 
 ## Not in this round
 
