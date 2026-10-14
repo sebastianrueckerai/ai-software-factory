@@ -27,7 +27,7 @@ Orientation on 2026-10-14 before the first commit, the code repository's `origin
 | Step | Pull request | Commit on main |
 |---|---|---|
 | Item 0a, the columns' scrolling | 763 | 418a188 (rebased on a roll and on 762, the store's Done order, that landed first) |
-| Item 0b, arrival order | | |
+| Item 0b, arrival order | 766 | 8f2b0d1 (rebased twice on rolls and the factory's 759) |
 | Item 1, the find | | |
 | Item 2, the menus | | |
 
