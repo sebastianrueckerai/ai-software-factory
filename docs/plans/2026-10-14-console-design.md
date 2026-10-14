@@ -77,7 +77,7 @@ What landed, in order, on the code repository's `main` by the controller's direc
 | The review's fix pass | 711 | a6b70e4 |
 | The spend gauges' fill (the policy drops inline styles; a meter now) | 726 | 65dae57 |
 | No accent filter, the ticker on the last day, the board ticking beside an open drawer (Sebastian, 2026-10-14) | 731 | b754bf6 (the first commit carried a moved main's inverse and was refused; rebuilt from the branch's base) |
-| C11, one time on a card | 738 | open |
+| C11, one time on a card | 738 | da6a406 |
 
 The structural check's lines after item 2: two, both item 3's (the whole card opens the drawer, the PR link on a verifying card's face). After item 3: none, `ok: every control present, the mechanics work`.
 
