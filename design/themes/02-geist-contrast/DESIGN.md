@@ -45,9 +45,9 @@ Elevation: dark uses hairlines only; light adds soft shadows (drawer `-12px 0 40
 - Pulse band full width under it, 24 px side padding: the sentence line, then the figures row.
 - Below: the chat LEFT at 52 percent, the board RIGHT at 48 percent, one hairline between. The mockup had the board left and the chat right; the chat moves left so the drawer, docked at the right screen edge, covers the board only.
 - The chat's log and composer sit in a centred column of at most 680 px (720 px at 1920), as in v0.
-- The board: header row (Board, accent select, Wide view, ?), Needs you as a band across the board's top with its items side by side, then four columns Queued, Working, Verifying, Done separated by hairlines. Five columns side by side would be 120 px each at 1440; the band keeps the five groups of ruling 255 and gives the decisions room.
+- The board: header row (Board, accent select, Wide view, ?), then five columns side by side: Needs you, Queued, Working, Verifying, Done (C4: Needs you is the first column, never a band). Needs you takes `minmax(auto, 1.5fr)`: 1.5 times the others, and never narrower than its one-row "Approve as you · Deny · Split". At 1920 that is 1.5 times (242 against 161 px); at 1440 the action row sets it (234 against 105 px). The other four share the rest and are separated by hairlines. With nothing waiting, all five are equal. The whole board scrolls as one, so a long Needs you grows downward like any column.
 - Drawer: absolute in the split region, right edge, `min(46vw, 720px)`, below the pulse band, so it never covers the chat (52 percent) or the pulse.
-- Wide view: the board takes the full width of the split, Needs you becomes the first of five columns and the lane chips show.
+- Wide view: the board takes the full width of the split with the same five columns, and the lane chips show.
 
 ## The pulse
 
@@ -66,23 +66,24 @@ Prominent (a card needs a person): the amber warning sign before the sentence, w
 
 ## The board and the card
 
-- Column heads: small capitals, --text-muted, the count in --text-faint; a 1 px rule under each.
-- Card: no box. Rows divided by 1 px --line, 10 px vertical padding. Line 1 a button: ref in --text-muted, title in --text, two lines at most. State row: glyph, state word, elapsed, then only the exceptional: n/n checks, gate and its age, PR, spend with the warning sign from 80 percent, in --text. Activity line in mono 11.5 px --text-muted on working and waiting cards only.
+- Column heads: 36 px, small capitals, --text-muted, the count in --text-faint; a 1 px rule under each. Columns are 8 px apart on each side of the hairline.
+- Card: no box. Rows divided by 1 px --line, 10 px vertical padding. Line 1 a button: ref in --text-muted, title in --text, two lines at most. In the narrow columns every state-row item may wrap, and a number never parts from its unit. State row: glyph, state word, elapsed, then only the exceptional: n/n checks, gate and its age, PR, spend with the warning sign from 80 percent, in --text. Activity line in mono 11.5 px --text-muted on working and waiting cards only.
 - Chips: 11 px on --bg-sub, radius 4. Exceptional chips (stale, on the provider, at its cap) are outlined in --text instead. The accent chip is the accent's name only: no hue, the board stays monochrome.
 - Stale card: an inset 1 px ring in --text-faint and "nothing for 40 min" in --text.
+- Done titles wrap to two lines at most.
 - Done shows at most 12 rows, then one faint line "and n earlier" linking to the full list.
 - Done, closed: one line, a 12 px glyph, ref, title, ellipsis, all --text-muted at weight 400; the state word is in the glyph's label, the time in the row's title. Failed: two lines, the cross in --fail, "failed" and the elapsed time under the title, all else --text-muted.
-- Actions: 24 px ghost buttons, 1 px --line-strong, radius 6, visible always.
+- Actions: 22 px ghost buttons, 11.5 px, 1 px --line-strong, radius 6, visible always; the move arrow drops when the board is under 800 px wide.
 - Hover: the row takes --hover; the title underlines. The open card keeps --hover-strong.
 
 ## Needs you
 
-- The only boxes on the board: --need-tint ground, 1 px --need-line, radius 8, padding 14/16. Heading in --text 14 px 600; the band head "Needs you" in --need.
-- Merge: "Merge PR #n" (opens the drawer at Reviews and audit), the risk and migration as amber-outlined chips, the waiting time right; the task title; "Model review: verdict. summary"; "Recommendation: …"; Approve as you (amber fill), Deny (opens the reason box and the "Deny by" choice), Split. Deny and Split are outlined in --need-line-strong, the same 32 px box as the primary.
+- The column is the only box on the board: --need-tint ground, a 1 px --need-line frame, radius 8. Its head "Needs you" and the count in --need, 15 px small capitals, an amber rule under it. Items stack inside, divided by 1 px --need-line, each with a 2 px amber rule on its left edge and 12 px padding. Heading in --text 14 px 600. Buttons inside are 28 px, 12 px type.
+- Merge: "Merge PR #n" (opens the drawer at Reviews and audit) with the waiting time right; the task title; the risk and migration as amber-outlined chips; "Model review: verdict. summary"; "Recommendation: …"; Approve as you (amber fill), Deny (opens the reason box and the "Deny by" choice), Split. Deny and Split are outlined in --need-line-strong, the same 32 px box as the primary.
 - Escalation: the ref and title as heading, the question, the choices as amber-outlined buttons, "Or in your words" (opens the box) and the small verdict buttons at the end. Capped: the box is open and its button reads "Grant one session with this answer" in amber fill.
 - Plan and resource approvals follow the merge's pattern (heading, two fact lines, amber primary first); no scenario carries one.
-- What makes them loudest: the only amber on the board, the only boxes, the only filled buttons.
-- An empty Needs you shows its head with 0 in --text-faint: no amber when nothing waits.
+- What makes them loudest: the only amber on the board, the only framed and tinted column, the only filled buttons.
+- An empty Needs you is a plain column with its head and 0 in --text-faint: no amber when nothing waits.
 
 ## The drawer
 
@@ -93,7 +94,7 @@ Prominent (a card needs a person): the amber warning sign before the sentence, w
 
 ## The phone
 
-Under 900 px one column: top bar (the home word over the project select, a menu button for the links, the switch, theme, user and Log out), the pulse, the chat with its log at 55 percent of the viewport height and the composer, then the board: Needs you in full, every button in it full width, one per row, 44 px tall, its label left-aligned at 16 px, then Working, Verifying, Queued, Done, each a section whose head toggles it; Done starts collapsed. The drawer takes the full screen.
+Under 900 px one column: top bar (the home word over the project select, a menu button for the links, the switch, theme, user and Log out), the pulse, the chat with its log at 55 percent of the viewport height and the composer, then the board: Needs you in full, the framed column at full width, every button in it full width, one per row, 44 px tall, its label left-aligned at 16 px, then Working, Verifying, Queued, Done, each a section whose head toggles it; Done starts collapsed. The drawer takes the full screen.
 
 ## Motion
 
