@@ -1,0 +1,22 @@
+You judge one built prototype of the multi-chat console, shown as a contact sheet of its screenshots, labelled by scenario: busy, threads (a second thread open while the first runs a turn), poke (a poke arrived in the inbox while another thread is open), assisted (the level is assisted; the inbox carries the agent's own starts with their decider), escalation (the level is autonomous; the inbox carries a direction question whose choices sit beside the text box), delete (the hard-delete warning), palette (the "/" command palette), level (the confirm dialog of a level change), and two phone shots at 390 px wide, dark and light.
+
+The shell is fixed and not under judgement: the top bar, the pulse band with its amber sentence and the instrument strip, the chat on the left, the board on the right. What this variant adds, and what you judge, each against the brief:
+1. The thread switcher: the active threads by last turn, the open one marked, a working mark on a thread with a turn in flight, an unread badge with the count, New, archived threads last and dimmer with a restore.
+2. The unread badge: on the row and in the browser tab's title. Quieter than the pulse and the amber Needs you column.
+3. The working mark: distinct from unread at a glance.
+4. The inbox thread: findable, named, its face different from a planning thread without shouting; pokes as agent turns with choices as buttons.
+5. The escalation's face: the question in the thread, its choices beside the text box, once, and "or in your words".
+6. Archive and delete: archive hides and keeps, restore brings back; the delete warning says the rows go for good and that one event names the member, the thread and the count.
+7. The commands /compact and /new as affordances of the text box, and the palette on "/".
+8. The autonomy level selector: a quiet instrument that states the policy; a change asks a confirm that says it is a policy change in the audit.
+9. Craft: cut-off text, cramped rows, a control that does not fit, both themes, the phone as one column.
+10. The order of loudness on the screen: the pulse first, Needs you second, the chat's badge and escalation third, everything else quiet.
+
+Answer in JSON only:
+{
+  "scores": { "switcher": 0-10, "badge": 0-10, "working": 0-10, "inbox": 0-10, "escalation": 0-10, "archive_delete": 0-10, "commands": 0-10, "level": 0-10, "craft": 0-10, "hierarchy": 0-10 },
+  "flaws": ["concrete, fixable, one per line, with the scenario where you see it"],
+  "strengths": ["one per line"],
+  "phone": "one paragraph on the 390 shots",
+  "verdict": "two sentences"
+}

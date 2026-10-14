@@ -1,0 +1,93 @@
+```json
+{
+  "ranking": [
+    {
+      "direction": "06-instrument",
+      "score": 9,
+      "why": "This direction best embodies the 'Mission Control' idiom with a dense, scannable instrument panel for threads, fulfilling the monitoring requirement. Its structure is calm, exact, and fits seamlessly with the existing shell."
+    },
+    {
+      "direction": "01-rail",
+      "score": 8,
+      "why": "A strong, conventional solution that provides an excellent, at-a-glance list of threads that is easy to monitor. It is robust and has a clear, proven path to mobile adaptation, though the autonomy selector placement is not ideal."
+    },
+    {
+      "direction": "02-tabs",
+      "score": 6,
+      "why": "It features the best placement for the autonomy selector in the global instrument strip, reinforcing its role as a policy. However, the tab metaphor is poor for monitoring, does not scale, and fails catastrophically on mobile."
+    },
+    {
+      "direction": "08-inbox-split",
+      "score": 5,
+      "why": "This direction correctly identifies the inbox thread as special, but its solution is heavy-handed, creating potential hierarchy problems and wasting vertical space. The visual separation feels less integrated than other options."
+    },
+    {
+      "direction": "07-messenger",
+      "score": 5,
+      "why": "While highly familiar and perfectly suited for mobile, its consumer-app aesthetic clashes with the 'calm, exact' Mission Control idiom. The potentially loud unread/active states risk disrupting the screen's information hierarchy."
+    },
+    {
+      "direction": "05-command",
+      "score": 4,
+      "why": "Hiding the thread switcher behind a command palette completely fails the core requirement of at-a-glance monitoring of all threads. This makes it unsuitable for a 'mission control' context despite its power-user elegance."
+    },
+    {
+      "direction": "03-title-menu",
+      "score": 2,
+      "why": "This is the weakest direction for monitoring, as it hides all information about other threads behind a click. It makes discovering unread messages or work in flight impossible without interaction."
+    },
+    {
+      "direction": "04-dock",
+      "score": 2,
+      "why": "The dock is a poor UI pattern for this context, as it doesn't scale, truncates long titles, and requires horizontal scrolling on mobile. It offers no significant advantages over superior patterns like the rail."
+    }
+  ],
+  "carry": [
+    {
+      "direction": "06-instrument",
+      "proof": "The prototype must prove that the dense table of threads can be gracefully simplified into a single, legible list on a 390px-wide screen."
+    },
+    {
+      "direction": "01-rail",
+      "proof": "The prototype must prove that placing the autonomy selector in a better location (like the top instrument strip) doesn't break the rail's visual integrity."
+    },
+    {
+      "direction": "07-messenger",
+      "proof": "The prototype must prove that the messenger aesthetic can be 'hardened' to match the Mission Control idiom and that its status indicators can be toned down to respect the loudness hierarchy."
+    }
+  ],
+  "drop": [
+    {
+      "direction": "02-tabs",
+      "reason": "Unsolvable mobile scaling issues."
+    },
+    {
+      "direction": "03-title-menu",
+      "reason": "Fails the core need for at-a-glance monitoring."
+    },
+    {
+      "direction": "04-dock",
+      "reason": "Poor scalability and fatal mobile limitations."
+    },
+    {
+      "direction": "05-command",
+      "reason": "Hides thread status, failing the monitoring requirement."
+    },
+    {
+      "direction": "08-inbox-split",
+      "reason": "Over-emphasizes the inbox, creating hierarchy and layout problems."
+    }
+  ],
+  "hierarchy_risks": [
+    "07-messenger",
+    "08-inbox-split"
+  ],
+  "phone_risks": [
+    "02-tabs",
+    "04-dock"
+  ],
+  "level_selector": "The placement in the main instrument strip (seen in 02, 05, and 08) reads best as a policy instrument. Separated from the immediate chat and board interaction areas, it feels like a global, project-wide setting that is stated rather than toggled. Placing it within the chat panel (01, 04, 06, 07) incorrectly scopes it to the chat and makes it feel like a more frequent, tactical control, which risks accidental changes. The instrument strip correctly frames it as a quiet, durable declaration of the project's operational mode.",
+  "inbox": "The inbox face in 01-rail and 06-instrument reads best. It establishes the inbox as a special, first-class item in the thread list through a unique icon and fixed position at the top, but keeps its visual treatment consistent with other threads. This makes it findable and distinct without shouting or breaking the 'calm and exact' grid of the instrument panel, unlike the overly prominent solution in 08-inbox-split which disrupts the layout.",
+  "notes": "All directions miss a clear, dedicated indicator for a 'turn in flight'—an agent actively working on a response in a specific thread. While a 'working' mark is sometimes present, it's not distinct from a simple 'unread' state. For a mission control interface, knowing where the AI is currently 'typing' is a critical piece of state information that would prevent users from interrupting or issuing conflicting commands. This could be a subtle, pulsing animation on the working mark or a dedicated icon."
+}
+```

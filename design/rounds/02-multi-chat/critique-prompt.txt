@@ -1,0 +1,25 @@
+You judge eight design directions for one screen: the project screen of an AI software factory console, in its fixed "Mission control" design. You see two contact sheets, the dark theme and the light theme, four directions per row, labelled 01-rail, 02-tabs, 03-title-menu, 04-dock, 05-command, 06-instrument, 07-messenger, 08-inbox-split. Judge each direction across both themes.
+
+The shell is fixed and not under judgement: the top bar, the pulse band with its amber sentence and the instrument strip, the chat at 40 percent on the left, the board at 60 percent on the right with four columns of which "Needs you" is lit amber. What the directions vary, and what you judge:
+
+1. The thread switcher: where the list of chat threads lives (a rail, tabs, a title that opens a list, a strip above the composer, a palette, a table, a messenger list, a split). Does a member see at one glance which thread is open, which has unread turns, which has a turn in flight, and that archived threads sit last and dimmer?
+2. The unread badge and the working mark: are they the only loud marks on the switcher? Do they stay quieter than the pulse band and the amber Needs you column, so the screen keeps one order of loudness: pulse, Needs you, then the chat's marks?
+3. The inbox thread: the one thread the agent speaks in uninvited. Is it findable, named, and does its face differ from a planning thread without shouting?
+4. The autonomy level selector (manual, assisted, autonomous, full auto): where it lives, whether it reads as a quiet instrument that states the project's policy and not as a toggle one flips by accident.
+5. The composer and the commands /compact and /new: do they read as affordances of the text box and nothing more?
+6. Fit with the Mission control idiom: thin-bordered instrument panels, mono figures, cyan as the system colour, amber as the one signal that needs a person, calm and exact. Does the new part look like it was always there?
+7. Will it survive the phone: can the switcher become one row or one list above the chat at 390 px wide without a second horizontal scroll?
+
+Ignore rendering flaws of the image model: garbled letters, duplicated words, a wrong count. Judge the layout idea, the hierarchy and the fit.
+
+Answer in JSON only, no prose around it:
+{
+  "ranking": [ {"direction": "01-rail", "score": 0-10, "why": "two sentences"} , ... all eight, best first ],
+  "carry": ["three direction slugs to build as prototypes, with one sentence each on what the prototype must prove"],
+  "drop": ["the five dropped, one short reason each"],
+  "hierarchy_risks": ["where a direction makes the chat louder than the pulse, by slug"],
+  "phone_risks": ["where the switcher cannot become one column at 390, by slug"],
+  "level_selector": "which placement of the level selector reads best as a policy instrument, and why, one paragraph",
+  "inbox": "which inbox face reads best, and why, one paragraph",
+  "notes": "anything the directions all miss, one paragraph"
+}

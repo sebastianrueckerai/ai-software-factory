@@ -1,0 +1,17 @@
+You compare three built prototypes of the multi-chat console, one contact sheet each, in the order rail, instrument, messenger. Each sheet shows the same scenarios: busy, threads, poke, escalation (dark), poke, assisted, escalation (light), the delete warning, the "/" palette, the level confirm, and two phone shots at 390 px.
+
+The three differ in where the thread switcher lives and how its rows look, and in where the autonomy level selector lives:
+- rail: one-line rows (mark, title, time) in a rail at the chat's left; the level as a segmented control in the chat's head.
+- instrument: a mono table (mark, thread, last) at the chat's left, with New in the head and Archive and Delete as text buttons on the open thread; the level as four lamps in the instrument strip.
+- messenger: two-line rows (a round mark, the title, the newest line, the time) at the chat's left, the archived folded; the level as a select in the top bar beside the project.
+
+The shell is fixed. Judge: which switcher lets a member see at one glance what is open, unread and working; which inbox face reads best; which level placement reads as a policy instrument and not a tactical toggle; which keeps the order of loudness (pulse, Needs you, then the chat's marks); which survives the phone best; and the fit with the Mission control idiom (thin-bordered instruments, mono figures, cyan system colour, amber for what needs a person, calm and exact).
+
+Answer in JSON only:
+{
+  "ranking": [ {"variant": "...", "score": 0-10, "why": "two sentences"}, ... ],
+  "recommend": "the variant to build, one paragraph with the reason",
+  "take_from_others": ["what the recommended one should borrow, one per line, naming the source variant"],
+  "level_placement": "which of the three placements, and why, one paragraph",
+  "risks": ["what the pick risks in the real console, one per line"]
+}
