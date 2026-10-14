@@ -20,7 +20,7 @@ The control room of a factory: a near-black blue room of thin-bordered instrumen
 | --mark | #5a8aa3 | #1d3557 | the 7 px corner marks of every panel (amber on the Needs you column) |
 | --text | #dfe7f1 | #0f1d33 | body (15.2:1 / 15.3:1) |
 | --text-muted | #93a1b5 | #46536a | meta, labels (6.9:1 / 7.3:1) |
-| --text-faint | #75849a | #5b6678 | done rows, the ticker (5.0:1 / 4.9:1) |
+| --text-faint | #7c8ba0 | #5b6678 | done rows, the ticker (5.7:1 / 4.9:1 on the page; 4.7:1 on a hovered card and on the Needs you card in dark, measured at the console's build) |
 | --accent | #4fcbe2 | #0a6a80 | the system colour: links, focus, Do it, Send, the gauge, running |
 | --need | #f4b13e | #f0a62a | the signal colour: the Needs you column, Approve, warnings |
 | --need-text | #f6bd5a | #8a4f00 | amber text on the page or the Needs you fill |
@@ -29,7 +29,7 @@ The control room of a factory: a near-black blue room of thin-bordered instrumen
 | --st-running | #4fcbe2 | #0a6a80 | dot and word, the card's left rule |
 | --st-waiting | #f4b13e | #8a4f00 | waiting on a human, stale, on the provider |
 | --st-review | #9fb0ff | #4152c4 | in review |
-| --st-done | #5cc98f | #1e7a4c | done |
+| --st-done | #5cc98f | #1c7448 | done (4.9:1 on a hovered card in light, measured at the console's build) |
 | --st-failed | #f26d6d | #b8322a | failed, blocked |
 | --st-closed | #93a1b5 | #5b6678 | closed, queued, waiting on dependencies |
 
