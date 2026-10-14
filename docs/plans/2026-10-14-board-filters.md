@@ -18,7 +18,7 @@ Each item is one pull request from the controller's fork with the lab's before a
 Orientation on 2026-10-14 before the first commit, the code repository's `origin/main` at fc5f612 (roadmap 233 landed after C11):
 
 - The lab, the structural check and the four columns are on main. The board's filter is the project and the view (`boardFilter`, `urlFilter`, `formFilter`, `query()`, the `filter` template), the stream reads the board under `urlFilter` and sends the columns' counts as `counters`.
-- The console tests read the column by `>Title <span` (`col` in lanes_test.go) and the cards by `data-card` (`columnItems` in screen_test.go), so the menu's control sits after the count in the markup and before it on the screen.
+- The console tests read the column by `>Title <span` (`col` in lanes_test.go) and the cards by `data-card` (`columnItems` in screen_test.go), so the menu's control sits after the head in the markup, at the head's right on the screen.
 - Open pull request 759 (roadmap 229, the face's title) touches `titleClause` in board.go, far from the filter and the columns.
 - The Done column's order came from the store (`priority DESC, finished_at DESC NULLS FIRST`, roadmap 234). The factory's card for 234 landed as #762 the same afternoon and the store now sorts finished cards by date; item 0b sorts on the board as well, so the board's order holds whatever the store does.
 
@@ -34,3 +34,12 @@ Orientation on 2026-10-14 before the first commit, the code repository's `origin
 ## Rulings
 
 - The find submits on Enter as a plain GET, not on a pause in typing: a swap of the columns alone would leave the stream on the old filter, since the stream opens with the page's query. The reload is the one way that keeps the poll, the fragments and the stream on the same query.
+- The find applies in both views, the menus in the four columns only. The wide view's human lane (its three lists) stays whole: it is the record view.
+- The status panel's lists read the columns as read, before the find and the menus narrowed them, and the strip counts the project: the filters are the member's lens on the board. The first round's review had declined the opposite for the accent filter with "a note in the IA would settle it"; the IA now says it.
+- A word of the find matches what the face says, and `is:<state>` names a state exactly, because a bare word such as "provider" also hits a title ("Pulse: a provider budget alert"), which the study's chips showed.
+- The count is rendered by a template, never built as HTML in Go: gosec's G203 refused `template.HTML`, and the stream's counters carry the template's output, so the head and the counters cannot drift.
+- A column's menu is a `details` after the head with a GET form of two radio groups and Apply; a choice submits it by script, Apply without. The menu sits after the count in the markup and before it on the screen, because the tests read the column by `>Title <span`. Escape closes an open menu in the capture phase, so the drawer's Escape does not fire.
+- The default order, arrival newest first, moved from a sort before the needs (item 0b) into the menus' step after the find, so "next up" can keep the store's rank. The status panel's In progress list follows the store's order since then, which the IA leaves open.
+- A plan item's cards table wider than its column, which the check's new scrolling lines found: the five columns' table cells wrap. The check's phone-target line reads only this round's controls; the prototype's text links and card openers are not its concern.
+- The lab's shots of an item come from a worktree pinned to the item's branch, since the next item's work starts in the first worktree while the lab runs.
+- Pull request 746, C12's ticker, was left open by the previous session with a green test job: landed in this round after three rebases, since C12 is decided and the page should not carry a ticker the decision removed.

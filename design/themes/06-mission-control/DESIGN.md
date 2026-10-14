@@ -47,7 +47,7 @@ Every state shows its word next to its hue; colour is never the only signal. In 
 top bar 44   home · project ▾ · Board New task Projects Resources Costs Policy Alerts      scenario · theme · sebastian · Log out
 status panel  ⚠ pulse sentence, 20 px ......................................................... more
               ● waiting on you | 3 working | 2 need you | €61.40 / €120.00 ▬▬▬▬▭▭ 51 % | GitHub: …
-main          CHAT 40 %, full height            | Board header: Board · accent ▾ · Wide view · ?
+main          CHAT 40 %, full height            | Board header: Board · find · Wide view · ?
               start line, then the log          | NEEDS YOU (lit) | Queued | In progress | Done
               > composer ................ Send  | 1.5             | 1      | 1.25        | 0.85
 ```
@@ -82,6 +82,12 @@ The main region: the raised panel, a 2 px cyan rule along its top edge, the larg
 Columns are sunken panels with corner marks; the header is the name in small capitals and the count in mono, on one baseline. A card: 1 px hairline border, 2 px left rule in the state hue (none on queued), 8 by 10 px padding. The whole card opens the drawer (item 226): a click anywhere on the face that is not a button, link or field; the title is a button, so Tab reaches the card, the card shows the 2 px cyan focus ring and Enter or Space opens it. The issue link lives in the drawer header, not on the face. Line 1 the ref in mono and the title, two lines at most. Line 2 the state row in mono 11 px: dot and state word in the hue (in In progress the stage: planning, building or verifying, each with its own dot, C8; in Queued: queued or waiting on dependencies), the time in the current stage (the total age stays in the drawer's Status line; C8), then only when exceptional: n/n checks, spend with "⚠ near its budget" in amber from 80 percent (with a 2 px amber meter under the card), the gate and its age, the fine states in amber ("on the provider", "stale, nothing for 40 min"). Separators trail their item, so a wrapped row never starts with a dot. The activity line in mono, one line, only on a working or waiting card or a failing check; the provider's wait may take two lines. Chips only when exceptional: "plan" in cyan on a plan-track card, blocked by n (red, the names on hover), from plan #n, the accent as a dot and its name. No lane badge, no Plan, Ready or Start plan buttons (225): the track is chosen at filing. A card's actions are Retry on a failed card and Close on a card waiting on a human (or failed without an issue), with a confirm. A stale card gets a dashed amber ring.
 
 Done, failed and closed cards are two-line rows without a box, all in the faint colour: the ref and title, then the state glyph and word (✓ done, ✕ failed, ⊘ closed) and the elapsed time. Only the failed tag takes a colour, the quiet red. Retry is a small underlined text link, not a button.
+
+## The find and the column menus (C13)
+
+The find box sits right of "Board" in the board's head: a 232 px mono field at 11.5 px with a 1 px button-line border, the placeholder in the faint colour ("Find: a word, #612, plan:558"), cyan border and ring on focus and a cyan border while it holds a find, × inside its right end as the link to the board without it. A narrowed column's count reads "2 of 5" with the number in cyan, an emptied column says "none match" in the faint mono. The Needs you column keeps its amber from its whole count. On the phone the box takes the full width under "Board" at 44 px.
+
+The column menus: a ▾ in the faint colour at the head's right of Queued, In progress and Done, 24 by 20 px, hover and open in the hover fill with a hairline, cyan with a cyan hairline while the column is in another order or has a show. The popover opens under the head at the column's right, on the raised panel with the strong line and the deep shadow: two radio groups with small-capital legends Order and Show, 22 px rows in the muted colour, the chosen one in the text colour, Apply as a small button. The state line under the head: the choices' words in cyan mono at 11 px, × at its right. On the phone the ▾ and the × are 44 px and the popover spans the column.
 
 ## Needs you
 
