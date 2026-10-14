@@ -1,10 +1,11 @@
-// The four moments every prototype shows. workingCount is the status figure; working is the card list. Loaded with <script src="../scenarios.js">
+// The four moments every prototype shows. workingCount is the status figure; working is the card list.
+// After item 225 (the lanes collapse): no backlog, no lane moves; a card carries its track (plan or direct) from filing and a working card its stage (planning, building, verifying). Loaded with <script src="../scenarios.js">
 // (file:// cannot fetch JSON). Every string is page copy; nothing here is invented
 // by a builder. A builder may add plausible detail of the same kinds, never new kinds.
 window.SCENARIOS = {
   busy: {
     project: "ai-software-factory-code",
-    state: "waiting on you", workingCount: 3, provider: 0, needYou: 2, spend: 61.40, cap: 120, github: "1 open pull request",
+    state: "waiting on you", workingCount: 3, provider: 0, needYou: 2, spend: 61.40, spendToday: 4.82, dayCap: 10, cap: 120, github: "1 open pull request", githubURL: "#",
     pulse: { prominent: true, sentence: "Two cards need your decision; #612's merge carries a migration.",
       bullets: ["Merge PR #612 waits for you: high risk, one migration, the audit found a missing default.",
                 "#603 asks which store the session table should use; the plan said Postgres.",
@@ -23,19 +24,19 @@ window.SCENARIOS = {
         choices: ["Postgres", "SQLite", "Ask the author"], capped: false, alert: 31 }
     ],
     queued: [
-      { issue: 455, task: "t-4c2559f5cb07", title: "Live check: close (Stage 16, 3.4)", status: "backlog", elapsed: "53 h 1 min in all", spent: 0, budget: 2, activity: "card_entered_lane by factoryd at 16:01", moves: ["Plan", "Ready"], closes: true },
-      { issue: 178, task: "t-9d2a71c0e4b3", title: "Console: show the configuration version", status: "backlog", elapsed: "347 h 40 min in all", spent: 0, budget: 2, activity: "accent_set by controller via chat at 07:08", moves: ["Plan", "Ready"], closes: true, accent: "teal" },
+      { issue: 455, task: "t-4c2559f5cb07", title: "Live check: close (Stage 16, 3.4)", status: "queued", elapsed: "53 h 1 min in all", spent: 0, budget: 2, activity: "filed by sebastian via chat at 16:01, direct" },
+      { issue: 178, task: "t-9d2a71c0e4b3", title: "Console: show the configuration version", status: "queued", elapsed: "347 h 40 min in all", spent: 0, budget: 2, activity: "filed by controller via chat at 07:08, direct", accent: "teal" },
       { issue: 620, task: "t-1f8e4b6a2c75", title: "Costs read: a from and a to date", status: "waiting on dependencies", elapsed: "2 h 14 min in all", spent: 0, budget: 2, blocked: 2, blockedOn: "#612, #609" },
-      { issue: 621, task: "t-5a3c9e1d7b40", title: "Export in pull request mode", status: "queued", elapsed: "48 min in all", spent: 0, budget: 2, plan: 558, planKey: "558.3" }
+      { issue: 621, task: "t-5a3c9e1d7b40", title: "Export in pull request mode", status: "queued", elapsed: "48 min in all", spent: 0, budget: 2, fromPlan: 558 }
     ],
     working: [
-      { issue: 601, task: "t-e02e56a2c488", title: "Console: the drawer's Overview top block", status: "running", elapsed: "23 min", checks: "3/4", spent: 1.72, budget: 2, near: true, model: "coding-cheap", activity: "Reading internal/console/board.go…", lane: "ready" },
-      { issue: 598, task: "t-b8a1d5f1612a", title: "GitHub sync pulls a card", status: "running", elapsed: "41 min", spent: 0.63, budget: 2, model: "coding-frontier", activity: "Running go test ./internal/console", lane: "ready" },
-      { issue: 611, task: "t-a4b58737c1bc", title: "Acceptance: export as the human", status: "running", elapsed: "8 min", spent: 0.11, budget: 2, model: "coding-cheap", activity: "Writing acceptance/export_test.go", lane: "ready" }
+      { issue: 601, task: "t-e02e56a2c488", title: "Console: the drawer's Overview top block", status: "running", stage: "building", track: "direct", elapsed: "23 min", checks: "3/4", spent: 1.72, budget: 2, near: true, model: "coding-cheap", activity: "Reading internal/console/board.go…" },
+      { issue: 598, task: "t-b8a1d5f1612a", title: "GitHub sync pulls a card", status: "running", stage: "building", track: "direct", elapsed: "41 min", spent: 0.63, budget: 2, model: "coding-frontier", activity: "Running go test ./internal/console" },
+      { issue: 611, task: "t-a4b58737c1bc", title: "Plan: the members page and the approvers", status: "running", stage: "planning", track: "plan", elapsed: "8 min", spent: 0.11, budget: 5, model: "coding-frontier", activity: "Reading docs/plans/2026-10-14-lane-collapse.md" }
     ],
     verifying: [
-      { issue: 612, task: "t-0b7d3e9a4c21", title: "Ledger: the month cap per project", status: "in review", elapsed: "2 h 30 min", checks: "4/4", pr: 612, spent: 1.08, budget: 2, model: "coding-frontier", activity: "review by factoryd at 14:02: approve" },
-      { issue: 609, task: "t-3e7b2c9f5a18", title: "Pulse: a provider budget alert", status: "in review", gate: "merge queue", gateAge: "6 min", elapsed: "1 h 51 min", checks: "4/4", pr: 609, spent: 0.84, budget: 2, model: "coding-cheap", activity: "merge queue: behind #612" }
+      { issue: 612, task: "t-0b7d3e9a4c21", title: "Ledger: the month cap per project", status: "in review", stage: "verifying", elapsed: "2 h 30 min", checks: "4/4", pr: 612, spent: 1.08, budget: 2, model: "coding-frontier", activity: "review by factoryd at 14:02: approve" },
+      { issue: 609, task: "t-3e7b2c9f5a18", title: "Pulse: a provider budget alert", status: "in review", stage: "verifying", gate: "merge queue", gateAge: "6 min", elapsed: "1 h 51 min", checks: "4/4", pr: 609, spent: 0.84, budget: 2, model: "coding-cheap", activity: "merge queue: behind #612" }
     ],
     done: [
       { issue: 490, title: "README.md: extend the intro", status: "done", elapsed: "29 min in all", spent: 0.01, budget: 2, at: "15:32" },
@@ -54,7 +55,7 @@ window.SCENARIOS = {
         proposal: { title: "I will:", changes: ["answer #603 with Postgres", "move #620 to ready"], detail: "answer posts on issue #603 as sebastian; the move is a lane start" } }
     ],
     drawer: {
-      card: { issue: 601, task: "t-e02e56a2c488", title: "Console: the drawer's Overview top block", status: "running", elapsed: "23 min", checks: "3/4", spent: 1.72, budget: 2, model: "coding-cheap", lane: "ready" },
+      card: { issue: 601, task: "t-e02e56a2c488", title: "Console: the drawer's Overview top block", status: "running", stage: "building", track: "direct", elapsed: "23 min", checks: "3/4", spent: 1.72, budget: 2, model: "coding-cheap" },
       overview: {
         task: "Give the drawer's Overview a four-line top block: task, status, budget and agent.",
         status: "running for 23 min, in checks 3 of 4",
@@ -78,13 +79,13 @@ window.SCENARIOS = {
   },
   idle: {
     project: "ai-software-factory-code",
-    state: "idle", workingCount: 0, provider: 0, needYou: 0, spend: 144.16, cap: 120, github: "",
+    state: "idle", workingCount: 0, provider: 0, needYou: 0, spend: 144.16, spendToday: 0.39, dayCap: 10, cap: 120, github: "", githubURL: "",
     pulse: { prominent: false, sentence: "Factory is idle with no active work; spend of €144.16 has exceeded the monthly budget of €120.00.",
-      bullets: ["Nothing runs and nothing waits for you.", "Two backlog cards wait for a lane: #455 and #178.", "The month cap is passed; new sessions wait until it is raised or the month turns."] },
+      bullets: ["Nothing runs and nothing waits for you.", "Two queued cards wait for the month cap to clear: #455 and #178.", "The month cap is passed; new sessions wait until it is raised or the month turns."] },
     needs: [],
     queued: [
-      { issue: 455, task: "t-4c2559f5cb07", title: "Live check: close (Stage 16, 3.4)", status: "backlog", elapsed: "53 h 1 min in all", spent: 0, budget: 2, activity: "card_entered_lane by factoryd via factoryd at 16:01", moves: ["Plan", "Ready"], closes: true },
-      { issue: 178, task: "t-9d2a71c0e4b3", title: "Console: show the configuration version", status: "backlog", elapsed: "347 h 40 min in all", spent: 0, budget: 2, activity: "accent_set by controller via chat at 07:08", moves: ["Plan", "Ready"], closes: true }
+      { issue: 455, task: "t-4c2559f5cb07", title: "Live check: close (Stage 16, 3.4)", status: "queued", elapsed: "53 h 1 min in all", spent: 0, budget: 2, activity: "filed by sebastian via chat at 16:01, direct" },
+      { issue: 178, task: "t-9d2a71c0e4b3", title: "Console: show the configuration version", status: "queued", elapsed: "347 h 40 min in all", spent: 0, budget: 2, activity: "filed by controller via chat at 07:08, direct" }
     ],
     working: [], verifying: [],
     doneCount: 139,
@@ -107,7 +108,7 @@ window.SCENARIOS = {
   },
   fire: {
     project: "ai-software-factory-code",
-    state: "waiting on you", workingCount: 1, provider: 2, needYou: 1, spend: 97.20, cap: 120, github: "1 open pull request",
+    state: "waiting on you", workingCount: 1, provider: 2, needYou: 1, spend: 97.20, spendToday: 9.71, dayCap: 10, cap: 120, github: "1 open pull request", githubURL: "#",
     pulse: { prominent: true, sentence: "The model provider refuses every call since 13:22; two cards wait on it and #538 is at its cap.",
       bullets: ["LiteLLM answers 429 from the provider's account budget; nothing can run until it is raised.", "#538 burned its budget on failed calls and asks for a decision.", "#531 has had no event for 40 minutes.", "Two cards failed today: #607 and #535."] },
     needs: [
@@ -116,16 +117,16 @@ window.SCENARIOS = {
         question: "The session cap fired after five attempts; the acceptance tests are written and pass. Another answer grants one more session of the same agent.", choices: [] }
     ],
     queued: [
-      { issue: 455, task: "t-4c2559f5cb07", title: "Live check: close (Stage 16, 3.4)", status: "backlog", elapsed: "53 h 1 min in all", spent: 0, budget: 2, moves: ["Plan", "Ready"], closes: true },
+      { issue: 455, task: "t-4c2559f5cb07", title: "Live check: close (Stage 16, 3.4)", status: "queued", elapsed: "53 h 1 min in all", spent: 0, budget: 2 },
       { issue: 540, task: "t-7788aa11bb22", title: "A capped verification card closes on attested evidence", status: "queued", elapsed: "12 min in all", spent: 0, budget: 2 }
     ],
     working: [
-      { issue: 531, task: "t-0f1e2d3c4b5a", title: "Console: the Close action's live check", status: "running", elapsed: "1 h 48 min", spent: 0.41, budget: 2, model: "coding-cheap", activity: "Running bash check", stale: true, staleText: "nothing for 40 min" },
-      { issue: 516, task: "t-9988776655aa", title: "Pulse: the provider budget margin", status: "running", elapsed: "2 h 2 min", spent: 1.95, budget: 2, near: true, model: "coding-frontier", provider: true, activity: "waiting on the model provider since 13:22 (429 budget exhausted)" },
-      { issue: 537, task: "t-5544332211bb", title: "Members: the approver list", status: "running", elapsed: "1 h 15 min", spent: 0.22, budget: 2, model: "coding-cheap", provider: true, activity: "waiting on the model provider since 13:24" }
+      { issue: 531, task: "t-0f1e2d3c4b5a", title: "Console: the Close action's live check", status: "running", stage: "building", elapsed: "1 h 48 min", spent: 0.41, budget: 2, model: "coding-cheap", activity: "Running bash check", stale: true, staleText: "nothing for 40 min" },
+      { issue: 516, task: "t-9988776655aa", title: "Pulse: the provider budget margin", status: "running", stage: "building", elapsed: "2 h 2 min", spent: 1.95, budget: 2, near: true, model: "coding-frontier", provider: true, activity: "waiting on the model provider since 13:22 (429 budget exhausted)" },
+      { issue: 537, task: "t-5544332211bb", title: "Members: the approver list", status: "running", stage: "building", elapsed: "1 h 15 min", spent: 0.22, budget: 2, model: "coding-cheap", provider: true, activity: "waiting on the model provider since 13:24" }
     ],
     verifying: [
-      { issue: 612, task: "t-0b7d3e9a4c21", title: "Ledger: the month cap per project", status: "in review", elapsed: "2 h 30 min", checks: "2/4", pr: 612, spent: 1.08, budget: 2, model: "coding-frontier", activity: "checks: go test ./acceptance failed" }
+      { issue: 612, task: "t-0b7d3e9a4c21", title: "Ledger: the month cap per project", status: "in review", stage: "verifying", elapsed: "2 h 30 min", checks: "2/4", pr: 612, spent: 1.08, budget: 2, model: "coding-frontier", activity: "checks: go test ./acceptance failed" }
     ],
     done: [
       { issue: 607, title: "Live check 3.11: split pre-check", status: "failed", elapsed: "1 h 13 min in all", spent: 0.20, budget: 2, at: "20:21", reason: "acceptance/big_table_test.go alone changes 506 lines, over the bound 400" },
@@ -142,10 +143,10 @@ window.SCENARIOS = {
   },
   quiet: {
     project: "ai-software-factory-code",
-    state: "working", workingCount: 1, provider: 0, needYou: 0, spend: 4.10, cap: 120, github: "0 open pull requests",
+    state: "working", workingCount: 1, provider: 0, needYou: 0, spend: 4.10, spendToday: 0.31, dayCap: 10, cap: 120, github: "0 open pull requests", githubURL: "#",
     pulse: { prominent: false, sentence: "One card is working; nothing needs you.", bullets: ["#622 started 6 minutes ago on the costs read's date window.", "Three cards finished this morning.", "Spend this month is €4.10 of €120."] },
     needs: [], queued: [],
-    working: [{ issue: 622, task: "t-c0ffee123456", title: "Costs read: a from and a to date", status: "running", elapsed: "6 min", spent: 0.08, budget: 2, model: "coding-cheap", activity: "Reading internal/console/ledger.go", lane: "ready" }],
+    working: [{ issue: 622, task: "t-c0ffee123456", title: "Costs read: a from and a to date", status: "running", stage: "building", elapsed: "6 min", spent: 0.08, budget: 2, model: "coding-cheap", activity: "Reading internal/console/ledger.go" }],
     verifying: [],
     done: [
       { issue: 620, title: "Costs page: the date window form", status: "done", elapsed: "38 min in all", spent: 0.22, budget: 2, at: "09:12" },

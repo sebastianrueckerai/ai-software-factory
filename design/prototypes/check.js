@@ -7,12 +7,12 @@ const url = (q) => 'file://' + path.join(dir, 'index.html') + '?' + q;
 const mustHave = {
   busy: ['Factory console', 'Board', 'New task', 'Projects', 'Resources', 'Costs', 'Policy', 'Alerts', 'Log out', 'sebastian',
     'waiting on you', '3 working', '2 need you', '€61.40', '€120', 'GitHub', 'Two cards need your decision', 'more',
-    'Needs you', 'Queued', 'Working', 'Verifying', 'Done', 'Merge PR #612', 'high risk', 'migration', 'Approve as you', 'Deny', 'Split',
+    'Needs you', 'Queued', 'Working', 'Verifying', 'Done', 'Merge PR #612', 'high risk', 'migration', 'Approve', 'Deny', 'Split',
     'Which store for the session table?', 'Postgres', 'SQLite', 'Ask the author',
-    '#455', '#178', '#620', 'blocked by 2', 'part of plan #558', '#601', '3/4 checks', '€1.72', 'near its budget', 'Reading internal/console/board.go',
-    '#598', '#611', '#612', '4/4 checks', '#609', 'merge queue', '#490', '#616', '#610', '#607', 'failed', '#608', '#604', '#599', 'closed', '#597',
+    '#455', '#178', '#620', 'blocked by 2', 'from plan #558', '#601', 'building', '3/4 checks', '€1.72', 'near its budget', 'Reading internal/console/board.go',
+    '#598', '#611', 'planning', '#612', 'verifying', '4/4 checks', '#609', 'merge queue', '#490', '#616', '#610', '#607', 'failed', '#608', '#604', '#599', 'closed', '#597',
     'project agent', 'New conversation', 'Why is #603 waiting?', 'read card #603', 'Do it', 'Skip', 'Send', 'own conversation'],
-  idle: ['idle', '0 working', '0 need you', '€144.16', 'Factory is idle', '#455', '#178', 'Plan', 'Ready', 'Close', 'Done'],
+  idle: ['idle', '0 working', '0 need you', '€144.16', 'Factory is idle', '#455', '#178', 'queued', 'Done'],
   fire: ['#538', 'Grant one session', 'nothing for 40 min', 'waiting on the model provider', '€1.95', '#535', 'failed'],
 };
 (async () => {

@@ -28,6 +28,10 @@ Judged on the busy screen in both themes, the idle screen, the drawer and the ph
 - **The chat's start line fills the void.** A chat with two messages and a bottom-aligned log looks empty; the inventory's start line at the top of the log fixes it everywhere.
 - **The critic is right on craft, wrong on structure.** Cut-off text, contrast, tap targets: take them. "The drawer covers the chat" and "the layout is tabbed": check the screenshot first.
 
+## After the pick
+
+Sebastian picked 06 Mission control (C5). From then on only 06 follows the later decisions (C4 to C7: Needs you as a column, the live dots, the chat turns, the lanes collapse, "Approve", the whole card opens the drawer, the status strip expands). The shared `scenarios.js` and `check.js` follow C7 too, so the other nine prototypes no longer pass `check.js`; they stay as the record of the round.
+
 ## Sebastian's call
 
 `PICKS.md`: which one becomes the console, or which two go one more round. The implementation in the console's templates and CSS follows the pick.

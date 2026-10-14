@@ -29,4 +29,6 @@ Notes:
 
 Which one becomes the console, or which two go one more round:
 
-Notes:
+- [x] 06 Mission control (Sebastian, 2026-10-14, C5), with the chat turns of 09 Inbox first.
+
+Notes: Needs you as the first column, never a tray (C4). Red stays for problems only. Chat under the board is out (the chat grows down, the board grows down). The implementation plan: [docs/plans/2026-10-14-console-design.md](../docs/plans/2026-10-14-console-design.md), roadmap item 227.

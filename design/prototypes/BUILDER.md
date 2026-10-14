@@ -11,7 +11,7 @@ Required hooks, so the shared scripts can check and shoot every prototype the sa
 - Every card element has `data-card="<issue number>"`; its title is a `<button data-open>` or `<a data-open>` that opens the drawer for that card.
 - The chat's composer is a `<textarea>`; Enter sends, Shift+Enter breaks. A proposal's buttons read exactly "Do it" and "Skip"; after Do it the proposal becomes an "applied" line with an "undo" control.
 - The scenario switch has `#scenario` (a select or buttons) and the four names busy, idle, fire, quiet.
-- Needs you actions carry their exact labels: "Approve as you", "Deny", "Split", the choice buttons, "Or in your words" (or the open text box), "Grant one session with this answer" on a capped card.
+- Needs you actions carry their exact labels: "Approve", "Deny", "Split", the choice buttons, "Or in your words" (or the open text box), "Grant one session with this answer" on a capped card.
 
 Check and shoot yourself before reporting:
 
