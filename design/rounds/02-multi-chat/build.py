@@ -71,7 +71,7 @@ def shell(t):
     t = sub(t, '''<button type="button" data-sc="busy">busy</button><button type="button" data-sc="idle">idle</button><button type="button" data-sc="fire">fire</button><button type="button" data-sc="quiet">quiet</button>''',
            '''<button type="button" data-sc="busy">busy</button><button type="button" data-sc="threads">threads</button><button type="button" data-sc="poke">poke</button><button type="button" data-sc="assisted">assisted</button><button type="button" data-sc="escalation">escalation</button>''')
     t = sub(t, "var st = { sc: S[params.get('scenario')] ? params.get('scenario') : 'busy', wide: false, accent: '', pulseOpen: false, statusOpen: false,\n    chat: [], old: [], queue: [], typing: false, drawer: null, done: {}, steer: {}, cols: {}, idx: null };\n  var D = function () { return S[st.sc]; };",
-           "var MC = window.MULTICHAT, MOMENTS = ['busy', 'threads', 'poke', 'assisted', 'escalation'];\n  var st = { sc: MOMENTS.indexOf(params.get('scenario')) >= 0 ? params.get('scenario') : 'busy', wide: false, accent: '', pulseOpen: false, statusOpen: false,\n    mc: null, queue: [], typing: false, drawer: null, done: {}, steer: {}, cols: {}, idx: null, palette: -1, dialog: null, menu: false, lvlOpen: false };\n  var D = function () { return S.busy; };")
+           "var MC = window.MULTICHAT, MOMENTS = ['busy', 'threads', 'poke', 'assisted', 'escalation'];\n  var st = { sc: MOMENTS.indexOf(params.get('scenario')) >= 0 ? params.get('scenario') : 'busy', wide: false, accent: '', pulseOpen: false, statusOpen: false,\n    mc: null, queue: [], typing: false, drawer: null, done: {}, steer: {}, cols: {}, idx: null, palette: -1, dialog: null, menu: false, lvlOpen: false, swOpen: true };\n  var D = function () { return S.busy; };")
     t = sub(t, "    st.chat = JSON.parse(JSON.stringify(d.chat)); st.old = []; st.queue = []; st.typing = false; st.done = {}; st.steer = {}; st.pulseOpen = false;",
            "    st.mc = MC.threadsOf(name); st.queue = []; st.typing = false; st.done = {}; st.steer = {}; st.pulseOpen = false; st.palette = -1; st.dialog = null; st.menu = false; st.lvlOpen = false;")
     t = sub(t, "      case 'chat-new': newConversation(); break;", "      case 'chat-new': newThread(); break;")
@@ -94,6 +94,7 @@ def shell(t):
     if (t.dataset.choice != null) { answer(+t.dataset.i, t.dataset.choice); return; }
     if (t.dataset.cmd) { runCommand(t.dataset.cmd); return; }
     if (t.dataset.lvlbtn != null) { toggleLevel(); return; }
+    if (t.dataset.swtoggle != null) { toggleSwitcher(); return; }
     if (t.dataset.lvl) { askLevel(t.dataset.lvl); return; }
     if (t.dataset.dlg) { dialogAct(t.dataset.dlg); return; }
     if (t.dataset.tmenu) { threadAct(t.dataset.tmenu); return; }
@@ -138,7 +139,7 @@ ENGINE = r'''  /* the threads (roadmap 239): the open thread's log, the switcher
   function badgeHTML(t) { return t.unread ? '<span class="badge" aria-label="' + t.unread + ' unread">' + t.unread + '</span>' : ''; }
   function rowHTML(t, cls) {
     var isOpen = t.id === st.mc.open;
-    return '<button type="button" class="trow' + (cls ? ' ' + cls : '') + (isOpen ? ' on' : '') + (t.unread ? ' unread' : '') + (t.inbox ? ' inbox' : '') + '" data-thread="' + t.id + '" aria-current="' + (isOpen ? 'true' : 'false') + '">' +
+    return '<button type="button" class="trow' + (cls ? ' ' + cls : '') + (isOpen ? ' on' : '') + (t.unread ? ' unread' : '') + (t.inbox ? ' inbox' : '') + '" data-thread="' + t.id + '" aria-current="' + (isOpen ? 'true' : 'false') + '" title="' + esc(t.title) + (t.unread ? ', ' + t.unread + ' unread' : '') + (t.working ? ', a turn in flight' : '') + '">' +
       markHTML(t) + '<span class="ttitle">' + esc(t.title) + '</span><span class="tat">' + esc(t.at) + '</span>' + badgeHTML(t) + '</button>';
   }
   function archivedHTML() {
@@ -158,6 +159,13 @@ ENGINE = r'''  /* the threads (roadmap 239): the open thread's log, the switcher
       return '<button type="button" role="menuitemradio" aria-checked="' + on + '" data-lvl="' + esc(l) + '"><i aria-hidden="true"></i><b>' + esc(l) + '</b><span class="ck" aria-hidden="true">' + (on ? '✓' : '') + '</span><span class="lw">' + esc(MC.levelWords[l]) + '</span></button>'; }).join('');
   }
   function renderLevel() { var c = $('.lvlctl'); if (c) c.outerHTML = levelCtlHTML(); }
+  /* the switcher's fold: a toggle in its head; folded, the rows keep their marks, the badge and the working dot; on the phone one summary row stands in */
+  function swToggleHTML() { return '<button type="button" class="swtg" data-swtoggle aria-expanded="' + st.swOpen + '" aria-label="' + (st.swOpen ? 'Fold the threads' : 'Unfold the threads') + '" title="' + (st.swOpen ? 'Fold the threads' : 'Unfold the threads') + '">' + (st.swOpen ? '‹' : '›') + '</button>'; }
+  function swSumHTML() {
+    var a = active(), un = unreadTotal(), wk = a.filter(function (t) { return t.working; }).length;
+    return '<button type="button" class="sw-sum" data-swtoggle aria-expanded="' + st.swOpen + '">Threads <span class="n">' + a.length + '</span>' + (un ? ' · <span class="badge">' + un + '</span> unread' : '') + (wk ? ' · <span class="tmark working"><i class="dot" aria-hidden="true"></i></span> ' + wk + ' working' : '') + '<span class="chev" aria-hidden="true">' + (st.swOpen ? '⌃' : '⌄') + '</span></button>';
+  }
+  function toggleSwitcher() { st.swOpen = !st.swOpen; renderChat(); var b = $('[data-swtoggle]'); if (b) b.focus(); }
   function toggleLevel() { st.lvlOpen = !st.lvlOpen; st.dialog = null; renderLevel(); var f = st.lvlOpen ? $('.lvlpop [aria-checked="true"]') : $('#level-btn'); if (f) f.focus(); }
   function closeLevel() { st.lvlOpen = false; st.dialog = null; renderLevel(); var b = $('#level-btn'); if (b) b.focus(); }
   function msgHTML(m, i) {
@@ -227,7 +235,7 @@ ENGINE = r'''  /* the threads (roadmap 239): the open thread's log, the switcher
       '<div class="prompt"><span class="ps" aria-hidden="true">&gt;</span><label class="vh" for="chat-input">Your message to the project agent</label>' +
       '<textarea id="chat-input" rows="3" maxlength="8192" placeholder="' + (t.inbox ? 'Reply to the factory, or ask… (Enter sends)' : 'Ask or tell the project… (Enter sends, Shift+Enter breaks the line)') + '" aria-keyshortcuts="/"></textarea>' +
       '<button type="submit" class="btn btn-primary">Send</button></div>' +
-      '<div class="own"><span class="cmds"><button type="button" class="cmd" data-cmd="/compact" title="compact this thread: the older turns become a summary">/compact</button><button type="button" class="cmd" data-cmd="/new" title="a new thread">/new</button></span>This is your own thread with the project agent; other members have theirs.' + levelCtlHTML() + '</div>' +
+      '<div class="own"><span class="own-l"><span class="cmds"><button type="button" class="cmd" data-cmd="/compact" title="the older turns of this thread become a summary">/compact</button><button type="button" class="cmd" data-cmd="/new" title="a new thread">/new</button></span><span>This is your own thread with the project agent; other members have theirs.</span></span>' + levelCtlHTML() + '</div>' +
       '<ol class="queue" id="chat-queue" aria-label="Your messages waiting for the turn to end" hidden></ol></form>';
   }
   function dialogHTML() {
@@ -331,6 +339,7 @@ ENGINE = r'''  /* the threads (roadmap 239): the open thread's log, the switcher
       log: '<div class="log" id="chat-log" aria-live="polite"><div class="log-inner"></div></div>',
       composer: composerHTML()
     });
+    $('#chat').classList.toggle('sw-collapsed', !st.swOpen);
     renderLog(); renderQueue(); renderPalette(); setTitle(); afterChat();
   }
 '''
@@ -385,7 +394,8 @@ COMMON_CSS = r'''/* the threads: the rows, the marks, the badge, the inbox, the 
 .answer .btn { height: auto; min-height: 28px; white-space: normal; }
 .answer-l { color: var(--need-text); font: 600 12px var(--font-ui); font-variant-caps: all-small-caps; letter-spacing: .06em; }
 .answer-or { color: var(--text-faint); font: 11.5px var(--font-mono); }
-.own { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.own { display: flex; align-items: flex-start; gap: 10px; }
+.own-l { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; }
 .cmds { display: inline-flex; gap: 4px; }
 .cmd { height: 18px; padding: 0 6px; border: 1px solid var(--line-strong); border-radius: 2px; background: none; color: var(--text-muted); font: 11px var(--font-mono); cursor: pointer; }
 .cmd:hover { color: var(--text); border-color: var(--text-faint); }
@@ -395,8 +405,8 @@ COMMON_CSS = r'''/* the threads: the rows, the marks, the badge, the inbox, the 
 .palette button b { color: var(--accent); font: 600 12.5px var(--font-mono); }
 .palette button[aria-selected="true"], .palette button:hover { background: var(--bg-hover); color: var(--text); }
 .archived-note { margin: 0; padding: 12px 14px; border-top: 1px solid var(--line); color: var(--text-muted); font-size: 12.5px; }
-.lvlctl { position: relative; margin-left: auto; }
-#level-btn { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border: 1px solid var(--line-strong); border-radius: 3px; background: none; color: var(--text-muted); font: 11.5px var(--font-mono); cursor: pointer; }
+.lvlctl { position: relative; margin-left: auto; flex: none; }
+#level-btn { display: inline-flex; align-items: center; gap: 6px; height: 18px; padding: 0 8px; border: 1px solid var(--line-strong); border-radius: 3px; background: none; color: var(--text-muted); font: 11.5px var(--font-mono); cursor: pointer; }
 #level-btn i { width: 8px; height: 8px; border-radius: 1px; background: var(--accent); box-shadow: 0 0 5px color-mix(in srgb, var(--accent) 70%, transparent); }
 #level-btn:hover, #level-btn[aria-expanded="true"] { color: var(--text); border-color: var(--text-faint); }
 .lvlpop { position: absolute; right: 0; bottom: calc(100% + 6px); z-index: 20; width: 330px; padding: 6px; background: var(--bg-raised); border: 1px solid var(--line-strong); box-shadow: 0 12px 32px rgba(0, 0, 0, .4); }
@@ -412,7 +422,25 @@ COMMON_CSS = r'''/* the threads: the rows, the marks, the badge, the inbox, the 
 .lvl-confirm { padding: 6px 8px 4px; }
 .lvl-confirm h2 { margin: 0 0 6px; font-size: 13px; font-weight: 600; }
 .lvl-confirm p { margin: 0 0 10px; color: var(--text-muted); font-size: 12px; line-height: 1.45; }
-.archived-note { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.archived-note { display: flex; align-items: flex-start; gap: 10px; }
+.swhead { display: flex; justify-content: flex-end; padding: 2px 4px 4px; }
+.swtg { width: 20px; height: 20px; padding: 0; border: 0; border-radius: 2px; background: none; color: var(--text-faint); font: 15px/1 var(--font-mono); cursor: pointer; }
+.swtg:hover { color: var(--text); background: var(--bg-hover); }
+.sw-sum { display: none; align-items: center; gap: 6px; width: 100%; min-height: 44px; padding: 0 12px; border: 0; border-bottom: 1px solid var(--line); background: var(--bg-panel); color: var(--text-muted); font: 12.5px var(--font-ui); text-align: left; cursor: pointer; }
+.sw-sum .n { color: var(--text); font-family: var(--font-mono); }
+.sw-sum .chev { margin-left: auto; color: var(--text-faint); font: 13px/1 var(--font-mono); }
+#chat.sw-collapsed #switcher { padding-left: 0; padding-right: 0; }
+#chat.sw-collapsed #switcher .thr { grid-template-columns: 1fr; padding: 2px 0 4px; }
+#chat.sw-collapsed #switcher .thr span, #chat.sw-collapsed #switcher .ttitle, #chat.sw-collapsed #switcher .tat, #chat.sw-collapsed #switcher .tline, #chat.sw-collapsed #switcher .tarch { display: none; }
+#chat.sw-collapsed #switcher .swhead, #chat.sw-collapsed #switcher .thr { justify-content: center; justify-items: center; }
+#chat.sw-collapsed #switcher .trow { position: relative; grid-template-columns: 1fr; justify-content: center; justify-items: center; padding: 0; }
+#chat.sw-collapsed #switcher .trow .tmark { width: 22px; justify-content: center; }
+#chat.sw-collapsed #switcher .trow .tmark:empty::before { content: "·"; color: var(--text-faint); }
+#chat.sw-collapsed #switcher .badge { position: absolute; top: 3px; right: 2px; min-width: 15px; padding: 0 3px; font-size: 9.5px; line-height: 15px; }
+@media (max-width: 899px) {
+  #chat.sw-collapsed #switcher { display: none; }
+  #chat.sw-collapsed .sw-sum { display: flex; }
+}
 .overlay-box p { margin: 0 0 14px; color: var(--text-muted); font-size: 13px; line-height: 1.5; }
 @media (max-width: 899px) {
   .trow { min-height: 44px; font-size: 14px; }
@@ -421,6 +449,7 @@ COMMON_CSS = r'''/* the threads: the rows, the marks, the badge, the inbox, the 
   .msg .choices { flex-direction: column; align-items: stretch; }
   .palette button { height: 44px; }
   #level-btn { height: 44px; padding: 0 12px; }
+  .swtg { width: 44px; height: 44px; }
   .lvlpop { width: min(330px, calc(100vw - 48px)); }
   .lvlpop [data-lvl] { min-height: 44px; }
   .cmd, .restore, .open-arch { min-height: 44px; }
@@ -441,6 +470,7 @@ def variant(name, css, js, head_level):
 # ---- variant rail: the threads as a rail at the chat's left edge ----
 
 RAIL_CSS = r'''.chat { display: grid; grid-template-columns: 196px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+#chat.sw-collapsed { grid-template-columns: 36px minmax(0, 1fr); }
 .chat > .chat-head { grid-column: 1 / -1; }
 .rail { display: flex; flex-direction: column; gap: 2px; min-height: 0; padding: 8px 6px; border-right: 1px solid var(--line); background: var(--bg-panel); overflow-y: auto; }
 .rail .trow { flex: none; }
@@ -454,7 +484,7 @@ RAIL_CSS = r'''.chat { display: grid; grid-template-columns: 196px minmax(0, 1fr
 }
 '''
 RAIL_JS = r'''  function switcherHTML() {
-    return '<nav class="rail" id="switcher" aria-label="Threads">' + active().map(function (t) { return rowHTML(t); }).join('') + archivedHTML() + '</nav>';
+    return swSumHTML() + '<nav class="rail" id="switcher" aria-label="Threads"><div class="swhead">' + swToggleHTML() + '</div>' + active().map(function (t) { return rowHTML(t); }).join('') + archivedHTML() + '</nav>';
   }
   function chatLayout(p) { return p.head + p.switcher + '<div class="chat-main">' + p.thread + p.start + p.log + p.composer + '</div>'; }
   function afterChat() {}
@@ -463,9 +493,10 @@ RAIL_JS = r'''  function switcherHTML() {
 # ---- variant instrument: the threads as a mono table at the chat's left, the thread's actions as text buttons ----
 
 INSTRUMENT_CSS = r'''.chat { display: grid; grid-template-columns: 212px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+#chat.sw-collapsed { grid-template-columns: 36px minmax(0, 1fr); }
 .chat > .chat-head { grid-column: 1 / -1; }
 .ttable { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--line); background: var(--bg-panel); overflow-y: auto; }
-.ttable .thr { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 0 6px; padding: 6px 8px 4px; color: var(--text-faint); font: 10.5px var(--font-mono); font-variant-caps: all-small-caps; letter-spacing: .06em; border-bottom: 1px solid var(--line); }
+.ttable .thr { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto auto; align-items: center; gap: 0 6px; padding: 6px 8px 4px; color: var(--text-faint); font: 10.5px var(--font-mono); font-variant-caps: all-small-caps; letter-spacing: .06em; border-bottom: 1px solid var(--line); }
 .ttable .trow { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 0 6px; min-height: 32px; padding: 0 8px; border-radius: 0; border-bottom: 1px solid var(--line); font: 12.5px var(--font-mono); }
 .ttable .trow.on { box-shadow: inset 2px 0 0 var(--accent); }
 .ttable .trow .tat { font-size: 11px; }
@@ -494,7 +525,7 @@ INSTRUMENT_CSS = r'''.chat { display: grid; grid-template-columns: 212px minmax(
 }
 '''
 INSTRUMENT_JS = r'''  function switcherHTML() {
-    return '<nav class="ttable" id="switcher" aria-label="Threads"><div class="thr" aria-hidden="true"><span>mark</span><span>thread</span><span>last</span></div>' +
+    return swSumHTML() + '<nav class="ttable" id="switcher" aria-label="Threads"><div class="thr"><span aria-hidden="true">mark</span><span aria-hidden="true">thread</span><span aria-hidden="true">last</span>' + swToggleHTML() + '</div>' +
       active().map(function (t) { return rowHTML(t); }).join('') + archivedHTML() + '</nav>';
   }
   function threadActionsHTML() {
@@ -507,6 +538,7 @@ INSTRUMENT_JS = r'''  function switcherHTML() {
 # ---- variant messenger: two-line rows with the newest line, round marks, the archived folded ----
 
 MESSENGER_CSS = r'''.chat { display: grid; grid-template-columns: 236px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+#chat.sw-collapsed { grid-template-columns: 36px minmax(0, 1fr); }
 .chat > .chat-head { grid-column: 1 / -1; }
 .mlist { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--line); background: var(--bg-panel); overflow-y: auto; }
 .mlist .trow { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; grid-template-rows: auto auto; gap: 1px 10px; align-items: center; min-height: 52px; padding: 7px 10px; border-radius: 0; border-bottom: 1px solid var(--line); }
@@ -536,14 +568,14 @@ MESSENGER_CSS = r'''.chat { display: grid; grid-template-columns: 236px minmax(0
 MESSENGER_JS = r'''  function newest(t) { var m = t.messages[t.messages.length - 1]; if (!m) return 'nothing yet'; var s = (m.who === 'you' ? 'you: ' : '') + m.text.replace(/\s+/g, ' '); return s.length > 48 ? s.slice(0, 48) + '…' : s; }
   function mrowHTML(t) {
     var isOpen = t.id === st.mc.open, init = t.inbox ? '⌂' : t.title.charAt(0).toUpperCase();
-    return '<button type="button" class="trow' + (isOpen ? ' on' : '') + (t.unread ? ' unread' : '') + (t.inbox ? ' inbox' : '') + '" data-thread="' + t.id + '" aria-current="' + (isOpen ? 'true' : 'false') + '">' +
+    return '<button type="button" class="trow' + (isOpen ? ' on' : '') + (t.unread ? ' unread' : '') + (t.inbox ? ' inbox' : '') + '" data-thread="' + t.id + '" aria-current="' + (isOpen ? 'true' : 'false') + '" title="' + esc(t.title) + (t.unread ? ', ' + t.unread + ' unread' : '') + (t.working ? ', a turn in flight' : '') + '">' +
       '<span class="tmark' + (t.inbox ? ' inbox' : t.working ? ' working' : '') + '" aria-hidden="true">' + (t.working && !t.inbox ? '<i class="dot"></i>' : init) + '</span>' +
       '<span class="ttitle">' + esc(t.title) + '</span><span class="tat">' + esc(t.at) + '</span>' +
       '<span class="tline' + (t.working ? ' working' : '') + '">' + (t.working ? 'a turn in flight…' : esc(newest(t))) + '</span>' + badgeHTML(t) + '</button>';
   }
   function switcherHTML() {
     var a = archived();
-    return '<nav class="mlist" id="switcher" aria-label="Threads">' + active().map(mrowHTML).join('') +
+    return swSumHTML() + '<nav class="mlist" id="switcher" aria-label="Threads"><div class="swhead">' + swToggleHTML() + '</div>' + active().map(mrowHTML).join('') +
       (a.length ? '<details class="tarch"' + (open().archived ? ' open' : '') + '><summary>Archived (' + a.length + ')</summary>' + a.map(function (t) {
         return '<span class="trow arch' + (t.id === st.mc.open ? ' on' : '') + '"><button type="button" class="ttitle open-arch" data-thread="' + t.id + '">' + esc(t.title) + '</button><button type="button" class="linkbtn restore" data-restore="' + t.id + '">restore</button></span>'; }).join('') + '</details>' : '') + '</nav>';
   }

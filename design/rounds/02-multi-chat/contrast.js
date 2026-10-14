@@ -7,7 +7,7 @@ const PAIRS = [
   ['the badge, ink on amber', '.badge'], ['the archived label', '.tarch-l, .tarch summary'], ['an archived title', '.trow.arch .ttitle'], ['restore, cyan', '.restore'],
   ['the thread head title', '.thead .ttl'], ['the thread hint, faint mono', '.thint'], ['"the factory", amber', '.msg.poke .who'], ['a decider line, faint mono', '.decider'], ['"needs you" on the escalation', '.esc-l'],
   ['"Answer:", amber small caps', '.answer-l'], ['"or in your words", faint', '.answer-or'], ['a command chip', '.cmd'], ['a palette name, cyan', '.palette button b'], ['a palette word', '.palette button span'],
-  ['the delete warning text', '.overlay-box p'], ['a choice button', '#chat .btn-choice'], ['the level button, muted mono on the composer', '#level-btn'], ['a level name in the menu', '.lvlpop b'], ['a level\'s words, muted', '.lvlpop .lw'], ['the menu head, faint', '.lvlpop .lp-head span'], ['the confirm\'s text', '.lvl-confirm p'], ['the newest line, faint', '.tline:not(.working)'], ['"a turn in flight", cyan', '.tline.working'],
+  ['the delete warning text', '.overlay-box p'], ['a choice button', '#chat .btn-choice'], ['the level button, muted mono on the composer', '#level-btn'], ['a level name in the menu', '.lvlpop b'], ['a level\'s words, muted', '.lvlpop .lw'], ['the menu head, faint', '.lvlpop .lp-head span'], ['the confirm\'s text', '.lvl-confirm p'], ['the fold toggle, faint', '.swtg'], ['the phone summary row', '.sw-sum'], ['the newest line, faint', '.tline:not(.working)'], ['"a turn in flight", cyan', '.tline.working'],
 ];
 (async () => {
   const b = await chromium.launch(); const out = {};

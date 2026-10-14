@@ -116,6 +116,24 @@ const CONTRAST_EL = '.trow .ttitle, .trow .tat, .tarch-l, .tarch summary, .trow.
     const order = await th.p.evaluate(() => Array.from(document.querySelectorAll('#switcher .trow[data-thread]')).map((e) => e.dataset.thread).join(','));
     if (!order.startsWith('inbox,costs,members,session-store')) fails.push(v + ': the rows are not by last turn (' + order + ')');
     if (!(await th.p.locator('.trow.inbox .badge').count())) fails.push(v + ': reading another thread cleared the inbox badge');
+    // the fold: the rows keep their marks, the badge and the working dot; a mark still opens its thread; the phone shows one summary row
+    await th.p.locator('[data-swtoggle]:visible').first().click(); await th.p.waitForTimeout(200);
+    if (!(await th.p.locator('#chat.sw-collapsed').count())) fails.push(v + ': the fold toggle does not fold');
+    const sw = await th.p.evaluate(() => document.querySelector('#switcher').getBoundingClientRect().width); if (sw > 40) fails.push(v + ': the folded switcher is ' + Math.round(sw) + ' px wide');
+    if (await th.p.locator('#switcher .ttitle:visible').count()) fails.push(v + ': the folded switcher still shows titles');
+    if (!(await th.p.locator('#switcher .trow.inbox .badge').isVisible())) fails.push(v + ': the folded switcher hides the inbox badge');
+    if (!(await th.p.locator('#switcher .trow .tmark.working').first().isVisible())) fails.push(v + ': the folded switcher hides the working mark');
+    await th.p.locator('#switcher .trow.inbox').click(); await th.p.waitForTimeout(200);
+    if (!(await openTitle(th.p)).includes('Inbox')) fails.push(v + ': a folded mark does not open its thread');
+    if (!(await th.p.locator('#chat.sw-collapsed').count())) fails.push(v + ': opening a thread unfolds');
+    await th.p.locator('[data-swtoggle]:visible').first().click(); await th.p.waitForTimeout(200);
+    if (await th.p.locator('#chat.sw-collapsed').count()) fails.push(v + ': the fold toggle does not unfold');
+    const pf = await open(v, 'scenario=threads&theme=dark', 390, 844);
+    await pf.p.locator('[data-swtoggle]:visible').first().click(); await pf.p.waitForTimeout(200);
+    if (!(await pf.p.locator('.sw-sum').isVisible())) fails.push(v + ': the phone fold shows no summary row');
+    const sumText = await pf.p.locator('.sw-sum').textContent(); if (!/1.*unread/.test(sumText) || !/2 working/.test(sumText)) fails.push(v + ': the phone summary lacks the counts (' + sumText.trim() + ')');
+    if (await pf.p.locator('#switcher').isVisible()) fails.push(v + ': the phone fold leaves the list in view');
+    await pf.p.close();
     await th.p.close();
     // poke: the fresh turn marks the row and the title while another thread is open
     const pk = await open(v, 'scenario=poke&theme=dark');
@@ -140,7 +158,7 @@ const CONTRAST_EL = '.trow .ttitle, .trow .tat, .tarch-l, .tarch summary, .trow.
     for (const sc of ['busy', 'escalation']) {
       const ph = await open(v, 'scenario=' + sc + '&theme=dark', 390, 844);
       const sw = await ph.p.evaluate(() => document.documentElement.scrollWidth); if (sw > 390) fails.push(v + ': horizontal scroll at 390 in ' + sc + ' (' + sw + ')');
-      const small = await ph.p.evaluate(() => Array.from(document.querySelectorAll('.trow, .btn-choice, .tmenu-btn, .tacts .btn, .cmd, .restore, #level-btn, .lvlpop [data-lvl], .open-arch')).filter((b) => b.offsetParent).map((b) => [b.className || b.id, b.getBoundingClientRect().height]).filter((x) => x[1] < 44));
+      const small = await ph.p.evaluate(() => Array.from(document.querySelectorAll('.trow, .btn-choice, .tmenu-btn, .tacts .btn, .cmd, .restore, #level-btn, .lvlpop [data-lvl], .open-arch, .swtg, .sw-sum')).filter((b) => b.offsetParent).map((b) => [b.className || b.id, b.getBoundingClientRect().height]).filter((x) => x[1] < 44));
       if (small.length) fails.push(v + ': phone targets under 44 px in ' + sc + ': ' + small.map((x) => x[0] + ' ' + Math.round(x[1])).join(', '));
       await ph.p.close();
     }

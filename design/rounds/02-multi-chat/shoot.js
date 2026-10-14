@@ -17,6 +17,8 @@ const common = [
   ['busy-light-1440-levels', 'scenario=busy&theme=light', 1440, 900, false, 'levels'],
   ['busy-dark-1440-level', 'scenario=busy&theme=dark', 1440, 900, false, 'level'],
   ['phone-busy-dark-390-levels', 'scenario=busy&theme=dark', 390, 844, false, 'levels'],
+  ['threads-dark-1440-folded', 'scenario=threads&theme=dark', 1440, 900, false, 'fold'],
+  ['phone-threads-dark-390-folded', 'scenario=threads&theme=dark', 390, 844, false, 'fold'],
   ['phone-escalation-dark-390', 'scenario=escalation&theme=dark', 390, 844, true],
   ['phone-threads-light-390', 'scenario=threads&theme=light', 390, 844, true],
 ];
@@ -41,6 +43,7 @@ const shots = {
       if (action === 'delete') { await p.locator('[data-tmenu="delete"]').click(); await p.waitForTimeout(300); }
       if (action === 'palette') { await p.locator('#chat-input').click(); await p.keyboard.type('/'); await p.waitForTimeout(300); }
       if (action === 'levels' || action === 'level') { await p.locator('#level-btn').click(); await p.waitForTimeout(200); }
+      if (action === 'fold') { await p.locator('[data-swtoggle]:visible').first().click(); await p.waitForTimeout(200); }
       if (action === 'level') { await p.locator('.lvlpop [data-lvl="autonomous"]').click(); await p.waitForTimeout(300); }
       await p.screenshot({ path: path.join(out, name + '.png'), fullPage: !!full });
       if (errors.length) console.log(v, name, 'JS errors:', errors.join(' | '));
