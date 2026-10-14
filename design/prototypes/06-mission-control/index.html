@@ -129,8 +129,10 @@ a { color: var(--accent); }
 .status:not(.prominent) .pulse-text { color: var(--text-muted); font-weight: 400; }
 .pulse-text .ref-link, .pulse-text .ref-plain { color: inherit; font-size: .9em; }
 .status.prominent .pulse-text .ref-link { color: var(--text); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--need) 60%, transparent); text-underline-offset: 4px; }
-.more { flex: none; height: 24px; padding: 0 9px; border: 1px solid var(--btn-line); border-radius: 3px; background: none; color: var(--text-muted); font: 11.5px var(--font-mono); cursor: pointer; }
-.more:hover { color: var(--text); border-color: var(--text-faint); }
+/* the whole band is one disclosure: a click anywhere on it that is not a link or a button opens the bullets and the status panel together; the chevron is the keyboard control */
+#pulse { cursor: pointer; }
+#pulse a, #pulse button { cursor: pointer; }
+#pulse:hover .pulse-row, #pulse:hover .strip { background: color-mix(in srgb, var(--text) 3%, transparent); }
 .bullets { margin: 0; padding: 0 16px 12px 46px; list-style: none; color: var(--text-muted); font-size: 13px; }
 .status:not(.prominent) .bullets { padding-left: 16px; }
 .bullets li { position: relative; padding: 2px 0; }
@@ -353,7 +355,7 @@ a.cell.needs.on:hover { background: color-mix(in srgb, var(--need) 16%, transpar
 /* live dots: a working card's dot breathes with a soft ring, an in-review card's dot slower and smaller */
 .st.s-running .dot { animation: live 2.2s ease-in-out infinite; }
 .st.s-review .dot { animation: live 3.6s ease-in-out infinite; }
-@keyframes live { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent); } 60% { opacity: .55; box-shadow: 0 0 0 4px transparent; } }
+@keyframes live { 0% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 70%, transparent); } 70% { opacity: .5; transform: scale(1.25); box-shadow: 0 0 0 6px transparent; } 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 transparent; } }
 .s-done { color: var(--st-done); } .s-failed { color: var(--st-failed); } .s-closed, .s-idle { color: var(--st-closed); }
 .warn { color: var(--need-text); }
 .bad { color: var(--st-failed); }
@@ -689,9 +691,8 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
       '<div class="pulse-row">' + (p.prominent ? '<span class="pulse-sign" aria-hidden="true">⚠</span>' : '') +
         '<p class="pulse-text">' + (p.prominent ? '<span class="vh">Warning: </span>' : '') + refs(p.sentence) +
           '<span class="typing pulse-typing" hidden role="status" aria-label="recomputing"><i></i><i></i><i></i></span></p>' +
-        '<button type="button" class="more" aria-expanded="' + st.pulseOpen + '" aria-controls="pulse-bullets">' + (st.pulseOpen ? 'less' : 'more') + '</button>' +
       '</div>' +
-      '<ul class="bullets" id="pulse-bullets"' + (st.pulseOpen ? '' : ' hidden') + '>' + p.bullets.map(function (b) { return '<li>' + refs(b) + '</li>'; }).join('') + '</ul>' +
+      '<ul class="bullets" id="pulse-bullets"' + (st.statusOpen ? '' : ' hidden') + '>' + p.bullets.map(function (b) { return '<li>' + refs(b) + '</li>'; }).join('') + '</ul>' +
       '<div class="strip" role="group" aria-label="Status of the project">' +
         '<span class="cell state s-' + stateWord(d.state) + '"><i class="dot" aria-hidden="true"></i>' + esc(d.state) + '</span>' +
         '<span class="cell"><span><b class="n">' + d.workingCount + '</b> working</span></span>' +
@@ -730,6 +731,8 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   function toggleStatus() {
     st.statusOpen = !st.statusOpen;
     $('#status-panel').hidden = !st.statusOpen;
+    $('#pulse-bullets').hidden = !st.statusOpen;
+    $('#pulse').classList.toggle('open', st.statusOpen);
     $('#status-toggle').setAttribute('aria-expanded', String(st.statusOpen));
     $('.strip').classList.toggle('xp-open', st.statusOpen);
   }
@@ -1117,7 +1120,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     var t = e.target.closest('button, a');
     if (!t) {
       if (e.target.closest('input, textarea, select, label, summary, form')) return;
-      if (e.target.closest('.strip')) { toggleStatus(); return; }
+      if (e.target.closest('#pulse')) { toggleStatus(); return; }
       var card = e.target.closest('[data-card]');
       if (card && !card.closest('#drawer') && !String(getSelection())) openDrawer(card.dataset.card);
       return;
@@ -1139,7 +1142,6 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     if (t.dataset.tab) { st.drawer.tab = t.dataset.tab; st.drawer.sec = null; renderDrawer(); $('[data-tab="' + t.dataset.tab + '"]', drawerEl).focus(); return; }
     if (t.dataset.qrm != null) { st.queue.splice(+t.dataset.qrm, 1); renderQueue(); return; }
     if (t.classList.contains('col-tog')) { var k = t.dataset.col, b = document.getElementById('colb-' + k); b.hidden = !b.hidden; st.cols[k] = !b.hidden; t.setAttribute('aria-expanded', String(!b.hidden)); return; }
-    if (t.classList.contains('more')) { st.pulseOpen = !st.pulseOpen; t.setAttribute('aria-expanded', String(st.pulseOpen)); t.textContent = st.pulseOpen ? 'less' : 'more'; $('#pulse-bullets').hidden = !st.pulseOpen; return; }
     if (t.classList.contains('dr-x')) { closeDrawer(); return; }
     if (t.classList.contains('menu-btn')) { var o = $('#top').classList.toggle('menu-open'); t.setAttribute('aria-expanded', String(o)); return; }
     if (t.getAttribute('href') === '#needs') { e.preventDefault(); var n = $('#needs'); n.scrollIntoView({ block: 'nearest' }); n.focus({ preventScroll: true }); return; }

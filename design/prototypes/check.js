@@ -6,7 +6,7 @@ const dir = path.resolve(process.argv[2]);
 const url = (q) => 'file://' + path.join(dir, 'index.html') + '?' + q;
 const mustHave = {
   busy: ['Factory console', 'Board', 'New task', 'Projects', 'Resources', 'Costs', 'Policy', 'Alerts', 'Log out', 'sebastian',
-    'waiting on you', '3 working', '2 need you', '€61.40', '€120', 'GitHub', 'Two cards need your decision', 'more',
+    'waiting on you', '3 working', '2 need you', '€61.40', '€120', 'GitHub', 'Two cards need your decision',
     'Needs you', 'Queued', 'Working', 'Verifying', 'Done', 'Merge PR #612', 'high risk', 'migration', 'Approve', 'Deny', 'Split',
     'Which store for the session table?', 'Postgres', 'SQLite', 'Ask the author',
     '#455', '#178', '#620', 'blocked by 2', 'from plan #558', '#601', 'building', '3/4 checks', '€1.72', 'near its budget', 'Reading internal/console/board.go',

@@ -13,7 +13,7 @@ Read off the templates in `internal/console/templates/` on 2026-10-13 (code comm
 
 - Filter: Project select, Accent select (eight fixed accents), Show. View toggle: Five columns or Wide view (the same five columns across the full width, the chat hidden). Keys button.
 - Status line: project name; state word (working, waiting on you, idle) with a dot; n working; n waiting on the provider (when any); n need you (links to Needs you); spend / month cap (links to Costs); GitHub state (when exported). A click on the line expands it in place: the working cards by name and stage, the cards that need you, the spend today against the day cap and the month against its cap, the provider state, the GitHub pull requests.
-- Pulse: warning sign when prominent; one sentence; typing indicator while recomputing; more/less; three or four bullets.
+- Pulse: warning sign when prominent; one sentence; typing indicator while recomputing; three or four bullets behind the band's disclosure (no more/less button: the band expands on click).
 - Five columns, each a title and a count: Needs you, Queued (waiting for capacity or on dependencies), Working, Verifying, Done. No lane columns (225).
 
 ### Card face
