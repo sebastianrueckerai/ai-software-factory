@@ -5461,3 +5461,45 @@ lane's own card 3.15 was frozen), backup sf-cluster-stage18-close in
 generation v14, cluster.yaml archive v15, `tofu destroy`, every Hetzner
 project at zero. The unfinished items are listed first in
 stage18-summary.md.
+
+### Stage 19 and the restart round: the roadmap items that landed
+
+The ledger's stage19-summary.md, restart-round-report.md and progress.md
+hold both rounds. The roadmap's prune of 2026-10-14 checked every item
+against the code's main and removed these, built unless the line says
+otherwise. Code commits unless named infra.
+
+- 158 the costs read's date window (2757ab2). 181 the CI queue alert
+  over a window, capacity alerts to a human, the alert pre-check
+  (4b983a2). 190 a token's rotation proved by a write (infra 253c000).
+- 192 an adjudicated finding no longer bounces (1344b2b). 193 the
+  reproduction refuses `cd` chains and worktrees at filing (e83534d).
+  194 a signal card's pinned reproduction base (8efe76b). 195 "also
+  failing on main" (911e083). 196 the roll guard tests ancestry
+  (5f0fef2), and a roll takes no queue turn (60b47d4).
+- 206 tokens and modeled cost per call and task (36fa6fd). 207 the GLM
+  Coding Plan trial: the switch landed (infra 31c55da) and ended under
+  ruling 325 when the quota ran out (infra 501fca5).
+- 208 a verification card closes on its acceptance evidence (d43509f).
+  209 a merge approval only on a green staged head (826f050). 210 the
+  console's fund action (bff4b59). 215 the attempt's budget floor
+  (d5a8b2a). 218 the split pre-check, proven live (429437d).
+- 211, 212 and 213's label (470c8a5), 216 (4a567f8), 223 (28ecf6f): the
+  console's chip, scrollbars and chat page. 219 Needs you holds a roll
+  only at its decision (e197dca). 221 the configuration version on the
+  board (27a6681). 220 the Close action ran live on five cards on
+  2026-10-14.
+- 222 the speed round's six items ([the plan](2026-10-14-speed.md)),
+  but for review beside the checks, which stays on the roadmap. 224 a
+  factory pull request's card files without a lane (a4d38b5). 227 the
+  console design (73de708 to e9c6378). 228 the stale card's ring and
+  sweep (57a8ee7). 229 the face's title (fcb23ab). 230 one-line step
+  outputs (d953a6e). 231 the workflow guard reads the merge-base
+  (4631262). 233 a card parked on a person frees its slot (fc5f612).
+  234 Done sorts by date (000d4bb). 236 the board's find box and
+  column menus (9dd3f0d, 3367ec9).
+- 232's epoch wiring and pinned base images (15fc239, fd4d280). The
+  rest of it stays on the roadmap as 242.
+- Gone for other reasons: 63 (LiteLLM's map prices every model in use),
+  73 (the speed round's CI), 128 (the red re-run proven, the lane proof
+  moot under 225), 160 (Stage 18 met its goal).
