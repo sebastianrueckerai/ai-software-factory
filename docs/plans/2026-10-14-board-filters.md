@@ -20,13 +20,13 @@ Orientation on 2026-10-14 before the first commit, the code repository's `origin
 - The lab, the structural check and the four columns are on main. The board's filter is the project and the view (`boardFilter`, `urlFilter`, `formFilter`, `query()`, the `filter` template), the stream reads the board under `urlFilter` and sends the columns' counts as `counters`.
 - The console tests read the column by `>Title <span` (`col` in lanes_test.go) and the cards by `data-card` (`columnItems` in screen_test.go), so the menu's control sits after the count in the markup and before it on the screen.
 - Open pull request 759 (roadmap 229, the face's title) touches `titleClause` in board.go, far from the filter and the columns.
-- The Done column's order comes from the store (`priority DESC, finished_at DESC NULLS FIRST`, roadmap 234): the menu's default order for Done is the store's and reads "as the board has it"; a true newest first is 234's fix, not this round's.
+- The Done column's order came from the store (`priority DESC, finished_at DESC NULLS FIRST`, roadmap 234). The factory's card for 234 landed as #762 the same afternoon and the store now sorts finished cards by date; item 0b sorts on the board as well, so the board's order holds whatever the store does.
 
 ## The round's ledger
 
 | Step | Pull request | Commit on main |
 |---|---|---|
-| Item 0a, the columns' scrolling | | |
+| Item 0a, the columns' scrolling | 763 | 418a188 (rebased on a roll and on 762, the store's Done order, that landed first) |
 | Item 0b, arrival order | | |
 | Item 1, the find | | |
 | Item 2, the menus | | |
