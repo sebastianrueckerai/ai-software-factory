@@ -160,6 +160,34 @@ a.cell.needs.on:hover { background: color-mix(in srgb, var(--need) 16%, transpar
 .spend.over .n, .spend.over .pct { color: var(--st-failed); }
 .pct { font: 12px var(--font-mono); color: var(--text-muted); min-width: 4ch; }
 .cell.gh { margin-left: auto; border-left: 1px solid var(--line); }
+.strip { cursor: pointer; transition: background-color .12s; }
+.strip:hover { background: color-mix(in srgb, var(--text) 3%, transparent); }
+.cell.xp { margin-left: auto; padding: 0 14px; border: 0; border-left: 1px solid var(--line); background: none; color: var(--text-muted); cursor: pointer; }
+.cell.gh + .cell.xp { margin-left: 0; }
+.cell.xp:hover { color: var(--text); }
+.cell.xp svg { width: 14px; height: 14px; transition: transform .15s; }
+.strip.xp-open .cell.xp svg { transform: rotate(180deg); }
+.sp { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr); border-top: 1px solid var(--line); }
+.sp > section { min-width: 0; padding: 10px 16px 12px; border-left: 1px solid var(--line); }
+.sp > section:first-child { border-left: 0; }
+.sp h3 { margin: 0 0 6px; color: var(--text-faint); font-size: 12.5px; font-weight: 600; font-variant-caps: all-small-caps; letter-spacing: .08em; }
+.sp ul { margin: 0; padding: 0; list-style: none; }
+.sp-link { display: block; width: 100%; padding: 2px 0; overflow: hidden; border: 0; background: none; color: var(--text-muted); font-size: 12.5px; line-height: 1.5; text-align: left; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; }
+.sp-link:hover { color: var(--text); }
+.sp-link .ref-plain { color: var(--text-faint); }
+.sp-link .mono { font-size: 11.5px; }
+.sp-g { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; margin-bottom: 8px; color: var(--text-muted); font-size: 12.5px; }
+.sp-g .lbl { color: var(--text-faint); }
+.sp-g .fig { justify-self: end; font: 12px var(--font-mono); }
+.sp-g .gauge { grid-column: 1 / -1; width: 100%; height: 4px; }
+.sp-g.warn .gauge i { background: var(--need); }
+.sp-g.over .gauge i { background: var(--st-failed); }
+.sp-g.over .fig { color: var(--st-failed); }
+.sp-note { margin: 0; color: var(--st-failed); font-size: 12.5px; }
+.sp-dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin: 0; font-size: 12.5px; }
+.sp-dl dt { color: var(--text-faint); }
+.sp-dl dd { margin: 0; color: var(--text-muted); }
+.sp-dl dd.warn { color: var(--need-text); }
 @keyframes breathe { 50% { opacity: .35; } }
 
 /* the main area: the chat left, the board right */
@@ -278,6 +306,7 @@ a.cell.needs.on:hover { background: color-mix(in srgb, var(--need) 16%, transpar
 /* a Needs you column narrower than one row of the merge actions: the primary on its own row, the choices one per row */
 @container (max-width: 271px) {
   .need .acts { display: grid; grid-template-columns: 1fr 1fr; }
+  .need .acts .btn { height: auto; min-height: 30px; padding: 6px 10px; line-height: 1.25; white-space: normal; text-align: center; }
   .need .acts > .btn-need:first-child, .need .acts > .btn:only-child { grid-column: 1 / -1; }
 }
 @container (max-width: 439px) {
@@ -296,6 +325,9 @@ a.cell.needs.on:hover { background: color-mix(in srgb, var(--need) 16%, transpar
 .col-body.over.end { -webkit-mask: none; mask: none; }
 .card { position: relative; padding: 7px 8px 8px; background: var(--bg-card); border: 1px solid var(--line); border-radius: 2px; transition: background-color .12s, border-color .12s; }
 .card:hover { background: var(--bg-hover); border-color: var(--line-strong); }
+.card, .drow, .need { cursor: pointer; }
+.card:has(.open:focus-visible), .drow:has(.open:focus-visible), .need:has(.open-h:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+.card .open:focus-visible, .drow .open:focus-visible, .need .open-h:focus-visible { outline: none; }
 .card.h-running { box-shadow: inset 2px 0 0 var(--st-running); }
 .card.h-review { box-shadow: inset 2px 0 0 var(--st-review); }
 .card.h-waiting { box-shadow: inset 2px 0 0 var(--st-waiting); }
@@ -310,8 +342,8 @@ a.cell.needs.on:hover { background: color-mix(in srgb, var(--need) 16%, transpar
 .srow > * { white-space: nowrap; }
 .srow > .warn, .srow > .st { white-space: normal; }
 .srow > *:not(:last-child)::after { content: "·"; margin-left: 4px; color: var(--text-faint); }
-.srow .st { gap: 4px; }
-.srow .st .dot { width: 5px; height: 5px; }
+.srow .st { display: inline; }
+.srow .st .dot { display: inline-block; width: 5px; height: 5px; margin-right: 5px; vertical-align: 1px; }
 .need .srow { font-size: 11.5px; }
 .srow a { color: var(--text-muted); }
 .srow a:hover { color: var(--accent); }
@@ -334,7 +366,7 @@ a.cell.needs.on:hover { background: color-mix(in srgb, var(--need) 16%, transpar
 .chip.amber { color: var(--need-text); border-color: color-mix(in srgb, var(--need) 60%, transparent); }
 .chip.fill { background: color-mix(in srgb, var(--need) 20%, transparent); }
 [data-theme="light"] .chip.fill { background: color-mix(in srgb, var(--need) 38%, transparent); }
-.chip.lane { color: var(--st-running); border-color: color-mix(in srgb, var(--st-running) 45%, transparent); }
+.chip.track { color: var(--st-running); border-color: color-mix(in srgb, var(--st-running) 45%, transparent); }
 .chip i { width: 7px; height: 7px; border-radius: 50%; }
 .cacts { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
 .cacts .btn-xs { padding: 0 5px; font-size: 11.5px; }
@@ -357,18 +389,9 @@ a.cell.needs.on:hover { background: color-mix(in srgb, var(--need) 16%, transpar
 .dmeta > .confirm::before { content: none; }
 .closing { color: var(--st-failed); border-color: var(--st-failed); }
 
-/* wide view */
-.lanes { flex: 1; min-height: 0; display: flex; gap: 16px; overflow-x: auto; padding-bottom: 4px; }
-.lane-group { display: flex; flex: none; flex-direction: column; gap: 6px; min-height: 0; }
-.lane-title { margin: 0; color: var(--text-muted); font-size: 13px; font-weight: 600; font-variant-caps: all-small-caps; letter-spacing: .08em; }
-.lane-cols { flex: 1; min-height: 0; display: flex; gap: 6px; }
-.lane-cols .col { flex: none; width: 200px; }
-.lane-cols .col.empty { width: 156px; }
-.lane-cols .needs-col:not(.empty) { width: 300px; }
-.lane-cols .col.drop { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, var(--bg-panel)); }
-.card[draggable="true"] { cursor: grab; }
-.handle { position: absolute; top: 6px; right: 7px; color: var(--text-faint); font-size: 12px; letter-spacing: -2px; }
-.card[draggable="true"] .open { padding-right: 14px; }
+/* wide view: the same five columns across the full width, the chat hidden */
+.main.wide { grid-template-columns: minmax(0, 1fr); }
+.main.wide .chat { display: none; }
 
 /* drawer */
 .drawer { position: absolute; top: 12px; right: 0; bottom: 12px; z-index: 20; display: flex; flex-direction: column; width: min(46%, 720px); background: var(--bg-raised); border: 1px solid var(--line-strong); border-left: 1px solid var(--accent); border-right: 0; box-shadow: var(--drawer-shadow); animation: drin .16s ease-out; }
@@ -501,11 +524,18 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   .status:not(.prominent) .more { margin-left: 0; }
   .bullets { padding-left: 42px; }
   .strip { flex-wrap: wrap; gap: 1px; background: var(--line); }
+  .cell.xp { flex: 0 0 auto; margin-left: auto; }
+  .sp { grid-template-columns: 1fr; }
+  .sp > section { border-left: 0; border-top: 1px solid var(--line); }
+  .sp > section:first-child { border-top: 0; }
+  .sp-link { white-space: normal; }
+  .need .srow .textlink { position: relative; }
+  .need .srow .textlink::before { content: ""; position: absolute; inset: -14px -10px; }
   .cell, .cell.gh { flex: 1 1 auto; min-height: 38px; margin: 0; padding: 0 12px; border: 0; background: var(--bg-panel); }
   .cell.needs.on { background: color-mix(in srgb, var(--need) 10%, var(--bg-panel)); }
   .cell.spend { flex-basis: 100%; }
   .cell.spend .gauge { flex: 1; width: auto; }
-  .cell.gh { flex-basis: 100%; }
+  .cell.gh { flex: 1 1 auto; }
   .main { display: flex; flex-direction: column; gap: 12px; padding: 12px; }
   .chat { min-height: 0; }
   .log { flex: none; height: auto; max-height: 62vh; }
@@ -590,7 +620,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   <div class="overlay-box">
     <h2 id="keys-title">Keys</h2>
     <dl>
-      <dt><kbd>w</kbd></dt><dd>the wide view, the lanes as columns, or back to the five columns</dd>
+      <dt><kbd>w</kbd></dt><dd>the wide view, the five columns across the full width with the chat hidden, or back</dd>
       <dt><kbd>Escape</kbd></dt><dd>close the card's drawer, or this list</dd>
       <dt><kbd>?</kbd></dt><dd>this list</dd>
       <dt><kbd>/</kbd></dt><dd>write to the project agent</dd>
@@ -609,7 +639,6 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   var MQ = matchMedia('(max-width: 899px)');
   var RM = matchMedia('(prefers-reduced-motion: reduce)');
   var ACCENTS = ['red', 'orange', 'amber', 'green', 'teal', 'blue', 'violet', 'pink'];
-  var LANES = ['Backlog', 'Plan', 'Ready', 'Running', 'Waiting on a human', 'Waiting on the author', 'In review', 'Done', 'Failed', 'Closed'];
   var COLS = [['queued', 'Queued'], ['working', 'Working'], ['verifying', 'Verifying'], ['done', 'Done']];
   var USER = 'sebastian';
   var $ = function (s, r) { return (r || document).querySelector(s); };
@@ -617,8 +646,8 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   var eur = function (n) { return '€' + Number(n).toFixed(2); };
   var now = function () { return new Date().toTimeString().slice(0, 5); };
 
-  var st = { sc: S[params.get('scenario')] ? params.get('scenario') : 'busy', wide: false, accent: '', pulseOpen: false,
-    chat: [], old: [], queue: [], typing: false, drawer: null, done: {}, lanes: {}, steer: {}, cols: {}, idx: null };
+  var st = { sc: S[params.get('scenario')] ? params.get('scenario') : 'busy', wide: false, accent: '', pulseOpen: false, statusOpen: false,
+    chat: [], old: [], queue: [], typing: false, drawer: null, done: {}, steer: {}, cols: {}, idx: null };
   var D = function () { return S[st.sc]; };
   var drawerEl = $('#drawer'), keysEl = $('#keys');
   var lastFocus = null, keysFocus = null;
@@ -672,7 +701,37 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
           '<span class="gauge" role="meter" aria-label="Spend of the month cap" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(pc) + '"><i style="width:' + Math.min(100, pc).toFixed(1) + '%"></i></span>' +
           '<span class="pct">' + Math.round(pc) + '%</span></a>' +
         (d.github ? '<span class="cell gh">GitHub: ' + esc(d.github) + '</span>' : '') +
-      '</div>';
+        '<button type="button" class="cell xp" id="status-toggle" aria-expanded="' + st.statusOpen + '" aria-controls="status-panel" aria-label="The status in detail" title="The status in detail">' +
+          '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>' +
+      '</div>' + statusPanelHTML();
+    $('.strip', el).classList.toggle('xp-open', st.statusOpen);
+  }
+  function gaugeRow(label, spent, cap, note) {
+    var pc = spent / cap * 100, g = pc > 100 ? 'over' : pc >= 80 ? 'warn' : '';
+    return '<div class="sp-g ' + g + '"><span class="lbl">' + label + '</span><span class="fig">' + eur(spent) + ' of ' + eur(cap) + note + '</span>' +
+      '<span class="gauge" role="meter" aria-label="' + label + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(pc) + '"><i style="width:' + Math.min(100, pc).toFixed(1) + '%"></i></span></div>';
+  }
+  function statusPanelHTML() {
+    var d = D(), none = '<p class="none">none</p>';
+    var since = d.working.filter(function (c) { return c.provider; }).map(function (c) { return (/since (\d\d:\d\d)/.exec(c.activity) || [])[1]; }).filter(Boolean).sort()[0];
+    var working = d.working.length ? '<ul>' + d.working.map(function (c) {
+      return '<li><button type="button" class="sp-link" data-open="' + c.issue + '"><span class="ref-plain">#' + c.issue + '</span> ' + esc(c.title) +
+        ' · <span class="s-' + hueOf(c.status) + '">' + esc(c.stage || c.status) + '</span> · <span class="mono">' + esc(c.elapsed) + '</span></button></li>'; }).join('') + '</ul>' : none;
+    var needs = d.needs.length ? '<ul>' + d.needs.map(function (n) {
+      return '<li><button type="button" class="sp-link" data-goto="' + n.issue + '">' + (n.kind === 'merge' ? 'Merge PR #' + n.pr : '<span class="ref-plain">#' + n.issue + '</span> ' + esc(n.title)) + '</button></li>'; }).join('') + '</ul>' : none;
+    var spend = gaugeRow('today', d.spendToday, d.dayCap, ' day cap') + gaugeRow('this month', d.spend, d.cap, '') +
+      (d.spend > d.cap ? '<p class="sp-note">the month cap is passed</p>' : '');
+    var pg = '<dl class="sp-dl"><dt>provider</dt><dd' + (d.provider ? ' class="warn"' : '') + '>' + (d.provider ? d.provider + ' waiting on the provider' + (since ? ' since ' + since : '') : 'ok') + '</dd>' +
+      '<dt>GitHub</dt><dd>' + (d.github ? '<a href="' + esc(d.githubURL || '#') + '">GitHub: ' + esc(d.github) + '</a>' : 'none') + '</dd></dl>';
+    return '<div class="sp" id="status-panel" role="region" aria-label="The status in detail"' + (st.statusOpen ? '' : ' hidden') + '>' +
+      '<section><h3>Working</h3>' + working + '</section><section><h3>Needs you</h3>' + needs + '</section>' +
+      '<section><h3>Spend</h3>' + spend + '</section><section><h3>Provider and GitHub</h3>' + pg + '</section></div>';
+  }
+  function toggleStatus() {
+    st.statusOpen = !st.statusOpen;
+    $('#status-panel').hidden = !st.statusOpen;
+    $('#status-toggle').setAttribute('aria-expanded', String(st.statusOpen));
+    $('.strip').classList.toggle('xp-open', st.statusOpen);
   }
   function pulseRecompute() {
     var t = $('.pulse-typing'); if (!t) return;
@@ -766,7 +825,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   /* board: a card face */
   function confirmOr(key, html) { return st.done[key] ? '<p class="confirm" role="status">' + esc(st.done[key]) + '</p>' : html; }
   function stateRow(c, col) {
-    var hue = hueOf(c.status), r = '<span class="st s-' + hue + '"><i class="dot" aria-hidden="true"></i>' + esc(c.status) + '</span>';
+    var hue = hueOf(c.status), r = '<span class="st s-' + hue + '"><i class="dot" aria-hidden="true"></i>' + esc(c.stage || c.status) + '</span>';
     if (c.elapsed) r += '<span>' + esc(c.elapsed) + '</span>';
     if (c.checks) r += '<span>' + esc(c.checks) + ' checks</span>';
     if (isNear(c)) r += '<span class="warn">' + eur(c.spent) + ' / ' + eur(c.budget) + ' ⚠ near its budget</span>';
@@ -776,34 +835,21 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     if (c.pr && col === 'verifying') r += '<a href="#">PR #' + c.pr + '</a>';
     return r;
   }
-  function laneOf(c, col) {
-    if (st.lanes[c.issue]) return st.lanes[c.issue];
-    if (col === 'done') return c.status === 'failed' ? 'Failed' : c.status === 'closed' ? 'Closed' : 'Done';
-    if (col === 'verifying') return 'In review';
-    if (col === 'working') return 'Running';
-    if (col === 'needs') return 'Waiting on a human';
-    return c.status === 'backlog' ? 'Backlog' : 'Ready';
-  }
   function cardHTML(c, col) {
     var hue = c.blocked ? 'failed' : hueOf(c.status), key = 'card-' + c.issue;
     var showAct = c.activity && (col === 'working' || c.gate || /failed/.test(c.activity));
     var chips = [];
+    if (c.track === 'plan') chips.push('<span class="chip track">plan</span>');
     if (c.blocked) chips.push('<span class="chip red" title="blocked by ' + esc(c.blockedOn) + '">blocked by ' + c.blocked + '</span>');
     if (c.waitingOn) chips.push('<span class="chip">waiting on #' + c.waitingOn + '</span>');
-    if (c.plan) chips.push('<span class="chip" title="' + esc(c.planKey || '') + '">part of plan #' + c.plan + '</span>');
+    if (c.fromPlan) chips.push('<span class="chip">from plan #' + c.fromPlan + '</span>');
     if (c.accent) chips.push('<span class="chip"><i style="background:var(--acc-' + esc(c.accent) + ')"></i>' + esc(c.accent) + '</span>');
-    if (st.wide && c.lane) chips.push('<span class="chip lane">' + esc(c.lane) + '</span>');
-    var acts = [];
-    (c.moves || []).forEach(function (m) { acts.push('<button type="button" class="btn btn-xs" data-act="move" data-key="' + key + '" data-issue="' + c.issue + '" data-val="' + esc(m) + '">→ ' + esc(m) + '</button>'); });
-    if (c.closes) acts.push('<button type="button" class="btn btn-xs" data-act="close" data-key="' + key + '">Close</button>');
-    var drag = st.wide && laneOf(c, col) === 'Backlog';
-    return '<article class="card h-' + hue + (c.stale ? ' stale' : '') + '" data-card="' + c.issue + '"' + (drag ? ' draggable="true"' : '') + '>' +
-      (drag ? '<span class="handle" aria-hidden="true">⋮⋮</span>' : '') +
+    var close = col === 'needs' ? confirmOr(key, '<div class="cacts"><button type="button" class="btn btn-xs" data-act="close" data-key="' + key + '">Close</button></div>') : '';
+    return '<article class="card h-' + hue + (c.stale ? ' stale' : '') + '" data-card="' + c.issue + '">' +
       '<button type="button" class="open" data-open="' + c.issue + '"><span class="clamp"><span class="ref">#' + c.issue + '</span> <span class="ttl">' + esc(c.title) + '</span></span></button>' +
       '<p class="srow">' + stateRow(c, col) + '</p>' +
       (showAct ? '<p class="act-line' + (c.provider ? ' warn' : '') + (/failed/.test(c.activity) ? ' bad' : '') + '" title="' + esc(c.activity) + '">' + esc(c.activity) + '</p>' : '') +
-      (chips.length ? '<div class="chips">' + chips.join('') + '</div>' : '') +
-      (acts.length ? confirmOr(key, '<div class="cacts">' + acts.join('') + '</div>') : '') +
+      (chips.length ? '<div class="chips">' + chips.join('') + '</div>' : '') + close +
       (isNear(c) ? '<span class="meter" aria-hidden="true"><i style="width:' + Math.min(100, c.spent / c.budget * 100).toFixed(1) + '%"></i></span>' : '') +
       '</article>';
   }
@@ -819,7 +865,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   /* Needs you */
   function denyForm(key, merge) {
     return '<form class="deny" id="' + key + '-deny" data-key="' + key + '" hidden>' +
-      '<label class="fl">Reason' + (merge ? ', posted on the pull request as you' : '') + '<textarea rows="2" name="reason"></textarea></label>' +
+      '<label class="fl">Reason<textarea rows="2" name="reason"></textarea></label>' +
       (merge ? '<fieldset><legend>Deny by</legend><label><input type="radio" name="' + key + '-by" value="requesting changes" checked> requesting changes</label>' +
         '<label><input type="radio" name="' + key + '-by" value="rejecting"> rejecting (closes the pull request)</label></fieldset>' : '') +
       '<div class="acts"><button type="submit" class="btn btn-danger">Deny</button></div></form>';
@@ -832,7 +878,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
           '<span class="chip amber fill">' + esc(n.risk) + ' risk</span>' + (n.migration ? '<span class="chip amber">migration</span>' : '') + '</div>' +
         '<p><b>Model review:</b> ' + esc(n.review.verdict) + '. ' + esc(n.review.summary) + '</p>' +
         '<p><b>Recommendation:</b> ' + esc(n.recommendation) + '</p>' +
-        confirmOr(key, '<div class="acts"><button type="button" class="btn btn-need" data-act="approve" data-key="' + key + '">Approve as you</button>' +
+        confirmOr(key, '<div class="acts"><button type="button" class="btn btn-need" data-act="approve" data-key="' + key + '">Approve</button>' +
           '<button type="button" class="btn" data-act="deny" data-key="' + key + '" aria-expanded="false" aria-controls="' + key + '-deny">Deny</button>' +
           '<button type="button" class="btn" data-act="split" data-key="' + key + '" data-val="' + n.pr + '">Split</button></div>' + denyForm(key, true)) +
         '<div class="need-foot"><span class="since" title="waiting since">' + esc(n.since) + '</span>' +
@@ -842,7 +888,8 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     if (n.kind === 'escalation') {
       var ch = n.choices || [], btn = n.capped ? 'Grant one session with this answer' : 'Answer';
       var row = '<span class="st s-waiting"><i class="dot" aria-hidden="true"></i>' + esc(n.status) + '</span><span>' + esc(n.elapsed) + '</span>' +
-        (isNear(n) ? '<span class="warn">' + eur(n.spent) + ' / ' + eur(n.budget) + ' ⚠ near its budget</span>' : '') + '<a href="#">answer on the issue</a>';
+        (isNear(n) ? '<span class="warn">' + eur(n.spent) + ' / ' + eur(n.budget) + ' ⚠ near its budget</span>' : '') + '<a href="#">answer on the issue</a>' +
+        (st.done[key + '-c'] ? '<span class="confirm">' + esc(st.done[key + '-c']) + '</span>' : '<button type="button" class="textlink" data-act="close" data-key="' + key + '-c">Close</button>');
       var body = ch.length
         ? '<div class="acts choices">' + ch.map(function (c) { return '<button type="button" class="btn btn-choice" data-act="choice" data-key="' + key + '" data-val="' + esc(c) + '">' + esc(c) + '</button>'; }).join('') +
             '<button type="button" class="btn btn-dashed" data-act="own" aria-expanded="false" aria-controls="' + key + '-own">Or in your words</button></div>' +
@@ -861,7 +908,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
             '<button type="button" class="btn btn-xs" data-act="verdict" data-key="' + key + '-v" data-val="false alarm">false alarm</button></span>') + '</div>' : '') +
         '</article>';
     }
-    return '<article class="card" data-card="' + n.issue + '">' + cardHTML(n, 'needs') + '</article>';
+    return cardHTML(n, 'needs');
   }
   function countHTML(n) { return n ? '<span class="count-pill">' + n + '</span>' : '<span class="cnt">0</span>'; }
   function needsColHTML(title, list, attrs, where) {
@@ -891,28 +938,14 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
         '<div class="col-body" id="colb-' + k + '"' + (open ? '' : ' hidden') + '>' + list.map(function (c) { return k === 'done' ? doneHTML(c) : cardHTML(c, k); }).join('') + '</div></section>';
     }).join('') + '</div>';
   }
-  function wideHTML() {
-    var d = D(), groups = [['Approvals', d.needs.filter(function (n) { return n.kind !== 'escalation' && n.kind !== 'human'; })],
-      ['Escalations', d.needs.filter(function (n) { return n.kind === 'escalation'; })], ['Human tasks', d.needs.filter(function (n) { return n.kind === 'human'; })]];
-    var human = groups.map(function (g) { return needsColHTML(g[0], g[1], 'data-lane="' + g[0] + '" aria-label="' + g[0] + '"', '-w'); }).join('');
-    var by = {}; LANES.forEach(function (l) { by[l] = []; });
-    ['queued', 'working', 'verifying', 'done'].forEach(function (k) { d[k].filter(vis).forEach(function (c) { by[laneOf(c, k)].push([c, k]); }); });
-    d.needs.filter(function (n) { return n.kind === 'escalation'; }).forEach(function (n) { by['Waiting on a human'].push([n, 'needs']); });
-    var agent = LANES.map(function (l) {
-      var list = by[l];
-      return '<section class="col marks' + (list.length ? '' : ' empty') + '" data-lane="' + l + '" aria-label="' + l + '"><div class="col-head"><h3>' + l + '</h3><span class="cnt">' + list.length + '</span></div>' +
-        '<div class="col-body">' + list.map(function (x) { return x[1] === 'done' || x[1] === 'needs' ? doneHTML(Object.assign({}, x[0], x[1] === 'needs' ? { status: 'waiting on a human', elapsed: x[0].elapsed } : {})) : cardHTML(x[0], x[1]); }).join('') + '</div></section>';
-    }).join('');
-    return '<div class="lanes"><div class="lane-group" id="needs" tabindex="-1"><h3 class="lane-title">Human lane</h3><div class="lane-cols">' + human + '</div></div>' +
-      '<div class="lane-group"><h3 class="lane-title">Agent lane</h3><div class="lane-cols">' + agent + '</div></div></div>';
-  }
   function renderBoard() {
     var acc = '<span class="sel sm"><select id="accent" aria-label="Accent"><option value="">every accent</option>' +
       ACCENTS.map(function (a) { return '<option' + (a === st.accent ? ' selected' : '') + '>' + a + '</option>'; }).join('') + '</select></span>';
     $('#board').innerHTML = '<div class="board-head"><h2 id="board-title">Board</h2>' + acc +
       '<button type="button" class="btn btn-xs" id="view-toggle" aria-keyshortcuts="w">' + (st.wide ? 'Five columns' : 'Wide view') + '</button>' +
       '<button type="button" class="icon-btn" id="keys-toggle" style="width:24px;height:24px;font:12px var(--font-mono)" aria-haspopup="dialog" aria-controls="keys" aria-keyshortcuts="Shift+?" title="Keys" aria-label="Keys">?</button></div>' +
-      (st.wide ? wideHTML() : colsHTML());
+      colsHTML();
+    $('#main').classList.toggle('wide', st.wide);
     markOverflow();
   }
 
@@ -955,11 +988,11 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   function drawerHTML(c) {
     var d = D(), full = d.drawer && d.drawer.card.issue === c.issue ? d.drawer : null, ov = full && full.overview;
     var hue = hueOf(c.status), near = isNear(c), tab = st.drawer.tab, n = c.need;
-    var facts = '<span class="st s-' + hue + '"><i class="dot" aria-hidden="true"></i>' + esc(c.status) + '</span>' +
+    var facts = '<span class="st s-' + hue + '"><i class="dot" aria-hidden="true"></i>' + esc(c.stage || c.status) + '</span>' +
       (c.elapsed ? '<span class="sep"></span><span>' + esc(c.elapsed) + '</span>' : '') +
       (c.checks ? '<span class="sep"></span><span>' + esc(c.checks) + ' checks</span>' : '') +
       (c.budget ? '<span class="sep"></span><span class="' + (near ? 'warn' : '') + '">' + eur(c.spent) + ' / ' + eur(c.budget) + (near ? ' ⚠ near its budget' : '') + '</span>' : '') +
-      (c.lane ? '<span class="chip lane">' + esc(c.lane) + '</span>' : '') +
+      (c.track === 'plan' ? '<span class="chip track">plan</span>' : '') +
       (c.provider ? '<span class="chip amber">on the provider</span>' : '') + (c.stale ? '<span class="chip amber">stale</span>' : '') +
       (c.model ? '<span class="chip">' + esc(c.model) + '</span>' : '') +
       (c.pr ? '<a href="#">PR #' + c.pr + '</a>' : '');
@@ -969,7 +1002,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
       var pct = c.budget ? Math.round(c.spent / c.budget * 100) : 0;
       body += '<dl class="top-block">' +
         '<dt>Task</dt><dd>' + refs(ov ? ov.task : c.title) + '</dd>' +
-        '<dt>Status</dt><dd>' + esc(ov ? ov.status : c.status + (c.elapsed ? ', ' + c.elapsed : '')) + '</dd>' +
+        '<dt>Status</dt><dd>' + esc(ov ? ov.status : (c.stage || c.status) + (c.elapsed ? ', ' + c.elapsed : '')) + '</dd>' +
         '<dt>Budget</dt><dd class="' + (near ? 'warn' : 'muted') + '"><span class="mono">' + esc(ov ? ov.budget : eur(c.spent) + ' of ' + eur(c.budget) + ', ' + pct + ' percent') + '</span>' + (near ? ' ⚠' : '') + '</dd>' +
         '<dt>Agent</dt><dd class="muted"><span class="mono">' + esc(ov ? ov.agent : (c.model || '—')) + '</span></dd></dl>';
       var open = '';
@@ -989,7 +1022,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
       var links = '<div class="links"><a href="#">issue #' + c.issue + '</a>' + (c.pr ? '<a href="#">PR #' + c.pr + '</a>' : '') + '<a href="#">the full timeline</a>' + (c.task ? '<span class="ref-plain">' + esc(c.task) + '</span>' : '') + '</div>';
       body += sec('objective', 'Objective', ov ? '<p>' + refs(ov.objective) + '</p><p class="prov">' + esc(ov.provenance) + '</p>' : '') +
         sec('summary', "The agent's summary", ov ? '<p>' + refs(ov.summary) + '</p>' : '') +
-        sec('plan', 'The plan', c.plan ? '<p>part of plan <span class="ref-plain">#' + c.plan + '</span>' + (c.planKey ? ', planned card ' + esc(c.planKey) : '') + '</p>' : '') +
+        sec('plan', 'The plan', c.fromPlan ? '<p>from plan <span class="ref-plain">#' + c.fromPlan + '</span></p>' : '') +
         sec('reviews', 'Reviews and audit', n && n.kind === 'merge' ? mergeFacts(n) : '', n && n.kind === 'merge' ? 'PR #' + n.pr : '', st.drawer.sec === 'reviews') +
         sec('related', 'Related cards', rel, ov && ov.related ? String(ov.related.length) : '') +
         sec('edit', 'Edit', edit) + sec('links', 'Links', links);
@@ -1056,10 +1089,9 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     if (a === 'deny') { var f = document.getElementById(key + '-deny'); f.hidden = !f.hidden; t.setAttribute('aria-expanded', String(!f.hidden)); if (!f.hidden) $('textarea', f).focus(); return; }
     if (a === 'own') { var b = document.getElementById(t.getAttribute('aria-controls')); b.hidden = !b.hidden; t.setAttribute('aria-expanded', String(!b.hidden)); if (!b.hidden) $('textarea', b).focus(); return; }
     if (a === 'close' && !t.classList.contains('closing')) { t.classList.add('closing'); t.textContent = 'Close: sure?'; setTimeout(function () { if (document.contains(t)) { t.classList.remove('closing'); t.textContent = 'Close'; } }, 3000); return; }
-    var msg = { approve: 'Approved as ' + USER, split: 'Split PR #' + v + ' requested', choice: 'Answered “' + v + '” on the issue as ' + USER,
-      answer: t.textContent === 'Answer' ? 'Answered on the issue as ' + USER : 'Granted one session with this answer', verdict: 'Marked: ' + v,
-      move: 'Moved to ' + v, close: 'Closed', retry: 'Retry queued' }[a];
-    if (a === 'move' && st.wide) st.lanes[t.dataset.issue] = v;
+    var msg = { approve: 'Approved', split: 'Split PR #' + v + ' requested', choice: 'Answered “' + v + '” on the issue',
+      answer: t.textContent === 'Answer' ? 'Answered on the issue' : 'Granted one session with this answer', verdict: 'Marked: ' + v,
+      close: 'Closed', retry: 'Retry queued' }[a];
     st.done[key] = msg; st.done[key.replace(/-(d|w)$/, '')] = msg;
     rerender();
   }
@@ -1072,7 +1104,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   function load(name) {
     st.sc = name; var d = D();
     st.idx = buildIndex();
-    st.chat = JSON.parse(JSON.stringify(d.chat)); st.old = []; st.queue = []; st.typing = false; st.done = {}; st.lanes = {}; st.steer = {}; st.pulseOpen = false;
+    st.chat = JSON.parse(JSON.stringify(d.chat)); st.old = []; st.queue = []; st.typing = false; st.done = {}; st.steer = {}; st.pulseOpen = false;
     closeDrawer(false);
     $('#project').innerHTML = '<option>' + esc(d.project) + '</option>';
     document.querySelectorAll('#scenario [data-sc]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.sc === name)); });
@@ -1082,10 +1114,22 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
 
   /* events */
   document.addEventListener('click', function (e) {
-    var t = e.target.closest('button, a'); if (!t) return;
+    var t = e.target.closest('button, a');
+    if (!t) {
+      if (e.target.closest('input, textarea, select, label, summary, form')) return;
+      if (e.target.closest('.strip')) { toggleStatus(); return; }
+      var card = e.target.closest('[data-card]');
+      if (card && !card.closest('#drawer') && !String(getSelection())) openDrawer(card.dataset.card);
+      return;
+    }
     if (t.getAttribute('href') === '#') e.preventDefault();
     if (t.hasAttribute('data-open')) { e.preventDefault(); openDrawer(t.dataset.open, t.dataset.sec ? { tab: 'overview', sec: t.dataset.sec } : null); return; }
     if (t.dataset.act) { act(t); return; }
+    if (t.dataset.goto) {
+      var it = $('#needs [data-card="' + t.dataset.goto + '"]');
+      if (it) { it.scrollIntoView({ block: 'nearest', behavior: RM.matches ? 'auto' : 'smooth' }); $('.open-h', it).focus({ preventScroll: true }); }
+      return;
+    }
     if (t.dataset.chat) {
       var m = st.chat[+t.dataset.i];
       m.pstate = { do: 'applied', skip: 'skipped', undo: 'undone' }[t.dataset.chat];
@@ -1102,6 +1146,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     switch (t.id) {
       case 'theme-toggle': setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark', true); break;
       case 'view-toggle': toggleWide(); break;
+      case 'status-toggle': toggleStatus(); break;
       case 'keys-toggle': openKeys(); break;
       case 'keys-close': closeKeys(); break;
       case 'chat-new': newConversation(); break;
@@ -1136,6 +1181,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     if (e.key === 'Escape') {
       if (!keysEl.hidden) { closeKeys(); return; }
       if (!drawerEl.hidden) { closeDrawer(); return; }
+      if (st.statusOpen) { toggleStatus(); $('#status-toggle').focus(); return; }
       if ($('#top').classList.contains('menu-open')) { $('#top').classList.remove('menu-open'); $('.menu-btn').setAttribute('aria-expanded', 'false'); return; }
       if (field) t.blur(); return;
     }
@@ -1148,17 +1194,10 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
       return;
     }
     if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if (e.key === '/') { e.preventDefault(); $('#chat-input').focus(); }
+    if (e.key === '/') { e.preventDefault(); if (st.wide) toggleWide(); $('#chat-input').focus(); }
     else if (e.key === '?') { e.preventDefault(); openKeys(); }
     else if (e.key === 'w' && !MQ.matches) toggleWide();
   });
-
-  /* wide view: drag a backlog card onto Plan or Ready */
-  var dragIssue = null;
-  document.addEventListener('dragstart', function (e) { var c = e.target.closest && e.target.closest('.card[draggable="true"]'); if (!c) return; dragIssue = c.dataset.card; e.dataTransfer.setData('text/plain', dragIssue); e.dataTransfer.effectAllowed = 'move'; });
-  document.addEventListener('dragover', function (e) { var l = e.target.closest && e.target.closest('[data-lane="Plan"], [data-lane="Ready"]'); if (!l || !dragIssue) return; e.preventDefault(); document.querySelectorAll('.drop').forEach(function (x) { if (x !== l) x.classList.remove('drop'); }); l.classList.add('drop'); });
-  document.addEventListener('drop', function (e) { var l = e.target.closest && e.target.closest('[data-lane="Plan"], [data-lane="Ready"]'); if (!l || !dragIssue) return; e.preventDefault(); st.lanes[dragIssue] = l.dataset.lane; st.done['card-' + dragIssue] = 'Moved to ' + l.dataset.lane; dragIssue = null; renderBoard(); });
-  document.addEventListener('dragend', function () { dragIssue = null; document.querySelectorAll('.drop').forEach(function (x) { x.classList.remove('drop'); }); });
 
   MQ.addEventListener('change', function () { $('#top').classList.remove('menu-open'); renderBoard(); renderTicker(); });
   var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { renderTicker(); markOverflow(); }, 200); });

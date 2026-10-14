@@ -7,7 +7,7 @@ CARRIED = ["06-mission-control", "09-inbox-first", "01-linear-calm", "02-geist-c
            "04-swiss-grid", "10-command-palette", "11-terminal", "13-factory-floor", "03-soft-saas"]
 ALL = ["01-linear-calm", "02-geist-contrast", "03-soft-saas", "04-swiss-grid", "05-broadsheet", "06-mission-control", "07-trading-floor",
        "08-grafana-dense", "09-inbox-first", "10-command-palette", "11-terminal", "12-blueprint", "13-factory-floor", "14-glass-depth", "15-riso", "16-messenger-dock"]
-SHOTS = ["busy-dark-1440", "busy7-dark-1440", "busy-light-1440", "idle-dark-1440", "fire-dark-1440", "drawer-busy-dark-1440", "busy-dark-1920", "quiet-light-1440", "phone-busy-dark-390", "phone-busy-light-390"]
+SHOTS = ["busy-dark-1440", "busy7-dark-1440", "strip-open-dark-1440", "busy-light-1440", "idle-dark-1440", "fire-dark-1440", "drawer-busy-dark-1440", "busy-dark-1920", "quiet-light-1440", "phone-busy-dark-390", "phone-busy-light-390"]
 esc = lambda s: html.escape(str(s))
 
 def cost(*dirs):
