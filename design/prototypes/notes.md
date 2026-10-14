@@ -22,7 +22,7 @@ Judged on the busy screen in both themes, the idle screen, the drawer and the ph
 ## What the round settled
 
 - **The shared IA works in every direction.** Pulse band on top, chat as a region, the five columns with a quiet card face, the drawer docked right, the phone as one column: ten different looks, one structure, every control present.
-- **Needs you as a tray or an inbox beats Needs you as a column.** 06, 09 and 16 make the two decisions the loudest thing without any colour trick; 01 and 04 as columns need a fill to compete.
+- **Needs you as a tray looked best with two cards and failed with seven.** The tray wrapped into rows, scrolled inside itself and squeezed the board. Sebastian's call (C4): Needs you is the first column with its own prominent treatment; 06 and 02 were changed to it.
 - **Done must be dimmer than Queued.** Every first build had Done too loud; every loop 1 fixed it the same way: faint token, no icons, no state word.
 - **The light theme is designed, not inverted.** The critic called four first builds "an inversion"; the ones that passed changed the surface model (cream, paper, concrete), not only the tokens.
 - **The chat's start line fills the void.** A chat with two messages and a bottom-aligned log looks empty; the inventory's start line at the top of the log fixes it everywhere.

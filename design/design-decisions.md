@@ -13,3 +13,7 @@ The round may prototype in plain HTML or React; the aim is a better design and U
 ## C3. The spending cap of the design round is $100 (2026-10-14, Sebastian)
 
 For fal and other services. Tokens are not capped. The run goes overnight; the director picks provisionally between rounds and Sebastian's picks in the morning are the decisions.
+
+## C4. Needs you is the first column, prominent, never a tray (2026-10-14, Sebastian)
+
+The Needs you column looks different from the other four and louder: its own fill, rule and header. It stays a regular column of the board, so seven waiting cards read like any column that grows downward. A tray or band across the top of the board is out: with seven cards it wraps into rows, scrolls inside itself and squeezes the board (seen on the Mission control prototype at 1440 and 1920). Done stays quiet.
