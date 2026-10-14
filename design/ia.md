@@ -42,7 +42,7 @@ Three elements in order of weight: the pulse says what to know now, the chat is 
 The face shows what matters for the card's state and no more. Elements in order, each only when it has content:
 
 1. Issue ref and title, the title at most two lines. The whole card opens the drawer (item 226), for every member; the buttons on the face act without opening it.
-2. State row: a dot and the state word in the state's hue, on an In progress card the stage from the session (planning, building, verifying; item 225, C8) with its own dot, the time in the current stage (never the total age, which the drawer's Status line keeps; C8), then only when exceptional: `n/n checks` while verifying, spend from 80 percent of budget with the warning sign, the gate text with its age, the fine state (retrying, held, on the provider, stale).
+2. State row: a dot and the state word in the state's hue, on an In progress card the stage from the session (planning, building, verifying; item 225, C8) with its own dot, then the card's age (C11: one time on the card, the time in the stage and the gates in the drawer), then only when exceptional: `n/n checks` while verifying, spend from 80 percent of budget with the warning sign, the fine state (retrying, held, on the provider, stale). No gate line on the face (C11).
 3. Activity line, monospace, one line, only on a working card or a card that waits: the newest event or the question. "answer on the issue" link stays.
 4. Chips only when exceptional: blocked by n, waiting on #n, from plan #n. No lane badge: there are no lanes (225). The model alias leaves the face and goes into the drawer's top block.
 5. Actions as a quiet row of small buttons: Retry, Close. No Start plan, no lane moves (225). They stay visible (no hover-only controls).
