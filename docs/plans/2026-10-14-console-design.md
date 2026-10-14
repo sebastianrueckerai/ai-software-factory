@@ -69,8 +69,20 @@ What landed, in order, on the code repository's `main` by the controller's direc
 | The structural check | 668 | 32cc922 |
 | Item 1, the tokens and the base sheet | 672 | e821c96 |
 | Item 2, the shell | 677 | b34697a |
+| Item 5, the drawer | 684 | open, its first test job red on a factoryd flake (the Temporal deadlock detector in TestWorkflowReportSixProviderRefusalsAskAHuman), rerun after a rebase on main |
+| Item 6, the chat | 685 | open, test job green on its first run |
+| Item 3, the board | 692 | open |
 
-The structural check's lines after item 2: two, both item 3's (the whole card opens the drawer, the PR link on a verifying card's face).
+The structural check's lines after item 2: two, both item 3's (the whole card opens the drawer, the PR link on a verifying card's face). After item 3: none, `ok: every control present, the mechanics work`.
+
+Rulings taken in item 3, each at the smallest change that keeps the IA:
+
+- A click on a card opens the drawer for a member who may write the task's project. The drawer's handler (`writableCard`) refuses a reader, so a reader's face stays plain. Opening the drawer for readers is a permission change outside this round.
+- The lane badge shows only a lane other than ready on the four-column board. Lanes exist until 225 is built, and ready is the default lane, so "ready" on every card said nothing. The wide view keeps its badges.
+- The PR link sits on a verifying card's face and on a closing card's, since closing is the merge of that PR.
+- A done plan card's row keeps the rollup of its children (n running, n done, n waiting) in its meta line. The plan's own work is over, its cards are not.
+- The drawer's Status line reads "<stage>, <time in the stage>, <total> in all" on a card in progress (C8: the total in the drawer).
+- The rows that hold forms are `div`s. A `form` closes a `p` in HTML, so the former `p.transitions` never held its forms.
 
 ## Not in this round
 
