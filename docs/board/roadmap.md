@@ -65,6 +65,9 @@ the badge stays below.
   v1, the map comes later ([automaker]).
 - **Forgejo project mirror** (old 30): board columns mirrored onto a
   Forgejo project, waiting on the upstream projects API.
+- **The whole chip opens the card** (Sebastian, 2026-10-14): a click anywhere on a card opens its drawer; only inner interactive elements keep their own action, and text selection on the objective survives. The parked cards' Plan and Ready buttons are today's exception; the main roadmap's item 225 removes them, after which the chip is one target with no exceptions ([../roadmap.md](../roadmap.md)).
+- **Files tab last** (Sebastian, 2026-10-14): the drawer's order becomes Overview, Activity, Chat, Files (`drawerTabs`, board.go); Files is read at review time, and the pinned links below carry most file traffic out of the drawer.
+- **References render as pinned Forgejo links** (Sebastian, 2026-10-14): the console renders repository paths in card fields, summaries and chat as links to Forgejo pinned to the commit the task record holds, each in a new window; the model never writes a URL, so none can be hallucinated. The pin is the audit truth: the version the work was verified against. Roadmap and plan references go by item number to the current file instead, since items are numbered and stable and the repository history is the rollback. One renderer helper covers every surface.
 
 [vibe-kanban]: reports/vibe-kanban.md
 [plane]: reports/plane.md
