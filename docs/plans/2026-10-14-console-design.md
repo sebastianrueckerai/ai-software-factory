@@ -93,6 +93,8 @@ Rulings taken in item 4:
 - The wide view keeps the merge item's full facts and the resource request's facts list. It is the record view; the four-column board is the brief.
 - The structural check opens every disclosure before it reads the page, so the deny form's choices and the own-answer box count as present.
 
+The merge queue wait, measured on 2026-10-14 for C8's condition (a Verifying column comes back if the queue still takes tens of minutes), from a roll's pull request filing to its merge on the code repository: before the speed round's items landed, #638 15 min, #647 26 min, #657 54 min, #683 34 min; after them, #695 3 min, #697 3 min. The four columns stand; no Verifying column comes back.
+
 Rulings taken in items 7 and 8:
 
 - Item 7: the New task page keeps its Lane field. Track (direct or plan) replaces Lane with item 225, which is not built; a relabel without the model would mislead. The page wears the shell from item 2.
