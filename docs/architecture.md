@@ -2563,7 +2563,9 @@ events, and depth comes through a tool. What each part does:
   the state list, the gates in order, each tool with the states it fits,
   the project's process, the policy's confirm list and limits, and one
   written paragraph on the overall flow. Nothing in it can drift from the
-  code. The `card` tool and the snapshot give a card's state as a
+  code. Workers read the same source: the gateway's `manual` tool serves
+  it to a session, and a card's first human message opens with its loop
+  sentence. The `card` tool and the snapshot give a card's state as a
   sentence. In its first live turn the agent opened the manual in 17 ms
   and named `answer` as the tool for a card at its session cap.
 - **Refusals.** A card action on the wrong state answers "Card #N
@@ -2820,7 +2822,9 @@ repository has a `check` file, and the factory's own code has one since
 Stage 17 (6.4).
 
 `Message` (Ruling 188, Task 88) puts text into the running session as the
-next user turn. A harness without such a mode answers `ErrNotSupported`,
+next user turn. The first human-sourced message opens with the factory
+basics from `internal/manual`, the manual's one source; later messages
+and the supervisor's go in bare. A harness without such a mode answers `ErrNotSupported`,
 and factoryd then redirects to a fresh session with the text as its
 finding, the restart it used before; `ErrNotRunning` means no session
 runs. opencode supports it by running as a server: the worker starts
