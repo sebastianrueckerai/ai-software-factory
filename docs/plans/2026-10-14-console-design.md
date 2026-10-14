@@ -78,6 +78,7 @@ What landed, in order, on the code repository's `main` by the controller's direc
 | The spend gauges' fill (the policy drops inline styles; a meter now) | 726 | 65dae57 |
 | No accent filter, the ticker on the last day, the board ticking beside an open drawer (Sebastian, 2026-10-14) | 731 | b754bf6 (the first commit carried a moved main's inverse and was refused; rebuilt from the branch's base) |
 | C11, one time on a card | 738 | da6a406 |
+| C12, no ticker along the foot | 746 | open |
 
 The structural check's lines after item 2: two, both item 3's (the whole card opens the drawer, the PR link on a verifying card's face). After item 3: none, `ok: every control present, the mechanics work`.
 
@@ -128,7 +129,7 @@ Declined, with the reason:
 - The project switch has no submit button without JavaScript, as the IA chose.
 - The escalation's Tab order follows the DOM (title, Close, then the choices) while the eye reads the choices first. Moving the face's transitions out of the DOM would split the face from its fragment; the order stays, and a note here records it.
 
-Sebastian's decisions after the round, from the live board (2026-10-14): C11, one time on a card, its age, the gate line gone (design-decisions.md); the accent filter removed; the ticker on the last day; the board ticking beside an open drawer. The wide view stays (Sebastian, 2026-10-14) until 225 folds the lanes; it hides the chat to give the lane columns the width, and w or "Four columns" brings the chat back.
+Sebastian's decisions after the round, from the live board (2026-10-14): C11, one time on a card, its age, the gate line gone (design-decisions.md); the accent filter removed; the ticker on the last day, then gone (C12); the board ticking beside an open drawer. The wide view stays (Sebastian, 2026-10-14) until 225 folds the lanes; it hides the chat to give the lane columns the width, and w or "Four columns" brings the chat back.
 
 The merge queue wait, measured on 2026-10-14 for C8's condition (a Verifying column comes back if the queue still takes tens of minutes), from a roll's pull request filing to its merge on the code repository: before the speed round's items landed, #638 15 min, #647 26 min, #657 54 min, #683 34 min; after them, #695 3 min, #697 3 min. The four columns stand; no Verifying column comes back.
 
