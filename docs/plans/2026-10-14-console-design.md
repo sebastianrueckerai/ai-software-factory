@@ -72,6 +72,7 @@ What landed, in order, on the code repository's `main` by the controller's direc
 | Item 5, the drawer | 684 | e533514 (its first test job red on a factoryd flake, the Temporal deadlock detector in TestWorkflowReportSixProviderRefusalsAskAHuman; green after a rebase on main) |
 | Item 6, the chat | 685 | 74e06c5 |
 | Item 3, the board | 692 | f6cbe93 |
+| Item 4, the Needs you items | 700 | open |
 
 The structural check's lines after item 2: two, both item 3's (the whole card opens the drawer, the PR link on a verifying card's face). After item 3: none, `ok: every control present, the mechanics work`.
 
@@ -83,6 +84,13 @@ Rulings taken in item 3, each at the smallest change that keeps the IA:
 - A done plan card's row keeps the rollup of its children (n running, n done, n waiting) in its meta line. The plan's own work is over, its cards are not.
 - The drawer's Status line reads "<stage>, <time in the stage>, <total> in all" on a card in progress (C8: the total in the drawer).
 - The rows that hold forms are `div`s. A `form` closes a `p` in HTML, so the former `p.transitions` never held its forms.
+
+Rulings taken in item 4:
+
+- The face nested in the escalation stays as it is: the card fragment (`/cards/<id>`) must equal the board's face byte for byte, so the item lends itself the face's parts by CSS (`display: contents` and `order`) and hides the face's activity line, which would repeat the question.
+- The plan item keeps Accept plan, Request changes and Reject: 225 is not built, and without them a plan could not be accepted.
+- The wide view keeps the merge item's full facts and the resource request's facts list. It is the record view; the four-column board is the brief.
+- The structural check opens every disclosure before it reads the page, so the deny form's choices and the own-answer box count as present.
 
 ## Not in this round
 
