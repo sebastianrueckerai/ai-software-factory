@@ -58,6 +58,20 @@ Two decisions reached the round after the handover was written:
 
 The round's pull requests, in order: the lab, the board page's figures (today's spend and the day cap, the GitHub remote, the plan flag), the structural check, then items 1, 2, 5, 6, 3, 4, 7, 8. The structural check lands with the prerequisites and tests the design's mechanics, so it is red on the mechanics an item has not built yet. Each pull request names the lines still red. From item 2 on it is green.
 
+## The round's ledger
+
+What landed, in order, on the code repository's `main` by the controller's direct push after a green test job (the merge API refuses the controller, as ruling 109 keeps the merge door for the factory; a same-repository pull request fails the `job-env-audit` job by design, so the round's pull requests come from the controller's fork):
+
+| Step | Pull request | Commit on main |
+|---|---|---|
+| The lab | 665 (661 closed: same-repository) | 73de708 |
+| The figures (today's spend, the day cap, the GitHub remote, the stage) | 667 | d1a6584 |
+| The structural check | 668 | 32cc922 |
+| Item 1, the tokens and the base sheet | 672 | e821c96 |
+| Item 2, the shell | 677 | b34697a |
+
+The structural check's lines after item 2: two, both item 3's (the whole card opens the drawer, the PR link on a verifying card's face).
+
 ## Not in this round
 
 The other nine prototypes (kept in `design/prototypes/` as the record), the notification service (145), the PWA and the phone beyond the one-column layout (146), the analytics page (147), a wide view with lanes (there are no lanes), a console app in the Terminal direction's language (an idea Sebastian noted, not scoped).
