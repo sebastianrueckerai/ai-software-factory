@@ -75,6 +75,7 @@ What landed, in order, on the code repository's `main` by the controller's direc
 | Item 4, the Needs you items | 700 | 9c69c61 (rebased on a roll that landed first; CI green on 07fe7c6, the same change) |
 | Items 7 and 8, the New task page and the secondary pages | 701 | e9c6378 |
 | The review's fix pass | 711 | a6b70e4 |
+| The spend gauges' fill (the policy drops inline styles; a meter now) | 726 | 65dae57 |
 
 The structural check's lines after item 2: two, both item 3's (the whole card opens the drawer, the PR link on a verifying card's face). After item 3: none, `ok: every control present, the mechanics work`.
 
