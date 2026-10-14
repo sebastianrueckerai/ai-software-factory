@@ -28,7 +28,7 @@ Orientation on 2026-10-14 before the first commit, the code repository's `origin
 |---|---|---|
 | Item 0a, the columns' scrolling | 763 | 418a188 (rebased on a roll and on 762, the store's Done order, that landed first) |
 | Item 0b, arrival order | 766 | 8f2b0d1 (rebased twice on rolls and the factory's 759) |
-| Item 1, the find | | |
+| Item 1, the find | 764 | 9dd3f0d (gosec refused the count's `template.HTML`, rendered by a template since; rebased on 759) |
 | Item 2, the menus | | |
 
 ## Rulings
