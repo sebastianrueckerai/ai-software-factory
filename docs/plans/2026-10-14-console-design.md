@@ -72,7 +72,7 @@ What landed, in order, on the code repository's `main` by the controller's direc
 | Item 5, the drawer | 684 | e533514 (its first test job red on a factoryd flake, the Temporal deadlock detector in TestWorkflowReportSixProviderRefusalsAskAHuman; green after a rebase on main) |
 | Item 6, the chat | 685 | 74e06c5 |
 | Item 3, the board | 692 | f6cbe93 |
-| Item 4, the Needs you items | 700 | open |
+| Item 4, the Needs you items | 700 | 07fe7c6 |
 
 The structural check's lines after item 2: two, both item 3's (the whole card opens the drawer, the PR link on a verifying card's face). After item 3: none, `ok: every control present, the mechanics work`.
 
