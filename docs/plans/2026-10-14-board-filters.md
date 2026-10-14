@@ -29,7 +29,10 @@ Orientation on 2026-10-14 before the first commit, the code repository's `origin
 | Item 0a, the columns' scrolling | 763 | 418a188 (rebased on a roll and on 762, the store's Done order, that landed first) |
 | Item 0b, arrival order | 766 | 8f2b0d1 (rebased twice on rolls and the factory's 759) |
 | Item 1, the find | 764 | 9dd3f0d (gosec refused the count's `template.HTML`, rendered by a template since; rebased on 759) |
-| Item 2, the menus | | |
+| Item 2, the menus | 768 | 3367ec9 (rebased on the ticker's landing) |
+| C12's ticker, pull request 746 from the console round, left open | 746 | 9d49925 |
+
+The round's state at the end of 2026-10-14: every item is on the code repository's main (0a 418a188, 0b 8f2b0d1, 1 9dd3f0d, 2 3367ec9, and C12's ticker 9d49925), the structural check reads `ok: every control present, the mechanics work` on each, the shots of every item and of the final main are in [design/rounds/02-board-filters/console/](../../design/rounds/02-board-filters/console/) with the round's page. The IA, the inventory and the theme carry the find and the menus. Not verified: the live board, which serves the last roll, and no roll has carried today's landings: main's push CI fails its image jobs since the factory's own merge fcb23ab (the test job passes), which the controller could not read through the API and which is outside this round.
 
 ## Rulings
 
