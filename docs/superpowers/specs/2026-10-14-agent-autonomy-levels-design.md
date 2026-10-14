@@ -115,6 +115,39 @@ The agent invents tasks only where the roadmap grants it in an explicit line
 roadmap for that grant; no grant, no invention. A drafting or refinement pass
 without the grant is out of scope for v1.
 
+## Reaching the human
+
+The escalation is the reach-out, and it is one mechanism, not a new alert. The
+agent files it on its own chat task, so the record stays out of the product
+repository: the project chat shows the message with its choices beside a text
+box, the Needs you column shows the card, and the pulse counts it. Sebastian
+answers in the thread, and the thread continues in the one transcript. That
+covers both asks: new tasks and help in refining existing ones. A wish he
+names in a reply goes where the ready check sends it: a ready statement
+becomes a labelled card at once, a fuzzy one becomes a plain issue on the
+backlog without the label that starts work, in his words.
+
+What the factory lacks today is delivery when he is not looking at the screen.
+The notification service (roadmap item 145) is the designed answer, its first
+event class is "you are needed", and its two channels are live: the Telegram
+bot and the Discord application exist, their tokens sit in the seeded
+`.env.tools`, and test messages were delivered to both. This build takes 145's
+first slice only:
+
+- a needs-you escalation sends one message to each bound channel,
+- the message carries the escalation's choices as inline buttons,
+- a button press or a reply resolves in the control plane; the first answer
+  wins, a later press on another venue hears "already answered",
+- routing as 145 rules it: a reply follows the venue of the human's last
+  message, and the browser always shows the whole transcript.
+
+The inbound path is new work either way: a webhook on the gateway's public
+HTTPS or a Telegram `getUpdates` long-poll, as 145's bounds name.
+
+Sequencing: assisted mode works on board and pulse alone. The push belongs
+with the autonomous level going live, because a full-auto factory that waits
+silently reads as stuck.
+
 ## Recording
 
 Every agent OK and every agent filing records its decider in the audit, the
@@ -132,6 +165,9 @@ intervention rate metric can read it later.
   a human convenience.
 - No staleness re-checks of queued cards in v1.
 - No drafting or refinement of unclear items in v1, outside a roadmap grant.
+- The rest of the notification service. Channel preferences, further channels,
+  Web Push with the PWA and catch-me-up stay in roadmap item 145; this build
+  takes only the needs-you push slice above.
 
 ## Open points for the implementation plan
 
@@ -140,6 +176,8 @@ intervention rate metric can read it later.
   `ValidatePlan` share one implementation.
 - The escalation's shape, on the existing `choices` field.
 - The exact wording of the roadmap grant line the invention check matches.
+- The inbound path for messenger replies, webhook or `getUpdates`, and the
+  bound-chat table's first rows from the seeded `.env.tools`.
 
 ## Evidence from the code survey, 2026-10-14
 
