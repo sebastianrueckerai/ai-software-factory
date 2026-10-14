@@ -11,15 +11,15 @@ Read off the templates in `internal/console/templates/` on 2026-10-13 (code comm
 
 ## Board page
 
-- Filter: Project select, Accent select (eight fixed accents), Show. View toggle: Five columns or Wide view (the same five columns across the full width, the chat hidden). Keys button.
-- Status line: project name; state word (working, waiting on you, idle) with a dot; n working; n waiting on the provider (when any); n need you (links to Needs you); spend / month cap (links to Costs); GitHub state (when exported). A click on the line expands it in place: the working cards by name and stage, the cards that need you, the spend today against the day cap and the month against its cap, the provider state, the GitHub pull requests.
+- Filter: Project select, Accent select (eight fixed accents), Show. View toggle: Four columns or Wide view (the same four columns across the full width, the chat hidden). Keys button.
+- Status line: project name; state word (working, waiting on you, idle) with a dot; n working; n waiting on the provider (when any); n need you (links to Needs you); spend / month cap (links to Costs); GitHub state (when exported). A click on the line expands it in place: the working cards by name and stage, the cards that need you, the spend today against the day cap and the month against its cap, the provider state, the GitHub pull requests, the configuration version and its infra commit linked to the tree (item 221, C9).
 - Pulse: warning sign when prominent; one sentence; typing indicator while recomputing; three or four bullets behind the band's disclosure (no more/less button: the band expands on click).
-- Five columns, each a title and a count: Needs you, Queued (waiting for capacity or on dependencies), Working, Verifying, Done. No lane columns (225).
+- Four columns, each a title and a count: Needs you, Queued (waiting for capacity or on dependencies), In progress (running, closing and in review, the stage on the card), Done (C8). No lane columns (225).
 
 ### Card face
 
 - Line 1: issue ref or task id; title; accent chip. The whole card opens the drawer (226); the issue link lives in the drawer.
-- Line 2: the state, on a working card the stage from the session (planning, building, verifying); elapsed "in all"; n/n checks; spend / budget with "⚠ near its budget" at 80 percent; gate text and its age.
+- Line 2: the state, on an In progress card the stage from the session (planning, building, verifying) with its own dot; the time in the current stage (C8; the total age lives in the drawer); n/n checks; spend / budget with "⚠ near its budget" at 80 percent; gate text and its age.
 - Activity line, monospace: the newest event in one line, or the escalation's question, with "answer on the issue" link when waiting; stale words ("nothing for 40 min").
 - GitHub PR state line, when exported in pull request mode.
 - Chips: fine states (retrying, held, on the provider, stale); model alias; blocked by n (names on hover); from plan #n (a child's plan as artifact); waiting on #n. No lane badge, no waiting-on-author state (225).
@@ -32,7 +32,7 @@ Read off the templates in `internal/console/templates/` on 2026-10-13 (code comm
 - Merge approval: "Merge PR #n" link; risk class; model review verdict and summary; agent's recommendation; More: migration files, review findings, earlier reviews, security audit (verdict, model, findings with file:line), why a human. Links: task id, issue, timeline. Decision note. Approve (approvers; every action is the member's, so "as you" is not said); Split (large risk class); Deny with reason textarea and "request changes / reject" radio.
 - Resource approval: type and volume, purpose, lease, cost per month and this lease, project, beyond the envelope. Approve (with the once-only note); Deny with reason.
 - A plan's open question: the same item as an escalation, on the planning card, with its choice buttons and own-answer field. No Accept plan, no Request changes, no Reject: a plan with no open question files its children and closes by itself (225). The plan's summary and its cards table live in the planning card's drawer.
-- Escalation: the card face; the reason; choice buttons; own answer textarea; Answer or "Grant one session with this answer" (capped); verdict buttons "real problem / false alarm" for approvers.
+- Escalation: the card face; the reason; choice buttons; own answer textarea; Answer or "Grant one session with this answer" (capped); on a capped card, for its owner, the Fund form (card 641, roadmap 210): an amount in EUR, a reason, Fund; verdict buttons "real problem / false alarm" for approvers.
 - Human task: a card face of kind human, with Close.
 
 ### Drawer

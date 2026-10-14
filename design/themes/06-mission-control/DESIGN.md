@@ -48,16 +48,16 @@ top bar 44   home · project ▾ · Board New task Projects Resources Costs Poli
 status panel  ⚠ pulse sentence, 20 px ......................................................... more
               ● waiting on you | 3 working | 2 need you | €61.40 / €120.00 ▬▬▬▬▭▭ 51 % | GitHub: …
 main          CHAT 40 %, full height            | Board header: Board · accent ▾ · Wide view · ?
-              start line, then the log          | NEEDS YOU (lit) | Queued | Working | Verifying | Done
-              > composer ................ Send  | 1.5             | 1.04   | 1.12    | 0.96      | 0.86
+              start line, then the log          | NEEDS YOU (lit) | Queued | In progress | Done
+              > composer ................ Send  | 1.5             | 1      | 1.25        | 0.85
 ticker 28     20:37 ✓ #616 Chat form: center the Send button · 20:30 ✓ #610 … (scrolls slowly)
 ```
 
 - The screen is one viewport high on a desktop; the log and the columns scroll inside.
-- Chat left at 40 percent, board right at 60 percent, 10 px gutter, 12 px page margin (14 and 18 from 1700 px). The five columns weigh 1.5 : 1.04 : 1.12 : 0.96 : 0.86 (Needs you, Queued, Working, Verifying, Done): at 1440 that is 224, 156, 168, 144, 129 px; at 1920 about 298 px for Needs you. A column that scrolls fades at its foot. At 900 to 1279 px Needs you spans the full board width, the four others go two by two, and the board scrolls as one.
-- Needs you is the board's first column, never a tray or band across the top (C4): five columns, Needs you about 1.5 times as wide as the others, its items stacked and growing downward, scrolling like any column. With nothing waiting it goes calm and narrows to 0.9.
+- Chat left at 40 percent, board right at 60 percent, 10 px gutter, 12 px page margin (14 and 18 from 1700 px). The four columns weigh 1.5 : 1 : 1.25 : 0.85 (Needs you, Queued, In progress, Done; C8): at 1440 that is about 268, 178, 223 and 152 px; at 1920 about 355 px for Needs you. A column that scrolls fades at its foot. At 900 to 1279 px Needs you spans the full board width, the three others go two by two with the third on its own row, and the board scrolls as one.
+- Needs you is the board's first column, never a tray or band across the top (C4): four columns (C8), Needs you about 1.5 times as wide as the others, its items stacked and growing downward, scrolling like any column. With nothing waiting it goes calm and narrows to 0.9.
 - The drawer docks at the right edge of the main area, `min(46 %, 720 px)` wide, from the top of the main area to the ticker: over the board, never over the chat (the chat ends at 40 percent).
-- Wide view ("Wide view" / "Five columns", key w): the same five columns across the full width of the main area, the chat hidden; "/" brings the chat back. There are no lane columns, no lane badges and no drag (item 225, C7).
+- Wide view ("Wide view" / "Four columns", key w): the same four columns across the full width of the main area, the chat hidden; "/" brings the chat back. There are no lane columns, no lane badges and no drag (item 225, C7).
 
 ## The pulse
 
@@ -67,10 +67,10 @@ The strip: cells split by vertical hairlines, each a mono numeral and a word ("3
 
 The strip expands (C7). A chevron cell at its right end is the disclosure button (aria-expanded, Enter or Space); a click anywhere on the strip outside its links does the same, and Escape or a second click folds it. The panel unfolds under the strip, inside the band, as four quiet columns split by hairlines, headers in small capitals in the faint colour, 12.5 px text:
 
-- Working: each working card as "#601 Console: the drawer's Overview top block · building · 23 min", the stage in its hue; a click opens the card's drawer.
+- In progress: each card as "#601 Console: the drawer's Overview top block · building · 23 min", the stage in its hue (planning, building, verifying; C8); a click opens the card's drawer.
 - Needs you: each item's headline ("Merge PR #612", "#603 Which store for the session table?"); a click scrolls to the item in the column and focuses it.
 - Spend: two small gauges, full column width, 4 px: today against the day cap ("€4.82 of €10.00 day cap") and this month against the month cap; amber from 80 percent, red past the cap with "the month cap is passed" under it.
-- Provider and GitHub: "provider ok" or "2 waiting on the provider since 13:22" in amber; the GitHub line as a link to the pull requests, "none" when not exported.
+- Provider, GitHub and configuration: "provider ok" or "2 waiting on the provider since 13:22" in amber; the GitHub line as a link to the pull requests, "none" when not exported; the configuration version and its infra commit as a link to the tree (item 221, C9).
 
 Empty lists say "none". On the phone the four columns stack.
 
@@ -80,7 +80,7 @@ The main region: the raised panel, a 2 px cyan rule along its top edge, the larg
 
 ## The board and the card
 
-Columns are sunken panels with corner marks; the header is the name in small capitals and the count in mono, on one baseline. A card: 1 px hairline border, 2 px left rule in the state hue (none on queued), 8 by 10 px padding. The whole card opens the drawer (item 226): a click anywhere on the face that is not a button, link or field; the title is a button, so Tab reaches the card, the card shows the 2 px cyan focus ring and Enter or Space opens it. The issue link lives in the drawer header, not on the face. Line 1 the ref in mono and the title, two lines at most. Line 2 the state row in mono 11 px: dot and state word in the hue (on a working card its stage: planning or building; in Verifying: verifying; in Queued: queued or waiting on dependencies), elapsed, then only when exceptional: n/n checks, spend with "⚠ near its budget" in amber from 80 percent (with a 2 px amber meter under the card), the gate and its age, the fine states in amber ("on the provider", "stale, nothing for 40 min"). Separators trail their item, so a wrapped row never starts with a dot. The activity line in mono, one line, only on a working or waiting card or a failing check; the provider's wait may take two lines. Chips only when exceptional: "plan" in cyan on a plan-track card, blocked by n (red, the names on hover), from plan #n, the accent as a dot and its name. No lane badge, no Plan, Ready or Start plan buttons (225): the track is chosen at filing. A card's actions are Retry on a failed card and Close on a card waiting on a human (or failed without an issue), with a confirm. A stale card gets a dashed amber ring.
+Columns are sunken panels with corner marks; the header is the name in small capitals and the count in mono, on one baseline. A card: 1 px hairline border, 2 px left rule in the state hue (none on queued), 8 by 10 px padding. The whole card opens the drawer (item 226): a click anywhere on the face that is not a button, link or field; the title is a button, so Tab reaches the card, the card shows the 2 px cyan focus ring and Enter or Space opens it. The issue link lives in the drawer header, not on the face. Line 1 the ref in mono and the title, two lines at most. Line 2 the state row in mono 11 px: dot and state word in the hue (in In progress the stage: planning, building or verifying, each with its own dot, C8; in Queued: queued or waiting on dependencies), the time in the current stage (the total age stays in the drawer's Status line; C8), then only when exceptional: n/n checks, spend with "⚠ near its budget" in amber from 80 percent (with a 2 px amber meter under the card), the gate and its age, the fine states in amber ("on the provider", "stale, nothing for 40 min"). Separators trail their item, so a wrapped row never starts with a dot. The activity line in mono, one line, only on a working or waiting card or a failing check; the provider's wait may take two lines. Chips only when exceptional: "plan" in cyan on a plan-track card, blocked by n (red, the names on hover), from plan #n, the accent as a dot and its name. No lane badge, no Plan, Ready or Start plan buttons (225): the track is chosen at filing. A card's actions are Retry on a failed card and Close on a card waiting on a human (or failed without an issue), with a confirm. A stale card gets a dashed amber ring.
 
 Done, failed and closed cards are two-line rows without a box, all in the faint colour: the ref and title, then the state glyph and word (✓ done, ✕ failed, ⊘ closed) and the elapsed time. Only the failed tag takes a colour, the quiet red. Retry is a small underlined text link, not a button.
 
@@ -102,7 +102,7 @@ The raised panel with a cyan left edge and a deep shadow to its left, slides in 
 
 ## The phone
 
-Under 900 px one column, no tabs: the top bar (home, project, theme, Menu with the rest), the status panel with the strip wrapping to two rows, the chat (the log as tall as its content and at most 62 percent of the viewport height, so the busy conversation shows whole from the start line to Do it; the composer under it, Do it and Skip side by side at 44 px), then the board as stacked sections: the lit Needs you column first, in full, never collapsible with every button full width, one per row, 44 px, 8 px between rows (the verdict buttons too), then Working, Verifying, Queued, Done collapsed, its titles wrapping to two lines. The ticker closes the page and clips inside itself: the page is exactly 390 wide in every scenario. The drawer takes the full screen.
+Under 900 px one column, no tabs: the top bar (home, project, theme, Menu with the rest), the status panel with the strip wrapping to two rows, the chat (the log as tall as its content and at most 62 percent of the viewport height, so the busy conversation shows whole from the start line to Do it; the composer under it, Do it and Skip side by side at 44 px), then the board as stacked sections: the lit Needs you column first, in full, never collapsible with every button full width, one per row, 44 px, 8 px between rows (the verdict buttons too), then In progress, Queued, Done collapsed, its titles wrapping to two lines. The ticker closes the page and clips inside itself: the page is exactly 390 wide in every scenario. The drawer takes the full screen.
 
 ## Motion
 

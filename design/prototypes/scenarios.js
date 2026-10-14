@@ -1,10 +1,10 @@
-// The four moments every prototype shows. workingCount is the status figure; working is the card list.
+// The four moments every prototype shows. workingCount is the status figure; inprogress is the card list of the In progress column (C8), each card with its stage.
 // After item 225 (the lanes collapse): no backlog, no lane moves; a card carries its track (plan or direct) from filing and a working card its stage (planning, building, verifying). Loaded with <script src="../scenarios.js">
 // (file:// cannot fetch JSON). Every string is page copy; nothing here is invented
 // by a builder. A builder may add plausible detail of the same kinds, never new kinds.
 window.SCENARIOS = {
   busy: {
-    project: "ai-software-factory-code",
+    project: "ai-software-factory-code", config: { version: 4, commit: "c9d98bb0aa11" },
     state: "waiting on you", workingCount: 3, provider: 0, needYou: 2, spend: 61.40, spendToday: 4.82, dayCap: 10, cap: 120, github: "1 open pull request", githubURL: "#",
     pulse: { prominent: true, sentence: "Two cards need your decision; #612's merge carries a migration.",
       bullets: ["Merge PR #612 waits for you: high risk, one migration, the audit found a missing default.",
@@ -29,12 +29,10 @@ window.SCENARIOS = {
       { issue: 620, task: "t-1f8e4b6a2c75", title: "Costs read: a from and a to date", status: "waiting on dependencies", elapsed: "2 h 14 min in all", spent: 0, budget: 2, blocked: 2, blockedOn: "#612, #609" },
       { issue: 621, task: "t-5a3c9e1d7b40", title: "Export in pull request mode", status: "queued", elapsed: "48 min in all", spent: 0, budget: 2, fromPlan: 558 }
     ],
-    working: [
+    inprogress: [
       { issue: 601, task: "t-e02e56a2c488", title: "Console: the drawer's Overview top block", status: "running", stage: "building", track: "direct", elapsed: "23 min", checks: "3/4", spent: 1.72, budget: 2, near: true, model: "coding-cheap", activity: "Reading internal/console/board.go…" },
       { issue: 598, task: "t-b8a1d5f1612a", title: "GitHub sync pulls a card", status: "running", stage: "building", track: "direct", elapsed: "41 min", spent: 0.63, budget: 2, model: "coding-frontier", activity: "Running go test ./internal/console" },
-      { issue: 611, task: "t-a4b58737c1bc", title: "Plan: the members page and the approvers", status: "running", stage: "planning", track: "plan", elapsed: "8 min", spent: 0.11, budget: 5, model: "coding-frontier", activity: "Reading docs/plans/2026-10-14-lane-collapse.md" }
-    ],
-    verifying: [
+      { issue: 611, task: "t-a4b58737c1bc", title: "Plan: the members page and the approvers", status: "running", stage: "planning", track: "plan", elapsed: "8 min", spent: 0.11, budget: 5, model: "coding-frontier", activity: "Reading docs/plans/2026-10-14-lane-collapse.md" },
       { issue: 612, task: "t-0b7d3e9a4c21", title: "Ledger: the month cap per project", status: "in review", stage: "verifying", elapsed: "2 h 30 min", checks: "4/4", pr: 612, spent: 1.08, budget: 2, model: "coding-frontier", activity: "review by factoryd at 14:02: approve" },
       { issue: 609, task: "t-3e7b2c9f5a18", title: "Pulse: a provider budget alert", status: "in review", stage: "verifying", gate: "merge queue", gateAge: "6 min", elapsed: "1 h 51 min", checks: "4/4", pr: 609, spent: 0.84, budget: 2, model: "coding-cheap", activity: "merge queue: behind #612" }
     ],
@@ -78,7 +76,7 @@ window.SCENARIOS = {
     }
   },
   idle: {
-    project: "ai-software-factory-code",
+    project: "ai-software-factory-code", config: { version: 4, commit: "c9d98bb0aa11" },
     state: "idle", workingCount: 0, provider: 0, needYou: 0, spend: 144.16, spendToday: 0.39, dayCap: 10, cap: 120, github: "", githubURL: "",
     pulse: { prominent: false, sentence: "Factory is idle with no active work; spend of €144.16 has exceeded the monthly budget of €120.00.",
       bullets: ["Nothing runs and nothing waits for you.", "Two queued cards wait for the month cap to clear: #455 and #178.", "The month cap is passed; new sessions wait until it is raised or the month turns."] },
@@ -87,7 +85,7 @@ window.SCENARIOS = {
       { issue: 455, task: "t-4c2559f5cb07", title: "Live check: close (Stage 16, 3.4)", status: "queued", elapsed: "53 h 1 min in all", spent: 0, budget: 2, activity: "filed by sebastian via chat at 16:01, direct" },
       { issue: 178, task: "t-9d2a71c0e4b3", title: "Console: show the configuration version", status: "queued", elapsed: "347 h 40 min in all", spent: 0, budget: 2, activity: "filed by controller via chat at 07:08, direct" }
     ],
-    working: [], verifying: [],
+    inprogress: [],
     doneCount: 139,
     done: [
       { issue: 490, title: "README.md: extend the intro", status: "done", elapsed: "29 min in all", spent: 0.01, budget: 2, at: "15:32" },
@@ -107,7 +105,7 @@ window.SCENARIOS = {
     drawer: null
   },
   fire: {
-    project: "ai-software-factory-code",
+    project: "ai-software-factory-code", config: { version: 4, commit: "c9d98bb0aa11" },
     state: "waiting on you", workingCount: 1, provider: 2, needYou: 1, spend: 97.20, spendToday: 9.71, dayCap: 10, cap: 120, github: "1 open pull request", githubURL: "#",
     pulse: { prominent: true, sentence: "The model provider refuses every call since 13:22; two cards wait on it and #538 is at its cap.",
       bullets: ["LiteLLM answers 429 from the provider's account budget; nothing can run until it is raised.", "#538 burned its budget on failed calls and asks for a decision.", "#531 has had no event for 40 minutes.", "Two cards failed today: #607 and #535."] },
@@ -120,12 +118,10 @@ window.SCENARIOS = {
       { issue: 455, task: "t-4c2559f5cb07", title: "Live check: close (Stage 16, 3.4)", status: "queued", elapsed: "53 h 1 min in all", spent: 0, budget: 2 },
       { issue: 540, task: "t-7788aa11bb22", title: "A capped verification card closes on attested evidence", status: "queued", elapsed: "12 min in all", spent: 0, budget: 2 }
     ],
-    working: [
+    inprogress: [
       { issue: 531, task: "t-0f1e2d3c4b5a", title: "Console: the Close action's live check", status: "running", stage: "building", elapsed: "1 h 48 min", spent: 0.41, budget: 2, model: "coding-cheap", activity: "Running bash check", stale: true, staleText: "nothing for 40 min" },
       { issue: 516, task: "t-9988776655aa", title: "Pulse: the provider budget margin", status: "running", stage: "building", elapsed: "2 h 2 min", spent: 1.95, budget: 2, near: true, model: "coding-frontier", provider: true, activity: "waiting on the model provider since 13:22 (429 budget exhausted)" },
-      { issue: 537, task: "t-5544332211bb", title: "Members: the approver list", status: "running", stage: "building", elapsed: "1 h 15 min", spent: 0.22, budget: 2, model: "coding-cheap", provider: true, activity: "waiting on the model provider since 13:24" }
-    ],
-    verifying: [
+      { issue: 537, task: "t-5544332211bb", title: "Members: the approver list", status: "running", stage: "building", elapsed: "1 h 15 min", spent: 0.22, budget: 2, model: "coding-cheap", provider: true, activity: "waiting on the model provider since 13:24" },
       { issue: 612, task: "t-0b7d3e9a4c21", title: "Ledger: the month cap per project", status: "in review", stage: "verifying", elapsed: "2 h 30 min", checks: "2/4", pr: 612, spent: 1.08, budget: 2, model: "coding-frontier", activity: "checks: go test ./acceptance failed" }
     ],
     done: [
@@ -142,12 +138,11 @@ window.SCENARIOS = {
     drawer: null
   },
   quiet: {
-    project: "ai-software-factory-code",
+    project: "ai-software-factory-code", config: { version: 4, commit: "c9d98bb0aa11" },
     state: "working", workingCount: 1, provider: 0, needYou: 0, spend: 4.10, spendToday: 0.31, dayCap: 10, cap: 120, github: "0 open pull requests", githubURL: "#",
     pulse: { prominent: false, sentence: "One card is working; nothing needs you.", bullets: ["#622 started 6 minutes ago on the costs read's date window.", "Three cards finished this morning.", "Spend this month is €4.10 of €120."] },
     needs: [], queued: [],
-    working: [{ issue: 622, task: "t-c0ffee123456", title: "Costs read: a from and a to date", status: "running", stage: "building", elapsed: "6 min", spent: 0.08, budget: 2, model: "coding-cheap", activity: "Reading internal/console/ledger.go" }],
-    verifying: [],
+    inprogress: [{ issue: 622, task: "t-c0ffee123456", title: "Costs read: a from and a to date", status: "running", stage: "building", elapsed: "6 min", spent: 0.08, budget: 2, model: "coding-cheap", activity: "Reading internal/console/ledger.go" }],
     done: [
       { issue: 620, title: "Costs page: the date window form", status: "done", elapsed: "38 min in all", spent: 0.22, budget: 2, at: "09:12" },
       { issue: 619, title: "Timeline: the gates meter label", status: "done", elapsed: "19 min in all", spent: 0.06, budget: 2, at: "08:40" },
@@ -157,3 +152,8 @@ window.SCENARIOS = {
     drawer: null
   }
 };
+// The record prototypes (01 to 16 but 06) read the two lists of the five-column board; they are views of inprogress.
+Object.values(window.SCENARIOS).forEach(function (d) {
+  d.working = d.inprogress.filter(function (c) { return c.stage !== 'verifying'; });
+  d.verifying = d.inprogress.filter(function (c) { return c.stage === 'verifying'; });
+});

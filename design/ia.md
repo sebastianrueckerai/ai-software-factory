@@ -17,7 +17,7 @@ Three elements in order of weight: the pulse says what to know now, the chat is 
 │ ● waiting on you · 3 working · 2 need you · €61.40 / €120 · GitHub 1 open PR │ figures, small
 ├─────────────────────────────────┬────────────────────────────────────────────┤
 │ CHAT  project agent · New …     │ BOARD  accent ▾  wide  ?                   │
-│                                 │ NEEDS YOU 2  QUEUED 4  WORKING 3  VERIF 2  DONE 8 │
+│                                 │ NEEDS YOU 2  QUEUED 4  IN PROGRESS 5  DONE 8      │
 │  agent: …                       │ ┌────────┐ ┌──────┐ ┌──────┐ ┌──────┐ ┌─────┐ │
 │  you: …                         │ │Merge   │ │#455  │ │#601  │ │#598  │ │#490 │ │
 │  proposal  [Do it] [Skip]       │ │PR #612 │ │…     │ │…     │ │…     │ │#616 │ │
@@ -31,9 +31,9 @@ Three elements in order of weight: the pulse says what to know now, the chat is 
 ```
 
 - **Top bar.** One quiet row: the home word, the project switch as a select (the page reloads on change, no Show button), the factory pages as small text links, then theme, the user and Log out. The accent filter, the view toggle and the keys button leave the page shell: they are board controls and sit in the board's own header.
-- **Pulse band.** The sentence first, large, with the warning sign when prominent; no "more" button. Under it the status figures in one small tabular row: the state word with its dot, n working, n waiting on the provider when any, n need you (links to Needs you), spend / cap (links to Costs), GitHub. The band has the prominent treatment (tint and left rule) only when a card needs a person. A click anywhere on the band expands it in place (one disclosure for the bullets and the figures, a chevron as the keyboard control, Escape or a second click folds it): the working cards by name and stage, the cards that need you, the spend today against the day cap and the month against its cap as two small gauges, the provider state, the GitHub pull requests as links.
+- **Pulse band.** The sentence first, large, with the warning sign when prominent; no "more" button. Under it the status figures in one small tabular row: the state word with its dot, n working, n waiting on the provider when any, n need you (links to Needs you), spend / cap (links to Costs), GitHub. The band has the prominent treatment (tint and left rule) only when a card needs a person. A click anywhere on the band expands it in place (one disclosure for the bullets and the figures, a chevron as the keyboard control, Escape or a second click folds it): the working cards by name and stage, the cards that need you, the spend today against the day cap and the month against its cap as two small gauges, the provider state, the GitHub pull requests as links, the configuration version with its infra commit linked to the tree (item 221, C9).
 - **Chat, the main region.** Left, 44 percent of the width, a raised panel. Header: "Chat", "project agent · project", New conversation, the old conversations select. The log at a reading width of at most 72 characters. The composer at the bottom with a three-row box and Send; the queue under it. Tool blocks collapsed, proposals as cards with Do it as the primary button and Skip as the quiet one.
-- **Board, the quiet region.** Right, the rest of the width. Its header row: "Board", the accent filter as a select that reloads, the wide-view link, the keys button. Five columns stay (ruling 255), headers as small capitals with the count. Needs you is the first column, with its own fill, rule and header so it is the loudest thing on the board, and it stays a column: no tray or band across the top (C4), so seven waiting cards grow downward like any column. Cards are compact (below).
+- **Board, the quiet region.** Right, the rest of the width. Its header row: "Board", the accent filter as a select that reloads, the wide-view link, the keys button. Four columns (ruling 255 as C8 amends it: Needs you, Queued, In progress, Done), headers as small capitals with the count. Needs you is the first column, with its own fill, rule and header so it is the loudest thing on the board, and it stays a column: no tray or band across the top (C4), so seven waiting cards grow downward like any column. Cards are compact (below).
 - **Drawer.** Docks at the right edge, 46 percent of the width, at most 720 px, over the board and never over the chat. Escape closes.
 - **Secondary pages** keep the shell and the pulse band is absent. Content width at most 80 rem.
 
@@ -42,7 +42,7 @@ Three elements in order of weight: the pulse says what to know now, the chat is 
 The face shows what matters for the card's state and no more. Elements in order, each only when it has content:
 
 1. Issue ref and title, the title at most two lines. The whole card opens the drawer (item 226), for every member; the buttons on the face act without opening it.
-2. State row: a dot and the state word in the state's hue, on a working card the stage from the session (planning, building, verifying; item 225), elapsed, then only when exceptional: `n/n checks` while verifying, spend from 80 percent of budget with the warning sign, the gate text with its age, the fine state (retrying, held, on the provider, stale).
+2. State row: a dot and the state word in the state's hue, on an In progress card the stage from the session (planning, building, verifying; item 225, C8) with its own dot, the time in the current stage (never the total age, which the drawer's Status line keeps; C8), then only when exceptional: `n/n checks` while verifying, spend from 80 percent of budget with the warning sign, the gate text with its age, the fine state (retrying, held, on the provider, stale).
 3. Activity line, monospace, one line, only on a working card or a card that waits: the newest event or the question. "answer on the issue" link stays.
 4. Chips only when exceptional: blocked by n, waiting on #n, from plan #n. No lane badge: there are no lanes (225). The model alias leaves the face and goes into the drawer's top block.
 5. Actions as a quiet row of small buttons: Retry, Close. No Start plan, no lane moves (225). They stay visible (no hover-only controls).
@@ -73,7 +73,7 @@ Activity and Files stay as they are. Chat stays as it is, with the steer box.
 
 ## The phone, under 900 px
 
-One column, no tabs: the top bar (home word, project select, a menu for the rest), the pulse band, the chat with its log at 55 percent of the viewport height and the composer under it, then the board as stacked sections: Needs you in full, then Working, Verifying, Queued, Done, each a section with its count, Done collapsed by default. The drawer takes the full screen. Needs-you actions are one-handed: the choice buttons full width.
+One column, no tabs: the top bar (home word, project select, a menu for the rest), the pulse band, the chat with its log at 55 percent of the viewport height and the composer under it, then the board as stacked sections: Needs you in full, then In progress, Queued, Done, each a section with its count, Done collapsed by default. The drawer takes the full screen. Needs-you actions are one-handed: the choice buttons full width.
 
 ## Tokens and skins
 
@@ -85,7 +85,7 @@ The oklch ladder and the state hues of proposal v1 stay as the base tokens (`bas
 |---|---|
 | layout.html | the header becomes the top bar: home, project select (form, auto-submit), the page links, theme, user, logout |
 | page.html | the filter form becomes the board header; the order is pulse, chat, board; the Board/Chat tabs go; the drawer stays last; the status figures row is a disclosure with the expanded panel |
-| board.html | the pulse band takes the status figures; the card face as above with the whole card as the drawer's opener; the needs-you items as above; column headers; the wide view's lane columns and the move and plan forms go (225) |
+| board.html | the pulse band takes the status figures; the card face as above with the whole card as the drawer's opener; the needs-you items as above; four column headers (C8); the wide view's lane columns and the move and plan forms go (225) |
 | drawer.html | the header, the tab order, the Overview top block and collapsed sections |
 | chat.html | the turns with an avatar and the name and time above the text |
 | new.html | Track (direct or plan) replaces Lane (225) |
