@@ -5635,6 +5635,11 @@ infra.
   for all environments (882a819, 2caf0fd); hello-import's and
   sqlite-import's staging read "not deployed yet". Its alert half is
   roadmap 259.
+- 204 closed by Sebastian's decision: DashScope serves tests only
+  ($178.83 of its $200 budget spent in October, a test card costs about
+  0.01 EUR), z.ai serves heavy work while its quota lasts and the local
+  session between, and a provider's budget refusal waits on the
+  provider-wait gate (ruling 267) with a named card.
 - go.mod names toolchain go1.26.9, the images' Go, so a local test runs
   the Go CI runs (a27f1c8). Under go 1.25.0 alone the race suite crashed
   in factoryd with "fatal error: fault", the night's unexplained
