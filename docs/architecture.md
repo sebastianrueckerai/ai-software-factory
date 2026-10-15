@@ -2399,10 +2399,11 @@ the button or by a confirmed tool call. Forgejo's whitelist stays the
 merge authority. A steer reaches the running session as a human message on
 the existing path (6.2, 6.6).
 
-**Context.** Each turn gets a compact project snapshot (the status line's
-figures, the columns with card titles and states), the last 30 events, the
-human's conversation so far and the tool list. Details come through the
-read tools. Agent output that a tool returns (summaries, messages,
+**Context.** Each turn gets the status line's figures, the human's
+conversation so far and the tools the member's role may use, each tool one
+sentence (roadmap 200, 201). The board, the history and every detail come
+through the read tools, never restated in the context, and a card is named
+by its issue number or its task id alike. Agent output that a tool returns (summaries, messages,
 comments) passes the existing inbound sanitiser before it enters the
 context, as briefs do today. Built with the last 40 messages of the
 member's conversation, kept in `chat_messages` per project and member. The
@@ -2555,8 +2556,8 @@ behind an OK (Ruling 261), so the chat is never blinder than the screen.
 Self-correction comes before prevention: the conversation keeps every tool
 call, result and refusal, the agent can open its manual, and every refusal
 names the state and the fitting action, so a wrong move corrects itself
-in the next turn. A turn's default context stays the snapshot and the last
-events, and depth comes through a tool. What each part does:
+in the next turn. A turn's default context is the status line, and the board,
+the history and every depth come through a tool. What each part does:
 
 - **The manual.** `system` renders the agent's manual from the code at
   call time (Ruling 262): the card states, each with its meaning beside
@@ -2565,7 +2566,7 @@ events, and depth comes through a tool. What each part does:
   written paragraph on the overall flow. Nothing in it can drift from the
   code. Workers read the same source: the gateway's `manual` tool serves
   it to a session, and a card's first human message opens with its loop
-  sentence. The `card` tool and the snapshot give a card's state as a
+  sentence. The `card` and `board` reads give a card's state as a
   sentence. In its first live turn the agent opened the manual in 17 ms
   and named `answer` as the tool for a card at its session cap.
 - **Refusals.** A card action on the wrong state answers "Card #N
