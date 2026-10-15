@@ -5713,6 +5713,38 @@ infra.
   is declared in one list (e2ec17a, 4dca629). Found from that history:
   #816's first session was evicted at the 1 GiB /tmp, now 4 GiB like
   CI's (1b166cf).
+- 46 live: main CI signs every image it pushes with a cosign key kept in
+  OpenBao (made by scripts/cosign-keygen.sh, its private half only in a
+  throwaway container and a pipe), and the roller rolls only an image
+  signed with it (1240229, 4b1ab68, 5d7bbbf; infra 742c205, 217fec8,
+  bffae5d). The first roll the new roller checked, 3bee252's at 11:15Z,
+  passed. Deploy-time admission waits for a need.
+- 242 and 203 live: Debian from a dated snapshot and PGDG at exact
+  versions; every outside image, chart and file of the factory's builds
+  and cluster pinned by one list (upstream-images.txt, 54 entries) and
+  copied by main CI into Forgejo's org upstream, from which builds, pull
+  request builds, the ts-go template and the cluster pull; the nodes
+  pull through registry mirrors of the store with a fallback; a human
+  card a week bumps the list (ec47ebf, 4e8ce00, 67a5761, 1dff74c,
+  90e5c71, 5788545, 04d2fc3, 5ba629e, b5a66fd, abed328, d1d4a3f; infra
+  13650e7 to 44c8d52, 62ff745). The store check: 54 images, 0 failed.
+  Every HelmRelease retries a failed install and upgrade, which cleared
+  SigNoz's 33-hour stall (infra bdeea76).
+- 259 a deployed environment whose Kustomization stands not Ready files
+  an alert card, and the alerts rows are the one answer to what fires:
+  every namespace label routes, a sweep heals a lost resolve, noise
+  holds no promotion (836d8ea, cc6ea68, f2e8c31, 7e33e0f). SigNoz's
+  collector sets an alert's namespace from the sending pod and drops an
+  app-sent one, which closed a path by which a project could file cards
+  on another (infra 2be6b14, 3bee252).
+- 176 a GitHub import row lives until the infra pull request that files
+  it merges or closes unmerged, and a failed filing is undone whole
+  (cc85b59, b60465b, 8eb4f01, 4bd496b, 4700328). 262 an earlier chat
+  turn's read replays without its result and its words with their time,
+  so no old read stands as the present; seen live at 11:21Z (31e718c,
+  34caf74, 0ac9768). 261 a factory pull request's forbidden paths and
+  findings go to a human's approval, and the refused template-update
+  cards were filed again (3797576, 1eb4eca): nine at 11:26Z.
 - go.mod names toolchain go1.26.9, the images' Go, so a local test runs
   the Go CI runs (a27f1c8). Under go 1.25.0 alone the race suite crashed
   in factoryd with "fatal error: fault", the night's unexplained
