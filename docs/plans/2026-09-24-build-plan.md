@@ -5662,6 +5662,21 @@ infra.
   mock did not take. Every mock of the gate and queue harnesses now
   locks one mutex (d67a02e). The roller's mainfix card #811 was closed
   at 0.0025 EUR.
+- 252's open part: a red main whose job lost its runner outright (no
+  runner line, the failure recorded at least 5 minutes after the log's
+  last line), whose dind restarted, or which left no log files the human
+  re-run card, not an agent card (9e1b9c9, ff354a9). Sandbox and CI pods
+  request the disk their emptyDirs may fill, so the scheduler counts it:
+  one fewer CI pod fits today, 7 instead of 8 (5be66bd, 879e489). The
+  nodes' disk split waits for the rebuild (infra 6087b76). A fetch that
+  failed on the way to Forgejo is a transient start failure, retried
+  like the egress probe's (f8aaf57).
+- 260: the eight template-update cards of 2026-10-13 failed on a bug
+  0a467cc had fixed the next day. A template update whose card failed
+  before any gate judged it is reopened and filed again, once per pull
+  request (739e848). A factory pull request card is known by its source,
+  inserted with its pull request in one row, and a restart in a waiting
+  state runs its gates, never a session (ea38025).
 - go.mod names toolchain go1.26.9, the images' Go, so a local test runs
   the Go CI runs (a27f1c8). Under go 1.25.0 alone the race suite crashed
   in factoryd with "fatal error: fault", the night's unexplained
