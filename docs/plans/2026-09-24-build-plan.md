@@ -5578,3 +5578,13 @@ infra.
   (07d51cc, 8a8770e, 61b0ff2, 252f22f, 8f5ecf8, cdce174, 2c9ff0b, and
   2740bac for the lab), the thread title, its time and the rail badge
   seen live after roll 799.
+- Two faults found on the morning of 2026-10-15, both fixed the same
+  day. Main's nightly run (a schedule) went red because the runner build
+  there passed no SOURCE_DATE_EPOCH; Forgejo files a scheduled run under
+  event push, so the roller read it as main's CI, filed fix card #804
+  and then the revert of the roll merge 07f0f84 (card #806, rejected).
+  ActionRuns now drops runs another trigger started, and the runner's
+  epoch defaults to 0 (ad582c0, 2b7c908). LiteLLM's proxy stop stood at
+  55 USD under a counter of 154 USD and refused every model call from
+  19:15Z on 2026-10-14: it is 370 now, held at 1.25 times the month cap
+  by a config-check script (infra ef8d0aa).
