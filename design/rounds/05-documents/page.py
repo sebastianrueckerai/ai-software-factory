@@ -89,7 +89,7 @@ pre{{white-space:pre-wrap;font-size:12px;background:#f7f7f7;padding:8px}} detail
 <h2>The recommendation</h2>
 <div class="rec">{rec_html}</div>
 <h2>The pick</h2>
-<p>Sebastian, 2026-10-15: <b>A. Wiki</b>, no second pane (C17, roadmap 273). His rulings on saving and on outside changes are built into the wiki prototype as states, below, and the plan is <a href="../../../docs/plans/2026-10-15-documents-in-the-screen.md">docs/plans/2026-10-15-documents-in-the-screen.md</a>.</p>
+<p>Sebastian, 2026-10-15: <b>A. Wiki</b>, no second pane (C17, roadmap 275). His rulings on saving and on outside changes are built into the wiki prototype as states, below, and the plan is <a href="../../../docs/plans/2026-10-15-documents-in-the-screen.md">docs/plans/2026-10-15-documents-in-the-screen.md</a>.</p>
 {states}
 <h2>The variants</h2>
 <p>Three shapes built on the instrument prototype of round 02, and a hybrid if the critics asked for one. Every variant shares the document engine (docs.js: the real documents of this repository, shortened, with their real links), the rendered document at a 70-character measure, the Read | Edit switch, the editor with Save as commit, the refusal when the file changed under the member, New document, the peek on hover and the phone layout. Open a variant live and click: the roadmap's links, the way back, Edit, Save, New document, a card. Add <code>&amp;conflict=1</code> to the URL to arm a refused save.</p>
