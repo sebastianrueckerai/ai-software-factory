@@ -5692,6 +5692,27 @@ infra.
   a one-part review instead of 20. Answers are read by comment id, live
   and in Reconcile, and tagged with their escalation's first line
   (6a7fe34, 6ceeab2, 7f65d97, 699bfef). Not seen live.
+- 243: the ledger books each call under its session, read from the
+  worker's bound token, and the fund's floor prices a session's opening,
+  every call started before the first one ended, summed as the holds
+  take them, each at its own alias's rate, the largest of the newest 20
+  sessions (#704's opening came to 0.891 EUR, not the old floor's few
+  thousandths). Every alias has an output limit in the policy, which the
+  tree check requires, and holds and floors take the smaller of the
+  asked and that limit; a day-cap refusal at the gate goes straight into
+  the day-cap wait. LiteLLM keys carry no budget of their own: the
+  gateway's holds are the budget, the proxy-wide max_budget the backstop
+  (7f75d81, e32d0ab, f5ee9cd, a2a39eb, 77b0c99, e1b9ebe, a803381,
+  501f4fa; infra 53999b8). 41: audit rows name the issue's author, and
+  every commit factoryd, the console and the worker write carries
+  Factory-Role, Factory-Task, Factory-Session, Requested-by and
+  Approved-by trailers through one helper (7f75d81, d84fedc).
+- 258: the replay test decodes the newest recorded input of each
+  activity into today's parameters, with card #816's live history (two
+  audits and reviews beside the checks) in testdata; a deliberate retype
+  is declared in one list (e2ec17a, 4dca629). Found from that history:
+  #816's first session was evicted at the 1 GiB /tmp, now 4 GiB like
+  CI's (1b166cf).
 - go.mod names toolchain go1.26.9, the images' Go, so a local test runs
   the Go CI runs (a27f1c8). Under go 1.25.0 alone the race suite crashed
   in factoryd with "fatal error: fault", the night's unexplained
