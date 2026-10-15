@@ -1,6 +1,6 @@
 # The escalation ladder: what happened on 2026-10-15, and how it works today
 
-This file collects facts for a later redesign of the escalation ladder and of how an outside agent checks in on a working agent. It describes four problems from one run of five cards, where the original data lives, and how the ladder works in the code today. It ends with the old roadmap items on the subject. The interpretations are the controller's and are marked as such.
+This file collects facts for a later redesign of the escalation ladder and of how an outside agent checks in on a working agent. It describes four problems from one run of five cards and four more from the cards of the documents feature that followed, where the original data lives, and how the ladder works in the code today. It ends with the old roadmap items on the subject. The interpretations are the controller's and are marked as such.
 
 The code references point at the code repository's `origin/main` at commit `7fe834c`. The live policy values come from the infra repository (`factory/policy.yaml`, `factory/processes/spec.yaml`, `k8s/platform/litellm/helmrelease.yaml`). All times are UTC.
 
@@ -210,6 +210,37 @@ This happened after the first version of this file.
 - **Answers outlive their purpose.** A human answer stays in every later session of the run, newest first, under "The human has answered ... do not escalate them again" (`workflow.go:3189-3202`, `opencode.go:579-691`). The brief puts the answers before the findings. Nothing marks an answer as spent once its session is over, or as replaced by a newer request.
 - **The agent obeyed the answer over the finding.** It treated the earlier answer as the stronger instruction.
 
+### Problem 8: a budget refusal cost a card two of its three sessions, and the answer to it was lost (card #854)
+
+This happened after the first version of this file.
+
+**What happened.**
+
+- **The card.** Card #854 is the second card of the documents feature: task t-2492d049a348, size medium, budget 5 EUR, rung frontier, so its sessions start on coding-frontier. Its brief asks for a save endpoint, an editor with a draft, three acceptance tests, and item 7: the console lab's slow save, its checks, and screenshots before and after.
+- **Session 1 (18:52:40 to 19:26:38, session s-5b591a385b33).** It made 182 calls on coding-frontier: 15,421,409 prompt tokens (15,047,552 of them cached) and 104,165 output tokens, for 4.894 EUR. The last calls sent about 138,000 prompt tokens each.
+- **The supervisor.** At 18:59 the repetition detector tripped. The supervisor sent a message (0.034 EUR): "You've been reading and grepping for 60+ tool calls without writing any code", followed by a plan. The session then wrote the code.
+- **The browser.** The card carries 20 command lines of session 1 as findings. They show the agent trying to get a browser for the console lab into the sandbox: `npm install playwright`, `npx playwright install chromium`, `@sparticuz/chromium`, `apt-get download libnspr4 libnss3`, and `curl` to download hosts, several with exit 6 (host not resolved). The sandbox image (`Dockerfile.sandbox`) has Node but no browser, and the sandbox's network does not reach the browser download hosts. A session cannot do item 7 of the brief.
+- **The end of session 1.** At 19:26:38 the gateway refused a call: "free headroom 0.071585 EUR (task 0.071585, ...) fits 0 output tokens after a request of 573968 bytes (about 138390 prompt tokens), below the minimum call of 1024 (status 402)". The worker pushed the work in progress to `factory/t-2492d049a348` at `a2d7ef5`, 14 files. At 19:30 the controller applied it on its base `5fdc280`: it builds, and `go test ./internal/console/` passes, including the three acceptance tests. Its pull request 860 later had green checks (6 of 6).
+- **Session 2 (19:26:52, session s-065faa954cdf).** It started with 0.0716 EUR of headroom. opencode opens a session with two calls at once. The first, 18,363 bytes asking for 24,576 output tokens, took a hold of 0.0716 EUR, all the headroom (ledger row 48598). The second, 54,972 bytes, was refused at 19:27:24.076 with a free headroom of 0.000004 EUR. opencode ended, and the first call was cancelled at 19:27:24.154 (audit decision `client_canceled`). The gateway booked the full hold, because a cancelled call reports no cost (`internal/gateway/server.go:688`, "cost not reported, booked the hold"). Session 2 got no answer from any model and cost 0.072 EUR.
+- **The budget question.** At 19:27:27 the funding check refused attempt 3 before it started: "the remaining budget cannot fund a call: Raise the budget (Fund on the board) and answer, or close the card." No session ran as attempt 3.
+- **The fund and the answer.** At 19:31:43 the controller raised the budget by 5 EUR to 10 EUR (`card_funded`) and answered with the state of the pushed work and what was left (comment 16226).
+- **No session followed.** The answer resumed the attempt loop at attempt 4, which is past the cap of 3 sessions. The workflow verified the pushed work: policy, reproduction and checks from 19:31:47, then the review of `a2d7ef5` with 8 findings. At 19:35:43 the card asked: "the session cap is reached: every finding sent to the agent so far goes to a human" (comment 16237). The card had run two sessions. The `tasks` row read `attempts` 2 and `extra_attempts` 0.
+- **The answer to the budget question was lost.** No session received it, and the cap question's history of findings does not hold it.
+- **The review.** The controller judged one of the 8 findings real: after the commit has landed, a failed read of the commit's time makes the save answer an error, and no `doc_written` row is written. The finding's stated consequence, duplicate commits, does not follow, because a retry with the same text takes the unchanged-text path. The other seven are false:
+  - Two contradict the picked prototype (`design/rounds/05-documents/wiki/index.html` lines 1708 and 1731 in this repository): "restored · discard" with a middle dot, and Discard only while a draft exists. The brief writes " - " where the prototype has "·". The review reads the brief, not the prototype.
+  - Four name code "in part 1" that the reviewing call did not see: the pins' draft dot, the save's `base` field, the route `/lab/docs-slow`, and the CSS of the new elements. All four are in the diff. The review reads a large diff in up to three parts, one call per part (`internal/factoryd/gates.go:741-752`).
+  - One misreads the dot: it asks that a landed save clear the dot even when the member typed after the save. The code keeps the draft, and so the dot, only for text typed after the save (`internal/console/static/console.js` line 872 at `a2d7ef5`).
+- **The cap answer.** At 19:38:32 the controller answered the cap question (comment 16238) with the one real finding and why the other seven are false. The answer granted an attempt, and session s-dfb6d933101b started as attempt 4 at 19:38:36. The answer also told the agent to run the console lab and take the screenshots. At 19:39:08 the controller took that back with a steer (`card_steered`), because the sandbox has no browser.
+
+**Controller's interpretation.**
+
+- **The funding check before a session is weaker than what a session needs.** `SessionFunded` (`activities.go:428`) prices a session's opening calls from the ledger, but only the console's Fund action uses it (`internal/console/actions.go:962`). The workflow's check before each attempt is `AttemptFunded`, the cheapest call. Session 2 passed it and could not make its opening calls. Sessions 2 and 3 of card #839 died the same way (problem 3).
+- **A refused attempt counts against the session cap.** The budget branch of the attempt loop (`workflow.go:1288-1311`) waits for the human and goes on with the next attempt number. The day-cap branch beside it takes the number back (`attempt--`, `workflow.go:1304`). Card #839's sessions were attempts 1, 2, 3 and 5. Card #854's are attempts 1, 2 and 4. Together with the starved session 2, one empty budget took two of the card's three sessions.
+- **The answer to a budget refusal is dropped.** The budget branch discards the answer's text (`final, end, _ := t.awaitHuman(why, nil)`, `workflow.go:1307`). The day-cap branch adds it to the findings.
+- **One empty budget took two human steps.** Fund and answer, then the cap answer, for a card that had run two sessions.
+- **Most of the money paid for context.** The average call of session 1 sent about 85,000 prompt tokens. The session read for at least 60 tool calls before it wrote code, and it spent calls on a browser it could not install.
+- **The brief asked for work a session cannot do.** Item 7 needs a browser, and the sandbox has none. The planner wrote it into the card, and the controller repeated it in its first cap answer.
+
 ### For comparison: a card that went as intended (card #840)
 
 Card #840 pushed after 26 minutes. Its first review (comment 15842) raised a possible data race on a new key field, which was a fair point. The second session fixed it with an atomic pointer and a race test. The second review (comment 15900) approved. The supervisor's check-ins answered `continue`. The controller read the diff and approved. Two sessions, no intervention beyond the approval.
@@ -244,7 +275,7 @@ The facts below are read from the code on `origin/main` at `7fe834c` and the liv
 - **A budget refusal has no outcome of its own.** The gateway's `refused_budget` reaches opencode as a failed call, and the session ends as `no_push` (`opencode.go:891-903`).
 - **The session cap** is `limits.sessions` 3 (policy.yaml:69). It is reached when the attempt number passes 3 plus the attempts a human granted (`workflow.go:1314`). Unjudged work on the branch is verified first (`workflow.go:1100-1115`). Then the card waits for a human with the text "the session cap is reached: every finding sent to the agent so far goes to a human", the last reason, and the card's whole history of findings (up to 8,000 bytes). The source is `cap`.
 - **An answer at the cap grants one attempt.** It also tops up the agent time to a quarter of `agent_time`, which is 30 minutes (`workflow.go:1735-1748`). A writer's "request changes" at the cap is itself the grant (`workflow.go:1088-1099`).
-- **Possibly one attempt too many.** On the budget-refusal path the attempt loop does not take back the attempt number (`workflow.go:1311`). The code reader who checked this did not confirm it against a test.
+- **One attempt too many on the budget path.** When the funding check refuses an attempt, the attempt loop waits for the human and goes on with the next attempt number (`workflow.go:1288-1311`). The refused attempt counts against the cap. Cards #839 and #854 show it (problems 3 and 8).
 
 ### What a new session's agent receives
 
@@ -401,7 +432,7 @@ Merges go through a merge queue per project. What a gate does with its findings 
 
 - **Live values.** A card's default is 5 EUR and the maximum 15. The day cap is 100 EUR and the month cap 544 EUR (policy.yaml:38-42). The sizes small, medium and large give 2, 5 and 10 EUR (`policy.go:1044-1054`), hardcoded.
 - **What a card's budget pays.** The review, supervisor, gate supervisor and audit calls are paid from the card's budget too.
-- **Funding check at each start.** At the start of each attempt, `AttemptFunded` checks whether the free headroom fits the cheapest call: 1,024 output tokens on the session's model (`activities.go:441-545`). The context of a real call is much larger, so a session can pass this check and die on its first real call. That happened to sessions 2 and 3 of card #839.
+- **Funding check at each start.** At the start of each attempt, `AttemptFunded` checks whether the free headroom fits the cheapest call: 1,024 output tokens on the session's model (`activities.go:441-545`). The context of a real call is much larger, so a session can pass this check and die on its first real call. That happened to sessions 2 and 3 of card #839 and to session 2 of card #854.
 
 ### Where architecture.md disagrees with the code
 
