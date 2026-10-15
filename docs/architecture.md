@@ -2402,8 +2402,9 @@ the existing path (6.2, 6.6).
 **Context.** Each turn gets the status line's figures, the human's
 conversation so far and the tools the member's role may use, each tool one
 sentence (roadmap 200, 201). The board, the history and every detail come
-through the read tools, never restated in the context, and a card is named
-by its issue number or its task id alike. Agent output that a tool returns (summaries, messages,
+through the read tools, never restated in the context, and an earlier
+turn's read is never replayed as data. A card is named by its issue number
+or its task id alike. Agent output that a tool returns (summaries, messages,
 comments) passes the existing inbound sanitiser before it enters the
 context, as briefs do today. Built with the last 40 messages of the
 member's conversation, kept in `chat_messages` per project and member. The
@@ -2554,9 +2555,13 @@ prompt that a tool, a result, a structured field or a deterministic step
 can carry (Ruling 263). Every read the console offers is a read tool, never
 behind an OK (Ruling 261), so the chat is never blinder than the screen.
 Self-correction comes before prevention: the conversation keeps every tool
-call, result and refusal, the agent can open its manual, and every refusal
-names the state and the fitting action, so a wrong move corrects itself
-in the next turn. A turn's default context is the status line, and the board,
+call, every write's result and every refusal, the agent can open its
+manual, and every refusal names the state and the fitting action, so a
+wrong move corrects itself in the next turn. A read's result travels only
+in its own turn: a later turn replays the call as a line with its time and
+age that says the project may have changed and names the tool to call
+again, since a live turn on 2026-10-15 answered from a two-hour-old board
+read despite its time stamp (roadmap 262). A turn's default context is the status line, and the board,
 the history and every depth come through a tool. What each part does:
 
 - **The manual.** `system` renders the agent's manual from the code at
