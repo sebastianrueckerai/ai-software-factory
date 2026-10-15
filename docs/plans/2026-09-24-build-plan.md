@@ -5801,7 +5801,7 @@ infra.
   token rotation now reads factory/projects instead of a list of names.
 - The factory built five cards on itself in the second GLM window
   (2026-10-15, cards #836 to #840, all merged and rolled with roll #846,
-  live on 89ee17a3c066). #836 (275, Forgejo-side review): a review or
+  live on 89ee17a3c066). #836 (Forgejo-side review): a review or
   comment written in Forgejo on a factory pull request reaches its card
   by the pull request's number. #837 (269, part): the board reads only
   the shown project's open cards. #838 (270): a page of finished cards
@@ -5815,9 +5815,9 @@ infra.
   are (internal/sealed, label project-mirror-tokens-v1, the project as
   additional data). Two of the cards needed the controller: #839 ran out
   of its 2 EUR and was funded to 5, and #838 reached approval on red
-  checks (275's open part). Reviews twice claimed a function on main was
-  missing (191).
-- 278 the review reads no merge rule (code 42b608e): told the human merge
+  checks. Reviews twice claimed a function on main was missing.
+- The review reads no merge rule (code 42b608e), a change the controller
+  made on 2026-10-15 without Sebastian's OK: told the human merge
   rule, the review answered concerns on changes it called sound and
   complete, which sent finished cards back to their agents.
 - go.mod names toolchain go1.26.9, the images' Go, so a local test runs
