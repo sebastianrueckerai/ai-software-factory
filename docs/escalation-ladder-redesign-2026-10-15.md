@@ -1,6 +1,6 @@
 # The escalation ladder: how it works, where it failed on 2026-10-15, and how it should work
 
-This document is for one decision: how the factory should handle a card that goes wrong, so that it heals itself, asks a human only when only a human can decide, and does not waste tokens. It explains the ladder from the ground up, follows the seven problems of 2026-10-15 through it, measures what they cost, and sketches the ladder after the changes.
+This document is for one decision: how the factory should handle a card that goes wrong, so that it heals itself, asks a human only when only a human can decide, and does not waste tokens. It explains the ladder from the ground up, follows the eight problems of 2026-10-15 through it, measures what they cost, and sketches the ladder after the changes.
 
 The facts come from [escalation-ladder-facts-2026-10-15.md](escalation-ladder-facts-2026-10-15.md), which cites the code, and from the gateway's ledger, queried on 2026-10-15 for the six cards of that day. Section 5 is a proposal, not a description.
 
@@ -175,7 +175,7 @@ flowchart TD
   S --> F["Its findings are the dead session's last 20 command lines plus its stop reason"]
 ```
 
-A budget refusal has no path of its own. The session ends as `no_push`, and the next attempt starts whenever the funding check passes. That check prices 1,024 output tokens on an empty prompt, so a session with 0.15 EUR of headroom passes it and dies on its first real call, which sends the whole context. The human is asked only when the check fails. That is how #839 ran two starved sessions before its fund question.
+A budget refusal has no path of its own. The session ends as `no_push`, and the next attempt starts whenever the funding check passes. That check prices 1,024 output tokens on an empty prompt, so a session with 0.15 EUR of headroom passes it and dies on its first real call, which sends the whole context. The human is asked only when the check fails. That is how #839 ran two starved sessions before its fund question, and #854 one. A session-level check that prices a session's opening calls from the ledger exists, `SessionFunded`, but only the console's Fund button uses it. When the check does fail, the attempt it refused still counts against the cap, and the human's answer to the fund question is discarded. The day-cap branch beside it takes the attempt number back and keeps the answer.
 
 Nobody with judgment looks at a dead session. The next session starts at once. Its "findings from earlier attempts" are lines such as `ran sleep 120; ps aux ... (exit 0)` and `changed internal/factoryd/store.go`. They say what was run, not what was wrong. The agent's own understanding of its work is gone with the pod.
 
@@ -239,11 +239,11 @@ flowchart TD
 | Card quiet while waiting on a dependency | Human | | No question is needed. The wait is by design. |
 | Approval at the cap with red checks | Human | | Yes. The fix was one line. |
 
-## 4. The seven problems of 2026-10-15
+## 4. The eight problems of 2026-10-15
 
 ### The run
 
-Five cards filed at 13:19:53 in project `ai-software-factory-code`, all merged between 14:15 and 14:48. Four of the five needed the human for something other than the final approval. Later that day the documents feature added a plan card and four cards, which brought problems 5 to 7.
+Five cards filed at 13:19:53 in project `ai-software-factory-code`, all merged between 14:15 and 14:48. Four of the five needed the human for something other than the final approval. Later that day the documents feature added a plan card and four cards, which brought problems 5 to 8.
 
 | Issue | Subject | Sessions | Human did, beyond the approval |
 |---|---|---|---|
@@ -253,12 +253,13 @@ Five cards filed at 13:19:53 in project `ai-software-factory-code`, all merged b
 | #839 | A task that ended carries its finish time | 4 run, 2 starved | Funded 3 EUR, named two tests and their fix, answered an audit |
 | #840 | A GitHub mirror's token is sealed at rest | 2 | Nothing |
 | #851 | Plan card of the documents feature | 1 | Refiled it as #852 after it failed. #852 filed a plan in time. |
+| #854 | The documents feature's save endpoint and editor | 2 run, 1 starved, 1 refused | Funded 5 EUR and answered, and the answer was dropped. Answered the cap question with one real finding of eight. |
 
 ### Why each problem happened
 
 **Problem 1, #837: `concerns` on finished work.** The review's input held the project's merge rule, `human`, and its prompt explained that an approve does not merge under that rule. The answer format says "approve when you would merge it as it is". The model concluded that it would not merge, since a human must, and answered `concerns` with no finding. Code turned that into a finding and started a session that fixed nothing. The cause is a rule in a prompt that belongs to code. Commit `42b608e` removed the merge rule from the review's input the same afternoon.
 
-**Problem 2, #836: a false finding three times.** The review claimed that `TasksByPR` had no implementation and the package would not compile. The method exists on main at `internal/factoryd/store.go:672`, and the checks were green. The reviewer could not open the file. The agent could not say "it exists". The next review re-read its last review and repeated the claim, as its prompt asks. The supervisor ran three times on `no_progress`, read the session's commands, and answered `continue` with "the agent is making solid progress". It never saw the review. Three sessions and a human later, the human opened main and approved. The same claim returned at 17:36 on card #853, about `docRootOK`, which is defined on main at `internal/console/autonomy.go:227`.
+**Problem 2, #836: a false finding three times.** The review claimed that `TasksByPR` had no implementation and the package would not compile. The method exists on main at `internal/factoryd/store.go:672`, and the checks were green. The reviewer could not open the file. The agent could not say "it exists". The next review re-read its last review and repeated the claim, as its prompt asks. The supervisor ran three times on `no_progress`, read the session's commands, and answered `continue` with "the agent is making solid progress". It never saw the review. Three sessions and a human later, the human opened main and approved. The same claim returned at 17:36 on card #853, about `docRootOK`, which is defined on main at `internal/console/autonomy.go:227`. On #854 seven of the review's eight findings were false. Four named code as missing that sat in another part of the diff, which the reviewing call had not read, since a large diff is reviewed in up to three parts with one call each. Two contradicted the design prototype, which the review does not read. One misread the code.
 
 **Problem 3, #839: a budget burnt waiting, then starved sessions.** The card had 2 EUR, the size "small". Session 1 ran the full test suite in the background and polled it with `sleep 120` and `sleep 420`. Each poll is a model call that resends the conversation. The session made 87 calls, 53 of them on the strong rung for 1.67 EUR. Two new tests failed, because the new database check forbids a row they create on purpose. The agent dropped the check inside the tests instead of stamping the test rows. The 45-minute check-in caught an earlier mistake, a reverted file, and that was useful. Nothing caught the dropped check before the gates. The session died on a budget refusal with 0.15 EUR left. Sessions 2 and 3 started, because the funding check prices a call of 1,024 output tokens and no context, and died on their first real call. Both counted as attempts. Their findings were the dead session's command lines. The human funded, named the tests and the fix, and the fifth attempt pushed in 15 minutes.
 
@@ -269,6 +270,8 @@ Five cards filed at 13:19:53 in project `ai-software-factory-code`, all merged b
 **Problem 6, #854 to #856: waiting cards asked whether their run was gone.** Three cards waited on #853 by design. The stale sweep counts `waiting-deps` as a state that can go stale, found them quiet for an hour, and moved them to `waiting-human` from outside their workflows. The human's answer changed nothing, because the workflows were still waiting on #853 and read no answer during that wait.
 
 **Problem 7, #853: an old answer overrode a newer request.** The human answered a cap question with "change nothing and end the session". That answer stays in every later session of the run, placed above the findings and marked "do not escalate them again". The human then denied the approval with four requested changes, which arrived as a finding. Session 5 read the old answer first and ended after 36 seconds with nothing to push.
+
+**Problem 8, #854: one empty budget took two of three sessions, and the answer to it was lost.** Session 1 made 182 calls for 4.89 EUR of a 5 EUR budget. It read for 60 tool calls before it wrote code, and the supervisor's message at the repetition trip got it writing. It spent calls on installing a browser the sandbox cannot reach, because the brief asked for screenshots of the console lab. The session died on a budget refusal with 0.07 EUR left after pushing 14 files that build and pass their tests. Session 2 passed the funding check, took all the headroom as a hold on its first call, saw its second call refused, and ended with no answer from any model. Attempt 3 was refused by the funding check, and the refused attempt counted. The human funded 5 EUR and answered with the state of the work. The budget branch of the attempt loop discards that answer. The loop went on at attempt 4, past the cap, so the card verified the pushed work, got eight review findings, and asked the human the cap question after two sessions. The human answered it with the one real finding and the seven false ones.
 
 ### Where the check-ins were inefficient, and what they cost
 
@@ -430,11 +433,13 @@ flowchart TD
 
 ### Changes that need no model
 
-These eleven changes are bugs or gaps in code, and the check-in agent does not replace them. They come first, because they cost nothing per card.
+These thirteen changes are bugs or gaps in code, and the check-in agent does not replace them. They come first, because they cost nothing per card.
 
 | Change | Problem it ends |
 |---|---|
-| The funding check prices a call with the real context size, not 1,024 output tokens on an empty prompt. A session that cannot fund one real call does not start and does not count. | 3 |
+| The check before each attempt is `SessionFunded`, which prices a session's opening calls from the ledger, not `AttemptFunded`, which prices 1,024 output tokens on an empty prompt. A session that cannot fund its opening calls does not start. | 3, 8 |
+| A refused attempt takes its number back, as the day-cap branch of the attempt loop already does. | 3, 8 |
+| The answer to a fund question reaches the next session, as the day-cap branch's answer already does. | 8 |
 | Budget left, time left and the attempt number stand in the brief, and a warning line reaches the agent near a limit. Roadmap 199. | 3, 5 |
 | A blocking wait tool for background jobs, so a long test run costs one call, not one per poll. | 3 |
 | A `concerns` verdict without findings is a remark on the card, not a finding and not a session. | 1 |
@@ -448,7 +453,7 @@ These eleven changes are bugs or gaps in code, and the check-in agent does not r
 
 Commit `42b608e`, which took the merge rule out of the review's input, stays.
 
-### The seven problems replayed
+### The eight problems replayed
 
 | Problem | Card | What happens after the changes | Human needed? |
 |---|---|---|---|
@@ -459,12 +464,13 @@ Commit `42b608e`, which took the merge rule out of the review's input, stays.
 | 5 | #851 | The planner gets "file the plan now" at 20 minutes. If it still runs out, the check-in writes what it read and a fresh planner session files the plan. | None |
 | 6 | #854 to #856 | The sweep reads the three workflows as alive and asks nothing. | None |
 | 7 | #853 | The request for changes stands above the dated answer and replaces it. | The request itself |
+| 8 | #854 | The agent reads its budget and pushes before it is gone. No starved session starts, and the refused attempt does not count. The fund answer reaches session 2. The check-in confirms one finding of eight and drops seven with evidence: four by the diff's file list, two by the prototype, one by the code. Session 2 fixes the one. | Fund |
 
-On 2026-10-15 four of five code cards needed the human beyond the approval. After the changes one does, and that one is a spend decision. Until the replay scenarios below run, this is a forecast.
+On 2026-10-15 four of the five code cards, and #854 twice, needed the human beyond the approval. After the changes two cards do, #839 and #854, each once and each to fund. Until the replay scenarios below run, this is a forecast.
 
 ### How to test the redesign
 
-The seven problems are recorded in detail, so they become replay scenarios. Each scenario is a fixture: the card's brief, the recorded session outcomes, the recorded review verdicts with their findings, the recorded CI results, and the human's recorded answers. The fixture runs through the workflow with every model role stubbed by its recorded answer and the check-in stubbed by a scripted one. The assertion is who gets asked and when: which sessions start, which findings reach a session, and whether a human question is raised. A change to the ladder then shows whether #836, #838 and #839 go through without a human, before it goes live. The workflow replay tests of Temporal are the shape to build on.
+The eight problems are recorded in detail, so they become replay scenarios. Each scenario is a fixture: the card's brief, the recorded session outcomes, the recorded review verdicts with their findings, the recorded CI results, and the human's recorded answers. The fixture runs through the workflow with every model role stubbed by its recorded answer and the check-in stubbed by a scripted one. The assertion is who gets asked and when: which sessions start, which findings reach a session, and whether a human question is raised. A change to the ladder then shows whether #836, #838 and #839 go through without a human, before it goes live. The workflow replay tests of Temporal are the shape to build on.
 
 ### The cost after
 
@@ -472,7 +478,7 @@ Per failure, the ladder spends one check-in, about 0.1 EUR, to decide whether a 
 
 ### The order of work
 
-1. **The eleven code changes.** They stop the money: the planner's 2.53 EUR, the starved sessions, the polling. They do not stop the day's recurring failure, the false review finding, which cost #836 two sessions and #838 one, and returned on #853.
+1. **The thirteen code changes.** They stop the money: the planner's 2.53 EUR, the starved sessions, the polling. They do not stop the day's recurring failure, the false review finding, which cost #836 two sessions and #838 one, and returned on #853.
 2. **The check-in at the gate moment, with the evidence rule and the replay scenarios.** This is the step that ends the false finding, and the only one that needs the new role. It also carries the human's request for changes and the cap.
 3. **The in-session moment and the dead-session moment.** The in-session check-in replaces the session supervisor's call, with the gate results and the card's facts added to its input. The dead-session check-in writes the handover the next session reads.
 
