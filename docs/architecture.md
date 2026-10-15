@@ -3713,7 +3713,10 @@ closed as real.
   workflow directories `.forgejo/**`, `.gitea/**` and `.github/**`,
   `migration` for `internal/*/migrations/**` and `internal/policy/schema.sql`,
   `high` for `k8s/**`, `**/Dockerfile*`, `go.mod` and `go.sum`, and `normal`
-  by default. A forbidden class fails the task and closes the pull request.
+  by default. A forbidden class fails an agent's task and closes the pull
+  request. A pull request factoryd opened itself (a template update, a
+  schema copy, a GitHub sync, a revert) has no agent, so its forbidden
+  paths go to a human's approval that names them (roadmap 261).
   Through Stage 7 every other class needed a human's approval. Ruling 168
   makes the globs path-generic, so a project's migrations and deploy
   manifests class like the factory's own: `**/migrations/**` is
