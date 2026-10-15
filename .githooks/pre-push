@@ -1,0 +1,15 @@
+#!/bin/sh
+# Refuses a push whose roadmap repeats an item number: parallel sessions
+# each take the next free number in their own copy, and only the pushed
+# tree shows both (roadmap 267 and 268 were taken twice on 2026-10-15).
+# Active through `git config core.hooksPath .githooks`.
+zero=0000000000000000000000000000000000000000
+while read -r _ sha _ _; do
+	[ "$sha" = "$zero" ] && continue
+	dups=$(for f in docs/roadmap.md docs/roadmap-risks-and-rejections.md; do git show "$sha:$f" 2>/dev/null; done |
+		sed -n 's/^- \*\*\([0-9][0-9]*\)\..*/\1/p' | sort | uniq -d | tr '\n' ' ')
+	if [ -n "$dups" ]; then
+		echo "pre-push: the roadmap repeats item numbers: $dups- give the later item the next free number" >&2
+		exit 1
+	fi
+done
