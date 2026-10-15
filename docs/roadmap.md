@@ -26,7 +26,7 @@ The ledger files are local to the controller's machine, in [.superpowers/sdd/202
 
 Sebastian's order of 2026-10-14: first the fixes, security and performance, then the mobile notifications with the chat on Telegram and Discord (145), then the other sections in their order.
 
-Ruling 325 (2026-10-14) sets how the work runs. The GLM Coding Plan's quota ran out within a day, so the coding aliases went back to DashScope (infra 501fca5). DashScope is too dear for heavy work, so the work runs in the local session, and cards go into the factory only to test the factory.
+Ruling 325 (2026-10-14) sets how the work runs. The GLM Coding Plan's quota ran out within a day, so the coding aliases went back to DashScope (infra 501fca5). DashScope is too dear for heavy work, so the work runs in the local session, and cards go into the factory only to test the factory. A second GLM window opened on 2026-10-15 when Sebastian's limit reset (infra 9a8463d): the coding aliases are on the GLM plan again, with the first window's caps.
 
 The local session's order of 2026-10-14 and the night of 2026-10-14 to 15 are done, and the build plan's section on that night records what they built. Items built in part keep only their open part here: 252 and 203 in Fixes, 42 in Security. Sebastian decided the open calls on 2026-10-15: 242 with 203 (pinned inputs from our own registry, a weekly bump card; 242 is built, 203 keeps its open part), 246 (the review's ladder runs at once, built), 46 (signing with a roller-side check), and 204 is closed. Features stay open: 191, 125 and 45. Since 2026-10-15 only the factory's own two projects are registered: Sebastian had the toy projects removed, and he adds new ones in time.
 
