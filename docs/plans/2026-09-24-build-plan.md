@@ -5799,6 +5799,27 @@ infra.
   what still pulled from Docker Hub were those projects' own
   Dockerfiles and their databases' default image. The reseed runbook's
   token rotation now reads factory/projects instead of a list of names.
+- The factory built five cards on itself in the second GLM window
+  (2026-10-15, cards #836 to #840, all merged and rolled with roll #846,
+  live on 89ee17a3c066). #836 (275, Forgejo-side review): a review or
+  comment written in Forgejo on a factory pull request reaches its card
+  by the pull request's number. #837 (269, part): the board reads only
+  the shown project's open cards. #838 (270): a page of finished cards
+  reads only its column; live, five pages of Done answered in 0.13 to
+  0.16 s. #839 (271): migration 20261015180000_final_finished_at stamps
+  every final row without a finish time and adds the check
+  tasks_final_finished_at; #568, closed by the controller's SQL on
+  2026-10-13 and in no column since, is back on page 3 of Done, and its
+  workflow, which still waited on a human, was terminated. #840 (273): a
+  GitHub mirror's token is sealed at rest as the console's OAuth tokens
+  are (internal/sealed, label project-mirror-tokens-v1, the project as
+  additional data). Two of the cards needed the controller: #839 ran out
+  of its 2 EUR and was funded to 5, and #838 reached approval on red
+  checks (275's open part). Reviews twice claimed a function on main was
+  missing (191).
+- 278 the review reads no merge rule (code 42b608e): told the human merge
+  rule, the review answered concerns on changes it called sound and
+  complete, which sent finished cards back to their agents.
 - go.mod names toolchain go1.26.9, the images' Go, so a local test runs
   the Go CI runs (a27f1c8). Under go 1.25.0 alone the race suite crashed
   in factoryd with "fatal error: fault", the night's unexplained
