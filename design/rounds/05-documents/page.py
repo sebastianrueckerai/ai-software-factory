@@ -64,6 +64,11 @@ def main():
         phones = "".join(fig(f"{slug}/shots/{s}.png", f"{title[3:]}: {cap}", "phone") for s, cap in PHONES if (R / slug / "shots" / f"{s}.png").exists())
         links = " ".join(f'<a href="{slug}/index.html?scenario=busy&amp;doc=docs/roadmap.md&amp;theme={t}">{t}</a>' for t in ("dark", "light"))
         variants += f'<section class="variant"><h2>{e(title)}</h2><p>{e(what)}</p><p class="all">open live: {links}</p><div class="grid">{shots}{phones}</div></section>'
+    STATES = [("state-clean", "clean"), ("state-unsaved", "unsaved: the dot"), ("state-saving", "saving"), ("state-saved", "saved"), ("state-failed", "not saved: Forgejo not reachable"), ("state-structure", "not saved: the structure check"), ("state-changed-read", "changed while reading"), ("state-changed-edit", "changed while editing"), ("state-load-theirs", "load theirs asks"), ("state-merged", "saved, merged"), ("state-refused", "refused: the same lines, show theirs"), ("state-draft-left", "a draft left behind: the dots"), ("state-restored", "a draft restored"), ("state-discard", "discard asks"), ("state-new", "a new document"), ("state-unsaved-light", "unsaved, light"), ("state-refused-light", "refused, light")]
+    PSTATES = [("phone-state-unsaved-390", "unsaved on the phone"), ("phone-state-changed-edit-390", "changed while editing, on the phone")]
+    sfigs = "".join(fig(f"wiki/shots/{s}.png", cap) for s, cap in STATES if (R / "wiki" / "shots" / f"{s}.png").exists())
+    sfigs += "".join(fig(f"wiki/shots/{s}.png", cap, "phone") for s, cap in PSTATES if (R / "wiki" / "shots" / f"{s}.png").exists())
+    states = f'<section class="variant"><h2>The wiki\'s save and change states</h2><p>Open the wiki live with <code>&amp;slow=1</code>, <code>&amp;offline=1</code>, <code>&amp;structure=1</code>, <code>&amp;changed=read|edit|same</code> or <code>&amp;draft=1</code> to walk them; Ctrl+S saves.</p><div class="grid">{sfigs}</div></section>' if sfigs else ""
     dirs = "".join(f'<figure>{"".join(f"<a href=\"{s}-{t}.png\"><img src=\"{s}-{t}.png\" alt=\"{s} {t}\" loading=\"lazy\"></a>" for t in ("dark", "light"))}<figcaption>{e(s)}</figcaption></figure>' for s in DIRECTIONS)
     page = f"""<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Round 05: the documents in the screen</title>
@@ -83,6 +88,9 @@ pre{{white-space:pre-wrap;font-size:12px;background:#f7f7f7;padding:8px}} detail
 <p class="meta"><a href="brief.md">the brief</a> · <a href="notes.md">the notes</a> · <a href="../../../docs/plans/2026-10-15-backlog-pull-and-close-out.md">the backlog plan</a> · <a href="BUILDER.md">the builder's brief</a> · <a href="../../PICKS.md">PICKS.md</a> · cost of the round ~${cost():.2f}</p>
 <h2>The recommendation</h2>
 <div class="rec">{rec_html}</div>
+<h2>The pick</h2>
+<p>Sebastian, 2026-10-15: <b>A. Wiki</b>, no second pane (C17, roadmap 273). His rulings on saving and on outside changes are built into the wiki prototype as states, below, and the plan is <a href="../../../docs/plans/2026-10-15-documents-in-the-screen.md">docs/plans/2026-10-15-documents-in-the-screen.md</a>.</p>
+{states}
 <h2>The variants</h2>
 <p>Three shapes built on the instrument prototype of round 02, and a hybrid if the critics asked for one. Every variant shares the document engine (docs.js: the real documents of this repository, shortened, with their real links), the rendered document at a 70-character measure, the Read | Edit switch, the editor with Save as commit, the refusal when the file changed under the member, New document, the peek on hover and the phone layout. Open a variant live and click: the roadmap's links, the way back, Edit, Save, New document, a card. Add <code>&amp;conflict=1</code> to the URL to arm a refused save.</p>
 {variants}

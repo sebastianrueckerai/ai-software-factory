@@ -71,6 +71,8 @@ Overview, top to bottom:
 
 Activity and Files stay as they are. Chat stays as it is, with the steer box.
 
+The document mode (C17). The same slot holds one document of the project's document repository instead of a card: the head with the named history arrows, Recent, the path with the saved-state indicator, Read | Edit, Open in Forgejo, Wide, New document and ×, then the pins row, then the rendered text at a 70-character measure. Links open in place; the browser's back is the arrow's step. Edit swaps the text for a plain text area with Save as commit, Cancel and Discard; the draft lives in the browser, the save is one commit as the member. A newer version shows one quiet changed line and never replaces the text by itself. A card takes the slot back, and a Documents button in the board head reopens the document.
+
 ## The phone, under 900 px
 
 One column, no tabs: the top bar (home word, project select, a menu for the rest), the pulse band, the chat with its thread table as one vertical list above the log, the log at 55 percent of the viewport height and the composer under it, then the board as stacked sections: Needs you in full, then In progress, Queued, Done, each a section with its count, Done collapsed by default. The drawer takes the full screen. Needs-you actions are one-handed: the choice buttons full width.

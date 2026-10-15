@@ -50,11 +50,11 @@ Notes: routines are per project, in the project's file. The main chat creates, c
 
 Where a document opens and how a member moves between linked documents ([the round page](rounds/05-documents/index.html), [the brief](rounds/05-documents/brief.md), [the notes](rounds/05-documents/notes.md)). Which shape becomes the console:
 
-- [ ] A. Wiki: one document in the drawer's slot, back and forward arrows, a Recent menu, three pins, the browser's back
+- [x] A. Wiki (Sebastian, 2026-10-15, C17): one document in the drawer's slot, back and forward arrows, a Recent menu, three pins, the browser's back. "What I don't need for now is two docs next to each other. I want the wiki."
 - [ ] B. Tabs: the same slot under a tab strip, a card as a tab too
 - [ ] C. Split: two panes over the whole board, a link opens beside its source
 - [ ] D. Hybrid, the recommendation: the wiki, with the split's two panes as its Wide state and the back arrow naming its target
 
 And two details: the body text size (13 px as the base, or the chat's 14.5 px for the long read), and whether a card opened from the board closes the document (wiki) or sits beside it as a tab (tabs).
 
-Notes:
+Notes: the body text at the chat's 14.5 px, a card closes the document and the Documents button reopens it. Sebastian's rulings on saving: Ctrl+S saves; the saved state is always visible in the head; unsaved changes carry a dot before the name as VS Code's; a newer version from the repository is offered, never loaded over his changes without asking; the commit's latency is hidden behind the draft, which is local and instant. The states are built into the wiki prototype (`wiki/states.js`, the `state-*` shots) and the plan is [docs/plans/2026-10-15-documents-in-the-screen.md](../docs/plans/2026-10-15-documents-in-the-screen.md), roadmap 273.

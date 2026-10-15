@@ -43,6 +43,7 @@ Read off the templates in `internal/console/templates/` on 2026-10-13 (code comm
 - Activity: gates table (gate, attempt, start, duration, outcome, meter against the longest); steps table (time, step, supervisor action and diagnosis, detail).
 - Chat: "Session n · model · outcome"; messages (who, time, text); steer form while running.
 - Files: the changed files of PR #n (file, change, added, deleted), "no pull request yet".
+- Document mode (C17): back and forward named by their target; Recent (last six); the path with the indicator (clean with commit and time, ● unsaved, saving…, not saved with its reason); Read | Edit; Open in Forgejo; Wide and Narrow; New document (name, Create); Close (Escape); pins row with + pin; the rendered text with its links and the hover peek; the editor (text area, Save as commit, Cancel, Discard, "based on <sha>"); the changed line (reload, or your save will merge · load theirs); the refusal (show theirs, load theirs); the restored-draft line (discard); the Documents button in the board head.
 
 ### Chat panel
 

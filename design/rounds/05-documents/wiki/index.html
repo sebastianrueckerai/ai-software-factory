@@ -725,7 +725,10 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
 @media (min-width: 1700px) { .doc-view.wide { left: calc(18px + (100% - 50px) * .4 + 14px); } .main.wide .doc-view.wide { left: 18px; } }
 .doc-head { flex: none; padding: 6px 12px 0 8px; border-bottom: 1px solid var(--line); }
 .doc-row { display: flex; align-items: center; gap: 4px; min-height: 32px; }
-.doc-row-tools, .doc-new { gap: 8px; padding: 2px 0 8px 4px; }
+.doc-row-nav { flex-wrap: wrap; padding-bottom: 2px; }
+.doc-row-nav .doc-mode { margin-left: 8px; }
+.doc-row-nav > .btn, .doc-row-nav > .doc-forgejo { margin-left: 4px; }
+.doc-new { gap: 8px; padding: 2px 0 8px 4px; }
 .doc-arrow { width: 26px; height: 26px; padding: 0; border: 1px solid transparent; border-radius: 3px; background: none; color: var(--text); font: 18px/1 var(--font-mono); cursor: pointer; transition: color .12s, background-color .12s, border-color .12s; }
 .doc-arrow { border-color: var(--line-strong); }
 .doc-arrow:hover { background: var(--bg-hover); border-color: var(--text-faint); }
@@ -740,12 +743,23 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
 .doc-recent-mark { grid-row: 1 / 3; color: var(--accent); font: 12px/18px var(--font-mono); }
 .doc-recent-label { color: var(--text); font-size: 12.5px; line-height: 18px; }
 .doc-recent-file { overflow: hidden; color: var(--text-faint); font: 11px/16px var(--font-mono); white-space: nowrap; text-overflow: ellipsis; }
-.doc-path { flex: 1 1 auto; min-width: 0; margin-left: 6px; overflow: hidden; color: var(--text-muted); font: 11.5px var(--font-mono); white-space: nowrap; text-overflow: ellipsis; }
+.doc-pathline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin: 0; padding: 3px 4px 8px 10px; color: var(--text-muted); font: 11.5px/1.6 var(--font-mono); }
+.doc-file { flex: 0 1 auto; display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.doc-path { min-width: 0; overflow: hidden; color: var(--text); white-space: nowrap; text-overflow: ellipsis; }
+.doc-state { flex: 1 1 260px; min-width: 0; }
+.doc-dot { color: var(--accent); font: 11px/1 var(--font-ui); }
+.doc-refused { color: var(--need-text); }
+.doc-saved::before { content: "✓ "; color: var(--st-done); }
+.doc-note { flex: none; margin: 0; padding: 5px 24px; border-bottom: 1px solid var(--line); color: var(--text-muted); font: 11.5px/1.6 var(--font-mono); }
+.doc-confirm { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.doc-confirm-q { margin-right: 2px; color: var(--text); font: 12.5px var(--font-ui); }
+.doc-confirm .btn { font-family: var(--font-ui); }
+.doc-acts { display: inline-block; }
+.doc-confirm .btn-danger { color: var(--st-failed); }
 .doc-x { flex: none; margin-left: 4px; }
 .doc-mode { flex: none; }
 .doc-mode button { height: 24px; padding: 0 11px; font: 12px/1 var(--font-ui); }
 .doc-mode button[aria-disabled="true"] { color: var(--text-faint); cursor: default; }
-.doc-draft-dot { display: inline-block; width: 5px; height: 5px; margin-left: 5px; border-radius: 50%; background: var(--accent); vertical-align: 2px; }
 .doc-gap { flex: 1; }
 .doc-forgejo { color: var(--accent); font-size: 12px; text-decoration: none; white-space: nowrap; }
 .doc-forgejo:hover, .doc-forgejo:focus-visible { text-decoration: underline; text-underline-offset: 3px; }
@@ -764,8 +778,6 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
 .doc-pin[aria-current="page"]::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: -1px; height: 2px; background: var(--accent); }
 .doc-pin-add { margin-left: auto; height: 30px; padding: 0 4px; border: 0; background: none; color: var(--text-faint); font: 11.5px var(--font-mono); cursor: pointer; }
 .doc-pin-add:hover { color: var(--text); }
-.doc-saved { flex: none; margin: 0; padding: 5px 24px; border-bottom: 1px solid var(--line); color: var(--text-muted); font: 11.5px/1.5 var(--font-mono); }
-.doc-saved::before { content: "✓ "; color: var(--st-done); }
 .doc-scroll { flex: 1; min-height: 0; overflow: auto; padding: 18px 24px 40px; }
 .doc-scroll:focus { outline: none; }
 .doc-scroll.scrolled { -webkit-mask: linear-gradient(transparent, #000 18px); mask: linear-gradient(transparent, #000 18px); }
@@ -797,9 +809,10 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
 #doc-editor:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 .doc-theirs-wrap { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; gap: 4px; }
 .doc-theirs-l { color: var(--text-muted); font: 11.5px var(--font-mono); }
-.doc-theirs { flex: 1; min-height: 60px; width: 100%; padding: 10px 12px; border: 1px dashed var(--line-strong); border-radius: 2px; background: var(--bg-panel); color: var(--text-muted); font: 12.5px/1.55 var(--font-mono); resize: none; }
-.doc-refused { flex: none; margin: 0; padding: 4px 10px; border-left: 3px solid var(--need); color: var(--need-text); font: 12.5px/1.45 var(--font-ui); }
-.doc-theirs-btn { margin-left: 8px; font-size: 12.5px; }
+.doc-theirs { position: relative; flex: 1; min-height: 60px; overflow: auto; padding: 8px 0; border: 1px dashed var(--line-strong); border-radius: 2px; background: var(--bg-panel); color: var(--text-muted); font: 12.5px/1.55 var(--font-mono); }
+.doc-tl { min-height: 1.55em; padding: 0 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.doc-tl.doc-clash { box-shadow: inset 2px 0 0 var(--need); color: var(--text); }
+.doc-discard { font-size: 12.5px; }
 .doc-edit-row { flex: none; display: flex; align-items: center; gap: 8px; }
 .doc-edit .btn { font-family: var(--font-ui); }
 .doc-base { margin-left: auto; color: var(--text-faint); font: 11.5px var(--font-mono); }
@@ -823,28 +836,35 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   .doc-recent-menu { position: fixed; left: 8px; right: 8px; top: 50px; width: auto; }
   .doc-recent-row { min-height: 44px; align-content: center; }
   .doc-x { order: 1; margin-left: auto; }
-  .doc-path { order: 2; flex: 1 1 200px; margin: 0 0 0 10px; white-space: normal; overflow-wrap: anywhere; }
+  .doc-pathline { order: 2; flex: 1 1 200px; padding: 4px 4px 4px 10px; }
+  .doc-path { white-space: normal; overflow-wrap: anywhere; }
+  .doc-state { flex-basis: 180px; }
   .doc-forgejo { order: 3; padding: 0 8px; }
-  .doc-mode, .doc-gap, .doc-row-tools > .btn, .doc-new > * { order: 4; }
-  .doc-mode { margin: 4px 0 0 4px; }
-  .doc-row-tools > .btn { margin-top: 4px; }
+  .doc-mode, .doc-gap, .doc-row-nav > .btn { order: 4; }
+  .doc-new > * { order: 5; }
+  .doc-row-nav .doc-mode { margin: 4px 0 0 4px; }
+  .doc-row-nav > .btn { margin-top: 4px; }
   .doc-mode button { height: 44px; padding: 0 18px; font-size: 13px; }
   .doc-forgejo { display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; }
   .doc-view [data-act="wide"], .doc-view [data-act="narrow"] { display: none; }
-  .doc-row-tools .btn-xs, .doc-new .btn-xs, .doc-sm { height: 44px; padding: 0 14px; font-size: 13px; }
+  .doc-row-nav .btn-xs, .doc-new .btn-xs, .doc-sm { height: 44px; padding: 0 14px; font-size: 13px; }
   .doc-new-l { flex-basis: 100%; margin: 4px 0 2px 6px; }
   .doc-new-at:first-of-type { margin-left: 6px; }
   .doc-name { flex: 1 1 60px; height: 44px; font-size: 14px; }
   .doc-pins { padding: 0 6px; }
   .doc-pin, .doc-pin-add { height: 44px; }
   .doc-pin-add { padding: 0 10px; }
-  .doc-saved { padding: 6px 16px; }
+  .doc-note { padding: 7px 16px 3px; }
+  .doc-confirm .btn { height: 44px; padding: 0 16px; font-size: 13px; }
   .doc-scroll { padding: 14px 16px 32px; }
   .doc-edit { padding: 10px 12px 12px; }
   .doc-edit-row { flex-direction: column; align-items: stretch; }
   .doc-edit-row .btn { width: 100%; height: 44px; font-size: 14px; }
   .doc-base { margin: 0; text-align: center; }
-  .doc-theirs-btn { display: inline-flex; align-items: center; min-height: 44px; }
+  .doc-pathline .linkbtn, .doc-note .linkbtn, .doc-discard { display: inline-flex; align-items: center; min-height: 44px; }
+  .doc-edit-row .doc-discard { justify-content: center; }
+  .doc-edit-row .doc-confirm { display: flex; flex-direction: column; align-items: stretch; }
+  .doc-edit-row .doc-confirm-q { margin: 4px 0; text-align: center; }
   .doc-peek { display: none !important; }
 }
 
@@ -1405,8 +1425,9 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     }).join('') + '</div>';
   }
   function renderBoard() {
-    $('#board').innerHTML = '<div class="board-head"><h2 id="board-title">Board</h2><span class="find" aria-hidden="true">Find: a word, #612, plan:558</span>' +
-      '<button type="button" class="btn btn-xs doc-reopen" id="doc-reopen" aria-controls="doc-view" aria-expanded="' + !docEl.hidden + '" title="The project\'s documents: the last one opens where you left it">Documents</button>' +
+    $('#board').innerHTML = '<div class="board-head"><h2 id="board-title">Board</h2>' +
+      '<button type="button" class="btn btn-xs doc-reopen" id="doc-reopen" aria-controls="doc-view" aria-expanded="' + !docEl.hidden + '" title="The project\'s documents: the last one opens where you left it">' + (anyDraft() ? dot() : '') + 'Documents</button>' +
+      '<span class="find" aria-hidden="true">Find: a word, #612, plan:558</span>' +
       '<button type="button" class="btn btn-xs" id="view-toggle" aria-keyshortcuts="w">' + (st.wide ? 'Four columns' : 'Wide view') + '</button>' +
       '<button type="button" class="icon-btn" id="keys-toggle" style="width:24px;height:24px;font:12px var(--font-mono)" aria-haspopup="dialog" aria-controls="keys" aria-keyshortcuts="Shift+?" title="Keys" aria-label="Keys">?</button></div>' +
       colsHTML();
@@ -1561,71 +1582,192 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     renderPulse(); renderChat(); renderBoard();
   }
 
-  /* the document view (round 05, wiki): one document in the drawer's slot. A link opens its target in place; ‹ › and the browser's own back walk DOCS.nav through history.pushState; Recent and the pins jump. A card takes the slot and closes the document, whose history and scroll stay. */
+  /* the document view (round 05, wiki): one document in the drawer's slot. A link opens its target in place; ‹ › and the browser's own back walk DOCS.nav through history.pushState; Recent and the pins jump. A card takes the slot and closes the document, whose history and scroll stay.
+     Saving: every keystroke keeps a draft in localStorage; Ctrl+S sends the text of that instant in the background, one save in flight and one queued behind it; the path line in the head shows the saved state. The server is simulated by the query: slow, offline, structure, changed=read|edit|same, draft. */
   var HOVER = matchMedia('(hover: hover) and (pointer: fine)');
-  var doc = { path: null, mode: 'read', text: '', wide: false, scroll: {}, saved: null, refused: null, theirs: false, form: false, recent: false };
+  var ROADMAP = 'docs/roadmap.md', DRAFT = 'doc-draft:';
+  var doc = { path: null, mode: 'read', text: '', wide: false, scroll: {}, theirs: false, form: false, recent: false, confirm: null, restored: null };
+  var seen = {}, fileAt = {}, saves = {}, outside = {}, armed = false;
   var navFocus = null;
-  function draftOf(p) { try { return sessionStorage.getItem('doc-draft:' + p); } catch (e) { return null; } }
-  function keepDraft(p, t) { try { sessionStorage.setItem('doc-draft:' + p, t); } catch (e) {} }
-  function dropDraft(p) { try { sessionStorage.removeItem('doc-draft:' + p); } catch (e) {} }
-  function known(p) { return !!p && (!!DOCS.files[p] || draftOf(p) != null); }
+  function draftOf(p) { try { return JSON.parse(localStorage.getItem(DRAFT + p)); } catch (e) { return null; } }
+  function keepDraft(p, t) { try { localStorage.setItem(DRAFT + p, JSON.stringify({ text: t, at: now() })); } catch (e) {} }
+  function dropDraft(p) { try { localStorage.removeItem(DRAFT + p); } catch (e) {} }
+  function anyDraft() { try { for (var i = 0; i < localStorage.length; i++) if (localStorage.key(i).indexOf(DRAFT) === 0) return true; } catch (e) {} return false; }
+  function known(p) { return !!p && (!!DOCS.files[p] || !!draftOf(p)); }
+  /* fresh: the version on master now; ver: the one the member reads and edits against, kept until a reload, a save or load theirs */
+  function fresh(p) { var f = DOCS.files[p]; return f ? { sha: f.sha, at: fileAt[p] || '11:20', md: f.md } : null; }
+  function ver(p) { return seen[p] || (seen[p] = fresh(p)); }
+  function sv(p) { return saves[p] || (saves[p] = { busy: false, again: false, err: null, landed: null }); }
+  function latest(p) { var ed = doc.path === p && $('#doc-editor'); if (ed) return ed.value; var d = draftOf(p); return d ? d.text : ver(p).md; }
   function docFile() { return DOCS.files[doc.path]; }
   function docScroller() { return $('.doc-scroll', docEl); }
   function keepScroll() { var s = docScroller(); if (s && !docEl.hidden && docEl.dataset.path === doc.path) doc.scroll[doc.path] = s.scrollTop; }
   function closeIcon() { return '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.5"/></svg>'; }
+  function dot() { return '<span class="doc-dot" role="img" aria-label="unsaved">●</span> '; }
+  function link(act, word) { return '<button type="button" class="linkbtn" data-act="' + act + '">' + word + '</button>'; }
+  function acts(html) { return '<span class="doc-acts">' + html + '</span>'; }
+
+  /* the server, simulated: an outside change replaces one line; a save merges it unless mine changed that line too (null) */
+  function merged(p, mine) {
+    var o = outside[p]; if (!o) return mine;
+    var ls = mine.split('\n'), i = ls.indexOf(o.from);
+    if (ls.indexOf(o.to) >= 0) return mine;
+    if (i < 0) return null;
+    ls[i] = o.to; return ls.join('\n');
+  }
+  function arrive(by) {
+    var p = ROADMAP, f = DOCS.files[p], ls = f.md.split('\n'), same = params.get('changed') === 'same';
+    var i = ls.findIndex(function (l) { return l.indexOf(same ? 'This file is' : 'The sections stand') === 0; });
+    ver(p);
+    outside[p] = { by: by, at: '14:08', from: ls[i], to: same ? ls[i].replace("This file is the factory's memory for future work.", 'This file is where the factory keeps the work it has not done yet.') : ls[i] + ' An item keeps its number for life, so a link to it never breaks.' };
+    ls[i] = outside[p].to; f.md = ls.join('\n'); f.sha = '5c0e9b1'; fileAt[p] = '14:08';
+    syncDoc();
+  }
+  function armChange() {
+    var c = params.get('changed');
+    if (armed || doc.path !== ROADMAP || (c !== 'edit' && c !== 'same')) return;
+    armed = true; setTimeout(function () { arrive('Sebastian'); }, 1200);
+  }
+  function saveDoc(p) {
+    var s = sv(p);
+    if (s.busy) { s.again = true; return; }
+    var text = latest(p);
+    s.busy = true; s.again = false; s.err = null; s.landed = null;
+    if (doc.path === p) { doc.theirs = false; doc.confirm = null; }
+    syncDoc();
+    setTimeout(function () { land(p, text); }, params.get('slow') === '1' ? 1800 : 0);
+  }
+  function land(p, text) {
+    var s = sv(p), o = outside[p], m = merged(p, text), r = null;
+    s.busy = false;
+    if (params.get('offline') === '1') s.err = { why: 'Forgejo not reachable', retry: true };
+    else if (params.get('structure') === '1' && p === ROADMAP) s.err = { why: 'item 267 appears twice · fix and save again' };
+    else if (m == null) s.err = { why: o.by + ' changed the same lines (' + o.at + ')', at: o.at, theirs: DOCS.files[p].md, clash: o.to };
+    else if (!(r = DOCS.save(p, m)).ok) s.err = { why: 'the file changed since you opened it (' + r.by + ', ' + r.at + ')', at: r.at, theirs: r.current };
+    if (s.err) { s.again = false; syncDoc(); return; }
+    var typed = latest(p), cur = merged(p, typed);
+    if (cur == null) cur = typed;
+    seen[p] = { sha: r.sha, at: r.at, md: m }; fileAt[p] = r.at;
+    delete outside[p];
+    s.landed = { sha: r.sha, at: r.at, by: o ? o.by : null };
+    if (doc.restored === p) doc.restored = null;
+    if (cur === m) dropDraft(p); else keepDraft(p, cur);
+    if (s.again && cur !== m) { saveDoc(p); return; }
+    s.again = false;
+    if (doc.path !== p || docEl.hidden) { syncReopen(); return; }
+    var ed = $('#doc-editor');
+    doc.text = cur;
+    if (ed && cur !== m) {
+      if (ed.value !== cur) {
+        var a = ed.selectionStart, b = ed.selectionEnd, top = ed.scrollTop, k = o ? ed.value.indexOf(o.from) : -1, d = cur.length - ed.value.length;
+        ed.value = cur; if (k >= 0 && k < a) { a += d; b += d; } ed.setSelectionRange(a, b); ed.scrollTop = top;
+      }
+      syncDoc(); return;
+    }
+    var had = docEl.contains(document.activeElement);
+    doc.mode = 'read'; renderDoc(); if (had) focusDoc(null);
+  }
 
   function docHeadHTML() {
-    var nav = DOCS.nav, p = doc.path, f = docFile(), draft = draftOf(p) != null;
+    var nav = DOCS.nav, f = docFile();
     var arrow = function (dir, glyph, i) {
       var to = nav.stack[i], can = dir === 'back' ? nav.canBack() : nav.canForward(), word = dir === 'back' ? 'Back' : 'Forward';
       return '<button type="button" class="doc-arrow" data-nav="' + dir + '" aria-label="' + word + (can ? ' to ' + esc(DOCS.label(to)) : '') + '" title="' + (can ? word + ': ' + esc(DOCS.label(to)) : 'Nothing ' + (dir === 'back' ? 'back' : 'forward')) + '"' + (can ? '' : ' aria-disabled="true"') + '>' + glyph + '</button>';
     };
-    var rows = nav.recent().map(function (r) {
-      var cur = r === p;
-      return '<button type="button" role="menuitem" class="doc-recent-row" data-doc="' + esc(r) + '"' + (cur ? ' aria-current="page"' : '') + '><span class="doc-recent-mark" aria-hidden="true">' + (cur ? '✓' : '') + '</span><span class="doc-recent-label">' + esc(DOCS.label(r)) + '</span><span class="doc-recent-file">' + esc(r) + '</span></button>';
-    }).join('');
     var head = '<div class="doc-row doc-row-nav">' + arrow('back', '‹', nav.index - 1) + arrow('forward', '›', nav.index + 1) +
       '<span class="doc-recent"><button type="button" class="doc-recent-btn" aria-haspopup="menu" aria-expanded="' + doc.recent + '" aria-controls="doc-recent-menu">Recent ▾</button>' +
-        '<span class="doc-recent-menu" id="doc-recent-menu" role="menu" aria-label="Recent documents"' + (doc.recent ? '' : ' hidden') + '><span class="doc-recent-head" aria-hidden="true">recent</span>' + rows + '</span></span>' +
-      '<span class="doc-path" id="doc-path" title="' + esc(p) + '">' + esc(p) + '</span>' +
+        '<span class="doc-recent-menu" id="doc-recent-menu" role="menu" aria-label="Recent documents"' + (doc.recent ? '' : ' hidden') + '></span></span>' +
+      '<span class="seg doc-mode" role="group" aria-label="Read or edit">' +
+        '<button type="button" data-mode="read" aria-pressed="' + (doc.mode === 'read') + '"' + (f ? '' : ' aria-disabled="true" title="Not saved yet"') + '>Read</button>' +
+        '<button type="button" data-mode="edit" aria-pressed="' + (doc.mode === 'edit') + '">Edit</button></span>' +
+      '<span class="doc-gap"></span>' +
+      (f ? '<a class="doc-forgejo" href="#" title="Forgejo\'s page of this file, in a new tab">Open in Forgejo ↗</a>' : '') +
+      '<button type="button" class="btn btn-xs" data-act="' + (doc.wide ? 'narrow' : 'wide') + '">' + (doc.wide ? 'Narrow' : 'Wide') + '</button>' +
+      '<button type="button" class="btn btn-xs" data-act="new">New document</button>' +
       '<button type="button" class="icon-btn doc-x" aria-label="Close" title="Close (Escape)">' + closeIcon() + '</button></div>';
     if (doc.form) return head + '<form class="doc-row doc-new" autocomplete="off"><label class="doc-new-l" for="doc-name">New document</label><span class="doc-new-at" aria-hidden="true">docs/</span>' +
       '<input id="doc-name" class="doc-name" name="name" placeholder="goal" spellcheck="false"><span class="doc-new-at" aria-hidden="true">.md</span>' +
       '<button type="submit" class="btn btn-primary doc-sm">Create</button><button type="button" class="btn btn-xs" data-act="new-cancel">Cancel</button></form>';
-    return head + '<div class="doc-row doc-row-tools"><span class="seg doc-mode" role="group" aria-label="Read or edit">' +
-        '<button type="button" data-mode="read" aria-pressed="' + (doc.mode === 'read') + '"' + (f ? '' : ' aria-disabled="true" title="Not saved yet"') + '>Read</button>' +
-        '<button type="button" data-mode="edit" aria-pressed="' + (doc.mode === 'edit') + '"' + (draft && doc.mode === 'read' ? ' title="Your draft is kept">Edit<i class="doc-draft-dot" aria-hidden="true"></i><span class="vh">, your draft is kept</span>' : '>Edit') + '</button></span>' +
-      '<span class="doc-gap"></span>' +
-      (f ? '<a class="doc-forgejo" href="#" title="Forgejo\'s page of this file, in a new tab">Open in Forgejo ↗</a>' : '') +
-      '<button type="button" class="btn btn-xs" data-act="' + (doc.wide ? 'narrow' : 'wide') + '">' + (doc.wide ? 'Narrow' : 'Wide') + '</button>' +
-      '<button type="button" class="btn btn-xs" data-act="new">New document</button></div>';
+    return head + '<p class="doc-pathline" id="doc-state"></p>';
   }
-  function docPinsHTML() {
+  /* the path line: the dot from the first keystroke to the save; then saving, the reason a save failed, the landed commit, or the version's commit and time */
+  function pathInner() {
+    var p = doc.path, v = ver(p), s = sv(p), e = s.err, dirty = !!draftOf(p), t = '', cls = 'doc-state';
+    if (s.busy) t = '· saving…';
+    else if (e) t = '<span class="doc-refused">not saved: ' + esc(e.why) + '</span>' + (e.retry ? ' · ' + acts(link('retry', 'retry')) : '') + (e.theirs != null ? theirsLinks() : '');
+    else if (s.landed) { cls += ' doc-saved'; t = s.landed.by ? 'saved, merged with ' + esc(s.landed.by) + '\'s change · ' + s.landed.sha + ' · ' + s.landed.at : 'Saved: ' + s.landed.sha + ' on master · ' + s.landed.at; }
+    else if (v && !dirty) t = v.sha + ' · ' + v.at;
+    return '<span class="doc-file">' + (dirty ? dot() : '') + '<span class="doc-path" id="doc-path" title="' + esc(p) + '">' + esc(p) + '</span></span>' + (t ? ' <span class="' + cls + '">' + t + '</span>' : '');
+  }
+  function theirsLinks() { return ' · ' + acts('<button type="button" class="linkbtn" data-act="theirs" aria-expanded="' + doc.theirs + '">' + (doc.theirs ? 'hide theirs' : 'show theirs') + '</button> · ' + link('load-theirs', 'load theirs')); }
+  /* the quiet line under the head: a confirm, an outside change, or a restored draft */
+  function noteInner() {
+    var p = doc.path, o = outside[p], d = draftOf(p), c = doc.confirm, e = sv(p).err;
+    if (c && c.at === 'note') return confirmHTML(c);
+    if (o && !(e && e.clash)) return 'changed by ' + esc(o.by) + ' ' + o.at + ' · ' + (doc.mode === 'edit' || d ? (merged(p, latest(p)) == null ? 'the same lines as yours' + theirsLinks() : 'your save will merge · ' + acts(link('load-theirs', 'load theirs'))) : acts(link('reload', 'reload')));
+    if (doc.restored === p && d) return 'draft from ' + esc(d.at) + ' restored · ' + acts(link('discard', 'discard'));
+    return '';
+  }
+  function confirmHTML(c) {
+    var q = c.kind === 'discard' ? ['Discard your changes?', 'Discard', 'Keep'] : ['Discard your changes and load the version of ' + esc(c.when) + '?', 'Load', 'Keep mine'];
+    return '<span class="doc-confirm" role="group" aria-label="' + q[0] + '"><span class="doc-confirm-q">' + q[0] + '</span> <button type="button" class="btn btn-xs btn-danger" data-act="' + c.kind + '-yes">' + q[1] + '</button> <button type="button" class="btn btn-xs" data-act="confirm-no">' + q[2] + '</button></span>';
+  }
+  function pinsInner() {
     var f = docFile();
-    return '<nav class="doc-pins" aria-label="Pinned documents"><span class="doc-pins-l" aria-hidden="true">pins</span>' + DOCS.pins.map(function (p) {
-      return '<button type="button" class="doc-pin" data-doc="' + esc(p) + '"' + (p === doc.path ? ' aria-current="page"' : '') + ' title="' + esc(p) + '">' + esc(DOCS.label(p)) + '</button>';
-    }).join('') + (f && DOCS.pins.indexOf(doc.path) < 0 ? '<button type="button" class="doc-pin-add" data-act="pin" title="Pin ' + esc(doc.path) + ' for this session">+ pin</button>' : '') + '</nav>';
+    return '<span class="doc-pins-l" aria-hidden="true">pins</span>' + DOCS.pins.map(function (p) {
+      return '<button type="button" class="doc-pin" data-doc="' + esc(p) + '"' + (p === doc.path ? ' aria-current="page"' : '') + ' title="' + esc(p) + '">' + (draftOf(p) ? dot() : '') + esc(DOCS.label(p)) + '</button>';
+    }).join('') + (f && DOCS.pins.indexOf(doc.path) < 0 ? '<button type="button" class="doc-pin-add" data-act="pin" title="Pin ' + esc(doc.path) + ' for this session">+ pin</button>' : '');
+  }
+  function recentInner() {
+    return '<span class="doc-recent-head" aria-hidden="true">recent</span>' + DOCS.nav.recent().map(function (r) {
+      var cur = r === doc.path;
+      return '<button type="button" role="menuitem" class="doc-recent-row" data-doc="' + esc(r) + '"' + (cur ? ' aria-current="page"' : '') + '><span class="doc-recent-mark" aria-hidden="true">' + (cur ? '✓' : '') + '</span><span class="doc-recent-label">' + (draftOf(r) ? dot() : '') + esc(DOCS.label(r)) + '</span><span class="doc-recent-file">' + esc(r) + '</span></button>';
+    }).join('');
+  }
+  function editRowInner() {
+    var v = ver(doc.path), c = doc.confirm;
+    if (c && c.at === 'row') return confirmHTML(c);
+    return '<button type="button" class="btn btn-primary" data-act="save" aria-keyshortcuts="Control+S Meta+S" title="Ctrl+S">Save as commit</button><button type="button" class="btn" data-act="cancel">Cancel</button>' +
+      (draftOf(doc.path) ? '<button type="button" class="linkbtn doc-discard" data-act="discard">Discard</button>' : '') +
+      '<span class="doc-base">' + (v ? 'based on ' + esc(v.sha) : 'a new file: the first save creates it') + '</span>';
+  }
+  function theirsOf(p) { var e = sv(p).err, o = outside[p]; return e && e.theirs != null ? e : o ? { theirs: DOCS.files[p].md, clash: o.to } : null; }
+  function theirsInner() {
+    var t = doc.theirs && theirsOf(doc.path); if (!t) return '';
+    return '<span class="doc-theirs-l">theirs: the file on master now, read-only</span><div class="doc-theirs" tabindex="0" role="region" aria-label="Theirs: the file on master now, read-only">' +
+      t.theirs.split('\n').map(function (l) { return '<div class="doc-tl' + (t.clash != null && l === t.clash ? ' doc-clash' : '') + '">' + esc(l) + '</div>'; }).join('') + '</div>';
   }
   function docBodyHTML() {
-    var f = docFile();
-    if (doc.mode === 'read' && f) return '<div class="doc-scroll" tabindex="-1"><article class="doc-body" aria-labelledby="doc-path">' + DOCS.render(f.md, doc.path) + '</article></div>';
-    var r = doc.refused;
+    var v = ver(doc.path);
+    if (doc.mode === 'read' && v) return '<div class="doc-scroll" tabindex="-1"><article class="doc-body" aria-labelledby="doc-path">' + DOCS.render(v.md, doc.path) + '</article></div>';
     return '<div class="doc-edit"><label class="vh" for="doc-editor">The Markdown of ' + esc(doc.path) + '</label><textarea id="doc-editor" spellcheck="true"></textarea>' +
-      (r && doc.theirs ? '<div class="doc-theirs-wrap"><span class="doc-theirs-l">theirs: the file on master now, read-only</span><textarea class="doc-theirs" readonly aria-label="Theirs: the file on master now"></textarea></div>' : '') +
-      (r ? '<p class="doc-refused" role="alert">The file changed since you opened it (' + esc(r.by) + ', ' + esc(r.at) + '). Your text is kept.<button type="button" class="linkbtn doc-theirs-btn" data-act="theirs" aria-expanded="' + doc.theirs + '">' + (doc.theirs ? 'hide theirs' : 'show theirs') + '</button></p>' : '') +
-      '<div class="doc-edit-row"><button type="button" class="btn btn-primary" data-act="save">Save as commit</button><button type="button" class="btn" data-act="cancel">Cancel</button>' +
-        '<span class="doc-base">' + (f ? 'based on ' + esc(f.sha) : 'a new file: the first save creates it') + '</span></div></div>';
+      '<div class="doc-theirs-wrap" id="doc-theirs-slot" hidden></div><div class="doc-edit-row"></div></div>';
+  }
+  function fill(el, html) { if (el && el._h !== html) { el.innerHTML = html; el._h = html; } return el; }
+  /* the state's parts in place, so the editor stays live under a save, a keystroke or an outside change */
+  function syncDoc() {
+    syncReopen();
+    if (docEl.hidden || !doc.path || docEl.dataset.path !== doc.path) return;
+    var a = docEl.contains(document.activeElement) ? document.activeElement : null;
+    fill($('#doc-state', docEl), pathInner());
+    fill($('.doc-pins', docEl), pinsInner());
+    fill($('#doc-recent-menu', docEl), recentInner());
+    var n = fill($('#doc-note', docEl), noteInner()); if (n) n.hidden = !n._h;
+    fill($('.doc-edit-row', docEl), editRowInner());
+    var w = $('#doc-theirs-slot', docEl), th = theirsInner();
+    if (w && w._h !== th) { fill(w, th); w.hidden = !th; var c = $('.doc-clash', w); if (c) c.parentNode.scrollTop = c.offsetTop - 8; }
+    if (a && !a.isConnected) focusDoc(a.dataset.act ? '[data-act="' + a.dataset.act + '"]' : a.dataset.doc ? '[data-doc="' + a.dataset.doc + '"]' : null);
   }
   function renderDoc() {
     hidePeek(); keepScroll();
     var ed0 = $('#doc-editor'), sel = ed0 && docEl.dataset.path === doc.path ? [ed0.selectionStart, ed0.selectionEnd, ed0.scrollTop] : null;
     docEl.classList.toggle('wide', doc.wide);
-    docEl.innerHTML = '<div class="doc-head">' + docHeadHTML() + '</div>' + docPinsHTML() +
-      (doc.saved && doc.saved.path === doc.path && doc.mode === 'read' ? '<p class="doc-saved" role="status">' + esc(doc.saved.text) + '</p>' : '') + docBodyHTML();
+    docEl.innerHTML = '<div class="doc-head">' + docHeadHTML() + '</div><nav class="doc-pins" aria-label="Pinned documents"></nav><p class="doc-note" id="doc-note" role="status" hidden></p>' + docBodyHTML();
     docEl.dataset.path = doc.path;
     var ed = $('#doc-editor'); if (ed) { ed.value = doc.text; if (sel) { ed.setSelectionRange(sel[0], sel[1]); ed.scrollTop = sel[2]; } }
-    var th = $('.doc-theirs', docEl); if (th) th.value = doc.refused.current;
     var s = docScroller(); if (s) { s.scrollTop = doc.scroll[doc.path] || 0; s.classList.toggle('scrolled', s.scrollTop > 0); }
+    syncDoc();
+    if (doc.mode === 'edit') armChange();
   }
   function focusDoc(sel) {
     var el = sel && $(sel, docEl);
@@ -1633,17 +1775,17 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     el = el || docScroller() || $('#doc-editor') || docEl;
     el.focus({ preventScroll: true });
   }
-  function syncReopen() { var b = $('#doc-reopen'); if (b) b.setAttribute('aria-expanded', String(!docEl.hidden)); }
-  /* show a path as the open document; the history is DOCS.nav's and is moved by the callers */
+  function syncReopen() { var b = $('#doc-reopen'); if (!b) return; b.setAttribute('aria-expanded', String(!docEl.hidden)); fill(b, (anyDraft() ? dot() : '') + 'Documents'); }
+  /* show a path as the open document; the history is DOCS.nav's and is moved by the callers. A draft reopens in the editor. */
   function showDoc(path, opts) {
     opts = opts || {};
     keepScroll(); closeDrawer(false);
-    if (doc.path !== path) doc.saved = null;
+    if (doc.path !== path) { doc.restored = null; sv(path).landed = null; }
     if (docEl.hidden) doc.pageY = scrollY;
-    var d = draftOf(path), f = DOCS.files[path];
-    doc.path = path; doc.form = false; doc.recent = false; doc.refused = null; doc.theirs = false;
-    doc.mode = d != null || !f ? 'edit' : 'read';
-    doc.text = d != null ? d : f ? f.md : '';
+    var d = draftOf(path), v = ver(path);
+    doc.path = path; doc.form = false; doc.recent = false; doc.theirs = false; doc.confirm = null;
+    doc.mode = d || !v ? 'edit' : 'read';
+    doc.text = d ? d.text : v ? v.md : '';
     docEl.hidden = false; docEl.dataset.path = '';
     renderDoc(); syncReopen();
     if (opts.frag) { var h = document.getElementById(opts.frag), s = docScroller(); if (h && s) s.scrollTop = h.getBoundingClientRect().top - s.getBoundingClientRect().top + s.scrollTop - 8; }
@@ -1661,7 +1803,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     if (docEl.hidden) return;
     var had = docEl.contains(document.activeElement);
     keepScroll(); hidePeek();
-    docEl.hidden = true; doc.recent = false; doc.form = false;
+    docEl.hidden = true; doc.recent = false; doc.form = false; doc.confirm = null;
     syncReopen(); if (doc.pageY) scrollTo(0, doc.pageY);
     if (had) { var b = $('#doc-reopen'); if (b) b.focus({ preventScroll: true }); }
   }
@@ -1683,33 +1825,44 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     m.hidden = !doc.recent; b.setAttribute('aria-expanded', String(doc.recent));
   }
   function docMode(m) {
-    var f = docFile(), ed = $('#doc-editor');
-    if (m === doc.mode || (m === 'read' && !f)) return;
+    var v = ver(doc.path);
+    if (m === doc.mode || (m === 'read' && !v)) return;
+    doc.confirm = null;
     if (m === 'edit') {
       var s = docScroller(), ratio = s && s.scrollHeight > s.clientHeight ? s.scrollTop / (s.scrollHeight - s.clientHeight) : 0, d = draftOf(doc.path);
-      doc.text = d != null ? d : f.md; doc.mode = 'edit'; renderDoc();
+      doc.text = d ? d.text : v.md; doc.mode = 'edit'; renderDoc();
       var e2 = $('#doc-editor'); e2.focus({ preventScroll: true }); e2.setSelectionRange(0, 0); e2.scrollTop = ratio * (e2.scrollHeight - e2.clientHeight);
     } else {
-      doc.text = ed.value; if (doc.text === f.md) dropDraft(doc.path);
-      doc.mode = 'read'; doc.refused = null; doc.theirs = false; renderDoc(); focusDoc('[data-mode="read"]');
+      doc.mode = 'read'; doc.theirs = false; renderDoc(); focusDoc('[data-mode="read"]');
     }
   }
-  function docAct(a) {
-    var ed = $('#doc-editor'), f = docFile();
-    if (a === 'save') {
-      var text = ed.value, r = DOCS.save(doc.path, text);
-      doc.text = text;
-      if (!r.ok) { keepDraft(doc.path, text); doc.refused = r; doc.theirs = false; renderDoc(); $('#doc-editor').focus({ preventScroll: true }); return; }
-      dropDraft(doc.path); doc.refused = null; doc.theirs = false; doc.mode = 'read';
-      doc.saved = { path: doc.path, text: 'Saved: ' + r.sha + ' on master · ' + r.at };
-      renderDoc(); focusDoc(null); return;
-    }
+  /* leave the editor without a dialog: the draft stays, the dot says so; Discard asks, then returns to the saved version; load theirs asks, then takes master's text */
+  function leaveNew() { if (DOCS.nav.canBack()) { navFocus = null; history.back(); } else closeDoc(); }
+  function docAct(a, t) {
+    var p = doc.path, f = docFile(), s = sv(p), ed = $('#doc-editor');
+    if (a === 'save' || a === 'retry') { saveDoc(p); if (ed && a === 'retry') ed.focus({ preventScroll: true }); return; }
     if (a === 'cancel') {
-      dropDraft(doc.path); doc.refused = null; doc.theirs = false;
-      if (!f) { if (DOCS.nav.canBack()) { navFocus = null; history.back(); } else closeDoc(); return; }
-      doc.mode = 'read'; doc.text = f.md; renderDoc(); focusDoc('[data-mode="edit"]'); return;
+      doc.confirm = null;
+      if (!f) { leaveNew(); return; }
+      doc.mode = 'read'; doc.theirs = false; renderDoc(); focusDoc('[data-mode="edit"]'); return;
     }
-    if (a === 'theirs') { doc.text = ed.value; doc.theirs = !doc.theirs; renderDoc(); focusDoc('[data-act="theirs"]'); return; }
+    if (a === 'discard' || a === 'load-theirs') {
+      doc.confirm = { kind: a === 'discard' ? 'discard' : 'theirs', at: t && t.closest('.doc-edit-row') ? 'row' : 'note', when: outside[p] ? outside[p].at : s.err && s.err.at };
+      syncDoc(); focusDoc('[data-act="confirm-no"]'); return;
+    }
+    if (a === 'confirm-no') {
+      var c = doc.confirm; doc.confirm = null; syncDoc();
+      focusDoc(c && c.kind === 'theirs' ? '[data-act="load-theirs"]' : c && c.at === 'row' ? '.doc-edit-row [data-act="discard"]' : '#doc-note [data-act="discard"]'); return;
+    }
+    if (a === 'discard-yes' || a === 'theirs-yes') {
+      dropDraft(p); delete outside[p]; s.err = null; s.landed = null; doc.confirm = null; doc.theirs = false; doc.restored = null;
+      if (!f) { leaveNew(); return; }
+      seen[p] = fresh(p); doc.text = f.md;
+      if (a === 'discard-yes') doc.mode = 'read';
+      renderDoc(); focusDoc(doc.mode === 'edit' ? '#doc-editor' : null); return;
+    }
+    if (a === 'reload') { seen[p] = fresh(p); delete outside[p]; renderDoc(); focusDoc(null); return; }
+    if (a === 'theirs') { if (doc.mode !== 'edit') docMode('edit'); doc.theirs = !doc.theirs; syncDoc(); focusDoc('[data-act="theirs"]'); return; }
     if (a === 'wide' || a === 'narrow') { doc.wide = a === 'wide'; renderDoc(); focusDoc('[data-act="' + (doc.wide ? 'narrow' : 'wide') + '"]'); return; }
     if (a === 'new') { if (ed) doc.text = ed.value; doc.form = true; renderDoc(); focusDoc('#doc-name'); return; }
     if (a === 'new-cancel') { doc.form = false; renderDoc(); focusDoc('[data-act="new"]'); return; }
@@ -1751,20 +1904,27 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     if (t.dataset.mode) { docMode(t.dataset.mode); return true; }
     if (t.classList.contains('doc-recent-btn')) { doc.recent = !doc.recent; syncRecent(); if (doc.recent) { var r = $('.doc-recent-row', docEl); if (r) r.focus(); } return true; }
     if (t.classList.contains('doc-x')) { closeDoc(); return true; }
-    if (t.dataset.act) { docAct(t.dataset.act); return true; }
+    if (t.dataset.act) { docAct(t.dataset.act, t); return true; }
     return false;
   }
   function docEscape(t, field) {
     if (peekEl) { hidePeek(); return true; }
+    if (doc.confirm && !docEl.hidden) { docAct('confirm-no'); return true; }
     if (doc.recent) { doc.recent = false; syncRecent(); focusDoc('.doc-recent-btn'); return true; }
     if (doc.form) { doc.form = false; renderDoc(); focusDoc('[data-act="new"]'); return true; }
     if (!docEl.hidden && !field && docEl.contains(t)) { closeDoc(); return true; }
     return false;
   }
   document.addEventListener('submit', function (e) { if (e.target.classList.contains('doc-new')) createDoc($('#doc-name').value); });
-  document.addEventListener('input', function (e) { if (e.target.id === 'doc-editor') { doc.text = e.target.value; keepDraft(doc.path, doc.text); } });
+  document.addEventListener('input', function (e) {
+    if (e.target.id !== 'doc-editor') return;
+    var p = doc.path, v = ver(p);
+    doc.text = e.target.value;
+    if (v && doc.text === v.md) dropDraft(p); else keepDraft(p, doc.text);
+    sv(p).landed = null; syncDoc();
+  });
   document.addEventListener('keydown', function (e) {
-    if (e.target.id === 'doc-editor' && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); docAct('save'); return; }
+    if (e.target.id === 'doc-editor' && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); saveDoc(doc.path); return; }
     if (doc.recent && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
       e.preventDefault();
       var rs = Array.prototype.slice.call(docEl.querySelectorAll('.doc-recent-row')), i = rs.indexOf(document.activeElement);
@@ -1813,10 +1973,12 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
     if (peekEl) { peekEl.remove(); peekEl = peekFor = null; }
   }, true);
 
-  /* at load: the session's pins, an armed conflict, ?open= as the history before ?doc=, the hash over ?doc= after a reload, a kept draft in the editor */
+  /* at load: the session's pins, an armed conflict, a simulated draft and outside change, ?open= as the history before ?doc=, the hash over ?doc= after a reload, a kept draft in the editor with its restored line */
   function initDoc() {
     try { JSON.parse(sessionStorage.getItem('doc-pins') || '[]').forEach(function (p) { if (DOCS.pins.indexOf(p) < 0) DOCS.pins.push(p); }); } catch (e) {}
-    if (params.get('conflict') === '1') DOCS.conflictNext('docs/roadmap.md');
+    if (params.get('conflict') === '1') DOCS.conflictNext(ROADMAP);
+    if (params.get('draft') === '1') { try { localStorage.setItem(DRAFT + ROADMAP, JSON.stringify({ text: DOCS.files[ROADMAP].md + '\n\nA line jotted earlier.', at: '14:05' })); } catch (e) {} }
+    if (params.get('changed') === 'read') setTimeout(function () { arrive('the project agent'); }, 1200);
     var fromHash = DOCS.nav.fromHash(location.hash), p = known(fromHash) ? fromHash : params.get('doc');
     if (!known(p)) return;
     var before = fromHash ? [] : (params.get('open') || '').split(',').filter(function (q) { return DOCS.files[q] && q !== p; });
@@ -1826,6 +1988,7 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
       if (i) history.pushState(s, '', DOCS.nav.hash(q)); else history.replaceState(s, '', i || before.length ? DOCS.nav.hash(q) : location.href);
     });
     showDoc(p);
+    if (draftOf(p)) { doc.restored = p; syncDoc(); }
   }
 
   /* events */
