@@ -2034,8 +2034,14 @@ htmx 2.0.11, vendored and pinned by its sha256. The pages are the board with
 both lanes and the approval cards, `/resources` with the commissioned
 resources and the envelopes, `/costs` and `/policy`. The board polls every 3
 seconds since Stage 12, so a human can watch a run live (Ruling 215, Task
-107, the round's first lane task); it polled every 10 before. It shows at most 300 tasks, open ones first, and reads only
-Postgres, never the timelines in S3.
+107, the round's first lane task); it polled every 10 before, and the
+event stream replaced the poll (Ruling 244, below). It reads only
+Postgres, never the timelines in S3. It showed at most 300 tasks until
+2026-10-15. Since then it reads the open cards whole and each column of
+finished cards a page of 50 at a time: the next page loads when the
+viewer scrolls to the column's end or presses Load more. A page follows
+the last card's arrival (its finish stamp, else its filing) and id, so a
+card that finishes between two pages neither repeats nor pushes one off.
 
 Added in Stage 8 (Tasks 61, 65, 67):
 
