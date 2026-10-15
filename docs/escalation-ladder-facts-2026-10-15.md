@@ -192,6 +192,23 @@ This happened after the first version of this file.
 - **Waiting on a dependency is quiet by design.** A card in a chain of four waits for hours with nothing to report, and the sweep reads that quiet as a dead run.
 - **The status and the run disagree.** The sweep changes the card's status outside its workflow, so the status says a human is needed while the workflow simply goes on waiting. The question's suggested reply ("start a new attempt") does not match what the run will do.
 
+### Problem 7: an old human answer overrode a newer request for changes (card #853)
+
+This happened after the first version of this file.
+
+**What happened.**
+
+- **The card.** Card #853 is the first card of the documents feature, task t-b00242d88364, pull request 857.
+- **The first answer.** At 17:58 the card was at its session cap. All the review's findings at head `5e8bcd2` were settled, so the controller answered: "All findings are settled at head 5e8bcd2, so change nothing and end the session without a commit." Session 4 ended after 30 seconds, and the card reached approval 783.
+- **The request for changes.** The controller then compared the console lab's screenshots with the design prototype. It found four gaps: no pins row, no path line, the phone head overflowing, and two labels. At 18:07:27 it denied the approval with "request changes", listing them.
+- **What session 5 received.** Its `ANSWERS` held the old answer ("change nothing and end the session without a commit"). Its `FINDINGS` held the new request ("reviewer controller requested changes: ... 1. The pins row is missing ...").
+- **What session 5 did.** It ended after 36 seconds with "no changes to push; the branch already held 5e8bcd2".
+
+**Controller's interpretation.**
+
+- **Answers outlive their purpose.** A human answer stays in every later session of the run, newest first, under "The human has answered ... do not escalate them again" (`workflow.go:3189-3202`, `opencode.go:579-691`). The brief puts the answers before the findings. Nothing marks an answer as spent once its session is over, or as replaced by a newer request.
+- **The agent obeyed the answer over the finding.** It treated the earlier answer as the stronger instruction.
+
 ### For comparison: a card that went as intended (card #840)
 
 Card #840 pushed after 26 minutes. Its first review (comment 15842) raised a possible data race on a new key field, which was a fair point. The second session fixed it with an atomic pointer and a race test. The second review (comment 15900) approved. The supervisor's check-ins answered `continue`. The controller read the diff and approved. Two sessions, no intervention beyond the approval.
