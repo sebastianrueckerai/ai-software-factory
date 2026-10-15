@@ -1,0 +1,41 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Console design round 03: the theme toggle</title>
+<style>body{font:14px/1.5 system-ui;margin:24px;color:#222;background:#f4f4f2}h1{font-size:20px}h2{font-size:16px;margin:32px 0 4px}p,li{max-width:80ch}p{margin:0 0 8px}figure{display:inline-block;vertical-align:top;margin:0 12px 12px 0;width:min(46%,680px)}figure img{width:100%;border:1px solid #ccc;background:#fff}figure.wide{width:min(96%,1400px)}figure.phone{width:min(30%,390px)}figcaption{font-size:12px;color:#555}table{border-collapse:collapse;margin:8px 0 12px}td,th{border:1px solid #ccc;padding:3px 10px;text-align:left;font-size:13px;vertical-align:top}td.n{text-align:right}code{font-size:12.5px}</style></head><body>
+<h1>Console design round 03: the theme toggle</h1>
+<p>"Theme: dark" in the top bar looks boring, so this round looks for a symbol to replace it. It ran the portfolio's process at the size of one control. <a href="brief.md">The brief</a> sets the rules. <a href="references/README.md">33 references</a> from other products and standards gave ten patterns. Twelve candidates were built as SVG and shot in the real console's top bar (the lab, busy scenario) at 1x and 3x, at rest, hovered and as a film of the switch. Two critics judged them over four loops. <a href="notes.md">The notes</a> hold the run, the scores and what the director overruled.</p>
+<p><b>Sebastian picked E, selector-3: C15, shipped in the code repository as 629198f.</b> <a href="shots/shipped/dark-header.png">The shipped top bar, dark</a>, <a href="shots/shipped/light-header.png">light</a>, <a href="shots/shipped/dark-phone.png">the phone</a>.</p>
+<p><b>The recommendation: E, selector-3.</b> Moon and sun side by side in a thin frame. A 1 px outline marks the theme in force and slides across in 280 ms. In the console it becomes two buttons, so a click on the sun sets the light theme and a click on the moon the dark theme. Both critics picked it in the compare loop (9 of 10 each). It is the only finalist that shows the theme in force and the other one at once, and it reads as an instrument's mode switch. It is 46 px wide, against 30 px for a single glyph. The runner-up depends on the critic: B, the half disc (Gemini), or C, eclipse-2 (GLM).</p>
+
+<h2>The finalists</h2>
+<p>A is the common web icon, kept as the baseline. D is the critics' pick as it was judged. E is D with its key fixed. D's filled key measured 1.6:1 on the page, under the console's 3:1 for a fill that carries a state. E's outline measures 7.5:1 (dark) and 6.6:1 (light).</p>
+<figure class="wide"><a href="compare-sheet-dark.png"><img src="compare-sheet-dark.png" alt="The five finalists in the dark theme"></a><figcaption>the finalists, dark: at 1x, at 3x at rest and hovered, and the switch to light</figcaption></figure>
+<figure class="wide"><a href="compare-sheet-light.png"><img src="compare-sheet-light.png" alt="The five finalists in the light theme"></a><figcaption>the finalists, light</figcaption></figure>
+<figure class="phone"><a href="shots/selector-3/dark-phone.png"><img src="shots/selector-3/dark-phone.png" alt="selector-3 on the phone, dark"></a><figcaption>E on the phone at 390, dark</figcaption></figure>
+<figure class="phone"><a href="shots/selector-3/light-phone.png"><img src="shots/selector-3/light-phone.png" alt="selector-3 on the phone, light"></a><figcaption>E on the phone at 390, light</figcaption></figure>
+
+<h2>Try them</h2>
+<p>Each bar carries the console's tokens. A click on a symbol switches that bar's theme and runs its motion. The button switches every bar at once.</p>
+<p><button type="button" id="all">Switch every bar</button></p>
+<div id="live" class="bars"></div>
+
+<h2>All twelve candidates</h2>
+<figure class="wide"><a href="contact-sheet-dark.png"><img src="contact-sheet-dark.png" alt="All candidates in the dark theme" loading="lazy"></a><figcaption>dark</figcaption></figure>
+<figure class="wide"><a href="contact-sheet-light.png"><img src="contact-sheet-light.png" alt="All candidates in the light theme" loading="lazy"></a><figcaption>light</figcaption></figure>
+
+<h2>The references</h2>
+<p>The research agent took a crop of each live toggle it could reach. The icon sets and the IEC symbols were rendered in both themes. <a href="references/README.md">The table</a> lists the motion of each one and the patterns.</p>
+<figure class="wide"><a href="references/sheet.png"><img src="references/sheet.png" alt="The references" loading="lazy"></a><figcaption>26 crops: toggles.dev, Comeau, Geist, Nuxt UI, Astro, Svelte, Radix, shadcn, Lucide, Phosphor, Tabler, Material Symbols, IEC 60417</figcaption></figure>
+
+<h2>The critics</h2>
+<p>This table shows the scores out of 10 in the compare loop. Both critics picked selector-2, and the key check then preferred selector-3 to it (Gemini 9 against 2 on state, GLM 8 against 3). <a href="notes.md">The notes</a> hold the two loops over all candidates and the claims the director checked against the pixels.</p>
+<table><tr><th>finalist</th><th>Gemini</th><th>GLM</th></tr>
+<tr><td>D selector-2</td><td class="n">9</td><td class="n">9</td></tr>
+<tr><td>C eclipse-2</td><td class="n">5</td><td class="n">8</td></tr>
+<tr><td>B half</td><td class="n">7</td><td class="n">4</td></tr>
+<tr><td>A swap</td><td class="n">6</td><td class="n">6</td></tr></table>
+
+<h2>Cost</h2>
+<p>Eight critic calls at $0.03, $0.24 of the $3 cap. No images were generated: the round is about one 18 px glyph, which an image model cannot draw exactly.</p>
+
+<script src="candidates.js"></script>
+<script src="live.js"></script>
+</body></html>

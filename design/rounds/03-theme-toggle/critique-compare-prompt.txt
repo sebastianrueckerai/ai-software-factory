@@ -1,0 +1,21 @@
+You compare four finalists for one control and pick one: the theme toggle in the top bar of an operations console for an AI software factory. The console's design is called "Mission control": a near-black blue room (dark theme, the default) or a warm cream day version (light theme) of thin-bordered instrument panels, cyan as the system colour, amber as the one signal that needs a person, monospace figures, everything exact and calm. Today the toggle is the plain text "Theme: dark", which the owner finds boring and wants replaced by a cool, fitting symbol.
+
+You see two compare sheets, the dark theme and the light theme. Each row is one finalist, A to D. The columns: the top bar's right end at 1x as a normal screen shows it; the same at 3x at rest; at 3x hovered; and a film of seven paused frames of the switch to the other theme (0, 80, 160, 240, 320, 420, 600 ms), in which the page background has already switched at frame 0 and only the symbol animates.
+
+Every finalist shows the theme in force, as a switch shows its position. The symbol stays in the muted text colour at rest, by rule: a theme in force is a normal state, and normal states whisper. The button's accessible name and tooltip name the action.
+
+- A, swap: a moon in the dark theme, a sun in the light theme, the one turns away as the other turns in. The common web pattern, kept as the baseline.
+- B, half: a ring half filled, the contrast glyph; the fill turns over half a turn.
+- C, eclipse-2: a filled sun with the moon's shadow cut out of it, so the dark theme shows a crescent inside the rays; in daylight the shadow slides off and the full sun shows.
+- D, selector-2: a two-position selector, moon and sun side by side in a thin frame, a pressed key under the one in force. Each half is its own target: a click on the sun sets the light theme, a click on the moon the dark one.
+
+Judge on: recognition by a newcomer at 1x; whether the theme in force can be read from the symbol alone; legibility at 1x in both themes; fit with the instrument idiom; quietness beside the text links; the motion; and whether it is "cool", memorable without being a gimmick. Look at the pixels before you claim a detail is lost.
+
+Answer in JSON only, no prose around it:
+{
+  "ranking": [ {"finalist": "A-swap", "score": 0-10, "why": "two sentences"}, ... all four, best first ],
+  "pick": "the one finalist to ship, by letter and slug",
+  "why_pick": "one paragraph: why this one over the runner-up",
+  "fix_before_ship": ["at most three concrete changes to the pick, each one sentence"],
+  "risks": "what could go wrong with the pick in use, one paragraph"
+}

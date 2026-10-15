@@ -5,7 +5,7 @@ Read off the templates in `internal/console/templates/` on 2026-10-13 (code comm
 ## Page shell
 
 - Home link "Factory console"; nav: Board, New task, Projects, Resources, Costs, Policy, Alerts (the last five for factory writers only).
-- Theme toggle (dark default, remembered). User name. Log out.
+- Theme selector (C15): moon and sun, each a button, the theme in force outlined (dark default, remembered). User name. Log out.
 - Flash line for a refused action. Footer live-stream status ("The live stream ended: reload the page to follow the board").
 - Keys overlay (?): w wide view, Escape, ?, f find, / chat, Enter, Shift+Enter.
 

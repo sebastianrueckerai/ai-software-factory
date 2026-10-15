@@ -44,7 +44,7 @@ Every state shows its word next to its hue; colour is never the only signal. In 
 ## Layout at 1440 and 1920
 
 ```
-top bar 44   home · project ▾ · Board New task Projects Resources Costs Policy Alerts      scenario · theme · sebastian · Log out
+top bar 44   home · project ▾ · Board New task Projects Resources Costs Policy Alerts      scenario · [☾]☼ · sebastian · Log out
 status panel  ⚠ pulse sentence, 20 px ......................................................... more
               ● waiting on you | 3 working | 2 need you | €61.40 / €120.00 ▬▬▬▬▭▭ 51 % | GitHub: …
 main          CHAT 40 %, full height            | Board header: Board · find · Wide view · ?
@@ -56,6 +56,7 @@ main          CHAT 40 %, full height            | Board header: Board · find ·
 - Chat left at 40 percent, board right at 60 percent, 10 px gutter, 12 px page margin (14 and 18 from 1700 px). The four columns weigh 1.5 : 1 : 1.25 : 0.85 (Needs you, Queued, In progress, Done; C8): at 1440 that is about 268, 178, 223 and 152 px; at 1920 about 355 px for Needs you. A column that scrolls fades at its foot. At 900 to 1279 px Needs you spans the full board width, the three others go two by two with the third on its own row, and the board scrolls as one.
 - Needs you is the board's first column, never a tray or band across the top (C4): four columns (C8), Needs you about 1.5 times as wide as the others, its items stacked and growing downward, scrolling like any column. With nothing waiting it goes calm and narrows to 0.9.
 - The drawer docks at the right edge of the main area, `min(46 %, 720 px)` wide, from the top of the main area to the foot: over the board, never over the chat (the chat ends at 40 percent).
+- The theme selector (C15) sits before the user's name: moon and sun side by side in a 1 px frame in `--line-strong`, 48 by 24 px, each half its own button. A 1 px outline in `--text-muted` marks the theme in force, and its glyph is in `--text`, the other in `--text-muted`. On the phone each half is 44 px and the glyphs 22 px.
 - Wide view ("Wide view" / "Four columns", key w): the same four columns across the full width of the main area, the chat hidden; "/" brings the chat back. There are no lane columns, no lane badges and no drag (item 225, C7).
 
 ## The pulse
@@ -123,7 +124,7 @@ Under 900 px one column, no tabs: the top bar (home, project, theme, Menu with t
 
 ## Motion
 
-Hover: 120 ms colour and border changes, never movement. Focus: a 2 px cyan outline, 2 px offset, on everything. The typing indicator: three dots stepping. The drawer slides 16 px in while fading. Under `prefers-reduced-motion` nothing moves: the dots stand, the drawer appears, replies arrive whole.
+Hover: 120 ms colour and border changes, never movement. Focus: a 2 px cyan outline, 2 px offset, on everything. The typing indicator: three dots stepping. The theme selector's outline slides to the chosen half in 280 ms (C15). The drawer slides 16 px in while fading. Under `prefers-reduced-motion` nothing moves: the dots stand, the drawer appears, replies arrive whole.
 
 Live dots (Sebastian, 2026-10-14, C6): the state dot of a running card (planning, building) breathes every 2.2 s with a soft expanding ring in its own colour; a verifying card's dot does the same every 3.6 s. Under reduced motion both stand still.
 

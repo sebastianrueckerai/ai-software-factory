@@ -1,0 +1,11 @@
+{
+  "critic": "glm-5v-turbo",
+  "images": [
+    "design/rounds/03-theme-toggle/compare-sheet-dark.png",
+    "design/rounds/03-theme-toggle/compare-sheet-light.png"
+  ],
+  "prompt": "You check one fix on a picked design. The control is the theme toggle in the top bar of an operations console in a \"Mission control\" design (near-black blue dark theme, warm cream light theme, thin-bordered instrument panels, everything exact and calm). The pick is a two-position selector: moon and sun side by side in a thin frame, the half in force marked; each half is its own target.\n\nYou see two compare sheets, dark and light. Look only at rows D and E. Columns: the top bar's right end at 1x as a screen shows it; at 3x at rest; at 3x hovered; a film of the switch to the other theme.\n\nD, selector-2, marks the half in force with a filled key in the panel border colour. That fill measures 1.6:1 against the page in the dark theme and 1.75:1 in the light theme, below the console's rule of 3:1 for a fill that carries a state. E, selector-3, marks it with a 1 px outline in the muted text colour instead (7.5:1 dark, 6.6:1 light), and slides it in 280 ms.\n\nLook at the pixels at 1x before you answer. Answer in JSON only:\n{\n  \"state_readable\": {\"D\": 0-10, \"E\": 0-10},\n  \"quietness\": {\"D\": 0-10, \"E\": 0-10},\n  \"better\": \"D or E\",\n  \"why\": \"two sentences\",\n  \"fix\": \"one concrete change to E if any, else empty\"\n}\n",
+  "answer": "```json\n{\n  \"state_readable\": {\"D\": 3, \"E\": 8},\n  \"quietness\": {\"D\": 5, \"E\": 9},\n  \"better\": \"E\",\n  \"why\": \"Candidate E meets the console's 3:1 contrast requirement for state indication while preserving the calm, thin-bordered instrument aesthetic through its outlined selection, whereas D fails accessibility with its insufficient 1.6:1\u20131.75:1 fill contrast. The high-contrast outline provides unambiguous active-state feedback without the visual weight of a solid background fill, better suiting the mission control's exact and restrained design language.\",\n  \"fix\": \"\"\n}\n```",
+  "est_cost_usd": 0.03,
+  "created": "2026-10-15T00:23:17"
+}
