@@ -5684,6 +5684,14 @@ infra.
   The review sent the first head back for an ssh-rsa blob too short for
   a real key, approved the second; filed to merged (PR 819) in 49
   minutes, three sessions, 0.1891 EUR. 49 is done.
+- 246 by Sebastian's rule (no special case): a stuck review or audit
+  beside the checks climbs its escalation ladder when it trips, each
+  running gate supervised on its own; red checks send the head back and
+  withdraw the ladder's open question, its inbox row, answer row and
+  alert settled; a gate's bound follows its diff's parts, 8 minutes for
+  a one-part review instead of 20. Answers are read by comment id, live
+  and in Reconcile, and tagged with their escalation's first line
+  (6a7fe34, 6ceeab2, 7f65d97, 699bfef). Not seen live.
 - go.mod names toolchain go1.26.9, the images' Go, so a local test runs
   the Go CI runs (a27f1c8). Under go 1.25.0 alone the race suite crashed
   in factoryd with "fatal error: fault", the night's unexplained
