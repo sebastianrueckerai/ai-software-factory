@@ -55,7 +55,7 @@ Per card: sessions run, sessions that produced nothing, EUR spent, EUR of sessio
 
 Good: human steps beyond the approval only for spend, goal conflict, policy class or access. Bad: a human step whose answer names a fact a tool held, or a fix the check-in could have named.
 
-For every human step, read the question the card asked and the answer. Classify the answer: a decision only a human could take, a fact a tool held, a fix a check-in should have found, or a correction of a check-in's verdict.
+For every human step, read the question the card asked and the answer. Classify the answer: a decision only a human could take, a fact a tool held, a fix a check-in should have found, a correction of a check-in's verdict, or a look at the screen of a UI card. The last is expected until the lab gate beside the ladder exists. Count it apart, so the ladder's own record stays readable.
 
 ### 4.2 Did the check-in run at the right moments, and what did it decide?
 
