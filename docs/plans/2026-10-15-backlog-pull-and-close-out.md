@@ -22,7 +22,9 @@ Verified in the code on 2026-10-15, origin/main of the code repository read at 9
 4. Keeping the backlog good, which is deduplication, grooming and ordering, is a different job and not the job of these two steps.
 5. The same two steps serve a text file and an external tracker. The tracker kind is not built in this round.
 
-Read from the discussion, open to correction: the build plan's record is a deterministic line with no model call, and whether a card covers its passage whole or in part is set by the filer at filing, so the close-out judges nothing after the fact.
+6. The build plan's record is a paragraph a model writes. The record names the old and the new commit, so every edit is one diff away and checkable, and the paragraph says why the step did what it did, which matters most where things were not clean. It is as short as the case allows: "Task done, but the roadmap item was already gone so I did nothing" is a whole paragraph.
+
+Read from the discussion, open to correction: whether a card covers its passage whole or in part is set by the filer at filing, so the close-out judges nothing after the fact.
 
 ## The reference
 
@@ -46,9 +48,9 @@ One JSON column on the task, `backlog_ref`, opaque to everything but the three p
    1. Read the file at head through the document repository's API, with its hash.
    2. Find the passage by exact string match.
    3. Found and `whole`: remove the passage's lines. Found and `part`: append one line under the passage, `Built in part by #<card>: <the card's title> (<date>).` Not found: no edit.
-   4. Where the block names a record file: append one record under the heading `### The day of <UTC date>: the roadmap items that landed`, made at the end of the file when absent. The record is the passage's first line cut to 120 characters, then the card, the pull request, the merge commit, `whole` or `part`, and the card's acceptance items one per line. No model call.
-   5. Write through `write_doc`'s door: the lock, the compare-and-swap with the hash of step 1, the allow-list, the structure check where it applies. On a hash mismatch, read again and retry, three times. The commit's trailers name the card and its approver.
-   6. Always, when no edit happened and when a step failed too: one comment on the card and one event `backlog_closed_out`, with the head commit read, found or not found, the edit made or none, the commit SHA, the permanent link, and every refusal or error verbatim.
+   4. Write the edit through `write_doc`'s door as one commit: the lock, the compare-and-swap with the hash of step 1, the allow-list, the structure check where it applies. On a hash mismatch, read again and retry, three times. The commit's trailers name the card and its approver. No edit, no commit.
+   5. One model call on the cheap rung, billed to the project's chat task, writes the paragraph: what the card built and why the step did what it did at head, as short as the case allows. Its input is the passage, the card's title and acceptance items, the pull request's description, the head read, and the edit made or the refusal. Where the block names a record file, a second commit through the same door appends the record under the heading `### The day of <UTC date>: the roadmap items that landed`, made at the end of the file when absent. The record's first line is code's: the passage's first line cut to 120 characters, the card, the pull request, the merge commit, `whole` or `part`, the reference's commit and step 4's commit, so the exact edit is one diff away. The paragraph sits under it. When the model call fails, the record keeps its first line and the comment says the paragraph is missing.
+   6. Always, when no edit happened and when a step failed too: one comment on the card and one event `backlog_closed_out`, with the head commit read, found or not found, the edit made or none, both commit SHAs, the permanent link, the paragraph, and every refusal or error verbatim.
 
    The close-out never escalates and never writes to the backlog what it did not find. A passage that is gone was removed by another card, reworded by a human, or removed in error. All three are safe to leave, and the card holds the evidence.
 
@@ -79,10 +81,11 @@ Hand-derived tests:
 - A second filing on a passage that an open card carries is refused, naming the card. A filing on a passage whose card is done is not.
 - An agent filing without a reference is refused. A human filing without one lands.
 - A plan's children and a delegated card carry the parent's reference.
-- Close-out, found and whole: the passage's lines are gone at head, the record sits under the day's heading, the comment and the event name the commit.
+- Close-out, found and whole: the passage's lines are gone at head, the record sits under the day's heading with its first line naming both commits and the paragraph under it, and the comment names both commits.
 - Close-out, found and part: the built-in-part line sits under the passage, the record sits under the day's heading.
 - Close-out, not found: the file is unchanged, the comment names the head commit and the old link.
-- Close-out, hash mismatch twice then success: one commit, three reads.
+- Close-out, the paragraph's model call fails: the record keeps its first line, the comment says the paragraph is missing, and the stamp is set.
+- Close-out, hash mismatch twice then success: the edit lands as one commit after three reads.
 - Close-out, the document repository unreachable: no stamp, the heal pass retries, after a day the stamp and a comment with the error.
 - Two cards on one file finishing together: two commits, the second on top of the first.
 - The pull step files one card with a reference read from head, as the factory's account, with `source: pull`.
