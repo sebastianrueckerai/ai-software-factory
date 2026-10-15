@@ -1,0 +1,16 @@
+You are an independent design critic judging the second loop of a design round. The screen is the project screen of an AI software factory console in its fixed "Mission control" design. The round lets a member read and lightly edit the project's documents (Markdown files in the project's git repository, linked to each other) inside the screen and move between linked documents without leaving the chat.
+
+In the first loop you and a second critic judged three shapes: "wiki" (one document in a panel docked at the right edge over the board, with back and forward arrows, a Recent menu and three pins, links opening in place), "tabs" (the same panel under a tab strip, one tab per opened document, a card as a tab too) and "split" (two panes over the whole board, a link in the left pane opening its target in the right). Both critics ranked wiki first and split last, and both asked for a combination: wiki's shape with the split's side-by-side only as a wide state. The builders made it: "hybrid" is the wiki variant as it is, with its Wide state holding two panes once a link is followed while wide (the source at the left with the followed link marked, the target at the right, Swap and One pane), Narrow returning to the docked slot, and the back arrow naming its target ("‹ roadmap") instead of a bare glyph.
+
+You see four labelled sheets, one per variant: wiki, tabs, split, hybrid. Each sheet shows the roadmap open in dark and in light, the plan opened from the roadmap's link, the state after going back, the peek on hover, the editor, the saved line, the refusal in light, the view at its widest, the New document form, a card opened over the document, six documents open, the roadmap at 1920, and the phone at 390 with the roadmap, the plan and the editor. The hybrid's sheet adds its two-pane Wide state at 1440 and at 1920.
+
+The rules: the chat stays visible and usable while a document is open, because copy and paste between the document and the chat is the point. Normal states whisper, exceptional states speak. The order of loudness is fixed: the pulse sentence, then the amber Needs you column, then the chat. A member must go from the roadmap to a plan and back with one obvious act and land where they left, must read comfortably, must see at once whether they are reading or editing and that a save is a commit. It must not look like an IDE. Nothing is shown twice.
+
+Answer as JSON only:
+{
+  "ranking": [ {"variant": "wiki|tabs|split|hybrid", "score": 0-10, "why": "two sentences"}, ... all four, best first ],
+  "hybrid_vs_wiki": "does the hybrid beat wiki alone, and what does the two-pane Wide gain or cost, one paragraph",
+  "named_arrows": "does the arrow naming its target ('‹ roadmap') read better than the bare glyph, or add noise, one paragraph",
+  "craft": [ {"variant": "...", "where": "screenshot name", "what": "one sentence", "severity": "high|medium|low"} ],
+  "verdict": "which variant should become the console, one paragraph"
+}

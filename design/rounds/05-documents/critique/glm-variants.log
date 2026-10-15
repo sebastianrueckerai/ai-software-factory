@@ -1,0 +1,46 @@
+```json
+{
+  "ranking": [
+    {"variant": "wiki", "score": 9, "why": "It honors the copy-paste-to-chat workflow by keeping the board visible, uses universal back/forward navigation that requires zero explanation, and reads as a sleek document viewer rather than an IDE."},
+    {"variant": "tabs", "score": 6, "why": "Multiple tabs provide parallel access but risk clutter and resemble an IDE; returning to a previous document requires scanning a tab strip rather than one obvious backward act."},
+    {"variant": "split", "score": 3, "why": "Covering the entire board breaks the primary workflow of copying between document and chat, and the 'Needs you' strip cannot compensate for losing the conversation context."}
+  ],
+  "moving": {
+    "wiki": "The back arrow reads as 'return' without explanation, and the Recent menu holds ten or more documents without breaking the mental model.",
+    "tabs": "Returning requires identifying and clicking the previous tab among potentially many, which fails the 'one obvious act' test when more than three documents are open.",
+    "split": "Navigation relies on clicking links in the left pane, which replaces the right pane's content and discards the previous reading position, failing to 'land where they left'."
+  },
+  "board": {
+    "wiki": "Roughly sixty percent of the board remains visible with the amber Needs you column and chat fully accessible beside the docked panel.",
+    "tabs": "Identical to wiki in board coverage, though tab height at the panel's top marginally reduces document vertical space.",
+    "split": "The board is entirely obscured except for a single-line 'Needs you' strip, making the chat inaccessible without closing the project screen."
+  },
+  "reading": {
+    "wiki": "The seventy-character measure creates a comfortable column at 1440 and remains well-proportioned at 1920 without excessive line length.",
+    "tabs": "Reading comfort matches wiki, though the tab strip above the document adds visual weight that competes with the content area.",
+    "split": "At 1920 the right pane becomes excessively wide for comfortable eye tracking, forcing the reader to traverse wasted horizontal space."
+  },
+  "editing": {
+    "wiki": "The Read | Edit toggle and 'Save as commit' button clearly signal state and action semantics, while the refusal dialog in light mode correctly shouts over the normal reading whisper.",
+    "tabs": "Editing controls are identical and clear, but the presence of multiple tabs risks the user losing which document is currently being edited.",
+    "split": "Editor functionality is present but disconnected from the chat context, undermining the edit-then-paste workflow that defines the screen's purpose."
+  },
+  "phone": {
+    "wiki": "The 390px view gracefully collapses to full-screen document with a persistent header for navigation, maintaining readability and the commit-save model.",
+    "tabs": "Tab labels truncate aggressively at 390px, making document identification difficult and the interface feel cramped compared to wiki's cleaner header.",
+    "split": "The two-pane layout forces unacceptable compromises on phone, either stacking panes (losing the split benefit) or rendering them too narrow to read."
+  },
+  "craft": [
+    {"variant": "wiki", "where": "saved-dark-1440", "what": "The saved confirmation line is too subtle against the dark background and could be missed, risking duplicate commits.", "severity": "medium"},
+    {"variant": "tabs", "where": "card-dark-1440", "what": "The card-as-tab metaphor breaks down when the card content is taller than the tab strip, creating an awkward overflow or thumbnail that obscures the tab label.", "severity": "high"},
+    {"variant": "split", "where": "six-dark-1440", "what": "The 'Needs you' strip uses insufficient contrast and positioning to alert the user to blocked tasks when the board is covered.", "severity": "high"}
+  ],
+  "keep": [
+    "The wiki's back/forward arrow pair with Recent dropdown, which provides flawless linear navigation without the cognitive load of tab management.",
+    "The wiki's three-pin system for holding roadmap, plan, and architecture simultaneously while keeping the main slot free for exploration.",
+    "The refusal state's high-visibility treatment in light mode (refused-light-1440), which correctly prioritizes the exceptional error over normal reading."
+  ],
+  "hybrid": "A wiki-tabs hybrid could theoretically combine wiki's history navigation with tabs' persistence, but it would introduce the very complexity wiki avoids; the better combination is wiki's shape with the split's 'link opens in adjacent pane' behavior only when the screen exceeds 1600px width, allowing power users to reference two documents side-by-side on large monitors while preserving the docked panel and chat visibility on standard laptops.",
+  "verdict": "The wiki variant should become the console because it alone respects the hierarchy of attention—keeping the pulse sentence and Needs you column prominent while letting the document whisper—preserves the chat for the critical copy-paste workflow, and provides the single most intuitive navigation model (back/forward) for non-technical visitors who expect web-standard browsing behavior rather than IDE patterns."
+}
+```

@@ -1,0 +1,32 @@
+You judge eight design directions for one screen: the project screen of an AI software factory console, in its fixed "Mission control" design. You see two contact sheets, the dark theme and the light theme, four directions per row, labelled 01-wiki-drawer, 02-tabs, 03-reader, 04-split, 05-docs-page, 06-chat-pane, 07-peek, 08-tree-rail. Judge each direction across both themes.
+
+The problem: the project's documents (a roadmap, plans, an architecture, all Markdown in the project's git repository, linked to each other) must be read and lightly edited inside this screen. The member reads the roadmap, follows a link to a plan, comes back, jots a few lines or a new file, saves it as one git commit, and copies text between the document and the chat. Until now the member did this in an editor and in Forgejo's pages, in other tabs, which breaks the flow. The directions each propose where a document opens and how the member moves between linked documents: in the drawer with history and pins, in tabs, in a wide reading pane, in a split, on a page of its own, inside the chat column, through hover peeks, or with a file tree.
+
+The shell is fixed and not under judgement: the top bar, the pulse band with its amber sentence and the instrument strip, the chat at 40 percent on the left with its thread table, the board at 60 percent on the right with four columns of which "Needs you" is lit amber. One rule every direction must keep: the chat stays visible and usable while a document is open, because copy and paste between the document and the chat is the point. What the directions vary, and what you judge:
+
+1. Moving: can a member go from the roadmap to a plan and back with one obvious act, and land where they left? Does the way back read without being explained?
+2. The chat: does it stay visible and usable, at a width where a member can still type and read it?
+3. The board: how much of it is lost while reading, and does the Needs you column stay visible or one glance away?
+4. Reading: is the document a comfortable read, rendered text at a sane measure in the console's type, not code and not a cramped column?
+5. Editing: does the Read | Edit switch read at once, and does "Save as commit" read as a commit to git, not a form?
+6. Scale: does the direction hold ten open documents without a tab strip, or does it need one, and is that honest?
+7. The order of loudness: pulse first, the amber Needs you column second, the chat third. Does the new part shout?
+8. Fit with the Mission control idiom: thin-bordered instrument panels, mono figures, cyan as the system colour, amber as the one signal that needs a person, calm and exact. Does the document view look like it was always there, and does it look like an IDE (bad)?
+9. The phone: can the direction become one column at 390 px wide without a second horizontal scroll?
+10. Pages against the screen: a direction that leaves the project screen (05) must earn the trip. Does the page add something the screen cannot hold, or does it just take the member away from the board?
+
+Ignore rendering flaws of the image model: garbled letters, duplicated words, a wrong count. Judge the layout idea, the hierarchy and the fit.
+
+Answer in JSON only, no prose around it:
+{
+  "ranking": [ {"direction": "01-wiki-drawer", "score": 0-10, "why": "two sentences"} , ... all eight, best first ],
+  "carry": ["three direction slugs to build as prototypes, with one sentence each on what the prototype must prove"],
+  "drop": ["the five dropped, one short reason each"],
+  "hybrids": ["at most two combinations of two directions that would beat either alone, by slugs, one sentence each"],
+  "chat_risks": ["where a direction makes the chat too narrow or hides it, by slug"],
+  "board_risks": ["where a direction hides the Needs you column with no glance back, by slug"],
+  "phone_risks": ["where the direction cannot become one column at 390, by slug"],
+  "moving": "which direction moves between linked documents best, and why, one paragraph",
+  "editing": "which treatment of Read | Edit and Save as commit reads best, and why, one paragraph",
+  "notes": "anything the directions all miss, one paragraph"
+}

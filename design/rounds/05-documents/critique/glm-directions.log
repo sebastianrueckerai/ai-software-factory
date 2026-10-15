@@ -1,0 +1,68 @@
+```json
+{
+  "ranking": [
+    {
+      "direction": "01-wiki-drawer",
+      "score": 9,
+      "why": "Preserves the full chat width and keeps the board underneath (or peekable) while offering a wide, comfortable reading pane that slides away to restore the full mission control view. The drawer metaphor fits the industrial idiom as a pull-out instrument panel, handling multiple documents via history and pins without cluttering the main stage."
+    },
+    {
+      "direction": "04-split",
+      "score": 7,
+      "why": "Enables the critical reference workflow of viewing a board card alongside its linked document, satisfying the copy-paste requirement without mode-switching. However, it permanently cramps the board to roughly thirty percent width, risking 'Needs you' usability, and it struggles to fit ten open documents without a tab strip."
+    },
+    {
+      "direction": "08-tree-rail",
+      "score": 6,
+      "why": "Provides excellent scalability for navigating a repository of many files through an always-visible tree, making it easy to jump between roadmap, plan, and architecture. Yet it consumes valuable horizontal real estate that squeezes either the document reading measure or the board, and on mobile it collapses into a complex stacking problem."
+    },
+    {
+      "direction": "02-tabs",
+      "score": 5,
+      "why": "Offers a familiar paradigm for managing multiple open documents, but risks either hiding the board entirely when a document tab is active (breaking 'Needs you' glanceability) or creating a cramped sub-layout where tabs, board, and document fight for space. It tends toward an IDE aesthetic that fights the calm instrument-panel idiom."
+    },
+    {
+      "direction": "03-reader",
+      "score": 5,
+      "why": "Delivers the most comfortable reading experience with generous measure and typography, treating the document as a first-class citizen. However, it dominates the visual hierarchy, shouting louder than the amber pulse band or the Needs you column, and typically obscures the chat or board, breaking the mission-control context."
+    },
+    {
+      "direction": "07-peek",
+      "score": 4,
+      "why": "Excels at quick, low-cost glances into linked documents without losing place, perfect for verifying a reference. It fails completely at the required editing workflow—jotting lines, saving commits, and sustained reading—as a peek is inherently transient and too small for text entry or rendered Markdown review."
+    },
+    {
+      "direction": "06-chat-pane",
+      "score": 2,
+      "why": "Placing the document inside the forty-percent chat column destroys the chat's usability, crushing it to a narrow sliver or hiding it entirely, which directly contradicts the core requirement that chat remain visible for copy-paste. It forces the document into a cramped vertical column unsuitable for reading or editing."
+    },
+    {
+      "direction": "05-docs-page",
+      "score": 1,
+      "why": "Navigating away from the mission control screen abandons the real-time context of the chat, the pulse band, and the board, forcing the member to switch tabs and breaking the flow. It earns no justification because the screen can hold a document view (as other directions prove), making the trip pure friction."
+    }
+  ],
+  "carry": [
+    "01-wiki-drawer: Prove that a slide-out panel can host full read-edit-save workflows while keeping the board accessible via a peek-edge or translucent overlay, and that the back-history feels like browser navigation.",
+    "04-split: Prove that the board remains functional at roughly 35% width (with document at 25%) or that the split intelligently collapses on smaller screens, and that the 'Needs you' amber signal survives the compression.",
+    "08-tree-rail: Prove that a narrow, icon-only tree rail (expanding on hover) can coexist with the document view without stealing focus from the mission control instruments, and that it scales to fifty files without scrolling madness."
+  ],
+  "drop": [
+    "05-docs-page: Leaves the mission control context entirely, solving the problem by abandoning the constraints.",
+    "06-chat-pane: Destroys the chat's usable width, violating the primary invariant that chat must remain visible for copy-paste.",
+    "03-reader: Overpowers the visual hierarchy with an immersive reading mode that hides the board and chat, feeling like a different application.",
+    "07-peek: Insufficient surface area for the editing and commit workflow; it is a feature, not a container.",
+    "02-tabs: Tends toward IDE-like clutter and either hides the board or cramps it beyond usefulness when documents are open."
+  ],
+  "hybrids": [
+    "01-wiki-drawer + 07-peek: Combine the drawer's full editing environment with hover-peeks on links so members can preview targets without navigating away from their current document position, then decide to open or dismiss.",
+    "04-split + 08-tree-rail: Use the split layout for board+document coexistence, but add a collapsible tree rail that slides out from the document pane's edge only when needed to switch files, preserving horizontal space when reading."
+  ],
+  "chat_risks": ["06-chat-pane", "03-reader"],
+  "board_risks": ["01-wiki-drawer", "02-tabs", "03-reader", "05-docs-page"],
+  "phone_risks": ["04-split", "08-tree-rail", "02-tabs"],
+  "moving": "The 01-wiki-drawer moves between linked documents best because it implements a web-like history stack within the drawer—clicking a link pushes the new document onto the stack with a smooth transition, and a prominent back button (or gesture) returns to the previous document and scroll position instantly. This mimics the familiar browser pattern members already use for documentation, while pins allow keeping the roadmap persistent even when drilling into plans. Unlike tabs, it doesn't flatten the hierarchy; unlike the split, it doesn't force constant resizing; and unlike the page, it never leaves the chat context, allowing the member to follow a link from the roadmap to the plan, read it, and pop back to their exact line in the roadmap with one obvious act.",
+  "editing": "The 01-wiki-drawer treats Read | Edit and Save as commit best by placing these controls in a thin, persistent instrument bar at the top of the document pane, using the console's monospace figures and cyan/amber palette. The Read | Edit toggle should be a segmented control that visually 'unlocks' the text area (changing border color from cyan to amber to indicate dirty state), and 'Save as commit' should read as a primary action button with a git branch indicator—not a form submit—making it clear this writes to the repository. The drawer's contained scope makes these controls feel like part of the document's control panel, fitting the mission control idiom better than a floating toolbar or a page-level header, and the commit action sits logically next to the file path and branch name as part of the document's identity.",
+  "notes": "All directions miss the explicit visual connection between the board card (e.g., #612) and the currently open document—showing which card linked to this file and whether the document's changes satisfy the card's requirements. They also largely ignore the git status integration: showing whether the viewed document has uncommitted edits, differs from main, or is the target of the current pull request, which is critical context for the member deciding whether to merge. Finally, none address how the document view handles images or diagrams embedded in the Markdown, which may need expansion beyond the text column or a lightbox that respects the dark/light theme."
+}
+```

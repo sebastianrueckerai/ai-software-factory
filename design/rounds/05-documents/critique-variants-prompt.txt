@@ -1,0 +1,19 @@
+You are an independent design critic judging three BUILT prototypes of the project screen of an AI software factory console. Each prototype lets a member read and lightly edit the project's documents (Markdown files in the project's git repository: a roadmap, plans, an architecture, linked to each other) inside the screen, and move between linked documents, without leaving the chat. The three prototypes differ in the shape only: "wiki" holds one document in a panel docked at the right edge over the board, with back and forward arrows, a Recent menu and three pins, and links open in place; "tabs" holds the documents in the same docked panel under a tab strip, one tab per opened document, a card as a tab too, and a link opens a new tab; "split" takes the board's full width with two panes side by side, a link in the left pane opens its target in the right pane, with a one-line "Needs you" strip since the board is covered. All three share the rendered document at a 70-character measure, the Read | Edit switch, the editor with "Save as commit", the refusal when the file changed under the member, the New document form, the hover peek on a link, and the phone layout.
+
+You see, for each prototype in turn, labelled screenshots: the roadmap open in dark and in light, the plan opened from the roadmap's link, the state after going back, the peek on hover, the editor, the saved line after a save, the refusal in light, the view at its widest, the New document form, a card opened over the document, the roadmap at 1920 wide, and the phone at 390 wide with the roadmap, the plan and the editor.
+
+The brief: a tool a member uses to steer a software project that agents build, and a screen a non-technical visitor finds slick and professional. The chat stays visible and usable while a document is open, because copy and paste between the document and the chat is the point. Normal states whisper, exceptional states speak: reading is a normal state, a refused save is the exceptional one. The order of loudness is fixed: the pulse sentence first, the amber Needs you column second, the chat third. Nothing new may outrank them. A member must go from the roadmap to a plan and back with one obvious act and land where they left, must read comfortably, must see at once whether they are reading or editing and that a save is a commit, and must find a new document's entry point. It must not look like an IDE.
+
+Answer as JSON only:
+{
+  "ranking": [ {"variant": "wiki|tabs|split", "score": 0-10, "why": "two sentences"}, ... all three, best first ],
+  "moving": {"wiki": "does the way back read without explanation, and does it hold at ten documents? one sentence", "tabs": "...", "split": "..."},
+  "board": {"wiki": "how much of the board is lost, and is Needs you one glance away? one sentence", "tabs": "...", "split": "..."},
+  "reading": {"wiki": "is the document a comfortable read at 1440 and at 1920? one sentence", "tabs": "...", "split": "..."},
+  "editing": {"wiki": "do Read | Edit, Save as commit and the refusal read right? one sentence", "tabs": "...", "split": "..."},
+  "phone": {"wiki": "one sentence on the 390 shots", "tabs": "...", "split": "..."},
+  "craft": [ {"variant": "...", "where": "screenshot name", "what": "one sentence", "severity": "high|medium|low"} ],
+  "keep": ["the three best things across the prototypes, one sentence each, naming the variant"],
+  "hybrid": "if a combination of two shapes would beat the best one, say which and why, one paragraph; else say none",
+  "verdict": "which variant should become the console, one paragraph"
+}

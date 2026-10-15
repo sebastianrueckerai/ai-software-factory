@@ -1,0 +1,462 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Round 05: the documents in the screen</title>
+<style>
+body{font:15px/1.5 system-ui,sans-serif;margin:0;padding:24px 28px;background:#f4f4f2;color:#111;max-width:1700px}
+h1{margin:0 0 4px} h2{margin:28px 0 8px;font-size:20px} .meta{color:#666} a{color:#0a5c7a}
+section.variant{background:#fff;padding:16px 18px;border-radius:6px;margin:16px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:14px;align-items:start}
+figure{margin:0} figure img{width:100%;display:block;border:1px solid #ddd;background:#111} figcaption{font-size:12.5px;color:#555;margin-top:4px}
+figure.phone{max-width:260px} .dirs{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px}
+.dirs figure{display:grid;grid-template-columns:1fr 1fr;gap:4px} .dirs figcaption{grid-column:1/3}
+table{border-collapse:collapse;font-size:13.5px;background:#fff} td,th{border:1px solid #ddd;padding:4px 8px;vertical-align:top;text-align:left}
+pre{white-space:pre-wrap;font-size:12px;background:#f7f7f7;padding:8px} details{margin:8px 0} .all a{margin-right:8px}
+.rec{background:#fff;padding:16px 18px;border-radius:6px;border-left:4px solid #0a5c7a}
+</style>
+<h1>Round 05: the documents in the screen</h1>
+<p class="meta"><a href="brief.md">the brief</a> · <a href="notes.md">the notes</a> · <a href="../../../docs/plans/2026-10-15-backlog-pull-and-close-out.md">the backlog plan</a> · <a href="BUILDER.md">the builder's brief</a> · <a href="../../PICKS.md">PICKS.md</a> · cost of the round ~$2.58</p>
+<h2>The recommendation</h2>
+<div class="rec"><p>**D. Hybrid: the wiki, with the split&#x27;s two panes as its Wide state, and the back arrow naming its target.** Both critics ranked it first in the second loop (Gemini 9, GLM 9) over the wiki alone (8, 8), and both had asked for exactly this combination after the first loop, as had the split&#x27;s own builder. The director agrees. [Open it live](hybrid/index.html?scenario=busy&amp;doc=docs/roadmap.md&amp;theme=dark).</p><p>What it is: one document in the drawer&#x27;s slot at the right edge over the board, the chat never covered, the Needs you column still visible at the slot&#x27;s left. Links open in place. &quot;‹ roadmap&quot; goes back and lands at the old scroll, and the browser&#x27;s own back is the same step. Recent holds the last six documents, three pins hold the files you keep returning to. Read | Edit, a plain text area with the browser&#x27;s spellcheck, Save as commit with the commit named in a quiet line, the refusal in amber when the file changed under you, with &quot;show theirs&quot;. New document from the head. Wide covers the board, and the first link followed while wide opens beside its source with the link marked, Swap and One pane; Narrow returns to the slot. The phone shows one pane full screen.</p><p>What it costs: the Wide state has two shapes, one centred document and then two panes once a link is followed, which is one more thing to learn; and at 1440 the two panes are 427 px each, about 58 characters a line, comfortable at 1920 (70 characters) and tight at 1440. Narrow is one click.</p><p>The runner-up is A. Wiki alone, both critics&#x27; 8 and their first pick of the first loop. B. Tabs is out: both critics call the strip an IDE look and a card as a tab a confusion of the model, and its builder&#x27;s own answer is that the strip is honest to four tabs at 46 percent of the width. C. Split is out: it covers the board whole, and its builder&#x27;s answer was that it belongs as the wiki&#x27;s Wide state, which the hybrid is.</p><p>For the implementation, not design questions: the body text at the chat&#x27;s 14.5 px rather than the base&#x27;s 13 px, since the wiki&#x27;s builder found 13 px small on the phone for a long read; the &quot;Documents&quot; button in the board head that every builder had to add so a closed document can be reopened; the second pane from 1200 px up only, since between 900 and 1199 px the panes fall to 265 to 355 px; and the check&#x27;s contrast parser, fixed this round for `color(srgb …)` values.</p></div>
+<h2>The variants</h2>
+<p>Three shapes built on the instrument prototype of round 02, and a hybrid if the critics asked for one. Every variant shares the document engine (docs.js: the real documents of this repository, shortened, with their real links), the rendered document at a 70-character measure, the Read | Edit switch, the editor with Save as commit, the refusal when the file changed under the member, New document, the peek on hover and the phone layout. Open a variant live and click: the roadmap's links, the way back, Edit, Save, New document, a card. Add <code>&amp;conflict=1</code> to the URL to arm a refused save.</p>
+<section class="variant"><h2>A. Wiki</h2><p>One document in the drawer&#x27;s slot at the right edge over the board. Links open in place. Back and forward arrows, a Recent menu and three pins in the head. The browser&#x27;s back works too.</p><p class="all">open live: <a href="wiki/index.html?scenario=busy&amp;doc=docs/roadmap.md&amp;theme=dark">dark</a> <a href="wiki/index.html?scenario=busy&amp;doc=docs/roadmap.md&amp;theme=light">light</a></p><div class="grid"><figure class=""><a href="wiki/shots/roadmap-dark-1440.png"><img src="wiki/shots/roadmap-dark-1440.png" alt="Wiki: the roadmap, dark" loading="lazy"></a><figcaption>Wiki: the roadmap, dark</figcaption></figure><figure class=""><a href="wiki/shots/roadmap-light-1440.png"><img src="wiki/shots/roadmap-light-1440.png" alt="Wiki: the roadmap, light" loading="lazy"></a><figcaption>Wiki: the roadmap, light</figcaption></figure><figure class=""><a href="wiki/shots/plan-dark-1440.png"><img src="wiki/shots/plan-dark-1440.png" alt="Wiki: the plan opened from the roadmap&#x27;s link" loading="lazy"></a><figcaption>Wiki: the plan opened from the roadmap&#x27;s link</figcaption></figure><figure class=""><a href="wiki/shots/back-dark-1440.png"><img src="wiki/shots/back-dark-1440.png" alt="Wiki: after going back" loading="lazy"></a><figcaption>Wiki: after going back</figcaption></figure><figure class=""><a href="wiki/shots/hover-dark-1440.png"><img src="wiki/shots/hover-dark-1440.png" alt="Wiki: the peek on hover" loading="lazy"></a><figcaption>Wiki: the peek on hover</figcaption></figure><figure class=""><a href="wiki/shots/edit-dark-1440.png"><img src="wiki/shots/edit-dark-1440.png" alt="Wiki: the editor" loading="lazy"></a><figcaption>Wiki: the editor</figcaption></figure><figure class=""><a href="wiki/shots/saved-dark-1440.png"><img src="wiki/shots/saved-dark-1440.png" alt="Wiki: after a save" loading="lazy"></a><figcaption>Wiki: after a save</figcaption></figure><figure class=""><a href="wiki/shots/refused-light-1440.png"><img src="wiki/shots/refused-light-1440.png" alt="Wiki: a refused save, light" loading="lazy"></a><figcaption>Wiki: a refused save, light</figcaption></figure><figure class=""><a href="wiki/shots/wide-dark-1440.png"><img src="wiki/shots/wide-dark-1440.png" alt="Wiki: the view at its widest" loading="lazy"></a><figcaption>Wiki: the view at its widest</figcaption></figure><figure class=""><a href="wiki/shots/new-light-1440.png"><img src="wiki/shots/new-light-1440.png" alt="Wiki: New document, light" loading="lazy"></a><figcaption>Wiki: New document, light</figcaption></figure><figure class=""><a href="wiki/shots/card-dark-1440.png"><img src="wiki/shots/card-dark-1440.png" alt="Wiki: a card opened over the document" loading="lazy"></a><figcaption>Wiki: a card opened over the document</figcaption></figure><figure class=""><a href="wiki/shots/six-dark-1440.png"><img src="wiki/shots/six-dark-1440.png" alt="Wiki: six documents open" loading="lazy"></a><figcaption>Wiki: six documents open</figcaption></figure><figure class=""><a href="wiki/shots/roadmap-dark-1920.png"><img src="wiki/shots/roadmap-dark-1920.png" alt="Wiki: the roadmap at 1920" loading="lazy"></a><figcaption>Wiki: the roadmap at 1920</figcaption></figure><figure class="phone"><a href="wiki/shots/phone-roadmap-dark-390.png"><img src="wiki/shots/phone-roadmap-dark-390.png" alt="Wiki: the roadmap on the phone" loading="lazy"></a><figcaption>Wiki: the roadmap on the phone</figcaption></figure><figure class="phone"><a href="wiki/shots/phone-plan-light-390.png"><img src="wiki/shots/phone-plan-light-390.png" alt="Wiki: the plan on the phone, light" loading="lazy"></a><figcaption>Wiki: the plan on the phone, light</figcaption></figure><figure class="phone"><a href="wiki/shots/phone-edit-dark-390.png"><img src="wiki/shots/phone-edit-dark-390.png" alt="Wiki: the editor on the phone" loading="lazy"></a><figcaption>Wiki: the editor on the phone</figcaption></figure></div></section><section class="variant"><h2>B. Tabs</h2><p>The same slot under a tab strip: one tab per opened document, a card as a tab too, a link opens a new tab. Beyond what fits, the rest fold into a menu.</p><p class="all">open live: <a href="tabs/index.html?scenario=busy&amp;doc=docs/roadmap.md&amp;theme=dark">dark</a> <a href="tabs/index.html?scenario=busy&amp;doc=docs/roadmap.md&amp;theme=light">light</a></p><div class="grid"><figure class=""><a href="tabs/shots/roadmap-dark-1440.png"><img src="tabs/shots/roadmap-dark-1440.png" alt="Tabs: the roadmap, dark" loading="lazy"></a><figcaption>Tabs: the roadmap, dark</figcaption></figure><figure class=""><a href="tabs/shots/roadmap-light-1440.png"><img src="tabs/shots/roadmap-light-1440.png" alt="Tabs: the roadmap, light" loading="lazy"></a><figcaption>Tabs: the roadmap, light</figcaption></figure><figure class=""><a href="tabs/shots/plan-dark-1440.png"><img src="tabs/shots/plan-dark-1440.png" alt="Tabs: the plan opened from the roadmap&#x27;s link" loading="lazy"></a><figcaption>Tabs: the plan opened from the roadmap&#x27;s link</figcaption></figure><figure class=""><a href="tabs/shots/back-dark-1440.png"><img src="tabs/shots/back-dark-1440.png" alt="Tabs: after going back" loading="lazy"></a><figcaption>Tabs: after going back</figcaption></figure><figure class=""><a href="tabs/shots/hover-dark-1440.png"><img src="tabs/shots/hover-dark-1440.png" alt="Tabs: the peek on hover" loading="lazy"></a><figcaption>Tabs: the peek on hover</figcaption></figure><figure class=""><a href="tabs/shots/edit-dark-1440.png"><img src="tabs/shots/edit-dark-1440.png" alt="Tabs: the editor" loading="lazy"></a><figcaption>Tabs: the editor</figcaption></figure><figure class=""><a href="tabs/shots/saved-dark-1440.png"><img src="tabs/shots/saved-dark-1440.png" alt="Tabs: after a save" loading="lazy"></a><figcaption>Tabs: after a save</figcaption></figure><figure class=""><a href="tabs/shots/refused-light-1440.png"><img src="tabs/shots/refused-light-1440.png" alt="Tabs: a refused save, light" loading="lazy"></a><figcaption>Tabs: a refused save, light</figcaption></figure><figure class=""><a href="tabs/shots/wide-dark-1440.png"><img src="tabs/shots/wide-dark-1440.png" alt="Tabs: the view at its widest" loading="lazy"></a><figcaption>Tabs: the view at its widest</figcaption></figure><figure class=""><a href="tabs/shots/new-light-1440.png"><img src="tabs/shots/new-light-1440.png" alt="Tabs: New document, light" loading="lazy"></a><figcaption>Tabs: New document, light</figcaption></figure><figure class=""><a href="tabs/shots/card-dark-1440.png"><img src="tabs/shots/card-dark-1440.png" alt="Tabs: a card opened over the document" loading="lazy"></a><figcaption>Tabs: a card opened over the document</figcaption></figure><figure class=""><a href="tabs/shots/six-dark-1440.png"><img src="tabs/shots/six-dark-1440.png" alt="Tabs: six documents open" loading="lazy"></a><figcaption>Tabs: six documents open</figcaption></figure><figure class=""><a href="tabs/shots/roadmap-dark-1920.png"><img src="tabs/shots/roadmap-dark-1920.png" alt="Tabs: the roadmap at 1920" loading="lazy"></a><figcaption>Tabs: the roadmap at 1920</figcaption></figure><figure class="phone"><a href="tabs/shots/phone-roadmap-dark-390.png"><img src="tabs/shots/phone-roadmap-dark-390.png" alt="Tabs: the roadmap on the phone" loading="lazy"></a><figcaption>Tabs: the roadmap on the phone</figcaption></figure><figure class="phone"><a href="tabs/shots/phone-plan-light-390.png"><img src="tabs/shots/phone-plan-light-390.png" alt="Tabs: the plan on the phone, light" loading="lazy"></a><figcaption>Tabs: the plan on the phone, light</figcaption></figure><figure class="phone"><a href="tabs/shots/phone-edit-dark-390.png"><img src="tabs/shots/phone-edit-dark-390.png" alt="Tabs: the editor on the phone" loading="lazy"></a><figcaption>Tabs: the editor on the phone</figcaption></figure></div></section><section class="variant"><h2>C. Split</h2><p>Two panes over the whole board: a link in the left pane opens its target in the right. Swap, One pane, and a one-line Needs you strip since the board is covered.</p><p class="all">open live: <a href="split/index.html?scenario=busy&amp;doc=docs/roadmap.md&amp;theme=dark">dark</a> <a href="split/index.html?scenario=busy&amp;doc=docs/roadmap.md&amp;theme=light">light</a></p><div class="grid"><figure class=""><a href="split/shots/roadmap-dark-1440.png"><img src="split/shots/roadmap-dark-1440.png" alt="Split: the roadmap, dark" loading="lazy"></a><figcaption>Split: the roadmap, dark</figcaption></figure><figure class=""><a href="split/shots/roadmap-light-1440.png"><img src="split/shots/roadmap-light-1440.png" alt="Split: the roadmap, light" loading="lazy"></a><figcaption>Split: the roadmap, light</figcaption></figure><figure class=""><a href="split/shots/plan-dark-1440.png"><img src="split/shots/plan-dark-1440.png" alt="Split: the plan opened from the roadmap&#x27;s link" loading="lazy"></a><figcaption>Split: the plan opened from the roadmap&#x27;s link</figcaption></figure><figure class=""><a href="split/shots/back-dark-1440.png"><img src="split/shots/back-dark-1440.png" alt="Split: after going back" loading="lazy"></a><figcaption>Split: after going back</figcaption></figure><figure class=""><a href="split/shots/hover-dark-1440.png"><img src="split/shots/hover-dark-1440.png" alt="Split: the peek on hover" loading="lazy"></a><figcaption>Split: the peek on hover</figcaption></figure><figure class=""><a href="split/shots/edit-dark-1440.png"><img src="split/shots/edit-dark-1440.png" alt="Split: the editor" loading="lazy"></a><figcaption>Split: the editor</figcaption></figure><figure class=""><a href="split/shots/saved-dark-1440.png"><img src="split/shots/saved-dark-1440.png" alt="Split: after a save" loading="lazy"></a><figcaption>Split: after a save</figcaption></figure><figure class=""><a href="split/shots/refused-light-1440.png"><img src="split/shots/refused-light-1440.png" alt="Split: a refused save, light" loading="lazy"></a><figcaption>Split: a refused save, light</figcaption></figure><figure class=""><a href="split/shots/wide-dark-1440.png"><img src="split/shots/wide-dark-1440.png" alt="Split: the view at its widest" loading="lazy"></a><figcaption>Split: the view at its widest</figcaption></figure><figure class=""><a href="split/shots/new-light-1440.png"><img src="split/shots/new-light-1440.png" alt="Split: New document, light" loading="lazy"></a><figcaption>Split: New document, light</figcaption></figure><figure class=""><a href="split/shots/card-dark-1440.png"><img src="split/shots/card-dark-1440.png" alt="Split: a card opened over the document" loading="lazy"></a><figcaption>Split: a card opened over the document</figcaption></figure><figure class=""><a href="split/shots/six-dark-1440.png"><img src="split/shots/six-dark-1440.png" alt="Split: six documents open" loading="lazy"></a><figcaption>Split: six documents open</figcaption></figure><figure class=""><a href="split/shots/roadmap-dark-1920.png"><img src="split/shots/roadmap-dark-1920.png" alt="Split: the roadmap at 1920" loading="lazy"></a><figcaption>Split: the roadmap at 1920</figcaption></figure><figure class="phone"><a href="split/shots/phone-roadmap-dark-390.png"><img src="split/shots/phone-roadmap-dark-390.png" alt="Split: the roadmap on the phone" loading="lazy"></a><figcaption>Split: the roadmap on the phone</figcaption></figure><figure class="phone"><a href="split/shots/phone-plan-light-390.png"><img src="split/shots/phone-plan-light-390.png" alt="Split: the plan on the phone, light" loading="lazy"></a><figcaption>Split: the plan on the phone, light</figcaption></figure><figure class="phone"><a href="split/shots/phone-edit-dark-390.png"><img src="split/shots/phone-edit-dark-390.png" alt="Split: the editor on the phone" loading="lazy"></a><figcaption>Split: the editor on the phone</figcaption></figure></div></section><section class="variant"><h2>D. Hybrid</h2><p>The combination both critics and the split&#x27;s builder asked for after the first loop: the wiki as it is, with the split&#x27;s two panes as its Wide state once a link is followed while wide, and the back arrow naming its target.</p><p class="all">open live: <a href="hybrid/index.html?scenario=busy&amp;doc=docs/roadmap.md&amp;theme=dark">dark</a> <a href="hybrid/index.html?scenario=busy&amp;doc=docs/roadmap.md&amp;theme=light">light</a></p><div class="grid"><figure class=""><a href="hybrid/shots/roadmap-dark-1440.png"><img src="hybrid/shots/roadmap-dark-1440.png" alt="Hybrid: the roadmap, dark" loading="lazy"></a><figcaption>Hybrid: the roadmap, dark</figcaption></figure><figure class=""><a href="hybrid/shots/roadmap-light-1440.png"><img src="hybrid/shots/roadmap-light-1440.png" alt="Hybrid: the roadmap, light" loading="lazy"></a><figcaption>Hybrid: the roadmap, light</figcaption></figure><figure class=""><a href="hybrid/shots/plan-dark-1440.png"><img src="hybrid/shots/plan-dark-1440.png" alt="Hybrid: the plan opened from the roadmap&#x27;s link" loading="lazy"></a><figcaption>Hybrid: the plan opened from the roadmap&#x27;s link</figcaption></figure><figure class=""><a href="hybrid/shots/back-dark-1440.png"><img src="hybrid/shots/back-dark-1440.png" alt="Hybrid: after going back" loading="lazy"></a><figcaption>Hybrid: after going back</figcaption></figure><figure class=""><a href="hybrid/shots/hover-dark-1440.png"><img src="hybrid/shots/hover-dark-1440.png" alt="Hybrid: the peek on hover" loading="lazy"></a><figcaption>Hybrid: the peek on hover</figcaption></figure><figure class=""><a href="hybrid/shots/edit-dark-1440.png"><img src="hybrid/shots/edit-dark-1440.png" alt="Hybrid: the editor" loading="lazy"></a><figcaption>Hybrid: the editor</figcaption></figure><figure class=""><a href="hybrid/shots/saved-dark-1440.png"><img src="hybrid/shots/saved-dark-1440.png" alt="Hybrid: after a save" loading="lazy"></a><figcaption>Hybrid: after a save</figcaption></figure><figure class=""><a href="hybrid/shots/refused-light-1440.png"><img src="hybrid/shots/refused-light-1440.png" alt="Hybrid: a refused save, light" loading="lazy"></a><figcaption>Hybrid: a refused save, light</figcaption></figure><figure class=""><a href="hybrid/shots/wide-dark-1440.png"><img src="hybrid/shots/wide-dark-1440.png" alt="Hybrid: the view at its widest" loading="lazy"></a><figcaption>Hybrid: the view at its widest</figcaption></figure><figure class=""><a href="hybrid/shots/new-light-1440.png"><img src="hybrid/shots/new-light-1440.png" alt="Hybrid: New document, light" loading="lazy"></a><figcaption>Hybrid: New document, light</figcaption></figure><figure class=""><a href="hybrid/shots/card-dark-1440.png"><img src="hybrid/shots/card-dark-1440.png" alt="Hybrid: a card opened over the document" loading="lazy"></a><figcaption>Hybrid: a card opened over the document</figcaption></figure><figure class=""><a href="hybrid/shots/six-dark-1440.png"><img src="hybrid/shots/six-dark-1440.png" alt="Hybrid: six documents open" loading="lazy"></a><figcaption>Hybrid: six documents open</figcaption></figure><figure class=""><a href="hybrid/shots/roadmap-dark-1920.png"><img src="hybrid/shots/roadmap-dark-1920.png" alt="Hybrid: the roadmap at 1920" loading="lazy"></a><figcaption>Hybrid: the roadmap at 1920</figcaption></figure><figure class="phone"><a href="hybrid/shots/phone-roadmap-dark-390.png"><img src="hybrid/shots/phone-roadmap-dark-390.png" alt="Hybrid: the roadmap on the phone" loading="lazy"></a><figcaption>Hybrid: the roadmap on the phone</figcaption></figure><figure class="phone"><a href="hybrid/shots/phone-plan-light-390.png"><img src="hybrid/shots/phone-plan-light-390.png" alt="Hybrid: the plan on the phone, light" loading="lazy"></a><figcaption>Hybrid: the plan on the phone, light</figcaption></figure><figure class="phone"><a href="hybrid/shots/phone-edit-dark-390.png"><img src="hybrid/shots/phone-edit-dark-390.png" alt="Hybrid: the editor on the phone" loading="lazy"></a><figcaption>Hybrid: the editor on the phone</figcaption></figure></div></section>
+<h2>The critics, the second loop</h2>
+<h3>Gemini 2.5 Pro</h3><table><tr><th>candidate</th><th>score</th><th>why</th></tr><tr><td>hybrid</td><td>9</td><td>It successfully integrates the feedback from the prior round, providing the focused wiki view by default and an optional, powerful split view. This design is versatile and respects all core constraints, making it the most capable and well-considered solution.</td></tr><tr><td>wiki</td><td>8</td><td>Its simple, single-panel approach is elegant and keeps the focus on the chat, perfectly embodying the &#x27;whisper&#x27; principle. While it lacks a side-by-side view, its clarity and minimalism make it a very strong standalone contender.</td></tr><tr><td>tabs</td><td>5</td><td>While familiar, the tabbed interface adds visual clutter and an &#x27;IDE-like&#x27; feel that contradicts the design goals. Managing several documents becomes cumbersome with truncated titles, detracting from the primary chat interaction.</td></tr><tr><td>split</td><td>2</td><td>The design fails a critical requirement by completely obscuring the chat and the rest of the console. This makes the primary workflow of referencing documents while using the chat impossible.</td></tr></table><details><summary>the whole answer</summary><pre>{
+ &quot;ranking&quot;: [
+  {
+   &quot;variant&quot;: &quot;hybrid&quot;,
+   &quot;score&quot;: 9,
+   &quot;why&quot;: &quot;It successfully integrates the feedback from the prior round, providing the focused wiki view by default and an optional, powerful split view. This design is versatile and respects all core constraints, making it the most capable and well-considered solution.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;wiki&quot;,
+   &quot;score&quot;: 8,
+   &quot;why&quot;: &quot;Its simple, single-panel approach is elegant and keeps the focus on the chat, perfectly embodying the &#x27;whisper&#x27; principle. While it lacks a side-by-side view, its clarity and minimalism make it a very strong standalone contender.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;tabs&quot;,
+   &quot;score&quot;: 5,
+   &quot;why&quot;: &quot;While familiar, the tabbed interface adds visual clutter and an &#x27;IDE-like&#x27; feel that contradicts the design goals. Managing several documents becomes cumbersome with truncated titles, detracting from the primary chat interaction.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;split&quot;,
+   &quot;score&quot;: 2,
+   &quot;why&quot;: &quot;The design fails a critical requirement by completely obscuring the chat and the rest of the console. This makes the primary workflow of referencing documents while using the chat impossible.&quot;
+  }
+ ],
+ &quot;hybrid_vs_wiki&quot;: &quot;The hybrid variant definitively beats the original wiki by treating it as a base and enhancing it. It retains the wiki&#x27;s elegant, docked panel as the default state, but adds a powerful, two-pane wide mode for users who need to compare documents. This significant gain in functionality for cross-referencing comes at no cost to the simple, default experience, as the complexity is contained within an optional state, making the hybrid a direct upgrade with no real drawbacks.&quot;,
+ &quot;named_arrows&quot;: &quot;The named back arrow, such as &#x27;\u2039 roadmap,&#x27; is a significant improvement over a bare glyph. It provides crucial context, telling the user exactly where the action will lead them, which greatly enhances predictability and reduces the risk of getting lost in a chain of documents. This small addition transforms the back button from a simple history-stack command into a meaningful navigational tool, adding clarity that far outweighs any potential &#x27;noise&#x27; or the minimal extra space it occupies.&quot;,
+ &quot;craft&quot;: [
+  {
+   &quot;variant&quot;: &quot;hybrid&quot;,
+   &quot;where&quot;: &quot;wide-dark-1440&quot;,
+   &quot;what&quot;: &quot;In the single-pane wide mode, the unconstrained line length makes the text very difficult to read comfortably.&quot;,
+   &quot;severity&quot;: &quot;high&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;tabs&quot;,
+   &quot;where&quot;: &quot;six-dark-1440&quot;,
+   &quot;what&quot;: &quot;With six documents open, the tab titles become heavily truncated and unusable, defeating the purpose of the tab interface.&quot;,
+   &quot;severity&quot;: &quot;high&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;hybrid&quot;,
+   &quot;where&quot;: &quot;hybrid-wide-two-dark-1440&quot;,
+   &quot;what&quot;: &quot;The &#x27;Swap&#x27; and &#x27;One pane&#x27; controls in the two-pane view are small and have low contrast, reducing their visibility and affordance.&quot;,
+   &quot;severity&quot;: &quot;medium&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;wiki&quot;,
+   &quot;where&quot;: &quot;card-dark-1440&quot;,
+   &quot;what&quot;: &quot;When a card appears over the document panel, its drop shadow is abruptly cut off by the edge of the screen, which looks unpolished.&quot;,
+   &quot;severity&quot;: &quot;low&quot;
+  }
+ ],
+ &quot;verdict&quot;: &quot;The hybrid variant should become the console&#x27;s document viewer. It successfully evolves the best design from the previous round based on critical feedback, creating a solution that is simple and focused in its default state but powerful when needed. It respects all of the established constraints, including the crucial visibility of the chat, and provides a superior, more flexible experience than any of the other options. With minor refinement to its wide mode&#x27;s typography and controls, it will be an excellent addition to the console.&quot;
+}</pre></details>
+<h3>GLM 5V Turbo</h3><table><tr><th>candidate</th><th>score</th><th>why</th></tr><tr><td>hybrid</td><td>9</td><td>It preserves wiki&#x27;s intimate docked posture for narrow screens while unlocking contextual side-by-side browsing only when width permits, satisfying the &#x27;chat must remain visible&#x27; rule in all states. The conditional two-pane mode adds genuine spatial memory for link-following without forcing the cognitive overhead of permanent split-view or tab management.</td></tr><tr><td>wiki</td><td>8</td><td>It perfectly executes the core constraints—chat visibility, non-IDE aesthetics, obvious back/forward navigation, and clear read/edit distinction—with minimal chrome. It loses points only for missing the opportunity to show source context alongside targets at wide breakpoints, forcing users to toggle rather than glance.</td></tr><tr><td>tabs</td><td>4</td><td>The persistent tab strip introduces browser-like clutter that competes with the required loudness hierarchy (pulse &gt; needs you &gt; chat) and evokes IDE aesthetics the brief explicitly forbids. While functional for multiple documents, the &#x27;card as tab&#x27; metaphor collapses into visual noise at the &#x27;six-dark-1440&#x27; density.</td></tr><tr><td>split</td><td>2</td><td>It fundamentally violates the primary workflow constraint by obscuring the chat column behind full-width panes, breaking the copy-paste tether between document and conversation. The permanent two-pane layout screams &#x27;code editor&#x27; and whispers nothing, inverting the required emotional hierarchy of states.</td></tr></table><details><summary>the whole answer</summary><pre>{
+ &quot;ranking&quot;: [
+  {
+   &quot;variant&quot;: &quot;hybrid&quot;,
+   &quot;score&quot;: 9,
+   &quot;why&quot;: &quot;It preserves wiki&#x27;s intimate docked posture for narrow screens while unlocking contextual side-by-side browsing only when width permits, satisfying the &#x27;chat must remain visible&#x27; rule in all states. The conditional two-pane mode adds genuine spatial memory for link-following without forcing the cognitive overhead of permanent split-view or tab management.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;wiki&quot;,
+   &quot;score&quot;: 8,
+   &quot;why&quot;: &quot;It perfectly executes the core constraints\u2014chat visibility, non-IDE aesthetics, obvious back/forward navigation, and clear read/edit distinction\u2014with minimal chrome. It loses points only for missing the opportunity to show source context alongside targets at wide breakpoints, forcing users to toggle rather than glance.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;tabs&quot;,
+   &quot;score&quot;: 4,
+   &quot;why&quot;: &quot;The persistent tab strip introduces browser-like clutter that competes with the required loudness hierarchy (pulse &gt; needs you &gt; chat) and evokes IDE aesthetics the brief explicitly forbids. While functional for multiple documents, the &#x27;card as tab&#x27; metaphor collapses into visual noise at the &#x27;six-dark-1440&#x27; density.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;split&quot;,
+   &quot;score&quot;: 2,
+   &quot;why&quot;: &quot;It fundamentally violates the primary workflow constraint by obscuring the chat column behind full-width panes, breaking the copy-paste tether between document and conversation. The permanent two-pane layout screams &#x27;code editor&#x27; and whispers nothing, inverting the required emotional hierarchy of states.&quot;
+  }
+ ],
+ &quot;hybrid_vs_wiki&quot;: &quot;The hybrid decisively beats wiki alone because it converts the wide state from a mere &#x27;wider docked panel&#x27; into a genuine contextual browser without narrowing the chat. The two-pane Wide gains spatial orientation\u2014seeing the source link highlighted in amber while reading the target eliminates the &#x27;where did I come from?&#x27; cognitive tax that plagues single-panel navigation\u2014but it costs a small modal shift in user model (understanding that width triggers a different navigation behavior). The addition of &#x27;Swap&#x27; and &#x27;One pane&#x27; controls adds minor complexity, yet these are exceptional-state controls that appear only when needed, preserving the whisper of normal reading. Crucially, hybrid ensures that the &#x27;obvious act&#x27; of clicking a link behaves intelligently: docked replacement when narrow, side-by-side comparison when wide, then seamless collapse back to docked on narrow\u2014all while keeping the chat column untouched.&quot;,
+ &quot;named_arrows&quot;: &quot;The named arrow (&#x27;\u2039 roadmap&#x27;) reads substantially better than a bare glyph because it pre-answers the navigation question &#x27;where will this take me?&#x27; before the click, which is essential for the &#x27;land where they left&#x27; requirement when users are three links deep in a documentation tree. It adds virtually no noise\u2014the word &#x27;roadmap&#x27; occupies less visual weight than the uncertainty it resolves\u2014and transforms the back button from a generic &#x27;undo&#x27; into a specific location anchor, reducing the need for users to maintain external mental stacks of their navigation history. The only risk is truncation with very long document titles, but given the factory&#x27;s apparent naming conventions (single words like &#x27;roadmap&#x27;, &#x27;plan&#x27;, &#x27;backing plan&#x27;), this is negligible; the gain in confidence and reduced misclicks far outweighs the rare ellipsis.&quot;,
+ &quot;craft&quot;: [
+  {
+   &quot;variant&quot;: &quot;tabs&quot;,
+   &quot;where&quot;: &quot;six-dark-1440&quot;,
+   &quot;what&quot;: &quot;Horizontal tab overflow creates a scrolling tab strip that draws eye attention away from the pulse sentence and amber Needs you column, violating the fixed loudness hierarchy.&quot;,
+   &quot;severity&quot;: &quot;high&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;split&quot;,
+   &quot;where&quot;: &quot;wide-dark-1440&quot;,
+   &quot;what&quot;: &quot;Two-pane layout completely occludes the chat column, making copy-paste between document and conversation impossible without closing the document.&quot;,
+   &quot;severity&quot;: &quot;high&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;wiki&quot;,
+   &quot;where&quot;: &quot;refused-light-1440&quot;,
+   &quot;what&quot;: &quot;The refusal state&#x27;s yellow/orange highlight blends slightly with the light theme background, potentially failing the &#x27;exceptional states speak&#x27; rule for users with low contrast sensitivity.&quot;,
+   &quot;severity&quot;: &quot;medium&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;hybrid&quot;,
+   &quot;where&quot;: &quot;wide-two-dark-1920&quot;,
+   &quot;what&quot;: &quot;The &#x27;Swap&#x27; and &#x27;One pane&#x27; buttons sit close to document content without sufficient negative space, risking accidental clicks during wide-screen reading.&quot;,
+   &quot;severity&quot;: &quot;low&quot;
+  }
+ ],
+ &quot;verdict&quot;: &quot;Hybrid should become the console because it is the only variant that treats screen width as a meaningful contextual variable rather than a layout constant, delivering the intimacy of a docked reader on phones and narrow windows while providing the comparative context of a split-view only when real estate allows\u2014without ever hiding the chat. It honors the first-loop feedback precisely: keeping wiki&#x27;s elegant single-column default (avoiding tab clutter and IDE vibes) while grafting split&#x27;s utility as an opt-in wide-state behavior. The named back-arrows further reduce navigation anxiety, and the clear read/edit state distinctions (with the blue &#x27;Save as commit&#x27; button) ensure members never mistake drafting for publishing. Where tabs noise and split obscures, hybrid whispers.&quot;
+}</pre></details>
+<h2>The critics on the three, the first loop</h2>
+<h3>Gemini 2.5 Pro</h3><table><tr><th>candidate</th><th>score</th><th>why</th></tr><tr><td>wiki</td><td>9</td><td>This variant is the most focused and elegant, perfectly balancing document access with board visibility. Its simple back/forward navigation is immediately intuitive and meets the brief without adding clutter or a steep learning curve.</td></tr><tr><td>tabs</td><td>7</td><td>While functional and familiar, the tab metaphor feels slightly too much like an IDE and risks UI clutter as more documents are opened. It solves the problem but with less grace and more cognitive load than the wiki variant.</td></tr><tr><td>split</td><td>2</td><td>This variant fails on several core requirements by hiding the chat, breaking the simple &#x27;go back&#x27; navigation model, and looking exactly like an IDE. It solves for a secondary use case (comparing documents) at the expense of the primary ones.</td></tr></table><details><summary>the whole answer</summary><pre>{
+ &quot;ranking&quot;: [
+  {
+   &quot;variant&quot;: &quot;wiki&quot;,
+   &quot;score&quot;: 9,
+   &quot;why&quot;: &quot;This variant is the most focused and elegant, perfectly balancing document access with board visibility. Its simple back/forward navigation is immediately intuitive and meets the brief without adding clutter or a steep learning curve.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;tabs&quot;,
+   &quot;score&quot;: 7,
+   &quot;why&quot;: &quot;While functional and familiar, the tab metaphor feels slightly too much like an IDE and risks UI clutter as more documents are opened. It solves the problem but with less grace and more cognitive load than the wiki variant.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;split&quot;,
+   &quot;score&quot;: 2,
+   &quot;why&quot;: &quot;This variant fails on several core requirements by hiding the chat, breaking the simple &#x27;go back&#x27; navigation model, and looking exactly like an IDE. It solves for a secondary use case (comparing documents) at the expense of the primary ones.&quot;
+  }
+ ],
+ &quot;moving&quot;: {
+  &quot;wiki&quot;: &quot;The back arrow is a universally understood action that requires no explanation, and the &#x27;Recent&#x27; menu is a scalable solution for navigating more than a few documents.&quot;,
+  &quot;tabs&quot;: &quot;Going back is an obvious tab click, but at ten documents, truncated tab titles would necessitate scrolling and make navigation cumbersome.&quot;,
+  &quot;split&quot;: &quot;It has no obvious &#x27;back&#x27; action, forcing the user to re-find their starting point in the left pane and failing the &#x27;land where they left&#x27; requirement.&quot;
+ },
+ &quot;board&quot;: {
+  &quot;wiki&quot;: &quot;A third of the board is lost, but the essential chat and &#x27;Needs you&#x27; column remain instantly accessible, correctly preserving the required visual hierarchy.&quot;,
+  &quot;tabs&quot;: &quot;The board is partially obscured identically to the wiki variant, keeping critical context and the &#x27;Needs you&#x27; column one glance away.&quot;,
+  &quot;split&quot;: &quot;The board is completely lost, which breaks the core copy-paste workflow with the chat, and the &#x27;Needs you&#x27; state is awkwardly displaced.&quot;
+ },
+ &quot;reading&quot;: {
+  &quot;wiki&quot;: &quot;The focused, single-column panel provides a very comfortable and distraction-free reading experience at both 1440 and 1920 widths.&quot;,
+  &quot;tabs&quot;: &quot;The reading experience is identical to the wiki variant and very comfortable, as the document content pane itself is unchanged.&quot;,
+  &quot;split&quot;: &quot;Reading is less comfortable as it splits attention between two documents, increasing cognitive load for the primary task of reading one document.&quot;
+ },
+ &quot;editing&quot;: {
+  &quot;wiki&quot;: &quot;The Read | Edit switch, &#x27;Save as commit&#x27; button, and loud refusal dialog are all clear, well-executed, and perfectly match their intended purpose.&quot;,
+  &quot;tabs&quot;: &quot;The shared editing components are just as effective here, as the state changes and actions are clearly communicated within the panel.&quot;,
+  &quot;split&quot;: &quot;While the components themselves work, the busier two-pane context slightly undermines the focus needed for a clean editing experience.&quot;
+ },
+ &quot;phone&quot;: {
+  &quot;wiki&quot;: &quot;The phone layout wisely adopts a full-screen view for documents, with clear back and close controls, making it highly usable on a small screen.&quot;,
+  &quot;tabs&quot;: &quot;It correctly abandons tabs for the same effective full-screen modal as the other variants, providing a clean and consistent mobile experience.&quot;,
+  &quot;split&quot;: &quot;It smartly defaults to the single full-screen document view on mobile, abandoning the desktop split-pane model for a usable layout.&quot;
+ },
+ &quot;craft&quot;: [
+  {
+   &quot;variant&quot;: &quot;split&quot;,
+   &quot;where&quot;: &quot;wide-dark-1440&quot;,
+   &quot;what&quot;: &quot;Covering the chat and the entire board is a high-severity design flaw as it breaks a primary user journey defined in the brief.&quot;,
+   &quot;severity&quot;: &quot;high&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;tabs&quot;,
+   &quot;where&quot;: &quot;card-dark-1440&quot;,
+   &quot;what&quot;: &quot;Treating a work item (card) as a document (tab) confuses the information architecture and the user&#x27;s mental model.&quot;,
+   &quot;severity&quot;: &quot;medium&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;wiki&quot;,
+   &quot;where&quot;: &quot;card-dark-1440&quot;,
+   &quot;what&quot;: &quot;Stacking a modal card view over the modal-like document panel creates excessive layering on one side of the screen.&quot;,
+   &quot;severity&quot;: &quot;low&quot;
+  }
+ ],
+ &quot;keep&quot;: [
+  &quot;The right-docked panel from the &#x27;wiki&#x27; and &#x27;tabs&#x27; variants, which provides document access while retaining the crucial context of the chat and board.&quot;,
+  &quot;The shared &#x27;refused-light-1440&#x27; modal dialog, which perfectly executes the &#x27;exceptional states speak&#x27; rule by making a failed save loud and unmissable.&quot;,
+  &quot;The disciplined 70-character measure for all document text, which rightly prioritizes reading comfort over simply filling horizontal space.&quot;
+ ],
+ &quot;hybrid&quot;: &quot;A hybrid of &#x27;wiki&#x27; and &#x27;tabs&#x27; would be superior. Use the &#x27;wiki&#x27; model as the default for its simplicity, with its back/forward arrows and &#x27;Recent&#x27; menu for most navigation. Then, repurpose the &#x27;pins&#x27; to be the &#x27;tabs&#x27;; pinning a document from the &#x27;Recent&#x27; menu would dock it as a persistent tab at the top of the panel, offering the power of &#x27;tabs&#x27; as an explicit, user-driven choice for key documents without cluttering the UI by default.&quot;,
+ &quot;verdict&quot;: &quot;The &#x27;wiki&#x27; variant should be implemented. It is the only prototype that fully respects the design brief, delivering a focused, professional, and intuitive experience that does not feel like an IDE. It correctly prioritizes the core user journey of reading and navigating between key documents while maintaining constant access to the chat and board. Its simplicity is its greatest strength, providing a powerful tool that whispers during normal use and speaks only when necessary, making it the clear choice for production.&quot;
+}</pre></details>
+<h3>GLM 5V Turbo</h3><table><tr><th>candidate</th><th>score</th><th>why</th></tr><tr><td>wiki</td><td>9</td><td>It honors the copy-paste-to-chat workflow by keeping the board visible, uses universal back/forward navigation that requires zero explanation, and reads as a sleek document viewer rather than an IDE.</td></tr><tr><td>tabs</td><td>6</td><td>Multiple tabs provide parallel access but risk clutter and resemble an IDE; returning to a previous document requires scanning a tab strip rather than one obvious backward act.</td></tr><tr><td>split</td><td>3</td><td>Covering the entire board breaks the primary workflow of copying between document and chat, and the &#x27;Needs you&#x27; strip cannot compensate for losing the conversation context.</td></tr></table><details><summary>the whole answer</summary><pre>{
+ &quot;ranking&quot;: [
+  {
+   &quot;variant&quot;: &quot;wiki&quot;,
+   &quot;score&quot;: 9,
+   &quot;why&quot;: &quot;It honors the copy-paste-to-chat workflow by keeping the board visible, uses universal back/forward navigation that requires zero explanation, and reads as a sleek document viewer rather than an IDE.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;tabs&quot;,
+   &quot;score&quot;: 6,
+   &quot;why&quot;: &quot;Multiple tabs provide parallel access but risk clutter and resemble an IDE; returning to a previous document requires scanning a tab strip rather than one obvious backward act.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;split&quot;,
+   &quot;score&quot;: 3,
+   &quot;why&quot;: &quot;Covering the entire board breaks the primary workflow of copying between document and chat, and the &#x27;Needs you&#x27; strip cannot compensate for losing the conversation context.&quot;
+  }
+ ],
+ &quot;moving&quot;: {
+  &quot;wiki&quot;: &quot;The back arrow reads as &#x27;return&#x27; without explanation, and the Recent menu holds ten or more documents without breaking the mental model.&quot;,
+  &quot;tabs&quot;: &quot;Returning requires identifying and clicking the previous tab among potentially many, which fails the &#x27;one obvious act&#x27; test when more than three documents are open.&quot;,
+  &quot;split&quot;: &quot;Navigation relies on clicking links in the left pane, which replaces the right pane&#x27;s content and discards the previous reading position, failing to &#x27;land where they left&#x27;.&quot;
+ },
+ &quot;board&quot;: {
+  &quot;wiki&quot;: &quot;Roughly sixty percent of the board remains visible with the amber Needs you column and chat fully accessible beside the docked panel.&quot;,
+  &quot;tabs&quot;: &quot;Identical to wiki in board coverage, though tab height at the panel&#x27;s top marginally reduces document vertical space.&quot;,
+  &quot;split&quot;: &quot;The board is entirely obscured except for a single-line &#x27;Needs you&#x27; strip, making the chat inaccessible without closing the project screen.&quot;
+ },
+ &quot;reading&quot;: {
+  &quot;wiki&quot;: &quot;The seventy-character measure creates a comfortable column at 1440 and remains well-proportioned at 1920 without excessive line length.&quot;,
+  &quot;tabs&quot;: &quot;Reading comfort matches wiki, though the tab strip above the document adds visual weight that competes with the content area.&quot;,
+  &quot;split&quot;: &quot;At 1920 the right pane becomes excessively wide for comfortable eye tracking, forcing the reader to traverse wasted horizontal space.&quot;
+ },
+ &quot;editing&quot;: {
+  &quot;wiki&quot;: &quot;The Read | Edit toggle and &#x27;Save as commit&#x27; button clearly signal state and action semantics, while the refusal dialog in light mode correctly shouts over the normal reading whisper.&quot;,
+  &quot;tabs&quot;: &quot;Editing controls are identical and clear, but the presence of multiple tabs risks the user losing which document is currently being edited.&quot;,
+  &quot;split&quot;: &quot;Editor functionality is present but disconnected from the chat context, undermining the edit-then-paste workflow that defines the screen&#x27;s purpose.&quot;
+ },
+ &quot;phone&quot;: {
+  &quot;wiki&quot;: &quot;The 390px view gracefully collapses to full-screen document with a persistent header for navigation, maintaining readability and the commit-save model.&quot;,
+  &quot;tabs&quot;: &quot;Tab labels truncate aggressively at 390px, making document identification difficult and the interface feel cramped compared to wiki&#x27;s cleaner header.&quot;,
+  &quot;split&quot;: &quot;The two-pane layout forces unacceptable compromises on phone, either stacking panes (losing the split benefit) or rendering them too narrow to read.&quot;
+ },
+ &quot;craft&quot;: [
+  {
+   &quot;variant&quot;: &quot;wiki&quot;,
+   &quot;where&quot;: &quot;saved-dark-1440&quot;,
+   &quot;what&quot;: &quot;The saved confirmation line is too subtle against the dark background and could be missed, risking duplicate commits.&quot;,
+   &quot;severity&quot;: &quot;medium&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;tabs&quot;,
+   &quot;where&quot;: &quot;card-dark-1440&quot;,
+   &quot;what&quot;: &quot;The card-as-tab metaphor breaks down when the card content is taller than the tab strip, creating an awkward overflow or thumbnail that obscures the tab label.&quot;,
+   &quot;severity&quot;: &quot;high&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;split&quot;,
+   &quot;where&quot;: &quot;six-dark-1440&quot;,
+   &quot;what&quot;: &quot;The &#x27;Needs you&#x27; strip uses insufficient contrast and positioning to alert the user to blocked tasks when the board is covered.&quot;,
+   &quot;severity&quot;: &quot;high&quot;
+  }
+ ],
+ &quot;keep&quot;: [
+  &quot;The wiki&#x27;s back/forward arrow pair with Recent dropdown, which provides flawless linear navigation without the cognitive load of tab management.&quot;,
+  &quot;The wiki&#x27;s three-pin system for holding roadmap, plan, and architecture simultaneously while keeping the main slot free for exploration.&quot;,
+  &quot;The refusal state&#x27;s high-visibility treatment in light mode (refused-light-1440), which correctly prioritizes the exceptional error over normal reading.&quot;
+ ],
+ &quot;hybrid&quot;: &quot;A wiki-tabs hybrid could theoretically combine wiki&#x27;s history navigation with tabs&#x27; persistence, but it would introduce the very complexity wiki avoids; the better combination is wiki&#x27;s shape with the split&#x27;s &#x27;link opens in adjacent pane&#x27; behavior only when the screen exceeds 1600px width, allowing power users to reference two documents side-by-side on large monitors while preserving the docked panel and chat visibility on standard laptops.&quot;,
+ &quot;verdict&quot;: &quot;The wiki variant should become the console because it alone respects the hierarchy of attention\u2014keeping the pulse sentence and Needs you column prominent while letting the document whisper\u2014preserves the chat for the critical copy-paste workflow, and provides the single most intuitive navigation model (back/forward) for non-technical visitors who expect web-standard browsing behavior rather than IDE patterns.&quot;
+}</pre></details>
+<h2>The eight directions</h2>
+<p><a href="contact-sheet-dark.jpg">the dark sheet</a> · <a href="contact-sheet-light.jpg">the light sheet</a> · the prompts are the .txt files beside each image, the sidecar .json names the model and the cost.</p>
+<div class="dirs"><figure><a href="01-wiki-drawer-dark.png"><img src="01-wiki-drawer-dark.png" alt="01-wiki-drawer dark" loading="lazy"></a><a href="01-wiki-drawer-light.png"><img src="01-wiki-drawer-light.png" alt="01-wiki-drawer light" loading="lazy"></a><figcaption>01-wiki-drawer</figcaption></figure><figure><a href="02-tabs-dark.png"><img src="02-tabs-dark.png" alt="02-tabs dark" loading="lazy"></a><a href="02-tabs-light.png"><img src="02-tabs-light.png" alt="02-tabs light" loading="lazy"></a><figcaption>02-tabs</figcaption></figure><figure><a href="03-reader-dark.png"><img src="03-reader-dark.png" alt="03-reader dark" loading="lazy"></a><a href="03-reader-light.png"><img src="03-reader-light.png" alt="03-reader light" loading="lazy"></a><figcaption>03-reader</figcaption></figure><figure><a href="04-split-dark.png"><img src="04-split-dark.png" alt="04-split dark" loading="lazy"></a><a href="04-split-light.png"><img src="04-split-light.png" alt="04-split light" loading="lazy"></a><figcaption>04-split</figcaption></figure><figure><a href="05-docs-page-dark.png"><img src="05-docs-page-dark.png" alt="05-docs-page dark" loading="lazy"></a><a href="05-docs-page-light.png"><img src="05-docs-page-light.png" alt="05-docs-page light" loading="lazy"></a><figcaption>05-docs-page</figcaption></figure><figure><a href="06-chat-pane-dark.png"><img src="06-chat-pane-dark.png" alt="06-chat-pane dark" loading="lazy"></a><a href="06-chat-pane-light.png"><img src="06-chat-pane-light.png" alt="06-chat-pane light" loading="lazy"></a><figcaption>06-chat-pane</figcaption></figure><figure><a href="07-peek-dark.png"><img src="07-peek-dark.png" alt="07-peek dark" loading="lazy"></a><a href="07-peek-light.png"><img src="07-peek-light.png" alt="07-peek light" loading="lazy"></a><figcaption>07-peek</figcaption></figure><figure><a href="08-tree-rail-dark.png"><img src="08-tree-rail-dark.png" alt="08-tree-rail dark" loading="lazy"></a><a href="08-tree-rail-light.png"><img src="08-tree-rail-light.png" alt="08-tree-rail light" loading="lazy"></a><figcaption>08-tree-rail</figcaption></figure></div>
+<h2>The critics on the directions</h2>
+<h3>Gemini 2.5 Pro</h3><table><tr><th>candidate</th><th>score</th><th>why</th></tr><tr><td>04-split</td><td>9</td><td>This is the only direction that successfully balances all constraints, keeping the chat and the critical &#x27;Needs you&#x27; board column visible. It perfectly fits the &#x27;instrument panel&#x27; idiom, adding a new view without disrupting the primary information hierarchy.</td></tr><tr><td>02-tabs</td><td>6</td><td>This provides a familiar, scalable navigation model and an excellent reading experience while keeping the chat fully functional. However, it completely hides the board, which violates the principle of keeping the &#x27;Needs you&#x27; signal present.</td></tr><tr><td>08-tree-rail</td><td>5</td><td>This offers the best scalability and file discovery, but at the cost of hiding the entire board and looking too much like an IDE. The fit is poor, and it sacrifices situational awareness for file management.</td></tr><tr><td>01-wiki-drawer</td><td>3</td><td>While it preserves the board, it completely hides the chat, making the core task of copy-pasting between doc and chat impossible. This violates a primary and explicit requirement.</td></tr><tr><td>07-peek</td><td>3</td><td>This is a useful supplemental feature for quick lookups, not a complete solution for reading, editing, and navigating between documents. It also fails on mobile where hover is not a viable interaction.</td></tr><tr><td>06-chat-pane</td><td>2</td><td>This fatally misunderstands the chat&#x27;s role by replacing the conversation view with a document, making simultaneous use impossible. The reading column is also uncomfortably narrow.</td></tr><tr><td>03-reader</td><td>1</td><td>The modal approach is loud, disruptive, and obscures both the chat and the board, violating multiple constraints. It doesn&#x27;t scale to multiple documents and feels alien to the &#x27;Mission control&#x27; idiom.</td></tr><tr><td>05-docs-page</td><td>0</td><td>This direction completely fails the brief by navigating away from the console, abandoning the context of the chat and board. It solves the problem by ignoring the premise.</td></tr></table><details><summary>the whole answer</summary><pre>{
+ &quot;ranking&quot;: [
+  {
+   &quot;direction&quot;: &quot;04-split&quot;,
+   &quot;score&quot;: 9,
+   &quot;why&quot;: &quot;This is the only direction that successfully balances all constraints, keeping the chat and the critical &#x27;Needs you&#x27; board column visible. It perfectly fits the &#x27;instrument panel&#x27; idiom, adding a new view without disrupting the primary information hierarchy.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;02-tabs&quot;,
+   &quot;score&quot;: 6,
+   &quot;why&quot;: &quot;This provides a familiar, scalable navigation model and an excellent reading experience while keeping the chat fully functional. However, it completely hides the board, which violates the principle of keeping the &#x27;Needs you&#x27; signal present.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;08-tree-rail&quot;,
+   &quot;score&quot;: 5,
+   &quot;why&quot;: &quot;This offers the best scalability and file discovery, but at the cost of hiding the entire board and looking too much like an IDE. The fit is poor, and it sacrifices situational awareness for file management.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;01-wiki-drawer&quot;,
+   &quot;score&quot;: 3,
+   &quot;why&quot;: &quot;While it preserves the board, it completely hides the chat, making the core task of copy-pasting between doc and chat impossible. This violates a primary and explicit requirement.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;07-peek&quot;,
+   &quot;score&quot;: 3,
+   &quot;why&quot;: &quot;This is a useful supplemental feature for quick lookups, not a complete solution for reading, editing, and navigating between documents. It also fails on mobile where hover is not a viable interaction.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;06-chat-pane&quot;,
+   &quot;score&quot;: 2,
+   &quot;why&quot;: &quot;This fatally misunderstands the chat&#x27;s role by replacing the conversation view with a document, making simultaneous use impossible. The reading column is also uncomfortably narrow.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;03-reader&quot;,
+   &quot;score&quot;: 1,
+   &quot;why&quot;: &quot;The modal approach is loud, disruptive, and obscures both the chat and the board, violating multiple constraints. It doesn&#x27;t scale to multiple documents and feels alien to the &#x27;Mission control&#x27; idiom.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;05-docs-page&quot;,
+   &quot;score&quot;: 0,
+   &quot;why&quot;: &quot;This direction completely fails the brief by navigating away from the console, abandoning the context of the chat and board. It solves the problem by ignoring the premise.&quot;
+  }
+ ],
+ &quot;carry&quot;: [
+  {
+   &quot;direction&quot;: &quot;04-split&quot;,
+   &quot;reason&quot;: &quot;The prototype must prove that the compressed board columns remain scannable and the document&#x27;s narrow measure is comfortable for sustained reading.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;02-tabs&quot;,
+   &quot;reason&quot;: &quot;This prototype must prove that hiding the board is an acceptable trade-off, or explore a minimal, persistent status indicator for the &#x27;Needs you&#x27; column.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;07-peek&quot;,
+   &quot;reason&quot;: &quot;This should be prototyped not as a primary solution, but as a supplementary hover/long-press feature to enrich any of the other carried directions.&quot;
+  }
+ ],
+ &quot;drop&quot;: [
+  {
+   &quot;direction&quot;: &quot;08-tree-rail&quot;,
+   &quot;reason&quot;: &quot;Hides the board and looks too much like an IDE, which was explicitly noted as undesirable.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;01-wiki-drawer&quot;,
+   &quot;reason&quot;: &quot;Hides the chat, which is a non-negotiable part of the workflow.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;06-chat-pane&quot;,
+   &quot;reason&quot;: &quot;Prevents simultaneous use of chat and document, defeating the purpose.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;03-reader&quot;,
+   &quot;reason&quot;: &quot;The disruptive modal pattern violates the calm, integrated feel of the console.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;05-docs-page&quot;,
+   &quot;reason&quot;: &quot;Navigating away from the main screen breaks the user&#x27;s flow and context entirely.&quot;
+  }
+ ],
+ &quot;hybrids&quot;: [
+  {
+   &quot;combination&quot;: &quot;04-split + 02-tabs&quot;,
+   &quot;idea&quot;: &quot;Use the split layout from 04, but add the tab bar from 02 above the document pane to manage multiple open docs without losing sight of the board.&quot;
+  },
+  {
+   &quot;combination&quot;: &quot;04-split + 07-peek&quot;,
+   &quot;idea&quot;: &quot;Implement the 04-split as the primary view, but add the 07-peek behavior on link hover to allow quick previews before committing to opening a new split or tab.&quot;
+  }
+ ],
+ &quot;chat_risks&quot;: [
+  &quot;01-wiki-drawer&quot;,
+  &quot;03-reader&quot;,
+  &quot;05-docs-page&quot;,
+  &quot;06-chat-pane&quot;
+ ],
+ &quot;board_risks&quot;: [
+  &quot;02-tabs&quot;,
+  &quot;03-reader&quot;,
+  &quot;05-docs-page&quot;,
+  &quot;08-tree-rail&quot;
+ ],
+ &quot;phone_risks&quot;: [
+  &quot;07-peek&quot;
+ ],
+ &quot;moving&quot;: &quot;Direction 02-tabs provides the most obvious and widely understood method for moving between documents, using a tab strip that clearly shows what is open and where you came from. Following a link opens a new tab, and going &#x27;back&#x27; is a single click on the previous tab, showing the full title of the document. While 08-tree-rail is also strong, its file-system metaphor is less direct for history-based navigation than the session-based metaphor of tabs.&quot;,
+ &quot;editing&quot;: &quot;Direction 03-reader presents the clearest &#x27;Read | Edit&#x27; controls, positioned prominently at the bottom of the modal, though the overall direction is poor. The &#x27;Save as commit&#x27; button treatment in 01-wiki-drawer is the most successful, using a button style with a git icon that clearly signals a VCS action, distinct from a simple form save. This clarity is crucial for communicating the weight of the action to the user.&quot;,
+ &quot;notes&quot;: &quot;None of the directions explicitly address the user journey of creating a *new* file. They all focus on opening existing documents, but the flow to &#x27;jot a few lines or a new file&#x27; needs a clear entry point. A &#x27;New Document&#x27; button should be considered as a persistent element, likely near the &#x27;Read | Edit&#x27; controls or, in the case of 04-split or 08-tree-rail, as a primary action in the document panel&#x27;s header.&quot;
+}</pre></details>
+<h3>GLM 5V Turbo</h3><table><tr><th>candidate</th><th>score</th><th>why</th></tr><tr><td>01-wiki-drawer</td><td>9</td><td>Preserves the full chat width and keeps the board underneath (or peekable) while offering a wide, comfortable reading pane that slides away to restore the full mission control view. The drawer metaphor fits the industrial idiom as a pull-out instrument panel, handling multiple documents via history and pins without cluttering the main stage.</td></tr><tr><td>04-split</td><td>7</td><td>Enables the critical reference workflow of viewing a board card alongside its linked document, satisfying the copy-paste requirement without mode-switching. However, it permanently cramps the board to roughly thirty percent width, risking &#x27;Needs you&#x27; usability, and it struggles to fit ten open documents without a tab strip.</td></tr><tr><td>08-tree-rail</td><td>6</td><td>Provides excellent scalability for navigating a repository of many files through an always-visible tree, making it easy to jump between roadmap, plan, and architecture. Yet it consumes valuable horizontal real estate that squeezes either the document reading measure or the board, and on mobile it collapses into a complex stacking problem.</td></tr><tr><td>02-tabs</td><td>5</td><td>Offers a familiar paradigm for managing multiple open documents, but risks either hiding the board entirely when a document tab is active (breaking &#x27;Needs you&#x27; glanceability) or creating a cramped sub-layout where tabs, board, and document fight for space. It tends toward an IDE aesthetic that fights the calm instrument-panel idiom.</td></tr><tr><td>03-reader</td><td>5</td><td>Delivers the most comfortable reading experience with generous measure and typography, treating the document as a first-class citizen. However, it dominates the visual hierarchy, shouting louder than the amber pulse band or the Needs you column, and typically obscures the chat or board, breaking the mission-control context.</td></tr><tr><td>07-peek</td><td>4</td><td>Excels at quick, low-cost glances into linked documents without losing place, perfect for verifying a reference. It fails completely at the required editing workflow—jotting lines, saving commits, and sustained reading—as a peek is inherently transient and too small for text entry or rendered Markdown review.</td></tr><tr><td>06-chat-pane</td><td>2</td><td>Placing the document inside the forty-percent chat column destroys the chat&#x27;s usability, crushing it to a narrow sliver or hiding it entirely, which directly contradicts the core requirement that chat remain visible for copy-paste. It forces the document into a cramped vertical column unsuitable for reading or editing.</td></tr><tr><td>05-docs-page</td><td>1</td><td>Navigating away from the mission control screen abandons the real-time context of the chat, the pulse band, and the board, forcing the member to switch tabs and breaking the flow. It earns no justification because the screen can hold a document view (as other directions prove), making the trip pure friction.</td></tr></table><details><summary>the whole answer</summary><pre>{
+ &quot;ranking&quot;: [
+  {
+   &quot;direction&quot;: &quot;01-wiki-drawer&quot;,
+   &quot;score&quot;: 9,
+   &quot;why&quot;: &quot;Preserves the full chat width and keeps the board underneath (or peekable) while offering a wide, comfortable reading pane that slides away to restore the full mission control view. The drawer metaphor fits the industrial idiom as a pull-out instrument panel, handling multiple documents via history and pins without cluttering the main stage.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;04-split&quot;,
+   &quot;score&quot;: 7,
+   &quot;why&quot;: &quot;Enables the critical reference workflow of viewing a board card alongside its linked document, satisfying the copy-paste requirement without mode-switching. However, it permanently cramps the board to roughly thirty percent width, risking &#x27;Needs you&#x27; usability, and it struggles to fit ten open documents without a tab strip.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;08-tree-rail&quot;,
+   &quot;score&quot;: 6,
+   &quot;why&quot;: &quot;Provides excellent scalability for navigating a repository of many files through an always-visible tree, making it easy to jump between roadmap, plan, and architecture. Yet it consumes valuable horizontal real estate that squeezes either the document reading measure or the board, and on mobile it collapses into a complex stacking problem.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;02-tabs&quot;,
+   &quot;score&quot;: 5,
+   &quot;why&quot;: &quot;Offers a familiar paradigm for managing multiple open documents, but risks either hiding the board entirely when a document tab is active (breaking &#x27;Needs you&#x27; glanceability) or creating a cramped sub-layout where tabs, board, and document fight for space. It tends toward an IDE aesthetic that fights the calm instrument-panel idiom.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;03-reader&quot;,
+   &quot;score&quot;: 5,
+   &quot;why&quot;: &quot;Delivers the most comfortable reading experience with generous measure and typography, treating the document as a first-class citizen. However, it dominates the visual hierarchy, shouting louder than the amber pulse band or the Needs you column, and typically obscures the chat or board, breaking the mission-control context.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;07-peek&quot;,
+   &quot;score&quot;: 4,
+   &quot;why&quot;: &quot;Excels at quick, low-cost glances into linked documents without losing place, perfect for verifying a reference. It fails completely at the required editing workflow\u2014jotting lines, saving commits, and sustained reading\u2014as a peek is inherently transient and too small for text entry or rendered Markdown review.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;06-chat-pane&quot;,
+   &quot;score&quot;: 2,
+   &quot;why&quot;: &quot;Placing the document inside the forty-percent chat column destroys the chat&#x27;s usability, crushing it to a narrow sliver or hiding it entirely, which directly contradicts the core requirement that chat remain visible for copy-paste. It forces the document into a cramped vertical column unsuitable for reading or editing.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;05-docs-page&quot;,
+   &quot;score&quot;: 1,
+   &quot;why&quot;: &quot;Navigating away from the mission control screen abandons the real-time context of the chat, the pulse band, and the board, forcing the member to switch tabs and breaking the flow. It earns no justification because the screen can hold a document view (as other directions prove), making the trip pure friction.&quot;
+  }
+ ],
+ &quot;carry&quot;: [
+  &quot;01-wiki-drawer: Prove that a slide-out panel can host full read-edit-save workflows while keeping the board accessible via a peek-edge or translucent overlay, and that the back-history feels like browser navigation.&quot;,
+  &quot;04-split: Prove that the board remains functional at roughly 35% width (with document at 25%) or that the split intelligently collapses on smaller screens, and that the &#x27;Needs you&#x27; amber signal survives the compression.&quot;,
+  &quot;08-tree-rail: Prove that a narrow, icon-only tree rail (expanding on hover) can coexist with the document view without stealing focus from the mission control instruments, and that it scales to fifty files without scrolling madness.&quot;
+ ],
+ &quot;drop&quot;: [
+  &quot;05-docs-page: Leaves the mission control context entirely, solving the problem by abandoning the constraints.&quot;,
+  &quot;06-chat-pane: Destroys the chat&#x27;s usable width, violating the primary invariant that chat must remain visible for copy-paste.&quot;,
+  &quot;03-reader: Overpowers the visual hierarchy with an immersive reading mode that hides the board and chat, feeling like a different application.&quot;,
+  &quot;07-peek: Insufficient surface area for the editing and commit workflow; it is a feature, not a container.&quot;,
+  &quot;02-tabs: Tends toward IDE-like clutter and either hides the board or cramps it beyond usefulness when documents are open.&quot;
+ ],
+ &quot;hybrids&quot;: [
+  &quot;01-wiki-drawer + 07-peek: Combine the drawer&#x27;s full editing environment with hover-peeks on links so members can preview targets without navigating away from their current document position, then decide to open or dismiss.&quot;,
+  &quot;04-split + 08-tree-rail: Use the split layout for board+document coexistence, but add a collapsible tree rail that slides out from the document pane&#x27;s edge only when needed to switch files, preserving horizontal space when reading.&quot;
+ ],
+ &quot;chat_risks&quot;: [
+  &quot;06-chat-pane&quot;,
+  &quot;03-reader&quot;
+ ],
+ &quot;board_risks&quot;: [
+  &quot;01-wiki-drawer&quot;,
+  &quot;02-tabs&quot;,
+  &quot;03-reader&quot;,
+  &quot;05-docs-page&quot;
+ ],
+ &quot;phone_risks&quot;: [
+  &quot;04-split&quot;,
+  &quot;08-tree-rail&quot;,
+  &quot;02-tabs&quot;
+ ],
+ &quot;moving&quot;: &quot;The 01-wiki-drawer moves between linked documents best because it implements a web-like history stack within the drawer\u2014clicking a link pushes the new document onto the stack with a smooth transition, and a prominent back button (or gesture) returns to the previous document and scroll position instantly. This mimics the familiar browser pattern members already use for documentation, while pins allow keeping the roadmap persistent even when drilling into plans. Unlike tabs, it doesn&#x27;t flatten the hierarchy; unlike the split, it doesn&#x27;t force constant resizing; and unlike the page, it never leaves the chat context, allowing the member to follow a link from the roadmap to the plan, read it, and pop back to their exact line in the roadmap with one obvious act.&quot;,
+ &quot;editing&quot;: &quot;The 01-wiki-drawer treats Read | Edit and Save as commit best by placing these controls in a thin, persistent instrument bar at the top of the document pane, using the console&#x27;s monospace figures and cyan/amber palette. The Read | Edit toggle should be a segmented control that visually &#x27;unlocks&#x27; the text area (changing border color from cyan to amber to indicate dirty state), and &#x27;Save as commit&#x27; should read as a primary action button with a git branch indicator\u2014not a form submit\u2014making it clear this writes to the repository. The drawer&#x27;s contained scope makes these controls feel like part of the document&#x27;s control panel, fitting the mission control idiom better than a floating toolbar or a page-level header, and the commit action sits logically next to the file path and branch name as part of the document&#x27;s identity.&quot;,
+ &quot;notes&quot;: &quot;All directions miss the explicit visual connection between the board card (e.g., #612) and the currently open document\u2014showing which card linked to this file and whether the document&#x27;s changes satisfy the card&#x27;s requirements. They also largely ignore the git status integration: showing whether the viewed document has uncommitted edits, differs from main, or is the target of the current pull request, which is critical context for the member deciding whether to merge. Finally, none address how the document view handles images or diagrams embedded in the Markdown, which may need expansion beyond the text column or a lightbox that respects the dark/light theme.&quot;
+}</pre></details>
+</html>

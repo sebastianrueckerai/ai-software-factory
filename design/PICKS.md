@@ -45,3 +45,16 @@ Where the routines live ([the round page](rounds/04-routines/index.html), [the b
 And the word: routine, standing order, or schedule. Sebastian: "you decide". The director: the thing is a routine, its rhythm line is its schedule.
 
 Notes: routines are per project, in the project's file. The main chat creates, changes and deletes them through tools. The schedule is any mix of a cron pattern, a merge count and an event, stated in words on the card. Run now files the card at once and the autonomy level decides the start. The clock is Temporal Schedules and store counters, reconciled from the configuration tree ([docs/routines.md](../docs/routines.md)).
+
+## Round 05, the documents in the screen
+
+Where a document opens and how a member moves between linked documents ([the round page](rounds/05-documents/index.html), [the brief](rounds/05-documents/brief.md), [the notes](rounds/05-documents/notes.md)). Which shape becomes the console:
+
+- [ ] A. Wiki: one document in the drawer's slot, back and forward arrows, a Recent menu, three pins, the browser's back
+- [ ] B. Tabs: the same slot under a tab strip, a card as a tab too
+- [ ] C. Split: two panes over the whole board, a link opens beside its source
+- [ ] D. Hybrid, the recommendation: the wiki, with the split's two panes as its Wide state and the back arrow naming its target
+
+And two details: the body text size (13 px as the base, or the chat's 14.5 px for the long read), and whether a card opened from the board closes the document (wiki) or sits beside it as a tab (tabs).
+
+Notes:

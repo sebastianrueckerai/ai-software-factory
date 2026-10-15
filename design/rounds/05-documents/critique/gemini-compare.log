@@ -1,0 +1,55 @@
+```json
+{
+  "ranking": [
+    {
+      "variant": "hybrid",
+      "score": 9,
+      "why": "It successfully integrates the feedback from the prior round, providing the focused wiki view by default and an optional, powerful split view. This design is versatile and respects all core constraints, making it the most capable and well-considered solution."
+    },
+    {
+      "variant": "wiki",
+      "score": 8,
+      "why": "Its simple, single-panel approach is elegant and keeps the focus on the chat, perfectly embodying the 'whisper' principle. While it lacks a side-by-side view, its clarity and minimalism make it a very strong standalone contender."
+    },
+    {
+      "variant": "tabs",
+      "score": 5,
+      "why": "While familiar, the tabbed interface adds visual clutter and an 'IDE-like' feel that contradicts the design goals. Managing several documents becomes cumbersome with truncated titles, detracting from the primary chat interaction."
+    },
+    {
+      "variant": "split",
+      "score": 2,
+      "why": "The design fails a critical requirement by completely obscuring the chat and the rest of the console. This makes the primary workflow of referencing documents while using the chat impossible."
+    }
+  ],
+  "hybrid_vs_wiki": "The hybrid variant definitively beats the original wiki by treating it as a base and enhancing it. It retains the wiki's elegant, docked panel as the default state, but adds a powerful, two-pane wide mode for users who need to compare documents. This significant gain in functionality for cross-referencing comes at no cost to the simple, default experience, as the complexity is contained within an optional state, making the hybrid a direct upgrade with no real drawbacks.",
+  "named_arrows": "The named back arrow, such as '‹ roadmap,' is a significant improvement over a bare glyph. It provides crucial context, telling the user exactly where the action will lead them, which greatly enhances predictability and reduces the risk of getting lost in a chain of documents. This small addition transforms the back button from a simple history-stack command into a meaningful navigational tool, adding clarity that far outweighs any potential 'noise' or the minimal extra space it occupies.",
+  "craft": [
+    {
+      "variant": "hybrid",
+      "where": "wide-dark-1440",
+      "what": "In the single-pane wide mode, the unconstrained line length makes the text very difficult to read comfortably.",
+      "severity": "high"
+    },
+    {
+      "variant": "tabs",
+      "where": "six-dark-1440",
+      "what": "With six documents open, the tab titles become heavily truncated and unusable, defeating the purpose of the tab interface.",
+      "severity": "high"
+    },
+    {
+      "variant": "hybrid",
+      "where": "hybrid-wide-two-dark-1440",
+      "what": "The 'Swap' and 'One pane' controls in the two-pane view are small and have low contrast, reducing their visibility and affordance.",
+      "severity": "medium"
+    },
+    {
+      "variant": "wiki",
+      "where": "card-dark-1440",
+      "what": "When a card appears over the document panel, its drop shadow is abruptly cut off by the edge of the screen, which looks unpolished.",
+      "severity": "low"
+    }
+  ],
+  "verdict": "The hybrid variant should become the console's document viewer. It successfully evolves the best design from the previous round based on critical feedback, creating a solution that is simple and focused in its default state but powerful when needed. It respects all of the established constraints, including the crucial visibility of the chat, and provides a superior, more flexible experience than any of the other options. With minor refinement to its wide mode's typography and controls, it will be an excellent addition to the console."
+}
+```

@@ -1,0 +1,55 @@
+```json
+{
+  "ranking": [
+    {
+      "variant": "hybrid",
+      "score": 9,
+      "why": "It preserves wiki's intimate docked posture for narrow screens while unlocking contextual side-by-side browsing only when width permits, satisfying the 'chat must remain visible' rule in all states. The conditional two-pane mode adds genuine spatial memory for link-following without forcing the cognitive overhead of permanent split-view or tab management."
+    },
+    {
+      "variant": "wiki",
+      "score": 8,
+      "why": "It perfectly executes the core constraints—chat visibility, non-IDE aesthetics, obvious back/forward navigation, and clear read/edit distinction—with minimal chrome. It loses points only for missing the opportunity to show source context alongside targets at wide breakpoints, forcing users to toggle rather than glance."
+    },
+    {
+      "variant": "tabs",
+      "score": 4,
+      "why": "The persistent tab strip introduces browser-like clutter that competes with the required loudness hierarchy (pulse > needs you > chat) and evokes IDE aesthetics the brief explicitly forbids. While functional for multiple documents, the 'card as tab' metaphor collapses into visual noise at the 'six-dark-1440' density."
+    },
+    {
+      "variant": "split",
+      "score": 2,
+      "why": "It fundamentally violates the primary workflow constraint by obscuring the chat column behind full-width panes, breaking the copy-paste tether between document and conversation. The permanent two-pane layout screams 'code editor' and whispers nothing, inverting the required emotional hierarchy of states."
+    }
+  ],
+  "hybrid_vs_wiki": "The hybrid decisively beats wiki alone because it converts the wide state from a mere 'wider docked panel' into a genuine contextual browser without narrowing the chat. The two-pane Wide gains spatial orientation—seeing the source link highlighted in amber while reading the target eliminates the 'where did I come from?' cognitive tax that plagues single-panel navigation—but it costs a small modal shift in user model (understanding that width triggers a different navigation behavior). The addition of 'Swap' and 'One pane' controls adds minor complexity, yet these are exceptional-state controls that appear only when needed, preserving the whisper of normal reading. Crucially, hybrid ensures that the 'obvious act' of clicking a link behaves intelligently: docked replacement when narrow, side-by-side comparison when wide, then seamless collapse back to docked on narrow—all while keeping the chat column untouched.",
+  "named_arrows": "The named arrow ('‹ roadmap') reads substantially better than a bare glyph because it pre-answers the navigation question 'where will this take me?' before the click, which is essential for the 'land where they left' requirement when users are three links deep in a documentation tree. It adds virtually no noise—the word 'roadmap' occupies less visual weight than the uncertainty it resolves—and transforms the back button from a generic 'undo' into a specific location anchor, reducing the need for users to maintain external mental stacks of their navigation history. The only risk is truncation with very long document titles, but given the factory's apparent naming conventions (single words like 'roadmap', 'plan', 'backing plan'), this is negligible; the gain in confidence and reduced misclicks far outweighs the rare ellipsis.",
+  "craft": [
+    {
+      "variant": "tabs",
+      "where": "six-dark-1440",
+      "what": "Horizontal tab overflow creates a scrolling tab strip that draws eye attention away from the pulse sentence and amber Needs you column, violating the fixed loudness hierarchy.",
+      "severity": "high"
+    },
+    {
+      "variant": "split",
+      "where": "wide-dark-1440",
+      "what": "Two-pane layout completely occludes the chat column, making copy-paste between document and conversation impossible without closing the document.",
+      "severity": "high"
+    },
+    {
+      "variant": "wiki",
+      "where": "refused-light-1440",
+      "what": "The refusal state's yellow/orange highlight blends slightly with the light theme background, potentially failing the 'exceptional states speak' rule for users with low contrast sensitivity.",
+      "severity": "medium"
+    },
+    {
+      "variant": "hybrid",
+      "where": "wide-two-dark-1920",
+      "what": "The 'Swap' and 'One pane' buttons sit close to document content without sufficient negative space, risking accidental clicks during wide-screen reading.",
+      "severity": "low"
+    }
+  ],
+  "verdict": "Hybrid should become the console because it is the only variant that treats screen width as a meaningful contextual variable rather than a layout constant, delivering the intimacy of a docked reader on phones and narrow windows while providing the comparative context of a split-view only when real estate allows—without ever hiding the chat. It honors the first-loop feedback precisely: keeping wiki's elegant single-column default (avoiding tab clutter and IDE vibes) while grafting split's utility as an opt-in wide-state behavior. The named back-arrows further reduce navigation anxiety, and the clear read/edit state distinctions (with the blue 'Save as commit' button) ensure members never mistake drafting for publishing. Where tabs noise and split obscures, hybrid whispers."
+}
+```

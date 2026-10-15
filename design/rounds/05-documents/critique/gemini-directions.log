@@ -1,0 +1,110 @@
+```json
+{
+  "ranking": [
+    {
+      "direction": "04-split",
+      "score": 9,
+      "why": "This is the only direction that successfully balances all constraints, keeping the chat and the critical 'Needs you' board column visible. It perfectly fits the 'instrument panel' idiom, adding a new view without disrupting the primary information hierarchy."
+    },
+    {
+      "direction": "02-tabs",
+      "score": 6,
+      "why": "This provides a familiar, scalable navigation model and an excellent reading experience while keeping the chat fully functional. However, it completely hides the board, which violates the principle of keeping the 'Needs you' signal present."
+    },
+    {
+      "direction": "08-tree-rail",
+      "score": 5,
+      "why": "This offers the best scalability and file discovery, but at the cost of hiding the entire board and looking too much like an IDE. The fit is poor, and it sacrifices situational awareness for file management."
+    },
+    {
+      "direction": "01-wiki-drawer",
+      "score": 3,
+      "why": "While it preserves the board, it completely hides the chat, making the core task of copy-pasting between doc and chat impossible. This violates a primary and explicit requirement."
+    },
+    {
+      "direction": "07-peek",
+      "score": 3,
+      "why": "This is a useful supplemental feature for quick lookups, not a complete solution for reading, editing, and navigating between documents. It also fails on mobile where hover is not a viable interaction."
+    },
+    {
+      "direction": "06-chat-pane",
+      "score": 2,
+      "why": "This fatally misunderstands the chat's role by replacing the conversation view with a document, making simultaneous use impossible. The reading column is also uncomfortably narrow."
+    },
+    {
+      "direction": "03-reader",
+      "score": 1,
+      "why": "The modal approach is loud, disruptive, and obscures both the chat and the board, violating multiple constraints. It doesn't scale to multiple documents and feels alien to the 'Mission control' idiom."
+    },
+    {
+      "direction": "05-docs-page",
+      "score": 0,
+      "why": "This direction completely fails the brief by navigating away from the console, abandoning the context of the chat and board. It solves the problem by ignoring the premise."
+    }
+  ],
+  "carry": [
+    {
+      "direction": "04-split",
+      "reason": "The prototype must prove that the compressed board columns remain scannable and the document's narrow measure is comfortable for sustained reading."
+    },
+    {
+      "direction": "02-tabs",
+      "reason": "This prototype must prove that hiding the board is an acceptable trade-off, or explore a minimal, persistent status indicator for the 'Needs you' column."
+    },
+    {
+      "direction": "07-peek",
+      "reason": "This should be prototyped not as a primary solution, but as a supplementary hover/long-press feature to enrich any of the other carried directions."
+    }
+  ],
+  "drop": [
+    {
+      "direction": "08-tree-rail",
+      "reason": "Hides the board and looks too much like an IDE, which was explicitly noted as undesirable."
+    },
+    {
+      "direction": "01-wiki-drawer",
+      "reason": "Hides the chat, which is a non-negotiable part of the workflow."
+    },
+    {
+      "direction": "06-chat-pane",
+      "reason": "Prevents simultaneous use of chat and document, defeating the purpose."
+    },
+    {
+      "direction": "03-reader",
+      "reason": "The disruptive modal pattern violates the calm, integrated feel of the console."
+    },
+    {
+      "direction": "05-docs-page",
+      "reason": "Navigating away from the main screen breaks the user's flow and context entirely."
+    }
+  ],
+  "hybrids": [
+    {
+      "combination": "04-split + 02-tabs",
+      "idea": "Use the split layout from 04, but add the tab bar from 02 above the document pane to manage multiple open docs without losing sight of the board."
+    },
+    {
+      "combination": "04-split + 07-peek",
+      "idea": "Implement the 04-split as the primary view, but add the 07-peek behavior on link hover to allow quick previews before committing to opening a new split or tab."
+    }
+  ],
+  "chat_risks": [
+    "01-wiki-drawer",
+    "03-reader",
+    "05-docs-page",
+    "06-chat-pane"
+  ],
+  "board_risks": [
+    "02-tabs",
+    "03-reader",
+    "05-docs-page",
+    "08-tree-rail"
+  ],
+  "phone_risks": [
+    "07-peek"
+  ],
+  "moving": "Direction 02-tabs provides the most obvious and widely understood method for moving between documents, using a tab strip that clearly shows what is open and where you came from. Following a link opens a new tab, and going 'back' is a single click on the previous tab, showing the full title of the document. While 08-tree-rail is also strong, its file-system metaphor is less direct for history-based navigation than the session-based metaphor of tabs.",
+  "editing": "Direction 03-reader presents the clearest 'Read | Edit' controls, positioned prominently at the bottom of the modal, though the overall direction is poor. The 'Save as commit' button treatment in 01-wiki-drawer is the most successful, using a button style with a git icon that clearly signals a VCS action, distinct from a simple form save. This clarity is crucial for communicating the weight of the action to the user.",
+  "notes": "None of the directions explicitly address the user journey of creating a *new* file. They all focus on opening existing documents, but the flow to 'jot a few lines or a new file' needs a clear entry point. A 'New Document' button should be considered as a persistent element, likely near the 'Read | Edit' controls or, in the case of 04-split or 08-tree-rail, as a primary action in the document panel's header."
+}
+```
