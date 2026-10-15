@@ -308,7 +308,7 @@ The check-ins on the five code cards cost 0.89 EUR and prevented none of the 3.7
 1. **No human before an agent tried once.** A failure first gets a check-in with sight, then one fresh session with a handover, then the human. Only decisions that are the human's by nature go to the human at once: spend above policy, a goal that conflicts with another card or became obsolete, a policy class agents may not touch, access the factory does not have.
 2. **Facts by code, judgment by model.** Budget left, time left, attempt number, CI state, adjudications: code injects them. No model is asked for a fact a tool can carry. Roadmap 199.
 3. **Small default context, depth by tool.** The whole conversation of a failed session goes to no prompt. A check-in gets a problem statement and the record's tail, and fetches the rest with search and read tools. The next session gets a handover note of 2,000 characters and the transcript as a searchable file.
-4. **A check-in has actions, not only eyes.** It can end a session with a handover, confirm or drop a finding, run the tests, and ask a human with a prepared question.
+4. **A check-in has actions, not only eyes.** It can end a session with a handover, confirm, drop or remark a finding, run the tests, and ask a human with a prepared question.
 5. **The judge of a result stays independent.** The review reads the diff and never the agent's story. Its findings are claims. A step with tools checks the claims before they cost a session.
 6. **Knowledge crosses session boundaries as a handover.** A supervisor message, a finding's dispute, a dead session's state: all of it lands in a note the next session reads first.
 
@@ -345,7 +345,7 @@ flowchart LR
     A1[continue]
     A2[message into the running session]
     A3[end the session with a handover]
-    A4[confirm or drop each finding]
+    A4[confirm, drop or remark each finding]
     A5[ask a human with a typed reason]
   end
   PS --> CK[Check-in agent, strong rung]
@@ -368,7 +368,7 @@ flowchart LR
 |---|---|---|
 | In session | A detector trip or the scheduled check-in, as today | "You check on session 2 of 3 of card #836, 'A Forgejo review reaches its card'. This session works on review findings: <list>. No harness event for 5 minutes. Budget left 3.1 of 5 EUR, time left 71 of 120 minutes. Decide: continue, message, or end with a handover." |
 | Session ended without a verified push | Budget refusal, time, step cap, loop, no changes | "Session 1 of card #839 ended: the gateway refused a call, 0.15 EUR left. The branch holds commit ddf3ffa, not yet judged. Write the handover for the next session, or ask a human if only a human can decide." |
-| Gate returned findings | Review `concerns`, red checks, failed reproduction, a human's request for changes | "Head 9a02364 of card #836: the review answered concerns with 2 findings. The checks are green. The agent's report says finding 1 is disputed: 'TasksByPR exists on main'. Confirm or drop each finding. Then decide: a fresh session with a handover, or a human." |
+| Gate returned findings | Review `concerns`, red checks, failed reproduction, a human's request for changes | "Head 9a02364 of card #836: the review answered concerns with 2 findings. The checks are green. The agent's report says finding 1 is disputed: 'TasksByPR exists on main'. Confirm, drop or remark each finding. Then decide: a fresh session with a handover, or a human." |
 
 **Where it runs.** In session, it is a second conversation inside the agent's own pod, with read-only tools on the live workspace. It sees the test log, the git state and the files as they are. At the other two moments the agent's pod is gone, so the check-in runs first in the next session's pod, before the coding conversation starts. It writes the handover, and the coding conversation starts with it. If the check-in decides that a human must act, the pod stops before the agent spends anything. No new pod shape, no new credentials.
 
@@ -395,13 +395,15 @@ flowchart TD
   CK -->|goal conflict, spend, policy class, access| H
 ```
 
-The review keeps judging the diff alone. A `concerns` verdict no longer costs a session by itself. The check-in confirms each finding against the repository, the checks and the agent's report. A confirmed finding goes to one fresh session with the fix named where the check-in found it. A confirmed finding that fails a second time goes to the human, with what both sessions tried.
+The review keeps judging the diff alone. A `concerns` verdict no longer costs a session by itself. The check-in confirms, drops or remarks each finding against the repository, the checks and the agent's report. A confirmed finding goes to one fresh session with the fix named where the check-in found it. A confirmed finding that fails a second time goes to the human, with what both sessions tried.
 
 **Dropping a finding has three guardrails.** A drop removes the only independent signal, so it is the most dangerous new power.
 
 1. Every dropped finding cites evidence that can be checked again: a file and line at a commit, or a command and its output. A drop without evidence is not a drop.
 2. The approval card shows every dropped finding with that evidence.
 3. A drop never counts as the review's approve. When every finding is dropped, the review runs again and reads the drop record instead of its own last review. Only the review's own approve merges under the auto rule or reaches the approval card as an approve. A finding the review raises again after a drop goes to the human with both records.
+
+**The third verdict, remark.** A finding that is an opinion, on style or on maintenance, can be neither dropped by evidence nor confirmed as a defect. It becomes a remark: it goes onto the card, blocks nothing and starts no session. The "maintenance concern" on #838 is one.
 
 The check-in reads the agent's report, so it is less independent than the review. The evidence rule limits the damage: a drop the human or the next review cannot check again is not allowed.
 
@@ -433,23 +435,54 @@ flowchart TD
 
 ### Changes that need no model
 
-These thirteen changes are bugs or gaps in code, and the check-in agent does not replace them. They come first, because they cost nothing per card.
+These twenty-two changes are bugs or gaps in code, and the check-in agent does not replace them. They come first, because they cost nothing per card.
+
+**Budget and attempts**
 
 | Change | Problem it ends |
 |---|---|
-| The check before each attempt is `SessionFunded`, which prices a session's opening calls from the ledger, not `AttemptFunded`, which prices 1,024 output tokens on an empty prompt. A session that cannot fund its opening calls does not start. | 3, 8 |
-| A refused attempt takes its number back, as the day-cap branch of the attempt loop already does. | 3, 8 |
-| The answer to a fund question reaches the next session, as the day-cap branch's answer already does. | 8 |
-| Budget left, time left and the attempt number stand in the brief, and a warning line reaches the agent near a limit. Roadmap 199. | 3, 5 |
+| The session cap counts the sessions that started and got a model answer, read from the `session_started` records, not the attempt loop's turns. A starved session counts as none, like a provider refusal of the first call does today, and no branch of the loop needs its own correction. The control flow changes, so runs in flight need a Temporal version gate. | 3, 8 |
+| The check before a session prices a useful session: `SessionFunded` for the opening calls, and above it a floor per rung in policy. A session that cannot fund it does not start. | 3, 8 |
+| Every wait for a human returns its answer, and one place adds it to the next session's input. Fund takes a note and resumes the card in one step. | 8 |
+| A card's budget derives from its rung and its size. A card filed on the strong rung gets at least the medium budget. | 3 |
+
+**Facts and detectors**
+
+| Change | Problem it ends |
+|---|---|
+| Budget left, time left and the attempt number stand in the brief, and a warning line reaches the agent near a limit. Roadmap 199. | 3, 5, 8 |
+| A spend-without-push detector: a card past a share of its budget with no push trips the in-session check-in. | 3, 8 |
+| A context-size detector: at a token threshold the in-session check-in ends the session with a handover, and a fresh session starts on the pushed work. If the worker can trigger opencode's own compaction through the serve API, that comes first. Check before choosing. | 8 |
 | A blocking wait tool for background jobs, so a long test run costs one call, not one per poll. | 3 |
-| A `concerns` verdict without findings is a remark on the card, not a finding and not a session. | 1 |
-| A dead session's command lines never pass as findings. The handover replaces them. | 3 |
 | The planner has a check-in and a warning at two thirds of its time. At the limit the card gets a check-in and a fresh session, not a fail. | 5 |
-| The stale sweep reads from Temporal whether the card's workflow is alive and escalates only a dead run, in any state. A quiet wait on a dependency is no signal. | 6 |
+
+**Findings and the review**
+
+| Change | Problem it ends |
+|---|---|
+| A `concerns` verdict without findings is a remark on the card, not a finding and not a session. | 1 |
+| A review finding that claims a name is absent, undefined or never called is grepped at head and at main before it counts. | 2, 8 |
+| Each call of a review in parts reads the names every other part adds: functions, types, routes, selectors. | 8 |
+| A deterministic anti-cheat check flags a diff that skips or removes a test, as a finding for the check-in. Roadmap 64. It catches named shapes only. A check weakened inside a test, as on #839, is the check-in's to see. | 3 |
+| A dead session's command lines never pass as findings. The handover replaces them. | 3 |
 | Human answers keep, each with its date and the question it answered. A newer answer or a request for changes replaces an older one explicitly, and the findings, a request for changes among them, stand above the answers in the brief. | 7 |
 | The approval at the cap with red checks offers "return to the agent" and "close", not Approve, like item 264 does for the factory's own pull requests. | 4 |
-| A deterministic anti-cheat check flags a diff that drops, skips or loosens a check or a test, as a finding for the check-in. Roadmap 64. | 3 |
-| The check-in's dropped and confirmed findings are records on the card, next to the adjudications. Roadmap 57. | 2 |
+| The check-in's dropped, confirmed and remarked findings are records on the card, next to the adjudications. Roadmap 57. | 2 |
+
+**Briefs and the sandbox**
+
+| Change | Problem it ends |
+|---|---|
+| The sandbox's capabilities stand in the planner's and the agent's briefs as a fact: the tools in the image, the egress list, and no browser where there is none. | 8 |
+| A pinned Chromium and Playwright in the sandbox image, so a UI card runs the console lab itself, and a lab gate that runs the lab's checks and attaches the screenshots for the human or a vision critic. | 8 |
+
+**Records**
+
+| Change | Problem it ends |
+|---|---|
+| The stale sweep reads from Temporal whether the card's workflow is alive and escalates only a dead run, in any state. A quiet wait on a dependency is no signal. | 6 |
+| A session record says `pushed` when the worker pushed the work in progress. The handover and the verify step read that outcome. | 3, 8 |
+| A cancelled call is settled from the provider's spend log, not booked at its full hold. | 8 |
 
 Commit `42b608e`, which took the merge rule out of the review's input, stays.
 
@@ -478,9 +511,15 @@ Per failure, the ladder spends one check-in, about 0.1 EUR, to decide whether a 
 
 ### The order of work
 
-1. **The thirteen code changes.** They stop the money: the planner's 2.53 EUR, the starved sessions, the polling. They do not stop the day's recurring failure, the false review finding, which cost #836 two sessions and #838 one, and returned on #853.
+1. **The twenty-two code changes.** They stop the money: the planner's 2.53 EUR, the starved sessions, the polling, the context that grows past 100,000 tokens. They do not stop the day's recurring failure, the false review finding, which cost #836 two sessions and #838 one, and returned on #853.
 2. **The check-in at the gate moment, with the evidence rule and the replay scenarios.** This is the step that ends the false finding, and the only one that needs the new role. It also carries the human's request for changes and the cap.
 3. **The in-session moment and the dead-session moment.** The in-session check-in replaces the session supervisor's call, with the gate results and the card's facts added to its input. The dead-session check-in writes the handover the next session reads.
+
+### How to tell whether it worked
+
+[escalation-ladder-validation.md](escalation-ladder-validation.md) is the brief for a session that looks at the factory from the outside after one real batch on the new ladder. It asks whether the cards healed without a human, what the check-in agent read, which tools it used and how often, whether its verdicts held, whether the next session used the handover, and what everything cost against the baseline of 2026-10-15.
+
+That document is part of the implementation in one way: it names the records the implementation must write, so that its questions can be answered. Per check-in, the moment, the statement, the tail's size, every tool call with its name, arguments, result size and duration, the decision, the evidence and the cost. Per finding, the verdict with its evidence and what the re-review and the human did with it. Per handover, the text and the session that read it. Per detector trip, the outcome. A record the validation cannot find is its first finding.
 
 ## 6. What stays
 
