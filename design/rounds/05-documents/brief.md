@@ -15,7 +15,7 @@ Sebastian on 2026-10-15: he reads the roadmap and the plans in his editor and wa
 ## The facts on the factory's side
 
 - The chat's agent reads and writes documents with two tools, `read_doc` and `write_doc`, on the project's document repository, under a path allow-list (docs/roadmap.md, docs/plans/, docs/board/, docs/<name>.md). A write is one commit straight to master, under a lock per repository and a content-hash compare-and-swap: a write whose base hash is stale is refused with the current content. A human's save goes through the same door with the human's own Forgejo token, so the commit names the member.
-- Item 263's `backlog` block names a project's document repository and its backlog file, so a user project shows its own documents and the factory's projects show this repository.
+- Item 268's `backlog` block names a project's document repository and its backlog file, so a user project shows its own documents and the factory's projects show this repository.
 - Anything beyond the screen, history, blame, a long rewrite, is Forgejo's page, reached by an "Open in Forgejo" link in the document's head.
 - The card drawer is the one slot beside the board today: 46 percent of the width at most 720 px, docked at the right edge over the board, never over the chat, full screen on the phone. It holds one thing at a time.
 
