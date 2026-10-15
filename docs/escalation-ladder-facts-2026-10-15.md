@@ -186,6 +186,7 @@ This happened after the first version of this file.
 - **The question.** At 17:47:28, 1 hour later, each asked a human: "The card was quiet for 1 h 0 min while waiting on its dependencies: is its run gone?" Its next step read: "Reply on this issue to start a new attempt with your comment as guidance, or close the issue to fail the task."
 - **Who asks.** The question comes from the stale sweep (`StaleSweep`, `internal/factoryd/temporal.go:204-275`). The sweep covers a card in `running`, `waiting-deps` or `waiting-poster` whose timeline and events stayed quiet for the stale window. It first sends the workflow a nudge signal. If the card is still quiet a window later, and no gate activity of it runs, the sweep moves it to `waiting-human` from outside the workflow (`escalateStale`, `temporal.go:313-343`).
 - **The answer changed nothing.** The controller answered at 17:47:44 that the dependency #853 was in review. The cards stayed `waiting-human`. Their workflows still wait on #853 and do not read the answer during that wait.
+- **It repeats.** At 18:57:10 the same question came again for #855 and #856, an hour later, while #854 was running and they waited on it.
 
 **Controller's interpretation.**
 
