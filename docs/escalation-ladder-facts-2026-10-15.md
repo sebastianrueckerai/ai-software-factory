@@ -157,6 +157,23 @@ The factoryd logs of that afternoon are gone with its restarts.
 - **The cap's approval offers Approve on red checks.** At the cap, red checks go onto the approval card with the other findings. The console offers Approve and Deny for an agent card whatever the checks say. It refuses Approve on red only for pull requests the factory itself opened.
 - **The review repeated an unfounded question.** It could not check the claim, for the reason in problem 2.
 
+### Problem 5: the planning card for the documents feature ran out of time and failed without asking anyone (card #851)
+
+This happened after the first version of this file.
+
+**What happened.**
+
+- **The card.** Card #851 (task t-4adb0a7925f1) is the plan card for roadmap item 277, "The documents in the screen". It went into the plan lane at 15:49:38. A plan card runs one planning session, which reads the brief and the repository and files a plan of up to 12 cards through its `file_plan` tool.
+- **Its brief** pointed at the written plan and at the design prototype in `/workspace/docs`. The prototype is 171 KB of HTML and 57 KB of JavaScript.
+- **The planner's limits.** Its agent time is 30 minutes, with no check-in (`policy.yaml`, class `planner`: `time: {agent_time: 30m, check_in: 0s}`).
+- **The session.** It ran from 15:49:40 to 16:19:43 on glm-5.3. It made 75 calls, which sent 6.0 million prompt tokens and returned 135,000 output tokens, 2.53 EUR at list prices. It never filed a plan. Its end reads `outcome: no_report`, "opencode serve: context canceled", and the plan record reads "the session ended without filing a plan through the file_plan tool".
+- **The failure.** At 16:19:46 the card failed with "wall-clock cap reached". The plan workflow fails a plan card at once when its agent time is used up (`internal/factoryd/plan.go:1082-1085`). No question went to a human, and no supervisor looked at the session.
+
+**Controller's interpretation.**
+
+- **The brief was too wide.** The planning session read far more than it needed. The plan was already written, and the prototype is the cards' concern, not the planner's.
+- **Nothing watched the planner.** With no check-in and no question at the time limit, nothing told the planner to file a plan before its time ran out. Nothing asked a human whether to give it more time.
+
 ### For comparison: a card that went as intended (card #840)
 
 Card #840 pushed after 26 minutes. Its first review (comment 15842) raised a possible data race on a new key field, which was a fair point. The second session fixed it with an atomic pointer and a race test. The second review (comment 15900) approved. The supervisor's check-ins answered `continue`. The controller read the diff and approved. Two sessions, no intervention beyond the approval.
