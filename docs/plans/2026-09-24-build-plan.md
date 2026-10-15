@@ -5677,6 +5677,13 @@ infra.
   request (739e848). A factory pull request card is known by its source,
   inserted with its pull request in one row, and a restart in a waiting
   state runs its gates, never a session (ea38025).
+- 49's model half checked live on code card #816 (pin an
+  ecdsa-sha2-nistp256 and an ssh-rsa public key as clean in the diff
+  scanner's test): the audit ran beside the checks on both heads (100
+  and 122 output tokens) and flagged neither key, so no false positive.
+  The review sent the first head back for an ssh-rsa blob too short for
+  a real key, approved the second; filed to merged (PR 819) in 49
+  minutes, three sessions, 0.1891 EUR. 49 is done.
 - go.mod names toolchain go1.26.9, the images' Go, so a local test runs
   the Go CI runs (a27f1c8). Under go 1.25.0 alone the race suite crashed
   in factoryd with "fatal error: fault", the night's unexplained
