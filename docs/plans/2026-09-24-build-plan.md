@@ -5614,6 +5614,27 @@ infra.
   14,520 bytes, the approver's from 27,989 to 19,735 (9566971, 7d76b78,
   47869cb). Found on the way: the level control reset a project's
   custom backlog cap to 8 on every change (47869cb).
+- 201's worker brief and supervisor (items 1 to 11): each fact once,
+  every carried list capped, review findings outlast unpushed sessions,
+  every factoryd model call reads compact JSON with its tails as lines,
+  and a bash command stays whole wherever factoryd decides, cut to 512
+  bytes only where a model reads it (641bf08, 5dd2723, 6e4c4ca, 993db2a).
+  Supervisor call 1 fell from 54,327 to 38,224 bytes, call 2 from 56,776
+  to 46,922. An acceptance command is proven only by a run whose exit
+  status is the command's, so a red run piped to tee closes no card
+  (836b62f, b991e26). 201 and 200 are done.
+- 222's audit half: the audit runs beside the checks under the review's
+  rule and is taken at its stage's turn, a project without the audit
+  skips the stage at its turn (4bfd30c). A harness card with 10 minutes
+  of checks and a 4-minute audit asks for approval at 10 minutes, not
+  14. The review half ran live on scratch12 #32: its call 4 seconds
+  after the checks started, the card filed to merged in 7 minutes 48
+  seconds for 0.0090 EUR. 222 is done.
+- 257 the Projects page and the projects chat tool show each
+  environment's deploy state from its Flux Kustomization, read at once
+  for all environments (882a819, 2caf0fd); hello-import's and
+  sqlite-import's staging read "not deployed yet". Its alert half is
+  roadmap 259.
 - go.mod names toolchain go1.26.9, the images' Go, so a local test runs
   the Go CI runs (a27f1c8). Under go 1.25.0 alone the race suite crashed
   in factoryd with "fatal error: fault", the night's unexplained
