@@ -5640,6 +5640,28 @@ infra.
   0.01 EUR), z.ai serves heavy work while its quota lasts and the local
   session between, and a provider's budget refusal waits on the
   provider-wait gate (ruling 267) with a named card.
+- 240 a session the day cap refused names the refusal, counts no
+  attempt when refused at its first call, and the card waits until the
+  day's free headroom funds a session (checked every 5 minutes) or the
+  UTC day turns, then resumes on its own and resolves its alert; a
+  healed run keeps that wait (0efe35e, 2bd10ce). Plan, split and report
+  sessions read the day, month and project caps too, and name a call
+  that crossed its cost hold, 241's open part (f804adb, 2bd10ce). 58's
+  open part: a clone that failed on the way to Forgejo is tried again,
+  and repro mode reports a failed init as a start failure (0c324cb).
+  None seen live.
+- 237: a plan acceptance in the burst window after a planner session is
+  taken there (c192e61). The quiet window stays timed from the wait's
+  take of the first comment: a window from the comment's own time would
+  split a burst delivered late, so 237 is done. 202: a red queue head
+  gets three re-runs, a turn on an unmoved main counting as one, and
+  leaves after six turns while main keeps moving, its escalation naming
+  both counts (825b232, 1f2b1ae, 58d51b0).
+- Run 1250 went red on a data race in the gate test harness: a review
+  beside the checks wrote the harness's record under a lock the policy
+  mock did not take. Every mock of the gate and queue harnesses now
+  locks one mutex (d67a02e). The roller's mainfix card #811 was closed
+  at 0.0025 EUR.
 - go.mod names toolchain go1.26.9, the images' Go, so a local test runs
   the Go CI runs (a27f1c8). Under go 1.25.0 alone the race suite crashed
   in factoryd with "fatal error: fault", the night's unexplained
