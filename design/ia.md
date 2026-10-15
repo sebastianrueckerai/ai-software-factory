@@ -93,3 +93,7 @@ The oklch ladder and the state hues of proposal v1 stay as the base tokens (`bas
 | console.css | split into `base.css` (tokens, mechanics, layout) and `skins/*.css` |
 
 Every existing test keeps passing or gets the one-line change its new markup needs, with the reason in the commit.
+
+## The routines (C16)
+
+Every routine of the project stands as a ghost card at the foot of the lane its card will land in: a human-card routine under Needs you, an agent-card or pull-request routine under Queued. The ghost shows the title with ↻, the schedule in words, the next run, the last run with its outcome, and the acts Skip once and Run now. A lane's count stays the count of its real cards. The board's head holds "↻ routines ▾" right of the find box with three radios, all, within 7 days, none, kept in the URL beside the filters. A lane with hidden ghosts ends in one faint line that opens the control. The instrument strip gets one cell only when a run is under an hour away or held. A ghost opens the routine's drawer (Overview, Runs, Config). A card a routine filed carries the chip "↻ routine" and the provenance line in its drawer. The chat creates, changes and deletes routines through tools. On the phone the ghosts sit at the foot of their lane's section and the control is a row in the board's head.

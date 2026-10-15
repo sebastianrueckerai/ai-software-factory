@@ -14,6 +14,10 @@ The runner-up is B. Board alone, both critics' first pick of the first loop, wit
 
 Two things for the implementation, not design questions: the strip's cell and the ghost card must read as one system (Gemini's one craft note on the hybrid), which the same ↻ glyph and the same words do, and the ghost card's text on the phone wraps to five lines and wants one line fewer.
 
+## The pick: C16
+
+Sebastian picked the hybrid on 2026-10-15 and amended it: every routine of the project stands as a ghost card at the foot of the lane its card will land in, so all of them are in view, with a control in the board's head that hides the far ones or all. The status panel's Routines column is out, since the board holds the one list. The strip's cell, the chip, the provenance line and the routine's drawer stay. The main chat creates, changes and deletes routines through tools. The schedule is any mix of a cron pattern, a merge count and an event, stated in words on the card. Run now files the card at once and the autonomy level decides the start. Routines are per project. The word: the thing is a routine, its rhythm line is its schedule. Recorded as C16 in [design-decisions.md](../../design-decisions.md), with [ia.md](../../ia.md), [the inventory](../../inventory.md) and [the theme](../../themes/06-mission-control/DESIGN.md) updated. The factory's side, with the clock as Temporal Schedules and store counters reconciled from the configuration tree, is in [docs/routines.md](../../../docs/routines.md) and roadmap 267.
+
 ## The directions
 
 Eight directions, both themes, `google/nano-banana-2.1` at 1K, $0.15 each, $2.40: [the dark sheet](contact-sheet-dark.jpg), [the light sheet](contact-sheet-light.jpg). The prompts share one head (the fixed shell of 2026-10-15 with the thread table and the moon and sun selector), one content block (the four routines and the two jobs at Monday 05:40, the two done cards with the chip, the acts) and differ in the home.

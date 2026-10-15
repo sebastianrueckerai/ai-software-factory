@@ -61,3 +61,15 @@ Read off the templates in `internal/console/templates/` on 2026-10-13 (code comm
 - Timeline: the card face, the gates table, the steps table.
 - New task: project, title, description, track (direct or plan, direct the default), priority, size, File the issue (225).
 - New project: name, process, template, GitHub source and token (import), merge rule, File the project; then the status panel with steps and Merge.
+
+## The routines (C16)
+
+- Board head: the control "↻ routines ▾" with the radios all, within 7 days, none. State in the URL.
+- Ghost card at the foot of a lane: ↻ and the title, the schedule in words, next run, last run and outcome, held line, Skip once, Run now. A click opens the routine's drawer.
+- Lane foot when ghosts are hidden: "n routines hidden", opens the control.
+- Instrument strip: the cell "↻ bump in 20 min" or "↻ bump held", only when a run is under an hour away or held.
+- Card face: the chip "↻ routine" after the state row on a card a routine filed.
+- Drawer of such a card: the provenance line under the top block, the routine's name as a link.
+- The routine's drawer: title with ↻, the mono subtitle, tabs Overview (top block: schedule, next, last, while open, tells; the acts; the brief; the runs; the configuration), Runs (the rows as in the Time section), Config (the yaml, "ask the project agent to change this").
+- Chat tools: `routines`, `routine_write` with a confirm, `routine_delete` with a confirm.
+- Resources page of the infra project: the cluster's jobs, read-only.

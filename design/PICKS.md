@@ -40,8 +40,8 @@ Where the routines live ([the round page](rounds/04-routines/index.html), [the b
 - [ ] A. Panel: the status panel's Routines column, the strip's cell when a run is under an hour away or held
 - [ ] B. Board: the ghost card at the foot of Queued and the "due" menu in its head
 - [ ] C. Chat: the pinned Routines panel under the inbox's head and the factory's poke
-- [ ] D. Hybrid, the recommendation: the ghost card on the board, the strip's cell and the Routines column in the status panel
+- [x] D. Hybrid, the recommendation, amended (Sebastian, 2026-10-15, C16): every routine as a ghost card at the foot of its lane, a control hides the far ones or all, the strip's cell stays, the status panel's column is out
 
-And the word: routine, standing order, or schedule.
+And the word: routine, standing order, or schedule. Sebastian: "you decide". The director: the thing is a routine, its rhythm line is its schedule.
 
-Notes:
+Notes: routines are per project, in the project's file. The main chat creates, changes and deletes them through tools. The schedule is any mix of a cron pattern, a merge count and an event, stated in words on the card. Run now files the card at once and the autonomy level decides the start. The clock is Temporal Schedules and store counters, reconciled from the configuration tree ([docs/routines.md](../docs/routines.md)).
