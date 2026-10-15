@@ -9,7 +9,8 @@ The facts come from [escalation-ladder-facts-2026-10-15.md](escalation-ladder-fa
 ### Terms
 
 - **Card**: one task, filed as an issue. Its id is `t-<12 hex>`, its issue a number such as #836.
-- **Session**: one run of the coding agent in its own sandbox pod with a fresh conversation. A card may take several sessions. The n-th session of a card is attempt n.
+- **Session**: one run of the coding agent in its own sandbox pod with a fresh conversation. A card may take several sessions.
+- **Attempt**: the counter of the attempt loop in the card's workflow. Today a refused attempt takes a number too, so #839's sessions ran as attempts 1, 2, 3 and 5, and #854's as 1, 2 and 4.
 - **Push**: a session's end that leaves a new commit on the card's branch. A push opens or updates the pull request.
 - **Gate**: one check of a pushed change. The gates run in a fixed order after every push.
 - **Finding**: one problem a gate reports. A finding goes back to the agent as a new session, or onto the card for a human.
@@ -167,15 +168,16 @@ flowchart TD
   E[Session ends without a push] --> W{Why?}
   W -->|day or month cap| CAP[Card waits for the cap]
   W -->|provider refusal on the first call| NA[Not counted as an attempt, retried]
-  W -->|anything else, a budget refusal too| NEXT{Attempt number past the cap?}
-  NEXT -->|yes| H[Human: the cap question]
-  NEXT -->|no| FC{Funding check: does the headroom fit 1,024 output tokens on an empty prompt?}
-  FC -->|yes| S[Next session starts at once]
+  W -->|anything else, a budget refusal too| FC{Funding check: does the headroom fit 1,024 output tokens on an empty prompt?}
   FC -->|no| FUND[Human: fund and answer]
+  FUND -->|answered, next attempt number| FC
+  FC -->|yes| NEXT{Attempt number past the cap?}
+  NEXT -->|yes| H[Human: the cap question]
+  NEXT -->|no| S[Next session starts at once]
   S --> F["Its findings are the dead session's last 20 command lines plus its stop reason"]
 ```
 
-A budget refusal has no path of its own. The session ends as `no_push`, and the next attempt starts whenever the funding check passes. That check prices 1,024 output tokens on an empty prompt, so a session with 0.15 EUR of headroom passes it and dies on its first real call, which sends the whole context. The human is asked only when the check fails. That is how #839 ran two starved sessions before its fund question, and #854 one. A session-level check that prices a session's opening calls from the ledger exists, `SessionFunded`, but only the console's Fund button uses it. When the check does fail, the attempt it refused still counts against the cap, and the human's answer to the fund question is discarded. The day-cap branch beside it takes the attempt number back and keeps the answer.
+A budget refusal has no path of its own. The session ends as `no_push`, and the next attempt starts whenever the funding check passes. That check prices 1,024 output tokens on an empty prompt, so a session with 0.15 EUR of headroom passes it and dies on its first real call, which sends the whole context. The human is asked only when the check fails. That is how #839 ran two starved sessions before its fund question, and #854 one. A session-level check that prices a session's opening calls from the ledger exists, `SessionFunded`, but only the console's Fund button uses it. When the check does fail, the attempt it refused still counts against the cap, and the human's answer to the fund question is discarded. The day-cap branch beside it takes the attempt number back and keeps the answer. The funding check runs before the cap check. After a fund the loop moves to the next number and only then meets the cap, which is why #854's fund led straight to the cap question.
 
 Nobody with judgment looks at a dead session. The next session starts at once. Its "findings from earlier attempts" are lines such as `ran sleep 120; ps aux ... (exit 0)` and `changed internal/factoryd/store.go`. They say what was run, not what was wrong. The agent's own understanding of its work is gone with the pod.
 
@@ -253,7 +255,7 @@ Five cards filed at 13:19:53 in project `ai-software-factory-code`, all merged b
 | #839 | A task that ended carries its finish time | 4 run, 2 starved | Funded 3 EUR, named two tests and their fix, answered an audit |
 | #840 | A GitHub mirror's token is sealed at rest | 2 | Nothing |
 | #851 | Plan card of the documents feature | 1 | Refiled it as #852 after it failed. #852 filed a plan in time. |
-| #854 | The documents feature's save endpoint and editor | 2 run, 1 starved, 1 refused | Funded 5 EUR and answered, and the answer was dropped. Answered the cap question with one real finding of eight. |
+| #854 | The documents feature's save endpoint and editor | 2 run, 1 starved, 1 refused | Funded 5 EUR and answered, and the answer was dropped. Answered the cap question with one real finding of eight. Ran the console lab by hand, found one failed check and five gaps against the prototype, and steered the session with them. |
 
 ### Why each problem happened
 
@@ -374,6 +376,8 @@ flowchart LR
 
 **What it costs.** The tail is 24 KiB at most, about 6,000 tokens. Each tool result adds a few thousand. A check-in that reads the review, opens three files and runs one test reads 30,000 to 60,000 tokens over a few calls, about 0.1 EUR at this run's prices. A wasted session costs 0.08 to 0.70 EUR.
 
+**Its model.** The check-in has an alias of its own in the strong group, as the supervisor has today, so policy can point it at a different model than the coding alias. A judge that shares the coder's model shares its blind spots. A different model family is the recommendation where one is available, not a requirement.
+
 **Limits in code.** Calls per card and a budget share, as the supervisor has today. The in-session check-in keeps today's deterministic first response: the cheap cap and the wall clock decide in code without a call.
 
 **The handover note.** The check-in writes it from the agent's report per finding and the evidence it gathered. The agent writes no handover of its own, only the report. The note is at most 2,000 characters, at the top of the next session's brief, above the findings and above the human answers. It names: what the earlier session did, the state of the branch, each finding with its verdict and the reason, what to do first, and what not to repeat. The earlier transcripts lie in the workspace as files, `/workspace/.factory/sessions/<session>.jsonl`, which the agent can grep. They are not in the prompt.
@@ -435,14 +439,14 @@ flowchart TD
 
 ### Changes that need no model
 
-These twenty-two changes are bugs or gaps in code, and the check-in agent does not replace them. They come first, because they cost nothing per card.
+These twenty-one changes are bugs or gaps in code, and the check-in agent does not replace them. Nineteen need no model and come first, because they cost nothing per card. Two need the check-in agent and say so in their row.
 
 **Budget and attempts**
 
 | Change | Problem it ends |
 |---|---|
-| The session cap counts the sessions that started and got a model answer, read from the `session_started` records, not the attempt loop's turns. A starved session counts as none, like a provider refusal of the first call does today, and no branch of the loop needs its own correction. The control flow changes, so runs in flight need a Temporal version gate. | 3, 8 |
-| The check before a session prices a useful session: `SessionFunded` for the opening calls, and above it a floor per rung in policy. A session that cannot fund it does not start. | 3, 8 |
+| The session cap counts the sessions that started and got a model answer, read from the `session_started` records, not the attempt loop's turns. The record is the coding conversation's, not the pod's, so a pod in which only a check-in ran and asked a human counts as none. A starved session counts as none, like a provider refusal of the first call does today, and no branch of the loop needs its own correction. The control flow changes, so runs in flight need a Temporal version gate. | 3, 8 |
+| The check before a session prices a useful session: `SessionFunded` for the opening calls, and above it a floor per rung in policy. A session that cannot fund it does not start. If the floor proves wrong, the refinement is a share of what the card's earlier sessions spent before their first push. | 3, 8 |
 | Every wait for a human returns its answer, and one place adds it to the next session's input. Fund takes a note and resumes the card in one step. | 8 |
 | A card's budget derives from its rung and its size. A card filed on the strong rung gets at least the medium budget. | 3 |
 
@@ -451,10 +455,10 @@ These twenty-two changes are bugs or gaps in code, and the check-in agent does n
 | Change | Problem it ends |
 |---|---|
 | Budget left, time left and the attempt number stand in the brief, and a warning line reaches the agent near a limit. Roadmap 199. | 3, 5, 8 |
-| A spend-without-push detector: a card past a share of its budget with no push trips the in-session check-in. | 3, 8 |
-| A context-size detector: at a token threshold the in-session check-in ends the session with a handover, and a fresh session starts on the pushed work. If the worker can trigger opencode's own compaction through the serve API, that comes first. Check before choosing. | 8 |
+| A spend-without-push detector: a card past a share of its budget with no push trips the in-session check-in, or the supervisor until the check-in exists. | 3, 8 |
+| A context-size detector: at a token threshold the session ends with a handover, and a fresh session starts on the pushed work. If the worker can trigger opencode's own compaction through the serve API, that comes first and needs no model. Otherwise the handover is the check-in's, with step 3. | 8 |
 | A blocking wait tool for background jobs, so a long test run costs one call, not one per poll. | 3 |
-| The planner has a check-in and a warning at two thirds of its time. At the limit the card gets a check-in and a fresh session, not a fail. | 5 |
+| The planner gets a warning at two thirds of its time. At the limit the card gets a fresh planner session, not a fail. The check-in and its handover at that moment come with step 3. | 5 |
 
 **Findings and the review**
 
@@ -462,19 +466,18 @@ These twenty-two changes are bugs or gaps in code, and the check-in agent does n
 |---|---|
 | A `concerns` verdict without findings is a remark on the card, not a finding and not a session. | 1 |
 | A review finding that claims a name is absent, undefined or never called is grepped at head and at main before it counts. | 2, 8 |
-| Each call of a review in parts reads the names every other part adds: functions, types, routes, selectors. | 8 |
+| One review call reads the whole diff up to the review model's context, about 37,000 tokens for today's three parts of 48 KiB. Only a diff beyond that is read in parts, and then each part's call reads the names the other parts add. | 8 |
 | A deterministic anti-cheat check flags a diff that skips or removes a test, as a finding for the check-in. Roadmap 64. It catches named shapes only. A check weakened inside a test, as on #839, is the check-in's to see. | 3 |
 | A dead session's command lines never pass as findings. The handover replaces them. | 3 |
 | Human answers keep, each with its date and the question it answered. A newer answer or a request for changes replaces an older one explicitly, and the findings, a request for changes among them, stand above the answers in the brief. | 7 |
 | The approval at the cap with red checks offers "return to the agent" and "close", not Approve, like item 264 does for the factory's own pull requests. | 4 |
-| The check-in's dropped, confirmed and remarked findings are records on the card, next to the adjudications. Roadmap 57. | 2 |
+| The check-in's dropped, confirmed and remarked findings are records on the card, next to the adjudications. Roadmap 57. With step 2, since the check-in writes them. | 2 |
 
 **Briefs and the sandbox**
 
 | Change | Problem it ends |
 |---|---|
 | The sandbox's capabilities stand in the planner's and the agent's briefs as a fact: the tools in the image, the egress list, and no browser where there is none. | 8 |
-| A pinned Chromium and Playwright in the sandbox image, so a UI card runs the console lab itself, and a lab gate that runs the lab's checks and attaches the screenshots for the human or a vision critic. | 8 |
 
 **Records**
 
@@ -485,6 +488,12 @@ These twenty-two changes are bugs or gaps in code, and the check-in agent does n
 | A cancelled call is settled from the provider's spend log, not booked at its full hold. | 8 |
 
 Commit `42b608e`, which took the merge rule out of the review's input, stays.
+
+### Beside the ladder: the screen of a UI card
+
+Nothing in the ladder finds the defects of a UI card. On #853 and #854 the real defects came from the human's console lab run compared with the prototype: four gaps on #853, one failed check and five gaps on #854. The review reads the diff, the check-in checks the review's claims, and neither sees the screen. The agent cannot see it either, since the sandbox has no browser, and #854's first session spent calls trying to install one.
+
+This is not the ladder's problem. It is the sandbox image's and the verification plane's, and it holds for every UI card, with or without an escalation. It needs two things, as an item of its own: a pinned Chromium and Playwright in the sandbox image, so a UI card runs the console lab itself and checks its own work, and a lab gate that runs the lab's checks and attaches the screenshots for the human or a vision critic to compare with the prototype. Until both exist, every UI card needs a human for the screen, and the replay below counts that.
 
 ### The eight problems replayed
 
@@ -497,9 +506,9 @@ Commit `42b608e`, which took the merge rule out of the review's input, stays.
 | 5 | #851 | The planner gets "file the plan now" at 20 minutes. If it still runs out, the check-in writes what it read and a fresh planner session files the plan. | None |
 | 6 | #854 to #856 | The sweep reads the three workflows as alive and asks nothing. | None |
 | 7 | #853 | The request for changes stands above the dated answer and replaces it. | The request itself |
-| 8 | #854 | The agent reads its budget and pushes before it is gone. No starved session starts, and the refused attempt does not count. The fund answer reaches session 2. The check-in confirms one finding of eight and drops seven with evidence: four by the diff's file list, two by the prototype, one by the code. Session 2 fixes the one. | Fund |
+| 8 | #854 | The agent reads its budget and pushes before it is gone. No starved session starts, and the refused attempt does not count. The fund answer reaches session 2. The check-in confirms one finding of eight and drops seven with evidence: four by the diff's file list, two by the prototype, one by the code. Session 2 fixes the one. | Fund, and the lab run until the lab gate exists |
 
-On 2026-10-15 four of the five code cards, and #854 twice, needed the human beyond the approval. After the changes two cards do, #839 and #854, each once and each to fund. Until the replay scenarios below run, this is a forecast.
+On 2026-10-15 four of the five code cards needed the human beyond the approval, and #854 three times: the fund, the cap answer and the lab run. After the changes two cards do: #839 to fund, and #854 to fund and to run the lab, until the lab gate beside the ladder exists. Until the replay scenarios below run, this is a forecast.
 
 ### How to test the redesign
 
@@ -511,7 +520,7 @@ Per failure, the ladder spends one check-in, about 0.1 EUR, to decide whether a 
 
 ### The order of work
 
-1. **The twenty-two code changes.** They stop the money: the planner's 2.53 EUR, the starved sessions, the polling, the context that grows past 100,000 tokens. They do not stop the day's recurring failure, the false review finding, which cost #836 two sessions and #838 one, and returned on #853.
+1. **The nineteen code changes that need no model.** They stop the money: the planner's 2.53 EUR, the starved sessions, the polling, the context that grows past 100,000 tokens. They do not stop the day's recurring failure, the false review finding, which cost #836 two sessions and #838 one, and returned on #853.
 2. **The check-in at the gate moment, with the evidence rule and the replay scenarios.** This is the step that ends the false finding, and the only one that needs the new role. It also carries the human's request for changes and the cap.
 3. **The in-session moment and the dead-session moment.** The in-session check-in replaces the session supervisor's call, with the gate results and the card's facts added to its input. The dead-session check-in writes the handover the next session reads.
 
