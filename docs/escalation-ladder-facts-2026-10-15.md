@@ -107,6 +107,8 @@ The factoryd logs of that afternoon are gone with its restarts.
 - At the session cap the card came to the controller (approval 776, 14:40). The controller checked main, found the method, and approved. The approval recorded four `finding_adjudicated` entries ("approved in the console"). The card merged at 14:41.
 - During the three sessions the supervisor ran three times, all on the `no_progress` detector ("no harness events for 5m"). It answered `continue` each time, with no guidance. It reported progress ("The agent has completed all required work", "The agent is making solid progress").
 
+- **The same pattern returned the same day on card #853.** That card is the first of the documents feature, pull request 857, head `3cc686a`, review at about 17:36. The review held: "docRootOK(resolved) is called on line 106 but never defined in this part or any visible file; without it the package will not compile". `docRootOK` is defined on main at `internal/console/autonomy.go:227`. The controller told the running agent so through the console's steer action at 17:38:15, the event `card_steered`.
+
 **Controller's interpretation.**
 
 - **The reviewer reads only the diff.** Each review call is one chat completion without tools. It cannot open a file outside the diff, so it cannot check a claim such as "this method has no implementation".
