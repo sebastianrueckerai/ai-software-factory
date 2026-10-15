@@ -5820,6 +5820,14 @@ infra.
   made on 2026-10-15 without Sebastian's OK: told the human merge
   rule, the review answered concerns on changes it called sound and
   complete, which sent finished cards back to their agents.
+- Agent sessions of a project that names a document repository
+  (chat.doc_repo) read its text files at /workspace/docs (code 7fe834c,
+  infra e5e0bc4, live on 1532d3b70f51): the session's read token covers
+  the repository, the clone container makes a shallow, partial, sparse
+  clone of the text files, and the brief names the folder. The factory's
+  two projects name sf/ai-software-factory, and factory-agent reads it.
+  Live: card #851's planning session held the design round's prototype
+  there, 15 MB against the repository's 370 MB.
 - go.mod names toolchain go1.26.9, the images' Go, so a local test runs
   the Go CI runs (a27f1c8). Under go 1.25.0 alone the race suite crashed
   in factoryd with "fatal error: fault", the night's unexplained
