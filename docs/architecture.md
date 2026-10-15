@@ -588,9 +588,10 @@ records. Registration (5.1) prints the YAML, and the controller or a human
 commits it. factoryd does not patch the Gateway, because Flux owns it and
 would revert the patch, and a wildcard certificate needs the DNS-01 provider
 we do not have. The commit is also the human's OK for each project. The demo
-app's names, `demo-staging` and `demo`, wait for hand-made A records:
-Namecheap's dynamic DNS API updates existing records only, and until the
-records exist the certificates and listeners stay not ready.
+app's names, `demo-staging` and `demo`, never got their hand-made A
+records (Namecheap's dynamic DNS API updates existing records only), and
+their listeners and certificates went with the toy projects on
+2026-10-15.
 
 ### 4.1 Object storage: Hetzner Object Storage versus running S3 ourselves
 

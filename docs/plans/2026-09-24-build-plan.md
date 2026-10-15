@@ -5783,6 +5783,22 @@ infra.
   finish stamp, else its filing) and id, the order the console shows, so
   a card that finishes between two pages neither repeats nor pushes one
   off. The chat's board read counts a finished column whole.
+- The toy projects are gone (Sebastian: "I only need the project of the
+  factory building itself"). demo-app, hello-import, linkshort to
+  linkshort4, notes, scratch12, scratch-seed, sqlite-import, uptime and
+  uptime2 left factory/projects (infra cc806fb, with demo-app's edge
+  listeners and certificates). Their Kustomizations, GitRepositories and
+  namespaces are deleted. In Forgejo, 90 container image versions, 31
+  repositories (each project's own and its forks), the archived
+  sf/demo-app, 11 organisations, 11 CI users and 22 tokens on
+  factory-projects and factory-merge are deleted. 535 LiteLLM keys (the
+  toy tasks' and two failed test tasks' of 2026-09-28), the projects and
+  project_mirrors rows and the pulses are deleted, and the 10 chat tasks
+  are closed. Tasks, events, the
+  ledger and the session timelines stay as history. This closes 242:
+  what still pulled from Docker Hub were those projects' own
+  Dockerfiles and their databases' default image. The reseed runbook's
+  token rotation now reads factory/projects instead of a list of names.
 - go.mod names toolchain go1.26.9, the images' Go, so a local test runs
   the Go CI runs (a27f1c8). Under go 1.25.0 alone the race suite crashed
   in factoryd with "fatal error: fault", the night's unexplained
