@@ -11,7 +11,7 @@ Read off the templates in `internal/console/templates/` on 2026-10-13 (code comm
 
 ## Board page
 
-- Filter: Project select. The find box (C13): words and `key:value` terms (`plan:`, `stage:`, `status:`, `is:`, `by:`, `model:`, `pr:`), Enter submits, × clears, `f` focuses, Escape in the box clears. View toggle: Four columns or Wide view (the same four columns across the full width, the chat hidden). Keys button.
+- Filter: Project select. The find box (C13): words and `key:value` terms (`plan:`, `stage:`, `status:`, `is:`, `by:`, `model:`, `pr:`), typing filters the board after a short pause and Enter still submits, × clears, `f` focuses, Escape in the box clears. View toggle: Four columns or Wide view (the same four columns across the full width, the chat hidden). Keys button.
 - Status line: project name; state word (working, waiting on you, idle) with a dot; n working; n waiting on the provider (when any); n need you (links to Needs you); spend / month cap (links to Costs); GitHub state (when exported). A click on the line expands it in place: the working cards by name and stage, the cards that need you, the spend today against the day cap and the month against its cap, the provider state, the GitHub pull requests, the configuration version and its infra commit linked to the tree (item 221, C9).
 - Pulse: warning sign when prominent; one sentence; typing indicator while recomputing; three or four bullets behind the band's disclosure (no more/less button: the band expands on click).
 - Four columns, each a title and a count ("n of m" when narrowed): Needs you, Queued (waiting for capacity or on dependencies), In progress (running, closing and in review, the stage on the card), Done (C8). No lane columns (225). The column menus (C13), a ▾ in the head of Queued, In progress and Done: the orders (newest first, oldest first; Queued next up; In progress by stage, by spend) and the shows (Queued blocked only, from plan #n; In progress exceptional only; Done failed only) as radios with Apply; the state line under the head with ×.
@@ -65,7 +65,7 @@ Read off the templates in `internal/console/templates/` on 2026-10-13 (code comm
 
 ## The routines (C16)
 
-- Board head: the control "↻ routines ▾" with the radios all, within 7 days, none. State in the URL.
+- Board head: the control "↻ routines ▾" with the radios all, within a period (a number and days or hours, 1 day at first), none. State in the URL.
 - Ghost card at the foot of a lane: ↻ and the title, the schedule in words, next run, last run and outcome, held line, Skip once, Run now. A click opens the routine's drawer.
 - Lane foot when ghosts are hidden: "n routines hidden", opens the control.
 - Instrument strip: the cell "↻ bump in 20 min" or "↻ bump held", only when a run is under an hour away or held.

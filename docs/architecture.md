@@ -2815,8 +2815,8 @@ trigger, card, outcome, note and cost) and `routine_merge_cursor`.
 **The rules that remove the surprise** are listed in routines.md. On the
 screen (5.6 and 5.7): every routine of the project stands as a ghost card
 at the foot of the lane its card will land in, with its schedule and its
-next run in words, and a control in the board's head hides the ones over
-a week away or all of them. The strip's cell names a run under an hour
+next run in words, and a control in the board's head hides the ones beyond
+a period (a number of days or hours, 1 day at first) or all of them. The strip's cell names a run under an hour
 away or a held one. A filed card carries a chip naming its routine and
 run, and its drawer a provenance line. A ghost opens the routine's drawer
 with Overview, Runs and Config and two acts: Skip once, a pending skip
