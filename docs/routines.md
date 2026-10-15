@@ -2,18 +2,18 @@
 
 This file holds the facts and the design behind the periodic tasks: work the factory does on its own at a rhythm, such as the weekly bump of the pinned outside inputs or an audit after twenty merges. Sebastian's question of 2026-10-15: a timer that files a card works, but it surprises. Where does a member see what runs on its own, and how does that marry with the one screen? The human's side is the design round [design/rounds/04-routines/](../design/rounds/04-routines/index.html) and Sebastian's pick, C16 in [design-decisions.md](../design/design-decisions.md). This file holds the factory's side. The [roadmap](roadmap.md) item 267 holds the status.
 
-## What runs on its own today
+## What ran on its own before the routines
 
-Two clocks live as Go constants, and nothing in the console shows them.
+Two clocks lived as Go constants, and nothing in the console showed them. Both are routines since 2026-10-15 (roadmap 267).
 
 | Clock | Rhythm | What it files | Where |
 |---|---|---|---|
 | The weekly upstream card | 7 days after the last filing, none while one is open | A human card, "Weekly bump of the pinned outside inputs", on the code repository, author factoryd | `internal/factoryd/upstream.go`, run by the roller's poll |
 | The template pass | 5 minutes after factoryd starts, then hourly and on each new configuration version | A "Template update" pull-request card per project whose render differs | `internal/factoryd/templateupdate.go`, run by the registrar |
 
-Both were decided in the roadmap (165, 187, 203, 242) and both surprised. The template pass filed eight cards at once on 2026-10-13, and every one failed at intake (old item 260). The weekly card's rhythm drifts, since it counts from the last filing and not from a clock time. Both clocks are timers in a goroutine's memory: a restart moves them, and no record says when the next run is.
+Both were decided in the roadmap (165, 187, 203, 242) and both surprised. The template pass filed eight cards at once on 2026-10-13, and every one failed at intake (old item 260). The weekly card's rhythm drifts, since it counts from the last filing and not from a clock time. Both clocks were timers in a goroutine's memory: a restart moved them, and no record said when the next run was.
 
-More runs on a clock without filing cards: the hourly reconcile, the daily revert pass, the pulse's 60 second fallback, the CNPG backup at 02:00 and the Forgejo dump at 02:30 as CronJobs in the cluster, and main's nightly CI run, which the roller once misread as a push run and answered with fix card #804.
+More runs on a clock without filing cards: the hourly reconcile, the daily revert pass, the pulse's 60 second fallback, the CNPG backup at 02:00 as a ScheduledBackup and the Forgejo dump at 02:30 as a CronJob in the cluster, and main's nightly CI run, which the roller once misread as a push run and answered with fix card #804.
 
 ## What the baseline rules
 
@@ -54,7 +54,7 @@ routines:
 
 The schedule is a list of triggers, any mix of three kinds:
 
-- `cron`: five fields in the factory's time zone, for any time pattern. The factory words it for the card ("every Monday 06:00", "first Sunday of the month 03:00"), and a pattern it cannot word shows as the expression.
+- `cron`: five fields in the factory's time zone, for any time pattern. A day of the month and a weekday set together must both match, as Temporal reads them, so `0 3 1-7 * 0` is the first Sunday of the month, and a pattern that never fires is refused. The factory words it for the card ("every Monday 06:00", "first Sunday of the month 03:00"), and a pattern it cannot word shows as the expression.
 - `merges`: a count of merged cards in the project since the last run ("every 20 merges · 14 of 20").
 - `on`: an event, `configuration-version` or `push-main`.
 
@@ -65,9 +65,9 @@ The kinds of work a routine files:
 - **pull-request**: a pass that files a card only when something differs, as the template pass does. Most runs end as "no change".
 - **report**: a poke or a document, no card. The weekly cost line, the drift view.
 
-`while_open` says what a run does while the last card is open: hold skips the run and says so, fold adds to the open card as a roll does, file opens another. `missed` says what a run does when its time passed while the factory was down: file once when it is back, or skip. `tell` says whether a filing pokes the inbox. A human card pokes in any case, since a card that needs a person is a poke class.
+`while_open` says what a run does while the last card is open: hold skips the run and says so, fold adds to the open card as a roll does and is a pull-request routine's choice only, file opens another. `missed` says what a run does when its time passed while the factory was down: file once when it is back, or skip. `tell` says whether a filing pokes the inbox, and a report that tells nobody is refused. A human card pokes in any case, since a card that needs a person is a poke class.
 
-The cluster's CronJobs (the backup, the dump) are jobs, not routines. They list on the infra project's Resources page, read-only, with their last outcome.
+The cluster's jobs (the dump as a CronJob, the backup as CNPG's ScheduledBackup) are jobs, not routines. They list on the infra project's Resources page, read-only, with their last outcome.
 
 ## The clock: durable, declared in git, reconciled
 
@@ -86,7 +86,7 @@ The question Sebastian put: how do recurring tasks live in this architecture so 
 | Option | Verdict |
 |---|---|
 | A goroutine with `time.After`, as today's two clocks | A timer in memory moves on every restart, keeps no record of the next run, cannot catch up and cannot be listed. Out. |
-| Kubernetes CronJobs calling factoryd | Right for cluster chores that stay CronJobs (the backup, the dump). Wrong for routines: a CronJob cannot count merges, needs a secret to call factoryd, splits the runs' history across two systems and keeps the factory's identity, budget and audit out of the loop. |
+| Kubernetes CronJobs calling factoryd | Right for cluster chores that stay cluster jobs (the dump, the backup). Wrong for routines: a CronJob cannot count merges, needs a secret to call factoryd, splits the runs' history across two systems and keeps the factory's identity, budget and audit out of the loop. |
 | A scheduler table in Postgres polled by factoryd | Works, and is a second scheduler beside Temporal with its own leader election, catch-up and retry to write and test. Temporal already has all four. |
 | Temporal Schedules plus store counters, reconciled from git | One durable engine for every run, the desired state in git, no hidden clock, idempotent runs, a visible list in the Temporal UI beside the console's. Chosen. |
 
@@ -102,7 +102,7 @@ Each rule is construction, not a prompt.
 4. **The card explains itself.** Source routine, the routine's name, the run's number, the last run's outcome and a link to the routine, on the face as a chip and in the drawer's provenance. The body comes from the brief file in the tree.
 5. **The poke names it.** The decider line reads "routine weekly-bump · every Monday 06:00".
 6. **Fan-out is one run.** A routine over many projects is one run with many cards, listed as one row. A run files at most one card per project.
-7. **Routine work whispers.** A run that files nothing or files an agent card is pulse material. A human card pokes as any Needs you card does.
+7. **Routine work whispers.** A run that files nothing or files an agent card is pulse material: every run of a project routine records one `routine_ran` event, and only a run that tells the inbox turns it into a poke, through the same queue as every other poke. A human card pokes as any Needs you card does.
 8. **A member can act.** Skip once and Run now are acts. Run now files the card at once, and the autonomy level decides who starts it. A change of schedule, a new routine and a deletion go through the chat's three tools, each one commit on the project's file after a confirm.
 9. **History.** Per routine, its runs: when, which card, outcome, duration, cost. The rows reuse the drawer's Time section (C10).
 10. **Identity and money.** A run's card names the routine as its author's reason. An agent routine's cards count against the project's caps and the WIP bound. A routine never bypasses the queue.

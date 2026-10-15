@@ -2760,6 +2760,77 @@ no merge request on a card, so it took a review and a merge in Forgejo
 (roadmap 187). The lane's criterion failed: after the probe no lane card
 landed through the lane, and Ruling 271 triggered once (roadmap 160).
 
+### 5.8 Routines
+
+Designed and built on 2026-10-15 (roadmap 267, C16 in
+[design-decisions.md](../design/design-decisions.md)). The facts and the
+design are in [routines.md](routines.md), and the human's side is design
+round 04. Before it, two clocks lived as Go constants and nothing on the
+screen showed them: the weekly upstream card, 7 days after the last
+filing, and the hourly template pass. Both surprised, and both are the
+first two routines.
+
+**A routine is data in the configuration tree.** A project's file holds a
+`routines:` list, and `policy.yaml` holds the factory's own, today the
+template pass that runs for every project with a template. A routine has
+a name, a brief under `routines/` in the tree, a schedule, the kind of
+thing it files (a human card, an agent card, a pull request, a report),
+what a run does while the last card is open (hold, fold onto it, file
+another), what a missed run does after the factory was down (file once,
+skip) and whether a filing pokes the inbox. The schedule is a list of
+triggers: a cron expression in the factory's time zone (`time_zone` in
+policy.yaml, a day of the month and a weekday set together both
+matching, as Temporal reads them), a merge count ("every 20 merges")
+or an event (a configuration version, a push to main). The schema generator carries the
+fields and their doc comments into the tree's JSON Schema. Validation
+refuses a cron that never fires, a report that tells nobody and a fold on
+anything but a pull-request routine.
+
+**The clock is Temporal, reconciled from the tree.** The desired state is
+in git, a reconcile pass makes the runtime match it, and the runtime is
+durable execution rather than a timer in memory. On every configuration
+version and once an hour, factoryd lists the Temporal schedules whose ID
+starts with `routine/` and creates, updates or deletes them until they
+match the tree's time triggers one to one: ID
+`routine/<project>/<routine>/<index>`, the cron and the zone in the spec,
+overlap policy skip, and a catch-up window of 24 hours for a routine that
+files a missed run once or 10 seconds for one that skips it. The Temporal
+server persists in CNPG's Postgres, so a restart of factoryd or of
+Temporal moves no run. Merge and event triggers are counters in the
+store: a merge pass reads the event log from a cursor and counts merges
+per routine, and a configuration version or a push to main fires the
+event triggers as it happens. A schedule or a counter starts one
+`RoutineRunWorkflow` per due time, ID `routine/<project>/<routine>/<due>`,
+which runs one activity: begin the run in the store (unique on the
+routine and its due, so a second start for the same due does nothing),
+file what the routine files through the primitives a roll or the chat
+uses, end the run with its outcome and record one `routine_ran` event,
+which the Poker turns into a poke behind the chat's line when the
+routine tells the inbox. A run that fails after its
+retries leaves a failed row with the error's text. The store holds three
+tables: `routine_state` (merges since the last merge run, a pending Skip
+once, the run count), `routine_runs` (one row per run with its due,
+trigger, card, outcome, note and cost) and `routine_merge_cursor`.
+
+**The rules that remove the surprise** are listed in routines.md. On the
+screen (5.6 and 5.7): every routine of the project stands as a ghost card
+at the foot of the lane its card will land in, with its schedule and its
+next run in words, and a control in the board's head hides the ones over
+a week away or all of them. The strip's cell names a run under an hour
+away or a held one. A filed card carries a chip naming its routine and
+run, and its drawer a provenance line. A ghost opens the routine's drawer
+with Overview, Runs and Config and two acts: Skip once, a pending skip
+the ghost shows with an undo, and Run now, which files at once and leaves
+the start to the autonomy level. The chat has five tools: list, write,
+delete, run and skip. A write or a delete is a commit on the
+configuration tree after a confirm, through the path a level change
+takes. The cluster's own jobs, the CronJobs and CNPG's ScheduledBackup,
+list read-only on the infra project's Resources page and in the chat's
+resources block, with their schedules in UTC.
+
+Rollback: revert the tree's commit and delete the `routine/` schedules in
+Temporal. The tables stay, as after every migration.
+
 ## 6. Chunk 4: the worker plane
 
 One task, one namespace, one ServiceAccount `task-<id>`, one pod.

@@ -79,3 +79,13 @@ Two rounds for one feature and one control: [multi-chat](rounds/02-multi-chat/no
 - **Image models add what the prompt did not ask for.** The ghost card direction's image drew a Routines panel the prompt never named, and both critics credited the direction for it. Read the sheet before the critics' ranking and note what the model invented.
 - **A critic answer can come back empty at four sheets of 2880 px a side.** Gemini's compare call returned nothing the first time and answered at 2048 px.
 - **The builders find faults in the base prototype.** Four this round, all in round 02's instrument prototype: a scrolled hidden label, a class name collision, a 17 px phone link, a `€NaN`. A prototype that other rounds build on wants its own check.
+
+## 2026-10-15, round 04 built: the routines in the factory
+
+The pick went from C16 to a thirteen-task plan and a subagent-driven build in one session, [the plan](../docs/plans/2026-10-15-routines.md).
+
+- **The clock is a design decision, not an implementation detail.** Sebastian's test was a DevOps friend reading the scheduler without screaming. The answer was the factory's own pattern: desired state in git, a reconcile pass, durable execution in Temporal. The alternatives table in [routines.md](../docs/routines.md) made the choice checkable.
+- **Two cron libraries disagree on a day.** robfig matches day-of-month OR day-of-week when both are set, Temporal matches AND. The next-run words on a ghost would have named a day the schedule never fires on. The whole-branch review found it, and the parser now steps until both match.
+- **A review of the whole branch finds faults in the base.** The final review found a level change refused since the autonomy screen's last commit, outside the round's scope. It was fixed on the branch.
+- **A word on the strip must come from data, not from a title.** The strip's cell said "inputs", the last word of the card's title. The routine's name carries the word now, so "weekly-bump" reads "bump".
+- **An idle scene stays idle.** The lab's idle scene gained the ghosts and stopped reading as idle. The ghosts went to the busy and the fire scenes, and the idle scene shows none.
