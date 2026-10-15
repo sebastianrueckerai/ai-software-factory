@@ -5588,3 +5588,33 @@ infra.
   55 USD under a counter of 154 USD and refused every model call from
   19:15Z on 2026-10-14: it is 370 now, held at 1.25 times the month cap
   by a config-check script (infra ef8d0aa).
+
+### The day of 2026-10-15: the roadmap items that landed
+
+The ledger's progress.md holds the steps. Code commits unless named
+infra.
+
+- 42 the worker probes its sandbox's egress before the agent starts:
+  the gateway answers, the canary, the metadata address and a direct IP
+  take no connection, a lookup of the canary's name fails at once, and
+  the worker runs as uid 1000; a sandbox more open than its policy
+  fails the start with each probe named, a gateway that does not answer
+  is retried (94d95ea, e4a8170). Reproduction pods probe the same way
+  before the repository's code runs, and a start refusal names the
+  sandbox, not a session (0f939f4, 0bd01e5). Not yet seen live.
+- 201's gate inputs (items 12 to 16): a review in parts sends the
+  shared block with part 1 alone, earlier reviews shrink to the last
+  round's, the audit's later parts get a short prompt, and the gate
+  supervisor reads a last result only beyond its timeline tail (cc39e21,
+  75e56bd). A review's model input fell from 142,420 to 126,825 bytes.
+  200 and 201's chat (items 18 and 19): one sentence per tool, tools
+  offered by the member's role, a card named by its issue number in
+  every card tool through the store, and the turn's opening context
+  restates no read; the writer's first request fell from 27,696 to
+  14,520 bytes, the approver's from 27,989 to 19,735 (9566971, 7d76b78,
+  47869cb). Found on the way: the level control reset a project's
+  custom backlog cap to 8 on every change (47869cb).
+- go.mod names toolchain go1.26.9, the images' Go, so a local test runs
+  the Go CI runs (a27f1c8). Under go 1.25.0 alone the race suite crashed
+  in factoryd with "fatal error: fault", the night's unexplained
+  failure at 13.5 seconds.
