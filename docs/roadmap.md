@@ -28,12 +28,13 @@ Sebastian's order of 2026-10-14: first the fixes, security and performance, then
 
 Ruling 325 (2026-10-14) sets how the work runs. The GLM Coding Plan's quota ran out within a day, so the coding aliases went back to DashScope (infra 501fca5). DashScope is too dear for heavy work, so the work runs in the local session, and cards go into the factory only to test the factory.
 
-The local session's order of 2026-10-14 is done: 244, 242, 222's review beside the checks, 243 and 241 are on main. The night of 2026-10-14 to 15 fixed 47, 58, 202, 214, 237, 238, 240, 245 to 253, 255 and 256, read 49 and 254, found and fixed the runner image's clock fault in 242, and saw 84 proven. What stays open in the first section is a feature or needs Sebastian's call:
+The local session's order of 2026-10-14 is done: 244, 242, 222's review beside the checks, 243 and 241 are on main. The night of 2026-10-14 to 15 fixed 47, 58, 202, 214, 237, 238, 240, 245 to 253, 255 and 256 (246's routing too), read 49 and 254, found and fixed the runner image's clock fault in 242, and saw 84 proven. What stays open in the first section is a feature or needs Sebastian's call:
 
 1. 203 or snapshot repositories: an in-cluster mirror, or dated Debian and PGDG snapshots, would also pin the apt layers 242 leaves open.
 2. 204: a provider budget the pulse tracks needs that budget in the configuration.
 3. 46: signed images need a key in OpenBao and, for deploy-time checks, an admission controller to choose.
-4. 191, 125, 176, 41, 42's worker probe and 45 are features.
+4. 246: how a beside review's trip is supervised while the checks still run (three ways named there).
+5. 191, 125, 176, 41, 42's worker probe and 45 are features.
 
 Stages 18 and 19 and the restart round are closed. The ledger's stage18-summary.md, stage19-summary.md and restart-round-report.md hold them, and the build plan records the roadmap items they built.
 
