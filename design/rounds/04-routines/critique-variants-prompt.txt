@@ -1,0 +1,17 @@
+You are an independent design critic judging three BUILT prototypes of the project screen of an AI software factory console. Each prototype gives the factory's routines a home. A routine is recurring work on a clock: a weekly bump of pinned versions filed as a human card, an hourly template pass, a weekly dependency update by an agent, an audit after 20 merges. Until now a timer filed the card and the member was surprised. The three prototypes differ in the home only: "panel" puts the routines in the expanded status panel under the instrument strip, "board" puts the next due routine as a dashed ghost card at the foot of the Queued column with a "due this week" menu in the column's head, "chat" pins a Routines panel under the inbox thread's head. All three share the routine chip on a filed card, the provenance line in the card's drawer, the routine's own drawer (Overview, Runs, Config) and the acts Skip once and Run now.
+
+You see, for each prototype in turn, labelled screenshots: the due moment (Monday 05:40, the weekly bump files in 20 minutes) in dark with the home closed and open, the same in light, the routine's drawer open, the filed moment (the weekly bump card #790 just landed in Needs you), the held moment (last week's #781 still open, so this week's run is held), and the phone at 390 wide with the home open.
+
+The brief: a tool a member uses to steer a software project that agents build, and a screen a non-technical visitor finds slick and professional. Normal states whisper, exceptional states speak: a routine that runs on time is a normal state and must whisper; a held run and a human card may speak. The order of loudness is fixed: the pulse sentence first, the amber Needs you column second, the chat third. Nothing new may outrank them. A member must find "what runs on its own" without being told where to look, must see the next run before it files without a click, must see at a glance that a card was filed by a routine, and must be able to act (skip once, run now) where they read. A change of rhythm is a configuration change proposed in the chat, never a toggle.
+
+Answer as JSON only:
+{
+  "ranking": [ {"variant": "panel|board|chat", "score": 0-10, "why": "two sentences"}, ... all three, best first ],
+  "announcement": {"panel": "does the next run show before it files, without a click? one sentence", "board": "...", "chat": "..."},
+  "loudness": {"panel": "does the home stay under the pulse and Needs you? one sentence", "board": "...", "chat": "..."},
+  "phone": {"panel": "one sentence on the 390 shot", "board": "...", "chat": "..."},
+  "craft": [ {"variant": "...", "where": "screenshot name", "what": "one sentence", "severity": "high|medium|low"} ],
+  "keep": ["the three best things across the prototypes, one sentence each, naming the variant"],
+  "hybrid": "if a combination of two homes would beat the best one, say which and why, one paragraph; else say none",
+  "verdict": "which variant should become the console, one paragraph"
+}

@@ -16,4 +16,4 @@ One folder per direction, one `index.html` each: plain HTML, CSS and JS in the f
 
 ## Screenshots
 
-`tools/shoot.sh prototypes/<slug>` in the portfolio repo takes 1440 and 390 full-page shots of `index.html`; add `?scenario=` and `?theme=` through a page copy or run the lab shoot script with the prototype's URL. The sheet page lists for every prototype: busy dark, busy light, idle dark, fire dark, the drawer open (busy, dark), the phone (busy, dark).
+[tools/shoot.sh](../../tools/shoot.sh) (`tools/shoot.sh design/prototypes/<slug>` from the repository root) takes 1440 and 390 full-page shots of `index.html`; add `?scenario=` and `?theme=` through a page copy or run the lab shoot script with the prototype's URL. The sheet page lists for every prototype: busy dark, busy light, idle dark, fire dark, the drawer open (busy, dark), the phone (busy, dark).

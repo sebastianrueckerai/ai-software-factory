@@ -32,3 +32,16 @@ Which one becomes the console, or which two go one more round:
 - [x] 06 Mission control (Sebastian, 2026-10-14, C5), with the chat turns of 09 Inbox first.
 
 Notes: Needs you as the first column, never a tray (C4). Red stays for problems only. Chat under the board is out (the chat grows down, the board grows down). The implementation plan: [docs/plans/2026-10-14-console-design.md](../docs/plans/2026-10-14-console-design.md), roadmap item 227.
+
+## Round 04, the routines
+
+Where the routines live ([the round page](rounds/04-routines/index.html), [the brief](rounds/04-routines/brief.md), [docs/routines.md](../docs/routines.md)). Which home becomes the console:
+
+- [ ] A. Panel: the status panel's Routines column, the strip's cell when a run is under an hour away or held
+- [ ] B. Board: the ghost card at the foot of Queued and the "due" menu in its head
+- [ ] C. Chat: the pinned Routines panel under the inbox's head and the factory's poke
+- [ ] D. Hybrid, the recommendation: the ghost card on the board, the strip's cell and the Routines column in the status panel
+
+And the word: routine, standing order, or schedule.
+
+Notes:

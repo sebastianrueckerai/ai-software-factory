@@ -1,0 +1,104 @@
+```json
+{
+  "ranking": [
+    {
+      "direction": "06-inbox-standing-row",
+      "score": 9,
+      "why": "This is the most integrated and calm solution, correctly treating routines as a background system activity. It uses an existing UI panel (the chat/inbox), respects the visual hierarchy, and has a clear path for mobile."
+    },
+    {
+      "direction": "01-ghost-card",
+      "score": 8,
+      "why": "The 'ghost card' is a brilliant announcement mechanism, placing the upcoming work in the user's direct line of sight. The dedicated panel for the list is a clean, discoverable home, though the amber color for a routine event is too loud."
+    },
+    {
+      "direction": "02-panel-column",
+      "score": 6,
+      "why": "Adding a dedicated column makes the routines list permanently visible, which is good for discoverability. However, it disrupts the established four-column layout and presents a significant risk for mobile responsiveness."
+    },
+    {
+      "direction": "07-routine-drawer",
+      "score": 5,
+      "why": "While a drawer is a common pattern, it hides the routine information by default and lacks a clear, integrated announcement mechanism. When open, it's disruptive by obscuring the main board view."
+    },
+    {
+      "direction": "05-schedule-tape",
+      "score": 4,
+      "why": "The timeline is a conceptually interesting way to view scheduled events, but it introduces a new UI metaphor that doesn't fit the panel idiom. Critically, its horizontal nature makes it unsuitable for a single-column mobile view."
+    },
+    {
+      "direction": "08-column-head",
+      "score": 3,
+      "why": "This direction places the routine list in a non-intuitive location, overloading the column header's purpose. It has very poor discoverability and would be awkward to interact with on a mobile device."
+    },
+    {
+      "direction": "03-routines-page",
+      "score": 1,
+      "why": "This fails by moving routine information to a separate page, which completely hides the announcement from the main project screen. It forces a context switch that violates the 'mission control' principle."
+    },
+    {
+      "direction": "04-policy-in-force",
+      "score": 1,
+      "why": "Like 03, this moves the information off-screen to a separate page, hiding the announcement. The abstract 'Policy' framing adds potential confusion without solving the core UI problem."
+    }
+  ],
+  "carry": [
+    {
+      "direction": "06-inbox-standing-row",
+      "why": "Prototype must prove that the standing row summary is visible enough and that users intuitively click it to find the full list and actions."
+    },
+    {
+      "direction": "01-ghost-card",
+      "why": "Prototype must prove that a non-amber (e.g., cyan or grey) ghost card can announce an on-time run quietly, reserving amber for failed/held runs."
+    },
+    {
+      "direction": "02-panel-column",
+      "why": "Prototype must prove that a fifth column can be integrated on desktop without overwhelming the 'Needs you' column, and explore a mobile-friendly alternative."
+    }
+  ],
+  "drop": [
+    {
+      "direction": "03-routines-page",
+      "reason": "Hides the announcement by leaving the screen."
+    },
+    {
+      "direction": "04-policy-in-force",
+      "reason": "Hides the announcement and adds confusing terminology."
+    },
+    {
+      "direction": "05-schedule-tape",
+      "reason": "Horizontal layout is not responsive for phone."
+    },
+    {
+      "direction": "07-routine-drawer",
+      "reason": "Lacks an integrated announcement mechanism on the main screen."
+    },
+    {
+      "direction": "08-column-head",
+      "reason": "Placement is not discoverable or intuitive."
+    }
+  ],
+  "hybrids": [
+    {
+      "combination": "06-inbox-standing-row + 01-ghost-card",
+      "why": "Use the standing row (06) for the complete list and management, but use the ghost card (01) as the high-fidelity announcement in the 'Needs you' column."
+    },
+    {
+      "combination": "01-ghost-card + 02-panel-column",
+      "why": "Combine the ghost card announcement (01) with the always-visible list from the panel column (02), but place the list in the bottom panel from 01 to solve the mobile problem."
+    }
+  ],
+  "hierarchy_risks": [
+    "01-ghost-card (if the ghost card is amber for on-time runs)",
+    "02-panel-column"
+  ],
+  "phone_risks": [
+    "02-panel-column",
+    "05-schedule-tape",
+    "08-column-head"
+  ],
+  "announcement": "Direction 01-ghost-card provides the best announcement. By placing a pre-emptive, semi-transparent 'ghost' card in the 'Needs you' column, it inserts the upcoming automated task directly into the user's primary workflow for actionable items. This is far more effective than a passive list or indicator because it uses an established location for 'what needs attention', is contextually perfect, and can visually signal its nature and timing without shouting. Its only risk is being too loud if it uses the amber signal color for a routine event; a system color like cyan would be quieter and more appropriate for an on-time run.",
+  "acts": "Direction 06-inbox-standing-row places the 'Skip once' and 'Run now' acts best. By revealing them within an expanded system message in the chat/inbox panel, it groups them logically with the routine's status information. This placement feels like a direct reply or command to the system in the same channel where configuration changes are proposed, reinforcing the acts as explicit commands rather than simple state toggles. Placing the acts adjacent to the 'name, rhythm, next, last' data gives the user full context before taking action.",
+  "notes": "None of the directions explicitly address the lifecycle of a failed or skipped run. While a failed run might generate an amber card in the 'Needs you' column, it's unclear how a skipped run is represented after the fact. The home for routines should not only show the last run's outcome but also provide a persistent, easily accessible log of past runs, including skips and failures, to aid in debugging and auditing process automation."
+}
+```

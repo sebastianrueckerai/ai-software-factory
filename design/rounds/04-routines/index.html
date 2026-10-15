@@ -1,0 +1,444 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Round 04: where the routines live</title>
+<style>
+body{font:15px/1.5 system-ui,sans-serif;margin:0;padding:24px 28px;background:#f4f4f2;color:#111;max-width:1700px}
+h1{margin:0 0 4px} h2{margin:28px 0 8px;font-size:20px} .meta{color:#666} a{color:#0a5c7a}
+section.variant{background:#fff;padding:16px 18px;border-radius:6px;margin:16px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:14px;align-items:start}
+figure{margin:0} figure img{width:100%;display:block;border:1px solid #ddd;background:#111} figcaption{font-size:12.5px;color:#555;margin-top:4px}
+figure.phone{max-width:260px} .dirs{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px}
+.dirs figure{display:grid;grid-template-columns:1fr 1fr;gap:4px} .dirs figcaption{grid-column:1/3}
+table{border-collapse:collapse;font-size:13.5px;background:#fff} td,th{border:1px solid #ddd;padding:4px 8px;vertical-align:top;text-align:left}
+pre{white-space:pre-wrap;font-size:12px;background:#f7f7f7;padding:8px} details{margin:8px 0} .all a{margin-right:8px}
+.rec{background:#fff;padding:16px 18px;border-radius:6px;border-left:4px solid #0a5c7a}
+</style>
+<h1>Round 04: where the routines live</h1>
+<p class="meta"><a href="brief.md">the brief</a> · <a href="notes.md">the notes</a> · <a href="../../../docs/routines.md">docs/routines.md</a> · <a href="BUILDER.md">the builder's brief</a> · <a href="../../PICKS.md">PICKS.md</a> · cost of the round ~$2.58</p>
+<h2>The recommendation</h2>
+<div class="rec"><p>**D. Hybrid: the ghost card on the board, the strip&#x27;s cell, the Routines column in the status panel.** Both critics asked for it after the first loop, and both ranked it first in the second (Gemini 10, GLM 9). The director agrees. [Open it live](hybrid/index.html?scenario=due&amp;theme=dark).</p><p>Three places, one job each, in the order of loudness the console already has. The instrument strip names a run only when it is under an hour away or held: &quot;↻ bump in 20 min&quot; in the muted colour, &quot;↻ bump held&quot; in amber. The board announces the next due routine as a dashed ghost card at the foot of Queued, where the card will land, with its time and its acts, and the Audit ghost under it counts merges. The expanded status panel holds the one list of every routine (name, rhythm, next, last), the cluster&#x27;s jobs under a hairline, and the configuration line, in the place C7 made for depth. A routine&#x27;s own drawer holds its runs and its configuration, and a filed card says on its face and in its drawer which routine filed it. Nothing is shown twice: the board&#x27;s &quot;due&quot; menu of variant B is gone.</p><p>What it costs: one cell in the strip, seen only when a run is near or held, and one more column in a panel that opens on click. What it answers: the member sees the next run without a click and without being told where to look, a card never surprises, the list has one home, the acts sit where the member reads, and a change of rhythm goes through the chat as a configuration commit.</p><p>The runner-up is B. Board alone, both critics&#x27; first pick of the first loop, with its list in the Queued head&#x27;s menu. A. Panel is third: the best list, and the strip&#x27;s cell carries the announcement, but the ghost card&#x27;s &quot;where the card will land&quot; is missing. C. Chat is out: the home is gone whenever another thread is open, and the builder and both critics agree that the poke before the run is a notification for a normal state.</p><p>Two things for the implementation, not design questions: the strip&#x27;s cell and the ghost card must read as one system (Gemini&#x27;s one craft note on the hybrid), which the same ↻ glyph and the same words do, and the ghost card&#x27;s text on the phone wraps to five lines and wants one line fewer.</p></div>
+<h2>The four variants</h2>
+<p>Three homes built on the instrument prototype of round 02, and the hybrid both critics asked for. Every variant shares the routine chip on a filed card, the provenance line in its drawer, the routine's own drawer (Overview, Runs, Config) and the acts Skip once and Run now. The moments: due (Monday 05:40, the weekly bump files in 20 minutes), filed (#790 just landed in Needs you), held (last week's #781 still open), audit (the audit reached 20 merges and runs as #792).</p>
+<section class="variant"><h2>A. Panel</h2><p>The home is the expanded status panel: a Routines column beside In progress, Needs you and Spend. The folded strip names a run only when it is under an hour away or held.</p><p class="all">open live: <a href="panel/index.html?scenario=due&amp;theme=dark">due</a> <a href="panel/index.html?scenario=filed&amp;theme=dark">filed</a> <a href="panel/index.html?scenario=held&amp;theme=dark">held</a> <a href="panel/index.html?scenario=audit&amp;theme=dark">audit</a> · <a href="panel/index.html?scenario=due&amp;theme=light">light</a></p><div class="grid"><figure class=""><a href="panel/shots/due-dark-1440.png"><img src="panel/shots/due-dark-1440.png" alt="Panel: due, dark, the home closed" loading="lazy"></a><figcaption>Panel: due, dark, the home closed</figcaption></figure><figure class=""><a href="panel/shots/due-dark-1440-home.png"><img src="panel/shots/due-dark-1440-home.png" alt="Panel: due, dark, the home open" loading="lazy"></a><figcaption>Panel: due, dark, the home open</figcaption></figure><figure class=""><a href="panel/shots/due-light-1440-home.png"><img src="panel/shots/due-light-1440-home.png" alt="Panel: due, light, the home open" loading="lazy"></a><figcaption>Panel: due, light, the home open</figcaption></figure><figure class=""><a href="panel/shots/due-dark-1440-routine.png"><img src="panel/shots/due-dark-1440-routine.png" alt="Panel: the weekly bump&#x27;s drawer" loading="lazy"></a><figcaption>Panel: the weekly bump&#x27;s drawer</figcaption></figure><figure class=""><a href="panel/shots/filed-dark-1440.png"><img src="panel/shots/filed-dark-1440.png" alt="Panel: filed: #790 in Needs you" loading="lazy"></a><figcaption>Panel: filed: #790 in Needs you</figcaption></figure><figure class=""><a href="panel/shots/filed-dark-1440-card.png"><img src="panel/shots/filed-dark-1440-card.png" alt="Panel: #790&#x27;s drawer with the provenance line" loading="lazy"></a><figcaption>Panel: #790&#x27;s drawer with the provenance line</figcaption></figure><figure class=""><a href="panel/shots/held-dark-1440-home.png"><img src="panel/shots/held-dark-1440-home.png" alt="Panel: held: #781 still open" loading="lazy"></a><figcaption>Panel: held: #781 still open</figcaption></figure><figure class=""><a href="panel/shots/audit-dark-1440.png"><img src="panel/shots/audit-dark-1440.png" alt="Panel: the audit running as #792" loading="lazy"></a><figcaption>Panel: the audit running as #792</figcaption></figure><figure class=""><a href="panel/shots/due-dark-1440-skip.png"><img src="panel/shots/due-dark-1440-skip.png" alt="Panel: after Skip once" loading="lazy"></a><figcaption>Panel: after Skip once</figcaption></figure><figure class="phone"><a href="panel/shots/phone-due-dark-390-home.png"><img src="panel/shots/phone-due-dark-390-home.png" alt="Panel: the home on the phone" loading="lazy"></a><figcaption>Panel: the home on the phone</figcaption></figure><figure class="phone"><a href="panel/shots/phone-filed-light-390.png"><img src="panel/shots/phone-filed-light-390.png" alt="Panel: filed, light, the phone" loading="lazy"></a><figcaption>Panel: filed, light, the phone</figcaption></figure></div></section><section class="variant"><h2>B. Board</h2><p>The home is the board: the next due routine as a dashed ghost card at the foot of Queued, and a &quot;due this week&quot; menu in the column&#x27;s head.</p><p class="all">open live: <a href="board/index.html?scenario=due&amp;theme=dark">due</a> <a href="board/index.html?scenario=filed&amp;theme=dark">filed</a> <a href="board/index.html?scenario=held&amp;theme=dark">held</a> <a href="board/index.html?scenario=audit&amp;theme=dark">audit</a> · <a href="board/index.html?scenario=due&amp;theme=light">light</a></p><div class="grid"><figure class=""><a href="board/shots/due-dark-1440.png"><img src="board/shots/due-dark-1440.png" alt="Board: due, dark, the home closed" loading="lazy"></a><figcaption>Board: due, dark, the home closed</figcaption></figure><figure class=""><a href="board/shots/due-dark-1440-home.png"><img src="board/shots/due-dark-1440-home.png" alt="Board: due, dark, the home open" loading="lazy"></a><figcaption>Board: due, dark, the home open</figcaption></figure><figure class=""><a href="board/shots/due-light-1440-home.png"><img src="board/shots/due-light-1440-home.png" alt="Board: due, light, the home open" loading="lazy"></a><figcaption>Board: due, light, the home open</figcaption></figure><figure class=""><a href="board/shots/due-dark-1440-routine.png"><img src="board/shots/due-dark-1440-routine.png" alt="Board: the weekly bump&#x27;s drawer" loading="lazy"></a><figcaption>Board: the weekly bump&#x27;s drawer</figcaption></figure><figure class=""><a href="board/shots/filed-dark-1440.png"><img src="board/shots/filed-dark-1440.png" alt="Board: filed: #790 in Needs you" loading="lazy"></a><figcaption>Board: filed: #790 in Needs you</figcaption></figure><figure class=""><a href="board/shots/filed-dark-1440-card.png"><img src="board/shots/filed-dark-1440-card.png" alt="Board: #790&#x27;s drawer with the provenance line" loading="lazy"></a><figcaption>Board: #790&#x27;s drawer with the provenance line</figcaption></figure><figure class=""><a href="board/shots/held-dark-1440-home.png"><img src="board/shots/held-dark-1440-home.png" alt="Board: held: #781 still open" loading="lazy"></a><figcaption>Board: held: #781 still open</figcaption></figure><figure class=""><a href="board/shots/audit-dark-1440.png"><img src="board/shots/audit-dark-1440.png" alt="Board: the audit running as #792" loading="lazy"></a><figcaption>Board: the audit running as #792</figcaption></figure><figure class=""><a href="board/shots/due-dark-1440-skip.png"><img src="board/shots/due-dark-1440-skip.png" alt="Board: after Skip once" loading="lazy"></a><figcaption>Board: after Skip once</figcaption></figure><figure class="phone"><a href="board/shots/phone-due-dark-390-home.png"><img src="board/shots/phone-due-dark-390-home.png" alt="Board: the home on the phone" loading="lazy"></a><figcaption>Board: the home on the phone</figcaption></figure><figure class="phone"><a href="board/shots/phone-filed-light-390.png"><img src="board/shots/phone-filed-light-390.png" alt="Board: filed, light, the phone" loading="lazy"></a><figcaption>Board: filed, light, the phone</figcaption></figure></div></section><section class="variant"><h2>C. Chat</h2><p>The home is the inbox thread: a pinned Routines panel under its head, foldable to one line, and the factory&#x27;s poke before and at the filing.</p><p class="all">open live: <a href="chat/index.html?scenario=due&amp;theme=dark">due</a> <a href="chat/index.html?scenario=filed&amp;theme=dark">filed</a> <a href="chat/index.html?scenario=held&amp;theme=dark">held</a> <a href="chat/index.html?scenario=audit&amp;theme=dark">audit</a> · <a href="chat/index.html?scenario=due&amp;theme=light">light</a></p><div class="grid"><figure class=""><a href="chat/shots/due-dark-1440.png"><img src="chat/shots/due-dark-1440.png" alt="Chat: due, dark, the home closed" loading="lazy"></a><figcaption>Chat: due, dark, the home closed</figcaption></figure><figure class=""><a href="chat/shots/due-dark-1440-home.png"><img src="chat/shots/due-dark-1440-home.png" alt="Chat: due, dark, the home open" loading="lazy"></a><figcaption>Chat: due, dark, the home open</figcaption></figure><figure class=""><a href="chat/shots/due-light-1440-home.png"><img src="chat/shots/due-light-1440-home.png" alt="Chat: due, light, the home open" loading="lazy"></a><figcaption>Chat: due, light, the home open</figcaption></figure><figure class=""><a href="chat/shots/due-dark-1440-routine.png"><img src="chat/shots/due-dark-1440-routine.png" alt="Chat: the weekly bump&#x27;s drawer" loading="lazy"></a><figcaption>Chat: the weekly bump&#x27;s drawer</figcaption></figure><figure class=""><a href="chat/shots/filed-dark-1440.png"><img src="chat/shots/filed-dark-1440.png" alt="Chat: filed: #790 in Needs you" loading="lazy"></a><figcaption>Chat: filed: #790 in Needs you</figcaption></figure><figure class=""><a href="chat/shots/filed-dark-1440-card.png"><img src="chat/shots/filed-dark-1440-card.png" alt="Chat: #790&#x27;s drawer with the provenance line" loading="lazy"></a><figcaption>Chat: #790&#x27;s drawer with the provenance line</figcaption></figure><figure class=""><a href="chat/shots/held-dark-1440-home.png"><img src="chat/shots/held-dark-1440-home.png" alt="Chat: held: #781 still open" loading="lazy"></a><figcaption>Chat: held: #781 still open</figcaption></figure><figure class=""><a href="chat/shots/audit-dark-1440.png"><img src="chat/shots/audit-dark-1440.png" alt="Chat: the audit running as #792" loading="lazy"></a><figcaption>Chat: the audit running as #792</figcaption></figure><figure class=""><a href="chat/shots/due-dark-1440-skip.png"><img src="chat/shots/due-dark-1440-skip.png" alt="Chat: after Skip once" loading="lazy"></a><figcaption>Chat: after Skip once</figcaption></figure><figure class="phone"><a href="chat/shots/phone-due-dark-390-home.png"><img src="chat/shots/phone-due-dark-390-home.png" alt="Chat: the home on the phone" loading="lazy"></a><figcaption>Chat: the home on the phone</figcaption></figure><figure class="phone"><a href="chat/shots/phone-filed-light-390.png"><img src="chat/shots/phone-filed-light-390.png" alt="Chat: filed, light, the phone" loading="lazy"></a><figcaption>Chat: filed, light, the phone</figcaption></figure></div></section><section class="variant"><h2>D. Hybrid</h2><p>The combination both critics asked for: the ghost card on the board as the announcement, the strip&#x27;s cell when a run is under an hour away or held, and the Routines column in the status panel as the one list. No menu in the column&#x27;s head.</p><p class="all">open live: <a href="hybrid/index.html?scenario=due&amp;theme=dark">due</a> <a href="hybrid/index.html?scenario=filed&amp;theme=dark">filed</a> <a href="hybrid/index.html?scenario=held&amp;theme=dark">held</a> <a href="hybrid/index.html?scenario=audit&amp;theme=dark">audit</a> · <a href="hybrid/index.html?scenario=due&amp;theme=light">light</a></p><div class="grid"><figure class=""><a href="hybrid/shots/due-dark-1440.png"><img src="hybrid/shots/due-dark-1440.png" alt="Hybrid: due, dark, the home closed" loading="lazy"></a><figcaption>Hybrid: due, dark, the home closed</figcaption></figure><figure class=""><a href="hybrid/shots/due-dark-1440-home.png"><img src="hybrid/shots/due-dark-1440-home.png" alt="Hybrid: due, dark, the home open" loading="lazy"></a><figcaption>Hybrid: due, dark, the home open</figcaption></figure><figure class=""><a href="hybrid/shots/due-light-1440-home.png"><img src="hybrid/shots/due-light-1440-home.png" alt="Hybrid: due, light, the home open" loading="lazy"></a><figcaption>Hybrid: due, light, the home open</figcaption></figure><figure class=""><a href="hybrid/shots/due-dark-1440-routine.png"><img src="hybrid/shots/due-dark-1440-routine.png" alt="Hybrid: the weekly bump&#x27;s drawer" loading="lazy"></a><figcaption>Hybrid: the weekly bump&#x27;s drawer</figcaption></figure><figure class=""><a href="hybrid/shots/filed-dark-1440.png"><img src="hybrid/shots/filed-dark-1440.png" alt="Hybrid: filed: #790 in Needs you" loading="lazy"></a><figcaption>Hybrid: filed: #790 in Needs you</figcaption></figure><figure class=""><a href="hybrid/shots/filed-dark-1440-card.png"><img src="hybrid/shots/filed-dark-1440-card.png" alt="Hybrid: #790&#x27;s drawer with the provenance line" loading="lazy"></a><figcaption>Hybrid: #790&#x27;s drawer with the provenance line</figcaption></figure><figure class=""><a href="hybrid/shots/held-dark-1440-home.png"><img src="hybrid/shots/held-dark-1440-home.png" alt="Hybrid: held: #781 still open" loading="lazy"></a><figcaption>Hybrid: held: #781 still open</figcaption></figure><figure class=""><a href="hybrid/shots/audit-dark-1440.png"><img src="hybrid/shots/audit-dark-1440.png" alt="Hybrid: the audit running as #792" loading="lazy"></a><figcaption>Hybrid: the audit running as #792</figcaption></figure><figure class=""><a href="hybrid/shots/due-dark-1440-skip.png"><img src="hybrid/shots/due-dark-1440-skip.png" alt="Hybrid: after Skip once" loading="lazy"></a><figcaption>Hybrid: after Skip once</figcaption></figure><figure class="phone"><a href="hybrid/shots/phone-due-dark-390-home.png"><img src="hybrid/shots/phone-due-dark-390-home.png" alt="Hybrid: the home on the phone" loading="lazy"></a><figcaption>Hybrid: the home on the phone</figcaption></figure><figure class="phone"><a href="hybrid/shots/phone-filed-light-390.png"><img src="hybrid/shots/phone-filed-light-390.png" alt="Hybrid: filed, light, the phone" loading="lazy"></a><figcaption>Hybrid: filed, light, the phone</figcaption></figure></div></section>
+<h2>The critics on the four, the second loop</h2>
+<h3>Gemini 2.5 Pro</h3><table><tr><th>candidate</th><th>score</th><th>why</th></tr><tr><td>hybrid</td><td>10</td><td>This is a perfect synthesis of the best ideas from the first round, successfully addressing the prior feedback. It provides effortless, pre-emptive awareness on the board while establishing a single, scalable home for routine management in the panel.</td></tr><tr><td>board</td><td>8</td><td>The ghost card is a brilliant, intuitive way to announce upcoming work without shouting, correctly placing the information in the context of the work queue. However, its secondary list in the column menu created a small redundancy that the hybrid variant elegantly solves.</td></tr><tr><td>panel</td><td>5</td><td>While this variant offers a clean and organized list, it fails the critical goals of discovery and pre-emptive visibility. Hiding all awareness of routines behind a click makes them too easy to miss, defeating the purpose of reducing surprise.</td></tr><tr><td>chat</td><td>3</td><td>This solution is thematically misplaced, inserting an operational concern into a communication space. It makes routine work feel louder than it should be and inappropriately competes for attention with human conversation.</td></tr></table><details><summary>the whole answer</summary><pre>{
+ &quot;ranking&quot;: [
+  {
+   &quot;variant&quot;: &quot;hybrid&quot;,
+   &quot;score&quot;: 10,
+   &quot;why&quot;: &quot;This is a perfect synthesis of the best ideas from the first round, successfully addressing the prior feedback. It provides effortless, pre-emptive awareness on the board while establishing a single, scalable home for routine management in the panel.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;board&quot;,
+   &quot;score&quot;: 8,
+   &quot;why&quot;: &quot;The ghost card is a brilliant, intuitive way to announce upcoming work without shouting, correctly placing the information in the context of the work queue. However, its secondary list in the column menu created a small redundancy that the hybrid variant elegantly solves.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;panel&quot;,
+   &quot;score&quot;: 5,
+   &quot;why&quot;: &quot;While this variant offers a clean and organized list, it fails the critical goals of discovery and pre-emptive visibility. Hiding all awareness of routines behind a click makes them too easy to miss, defeating the purpose of reducing surprise.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;chat&quot;,
+   &quot;score&quot;: 3,
+   &quot;why&quot;: &quot;This solution is thematically misplaced, inserting an operational concern into a communication space. It makes routine work feel louder than it should be and inappropriately competes for attention with human conversation.&quot;
+  }
+ ],
+ &quot;hybrid_vs_board&quot;: &quot;The hybrid decisively beats the board variant by refining its excellent core concept. It keeps the ghost card as the primary announcement\u2014the board&#x27;s great strength\u2014but improves the information architecture by moving the comprehensive list of all routines to the status panel. This eliminates the board&#x27;s slightly redundant column-head menu, creating a clearer separation of concerns: the board is for immediate, contextual awareness of the *next* event, while the panel is the single, authoritative home for managing the *entire* system of routines. The hybrid gains a more logical and scalable structure without losing any of the board&#x27;s ambient magic.&quot;,
+ &quot;one_list&quot;: &quot;The hybrid is absolutely right to drop the column head&#x27;s menu so the status panel holds the one list. This decision enforces the &#x27;nothing is shown twice&#x27; rule and establishes a more robust information architecture for the console. The ghost card perfectly serves its purpose as an ambient, actionable announcement for the next due item, while the status panel correctly functions as the persistent, comprehensive home for configuration and management. Maintaining a second, &#x27;quick&#x27; list on the board would introduce redundancy and create ambiguity about which list is the source of truth, whereas this clear division between timely notification and overall management is the mark of a well-considered design.&quot;,
+ &quot;craft&quot;: [
+  {
+   &quot;variant&quot;: &quot;hybrid&quot;,
+   &quot;where&quot;: &quot;hybrid-due-dark-1440-home&quot;,
+   &quot;what&quot;: &quot;The amber dot in the status panel&#x27;s header feels disconnected from the amber cell in the instrument strip; they should visually be one control.&quot;,
+   &quot;severity&quot;: &quot;medium&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;board&quot;,
+   &quot;where&quot;: &quot;board-phone-due-dark-390-home&quot;,
+   &quot;what&quot;: &quot;The description text on the ghost card wraps to five lines and feels very cramped, reducing scannability on a small screen.&quot;,
+   &quot;severity&quot;: &quot;medium&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;panel&quot;,
+   &quot;where&quot;: &quot;panel-due-dark-1440-home&quot;,
+   &quot;what&quot;: &quot;The heading for the routines list is just &#x27;Routines&#x27;, which is less descriptive than it could be compared to the other panel columns.&quot;,
+   &quot;severity&quot;: &quot;low&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;chat&quot;,
+   &quot;where&quot;: &quot;chat-phone-due-dark-390-home&quot;,
+   &quot;what&quot;: &quot;The pinned routines panel consumes a large, fixed portion of the vertical space, pushing the primary content of the chat thread too far down.&quot;,
+   &quot;severity&quot;: &quot;high&quot;
+  }
+ ],
+ &quot;verdict&quot;: &quot;The hybrid variant should become the console. It is the clear winner, having successfully synthesized the feedback from the previous round into a solution that is elegant, intuitive, and adheres to all the stated design rules. It provides exactly the right amount of awareness at the right time\u2014a quiet whisper of an upcoming event directly in the user&#x27;s workflow\u2014without creating noise or clutter. By establishing a clear, single source of truth for managing all routines in the status panel, the hybrid offers a robust and scalable foundation that feels like a natural extension of the existing Mission Control interface.&quot;
+}</pre></details>
+<h3>GLM 5V Turbo</h3><table><tr><th>candidate</th><th>score</th><th>why</th></tr><tr><td>hybrid</td><td>9</td><td>It uniquely satisfies the &#x27;see without clicking&#x27; requirement via the board ghost card while maintaining a single authoritative list in the status panel, achieving perfect progressive disclosure across three distinct attention levels (strip, board, panel) without duplication.</td></tr><tr><td>board</td><td>7</td><td>It excels at contextual awareness by placing the next run in the workflow&#x27;s line of sight, but either clutters the column head with a menu (violating single-list purity) or, if the menu is absent, forces the member to hunt for the complete schedule elsewhere.</td></tr><tr><td>panel</td><td>6</td><td>It correctly identifies the status panel as the home for system-level concerns, but hides routines behind an expandable panel that many members will keep collapsed, failing the &#x27;find without being told&#x27; test until the strip cell fires.</td></tr><tr><td>chat</td><td>3</td><td>It fundamentally misplaces machine-scheduled operations into a conversational channel, causing normal routine states to &#x27;speak&#x27; loudly in a space reserved for human exception-handling and collaboration.</td></tr></table><details><summary>the whole answer</summary><pre>{
+ &quot;ranking&quot;: [
+  {
+   &quot;variant&quot;: &quot;hybrid&quot;,
+   &quot;score&quot;: 9,
+   &quot;why&quot;: &quot;It uniquely satisfies the &#x27;see without clicking&#x27; requirement via the board ghost card while maintaining a single authoritative list in the status panel, achieving perfect progressive disclosure across three distinct attention levels (strip, board, panel) without duplication.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;board&quot;,
+   &quot;score&quot;: 7,
+   &quot;why&quot;: &quot;It excels at contextual awareness by placing the next run in the workflow&#x27;s line of sight, but either clutters the column head with a menu (violating single-list purity) or, if the menu is absent, forces the member to hunt for the complete schedule elsewhere.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;panel&quot;,
+   &quot;score&quot;: 6,
+   &quot;why&quot;: &quot;It correctly identifies the status panel as the home for system-level concerns, but hides routines behind an expandable panel that many members will keep collapsed, failing the &#x27;find without being told&#x27; test until the strip cell fires.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;chat&quot;,
+   &quot;score&quot;: 3,
+   &quot;why&quot;: &quot;It fundamentally misplaces machine-scheduled operations into a conversational channel, causing normal routine states to &#x27;speak&#x27; loudly in a space reserved for human exception-handling and collaboration.&quot;
+  }
+ ],
+ &quot;hybrid_vs_board&quot;: &quot;The hybrid decisively beats board alone by eliminating the column-head menu\u2014a source of dangerous duplication that would eventually desync with the canonical list\u2014while retaining board&#x27;s killer feature: the ghost card as a low-noise announcement in the workflow itself. What it loses is the ultra-convenient &#x27;peek&#x27; at upcoming routines without leaving the board&#x27;s gaze path, but this is a necessary sacrifice to enforce the &#x27;one list&#x27; invariant and prevent the confusion of two competing registries. The hybrid gains architectural integrity: the board announces *that* something is coming, the panel owns *what* and *when*, and the strip owns *now*.&quot;,
+ &quot;one_list&quot;: &quot;The hybrid is absolutely right to drop the column-head menu. Routines are agent work, not human work-items; they belong in the status panel (the system&#x27;s instrument cluster) alongside budgets and build status, not in the Queued column (which is a human inbox). Keeping a quick list on the board would violate the &#x27;nothing shown twice&#x27; rule and, worse, blur the critical semantic distinction between &#x27;a card waiting for *you*&#x27; (the Queued column&#x27;s purpose) and &#x27;a timer waiting for *the clock*&#x27; (a routine). The ghost card is sufficient board-presence because it is an *effect* (a forthcoming filing), not a *registry*.&quot;,
+ &quot;craft&quot;: [
+  {
+   &quot;variant&quot;: &quot;hybrid&quot;,
+   &quot;where&quot;: &quot;hybrid:due-dark-1440&quot;,
+   &quot;what&quot;: &quot;The visual relationship between the strip cell (top) and the board ghost card (bottom-right) must be unambiguously coded as &#x27;same system, different urgency&#x27; so members don&#x27;t perceive them as two independent notifications.&quot;,
+   &quot;severity&quot;: &quot;medium&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;board&quot;,
+   &quot;where&quot;: &quot;board:due-dark-1440&quot;,
+   &quot;what&quot;: &quot;If the &#x27;due&#x27; menu renders inline within the column head, it risks pushing actual queued cards below the fold when more than three routines exist, damaging the board&#x27;s scanability.&quot;,
+   &quot;severity&quot;: &quot;high&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;panel&quot;,
+   &quot;where&quot;: &quot;panel:phone-due-dark-390-home&quot;,
+   &quot;what&quot;: &quot;At 390px width, collapsing the status panel to make room for the board likely hides the routines list entirely on mobile, leaving the phone reliant solely on the strip cell which may fire too late for comfortable review.&quot;,
+   &quot;severity&quot;: &quot;high&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;chat&quot;,
+   &quot;where&quot;: &quot;chat:due-light-1440-home&quot;,
+   &quot;what&quot;: &quot;In light mode, the routines panel pinned under the inbox thread competes visually with human message threads, making the &#x27;Routines&#x27; header appear like a conversation participant rather than a system module.&quot;,
+   &quot;severity&quot;: &quot;medium&quot;
+  }
+ ],
+ &quot;verdict&quot;: &quot;The hybrid variant should become the console. It is the only design that honors the dual citizenship of routines\u2014as background infrastructure (status panel list) and as foreground workflow events (board ghost card)\u2014while strictly enforcing the &#x27;single list, single detail&#x27; constraint that prevents the fragmentation plaguing the other approaches. By using the strip for imminence (&lt;1 hour), the board for anticipation (next due), and the panel for administration (full schedule), it creates a noise gradient that perfectly matches the required loudness order: the pulse sentence screams, the amber Needs you column speaks, and the routine system whispers exactly where each audience needs to hear it. The removal of the board&#x27;s menu is the critical simplification that transforms a clever prototype into a maintainable information architecture.&quot;
+}</pre></details>
+<h2>The critics on the first three, the first loop</h2>
+<h3>Gemini 2.5 Pro</h3><table><tr><th>candidate</th><th>score</th><th>why</th></tr><tr><td>board</td><td>9</td><td>This variant best embodies the &quot;whisper/speak&quot; principle by integrating routines into the primary workflow in an ambient, contextual way. The held state is exceptionally clear without being disruptive.</td></tr><tr><td>panel</td><td>7</td><td>A solid, discoverable solution that correctly places routines in a system status area and meets all functional requirements. However, the expanded home is less elegant and more visually intrusive than the board variant.</td></tr><tr><td>chat</td><td>4</td><td>This variant fails the critical requirement to show the next run without a click from the main screen and feels conceptually misplaced. It silos routine information away from the primary project view.</td></tr></table><details><summary>the whole answer</summary><pre>{
+ &quot;ranking&quot;: [
+  {
+   &quot;variant&quot;: &quot;board&quot;,
+   &quot;score&quot;: 9,
+   &quot;why&quot;: &quot;This variant best embodies the \&quot;whisper/speak\&quot; principle by integrating routines into the primary workflow in an ambient, contextual way. The held state is exceptionally clear without being disruptive.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;panel&quot;,
+   &quot;score&quot;: 7,
+   &quot;why&quot;: &quot;A solid, discoverable solution that correctly places routines in a system status area and meets all functional requirements. However, the expanded home is less elegant and more visually intrusive than the board variant.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;chat&quot;,
+   &quot;score&quot;: 4,
+   &quot;why&quot;: &quot;This variant fails the critical requirement to show the next run without a click from the main screen and feels conceptually misplaced. It silos routine information away from the primary project view.&quot;
+  }
+ ],
+ &quot;announcement&quot;: {
+  &quot;panel&quot;: &quot;Yes, the instrument strip shows a text countdown to the next run, which is always visible.&quot;,
+  &quot;board&quot;: &quot;Yes, a dashed ghost card for the next due routine appears at the foot of the Queued column.&quot;,
+  &quot;chat&quot;: &quot;No, the user must first navigate away from the board and into the chat view to see the pinned routines panel.&quot;
+ },
+ &quot;loudness&quot;: {
+  &quot;panel&quot;: &quot;Yes, its home is subordinate to the pulse sentence and less visually demanding than the amber Needs you column.&quot;,
+  &quot;board&quot;: &quot;Yes, its home at the foot of a non-critical column is the quietest of the three, perfectly adhering to the hierarchy.&quot;,
+  &quot;chat&quot;: &quot;No, by taking up permanent space in the chat view it competes for attention with actual messages and is too loud for a normal state.&quot;
+ },
+ &quot;phone&quot;: {
+  &quot;panel&quot;: &quot;The expanded panel is functional but consumes a large portion of the viewport, pushing primary content down.&quot;,
+  &quot;board&quot;: &quot;The menu-based home is very space-efficient and feels native to a narrow screen, providing access without reflowing the layout.&quot;,
+  &quot;chat&quot;: &quot;The pinned panel is clean within its own view but is completely hidden when viewing the project board.&quot;
+ },
+ &quot;craft&quot;: [
+  {
+   &quot;variant&quot;: &quot;board&quot;,
+   &quot;where&quot;: &quot;board:filed-dark-1440-card&quot;,
+   &quot;what&quot;: &quot;The amber highlight on the newly filed card #790 bleeds out of the column&#x27;s left boundary, suggesting a z-index or overflow bug.&quot;,
+   &quot;severity&quot;: &quot;medium&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;panel&quot;,
+   &quot;where&quot;: &quot;panel:due-dark-1440-routine&quot;,
+   &quot;what&quot;: &quot;The heading &#x27;Run history&#x27; inside the &#x27;Runs&#x27; tab is redundant, as the table headers below convey the same information more specifically.&quot;,
+   &quot;severity&quot;: &quot;low&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;panel&quot;,
+   &quot;where&quot;: &quot;panel:due-light-1440-home&quot;,
+   &quot;what&quot;: &quot;The button styles in the expanded panel are inconsistent; &#x27;Run now&#x27; has a visible focus state while &#x27;Skip once&#x27; does not.&quot;,
+   &quot;severity&quot;: &quot;low&quot;
+  }
+ ],
+ &quot;keep&quot;: [
+  &quot;The dashed ghost card from `board` is a brilliant, ambient way to show upcoming automated work directly in the context of the workflow.&quot;,
+  &quot;The &#x27;held&#x27; state indication in the instrument strip from `panel` provides excellent, high-level visibility for exceptional states.&quot;,
+  &quot;The clear &#x27;Weekly bump&#x27; routine chip on the filed card, shared by all variants, is essential for at-a-glance attribution.&quot;
+ ],
+ &quot;hybrid&quot;: &quot;A hybrid of `board` and `panel` would be superior. Use the `board` variant&#x27;s ghost card and column-header menu as the primary, ambient home for routines. Add the top-level summary from `panel` to the instrument strip (&#x27;Routines \u00b7 Next bump in 20 min&#x27; or &#x27;Routines \u00b7 1 held&#x27;) to provide glanceable system status and a clear indication of exceptional states without requiring the user to scroll the board. This combines the elegant, contextual whisper of the board with the immediate, high-level feedback of the panel.&quot;,
+ &quot;verdict&quot;: &quot;The `board` variant should become the console. It masterfully interprets the brief&#x27;s core principle that normal states should whisper. Placing the next run as a ghost card directly on the board is contextually brilliant, treating automated work as a natural part of the project&#x27;s future. Its approach to the &#x27;held&#x27; state\u2014turning the quiet ghost card into an unmissable but still contextual amber alert\u2014is the best execution of an exceptional state speaking up. While its discoverability is slightly weaker than the `panel` variant, its superior elegance, ambient nature, and flawless adherence to the loudness hierarchy make it the most professional and effective solution for both members and visitors.&quot;
+}</pre></details>
+<h3>GLM 5V Turbo</h3><table><tr><th>candidate</th><th>score</th><th>why</th></tr><tr><td>board</td><td>9</td><td>The ghost card in the Queued column makes the next run visible without a click while keeping normal-state routines whisper-quiet at the column foot. It integrates autonomous work into the spatial model of the board so members see &#x27;what runs on its own&#x27; exactly where they expect to see work arriving.</td></tr><tr><td>chat</td><td>7</td><td>Pinning routines under the inbox correctly relegates them to the third tier of loudness and perfectly supports configuration-as-conversation, but it buries the next-run announcement inside a scrollable chat pane that a member must already be reading to notice.</td></tr><tr><td>panel</td><td>5</td><td>Hiding routines behind an expandable status panel fails the discovery requirement because a member must know to click the instrument strip to find autonomous work. When expanded, the panel dominates the top of the screen and risks outranking the pulse sentence.</td></tr></table><details><summary>the whole answer</summary><pre>{
+ &quot;ranking&quot;: [
+  {
+   &quot;variant&quot;: &quot;board&quot;,
+   &quot;score&quot;: 9,
+   &quot;why&quot;: &quot;The ghost card in the Queued column makes the next run visible without a click while keeping normal-state routines whisper-quiet at the column foot. It integrates autonomous work into the spatial model of the board so members see &#x27;what runs on its own&#x27; exactly where they expect to see work arriving.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;chat&quot;,
+   &quot;score&quot;: 7,
+   &quot;why&quot;: &quot;Pinning routines under the inbox correctly relegates them to the third tier of loudness and perfectly supports configuration-as-conversation, but it buries the next-run announcement inside a scrollable chat pane that a member must already be reading to notice.&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;panel&quot;,
+   &quot;score&quot;: 5,
+   &quot;why&quot;: &quot;Hiding routines behind an expandable status panel fails the discovery requirement because a member must know to click the instrument strip to find autonomous work. When expanded, the panel dominates the top of the screen and risks outranking the pulse sentence.&quot;
+  }
+ ],
+ &quot;announcement&quot;: {
+  &quot;panel&quot;: &quot;No, the next run hides inside the collapsed status panel until the member expands the instrument strip.&quot;,
+  &quot;board&quot;: &quot;Yes, the dashed ghost card sits visibly at the foot of the Queued column twenty minutes before it fires.&quot;,
+  &quot;chat&quot;: &quot;Only if the Routines panel beneath the inbox is already pinned open; otherwise the next run scrolls out of sight.&quot;
+ },
+ &quot;loudness&quot;: {
+  &quot;panel&quot;: &quot;No, when expanded the panel occupies the full width above the board and competes directly with the pulse sentence for attention.&quot;,
+  &quot;board&quot;: &quot;Yes, the ghost card lives in the board&#x27;s columnar layout well below the amber Needs you header and the pulse banner.&quot;,
+  &quot;chat&quot;: &quot;Yes, by living inside the chat pane it naturally occupies the quietest tier of the visual hierarchy below both the pulse and the Needs you column.&quot;
+ },
+ &quot;phone&quot;: {
+  &quot;panel&quot;: &quot;The 390px shot crams the expanded panel into a dense scrollable list that pushes the Skip once and Run now buttons below the fold.&quot;,
+  &quot;board&quot;: &quot;The phone condenses the board into a single stream where the upcoming routine card and its action buttons sit cleanly above the fold alongside the queued work.&quot;,
+  &quot;chip&quot;: &quot;The phone renders the chat and its pinned Routines panel as a readable column, but the action buttons feel small and detached from the board context.&quot;
+ },
+ &quot;craft&quot;: [
+  {
+   &quot;variant&quot;: &quot;board&quot;,
+   &quot;where&quot;: &quot;board:due-light-1440-home&quot;,
+   &quot;what&quot;: &quot;The dashed border of the ghost card loses sufficient contrast against the white background and reads as a broken layout rather than a future event.&quot;,
+   &quot;severity&quot;: &quot;medium&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;panel&quot;,
+   &quot;where&quot;: &quot;panel:held-dark-1440-home&quot;,
+   &quot;what&quot;: &quot;The held-state indicator on last week&#x27;s #781 card uses the same amber tone as the Needs you column header, creating confusion between a held routine and a card requiring human decision.&quot;,
+   &quot;severity&quot;: &quot;high&quot;
+  },
+  {
+   &quot;variant&quot;: &quot;chat&quot;,
+   &quot;where&quot;: &quot;chat:phone-due-dark-390-home&quot;,
+   &quot;what&quot;: &quot;The Routines panel consumes sixty percent of the vertical space on phone, pushing the actual chat thread and the compose area off screen.&quot;,
+   &quot;severity&quot;: &quot;medium&quot;
+  }
+ ],
+ &quot;keep&quot;: [
+  &quot;Board&#x27;s placement of the next due routine as a dashed ghost card at the foot of the Queued column, which teaches the member to read time spatially.&quot;,
+  &quot;Chat&#x27;s positioning of the Routines panel under the inbox thread head, which ensures that rhythm-change proposals land in the conversation where they belong.&quot;,
+  &quot;Panel&#x27;s routine drawer structure (Overview, Runs, Config) that opens consistently from any routine chip whether on a filed card or in the home.&quot;
+ ],
+ &quot;hybrid&quot;: &quot;A combination of Board and Chat would beat Board alone: keep the ghost card in the Queued column for zero-click visibility and loudness-correct placement, but when the member clicks that ghost card (or the due-this-week menu), open the Chat variant&#x27;s Routines panel as a contextual drawer anchored to the card rather than expanding a top-level panel. This gives the announcement the board&#x27;s spatial authority while giving the home the chat&#x27;s conversational context for configuration changes.&quot;,
+ &quot;verdict&quot;: &quot;The board variant should become the console because it is the only design that satisfies the critical constraint of showing the next run before it files without a click, while respecting the fixed loudness hierarchy by keeping autonomous work visually subordinate to the pulse and the Needs you column. The ghost card turns abstract cron schedules into concrete, visible objects in the workspace that members can monitor peripherally and act upon (skip or run) without navigating away from their board, and the filed-card provenance chip clearly marks routine-originated work without breaking the kanban metaphor.&quot;
+}</pre></details>
+<h2>The eight directions</h2>
+<p><a href="contact-sheet-dark.jpg">the dark sheet</a> · <a href="contact-sheet-light.jpg">the light sheet</a> · the prompts are the .txt files beside each image, the sidecar .json names the model and the cost.</p>
+<div class="dirs"><figure><a href="01-ghost-card-dark.png"><img src="01-ghost-card-dark.png" alt="01-ghost-card dark" loading="lazy"></a><a href="01-ghost-card-light.png"><img src="01-ghost-card-light.png" alt="01-ghost-card light" loading="lazy"></a><figcaption>01-ghost-card</figcaption></figure><figure><a href="02-panel-column-dark.png"><img src="02-panel-column-dark.png" alt="02-panel-column dark" loading="lazy"></a><a href="02-panel-column-light.png"><img src="02-panel-column-light.png" alt="02-panel-column light" loading="lazy"></a><figcaption>02-panel-column</figcaption></figure><figure><a href="03-routines-page-dark.png"><img src="03-routines-page-dark.png" alt="03-routines-page dark" loading="lazy"></a><a href="03-routines-page-light.png"><img src="03-routines-page-light.png" alt="03-routines-page light" loading="lazy"></a><figcaption>03-routines-page</figcaption></figure><figure><a href="04-policy-in-force-dark.png"><img src="04-policy-in-force-dark.png" alt="04-policy-in-force dark" loading="lazy"></a><a href="04-policy-in-force-light.png"><img src="04-policy-in-force-light.png" alt="04-policy-in-force light" loading="lazy"></a><figcaption>04-policy-in-force</figcaption></figure><figure><a href="05-schedule-tape-dark.png"><img src="05-schedule-tape-dark.png" alt="05-schedule-tape dark" loading="lazy"></a><a href="05-schedule-tape-light.png"><img src="05-schedule-tape-light.png" alt="05-schedule-tape light" loading="lazy"></a><figcaption>05-schedule-tape</figcaption></figure><figure><a href="06-inbox-standing-row-dark.png"><img src="06-inbox-standing-row-dark.png" alt="06-inbox-standing-row dark" loading="lazy"></a><a href="06-inbox-standing-row-light.png"><img src="06-inbox-standing-row-light.png" alt="06-inbox-standing-row light" loading="lazy"></a><figcaption>06-inbox-standing-row</figcaption></figure><figure><a href="07-routine-drawer-dark.png"><img src="07-routine-drawer-dark.png" alt="07-routine-drawer dark" loading="lazy"></a><a href="07-routine-drawer-light.png"><img src="07-routine-drawer-light.png" alt="07-routine-drawer light" loading="lazy"></a><figcaption>07-routine-drawer</figcaption></figure><figure><a href="08-column-head-dark.png"><img src="08-column-head-dark.png" alt="08-column-head dark" loading="lazy"></a><a href="08-column-head-light.png"><img src="08-column-head-light.png" alt="08-column-head light" loading="lazy"></a><figcaption>08-column-head</figcaption></figure></div>
+<h2>The critics on the directions</h2>
+<h3>Gemini 2.5 Pro</h3><table><tr><th>candidate</th><th>score</th><th>why</th></tr><tr><td>06-inbox-standing-row</td><td>9</td><td>This is the most integrated and calm solution, correctly treating routines as a background system activity. It uses an existing UI panel (the chat/inbox), respects the visual hierarchy, and has a clear path for mobile.</td></tr><tr><td>01-ghost-card</td><td>8</td><td>The &#x27;ghost card&#x27; is a brilliant announcement mechanism, placing the upcoming work in the user&#x27;s direct line of sight. The dedicated panel for the list is a clean, discoverable home, though the amber color for a routine event is too loud.</td></tr><tr><td>02-panel-column</td><td>6</td><td>Adding a dedicated column makes the routines list permanently visible, which is good for discoverability. However, it disrupts the established four-column layout and presents a significant risk for mobile responsiveness.</td></tr><tr><td>07-routine-drawer</td><td>5</td><td>While a drawer is a common pattern, it hides the routine information by default and lacks a clear, integrated announcement mechanism. When open, it&#x27;s disruptive by obscuring the main board view.</td></tr><tr><td>05-schedule-tape</td><td>4</td><td>The timeline is a conceptually interesting way to view scheduled events, but it introduces a new UI metaphor that doesn&#x27;t fit the panel idiom. Critically, its horizontal nature makes it unsuitable for a single-column mobile view.</td></tr><tr><td>08-column-head</td><td>3</td><td>This direction places the routine list in a non-intuitive location, overloading the column header&#x27;s purpose. It has very poor discoverability and would be awkward to interact with on a mobile device.</td></tr><tr><td>03-routines-page</td><td>1</td><td>This fails by moving routine information to a separate page, which completely hides the announcement from the main project screen. It forces a context switch that violates the &#x27;mission control&#x27; principle.</td></tr><tr><td>04-policy-in-force</td><td>1</td><td>Like 03, this moves the information off-screen to a separate page, hiding the announcement. The abstract &#x27;Policy&#x27; framing adds potential confusion without solving the core UI problem.</td></tr></table><details><summary>the whole answer</summary><pre>{
+ &quot;ranking&quot;: [
+  {
+   &quot;direction&quot;: &quot;06-inbox-standing-row&quot;,
+   &quot;score&quot;: 9,
+   &quot;why&quot;: &quot;This is the most integrated and calm solution, correctly treating routines as a background system activity. It uses an existing UI panel (the chat/inbox), respects the visual hierarchy, and has a clear path for mobile.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;01-ghost-card&quot;,
+   &quot;score&quot;: 8,
+   &quot;why&quot;: &quot;The &#x27;ghost card&#x27; is a brilliant announcement mechanism, placing the upcoming work in the user&#x27;s direct line of sight. The dedicated panel for the list is a clean, discoverable home, though the amber color for a routine event is too loud.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;02-panel-column&quot;,
+   &quot;score&quot;: 6,
+   &quot;why&quot;: &quot;Adding a dedicated column makes the routines list permanently visible, which is good for discoverability. However, it disrupts the established four-column layout and presents a significant risk for mobile responsiveness.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;07-routine-drawer&quot;,
+   &quot;score&quot;: 5,
+   &quot;why&quot;: &quot;While a drawer is a common pattern, it hides the routine information by default and lacks a clear, integrated announcement mechanism. When open, it&#x27;s disruptive by obscuring the main board view.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;05-schedule-tape&quot;,
+   &quot;score&quot;: 4,
+   &quot;why&quot;: &quot;The timeline is a conceptually interesting way to view scheduled events, but it introduces a new UI metaphor that doesn&#x27;t fit the panel idiom. Critically, its horizontal nature makes it unsuitable for a single-column mobile view.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;08-column-head&quot;,
+   &quot;score&quot;: 3,
+   &quot;why&quot;: &quot;This direction places the routine list in a non-intuitive location, overloading the column header&#x27;s purpose. It has very poor discoverability and would be awkward to interact with on a mobile device.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;03-routines-page&quot;,
+   &quot;score&quot;: 1,
+   &quot;why&quot;: &quot;This fails by moving routine information to a separate page, which completely hides the announcement from the main project screen. It forces a context switch that violates the &#x27;mission control&#x27; principle.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;04-policy-in-force&quot;,
+   &quot;score&quot;: 1,
+   &quot;why&quot;: &quot;Like 03, this moves the information off-screen to a separate page, hiding the announcement. The abstract &#x27;Policy&#x27; framing adds potential confusion without solving the core UI problem.&quot;
+  }
+ ],
+ &quot;carry&quot;: [
+  {
+   &quot;direction&quot;: &quot;06-inbox-standing-row&quot;,
+   &quot;why&quot;: &quot;Prototype must prove that the standing row summary is visible enough and that users intuitively click it to find the full list and actions.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;01-ghost-card&quot;,
+   &quot;why&quot;: &quot;Prototype must prove that a non-amber (e.g., cyan or grey) ghost card can announce an on-time run quietly, reserving amber for failed/held runs.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;02-panel-column&quot;,
+   &quot;why&quot;: &quot;Prototype must prove that a fifth column can be integrated on desktop without overwhelming the &#x27;Needs you&#x27; column, and explore a mobile-friendly alternative.&quot;
+  }
+ ],
+ &quot;drop&quot;: [
+  {
+   &quot;direction&quot;: &quot;03-routines-page&quot;,
+   &quot;reason&quot;: &quot;Hides the announcement by leaving the screen.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;04-policy-in-force&quot;,
+   &quot;reason&quot;: &quot;Hides the announcement and adds confusing terminology.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;05-schedule-tape&quot;,
+   &quot;reason&quot;: &quot;Horizontal layout is not responsive for phone.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;07-routine-drawer&quot;,
+   &quot;reason&quot;: &quot;Lacks an integrated announcement mechanism on the main screen.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;08-column-head&quot;,
+   &quot;reason&quot;: &quot;Placement is not discoverable or intuitive.&quot;
+  }
+ ],
+ &quot;hybrids&quot;: [
+  {
+   &quot;combination&quot;: &quot;06-inbox-standing-row + 01-ghost-card&quot;,
+   &quot;why&quot;: &quot;Use the standing row (06) for the complete list and management, but use the ghost card (01) as the high-fidelity announcement in the &#x27;Needs you&#x27; column.&quot;
+  },
+  {
+   &quot;combination&quot;: &quot;01-ghost-card + 02-panel-column&quot;,
+   &quot;why&quot;: &quot;Combine the ghost card announcement (01) with the always-visible list from the panel column (02), but place the list in the bottom panel from 01 to solve the mobile problem.&quot;
+  }
+ ],
+ &quot;hierarchy_risks&quot;: [
+  &quot;01-ghost-card (if the ghost card is amber for on-time runs)&quot;,
+  &quot;02-panel-column&quot;
+ ],
+ &quot;phone_risks&quot;: [
+  &quot;02-panel-column&quot;,
+  &quot;05-schedule-tape&quot;,
+  &quot;08-column-head&quot;
+ ],
+ &quot;announcement&quot;: &quot;Direction 01-ghost-card provides the best announcement. By placing a pre-emptive, semi-transparent &#x27;ghost&#x27; card in the &#x27;Needs you&#x27; column, it inserts the upcoming automated task directly into the user&#x27;s primary workflow for actionable items. This is far more effective than a passive list or indicator because it uses an established location for &#x27;what needs attention&#x27;, is contextually perfect, and can visually signal its nature and timing without shouting. Its only risk is being too loud if it uses the amber signal color for a routine event; a system color like cyan would be quieter and more appropriate for an on-time run.&quot;,
+ &quot;acts&quot;: &quot;Direction 06-inbox-standing-row places the &#x27;Skip once&#x27; and &#x27;Run now&#x27; acts best. By revealing them within an expanded system message in the chat/inbox panel, it groups them logically with the routine&#x27;s status information. This placement feels like a direct reply or command to the system in the same channel where configuration changes are proposed, reinforcing the acts as explicit commands rather than simple state toggles. Placing the acts adjacent to the &#x27;name, rhythm, next, last&#x27; data gives the user full context before taking action.&quot;,
+ &quot;notes&quot;: &quot;None of the directions explicitly address the lifecycle of a failed or skipped run. While a failed run might generate an amber card in the &#x27;Needs you&#x27; column, it&#x27;s unclear how a skipped run is represented after the fact. The home for routines should not only show the last run&#x27;s outcome but also provide a persistent, easily accessible log of past runs, including skips and failures, to aid in debugging and auditing process automation.&quot;
+}</pre></details>
+<h3>GLM 5V Turbo</h3><table><tr><th>candidate</th><th>score</th><th>why</th></tr><tr><td>02-panel-column</td><td>9</td><td>Gives routines a dedicated, always-visible home in the instrument-panel idiom without leaving the screen. The column quietly lists name, rhythm, next run, and last outcome in mono type, satisfying the &#x27;one place&#x27; and &#x27;at a glance&#x27; requirements while staying subordinate to the amber Needs-you column.</td></tr><tr><td>01-ghost-card</td><td>8</td><td>Contextualizes routines exactly where their output lands—the board columns—making the link between schedule and artifact immediate. Ghost cards whisper the next run time in situ, though they risk being less discoverable than a standing panel for members who don&#x27;t scan the whole board.</td></tr><tr><td>08-column-head</td><td>7</td><td>Elegantly integrates rhythm metadata into existing architecture without adding new panels, keeping the layout calm. However, column headers may lack vertical space to show last-outcome history and cluster jobs without cramming or scrolling, risking incompleteness.</td></tr><tr><td>06-inbox-standing-row</td><td>6</td><td>Leverages the inbox&#x27;s role as the factory&#x27;s voice to announce runs, which is narratively strong. It risks violating the loudness hierarchy by elevating automated schedule noise above the human Needs-you signals and the pulse band.</td></tr><tr><td>05-schedule-tape</td><td>5</td><td>Offers excellent temporal intuition for &#x27;when&#x27; but introduces a graphical idiom (horizontal timeline) that clashes with the thin-bordered, text-heavy Mission Control aesthetic. It struggles to encode outcome history and fails catastrophically on phone widths.</td></tr><tr><td>07-routine-drawer</td><td>4</td><td>Hides the home behind an interaction, failing the core requirement that a member see what runs on its own without being told where to look or clicking to reveal. Useful only for deep inspection, not for ambient awareness.</td></tr><tr><td>03-routines-page</td><td>3</td><td>Abandons the Mission Control screen entirely, forcing navigation away from the work context to see the schedule. It does not earn this trip because the announcement of the next run must live where the member already stares—at the board—not on a separate tab.</td></tr><tr><td>04-policy-in-force</td><td>2</td><td>Confuses operational scheduling with policy configuration, burying the living rhythm under static rules. Even worse than the routines-page, it frames running work as bureaucracy rather than heartbeat.</td></tr></table><details><summary>the whole answer</summary><pre>{
+ &quot;ranking&quot;: [
+  {
+   &quot;direction&quot;: &quot;02-panel-column&quot;,
+   &quot;score&quot;: 9,
+   &quot;why&quot;: &quot;Gives routines a dedicated, always-visible home in the instrument-panel idiom without leaving the screen. The column quietly lists name, rhythm, next run, and last outcome in mono type, satisfying the &#x27;one place&#x27; and &#x27;at a glance&#x27; requirements while staying subordinate to the amber Needs-you column.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;01-ghost-card&quot;,
+   &quot;score&quot;: 8,
+   &quot;why&quot;: &quot;Contextualizes routines exactly where their output lands\u2014the board columns\u2014making the link between schedule and artifact immediate. Ghost cards whisper the next run time in situ, though they risk being less discoverable than a standing panel for members who don&#x27;t scan the whole board.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;08-column-head&quot;,
+   &quot;score&quot;: 7,
+   &quot;why&quot;: &quot;Elegantly integrates rhythm metadata into existing architecture without adding new panels, keeping the layout calm. However, column headers may lack vertical space to show last-outcome history and cluster jobs without cramming or scrolling, risking incompleteness.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;06-inbox-standing-row&quot;,
+   &quot;score&quot;: 6,
+   &quot;why&quot;: &quot;Leverages the inbox&#x27;s role as the factory&#x27;s voice to announce runs, which is narratively strong. It risks violating the loudness hierarchy by elevating automated schedule noise above the human Needs-you signals and the pulse band.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;05-schedule-tape&quot;,
+   &quot;score&quot;: 5,
+   &quot;why&quot;: &quot;Offers excellent temporal intuition for &#x27;when&#x27; but introduces a graphical idiom (horizontal timeline) that clashes with the thin-bordered, text-heavy Mission Control aesthetic. It struggles to encode outcome history and fails catastrophically on phone widths.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;07-routine-drawer&quot;,
+   &quot;score&quot;: 4,
+   &quot;why&quot;: &quot;Hides the home behind an interaction, failing the core requirement that a member see what runs on its own without being told where to look or clicking to reveal. Useful only for deep inspection, not for ambient awareness.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;03-routines-page&quot;,
+   &quot;score&quot;: 3,
+   &quot;why&quot;: &quot;Abandons the Mission Control screen entirely, forcing navigation away from the work context to see the schedule. It does not earn this trip because the announcement of the next run must live where the member already stares\u2014at the board\u2014not on a separate tab.&quot;
+  },
+  {
+   &quot;direction&quot;: &quot;04-policy-in-force&quot;,
+   &quot;score&quot;: 2,
+   &quot;why&quot;: &quot;Confuses operational scheduling with policy configuration, burying the living rhythm under static rules. Even worse than the routines-page, it frames running work as bureaucracy rather than heartbeat.&quot;
+  }
+ ],
+ &quot;carry&quot;: [
+  &quot;02-panel-column&quot;,
+  &quot;01-ghost-card&quot;,
+  &quot;08-column-head&quot;
+ ],
+ &quot;drop&quot;: [
+  &quot;03-routines-page&quot;,
+  &quot;Hides the operational heartbeat behind a navigation action; the screen must hold the schedule.&quot;,
+  &quot;04-policy-in-force&quot;,
+  &quot;Too abstract for daily runs; policy is configuration, not operation.&quot;,
+  &quot;07-routine-drawer&quot;,
+  &quot;Fails visibility; routines must be seen without a click to announce next runs.&quot;,
+  &quot;05-schedule-tape&quot;,
+  &quot;Fails phone constraint; horizontal time cannot compress to 390px without breaking.&quot;,
+  &quot;06-inbox-standing-row&quot;,
+  &quot;Risks inflating automated notifications above human Needs-you signals.&quot;
+ ],
+ &quot;hybrids&quot;: [
+  &quot;02+08&quot;,
+  &quot;Panel-column provides the complete list home while column-head highlights the active next-run per column, giving both overview and spatial context without duplication.&quot;,
+  &quot;01+02&quot;,
+  &quot;Ghost-cards in the board columns show where the run will land, while a slim summary panel lists the full cluster including backup/dump jobs that don&#x27;t file cards.&quot;
+ ],
+ &quot;hierarchy_risks&quot;: [
+  &quot;06-inbox-standing-row&quot;,
+  &quot;Places routine announcements in the persistent chat layer, potentially outranking the board&#x27;s amber Needs-you column in attention.&quot;,
+  &quot;05-schedule-tape&quot;,
+  &quot;A graphical tape at the top could visually dominate the pulse band if not carefully subdued to background noise.&quot;,
+  &quot;03-routines-page&quot;,
+  &quot;By vacating the screen, it avoids direct conflict but creates a dangerous silence where the announcement should live, forcing the member to leave to check the clock.&quot;
+ ],
+ &quot;phone_risks&quot;: [
+  &quot;05-schedule-tape&quot;,
+  &quot;Horizontal timeline forces a second horizontal scroll or wraps illegibly at 390px width.&quot;,
+  &quot;02-panel-column&quot;,
+  &quot;If implemented as a fixed-width column, it may push the board off-screen; must collapse to an expandable row or accordion.&quot;,
+  &quot;08-column-head&quot;,
+  &quot;Stacking four column headers with rhythm details may consume all viewport height before any cards are visible on a narrow screen.&quot;
+ ],
+ &quot;announcement&quot;: &quot;Direction 02-panel-column announces the next run best. It provides a stable, narrow vertical list in the instrument-panel style where each routine displays &#x27;next Mon 06:00&#x27; (or &#x27;in 23 min&#x27;) in quiet cyan mono type, persistently visible in peripheral vision without requiring any click or hover. Unlike the drawer (hidden) or the page (navigated away), it stays on the Mission Control screen. Unlike the inbox, it does not mimic the visual weight of a human message or an amber alert, so it whispers rather than shouts. Unlike the schedule tape, it requires no graphical parsing of timelines\u2014just reading down a list. It treats an on-time run as the normal, calm state (background text) while reserving amber only for held or failed runs, perfectly matching the requirement that normalcy whispers and exception speaks.&quot;,
+ &quot;acts&quot;: &quot;Placement in 01-ghost-card or 02-panel-column reads best as acts. When Skip once and Run now appear as small, cyan-outlined text buttons (or ghost buttons with thin borders) at the far right of the routine row or ghost card, they read as momentary interventions\u2014&#x27;do this once now&#x27;\u2014rather than persistent state toggles. Their placement inline with the rhythm text (&#x27;every Monday 06:00&#x27;) reinforces that they are exceptions to the rule, not replacements for it. This leaves conceptual room for the chat to propose permanent rhythm changes (&#x27;change to Tuesday&#x27;) as configuration proposals requiring discussion and approval, keeping the UI surface clean: the button is for immediate agency, the chat is for governance. Toggles imply &#x27;this is the new state&#x27;; these buttons imply &#x27;I am overriding the clock once,&#x27; which is the correct mental model forSkip once and Run now.&quot;,
+ &quot;notes&quot;: &quot;All eight directions miss the critical feedback loop between the routine&#x27;s execution and the card it produces. When a routine such as &#x27;Weekly bump&#x27; files a card into the board, that card should carry a subtle, non-intrusive tag\u2014a thin cyan line or small &#x27;auto-filed by Weekly bump&#x27; chip\u2014that links back to the routine&#x27;s last-run entry, allowing the member to trace the artifact to its schedule without opening a drawer. Additionally, none of the directions adequately distinguish between project routines (which file cards visible on the board) and cluster infrastructure jobs (backup, Forgejo dump) which do not produce board artifacts; these infrastructure jobs need a visually distinct subsection\u2014perhaps greyed out or in a separate &#x27;Cluster&#x27; group\u2014so the member instantly knows which runs generate work items and which maintain the factory itself.&quot;
+}</pre></details>
+</html>

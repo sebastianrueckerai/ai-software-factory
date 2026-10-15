@@ -1,0 +1,29 @@
+You judge eight design directions for one screen: the project screen of an AI software factory console, in its fixed "Mission control" design. You see two contact sheets, the dark theme and the light theme, four directions per row, labelled 01-ghost-card, 02-panel-column, 03-routines-page, 04-policy-in-force, 05-schedule-tape, 06-inbox-standing-row, 07-routine-drawer, 08-column-head. Judge each direction across both themes.
+
+The problem: the factory runs routines, recurring work on a clock (a weekly bump of pinned versions filed as a human card, an hourly template pass, a weekly dependency update by an agent, an audit after 20 merges). Until now a timer filed the card and the member was surprised. The directions each propose a home: where a member sees what runs on its own (name, rhythm, next run, last run and its outcome), how the next run is announced before it files, how a filed card says which routine filed it, where the acts Skip once and Run now live, and whether the cluster's own jobs (backup, dump) are listed too.
+
+The shell is fixed and not under judgement: the top bar, the pulse band with its amber sentence and the instrument strip, the chat at 40 percent on the left with its thread table, the board at 60 percent on the right with four columns of which "Needs you" is lit amber. What the directions vary, and what you judge:
+
+1. The home: does a member find "what runs on its own" without being told where to look? Is it one place, and does it answer name, rhythm, next, last and outcome at one glance?
+2. The announcement: is the next run visible before it files, without a click, and quietly? A routine that runs on time is a normal state, so it must whisper. A held run or a failed run is exceptional and may speak.
+3. The card's face: does a card a routine filed say so at a glance (a chip, a line), and does it stay quiet among the other cards?
+4. The order of loudness: pulse first, the amber Needs you column second, the chat third. Does the direction keep it, or does the new element shout?
+5. The acts: are Skip once and Run now where the member reads, and do they read as acts? Does the direction leave room for "change the rhythm" as a configuration change proposed in the chat, not a toggle?
+6. Fit with the Mission control idiom: thin-bordered instrument panels, mono figures, cyan as the system colour, amber as the one signal that needs a person, calm and exact. Does the new part look like it was always there?
+7. The phone: can the home become one row or one list at 390 px wide without a second horizontal scroll?
+8. Pages against the screen: a direction that leaves the project screen (03, 04) must earn the trip. Does a page add something the screen cannot hold, or does it hide the announcement?
+
+Ignore rendering flaws of the image model: garbled letters, duplicated words, a wrong count. Judge the layout idea, the hierarchy and the fit.
+
+Answer in JSON only, no prose around it:
+{
+  "ranking": [ {"direction": "01-ghost-card", "score": 0-10, "why": "two sentences"} , ... all eight, best first ],
+  "carry": ["three direction slugs to build as prototypes, with one sentence each on what the prototype must prove"],
+  "drop": ["the five dropped, one short reason each"],
+  "hybrids": ["at most two combinations of two directions that would beat either alone, by slugs, one sentence each"],
+  "hierarchy_risks": ["where a direction makes the routines louder than the pulse or the Needs you column, by slug"],
+  "phone_risks": ["where the home cannot become one column at 390, by slug"],
+  "announcement": "which direction announces the next run best before it files, and why, one paragraph",
+  "acts": "which placement of Skip once and Run now reads best as an act and not a toggle, and why, one paragraph",
+  "notes": "anything the directions all miss, one paragraph"
+}

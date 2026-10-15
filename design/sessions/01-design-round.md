@@ -1,6 +1,6 @@
 # Session 01: the console design round
 
-The portfolio's process ([portfolio/docs/process.md](../../../portfolio/docs/process.md)) applied to the Factory console. Images go wide, a vision critic judges, Sebastian picks, code follows. Everything here runs in isolation: the docs worktree `asf-docs-console-design` for the artefacts, the code worktree `asf-code-console-design` for the console's templates and CSS. Nothing deploys.
+The portfolio's process ([process.md](../process.md)) applied to the Factory console. Images go wide, a vision critic judges, Sebastian picks, code follows. Everything here runs in isolation: the docs worktree `asf-docs-console-design` for the artefacts, the code worktree `asf-code-console-design` for the console's templates and CSS. Nothing deploys.
 
 ## Goal
 
@@ -11,7 +11,7 @@ When the round ends, Sebastian opens one page, [design/index.html](../index.html
 - The brief: [brief.md](../brief.md). The hierarchy: pulse, then chat as the main affordance, then the board. Drawer docked right. Phone: chat first, board below.
 - The inventory of every control and data point: [inventory.md](../inventory.md). Nothing is dropped; anything may move.
 - The lab: `scripts/console-lab/run.sh` in the code worktree serves the real console with fake data in four scenarios and screenshots every view in both themes. The baseline shots of today's console come from it, free.
-- Models and keys: the portfolio's [models.md](../../../portfolio/docs/research/models.md) and `.env.tools`; `tools/img.py` and `tools/shoot.sh` run from the portfolio root with absolute `--out` paths. The critic is Gemini 2.5 Pro through fal's `any-llm/vision`.
+- Models and keys: [models.md](../models.md) and `.env.tools`; `tools/img.py` and `tools/shoot.sh` run from the repository root with absolute `--out` paths (since 2026-10-15 in this repository, with the keys in this repository's `.env.tools`). The critic is Gemini 2.5 Pro through fal's `any-llm/vision`.
 - Spending cap: **$100** (Sebastian, 2026-10-14, for fal and other services; tokens are not capped), estimated $12 to $30. The fal key cannot read the real spend; `tools/img.py cost` adds up estimates. Sebastian checks the fal dashboard afterwards.
 - Picks between rounds are the director's with the critic's ranking next to them, provisional, as in the portfolio's overnight run. Only Sebastian's picks are decisions and go into `design-decisions.md` in this folder.
 

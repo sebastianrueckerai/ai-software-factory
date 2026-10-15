@@ -1,0 +1,56 @@
+```json
+{
+  "ranking": [
+    {"direction": "02-panel-column", "score": 9, "why": "Gives routines a dedicated, always-visible home in the instrument-panel idiom without leaving the screen. The column quietly lists name, rhythm, next run, and last outcome in mono type, satisfying the 'one place' and 'at a glance' requirements while staying subordinate to the amber Needs-you column."},
+    {"direction": "01-ghost-card", "score": 8, "why": "Contextualizes routines exactly where their output lands—the board columns—making the link between schedule and artifact immediate. Ghost cards whisper the next run time in situ, though they risk being less discoverable than a standing panel for members who don't scan the whole board."},
+    {"direction": "08-column-head", "score": 7, "why": "Elegantly integrates rhythm metadata into existing architecture without adding new panels, keeping the layout calm. However, column headers may lack vertical space to show last-outcome history and cluster jobs without cramming or scrolling, risking incompleteness."},
+    {"direction": "06-inbox-standing-row", "score": 6, "why": "Leverages the inbox's role as the factory's voice to announce runs, which is narratively strong. It risks violating the loudness hierarchy by elevating automated schedule noise above the human Needs-you signals and the pulse band."},
+    {"direction": "05-schedule-tape", "score": 5, "why": "Offers excellent temporal intuition for 'when' but introduces a graphical idiom (horizontal timeline) that clashes with the thin-bordered, text-heavy Mission Control aesthetic. It struggles to encode outcome history and fails catastrophically on phone widths."},
+    {"direction": "07-routine-drawer", "score": 4, "why": "Hides the home behind an interaction, failing the core requirement that a member see what runs on its own without being told where to look or clicking to reveal. Useful only for deep inspection, not for ambient awareness."},
+    {"direction": "03-routines-page", "score": 3, "why": "Abandons the Mission Control screen entirely, forcing navigation away from the work context to see the schedule. It does not earn this trip because the announcement of the next run must live where the member already stares—at the board—not on a separate tab."},
+    {"direction": "04-policy-in-force", "score": 2, "why": "Confuses operational scheduling with policy configuration, burying the living rhythm under static rules. Even worse than the routines-page, it frames running work as bureaucracy rather than heartbeat."}
+  ],
+  "carry": [
+    "02-panel-column",
+    "01-ghost-card",
+    "08-column-head"
+  ],
+  "drop": [
+    "03-routines-page",
+    "Hides the operational heartbeat behind a navigation action; the screen must hold the schedule.",
+    "04-policy-in-force",
+    "Too abstract for daily runs; policy is configuration, not operation.",
+    "07-routine-drawer",
+    "Fails visibility; routines must be seen without a click to announce next runs.",
+    "05-schedule-tape",
+    "Fails phone constraint; horizontal time cannot compress to 390px without breaking.",
+    "06-inbox-standing-row",
+    "Risks inflating automated notifications above human Needs-you signals."
+  ],
+  "hybrids": [
+    "02+08",
+    "Panel-column provides the complete list home while column-head highlights the active next-run per column, giving both overview and spatial context without duplication.",
+    "01+02",
+    "Ghost-cards in the board columns show where the run will land, while a slim summary panel lists the full cluster including backup/dump jobs that don't file cards."
+  ],
+  "hierarchy_risks": [
+    "06-inbox-standing-row",
+    "Places routine announcements in the persistent chat layer, potentially outranking the board's amber Needs-you column in attention.",
+    "05-schedule-tape",
+    "A graphical tape at the top could visually dominate the pulse band if not carefully subdued to background noise.",
+    "03-routines-page",
+    "By vacating the screen, it avoids direct conflict but creates a dangerous silence where the announcement should live, forcing the member to leave to check the clock."
+  ],
+  "phone_risks": [
+    "05-schedule-tape",
+    "Horizontal timeline forces a second horizontal scroll or wraps illegibly at 390px width.",
+    "02-panel-column",
+    "If implemented as a fixed-width column, it may push the board off-screen; must collapse to an expandable row or accordion.",
+    "08-column-head",
+    "Stacking four column headers with rhythm details may consume all viewport height before any cards are visible on a narrow screen."
+  ],
+  "announcement": "Direction 02-panel-column announces the next run best. It provides a stable, narrow vertical list in the instrument-panel style where each routine displays 'next Mon 06:00' (or 'in 23 min') in quiet cyan mono type, persistently visible in peripheral vision without requiring any click or hover. Unlike the drawer (hidden) or the page (navigated away), it stays on the Mission Control screen. Unlike the inbox, it does not mimic the visual weight of a human message or an amber alert, so it whispers rather than shouts. Unlike the schedule tape, it requires no graphical parsing of timelines—just reading down a list. It treats an on-time run as the normal, calm state (background text) while reserving amber only for held or failed runs, perfectly matching the requirement that normalcy whispers and exception speaks.",
+  "acts": "Placement in 01-ghost-card or 02-panel-column reads best as acts. When Skip once and Run now appear as small, cyan-outlined text buttons (or ghost buttons with thin borders) at the far right of the routine row or ghost card, they read as momentary interventions—'do this once now'—rather than persistent state toggles. Their placement inline with the rhythm text ('every Monday 06:00') reinforces that they are exceptions to the rule, not replacements for it. This leaves conceptual room for the chat to propose permanent rhythm changes ('change to Tuesday') as configuration proposals requiring discussion and approval, keeping the UI surface clean: the button is for immediate agency, the chat is for governance. Toggles imply 'this is the new state'; these buttons imply 'I am overriding the clock once,' which is the correct mental model forSkip once and Run now.",
+  "notes": "All eight directions miss the critical feedback loop between the routine's execution and the card it produces. When a routine such as 'Weekly bump' files a card into the board, that card should carry a subtle, non-intrusive tag—a thin cyan line or small 'auto-filed by Weekly bump' chip—that links back to the routine's last-run entry, allowing the member to trace the artifact to its schedule without opening a drawer. Additionally, none of the directions adequately distinguish between project routines (which file cards visible on the board) and cluster infrastructure jobs (backup, Forgejo dump) which do not produce board artifacts; these infrastructure jobs need a visually distinct subsection—perhaps greyed out or in a separate 'Cluster' group—so the member instantly knows which runs generate work items and which maintain the factory itself."
+}
+```

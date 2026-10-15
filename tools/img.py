@@ -51,10 +51,9 @@ FAL_CRITICS = {
 
 
 def load_env():
-    # the keys live in the portfolio repo's .env.tools until this repo has its own
     env = ROOT / ".env.tools"
     if not env.exists():
-        env = Path.home() / "repos" / "portfolio" / ".env.tools"
+        sys.exit(f"missing {env}: provider keys live there")
     for line in env.read_text().splitlines():
         if "=" in line and not line.lstrip().startswith("#"):
             k, v = line.split("=", 1)

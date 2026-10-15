@@ -1,0 +1,63 @@
+```json
+{
+  "ranking": [
+    {
+      "variant": "board",
+      "score": 9,
+      "why": "This variant best embodies the \"whisper/speak\" principle by integrating routines into the primary workflow in an ambient, contextual way. The held state is exceptionally clear without being disruptive."
+    },
+    {
+      "variant": "panel",
+      "score": 7,
+      "why": "A solid, discoverable solution that correctly places routines in a system status area and meets all functional requirements. However, the expanded home is less elegant and more visually intrusive than the board variant."
+    },
+    {
+      "variant": "chat",
+      "score": 4,
+      "why": "This variant fails the critical requirement to show the next run without a click from the main screen and feels conceptually misplaced. It silos routine information away from the primary project view."
+    }
+  ],
+  "announcement": {
+    "panel": "Yes, the instrument strip shows a text countdown to the next run, which is always visible.",
+    "board": "Yes, a dashed ghost card for the next due routine appears at the foot of the Queued column.",
+    "chat": "No, the user must first navigate away from the board and into the chat view to see the pinned routines panel."
+  },
+  "loudness": {
+    "panel": "Yes, its home is subordinate to the pulse sentence and less visually demanding than the amber Needs you column.",
+    "board": "Yes, its home at the foot of a non-critical column is the quietest of the three, perfectly adhering to the hierarchy.",
+    "chat": "No, by taking up permanent space in the chat view it competes for attention with actual messages and is too loud for a normal state."
+  },
+  "phone": {
+    "panel": "The expanded panel is functional but consumes a large portion of the viewport, pushing primary content down.",
+    "board": "The menu-based home is very space-efficient and feels native to a narrow screen, providing access without reflowing the layout.",
+    "chat": "The pinned panel is clean within its own view but is completely hidden when viewing the project board."
+  },
+  "craft": [
+    {
+      "variant": "board",
+      "where": "board:filed-dark-1440-card",
+      "what": "The amber highlight on the newly filed card #790 bleeds out of the column's left boundary, suggesting a z-index or overflow bug.",
+      "severity": "medium"
+    },
+    {
+      "variant": "panel",
+      "where": "panel:due-dark-1440-routine",
+      "what": "The heading 'Run history' inside the 'Runs' tab is redundant, as the table headers below convey the same information more specifically.",
+      "severity": "low"
+    },
+    {
+      "variant": "panel",
+      "where": "panel:due-light-1440-home",
+      "what": "The button styles in the expanded panel are inconsistent; 'Run now' has a visible focus state while 'Skip once' does not.",
+      "severity": "low"
+    }
+  ],
+  "keep": [
+    "The dashed ghost card from `board` is a brilliant, ambient way to show upcoming automated work directly in the context of the workflow.",
+    "The 'held' state indication in the instrument strip from `panel` provides excellent, high-level visibility for exceptional states.",
+    "The clear 'Weekly bump' routine chip on the filed card, shared by all variants, is essential for at-a-glance attribution."
+  ],
+  "hybrid": "A hybrid of `board` and `panel` would be superior. Use the `board` variant's ghost card and column-header menu as the primary, ambient home for routines. Add the top-level summary from `panel` to the instrument strip ('Routines · Next bump in 20 min' or 'Routines · 1 held') to provide glanceable system status and a clear indication of exceptional states without requiring the user to scroll the board. This combines the elegant, contextual whisper of the board with the immediate, high-level feedback of the panel.",
+  "verdict": "The `board` variant should become the console. It masterfully interprets the brief's core principle that normal states should whisper. Placing the next run as a ghost card directly on the board is contextually brilliant, treating automated work as a natural part of the project's future. Its approach to the 'held' state—turning the quiet ghost card into an unmissable but still contextual amber alert—is the best execution of an exceptional state speaking up. While its discoverability is slightly weaker than the `panel` variant, its superior elegance, ambient nature, and flawless adherence to the loudness hierarchy make it the most professional and effective solution for both members and visitors."
+}
+```

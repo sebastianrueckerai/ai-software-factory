@@ -22,6 +22,17 @@ Five planes in a loop: signals (issues, telemetry, alerts) feed a durable contro
 
 Reliability comes from how an AI step is built, not from its prompt (Sebastian, 2026-10-12). Each step has a limited scope. It gets all the context it needs, including the history of the steps before it, all the tools it needs, tools to gather more, and a clear view of its goal. It checks its own work and corrects itself, and every refusal names the state and the fitting action, so it can. When a step goes wrong, fix it by construction: in code, in a tool's shape, in a check or in the configuration, and make a step that is too large smaller. A prompt rule is the last resort: needed at times, but brittle, and such rules accumulate. Stage 16's four principles above apply this to the chat. The roadmap's third guiding idea and `docs/architecture.md` section 1 carry it.
 
+## Design rounds
+
+The console's design runs as rounds by the process in [design/process.md](design/process.md): image models go wide, a vision critic judges, Sebastian picks, code follows. A round that designs one control or one feature uses the condensed form described there.
+
+- Every generated image gets a sidecar JSON with model, prompt, references, parameters and cost. An output that cannot be made again does not count.
+- A round ends with its page `design/rounds/NN-slug/index.html`. Sebastian's pick becomes a C-entry in [design/design-decisions.md](design/design-decisions.md). Never reverse a decision silently.
+- The model that wrote a prompt is never the only judge of its output. Use the independent critics of [design/models.md](design/models.md).
+- Stay inside the round's spending cap. Ask before a run that would pass it.
+- Provider keys live in the gitignored `.env.tools`. Never print a key.
+- Read [design/process.md](design/process.md) before any image generation or critique, [design/models.md](design/models.md) before calling a provider, and [design/design-decisions.md](design/design-decisions.md) before changing the look.
+
 ## Constraints that shape every choice
 
 - Immutable and re-seedable end to end: deleting everything and re-seeding must work.

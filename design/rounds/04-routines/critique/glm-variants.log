@@ -1,0 +1,63 @@
+```json
+{
+  "ranking": [
+    {
+      "variant": "board",
+      "score": 9,
+      "why": "The ghost card in the Queued column makes the next run visible without a click while keeping normal-state routines whisper-quiet at the column foot. It integrates autonomous work into the spatial model of the board so members see 'what runs on its own' exactly where they expect to see work arriving."
+    },
+    {
+      "variant": "chat",
+      "score": 7,
+      "why": "Pinning routines under the inbox correctly relegates them to the third tier of loudness and perfectly supports configuration-as-conversation, but it buries the next-run announcement inside a scrollable chat pane that a member must already be reading to notice."
+    },
+    {
+      "variant": "panel",
+      "score": 5,
+      "why": "Hiding routines behind an expandable status panel fails the discovery requirement because a member must know to click the instrument strip to find autonomous work. When expanded, the panel dominates the top of the screen and risks outranking the pulse sentence."
+    }
+  ],
+  "announcement": {
+    "panel": "No, the next run hides inside the collapsed status panel until the member expands the instrument strip.",
+    "board": "Yes, the dashed ghost card sits visibly at the foot of the Queued column twenty minutes before it fires.",
+    "chat": "Only if the Routines panel beneath the inbox is already pinned open; otherwise the next run scrolls out of sight."
+  },
+  "loudness": {
+    "panel": "No, when expanded the panel occupies the full width above the board and competes directly with the pulse sentence for attention.",
+    "board": "Yes, the ghost card lives in the board's columnar layout well below the amber Needs you header and the pulse banner.",
+    "chat": "Yes, by living inside the chat pane it naturally occupies the quietest tier of the visual hierarchy below both the pulse and the Needs you column."
+  },
+  "phone": {
+    "panel": "The 390px shot crams the expanded panel into a dense scrollable list that pushes the Skip once and Run now buttons below the fold.",
+    "board": "The phone condenses the board into a single stream where the upcoming routine card and its action buttons sit cleanly above the fold alongside the queued work.",
+    "chip": "The phone renders the chat and its pinned Routines panel as a readable column, but the action buttons feel small and detached from the board context."
+  },
+  "craft": [
+    {
+      "variant": "board",
+      "where": "board:due-light-1440-home",
+      "what": "The dashed border of the ghost card loses sufficient contrast against the white background and reads as a broken layout rather than a future event.",
+      "severity": "medium"
+    },
+    {
+      "variant": "panel",
+      "where": "panel:held-dark-1440-home",
+      "what": "The held-state indicator on last week's #781 card uses the same amber tone as the Needs you column header, creating confusion between a held routine and a card requiring human decision.",
+      "severity": "high"
+    },
+    {
+      "variant": "chat",
+      "where": "chat:phone-due-dark-390-home",
+      "what": "The Routines panel consumes sixty percent of the vertical space on phone, pushing the actual chat thread and the compose area off screen.",
+      "severity": "medium"
+    }
+  ],
+  "keep": [
+    "Board's placement of the next due routine as a dashed ghost card at the foot of the Queued column, which teaches the member to read time spatially.",
+    "Chat's positioning of the Routines panel under the inbox thread head, which ensures that rhythm-change proposals land in the conversation where they belong.",
+    "Panel's routine drawer structure (Overview, Runs, Config) that opens consistently from any routine chip whether on a filed card or in the home."
+  ],
+  "hybrid": "A combination of Board and Chat would beat Board alone: keep the ghost card in the Queued column for zero-click visibility and loudness-correct placement, but when the member clicks that ghost card (or the due-this-week menu), open the Chat variant's Routines panel as a contextual drawer anchored to the card rather than expanding a top-level panel. This gives the announcement the board's spatial authority while giving the home the chat's conversational context for configuration changes.",
+  "verdict": "The board variant should become the console because it is the only design that satisfies the critical constraint of showing the next run before it files without a click, while respecting the fixed loudness hierarchy by keeping autonomous work visually subordinate to the pulse and the Needs you column. The ghost card turns abstract cron schedules into concrete, visible objects in the workspace that members can monitor peripherally and act upon (skip or run) without navigating away from their board, and the filed-card provenance chip clearly marks routine-originated work without breaking the kanban metaphor."
+}
+```

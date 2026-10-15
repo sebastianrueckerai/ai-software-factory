@@ -1,0 +1,55 @@
+```json
+{
+  "ranking": [
+    {
+      "variant": "hybrid",
+      "score": 9,
+      "why": "It uniquely satisfies the 'see without clicking' requirement via the board ghost card while maintaining a single authoritative list in the status panel, achieving perfect progressive disclosure across three distinct attention levels (strip, board, panel) without duplication."
+    },
+    {
+      "variant": "board",
+      "score": 7,
+      "why": "It excels at contextual awareness by placing the next run in the workflow's line of sight, but either clutters the column head with a menu (violating single-list purity) or, if the menu is absent, forces the member to hunt for the complete schedule elsewhere."
+    },
+    {
+      "variant": "panel",
+      "score": 6,
+      "why": "It correctly identifies the status panel as the home for system-level concerns, but hides routines behind an expandable panel that many members will keep collapsed, failing the 'find without being told' test until the strip cell fires."
+    },
+    {
+      "variant": "chat",
+      "score": 3,
+      "why": "It fundamentally misplaces machine-scheduled operations into a conversational channel, causing normal routine states to 'speak' loudly in a space reserved for human exception-handling and collaboration."
+    }
+  ],
+  "hybrid_vs_board": "The hybrid decisively beats board alone by eliminating the column-head menu—a source of dangerous duplication that would eventually desync with the canonical list—while retaining board's killer feature: the ghost card as a low-noise announcement in the workflow itself. What it loses is the ultra-convenient 'peek' at upcoming routines without leaving the board's gaze path, but this is a necessary sacrifice to enforce the 'one list' invariant and prevent the confusion of two competing registries. The hybrid gains architectural integrity: the board announces *that* something is coming, the panel owns *what* and *when*, and the strip owns *now*.",
+  "one_list": "The hybrid is absolutely right to drop the column-head menu. Routines are agent work, not human work-items; they belong in the status panel (the system's instrument cluster) alongside budgets and build status, not in the Queued column (which is a human inbox). Keeping a quick list on the board would violate the 'nothing shown twice' rule and, worse, blur the critical semantic distinction between 'a card waiting for *you*' (the Queued column's purpose) and 'a timer waiting for *the clock*' (a routine). The ghost card is sufficient board-presence because it is an *effect* (a forthcoming filing), not a *registry*.",
+  "craft": [
+    {
+      "variant": "hybrid",
+      "where": "hybrid:due-dark-1440",
+      "what": "The visual relationship between the strip cell (top) and the board ghost card (bottom-right) must be unambiguously coded as 'same system, different urgency' so members don't perceive them as two independent notifications.",
+      "severity": "medium"
+    },
+    {
+      "variant": "board",
+      "where": "board:due-dark-1440",
+      "what": "If the 'due' menu renders inline within the column head, it risks pushing actual queued cards below the fold when more than three routines exist, damaging the board's scanability.",
+      "severity": "high"
+    },
+    {
+      "variant": "panel",
+      "where": "panel:phone-due-dark-390-home",
+      "what": "At 390px width, collapsing the status panel to make room for the board likely hides the routines list entirely on mobile, leaving the phone reliant solely on the strip cell which may fire too late for comfortable review.",
+      "severity": "high"
+    },
+    {
+      "variant": "chat",
+      "where": "chat:due-light-1440-home",
+      "what": "In light mode, the routines panel pinned under the inbox thread competes visually with human message threads, making the 'Routines' header appear like a conversation participant rather than a system module.",
+      "severity": "medium"
+    }
+  ],
+  "verdict": "The hybrid variant should become the console. It is the only design that honors the dual citizenship of routines—as background infrastructure (status panel list) and as foreground workflow events (board ghost card)—while strictly enforcing the 'single list, single detail' constraint that prevents the fragmentation plaguing the other approaches. By using the strip for imminence (<1 hour), the board for anticipation (next due), and the panel for administration (full schedule), it creates a noise gradient that perfectly matches the required loudness order: the pulse sentence screams, the amber Needs you column speaks, and the routine system whispers exactly where each audience needs to hear it. The removal of the board's menu is the critical simplification that transforms a clever prototype into a maintainable information architecture."
+}
+```

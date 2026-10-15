@@ -1,0 +1,16 @@
+You are an independent design critic judging the second loop of a design round. The screen is the project screen of an AI software factory console in its fixed "Mission control" design. The round gives the factory's routines a home. A routine is recurring work on a clock: a weekly bump of pinned versions filed as a human card, an hourly template pass, a weekly dependency update by an agent, an audit after 20 merges. Until now a timer filed the card and the member was surprised.
+
+In the first loop you and a second critic judged three homes: "panel" (the routines as a column in the expanded status panel under the instrument strip, with a quiet strip cell when a run is under an hour away or held), "board" (the next due routine as a dashed ghost card at the foot of the Queued column, with a "due" menu in the column's head listing all routines) and "chat" (a Routines panel pinned under the inbox thread's head). Both critics ranked board first and both asked for a hybrid of board and panel. The builders made it: "hybrid" keeps the ghost card on the board as the announcement, the strip's cell, and the status panel's Routines column as the one list of all routines. The "due" menu in the column's head is gone, so the list has one home.
+
+You see four labelled sheets, one per variant: panel, board, chat, hybrid. Each sheet shows the due moment (Monday 05:40, the weekly bump files in 20 minutes) in dark with the home closed and open, the same in light with the home open, the routine's drawer, the filed card's drawer with its provenance line, the held moment (last week's #781 still open), the audit moment, and the phone at 390 wide with the home open.
+
+The rules: normal states whisper, exceptional states speak. The order of loudness is fixed: the pulse sentence, then the amber Needs you column, then the chat. A member must find "what runs on its own" without being told where to look, must see the next run before it files without a click, must see at a glance that a card was filed by a routine, and must be able to act (Skip once, Run now) where they read. Nothing is shown twice: one list of the routines, one detail view (the drawer).
+
+Answer as JSON only:
+{
+  "ranking": [ {"variant": "panel|board|chat|hybrid", "score": 0-10, "why": "two sentences"}, ... all four, best first ],
+  "hybrid_vs_board": "does the hybrid beat board alone, and what does it lose or gain, one paragraph",
+  "one_list": "is the hybrid right to drop the column head's menu so the status panel holds the one list, or should the board keep a quick list too, one paragraph",
+  "craft": [ {"variant": "...", "where": "screenshot name", "what": "one sentence", "severity": "high|medium|low"} ],
+  "verdict": "which variant should become the console, one paragraph"
+}
