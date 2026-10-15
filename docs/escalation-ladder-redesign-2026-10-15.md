@@ -1,0 +1,465 @@
+# The escalation ladder: how it works, where it failed on 2026-10-15, and how it should work
+
+This document is for one decision: how the factory should handle a card that goes wrong, so that it heals itself, asks a human only when only a human can decide, and does not waste tokens. It explains the ladder from the ground up, follows the seven problems of 2026-10-15 through it, measures what they cost, and sketches the ladder after the changes.
+
+The facts come from [escalation-ladder-facts-2026-10-15.md](escalation-ladder-facts-2026-10-15.md), which cites the code, and from the gateway's ledger, queried on 2026-10-15 for the six cards of that day. Section 5 is a proposal, not a description.
+
+## 1. The pieces
+
+### Terms
+
+- **Card**: one task, filed as an issue. Its id is `t-<12 hex>`, its issue a number such as #836.
+- **Session**: one run of the coding agent in its own sandbox pod with a fresh conversation. A card may take several sessions. The n-th session of a card is attempt n.
+- **Push**: a session's end that leaves a new commit on the card's branch. A push opens or updates the pull request.
+- **Gate**: one check of a pushed change. The gates run in a fixed order after every push.
+- **Finding**: one problem a gate reports. A finding goes back to the agent as a new session, or onto the card for a human.
+- **Check-in**: any look at a session or a card by something other than the coding agent itself.
+- **Escalation**: the card stops and waits for a human.
+
+### Two rungs, not models
+
+The factory names models by alias. Policy maps each alias to a provider's model. Every alias belongs to one of two groups, and this document speaks of the groups.
+
+| Rung | Aliases today | Who uses it |
+|---|---|---|
+| Cheap | `coding-cheap` | Coding sessions at the start. The coding agent's subagents, always. |
+| Strong | `coding-frontier`, `review-frontier`, `supervisor` | Coding sessions after a climb. The review, the audit, both supervisors. |
+
+Which provider backs a rung is configuration. On 2026-10-15 the coding aliases ran on the z.ai coding plan, whose calls cost nothing beyond the plan. The review and supervisor aliases ran on a second provider that bills per call. Nothing in the ladder depends on the provider.
+
+### The roles
+
+Seven roles touch a card. Three are code, three are models, one is a human.
+
+| Role | What it is | Rung | What it reads | What it can do |
+|---|---|---|---|---|
+| Coding agent | opencode in a sandbox pod, one conversation per session | Cheap, then strong | Its brief. The repository. The document repository at `/workspace/docs`. | Edit, run commands, ask a human (`escalate_to_human`), ask the issue's author (`request_info`), file a child card (`delegate`). |
+| Detectors | Go code inside each session that watches every event and a timer | None | Every harness event | Trip. A trip calls the session supervisor or decides in code. |
+| Session supervisor | One chat completion per trip | Strong | The brief, the trip, a digest of the last 40 commands, 40 edited files, 5 errors and the diff, the last 24 KiB of the session record | `continue`, `message` into the running session, `escalate` to a human |
+| Gate supervisor | One chat completion when a gate runs past its time bound | Strong | The objective, the last 8 KiB of the card's timeline, the gate's state | `wait`, `retry`, `cancel`, `escalate` |
+| Review | One chat completion per push | Strong | The brief, the diff in up to three parts of 48 KiB, the reproduction and audit results, its own last review | `approve`, or `concerns` with up to 10 findings |
+| Audit | One chat completion per push, code projects only | Strong | The diff against a checklist of six items | `clear` or findings. Findings go to the card, never to the agent. |
+| Human | A member in the console or on the issue | | The card, the pull request, whatever they open | Answer, grant a session, fund, approve, request changes, reject, retry, close, steer a running agent |
+
+No model role has a tool. Each of the four model roles is one call that reads a fixed input and answers one JSON object. Only the coding agent can open a file, run a command or read the repository. Only the human can read everything.
+
+```mermaid
+flowchart LR
+  H[Human]
+  C[Card: issue, branch, pull request, timeline]
+  A[Coding agent in a sandbox pod]
+  D[Detectors in code]
+  S[Session supervisor]
+  G[Gate supervisor]
+  R[Review]
+  U[Audit]
+  CI[Checks in CI]
+  C -->|brief, findings, answers| A
+  A -->|push| C
+  D -->|trip| S
+  S -->|message| A
+  S -->|escalate| H
+  C -->|diff| R
+  C -->|diff| U
+  C -->|head| CI
+  R -->|findings| C
+  CI -->|red checks| C
+  U -->|findings for a human| C
+  G -->|wait, retry, cancel| C
+  G -->|escalate| H
+  C -->|question, approval| H
+  H -->|answer, grant, fund, approve, steer| C
+```
+
+## 2. The happy path
+
+A card that goes as intended runs one or two sessions, passes the gates and gets merged. Every arrow in the diagram is a handover, and each handover carries a fixed set of things.
+
+```mermaid
+flowchart TD
+  F[Filed in the ready lane] --> B[Brief built from the issue]
+  B --> S1[Session 1 on the cheap rung]
+  S1 -->|8 min without a push| S1s[Same session, strong rung]
+  S1 --> P[Push: commit, pull request]
+  S1s --> P
+  P --> GP[Policy gate]
+  GP --> GM[Migration gate]
+  GM --> GR[Reproduction gate]
+  GR --> PAR{Beside each other}
+  PAR --> CI[Checks in CI]
+  PAR --> RV[Review]
+  PAR --> AU[Audit]
+  CI --> AP[Approval: merge queue, sync with main, human]
+  RV --> AP
+  AU --> AP
+  AP --> M[Merge as factory-merge]
+  RV -->|concerns| S2[Session 2 with the findings]
+  CI -->|red| S2
+  S2 --> P
+```
+
+### Who sees what at each handover
+
+| Handover | What crosses | What does not cross |
+|---|---|---|
+| Issue to session 1 | The issue text without its size, budget and rung lines. The repository map. The tools. The work guide. The author's standing. | The budget. The time left. The attempt number. |
+| Session to gates | The branch head. The agent's last message, 2,000 bytes at most. A `not_reproduced:` line, if any. | The conversation. The agent's commit messages, which the worker replaces. |
+| Gates to session 2 | Up to 60 findings, the newest kept, each cut at 1,000 bytes. Red checks with the job log's last 40 lines. Human answers of the whole run. | The review's full text. The earlier conversation. Any supervisor message. Pull request comments other than a trusted human's request for changes. |
+| Gates to the human | The approval card with the diff, the checks, the review's findings and the agent's last message as "Recommendation". | |
+| Human to a later session | Every answer of the run, newest first, under "do not escalate them again". | |
+
+The brief's sections run in this order: human answers, left-out notes, repository and commit, the author's standing, the issue, the spec, the poster's answers, the findings from earlier attempts, the repository map, the tools, the work guide. The answers stand above the findings.
+
+### An example that went as intended
+
+Card #840 pushed after 26 minutes. Its first review raised a possible data race on a new key field, which was a fair point. The second session fixed it with an atomic pointer and a race test. The second review approved. The supervisor's check-ins answered `continue`. The human read the diff and approved. The card cost 2.57 EUR at list prices for 2 sessions, 2 reviews, 2 audits and 3 supervisor calls.
+
+## 3. The unhappy paths today
+
+Something goes wrong at one of four moments: inside a session, when a session ends without a push, when a gate returns findings, and when a cap is reached. Each moment has its own path, its own watcher or none, and its own way to the human.
+
+### 3.1 Inside a session: a detector trips
+
+The detectors watch every event. The live thresholds:
+
+| Detector | Trips when |
+|---|---|
+| `no_progress` | No harness event for 5 minutes |
+| Reading without writing | 60 steps |
+| `no_write` | 900 seconds |
+| Repeated identical call | 4 times |
+| Repeated same failure | 3 times |
+| `churn` | 15 |
+| Check-in | Every 45 minutes of the card's agent time, never in a session's first 10 minutes |
+| Cheap cap | 8 minutes on the cheap rung without a push, attempt 1 only |
+| Wall clock | The card's 2 hours of agent time are used up |
+
+```mermaid
+flowchart TD
+  T[Detector trips] --> K{Which?}
+  K -->|cheap cap| CL[Climb to the strong rung in place, decided in code]
+  K -->|wall clock| FIN[Session ends, no supervisor call]
+  K -->|any other| SV[Session supervisor: one call, no tools]
+  SV -->|continue| RUN[Session runs on]
+  SV -->|message| MSG["Guidance becomes the agent's next turn"]
+  SV -->|escalate| H[Human]
+  MSG --> ST{Next trip with no file written since, or flip-flop, or churn?}
+  ST -->|cheap rung| CL2[Climb in place]
+  ST -->|strong rung| STOP[Session stops, next session on the strong rung]
+  ST -->|no| RUN
+  SV -->|7th trip| H
+```
+
+What the supervisor sees: the brief, the trip, the digest, the record's tail, its own earlier messages, and on its first call the carried findings. It sees no review, no CI result, no card timeline, and it cannot open a file. It judges whether the agent is moving, not whether the agent is right.
+
+What it can do: `continue`, `message`, `escalate`. It cannot stop a session without escalating, cannot change the rung, cannot run a test, and cannot tell a gate that a finding is wrong. A message it sends lives and dies with the session.
+
+### 3.2 A session ends without a push
+
+A session ends without a push for eight reasons: the agent finishes with nothing to push, the step cap of 1,500, the wall clock, a loop of three nudges without new content, a budget refusal, a day or month cap, a provider refusal, a content filter.
+
+```mermaid
+flowchart TD
+  E[Session ends without a push] --> W{Why?}
+  W -->|budget refusal| BQ[Card waits for a human: fund and answer]
+  W -->|day or month cap| CAP[Card waits for the cap]
+  W -->|provider refusal on the first call| NA[Not counted as an attempt, retried]
+  W -->|anything else| NEXT{Attempt number past the cap?}
+  NEXT -->|no| S[Next session starts at once]
+  NEXT -->|yes| H[Human: the cap question]
+  S --> F["Its findings are the dead session's last 20 command lines plus its stop reason"]
+```
+
+Nobody with judgment looks at a dead session. The next session starts at once. Its "findings from earlier attempts" are lines such as `ran sleep 120; ps aux ... (exit 0)` and `changed internal/factoryd/store.go`. They say what was run, not what was wrong. The agent's own understanding of its work is gone with the pod.
+
+### 3.3 A gate returns findings
+
+The review and the checks run beside each other. Red checks cancel the review. Findings of the reproduction, the checks and the review go to a new session. Findings of the audit and the migration gate go to the card for a human.
+
+```mermaid
+flowchart TD
+  P[Push] --> G[Gates]
+  G -->|review: concerns| C{Returns so far above stronger_after?}
+  G -->|checks: red| C
+  G -->|reproduction: failed| C
+  C -->|no| S[Next session, same rung, with the findings]
+  C -->|yes| SS[Next session on the strong rung]
+  S --> P2[Push]
+  SS --> P2
+  P2 --> G2[Gates again. The review reads its last review and repeats every finding it judges unaddressed]
+  G2 -->|concerns a third time| CAP[Session cap: human]
+  G -->|audit or migration| H[Card for a human, no session]
+```
+
+The review reads the diff and cannot check a claim. The prompt tells it to list again every finding of its last review that the new head did not address. The agent cannot answer a finding in words. Its only way to address one is to change code. A false finding therefore loops until the session cap, and every loop costs one session. A `concerns` verdict without findings becomes the finding "model review: <summary>" and costs one session too.
+
+When a human approves over findings, each finding is recorded as adjudicated, and a later finding with exactly the same text no longer sends a session back. The review never learns of the adjudication.
+
+### 3.4 The session cap and the other direct paths to a human
+
+```mermaid
+flowchart TD
+  X[Event] --> Y{Which?}
+  Y -->|attempt number past 3 plus grants| CAP[Cap question: the findings history, up to 8,000 bytes]
+  Y -->|budget refusal| FUND[Fund question]
+  Y -->|agent calls escalate_to_human| ASK["The agent's question"]
+  Y -->|supervisor escalates| SUP["The supervisor's reason"]
+  Y -->|planner's 30 minutes used up| FAIL[Plan card fails. No question.]
+  Y -->|card quiet for the stale window, also in waiting-deps| STALE[Is its run gone?]
+  Y -->|cap reached with red checks| APR[Approval card offering Approve and Deny, though Approve cannot merge a red head]
+  CAP --> H[Human]
+  FUND --> H
+  ASK --> H
+  SUP --> H
+  STALE --> H
+  APR --> H
+  H -->|answer or grant| S[One more session, plus 30 minutes]
+  H -->|request changes| S
+  H -->|fund, then answer| S
+  H -->|reject or close| DONE[Card fails or closes]
+```
+
+### Where the ladder goes to a human today
+
+| Moment | Who looks first | With tools? | Could an agent have tried first? |
+|---|---|---|---|
+| Detector trip in a session | Session supervisor | No | It does try, by message. It cannot see gate results or the repository. |
+| Session dead without a push | Nobody | | Yes. Nobody writes a handover. |
+| Gate returns findings | Nobody. The next session starts. | | Yes. Nobody checks whether the finding is true. |
+| Session cap | Human | | Yes. The human gets the history and finds the fix in minutes, as on #836, #838 and #839. |
+| Budget refusal | Human | | The spend is the human's. The agent could have wrapped up before. |
+| Planner time | Nobody. The card fails. | | Yes. A second planner session with what the first read. |
+| Card quiet while waiting on a dependency | Human | | No question is needed. The wait is by design. |
+| Approval at the cap with red checks | Human | | Yes. The fix was one line. |
+
+## 4. The seven problems of 2026-10-15
+
+### The run
+
+Five cards filed at 13:19:53 in project `ai-software-factory-code`, all merged between 14:15 and 14:48. Four of the five needed the human for something other than the final approval. Later that day the documents feature added a plan card and four cards, which brought problems 5 to 7.
+
+| Issue | Subject | Sessions | Human did, beyond the approval |
+|---|---|---|---|
+| #836 | A Forgejo review or comment reaches its card | 3 | Overruled a false review finding, three times repeated |
+| #837 | The board reads only its project's open cards | 3 | Overruled a `concerns` that had no finding |
+| #838 | A page of finished cards reads only its column | 4 | Denied an approval on red checks and named the one-line fix |
+| #839 | A task that ended carries its finish time | 4 run, 2 starved | Funded 3 EUR, named two tests and their fix, answered an audit |
+| #840 | A GitHub mirror's token is sealed at rest | 2 | Nothing |
+| #851 | Plan card of the documents feature | 1 | Nothing. The card failed. |
+
+### Why each problem happened
+
+**Problem 1, #837: `concerns` on finished work.** The review's input held the project's merge rule, `human`, and its prompt explained that an approve does not merge under that rule. The answer format says "approve when you would merge it as it is". The model concluded that it would not merge, since a human must, and answered `concerns` with no finding. Code turned that into a finding and started a session that fixed nothing. The cause is a rule in a prompt that belongs to code. Commit `42b608e` removed the merge rule from the review's input the same afternoon.
+
+**Problem 2, #836: a false finding three times.** The review claimed that `TasksByPR` had no implementation and the package would not compile. The method exists on main at `internal/factoryd/store.go:672`, and the checks were green. The reviewer could not open the file. The agent could not say "it exists". The next review re-read its last review and repeated the claim, as its prompt asks. The supervisor ran three times on `no_progress`, read the session's commands, and answered `continue` with "the agent is making solid progress". It never saw the review. Three sessions and a human later, the human opened main and approved. The same claim returned at 17:36 on card #853, about `docRootOK`, which is defined on main at `internal/console/autonomy.go:227`.
+
+**Problem 3, #839: a budget burnt waiting, then starved sessions.** The card had 2 EUR, the size "small". Session 1 ran the full test suite in the background and polled it with `sleep 120` and `sleep 420`. Each poll is a model call that resends the conversation. The session made 87 calls, 53 of them on the strong rung for 1.67 EUR. Two new tests failed, because the new database check forbids a row they create on purpose. The agent dropped the check inside the tests instead of stamping the test rows. The 45-minute check-in caught an earlier mistake, a reverted file, and that was useful. Nothing caught the dropped check before the gates. The session died on a budget refusal with 0.15 EUR left. Sessions 2 and 3 started, because the funding check prices a call of 1,024 output tokens and no context, and died on their first real call. Both counted as attempts. Their findings were the dead session's command lines. The human funded, named the tests and the fix, and the fifth attempt pushed in 15 minutes.
+
+**Problem 4, #838: a merge approval on red checks.** Cards #837 and #838 changed the same function in parallel. After #837 merged, #838's new test stand-in no longer matched the interface, and the sync with main turned the checks red. The card was at its cap, so the red checks went onto an approval card that offered Approve, which cannot merge a red head. The human denied with "request changes" and named the one-line fix. Session 4 made it in 9 minutes. Four reviews had also repeated a question about a test's project name that the test rig answers, for the reason in problem 2.
+
+**Problem 5, #851: the planner ran out of time and failed.** The plan card had 30 minutes and no check-in. Its brief pointed at a 171 KB prototype. The planner read for 30 minutes, made 75 calls with 6.0 million prompt tokens, and never called `file_plan`. The plan workflow fails the card at once at the time limit. No warning reached the planner, no one looked at the session, and no question went to a human.
+
+**Problem 6, #854 to #856: waiting cards asked whether their run was gone.** Three cards waited on #853 by design. The stale sweep counts `waiting-deps` as a state that can go stale, found them quiet for an hour, and moved them to `waiting-human` from outside their workflows. The human's answer changed nothing, because the workflows were still waiting on #853 and read no answer during that wait.
+
+**Problem 7, #853: an old answer overrode a newer request.** The human answered a cap question with "change nothing and end the session". That answer stays in every later session of the run, placed above the findings and marked "do not escalate them again". The human then denied the approval with four requested changes, which arrived as a finding. Session 5 read the old answer first and ended after 36 seconds with nothing to push.
+
+### Where the check-ins were inefficient, and what they cost
+
+The question behind this document was whether the escalation agents read many tokens for nothing. The ledger says they read few tokens, and for nothing.
+
+The five code cards cost this at list prices:
+
+| Role | Calls | Prompt tokens | EUR | Share of the five cards |
+|---|---|---|---|---|
+| Coding sessions | 578 | 32.5 million | 9.90 | 92 % |
+| Session supervisor | 17 | 214,000 | 0.44 | 4 % |
+| Review | 14 | 103,000 | 0.19 | 2 % |
+| Audit | 14 | 89,000 | 0.26 | 2 % |
+
+A supervisor call reads 9,000 to 16,000 tokens. A review call reads 6,000 to 10,000 tokens. A coding call reads 35,000 to 80,000 tokens, of which 95 % or more come from the provider's cache. The planner on #851 read 6.0 million tokens for 2.53 EUR and filed nothing.
+
+The sessions that produced nothing cost this:
+
+| Card | Sessions that produced nothing | EUR | Why |
+|---|---|---|---|
+| #836 | 2 and 3 | 0.70 | Answered a false finding |
+| #837 | 3 | 0.08 | A `concerns` with no finding |
+| #838 | 3 | 0.25 | Changed nothing. Session 4 fixed one line a message could have named. |
+| #839 | 2 and 3 | 0.15 | Starved. Part of session 1's 1.67 EUR went to polling. |
+| #851 | 1 | 2.53 | No plan filed |
+| Total | | 3.70 | |
+
+The check-ins on the five code cards cost 0.89 EUR and prevented none of the 3.70 EUR. The waste is downstream of the check-ins, in sessions they could not stop because they could not see the cause. Reading more, with tools, is cheaper than one wasted session: a check-in that opens three files and reads the review costs about 0.1 EUR at these prices.
+
+## 5. The ladder after the changes
+
+### Principles
+
+1. **No human before an agent tried once.** A failure first gets a check-in with sight, then one fresh session with a handover, then the human. Only decisions that are the human's by nature go to the human at once: spend above policy, a goal that conflicts with another card or became obsolete, a policy class agents may not touch, access the factory does not have.
+2. **Facts by code, judgment by model.** Budget left, time left, attempt number, CI state, adjudications: code injects them. No model is asked for a fact a tool can carry. Roadmap 199.
+3. **Small default context, depth by tool.** The whole conversation of a failed session goes to no prompt. A check-in gets a problem statement and the record's tail, and fetches the rest with search and read tools. The next session gets a handover note of 2,000 characters and the transcript as a searchable file.
+4. **A check-in has actions, not only eyes.** It can end a session with a handover, confirm or drop a finding, run the tests, and ask a human with a prepared question.
+5. **The judge of a result stays independent.** The review reads the diff and never the agent's story. Its findings are claims. A step with tools checks the claims before they cost a session.
+6. **Knowledge crosses session boundaries as a handover.** A supervisor message, a finding's dispute, a dead session's state: all of it lands in a note the next session reads first.
+
+### The roles after
+
+One role is new, the check-in agent. It replaces the session supervisor's model call and takes two moments that have no watcher today.
+
+| Role | Change |
+|---|---|
+| Coding agent | Reads its budget, time and attempt in the brief and gets a warning line in its responses near a limit. Waits on a background job through a blocking tool instead of polling. Ends every session with a report per finding: `fixed`, `disputed` with a reason, or `open`. |
+| Detectors | Unchanged. Cheap, in code. |
+| Check-in agent | New. One conversation on the strong rung with read tools. Called at three moments. Writes the handover. |
+| Review | Unchanged as a judge. Its findings become claims that the check-in verifies before they reach a session. Its "repeat" instruction goes. It receives the check-in's verdict on its earlier findings instead. |
+| Gate supervisor | Unchanged. |
+| Audit | Unchanged. |
+| Human | Asked with a prepared question: what happened, what was tried, what the check-in found, the options. |
+
+### The check-in agent
+
+```mermaid
+flowchart LR
+  subgraph Inputs
+    PS[Problem statement, written by code]
+    TL[Tail of the session record]
+  end
+  subgraph T["Tools, read-only"]
+    T1[transcript_search, transcript_read]
+    T2[card: brief, state, budget, time, attempts, findings history, adjudications, disputes]
+    T3["gates: last review's full text, checks with logs, reproduction output"]
+    T4[repo: read a file, grep, git log, at head and at main]
+    T5[run: the tests or the reproduction in the sandbox]
+  end
+  subgraph Actions
+    A1[continue]
+    A2[message into the running session]
+    A3[end the session with a handover]
+    A4[confirm or drop each finding]
+    A5[ask a human with a typed reason]
+  end
+  PS --> CK[Check-in agent, strong rung]
+  TL --> CK
+  CK --> T1
+  CK --> T2
+  CK --> T3
+  CK --> T4
+  CK --> T5
+  CK --> A1
+  CK --> A2
+  CK --> A3
+  CK --> A4
+  CK --> A5
+```
+
+**The three moments and their problem statements.** Code writes the statement from facts it holds. The three below are the shape, not the final text.
+
+| Moment | Trigger | Statement |
+|---|---|---|
+| In session | A detector trip or the scheduled check-in, as today | "You check on session 2 of 3 of card #836, 'A Forgejo review reaches its card'. This session works on review findings: <list>. No harness event for 5 minutes. Budget left 3.1 of 5 EUR, time left 71 of 120 minutes. Decide: continue, message, or end with a handover." |
+| Session ended without a verified push | Budget refusal, time, step cap, loop, no changes | "Session 1 of card #839 ended: the gateway refused a call, 0.15 EUR left. The branch holds commit ddf3ffa, not yet judged. Write the handover for the next session, or ask a human if only a human can decide." |
+| Gate returned findings | Review `concerns`, red checks, failed reproduction, a human's request for changes | "Head 9a02364 of card #836: the review answered concerns with 2 findings. The checks are green. The agent's report says finding 1 is disputed: 'TasksByPR exists on main'. Confirm or drop each finding. Then decide: a fresh session with a handover, or a human." |
+
+**Where it runs.** In session, it is a second conversation inside the agent's own pod, with read-only tools on the live workspace. It sees the test log, the git state and the files as they are. At the other two moments the agent's pod is gone, so the check-in runs first in the next session's pod, before the coding conversation starts. It writes the handover, and the coding conversation starts with it. If the check-in decides that a human must act, the pod stops before the agent spends anything. No new pod shape, no new credentials.
+
+**What it costs.** The tail is 24 KiB at most, about 6,000 tokens. Each tool result adds a few thousand. A check-in that reads the review, opens three files and runs one test reads 30,000 to 60,000 tokens over a few calls, about 0.1 EUR at this run's prices. A wasted session costs 0.08 to 0.70 EUR.
+
+**Limits in code.** Calls per card and a budget share, as the supervisor has today. The in-session check-in keeps today's deterministic first response: the cheap cap and the wall clock decide in code without a call.
+
+**The handover note.** At most 2,000 characters, at the top of the next session's brief, above the findings and above the human answers. It names: what the earlier session did, the state of the branch, each finding with its verdict and the reason, what to do first, and what not to repeat. The earlier transcripts lie in the workspace as files, `/workspace/.factory/sessions/<session>.jsonl`, which the agent can grep. They are not in the prompt.
+
+### The findings loop after
+
+```mermaid
+flowchart TD
+  P["Push with the agent's report per finding"] --> G[Gates]
+  G -->|approve and green| AP[Approval]
+  G -->|concerns, red checks, or failed reproduction| CK[Check-in at the gate moment]
+  CK -->|every finding dropped| AP
+  CK -->|findings confirmed| HO[Handover: confirmed findings, the reason each is true, the fix where it is plain]
+  HO --> S[One fresh session]
+  S --> P
+  CK -->|the same confirmed finding failed twice| H["Human with the check-in's analysis"]
+  CK -->|goal conflict, spend, policy class, access| H
+```
+
+The review keeps judging the diff alone. A `concerns` verdict no longer costs a session by itself. The check-in confirms each finding against the repository, the checks and the agent's report. A dropped finding is recorded with its reason, and the next review receives that record instead of its own last review. A confirmed finding goes to one fresh session with the fix named where the check-in found it. A confirmed finding that fails a second time goes to the human, with what both sessions tried.
+
+### The unhappy paths after
+
+```mermaid
+flowchart TD
+  X[Event] --> Y{Which?}
+  Y -->|detector trip| CK1[Check-in in the pod]
+  Y -->|session dead without a push| CK2[Check-in before the next session]
+  Y -->|gate returned findings| CK3[Check-in at the gate moment]
+  Y -->|budget nearly out| WARN[Warning line to the agent: wrap up and push]
+  Y -->|budget refused| FUND["Human: fund. The check-in's handover waits for the money."]
+  Y -->|planner at 20 of 30 minutes| PW[Warning to the planner: file the plan now]
+  Y -->|planner at 30 minutes| CK2
+  Y -->|card waiting on a dependency| NONE[No stale question. Waiting is by design.]
+  Y -->|cap reached with red checks| RET["Return to the agent with the check-in's fix, or close. Never Approve."]
+  CK1 -->|continue or message| RUN[Session runs on]
+  CK1 -->|end with handover| S[One fresh session]
+  CK2 --> S
+  CK3 --> S
+  S -->|fails again the same way| H[Human with a prepared question]
+  CK1 -->|only a human can decide| H
+  CK2 -->|only a human can decide| H
+  CK3 -->|only a human can decide| H
+```
+
+### Changes that need no model
+
+These are bugs or gaps in code, and the check-in agent does not replace them. They come first, because they cost nothing per card.
+
+| Change | Problem it ends |
+|---|---|
+| The funding check prices a call with the real context size, not 1,024 output tokens on an empty prompt. A session that cannot fund one real call does not start and does not count. | 3 |
+| Budget left, time left and the attempt number stand in the brief, and a warning line reaches the agent near a limit. Roadmap 199. | 3, 5 |
+| A blocking wait tool for background jobs, so a long test run costs one call, not one per poll. | 3 |
+| A `concerns` verdict without findings is a remark on the card, not a finding and not a session. | 1 |
+| A dead session's command lines never pass as findings. The handover replaces them. | 3 |
+| The planner has a check-in and a warning at two thirds of its time. At the limit the card gets a check-in and a fresh session, not a fail. | 5 |
+| The stale sweep skips `waiting-deps`. | 6 |
+| A human answer is spent after the session it was given to. A later request for changes stands above any earlier answer. | 7 |
+| The approval at the cap with red checks offers "return to the agent" and "close", not Approve, like item 264 does for the factory's own pull requests. | 4 |
+| A deterministic anti-cheat check flags a diff that drops, skips or loosens a check or a test, as a finding for the check-in. Roadmap 64. | 3 |
+| The check-in's dropped and confirmed findings are records on the card, next to the adjudications. Roadmap 57. | 2 |
+
+Commit `42b608e`, which took the merge rule out of the review's input, stays.
+
+### The seven problems replayed
+
+| Problem | Card | What happens after the changes | Human needed? |
+|---|---|---|---|
+| 1 | #837 | The review no longer reads the merge rule. A `concerns` without findings starts no session. | Approval only |
+| 2 | #836 | The agent's report disputes the finding. The check-in greps main, finds the method, drops the finding with the reason. The next review reads the record. | Approval only |
+| 3 | #839 | The agent reads "0.4 EUR left" and pushes. The wait tool ends the polling. No starved session starts. The anti-cheat check flags the dropped database check. The check-in reads the two failing tests and names the fix in the handover. | Fund, and the migration's approval |
+| 4 | #838 | After the sync with main, the check-in reads the red check's log, names the one-line fix, and one fresh session makes it. | Approval only |
+| 5 | #851 | The planner gets "file the plan now" at 20 minutes. If it still runs out, the check-in writes what it read and a fresh planner session files the plan. | None |
+| 6 | #854 to #856 | No stale question while waiting on a dependency. | None |
+| 7 | #853 | The old answer is spent. The request for changes stands first. | The request itself |
+
+On 2026-10-15 four of five code cards needed the human beyond the approval. After the changes one does, and that one is a spend decision.
+
+### The cost after
+
+Per failure, the ladder spends one check-in, about 0.1 EUR, to decide whether a session is worth starting. On the five code cards that replaces 3.70 EUR of sessions that produced nothing, and the human's time on four cards. A card that goes as intended, like #840, pays nothing new: no detector trips, no findings, no check-in.
+
+## 6. What stays
+
+- One pod per session, with a fresh conversation. The handover carries the knowledge, not the context.
+- The detectors in code, with their thresholds in policy.
+- Rung changes in code: at filing, at the cheap cap, after `stronger_after` returns, and by the stuck rule. The check-in may recommend a rung in its handover, and code decides.
+- The review as a diff-only judge, independent of the agent's story.
+- The session cap of 3, now a backstop that the ladder rarely reaches, since every session after the first arrives with a handover.
+- Budget decisions with the human. The ladder makes sure the question comes before the money is gone, not after.
+
+## 7. Decisions for Sebastian
+
+1. **Where the gate-moment check-in verifies findings.** This document puts the tools in the check-in agent and keeps the review diff-only. The alternative is tools in the review itself, as roadmap 191 proposes. One role with tools is leaner, and the review stays independent. The alternative saves one step on a true finding.
+2. **Who writes the handover.** This document has the check-in write it, from both sides' evidence. The alternative adds a required last step to every coding session, in which the agent writes its own. Both together cost one more call per session.
+3. **How many fresh sessions before the human.** This document says one per distinct confirmed finding or stop reason. Two is the other sensible value.
+4. **The check-in's pod.** Inside the agent's pod in session, and in the next session's pod at the other moments. The alternative is a pod of its own, which costs a pod start per check-in and keeps the check-in's tools apart from the agent's workspace.
+5. **Parallel cards that touch the same files**, the root of problem 4. It is a scheduling question, not a ladder question, and this document leaves it open.
