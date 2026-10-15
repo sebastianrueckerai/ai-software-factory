@@ -1,0 +1,49 @@
+# The escalation ladder: implementation notes
+
+The notes of the implementation of [the redesign](../escalation-ladder-redesign-2026-10-15.md). A fresh session resumes from this file. The plans hold the tasks and their checkboxes; this file holds the phases, the decisions and the state.
+
+## The phases, from the design's order of work
+
+1. **The code changes that need no model**, in three plans that each stand on their own:
+   - A, attempts, budget and answers: [2026-10-15-escalation-ladder-a-attempts-budget-answers.md](2026-10-15-escalation-ladder-a-attempts-budget-answers.md). The session cap counts sessions, `SessionFunded` with a floor per rung, one path for every human wait and Fund as the answer, the budget from rung and size, dated answers below the findings, a dead session's stop report instead of its command lines, no Approve on red checks at the cap, a `concerns` without findings as a remark.
+   - B, facts, detectors and the planner: [2026-10-15-escalation-ladder-b-facts-detectors-planner.md](2026-10-15-escalation-ladder-b-facts-detectors-planner.md). Budget, time and attempt in the brief with a warning near a limit, the spend-without-push detector, the context-size detector or compaction, the blocking wait tool, the planner's warning and second session, the sandbox's capabilities in the brief, the session record's `pushed`.
+   - C, the review and the records: [2026-10-15-escalation-ladder-c-review-records.md](2026-10-15-escalation-ladder-c-review-records.md). Absence claims grepped before they count, one review call for the whole diff, the anti-cheat check, the stale sweep on Temporal's liveness, a cancelled call settled from the provider's spend.
+2. **The check-in agent at the gate moment**, with the evidence rule, the three verdicts and the records, and the replay scenarios of the eight problems as the test. Plan D, not yet written.
+3. **The in-session and dead-session moments**, the handover, the check-in's own alias. Plan E, not yet written.
+
+Beside the ladder, not in these plans: the screen of a UI card (a browser in the sandbox image and a lab gate), roadmap 281's research on how a session gets its tools.
+
+## Decisions
+
+- Each plan is written by a fresh context that reads the design, the facts and the code, and returns a summary. Sebastian reviews the plans and picks the execution method before any code changes.
+- Code changes go on a worktree branch of the code repository, land on main after the repository's gates (gofmt, vet, gosec, `go test -race ./...`, the Postgres tests), and reach the cluster through a roll card. Temporal workflow changes that alter control flow for runs in flight carry a version gate.
+- Policy values live in the infra repository's `factory/policy.yaml`; a code change that needs a new key ships with its default and the infra change follows.
+
+## Findings of the plan writers that change the design's letter
+
+- **The context-size detector is configuration.** opencode v1.18.32 auto-compacts at `limit.input - compaction.reserved`. The factory declares a 200,000-token context, so compaction started near 175,000 tokens and #854's 138,000 never reached it. Plan B sets `limit.input` to the policy value `context_tokens` and `compaction: {auto: true, reserved: 0}`, so the threshold is exact and no detector, no supervisor call and no session end is needed. Not verified live; plan B has a check for the first card after the roll.
+- **The wrap-up warning is a message from the runner, not a line in a gateway response.** The gateway knows only the budget, and a streamed line would land in the history as the model's words. The runner's tick sends it once per limit through the existing message path.
+- **The wait tool is a worker subcommand**, `agent-worker wait <pid> [seconds]`, since the gateway cannot see sandbox processes and the opencode plugin holds only the pinned dependency.
+- **The budget branch does not discard comment answers.** It drops the change requests drained during the wait. Plan A fixes both through one closure that every wait of the loop uses, and Fund posts its note as a comment answer.
+- **`session_started` is written at pod start today.** Plan A moves it to the activity that sees the first model answer, and counts from the activity's result, since event rows are best-effort.
+- **The anti-cheat findings cannot go through the policy gate**, whose `on_findings` is floored at `fail`. Plan C routes them through the checks stage's rule, as the queue's findings go.
+- **The review's absence claims become a structured `claims` field** (finding index, kind, symbol), checked by `git grep` on a depth-1 clone, since Forgejo has no code search. A drop never counts as approve: the verdict stays `concerns` with no finding and no session.
+- **A cancelled call's spend** depends on LiteLLM's version. Plan C probes `/spend/logs/v2` first and handles three outcomes: a row, no row after 45 s, or an unreadable log.
+- **The infra policy keys land after the roll**, since a running factoryd rejects an unknown key. Every plan ends with that order.
+
+## Defaults the plans propose, to be struck by Sebastian if wrong
+
+| Value | Default | Source |
+|---|---|---|
+| Session floor, cheap rung | 0.30 EUR | #839's starved sessions had 0.15 EUR |
+| Session floor, strong rung | 0.60 EUR | #854's starved session had 0.07 EUR |
+| Wrap-up warning | at 80 % of the budget | #854 |
+| Planner's warning | at 67 % of its time | the design's two thirds |
+| Spend-without-push trip | at 60 % of the budget | #854 spent 98 % before its first push |
+| Context line | 100,000 tokens | #854's calls grew to 138,000 |
+| Planner's second session | half the cap, 15 minutes | the first session's reading is carried as a finding |
+| Review single-call limit | 256 KiB, about 66,000 tokens | plan C reads the model's real `max_input_tokens` first |
+
+## State
+
+- 2026-10-15: the design is approved. The three plans of phase 1 are written, 28 tasks and 146 steps in all, none run. Sebastian reviews them and picks the execution method. No code changed yet.
