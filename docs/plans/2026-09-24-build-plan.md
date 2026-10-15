@@ -5503,3 +5503,78 @@ otherwise. Code commits unless named infra.
 - Gone for other reasons: 63 (LiteLLM's map prices every model in use),
   73 (the speed round's CI), 128 (the red re-run proven, the lane proof
   moot under 225), 160 (Stage 18 met its goal).
+
+### The night of 2026-10-14 to 15: the roadmap items that landed
+
+The ledger's progress.md holds the steps. Code commits unless named
+infra.
+
+- 244 a needs-you card shows the question and a pointer, not the
+  findings history (cc14faf). 222's review beside the checks (cb1d409),
+  active for spec cards since infra 87fe0cf. 245 the task row's gate
+  follows the activity the workflow awaits (96be2a0). 246 a beside
+  review's trips stay on it until the review stage supervises them
+  (96be2a0), each long gate run has its own activity id, and a dropped
+  trip resolves its alert as noise (1f12e20, f75a37a, 3ee05a2). None of
+  these was seen live, nor were the speed round's sync-skip, red-main
+  backstop and delegate child card, which tests alone prove. The audit
+  half of 222 and 246's trip during the checks wait stay on the roadmap.
+- 243 the fund floor fits against the gateway's free figure, holds
+  netted, and its refusal names the holds and both actions (60bb6aa).
+  241 Fit prices a cached prefix only as far as the model's measured
+  cache floor, and an agent session whose call crossed its hold names
+  its tokens, hold and action (1b44239). 247 a refusal's actions lead
+  its first line, so the question row keeps them (6ca817e). 248 card
+  #756's orphan hold was a call a roll cut: a roll now lets the calls in
+  flight run 270 s, then cancels them so each books its hold (c3d4502).
+  249 Fund only for a budget refusal (7ac60a2). None of these was seen
+  live. 243's first-call floor and 241's plan and report sessions stay
+  on the roadmap.
+- 202 and 67: a queue head red at its merge is re-staged or its red
+  checks run again, three turns per entry, a pass on the same tree is
+  recorded as flaky, and a head still red leaves the queue on an
+  escalation (731ebc1, 3211645, a3c2fef, 9f01fb1, its toolchain half
+  earlier in c14fbda). 58 each step before the harness fails with a
+  named reason, and a start failure goes to a human at no agent cost
+  (b4024ae, 3e51c74, 693afcc, 4dffa60). 214 a revived task clones its
+  pull request's head when its branch is gone (e7e7133). 237 an answer
+  in parts resumes the card whole after 30 seconds of quiet (c895140,
+  a3e8b38, d5fdac4). 240 the namespace-wait line shows only where a live
+  lease is held back (f903e10). None of these was seen live. The open
+  parts of 202, 58, 237 and 240 stay on the roadmap.
+- 242 main's image jobs build on a buildkitd with rewrite-timestamp, and
+  the Dockerfiles set the clocks inside the content to the epoch
+  (b4bfd50, 4e7af4a, 3beea51, a0edfe4). 250 each image's epoch is the
+  newest commit that touches its inputs (7264b62). Seen live: roll merge
+  c016138 kept all three amd64 manifests of 3beea51 (run 1234). Every
+  download is checked by ADD --checksum, and no layer keeps an archive:
+  60.6 MB less in the worker image, 137.6 MB in the runner (9f01496).
+  Main's push CI runs gosec (c2f58bb). 242's apt layers stay on the
+  roadmap.
+- 251 one Go toolchain by digest for all three images (d642ac3), and 255
+  moved it to the supported go1.26.9, with go.mod keeping go 1.25.0
+  (68abd66). 238 the image build prints each build's newest log line
+  every 30 seconds and fails at 45 minutes with its log (b993525), not
+  yet seen on a pull request with an image change.
+- 252 the runner's prune sidecar measures the volume with du every
+  minute and prunes from 22 GiB, a run's measured peak of 13.3 GiB below
+  the 40Gi limit (infra b21a483), live since 2026-10-14 21:26Z. A red
+  main whose failed jobs all lost their runner files a human re-run
+  card, not an agent card (8e594e3, 985372a). 253 the sidecar removes a
+  cancelled job's buildkitd and its state volume while no job runs
+  (infra eac8782). 254 read, not built: Go's trim keeps what a command
+  uses, so an image epoch older than five days costs one slower CI job
+  and no wrong result. 252's runner killed outright, its dind restart
+  and sf-2's DiskPressure stay on the roadmap.
+- 47 both workflow-directory guards fold the case, and tests prove a
+  symlink is refused (c195b20). No case variant ever ran, since Forgejo
+  reads the exact path. 49's pre-check read: it flags none of seven SSH
+  public-key forms, and a test pins four (417c29b). 42's gateway half
+  read: the gateway connects to no address an agent chooses, so it needs
+  no guard today. 84 proven: each month-cap threshold fired once a month
+  (alerts rows 211 to 213, 526, 544 and 545). 49's model half and 42's
+  worker probe stay on the roadmap.
+- 256 nine console layout faults from a lab pass of every screen
+  (07d51cc, 8a8770e, 61b0ff2, 252f22f, 8f5ecf8, cdce174, 2c9ff0b, and
+  2740bac for the lab), the thread title, its time and the rail badge
+  seen live after roll 799.
