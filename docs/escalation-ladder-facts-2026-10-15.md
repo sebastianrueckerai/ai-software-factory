@@ -176,6 +176,22 @@ This happened after the first version of this file.
 - **The brief was too wide.** The planning session read far more than it needed. The plan was already written, and the prototype is the cards' concern, not the planner's.
 - **Nothing watched the planner.** With no check-in and no question at the time limit, nothing told the planner to file a plan before its time ran out. Nothing asked a human whether to give it more time.
 
+### Problem 6: cards waiting on a dependency asked a human whether their run was gone (cards #854 to #856)
+
+This happened after the first version of this file.
+
+**What happened.**
+
+- **The wait.** Cards #854, #855 and #856 are the later cards of the documents feature. Each waits until the card before it is done. They entered the ready lane at 16:46 and moved to `waiting-deps` while card #853 worked.
+- **The question.** At 17:47:28, 1 hour later, each asked a human: "The card was quiet for 1 h 0 min while waiting on its dependencies: is its run gone?" Its next step read: "Reply on this issue to start a new attempt with your comment as guidance, or close the issue to fail the task."
+- **Who asks.** The question comes from the stale sweep (`StaleSweep`, `internal/factoryd/temporal.go:204-275`). The sweep covers a card in `running`, `waiting-deps` or `waiting-poster` whose timeline and events stayed quiet for the stale window. It first sends the workflow a nudge signal. If the card is still quiet a window later, and no gate activity of it runs, the sweep moves it to `waiting-human` from outside the workflow (`escalateStale`, `temporal.go:313-343`).
+- **The answer changed nothing.** The controller answered at 17:47:44 that the dependency #853 was in review. The cards stayed `waiting-human`. Their workflows still wait on #853 and do not read the answer during that wait.
+
+**Controller's interpretation.**
+
+- **Waiting on a dependency is quiet by design.** A card in a chain of four waits for hours with nothing to report, and the sweep reads that quiet as a dead run.
+- **The status and the run disagree.** The sweep changes the card's status outside its workflow, so the status says a human is needed while the workflow simply goes on waiting. The question's suggested reply ("start a new attempt") does not match what the run will do.
+
 ### For comparison: a card that went as intended (card #840)
 
 Card #840 pushed after 26 minutes. Its first review (comment 15842) raised a possible data race on a new key field, which was a fair point. The second session fixed it with an atomic pointer and a race test. The second review (comment 15900) approved. The supervisor's check-ins answered `continue`. The controller read the diff and approved. Two sessions, no intervention beyond the approval.
