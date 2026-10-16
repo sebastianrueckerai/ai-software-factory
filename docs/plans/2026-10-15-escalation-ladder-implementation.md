@@ -9,7 +9,7 @@ The notes of the implementation of [the redesign](../escalation-ladder-redesign-
    - B, facts, detectors and the planner: [2026-10-15-escalation-ladder-b-facts-detectors-planner.md](2026-10-15-escalation-ladder-b-facts-detectors-planner.md). Budget, time and attempt in the brief with a warning near a limit, the spend-without-push detector, the context-size detector or compaction, the blocking wait tool, the planner's warning and second session, the sandbox's capabilities in the brief, the session record's `pushed`.
    - C, the review and the records: [2026-10-15-escalation-ladder-c-review-records.md](2026-10-15-escalation-ladder-c-review-records.md). Absence claims grepped before they count, one review call for the whole diff, the anti-cheat check, the stale sweep on Temporal's liveness, a cancelled call settled from the provider's spend.
 2. **The check-in agent at the gate moment**, with the evidence rule, the three verdicts and the records, and the replay scenarios of the eight problems as the test. Plan D: [2026-10-16-escalation-ladder-d-checkin-gate.md](2026-10-16-escalation-ladder-d-checkin-gate.md), in execution.
-3. **The in-session and dead-session moments**, the handover, the check-in's own alias. Plan E, not yet written.
+3. **The in-session and dead-session moments**, the handover, the check-in's own alias. Plan E: [2026-10-16-escalation-ladder-e-checkin-moments.md](2026-10-16-escalation-ladder-e-checkin-moments.md), in execution.
 
 Beside the ladder, not in these plans: the screen of a UI card (a browser in the sandbox image and a lab gate), roadmap 281's research on how a session gets its tools.
 
