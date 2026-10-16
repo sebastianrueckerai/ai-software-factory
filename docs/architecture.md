@@ -1092,6 +1092,21 @@ or a close decides the task. The gap showed on the bug lane's first task,
 session fired the half-way check-in at once, the supervisor answered
 `retry_stronger`, and the task failed "4 attempts exhausted" with no pull
 request.
+Since the escalation ladder's plan A (change id `session-ladder`) the session
+cap counts the sessions that got a model answer: after every session the short
+activity `SessionAnswered` reads the gateway's ledger and writes the
+`session_started` record of one that did, so a starved or refused session takes
+no number. A session starts only when `SessionFunded` finds its opening calls
+and the floor of its rung (`budget.session_floor_cheap_eur` and
+`budget.session_floor_frontier_eur`) free, and the question names the amount; the
+console's Fund posts its note as the answer, and every wait for a human adds the
+change requests that answered it to the next session's findings. A card filed on
+the strong rung gets at least the medium budget. Answers carry their date and
+the question, and stand below the findings in the brief; a dead session leaves
+its stop line, the commit its branch holds with the gates' judgment of it and the
+agent's last message, never its command lines; an agent card on red checks at the
+cap offers return and close, not Approve; and a review's `concerns` without a
+finding is a remark on the card (change id `review-remark`).
 Since Stage 12 finished work survives every cap (Task 112, change id
 `keep-work`). The agent time is the task's own, hours by default (5.3),
 and a session starts only with at least five minutes of it left, since
