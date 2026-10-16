@@ -1595,6 +1595,19 @@ Besides its `version`, `policy.yaml` holds eleven sections:
   becomes 0. The class `planner` sets 30 minutes and no check-in. Every
   session kind, plan and report sessions included, takes its time from
   the task's class, process and project.
+  Roadmap 199's facts and detectors (escalation ladder plan B) added four
+  `limits` keys: `warn_at` (80) and `plan_warn_at` (67), the percent of a
+  card's budget or a session's agent time at which factoryd sends the running
+  agent a wrap-up message (the planner's says to file the plan), `no_push_spend`
+  (60), the percent of the card's budget spent with nothing pushed at which
+  the session supervisor is called (`spend_no_push`), and `context_tokens`
+  (100000), the size at which opencode compacts the conversation, set in the
+  generated config as `limit.input` with `compaction.reserved` 0. A session's
+  brief states its budget left, agent time left and session number, and the
+  sandbox's tools, reachable names and missing browser, derived from the image
+  and `sandboxRegistries`. A plan card whose agent time is used up gets half
+  the cap as one fresh planner session carrying the paths the first read
+  (`planner-retry`).
   Since Stage 17 `stronger_after` is 3, the session cap, so returning
   findings never climb a card, and the frontier tier comes only through
   `retry_stronger` (Ruling 299).
