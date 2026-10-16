@@ -1107,6 +1107,30 @@ its stop line, the commit its branch holds with the gates' judgment of it and th
 agent's last message, never its command lines; an agent card on red checks at the
 cap offers return and close, not Approve; and a review's `concerns` without a
 finding is a remark on the card (change id `review-remark`).
+Since the escalation ladder's plan D, findings that wait for the next
+session are judged before it starts. factoryd runs one conversation under
+purpose `checkin` on the class's `checkin_model` (else the review alias,
+5.3) inside the next session's pod, before the coding conversation, with
+the findings and their sources, the gates' results, the parent session's
+record and the card's facts as its input and eight tools: four answered by
+factoryd (the parent record, the card's facts, the gates, a transcript
+search) and four run in the workspace (`read_file`, `grep`, `git_log`,
+`run`). Its answer gives each finding one of three verdicts — confirmed,
+dropped or remark — and every drop names evidence the conversation
+gathered itself; the guards sit in code, not the prompt: a drop without
+checkable evidence becomes a confirm, a dropped finding a later review
+re-raises goes to a human with both records, and a finding the check-in
+confirms as many times as the session cap grants sessions goes to the
+human too. The verdicts attach to the review they judged and ride the next
+review's prompt; a round whose findings all dropped verifies again on the
+drop record, and only that verification's own approval merges. The
+conversation may instead hand the session a handover, which waits at the
+top of its brief (the worker holds the conversation's start ten minutes
+for it). The records: a `checkin` timeline step with the verdicts and the
+record, a `handover` step when it hands over, and the gateway's ledger
+refs `checkin/<alias>`. Plan E extends the same machinery to the
+in-session and dead-session moments, reusing the runner, the tools, the
+records and the alias with a different `Moment`.
 Since Stage 12 finished work survives every cap (Task 112, change id
 `keep-work`). The agent time is the task's own, hours by default (5.3),
 and a session starts only with at least five minutes of it left, since
