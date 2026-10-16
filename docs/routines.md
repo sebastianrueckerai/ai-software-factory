@@ -136,6 +136,10 @@ Which routines the factory would run, so the design shows real ones. Not a commi
 6. The main chat creates, changes and deletes routines through tool calls (Sebastian).
 7. The clock is Temporal Schedules and store counters, reconciled from the configuration tree (the director, on Sebastian's "find out").
 
+## Decided on 2026-10-16
+
+1. A scheduled routine at manual autonomy starts through the scheduler like every task does: every action of the run confirms, and no start gate stands before the run. A run that waits for a click loses its clock, and the sandbox run changes nothing outside (Sebastian, on the director's recommendation).
+
 ## Sources
 
 Sebastian, 2026-10-15. [layers.md](layers.md) sections 2 and 5. [roadmap.md](roadmap.md) items 165, 187, 203, 205, 225, 239, 242 and 267. [architecture.md](architecture.md) sections 5.1, 5.3, 5.6 and 7. [design/design-decisions.md](../design/design-decisions.md) C16. The code repository's `internal/factoryd/upstream.go`, `templateupdate.go` and `go.mod`. The infra repository's `k8s/platform/temporal/helmrelease.yaml` and `k8s/platform/cnpg/databases.yaml`. The board research: [Factory's automations](board/reports/factory-mission-control.md), [GitHub Agent HQ's automations pane](board/reports/github-agent-hq.md), [Hermes's scheduled column](board/reports/hermes-kanban.md) and [Trello's Butler](board/reports/trello.md).
