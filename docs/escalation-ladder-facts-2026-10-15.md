@@ -245,6 +245,25 @@ This happened after the first version of this file.
 
 Card #840 pushed after 26 minutes. Its first review (comment 15842) raised a possible data race on a new key field, which was a fair point. The second session fixed it with an atomic pointer and a race test. The second review (comment 15900) approved. The supervisor's check-ins answered `continue`. The controller read the diff and approved. Two sessions, no intervention beyond the approval.
 
+### Problem 9: the revert rung fired on an infrastructure red and picked a target that could not fix it (cards #885, #889, 2026-10-16)
+
+This happened after the first version of this file.
+
+**What happened.**
+
+- Hetzner's fsn1 object storage was degraded from 2026-10-15 18:19 UTC. Forgejo's registry answered 500s from about 23:30, Forgejo itself was down from 00:05 to 01:44 (22 restarts, `storage.Init` 503). Main's push run 1360 on `c38354e` was cancelled at 01:44:42 in the outage, as were runs 1365 and 1366 after it.
+- The mainfix card #885 "main is red at c38354e: ci / upstream (push)" was filed at 01:44:42. The controller closed it as noise at 01:45:34: the run had been cancelled by the outage, not failed on code.
+- Main went red again at 02:07:36. Run 1367 (`3b2d5eb`) failed in its `upstream` job: five of eight store uploads got 404, 504 and 500 from the registry while storage still flapped after the 01:44 recovery (job log 10429). The same job passed on run 1372 (`93d373e`, which contains `c38354e`) once storage was stable. No new mainfix card was filed for this second red.
+- At 03:44:56, two hours after #885 was filed, the revert card #889 fired: "Main's push run at c38354e failed and the fix-forward card did not land within 2h0m0s. This pull request reverts c38354e". Its pull request #888 reverted `c38354e`, a console-JavaScript change (the htmx guard of the board). The approval request 803 reached the human at 03:48.
+- The controller denied the approval and closed #889 as noise at 06:12 with the evidence above: the reverted commit cannot reach the failing job, and the job passes with the commit present.
+
+**Controller's interpretation.**
+
+- **A cancelled run reads as a failed one.** Run 1360 never completed; the outage cancelled it. Both the mainfix card and the revert card said "failed".
+- **A red that returns after the fix-forward card closes as noise starts no new clock.** The 2-hour timer stayed anchored on the closed #885, so its premise "no fix landed" was false twice over: the first red was the outage, and the second red (02:07) was also infrastructure but never got its own card. The noise close of the fix-forward card should end the episode, not leave the escalation armed.
+- **The revert target is the run the fix-forward card named, not the newest failed run.** At 03:44 the newest failed run was 1367 on `3b2d5eb`, four commits after `c38354e`. The revert rung did not look.
+- **The revert rung never asks what failed.** It does not compare the failing job with the reverted commit's files. A revert of a console-JS commit cannot fix a store-upload failure; had the human approved it, main would have lost a working fix and stayed red.
+
 ## How the ladder works today
 
 The facts below are read from the code on `origin/main` at `7fe834c` and the live policy. References are `file:line`.
