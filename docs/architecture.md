@@ -1607,7 +1607,10 @@ Besides its `version`, `policy.yaml` holds eleven sections:
   sandbox's tools, reachable names and missing browser, derived from the image
   and `sandboxRegistries`. A plan card whose agent time is used up gets half
   the cap as one fresh planner session carrying the paths the first read
-  (`planner-retry`).
+  (`planner-retry`). The stale sweep asks Temporal whether the card's
+  workflow runs: a running workflow is left alone in any state and its
+  nudge memory clears, a dead one keeps the nudge, grace and escalation
+  ladder, and a Temporal error skips the card for that pass.
   Since Stage 17 `stronger_after` is 3, the session cap, so returning
   findings never climb a card, and the frontier tier comes only through
   `retry_stronger` (Ruling 299).
@@ -1709,8 +1712,11 @@ A model call whose caller has gone is the caller's act, not a fault
 upstream. Since Stage 12 (Task 122) the gateway answers 499 with the audit
 decision `client_canceled` when the request's own context is cancelled,
 during the upstream call or while it mints or renews the session's key,
-and keeps the hold's booking, since the provider may have run part of the
-call. A transport failure while the caller is still connected stays 502.
+and prices the call from LiteLLM's spend log, which the gateway finds by
+the hold id it sends in `x-litellm-spend-logs-metadata`: the rows' spend
+when they appear within 45 s, zero with an audit row that says no record
+exists, the full hold when the log cannot be read. A transport failure
+while the caller is still connected stays 502.
 The case came from the supervisor: each session it ended cut the agent's
 pending call, the gateway answered 502 `error_upstream` to a client that
 was gone, and five such answers in a quiet hour fired the 5xx alert on the
@@ -2706,9 +2712,12 @@ the history and every depth come through a tool. What each part does:
 - **Rolls in a session gap** (Ruling 269, 7). A roll merges only when no
   session runs, and new sessions wait while it does, so a roll no longer
   stops a running session. The card's chip reads "waiting for a roll".
-- **The review per part** (7). The model review and the audit read a diff
-  per file in up to three parts, answer "not reviewed" when they cannot
-  read it all, and carry the added lines' concurrency sites as context.
+- **The review per part** (7). The model review reads a diff in one call
+  when it fits `limits.review_diff_kib`, else per file in up to three parts
+  of that size, and each part's call reads the names the other parts add;
+  the audit reads parts of 48 KiB. Both answer "not reviewed" when they
+  cannot read it all, and carry the added lines' concurrency sites as
+  context.
 - **Persistence.** Proposals and undo tokens in `chat_proposals`, a new
   conversation beside the old ones, and the replay rule (above).
 
@@ -3835,7 +3844,11 @@ closed as real.
   and lockfiles, agent instruction files, `CODEOWNERS` and every top-level
   dot file and directory, so a change to what installs, builds or
   instructs the agent always waits for a human. Live: a pull request that
-  touched only `go.mod` went to the card as `high`.
+  touched only `go.mod` went to the card as `high`. The policy gate also
+  reads the diff for four Go shapes (an unconditional `t.Skip` added, a
+  removed `Test` function, a build constraint added to an old test file, a
+  test file renamed away) and returns them as findings for the agent; it
+  catches these shapes only.
 - **Migration gate.** When migration paths changed, it comments "schema
   migration: human review required" with the list, and the approval card
   carries it.
@@ -3896,12 +3909,19 @@ closed as real.
   the gate supervisor answered (Ruling 171's race); the rule is proven by
   its tests and by the same rule on the audit stage, live below. Since
   Stage 16 the review fetches the diff up to 1 MiB, splits it per file,
-  packs at most three parts of 48 KiB, makes one call per part and
-  combines the verdicts. Each part sees the whole file list. A bigger diff
+  packs the files into one call up to `limits.review_diff_kib` (48 KiB when
+  absent), else at most three parts of that size, one call each, and
+  combines the verdicts. Each part sees the whole file list and the
+  functions, types, routes and selectors the other parts add. A bigger diff
   is "not reviewed", with no call and no findings. The prompt carries the
   added lines' goroutines, channels, locks, selects and atomics as context,
-  not as a rule (Ruling 263). Live, it read a lane pull request in full and
-  found the defect the controller's review found.
+  not as a rule (Ruling 263). A finding that claims a name is undefined or
+  uncalled carries a claim (kind, symbol); `git grep` at the head and at
+  main checks it, and a finding the grep contradicts is dropped by code and
+  recorded with file and line on the review, the timeline and the pull
+  request. A drop never turns `concerns` into `approve`. Live, it read a
+  lane pull request in full and found the defect the controller's review
+  found.
 - **Security audit** (Ruling 188, Task 85). After the review, for a project
   whose file says `audit: true` (the code repository's does), a stage
   `audit` with `on_findings: human` only: its findings go to the card,
