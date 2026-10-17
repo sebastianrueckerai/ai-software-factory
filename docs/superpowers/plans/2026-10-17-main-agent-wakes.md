@@ -46,25 +46,25 @@ The five conditions most likely to bite, each pinned by a test in the owning tas
 - Consumes: the private turn pipeline (`turnGate`, `EnsureChatTask`, `AddChatMessage`, `StartQueued`, `t.run`), the `PulseContext` request-less pattern (`internal/console/pulse.go:106-113`), the `Sessions` port.
 - Produces: `func (c *Console) StartWake(ctx context.Context, project, login string, conversation int64, birth, text string) error` — runs one synchronous member turn on `conversation` with `birth` as the user row's `BirthKind`. Birth kinds: `wake_ask`, `wake_card`, `wake_timer`, `wake_heartbeat`. Task 2 calls this through the `factoryd.WakeStarter` interface.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 In `wake_test.go` on the `AcceptanceRig`: `TestStartWakeRunsATurnWithoutHTTP` — script the fake gateway with `Reply`, call `StartWake` on the rig's project for the member with the inbox conversation; assert the user row exists with `birth_kind=wake_ask` and the scripted assistant row follows, both on the passed conversation. `TestStartWakeQueuesBehindALiveTurn` — start a slow human turn over `httptest` (a gateway reply that blocks), call `StartWake` on the same thread, assert the wake's user row is written `queued` and its turn only runs after the human turn finishes.
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `scripts/pg-test.sh go test -race ./internal/console/ -run TestStartWake -v`
 Expected: FAIL, no `StartWake` exported.
 
-- [ ] **Step 3: Implement `StartWake` in `internal/console/wake.go`**
+- [x] **Step 3: Implement `StartWake` in `internal/console/wake.go`**
 
 Build the request-less turn the `PulseContext` way: a `*http.Request` whose context carries a `*session` for `login`. The session's tokens come from the member's newest `console_sessions` row (add `ConsoleSessionForUser(ctx, user) (access, refresh string, expiry time.Time, ok bool, err error)` to the `Sessions` port and `PGStore`); with no live session the wake still runs and token-needing tools refuse. Then do what `chatPost` does after its HTTP prologue: resolve project and `ChatOf` config, set the actor (`via: chat`, decider starts empty), `EnsureChatTask`, `turns.enter` + `turns.slot`, write the user row (`Queued` when position > 0, `StartQueued` after the wait), and `t.run(taskID, "")` with the turn's event sink discarded (the `stream(write, nil)` pattern, `chat.go:136-151`). Return when the turn ends.
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `scripts/pg-test.sh go test -race ./internal/console/ -run TestStartWake -v`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 `git add internal/console/wake.go internal/console/wake_test.go internal/console/chat.go && git commit -m "main agent: the console wake seam, a turn without a request"` (+ attribution line).
 
@@ -78,7 +78,7 @@ Expected: PASS.
 - Consumes: `Console.StartWake` (Task 1) behind a local port: `type WakeStarter interface { StartWake(ctx context.Context, project, login string, conversation int64, birth, text string) error }`.
 - Produces: `type Waker struct { Store WakeStore; Current func() policy.Version; Start WakeStarter; Pulse func(ctx context.Context, repository string) (workOpen, waitingHuman bool, err error); Now func() time.Time }`, `func (w *Waker) Loop(ctx context.Context, every time.Duration)`, `func (w *Waker) Pass(ctx context.Context) error`. Store methods on `PGStore`: `WakeEvents(ctx, repository string, after int64, limit int) ([]Event, error)` (kinds `question_asked`, `card_moved`, `task_status`, `task_ended`, ordered ascending), `WakeCursor`/`SetWakeCursor(ctx, repository string, id int64)`, `WakeMark(ctx, repository, key string, at time.Time) error` (upsert), `WakeMarkAt(ctx, repository, key string) (time.Time, bool, error)`. Migration creates `chat_wake_cursor(repository text PK, event_id bigint)` (per repository, unlike the Poker's single row) and `chat_wake_state(repository text, key text, at timestamptz, PK (repository, key))`. Keys in use: `turn` (last wake start), `ask:<taskID>:<sha of ask text>`, `card:<taskID>`, `hb:open`, `hb:idle`, `budget:<YYYY-MM>`, `cooldown`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 PG-backed (`schematest.DSN`), fake `WakeStarter` recording calls, `Now` pluggable:
 `TestWakerWakesOnAskAtAutonomous` (event `question_asked` via=factoryd on an autonomous project → one `StartWake`, birth `wake_ask`, on the venue member's inbox conversation, cursor advanced past the event),
@@ -90,21 +90,21 @@ PG-backed (`schematest.DSN`), fake `WakeStarter` recording calls, `Now` pluggabl
 `TestWakerFailedTurnRetriesColdly` (starter errors → cursor stays, mark `cooldown`; a Pass inside the cooldown does not call the starter; a Pass after it does),
 `TestWakerMarksSurviveRestart` (new `Waker` over the same store after a handled batch → no duplicate starts; after an unhandled batch → the cause still starts).
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `scripts/pg-test.sh go test -race ./internal/factoryd/ -run TestWaker -v`
 Expected: FAIL, no `Waker`.
 
-- [ ] **Step 3: Implement the Waker and store methods**
+- [x] **Step 3: Implement the Waker and store methods**
 
 `Pass`: for each project in `Current()`: read `WakeEvents` after the per-repository cursor (seed at max id on first read, the Poker's no-history rule). Split the batch: `via=chat` events are skipped (agent-caused); `question_asked` events are eligible only at autonomy `autonomous`; each eligible ask gets key `ask:<task>:<sha256(ask text)>`. If every eligible ask is already marked, just advance the cursor. Otherwise check the `turn` mark (10 s), the `cooldown` mark (60 s), and the chat task budget (`EnsureChatTask` + spent vs cap): blocked → return without advancing. Ready → venue member by the Poker's recipient rule (`pokeTo`, `pokes.go:196-201`; no recipient → advance and move on), `EnsureInbox` for the conversation, build one wake text naming every ask with its card ref, `Start(ctx, project, login, conv, "wake_ask", text)`, await it. On success: mark every ask key, mark `turn`, advance the cursor to the newest handled event. On error: mark `cooldown`, leave the cursor. Budget dead → `EscalateToHuman` with `monthCapQuestion` once per month key, mark it, advance nothing that needs a turn. `Loop(ctx, 5s)` ticks `Pass`; `main.go` wires it beside the Poker with `Start: consoleHandler`, `Pulse` from `Console.PulseContext` plus the project lookup.
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `scripts/pg-test.sh go test -race ./internal/factoryd/ -run TestWaker -v`
 Expected: PASS.
 
-- [ ] **Step 5: Run the whole suite and commit**
+- [x] **Step 5: Run the whole suite and commit**
 
 Run: `scripts/pg-test.sh go test -race ./...`
 Expected: all packages ok.
@@ -120,20 +120,20 @@ Expected: all packages ok.
 - Consumes: `HumanQuestion` and its intake row (`internal/factoryd/question.go:37-51`), the escalation row builder the Poker uses (`pokeOf`, `pokes.go:205-304`).
 - Produces: store method `AttachAnalysis(ctx, repository, taskID string, found, recommendation string) error` — updates the task's newest open ask: appends `found` to the question's `Info`, sets `Recommendation` with `Source: "agent"`, and rewrites the ask's chat escalation row content from the enriched question so the inbox row itself carries the analysis. Tool `attach_analysis` with params `task` (required), `found` (required), `recommendation`; `write: true`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `TestAttachAnalysisEnrichesOpenAsk` (rig: card with an open five-part ask; a turn calls `attach_analysis`; assert the intake question's `Info` grew, `Recommendation` set with source `agent`, and the inbox escalation row's content now contains the analysis), `TestAttachAnalysisRefusesAnsweredAsk` (answer the ask first; the tool refuses with a reason naming the state and the fitting action). In `wakes_test.go`: `TestWakeAskTextNamesCardsAndTools` — the wake text lists each ask with its card ref and names `attach_analysis` as the way to record what it found.
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `scripts/pg-test.sh go test -race ./internal/console/ ./internal/factoryd/ -run 'TestAttachAnalysis|TestWakeAskText' -v`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Wake text (writing guide, exact copy): `Wake: %d asks wait for a human.` then one line per ask: `#<card>: <ask sentence>`. Then: `Read each card. Settle what your permissions allow. For what stays the human's, record what you found with attach_analysis. An ask already answered is done.` `attach_analysis` validates the ask is still open (else refuse, naming that it is answered), calls `AttachAnalysis`. Register in the three places, next to `escalate` in order.
 
-- [ ] **Step 4: Run tests, then the suite; commit**
+- [x] **Step 4: Run tests, then the suite; commit**
 
 Run: `scripts/pg-test.sh go test -race ./...`
 Expected: all ok.
@@ -149,10 +149,10 @@ Expected: all ok.
 - Consumes: row JSON from the chat load endpoint; `birth_kind` values `wake_*` from Task 1.
 - Produces: consecutive rows of one wake turn (user row + assistant rows) collapse into a single row titled with the wake's first line, full text behind an expand, the same interaction as a poke row's fold.
 
-- [ ] **Step 1: Add the lab/browser check asserting the collapsed wake row and its expand.**
-- [ ] **Step 2: Run it against a worktree build with a seeded wake turn; verify it fails before the JS change.**
-- [ ] **Step 3: Implement the collapse in `factoryHTML`: a row whose `birth_kind` starts `wake` opens collapsed; the expand reveals the turn's messages.**
-- [ ] **Step 4: Re-run the check; commit** `main agent: a wake turn is one row with an expand`.
+- [x] **Step 1: Add the lab/browser check asserting the collapsed wake row and its expand.**
+- [x] **Step 2: Run it against a worktree build with a seeded wake turn; verify it fails before the JS change.**
+- [x] **Step 3: Implement the collapse in `factoryHTML`: a row whose `birth_kind` starts `wake` opens collapsed; the expand reveals the turn's messages.**
+- [x] **Step 4: Re-run the check; commit** `main agent: a wake turn is one row with an expand`.
 
 ### Task 5: Card-bound threads — the door
 
@@ -165,13 +165,13 @@ Expected: all ok.
 - Consumes: `ensureInbox`'s numbering scheme (`factoryd/chat.go:427-446`), the five-part question record, `chat.js` `[data-open-thread]` handling (`chat.js:611-615`).
 - Produces: `EnsureCardThread(ctx, repository, login, taskID string) (int64, error)` (creates the bound conversation titled `#<taskID>` on first call for the card, any later caller gets the same conversation), `CardThreadFor(ctx, repository, taskID string) (login string, conversation int64, ok bool, err error)`, route `POST /cards/{id}/thread` returning the conversation number; the first message is written by code from the ask record (role user, kind `escalation`, `Choices` and `TaskID` set so answer buttons render and settle through `chatAnswer`), no model call.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Factoryd (PG): `TestEnsureCardThreadIsOnePerCard` (two calls, different logins → same conversation; `task_id` set), `TestPokerAppendsLaterAsksToCardThread` (a card with a bound thread gets a second `question_asked` → the row lands in the inbox AND the card thread). Console (rig): `TestCardDoorOpensBoundThread` (card with open ask → `POST /cards/{id}/thread` → 200 with a conversation number; the thread's first row is the five parts with choices; answering through `/chat/answer` on that thread settles the ask), `TestDrawerShowsDoorAndSessionTab` (drawer HTML contains the door control and the tab named `Session`, not `Chat`).
 
-- [ ] **Step 2: Run to verify they fail.** `scripts/pg-test.sh go test -race ./internal/factoryd/ ./internal/console/ -run 'CardThread|CardDoor|DrawerShows' -v`
-- [ ] **Step 3: Implement** the migration, store methods, the Poker append (inside `Poke`'s transaction: when the row is an escalation and `CardThreadFor` hits, `insertChatMessage` into the card thread too), `cardThread` binding-first (event scan stays for cards filed from a thread), the route and handler, the drawer template change, the ask-row thread chip.
-- [ ] **Step 4: Run the suite; commit** `main agent: every needs-you card gets a thread, the drawer names the door`.
+- [x] **Step 2: Run to verify they fail.** `scripts/pg-test.sh go test -race ./internal/factoryd/ ./internal/console/ -run 'CardThread|CardDoor|DrawerShows' -v`
+- [x] **Step 3: Implement** the migration, store methods, the Poker append (inside `Poke`'s transaction: when the row is an escalation and `CardThreadFor` hits, `insertChatMessage` into the card thread too), `cardThread` binding-first (event scan stays for cards filed from a thread), the route and handler, the drawer template change, the ask-row thread chip.
+- [x] **Step 4: Run the suite; commit** `main agent: every needs-you card gets a thread, the drawer names the door`.
 
 ### Task 6: Threads visible across the project, `chat_search`
 
@@ -184,13 +184,13 @@ Factoryd (PG): `TestEnsureCardThreadIsOnePerCard` (two calls, different logins �
 - Consumes: the `session_search` recipe (`internal/console/chat_sessions.go:594-700`: query 2-200 runes, quoted regex, 20 hits, 100-byte excerpts), the `Chat` port's `Conversations`/`ChatMessages`.
 - Produces: tool `chat_search` (params `query` required, `thread` optional) returning lines `thread %d (%s's, %s): row %d %s: <excerpt>`; `active_threads` lines gain the owner when the thread is another member's; the chat page opens any project conversation read/write with the owner named.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `TestChatSearchFindsAcrossMembers` (two members' threads; searching from member A's turn finds a hit in B's thread with owner named and excerpt capped at 100 bytes; 21st hit counted but not shown), `TestActiveThreadsListsProjectWide` (B's non-inbox thread appears in A's `active_threads` output with B named), `TestConversationReadAcrossMembers` (A opens B's conversation by number → rows render, owner named; A's turn on it records actor A).
 
-- [ ] **Step 2: Run to verify they fail.**
-- [ ] **Step 3: Implement** the search (scan live rows per conversation, newest conversations first, stop at 20 hits), the visibility change, the UI grouping.
-- [ ] **Step 4: Suite; commit** `main agent: threads are project-visible and searchable`.
+- [x] **Step 2: Run to verify they fail.**
+- [x] **Step 3: Implement** the search (scan live rows per conversation, newest conversations first, stop at 20 hits), the visibility change, the UI grouping.
+- [x] **Step 4: Suite; commit** `main agent: threads are project-visible and searchable`.
 
 ### Task 7: Timers, watches, heartbeat
 
@@ -203,13 +203,13 @@ Factoryd (PG): `TestEnsureCardThreadIsOnePerCard` (two calls, different logins �
 - Consumes: `Pulse` port from Task 2 (`workOpen`, `waitingHuman`).
 - Produces: tools `watch_card(task)` / `unwatch_card(task)` (thread-stored subscriptions), `set_timer(minutes, note, task optional)` (one-shot row, gone after firing; a wake turn calling it again is the rearm). Waker classes: watched card moves (`card_moved`/`task_status` on a watched task, level assisted+, turn on the watch's conversation, `card:<task>` mark enforces one wake per card per minute, same-card events in one batch combine); timer due (poll `DueTimers`, never combined, turn on the timer's conversation with the note, delete after its turn); heartbeat (assisted+; `workOpen` → one turn an hour on the inbox, else one a day; keys `hb:open`/`hb:idle`); cleanup (`task_ended` on a watched/timer task deletes its watches and timers). Per-project cap `wakeTimersMax = 16` across watches plus timers; the adding tool refuses with the count when exceeded. None of the three tools appear in a confirm list.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `TestWatchedCardWakesAtAssistedOnItsThread` (watch on conversation X → `card_moved` → one wake on X at assisted; manual → none; second move inside a minute → none; after a minute → wake), `TestTimerFiresOnceOnItsThread` (`set_timer` row due → wake with the note on its conversation, row gone; a turn calling `set_timer` again creates the rearm), `TestWatchesDieWithTheCard` (`task_ended` → watch and bound timers deleted), `TestHeartbeatOpenHourlyIdleDaily` (`workOpen=true` → wake, mark `hb:open`; `Now+30min` → none; `Now+61min` → wake. `workOpen=false` → wake once, `Now+2h` → none, `Now+25h` → wake), `TestTimerCapRefuses` (17th add refused naming the cap).
 
-- [ ] **Step 2: Run to verify they fail.**
-- [ ] **Step 3: Implement** the migration, CRUD, tools, the three classes in `Pass` (timers first — they never combine — then watched cards, then asks), the cleanup, the cap.
-- [ ] **Step 4: Suite; commit** `main agent: watches, one-shot timers with rearm, and the heartbeat`.
+- [x] **Step 2: Run to verify they fail.**
+- [x] **Step 3: Implement** the migration, CRUD, tools, the three classes in `Pass` (timers first — they never combine — then watched cards, then asks), the cleanup, the cap.
+- [x] **Step 4: Suite; commit** `main agent: watches, one-shot timers with rearm, and the heartbeat`.
 
 ### Task 8: Docs, level review, ledger (design repo)
 
@@ -218,9 +218,9 @@ Factoryd (PG): `TestEnsureCardThreadIsOnePerCard` (two calls, different logins �
 - Create: `/home/womb/repos/ai-software-factory/docs/level-review-2026-10-17.md` — one table: each level manual to full auto, what it guards today, what wakes change, a recommendation. Sebastian decides; nothing here changes code.
 - Modify: the SDD ledger progress entry and this plan's checkboxes.
 
-- [ ] **Step 1: Rewrite 5.6/5.7 to the built reality** (wakes, attempts, card threads, visibility, timers), following the writing guide.
-- [ ] **Step 2: Write the level review proposal** from the shipped code: name the confirm lists each level produces, where a wake turn hits them, and what the review should decide.
-- [ ] **Step 3: Commit and push both repos** (design: `origin` and `forgejo`; code: `origin` and `github`).
+- [x] **Step 1: Rewrite 5.6/5.7 to the built reality** (wakes, attempts, card threads, visibility, timers), following the writing guide.
+- [x] **Step 2: Write the level review proposal** from the shipped code: name the confirm lists each level produces, where a wake turn hits them, and what the review should decide.
+- [x] **Step 3: Commit and push both repos** (design: `origin` and `forgejo`; code: `origin` and `github`).
 
 ---
 

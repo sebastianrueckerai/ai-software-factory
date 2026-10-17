@@ -2250,7 +2250,8 @@ the five columns beside the chat take the main view, and these columns
 stay as the full-width board, the wide view.
 [board/proposal-v2.md](board/proposal-v2.md) is the board's spec from then
 on, and [board/proposal-v1.md](board/proposal-v1.md) stays as the record
-the click dummy implemented.
+the click dummy implemented. Since 2026-10-18 the card drawer carries the
+door to the card's own chat thread (5.7).
 
 ### 5.7 The project screen and the project agent
 
@@ -2329,6 +2330,8 @@ sandbox becomes a card.
   member's next messages wait in a queue under the input, each editable in
   place and removable, and go out in order as their own turns when the
   turn ends. Live, two messages typed during a turn went out in order.
+  Since 2026-10-18 a wake turn is one row with an expand, its fold the
+  wake's first line, the whole turn behind the fold (below).
 - **Card drawer**: everything about one piece of work. It opens beside the
   board at 40 to 50 percent of the width, with the tabs Overview, Activity,
   Files and Chat. Chat is the default tab on a running card, as in the
@@ -2343,7 +2346,10 @@ sandbox becomes a card.
   tab reloads on a reconnect and when the session ends, and a steer being
   typed survives the reload. Live, the drawer of a running card opened on
   Chat with its session's messages and the steer box. Overview's top block
-  and collapsed sections are roadmap 177.
+  and collapsed sections are roadmap 177. Since 2026-10-18 the drawer also
+  carries the door to the card's own thread, the button "Talk about this
+  card" (below). The Chat tab keeps its meaning, the worker session's
+  transcript, not the conversation about the card.
 
 **One event per act.** Every console action records one event, with the
 field `via` saying whether a button or the chat made it. The project's
@@ -2461,6 +2467,9 @@ the month only (roadmap 158).
 | `set_dependency` (Stage 16) | add or remove a dependency | confirm |
 | `split_card` (Stage 17) | split a large card's pull request | confirm |
 | `github_sync` (Stage 17) | Sync latest from GitHub | confirm |
+| `attach_analysis` (2026-10-18) | record what a wake turn found inside an ask | none |
+| `chat_search` (2026-10-18) | read every thread of the project | none |
+| `watch_card`, `unwatch_card`, `set_timer` (2026-10-18) | the thread's own watches and timers | none |
 
 `answer` and `steer` confirm by default (Ruling 259), because the text the
 agent reads from cards and events is untrusted and could ask for either. A
@@ -2838,6 +2847,95 @@ naming the fitting tools (roadmap 183). The gap: the Sync pull request that the 
 no merge request on a card, so it took a review and a merge in Forgejo
 (roadmap 187). The lane's criterion failed: after the probe no lane card
 landed through the lane, and Ruling 271 triggered once (roadmap 160).
+
+**The main agent's wakes** (the [concept
+note](main-agent-concept-2026-10-17.md) of 2026-10-17, built 2026-10-17
+and 2026-10-18). Between messages the project agent does not exist, and
+every loop around the chat that looked autonomous was deterministic code.
+The Waker (internal/factoryd/wakes.go) closes that gap. It watches the
+event stream behind its own per-repository cursor the way the Poker does,
+and for a chosen event class it starts one turn on the venue member's
+inbox thread: the existing chat loop, the same prompt and tools, at most
+8 model calls, spend on the monthly chat task, events `via: chat` with
+decider `agent`. The venue member is the Poker's recipient, the project's
+notify list else its approvers, and the turn runs as that member like a
+turn they started. A wake never fires on an event the agent itself
+caused: events `via: chat` wake nobody.
+
+| Wake class | Fires on | Levels |
+|---|---|---|
+| An ask is filed | `question_asked`, from any source but the chat itself | autonomous and full auto |
+| A watched card moves | a state change of a card a thread watches | assisted and above |
+| A timer comes due | the thread's one-shot wake row | assisted and above |
+| The heartbeat | an hour while work sits open, a day while the board is idle | assisted and above |
+
+The caps limit wake turns and drop nothing. Every event still lands in
+the log and pokes the inbox, whatever the caps do, and the Waker moves
+its cursor only past a cause that had its turn, so a cause without its
+turn waits and never expires. A burst makes one turn: asks queue and
+batch, every ask exactly one attempt, so three cards that hit their cap
+in a minute make one turn that reads all three; card wakes combine per
+card; timers never combine. At most one wake turn runs per 10 seconds,
+one wake judges a watched card per minute, a pass reads 100 events, and
+a wake that fails holds the project's next for a minute. When the
+gateway refuses the chat task's spend, the Waker asks for money in code,
+once, the month-cap card, and no wake runs until the answer comes.
+
+The ask attempt, at autonomous and full auto: every ask that would reach
+a human gets one model turn before the human sees it, except an ask the
+chat itself filed, whose turn already studied the situation. The attempt
+reads the ask and the card's own records with the tools it has. It
+settles what the level's permissions allow, it names an ask obsolete
+when the card moved on, which settles the ask as answered no more, or it
+cannot settle, and then the ask reaches the human with the attempt's
+analysis attached inside the five parts: an `analysis_attached` event
+and the ask row rewritten, the attempt named as the source. Money,
+direction and policy class stay the human's, the concept's boundary
+table, and first answer wins from wherever it lands.
+
+Every needs-you card gets a thread, the card door. Code writes the first
+message from the ask record, the five parts plus the attempt's analysis
+if one ran, with no model call, one thread per card: a later ask on the
+same card appends to it as a new ask row, and a repeated ask bumps its
+row. The drawer carries the door, "Talk about this card", shown whenever
+the card is escalated and the chat exists, and an inbox ask row of a
+card with a thread carries the link to it. An answer in the thread
+settles the card through the same machinery as the inbox buttons.
+
+Threads became project-wide, reversing open question 213 and the
+no-search rule of the 2026-10-14 autonomy plan. Every member sees every
+thread, inbox threads included, and the switcher names each thread's
+owner. The digest of active threads holds the working set, and
+`chat_search` reads the record: every thread of the project, 20 hits,
+excerpts capped at 100 bytes, a thread's newest 500 rows scanned. A
+thread's marker controls, rename, seen, clear, archive and delete, stay
+its owner's.
+
+The timers, both the agent's own and stored on the thread that set them.
+A watch, `watch_card` ended by `unwatch_card`, wakes the watching thread
+when the watched card moves. A one-shot timer, `set_timer` with 1 to
+1440 minutes, a note of 1 to 200 characters and an optional card to die
+with, fires one turn that names the note and the check it stood for. The
+rearm covers watching a thing for a while: a wake turn whose reason
+still stands writes the next one-shot before it ends, with whatever
+interval fits, and a turn whose reason ended writes none, so a chain
+ends on its own and a forgotten timer cannot run forever. A watch and a
+bound timer die with their card, however the card ended. A project holds
+at most 16 watches and timers together, and the tool that crosses the
+cap names the count back. The heartbeat is the failsafe: a wake turn
+that never ran leaves the open work for it to see. It reads the same
+snapshot the agent reads (Console.PulseState beside the pulse's own
+view), work open when a card works or waits on the provider, and it
+skips a board that waits on a human, since the needs-you card already
+has the member's eye.
+
+With the new tools the chat has 29 reads and 38 writes. The inbox volume
+filter is a contingency, unbuilt. Messengers stay outbox only. The agent
+still runs no code, work that needs a sandbox becomes a card, and the
+agent never invents tasks. The wake classes' levels are the concept's
+first draft; the level review of 2026-10-17
+([level-review-2026-10-17.md](level-review-2026-10-17.md)) proposes
+what stands.
 
 ### 5.8 Routines
 
