@@ -1128,9 +1128,17 @@ conversation may instead hand the session a handover, which waits at the
 top of its brief (the worker holds the conversation's start ten minutes
 for it). The records: a `checkin` timeline step with the verdicts and the
 record, a `handover` step when it hands over, and the gateway's ledger
-refs `checkin/<alias>`. Plan E extends the same machinery to the
-in-session and dead-session moments, reusing the runner, the tools, the
-records and the alias with a different `Moment`.
+refs `checkin/<alias>`. Plan E extends the same machinery to two more
+moments. A detector trip mid-session runs the check-in inside the running
+session's pod: a second conversation on the same alias, the live workspace
+readable through its tools and no `run`, deciding continue, message,
+handover or human. A session that ended without a push and without a
+check-in of its own is the dead moment: the next session's start asks
+about it, reads the dead session's record and writes the handover the
+work then starts from, the note waiting at the top of that session's own
+brief. A mid-session handover's note rides the next session's brief when
+no ask goes with it and stays on the timeline when one does. The per-card
+budget caps all three moments together.
 Since Stage 12 finished work survives every cap (Task 112, change id
 `keep-work`). The agent time is the task's own, hours by default (5.3),
 and a session starts only with at least five minutes of it left, since
@@ -1514,8 +1522,10 @@ The version is the commit. factoryd stores each new tree as an immutable
 version from Postgres, and every audit row names that version. Every task
 pins the version it started under: its session cap, agent time and
 `stronger_after`, and in every session, gate supervisor call and review the
-agent time, the supervisor calls, the supervisor timeout, the `no_write`
-threshold and the gate bounds. The risk rules, the factoryd aliases, the
+agent time, the check-in limits, the supervisor timeout, the `no_write`
+threshold and the gate bounds. The risk rules, the factoryd aliases — a
+factoryd call's alias comes from the version in force, because the
+gateway's purpose check enforces that version, not the task's pin — the
 gateway's enforcement, the budget at intake, the approvers, the envelope
 and the project defaults are read live. A JSON Schema generated from the Go
 types (`factoryd schema`) sits in `factory/schema/`, and each file names it
@@ -1592,8 +1602,8 @@ Besides its `version`, `policy.yaml` holds eleven sections:
   (7).
 - `bounds`: seconds per Temporal activity before its gate counts as stuck
   (6.6), plus a `default`.
-- `supervisor`: the thresholds of the session supervisor's progress
-  detector (6.6).
+- `supervisor`: the thresholds of the progress detectors (6.6), which
+  feed the check-in.
 - `limits`, since Stage 9: the session cap (3), the agent time per task,
   the supervisor calls per session, the supervisor timeout (6 minutes,
   Ruling 186, at most 15) and `stronger_after`, the returns from one stage
@@ -1608,7 +1618,15 @@ Besides its `version`, `policy.yaml` holds eleven sections:
   for none): agent time 2 hours (it was 20 minutes), check-in 45 minutes,
   steps 1500 (it was 200, which ran out in 17 to 50 minutes; at 5 seconds a
   turn 1500 steps outlast 2 hours, so the agent time stays the bound) and
-  supervisor calls 6 (it was 3), check-ins not counted. The per-task spend
+  supervisor calls 6 (it was 3), check-ins not counted — the per-session
+  count retired by plan E, the key left in the vocabulary a pinned policy
+  loads. The escalation ladder's plan D added five keys for the check-in:
+  `checkin_calls` (12 model calls per card), `checkin_share` (10 percent
+  of its budget), `checkin_tail_kib` (24, the parent record's tail cut
+  into the statement), `checkin_handover_chars` (2000, the note cap) and
+  `checkin_sessions` (1, the fresh sessions one confirmed finding gets
+  before the human is asked); plan E shares them across the gate, session
+  and dead moments. The per-task spend
   cap of 2 EUR stays the cost guard. The two time values form
   `policy.Time`, which a class in `policy.yaml`, a process file and a
   project file may set too, each field on its own: the most specific set
@@ -1624,7 +1642,7 @@ Besides its `version`, `policy.yaml` holds eleven sections:
   card's budget or a session's agent time at which factoryd sends the running
   agent a wrap-up message (the planner's says to file the plan), `no_push_spend`
   (60), the percent of the card's budget spent with nothing pushed at which
-  the session supervisor is called (`spend_no_push`), and `context_tokens`
+  the session's check-in is asked (`spend_no_push`), and `context_tokens`
   (100000), the size at which opencode compacts the conversation, set in the
   generated config as `limit.input` with `compaction.reserved` 0. A session's
   brief states its budget left, agent time left and session number, and the
@@ -2969,7 +2987,7 @@ Stage 17 (6.4).
 `Message` (Ruling 188, Task 88) puts text into the running session as the
 next user turn. The first human-sourced message opens with the factory
 basics from `internal/manual`, the manual's one source; later messages
-and the supervisor's go in bare. A harness without such a mode answers `ErrNotSupported`,
+and the check-in's guidance go in bare. A harness without such a mode answers `ErrNotSupported`,
 and factoryd then redirects to a fresh session with the text as its
 finding, the restart it used before; `ErrNotRunning` means no session
 runs. opencode supports it by running as a server: the worker starts
@@ -2988,8 +3006,9 @@ admits factoryd alone on that port, and factoryd's egress admits the port
 on worker pods. The bearer crosses the pod network in plain HTTP, like
 factoryd's other in-cluster calls. The agent can reach opencode's own
 loopback server, which gives it nothing its shell does not. The first
-user is the loop nudge (6.6), and since Stage 12 the supervisor's
-guidance at every trip and check-in (6.6): on the round's exit test four
+user is the loop nudge (6.6), and since Stage 12 guidance at every
+trip and check-in, the supervisor's until plan E and the check-in's
+since (6.6): on the round's exit test four
 messages reached running sessions and none was restarted. Review findings
 still arrive after a session has handed in, so they stay a new session's
 findings; inline review comments and questions answered by other agents
@@ -3044,7 +3063,7 @@ repository it owns with hooks and repository config disabled, git by its
 absolute path (an agent-planted `git` on the PATH-writable cache cannot
 take the call), and the deferred revocation still removes the token.
 factoryd then opens the pull request `sf:main ← factory-agent:factory/<id>`.
-Every stop path — the supervisor's stop, the wall clock, factoryd's own
+Every stop path — a check-in stop, the wall clock, factoryd's own
 graceful shutdown — funnels through the same hand-over inside the pod's
 termination grace, proven live by round 2's drills with
 `scripts/agent-sees-no-token.sh` finding zero credentials in the running
@@ -3078,7 +3097,7 @@ task tokens.
 **The sandbox contract** (Task 82, code 689cba1, 2026-09-29). The agent
 never pushes and never opens a pull request: at the session's end the
 worker commits the working tree and pushes it, and factoryd opens the pull
-request. A supervisor stop pushes the work in progress, and the next
+request. A check-in stop pushes the work in progress, and the next
 session starts from it. A session that resumes on a branch already holding
 its work and adds nothing counts as a pushed result (f870bdb); before that
 fix the workflow read it as `no_push` and ran to the cap. The Stage 9 bug
@@ -3109,8 +3128,8 @@ fix a review flagged main's own change as out of scope).
 
 **Report sessions** (Ruling 185, Task 74). An `analyzer` task runs in
 report mode: the worker gets the upstream read token only, no fork token
-and no push, the brief asks for a write-up and no code, the supervisor's
-repetition and `no_write` detectors are off, and factoryd posts the
+and no push, the brief asks for a write-up and no code, the repetition and
+`no_write` detectors are off, and factoryd posts the
 session's last message as a comment on the parent issue. The task ends
 `done` at the comment. A report task is a task row of its own with a parent
 task, so the heal pass restarts it like any other. The reproduction gate
@@ -3322,7 +3341,14 @@ parent session ID, not as a resurrected process.
 ### 6.6 Supervision
 
 Two layers. Cheap detectors in factoryd read the event stream and decide
-when to call the supervisor. The supervisor, a model, decides what to do.
+when to ask the check-in. The check-in, a model conversation in the
+agent's own pod, decides what to do: continue, message, handover or
+human. The wall clock, the cheap cap, the stuck rule and the agent's own
+asks never reach the conversation; they decide in code. Until plan E the
+trip called the session supervisor, a model asked beside the pod. Plan E
+deleted it, its `askSupervisor` caller and its per-session call count,
+and kept `SupervisorModel` for the gate supervisor, the review and the
+audit, and the policy vocabulary a pinned policy loads.
 
 An agent that circles rarely repeats itself word for word. It tries the same
 idea in new words, so no deterministic check catches every circle. What a
@@ -3347,20 +3373,26 @@ already stores:
   replaced **half way**, which tripped once per task at half its wall-clock
   cap or half its budget.
 
-A trip calls the supervisor: the strongest model configured, under its own
-`supervisor` alias. It gets the brief, the session record and a progress
-digest: the commands run with their outcomes over time, the files touched
-with edit counts, the last error signatures and the diff so far. That digest
-is what a human reviewer would read to see a circle that the detectors
-cannot name. Since Stage 12 (Rulings 216, 224, Task 111) the supervisor
-picks one of three actions: continue, message (its guidance goes into the
-running session, which keeps its context and its work), or escalate to a
-human. Until then it chose among continue, redirect (the session ended and
-a new pod resumed with the guidance as findings), retry on a stronger model
-and escalate, and every correction cost a session: on the Stage 11 exit
-test 23 of 58 sessions ended in a redirect. It never raises a cap or a
-budget. Only a human does that. Most tasks never trip a detector, so the
-supervisor costs little.
+A trip asks the in-session check-in: a second conversation in the agent's
+own pod on the `checkin` alias (the class's `checkin_model`, else the
+review alias, 5.3), the live workspace readable through its tools and no
+`run`. It gets the trip, the guidance already delivered in the session,
+the gates' results and the live transcript's tail, and answers continue,
+message (its guidance goes into the running session, which keeps its
+context and its work), handover (a note for the next work) or human. The
+progress digest, what a human reviewer would read to see a circle that
+the detectors cannot name — the commands run with their outcomes over
+time, the files touched with edit counts, the last error signatures and
+the diff so far — rides the recorded decision and its issue comment.
+Until plan E the trip called the session supervisor, which since Stage 12
+(Rulings 216, 224, Task 111) picked continue, message or escalate, and
+before that among continue, redirect (the session ended and a new pod
+resumed with the guidance as findings), retry on a stronger model and
+escalate, with every correction costing a session: on the Stage 11 exit
+test 23 of 58 sessions ended in a redirect. The check-in never raises a
+cap or a budget. Only a human does that. Most tasks never trip a
+detector, so the check-in costs little, and the per-card budget caps all
+moments together.
 
 As built (Stage 6), with the defaults that tuning starts from:
 
@@ -3393,8 +3425,9 @@ As built (Stage 6), with the defaults that tuning starts from:
   agent time, so it continues across sessions without a stored flag; a
   session's first check-in comes no earlier than ten minutes after its
   start. Its detail reads "scheduled check-in, no detector tripped", it
-  writes no alert, and it does not count against the session's supervisor
-  calls. Half way, its predecessor, fired once per task through a flag on
+  writes no alert, and its conversation spends from the check-in's
+  per-card budget like any other moment. Half way, its predecessor, fired
+  once per task through a flag on
   the task row, which a migration dropped with it, and it tripped on a
   resumed session's first tick (#186) and on a planner's first tick when
   the planner read the limits' agent time instead of its class's.
@@ -3414,30 +3447,36 @@ As built (Stage 6), with the defaults that tuning starts from:
   (backlog 80, 88). On Stage 12's exit test no session reached the cap: the
   longest ran 41 minutes.
 
-The supervisor runs inside the session activity, because `continue` needs the
-live session (Ruling 87). It must answer strict JSON with one of the three
-actions, a message carrying guidance and an escalation carrying a reason;
-an unreadable answer, and a `redirect` or `retry_stronger` from the model,
-escalate. Its input holds the guidance it already sent in this session,
-and the prompt asks it not to repeat a message that did not work. A
-message travels the loop nudge's path (6.2) and is recorded as a `message`
-step and an issue comment; once the worker accepts it, or answers that the
-session already ended, every progress detector starts afresh from the
-message's time, and the session reads on. A message the worker cannot take
-(a harness without messages, a network error) falls back to the old
-redirect: the session stops with the guidance as a finding. A session gets
-at most `limits.supervisor_calls` calls (6 since Stage 12, 3 before),
-check-ins not counted, and the next trip escalates without one. The
-project agent's `steer` (5.7, Stage 15) reaches a session the same way
-(`Runner.MessageSession`), as a human message on this path under the
-human's name, and does not arm the stuck rule.
+The check-in conversation runs inside the session activity, because
+`continue` needs the live session (Ruling 87). It must answer strict JSON
+with one of the four decisions, a message carrying guidance, a handover
+carrying a note and a human escalation carrying a reason; an answer
+naming anything else escalates, and an unreadable answer gets one repair
+round before it escalates. Its input holds the guidance already delivered
+in this
+session, and the prompt asks it not to repeat a message that did not
+work. A message travels the loop nudge's path (6.2) and is recorded as a
+`message` step and an issue comment; once the worker accepts it, or
+answers that the session already ended, every progress detector starts
+afresh from the message's time, and the session reads on. A message the
+worker cannot take (a harness without messages, a network error) falls
+back to the old redirect: the session stops with the guidance as a
+finding. The per-card budget replaces the old per-session count
+(`limits.supervisor_calls`, which stayed in the vocabulary a pinned
+policy loads): at most `checkin_calls` model calls and the
+`checkin_share` percent of the card's budget, all moments and rounds
+together, and the next trip past either answers human in code, with no
+call spent. The project agent's `steer` (5.7, Stage 15) reaches a session
+the same way (`Runner.MessageSession`), as a human message on this path
+under the human's name, and does not arm the stuck rule.
 
 **The one stuck rule** (Rulings 216, 224). The model cannot choose a
 stronger model or a restart; one rule in code ends a session that does not
 take its message. After a delivered message, the next detector trip with
 no file written since, or a flip-flop or churn trip at all, since circles
-of writes are not progress, ends the session without a supervisor call as
-`retry_stronger`, with the finding `stuck after the supervisor's message:
+of writes are not progress, ends the session without a check-in
+conversation as `retry_stronger`, with the finding `stuck after the
+supervisor's message:
 <kind>: <detail>` and an issue comment. The workflow already runs that
 outcome: the next session on the stronger rung, from the pushed work in
 progress. A check-in, the wall clock and the stall detector never count as
@@ -3448,15 +3487,18 @@ supervisor saw a flip-flop on one file and told the session which hook did
 not read the route's context, and the auth card's two messages about a
 probe test kept a 41-minute session going to a pushed head.
 
-Each call runs under a per-task
-`supervisor` virtual key and takes a hold for its worst case like any model
-call (5.4), so the supervisor spends from the task's money and cannot overrun
-it or the day cap. With nothing left, the task escalates without a call.
-With Task 71 (rolled 2026-09-28) the call goes through the gateway, which
-audits it with kind `supervisor` and books it under `supervisor/<alias>`
-(5.3). `supervisor` maps to tier-high, the strongest configured model,
-since Stage 10 Qwen 3.8 max alone (4.4). Every decision
-goes to the session record, the timeline and an issue comment.
+Each check-in call runs under the task's virtual key and takes a hold
+for its worst case like any model call (5.4), so the check-in spends from
+the task's money and cannot overrun it, the day cap or its per-card
+share. With nothing left, the task escalates without a call. The call
+goes through the gateway under purpose `checkin`, which audits it and
+books it under `checkin/<alias>` (5.3, plan D); Task 71 (rolled
+2026-09-28) had put the supervisor, gate supervisor and review calls
+there, audited with kind `supervisor` under `supervisor/<alias>`. The
+`supervisor` alias itself stays on tier-high, the strongest configured
+model, since Stage 10 Qwen 3.8 max alone (4.4), for the gate supervisor
+(6.6, below). Every decision goes to the session record, the timeline
+and an issue comment.
 
 Stopping is graceful: the worker gets SIGTERM, pushes the work in progress to
 the fork and reports what it did, so a stuck end or an undelivered
@@ -3466,7 +3508,7 @@ The answer is a comment from a trusted human (owner, admin or write on the
 repository), newer than the escalation comment, written in Forgejo or in the
 console. It may grant a bounded slice of agent time, ten minutes by default
 and never more than the full cap per answer. A human may raise a cap this
-way; the supervisor never can.
+way; the check-in never can.
 
 **Repeats and the cap** (Ruling 193, Task 81). A redirect or `no_push`
 after the same trip kind counts as a return from the stage
@@ -3483,8 +3525,7 @@ findings never climb a card (Ruling 299). With 1, the lane probe's third
 session ran on the frontier tier for 3.08 EUR in 20 minutes.
 
 **A provider refusal** (Ruling 267, Stage 16). A code session whose first
-call the provider refuses counts neither an attempt nor agent time nor a
-supervisor call. The refusal is an upstream 429, 402 or 5xx, or LiteLLM
+call the provider refuses counts neither an attempt nor agent time. The refusal is an upstream 429, 402 or 5xx, or LiteLLM
 unreachable, read from the gateway's audit rows. An upstream 400, 401 or
 404 stays `no_push`, and the factory's own budget 402 is no provider
 refusal. The timeline records `provider_refused` at the gate `provider`,
@@ -3506,9 +3547,9 @@ content, and model steps in between do not break the run. At
 (6.2): "You repeated the same call three times (<tool>). Change approach,
 then continue.", records a `nudge` step on the timeline and resets both
 counts for that call. The same call again after its `nudges` (1) trips
-`same_call` to the supervisor as before, with "after 1 nudge" in the
+`same_call` to the check-in as before, with "after 1 nudge" in the
 trip. A nudge counts only once the worker answered; an undelivered one
-trips to the supervisor, and a harness without messages gets the redirect
+trips to the check-in, and a harness without messages gets the redirect
 with the nudge as guidance. The count reads the event stream, not the
 gateway's audit rows, because opencode's built-in tools, the shell, read
 and edit, never pass the gateway and the audit rows carry no input hash
@@ -3552,7 +3593,7 @@ finding and asked the same question again.
 The agent can escalate by itself too, with the `escalate_to_human` tool. The
 gateway passes the question and the reason to factoryd, which records an
 intake event and hands the escalation to the live session. The session stops
-with a work-in-progress push, calls no supervisor, and the workflow posts the
+with a work-in-progress push, asks no check-in, and the workflow posts the
 question on the issue as for any escalation. With Task 66 (rolled 2026-09-28)
 the tool requires a `recommendation` of at most 2000 bytes, so the issue and
 the card read "The agent asks", "Why" and "Recommendation", and the agent's
@@ -3580,7 +3621,7 @@ nor the repetition count before, so both tripped on agents that were
 writing (Task 111).
 
 **The gate supervisor** (Rulings 141, 154, 162, 163, built in Task 67, live
-since roll e3f7c16). The session supervisor watches an agent. The gate
+since roll e3f7c16). The session's check-in watches the agent. The gate
 supervisor watches the machine gates, so no gate waits in silence. Each
 activity has a bound, from the policy's `bounds` section, else the default
 of the ruling, else the policy's `default`, else 120 seconds:
@@ -4687,7 +4728,7 @@ since Stage 6, but neither has run under load.
 | Agent pull requests | From a `factory-agent` fork, so PR jobs get a read-only token; two session tokens, read upstream and write the fork; workflow-directory guard in the worker and factoryd | Decided (Rulings 97, 100) |
 | CI registrar | Dedicated `factory-ci` account, organisation owner because the runner API demands it, token scoped to the code repository, `main` protected with `apply_to_admins` | Decided (Rulings 101, 101a) |
 | Missed webhooks | The heal pass re-reads Forgejo every minute and signals what webhooks missed; `Reconcile` at the start of every workflow run | Decided |
-| Supervision | Cheap trace detectors over the event stream, the strongest model as supervisor under its own alias, inside the session activity, at most six calls per session plus a scheduled check-in, paid from the task's remaining budget, choosing continue, message into the running session or escalate; one stuck rule in code ends a session that ignores a message and climbs a rung. Agent time and check-in per class, process and project. Human answers are kept across attempts in their own brief section. A `no_write` progress detector, and a gate supervisor for the six long gates with wait, retry, cancel or escalate. A 6-minute supervisor timeout, every exhausted task to the card, a repeated trip to the stronger rung. A nudge into the running session before the same-call trip. Since Stage 17 three nudges without new content end the session, the provider's repetition refusal ends it the same way, and the reading threshold is 60 | Built (Rulings 82, 86, 87, 118, 120, 141, 154, 161, 162, 163, 186, 193, 202, 216, 217, 218, 224, 280, 298) |
+| Supervision | Cheap trace detectors over the event stream; since plan E a trip asks the in-session check-in, a second conversation in the agent's own pod under the `checkin` alias, read-only on the live workspace, choosing continue, message into the running session, handover or human, paid from the task's remaining budget under a per-card call cap and share shared by the gate, session and dead moments; one stuck rule in code ends a session that ignores a message and climbs a rung. Agent time and check-in per class, process and project. Human answers are kept across attempts in their own brief section. A `no_write` progress detector, and a gate supervisor for the six long gates with wait, retry, cancel or escalate. A 6-minute supervisor timeout, every exhausted task to the card, a repeated trip to the stronger rung. A nudge into the running session before the same-call trip. Since Stage 17 three nudges without new content end the session, the provider's repetition refusal ends it the same way, and the reading threshold is 60 | Built (Rulings 82, 86, 87, 118, 120, 141, 154, 161, 162, 163, 186, 193, 202, 216, 217, 218, 224, 280, 298) |
 | Alerts | An `alerts` table with a verdict per alert, counted in SigNoz, with a precision panel. Alerts on the factory's own namespaces route by the namespace label like a project's | Built (Rulings 140, 180) |
 | Factory model calls | The review and both supervisors call through the gateway with factoryd's token and purpose headers, audited and booked like an agent's | Built (Task 71) |
 | Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list. Servers and volumes, no buckets. SSH certificates bound to one server. Outbound tcp 53, 80 and 443. Deletion at the last tick before the lease ends | Built (Rulings 80, 83, 121, 122, 124, 125) |
@@ -4788,9 +4829,9 @@ works `factory` and `demo-app`.
 | gVisor | An userspace kernel that intercepts container syscalls, stronger isolation than plain containers |
 | Kata | MicroVM containers: a real lightweight VM per pod, strongest isolation tier |
 | MicroVM | A small virtual machine with its own kernel, started per pod or job on a KVM host (Kata, Firecracker); needs `/dev/kvm`, so bare metal or nested virtualisation |
-| Supervisor | The strongest configured model, called inside the session when a detector trips or a check-in is due, choosing continue, a message into the running session or escalate; never raises a cap |
-| Check-in | The supervisor's scheduled look at a running session every `check_in` of agent time (45 minutes by default), with no detector tripped |
-| Stuck rule | After a delivered supervisor message, a trip with no write since, or a flip-flop or churn, ends the session without a call and the next one runs on the stronger rung |
+| Supervisor | The strongest configured model under the `supervisor` alias; since plan E it serves the gate supervisor, the review and the audit — the session supervisor it named is gone, its trip path the in-session check-in; never raises a cap |
+| Check-in | The scheduled look at a running session every `check_in` of agent time (45 minutes by default), with no detector tripped; since plan D also the model conversation that judges at the gate, mid-session and at a dead session's ask, under the `checkin` alias, choosing continue, message, handover or human |
+| Stuck rule | After a delivered message, a trip with no write since, or a flip-flop or churn, ends the session without a conversation and the next one runs on the stronger rung |
 | Cache volume | A project's directory on its node, `/var/lib/factory-cache/cache-agent-<project>` or `cache-ci-<project>`, mounted at `/cache` for Go's build cache, installed tools and npm's cache |
 | Fork PR | A pull request from `factory-agent`'s fork into `sf`; Forgejo gives its CI jobs a read-only token and no secrets |
 | Job token | The token Forgejo Actions hands each CI job; writable on a same-repository PR, read-only on a fork PR |
