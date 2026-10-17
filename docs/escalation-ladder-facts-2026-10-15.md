@@ -505,7 +505,7 @@ Built before 2026-10-15, recorded in `docs/plans/2026-09-24-build-plan.md`:
 - **237. An answer in parts.**
 - **240. The day-cap wait.**
 - **243, 247 and 249. The fund floor and the refusal texts.**
-- **244. A "needs you" card shows the question and a pointer, not the findings history.**
+- **244. A "needs you" card shows the question and a pointer, not the findings history.** Extended by 295: every part a face carries is bounded at the face's assembly point and clamped by the board's stylesheet; the drawer keeps the whole text.
 - **245 and 246. The gate row follows the awaited activity.** Gates beside the checks are supervised on their own, with their own escalation ladder.
 - **58. A start failure goes to a human.**
 - **264. A factory pull request card's approval offers what fits its head.** On red checks it offers re-run and close, not approve. Only for pull requests the factory opened, not for agent cards.
