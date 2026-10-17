@@ -92,8 +92,10 @@ Later, inside 145: the send guard and the settle edit on the outbox and the deli
 
 Non-goals: no new table, no stored state beyond the birth-event column, no deletion or rewrite of history rows, no per-row read flags, no age rules, no change to the alerts page, no messengers in this concept.
 
-## 8. Open points
+## 8. Rulings and what stays open
 
-1. **Roadmap placement.** A new item for phases 1 and 2, with 145 keeping the messengers, or an extension of 145? My call is the new item, since 145 is scoped to the messengers and this settles the surface that exists today. The ruling is Sebastian's.
-2. **The reason line's detail.** Word, actor and time, or the word alone? My call is all three in faint mono, since the event carries them and the decider line set the pattern.
-3. **The badge.** Keep the plain unread count, or split it, "1 needs you · 3 new"? My call is to keep it plain and let the design round of phase 2 decide with the rest of the look.
+Sebastian ruled on 2026-10-17:
+
+1. **Roadmap placement.** A new item, 292, and phase 1 is built next; 145 keeps the messengers and inherits the rule.
+2. **The reason line.** Word, actor and time: "answered by sebastian · 14:02".
+3. **The badge.** It splits, "1 needs you · 3 new". Phase 1 builds the split's logic in the console's plain styles, and the design round of phase 2 shapes it with the rest of the inbox's look.
