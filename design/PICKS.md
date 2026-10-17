@@ -58,3 +58,13 @@ Where a document opens and how a member moves between linked documents ([the rou
 And two details: the body text size (13 px as the base, or the chat's 14.5 px for the long read), and whether a card opened from the board closes the document (wiki) or sits beside it as a tab (tabs).
 
 Notes: the body text at the chat's 14.5 px, a card closes the document and the Documents button reopens it. Sebastian's rulings on saving: Ctrl+S saves; the saved state is always visible in the head; unsaved changes carry a dot before the name as VS Code's; a newer version from the repository is offered, never loaded over his changes without asking; the commit's latency is hidden behind the draft, which is local and instant. The states are built into the wiki prototype (`wiki/states.js`, the `state-*` shots) and the plan is [docs/plans/2026-10-15-documents-in-the-screen.md](../docs/plans/2026-10-15-documents-in-the-screen.md), roadmap 277.
+
+## Round 08, the top bar
+
+The eight destinations' shape on the 44 px bar ([the round page](rounds/08-top-bar/index.html), [the brief](rounds/08-top-bar/brief.md), [the notes](rounds/08-top-bar/notes.md)). Which direction becomes the console:
+
+- [x] 8. Sparse (the director under delegation, 2026-10-17, C23): quiet words in three groups, the open page's word cyan with a short underline, New task the only bordered word. "implement whatever design you liked best". Both compare critics picked it (43:39, 41:37).
+- [ ] 4. Panel, the runner-up: the same words in one hairline-framed segmented panel
+- [ ] the other six directions: tabs, underline, lamp, act-right, project-first, mono
+
+Revisit panel if the destinations grow past eight or the cyan underline proves too subtle in daily use.

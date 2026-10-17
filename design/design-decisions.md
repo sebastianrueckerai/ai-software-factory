@@ -154,3 +154,11 @@ An amendment to C18's badge line. The browser tab title's marker drops its words
 ## C22. A timestamp never breaks inside its value (2026-10-17, Sebastian)
 
 From the card drawer's Last activity rows, where a narrow column split a date mid-value ("2026-10-" over "17 19:35"). Every timestamp in the console stays whole on one line; a column that cannot hold it overflows or ellipses, but a date never reads as two values.
+
+## C23. The top bar: sparse words in three groups, the open page's word cyan (2026-10-17, the director under delegation)
+
+From round 08 ([design/rounds/08-top-bar/index.html](rounds/08-top-bar/index.html)), eight directions at both widths and in both themes, three critic runs, a fix loop and a compare pass. Both compare critics picked sparse (gemini 43:39, glm 41:37) and the director's pixel pass agreed. Sebastian delegated the pick ("implement whatever design you liked best", 2026-10-17); this entry is provisional until he confirms it.
+
+The bar. One 44 px bar, hairline rules, quiet small-capitals words: the home link, the project select, then the eight destinations in three groups with generous space between them — the working board (Board, New task), the reference pages (Projects, Resources, Costs), governance (Policy, Alerts, Notifications) — and the theme toggle, the member's name and Log out at the right end. No box holds the links. The open page's word carries the cyan and a short underline; New task is the bar's only bordered word. At 1440 all eight show; under 1200 the tail folds into a More menu. On the phone Board's word stays in the bar itself, New task becomes a bordered "+", and Menu opens a sheet of 44 px rows with the group gap and Log out last. No new colour; every text pair 4.5:1 in both themes.
+
+What goes: the runner-up's fixed panel (it needs collapse logic to survive a long slug or a narrow window, and its divider rule broke in the generator's own hands), lamps before destinations, folder tabs, a second stacked bar. The reference is [cand/fix-sparse-desk-dark.png](rounds/08-top-bar/cand/fix-sparse-desk-dark.png); the reasons are in [the round's notes](rounds/08-top-bar/notes.md). Revisit panel if the destinations grow past eight or the cyan underline proves too subtle in daily use.
