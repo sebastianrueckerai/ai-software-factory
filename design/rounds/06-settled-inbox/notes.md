@@ -70,7 +70,7 @@ Claims checked against pixels and arithmetic:
   and both at or above the decider line, the brief's floor.
 - Phone clipping of the fold or the buttons — dismissed by crops at 1x.
 
-## The pick (provisional)
+## The pick (ruled by Sebastian, 2026-10-17)
 
 **02 quiet-log, with the two-pill badge** — the settled row folds to one
 line, reason first, first words after it; the amber pill counts open asks,
@@ -80,8 +80,9 @@ Pre-ship notes for the build: a folded row expands on tap or click (both
 critics, agreed); if the reason and snippet read mushy live, a 1 px tick
 between them sharpens the log entry — build note, not ruled here.
 
-Sebastian is away; per `design/process.md` the director picks provisionally
-and his pick overrides, becoming the C-entry in `design/design-decisions.md`.
+The director picked provisionally under `design/process.md`'s away rule;
+Sebastian confirmed it on return, 2026-10-17 ("looks good"). Ruled as
+[C18](../../design-decisions.md) in `design/design-decisions.md`.
 
 ## The build (phase 2, landed)
 

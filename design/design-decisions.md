@@ -122,3 +122,14 @@ Outside changes. A newer version landing while the document is open, from the ag
 
 What goes: the second pane, the tab strip, the tree rail, a lock or presence while editing, autosave to git, a commit message box.
 
+## C18. The settled inbox: the quiet log, the two pills (2026-10-17, Sebastian)
+
+From round 06 ([design/rounds/06-settled-inbox/](rounds/06-settled-inbox/index.html), roadmap 292), six candidates over the console's own stylesheet, row 00 the plain styles phase 1 had landed. The director picked 02 quiet-log provisionally under the away rule; Sebastian confirmed it 2026-10-17 ("looks good").
+
+The settled row. A row the settle rule has closed keeps its who line, the name muted and the avatar's dot faint, and folds to one quiet line in mono: the reason word first ("answered by sebastian · 14:02", "seen"), then the first words of the content with an ellipsis. Tap or click expands the full row, text, reason and buttons; tap again folds it. The fold is a 44 px target on the phone. What the settled row loses at rest: the amber rule, the action buttons, the full text. The reference is [cand/c2.css](rounds/06-settled-inbox/cand/c2.css); the build landed as 2be0d7c in the code repository, with same-region evidence in [ev/](rounds/06-settled-inbox/ev/).
+
+The badge. The switcher's inbox badge splits into two pills behind one aria-label: the amber pill counts open asks (needs you), the bordered pill counts unseen new rows, and the tab title carries both, "1 needs you · 3 new".
+
+What goes: the runner-up's reason on the right, a bare reason-only line, hiding the who line or the avatar.
+
+
