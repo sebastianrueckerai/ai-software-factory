@@ -129,12 +129,14 @@ This also answers an earlier worry, that the inbox grows into a record too long 
 
 ## Timers
 
-Two kinds, both owned by the agent and thrown away after use. Routines stay as they are: factory-owned config in the tree, kept and reviewed.
+Two kinds, both owned by the agent. Routines stay as they are: factory-owned config in the tree, kept and reviewed.
 
-1. **A subscription.** "Wake me when cards #1015 and #1017 change state." Stored on the thread. The wake fires on the matching event, once per change.
+1. **A subscription.** "Wake me when cards #1015 and #1017 change state." Stored on the thread. The wake fires on the matching event, once per change. The agent removes it when the watching ends. A subscription on a card dies with the card.
 2. **A one-shot.** "Check this in 5 minutes." A wake tool writes a row with a due time. factoryd fires it like a routine's cron, one turn, then the row is gone.
 
-A small count per project caps them, set at build time. A timer schedules attention, not work. The routines ruling stands: the agent never invents tasks.
+The agent can watch something for a while, Sebastian's request of this session. The rearm covers it: a wake turn whose reason to watch still stands writes the next one-shot before it ends, with whatever interval fits. A wake turn whose reason ended writes none. The interval can change with each rearm, short while things move, long when they stall. A fixed recurring timer was rejected: a timer the agent forgets to cancel runs forever, and a rearm chain ends on its own. If a wake turn fails to run, the heartbeat still sees the open work.
+
+A small count per project caps them, set at build time. A rearm chain holds one row at a time. A timer schedules attention, not work. The routines ruling stands: the agent never invents tasks.
 
 ## What this is not
 
@@ -146,7 +148,7 @@ Not a persistent agent process, not a new kind of session, not a second channel.
 2. Ask attempts at autonomous and full auto: the boundary table against the question families, analysis inside the five parts.
 3. Card-bound threads: the binding, the door in the drawer and the inbox row, settling through the answer machinery, links both ways.
 4. Thread visibility and `chat_search`.
-5. Timers: subscriptions and the one-shot wake tool.
+5. Timers: subscriptions and the one-shot wake tool, rearmed by wake turns.
 6. The level review: with wakes in place, revisit what each level guards, manual to full auto. Sebastian's decision of 2026-10-17 to hold this review after the build.
 7. The doc pass: architecture.md 5.6 and 5.7 rewritten against this note. The area's open items go into the build cards where they belong: roadmap 280 show_doc, 276 backlog pull, 205 main-loop pruning, 226 prompt pack and context snapshot, 30 answer chain, 145 notifications phase 3, and card #1013's budget handling.
 
@@ -162,4 +164,5 @@ The roadmap is Sebastian's to curate. No items are filed here.
 | Every needs-you card gets a bound thread with the ask as its first message | Sebastian, this session |
 | Notifications and agent acts stay in the one inbox thread, one row per wake with an expand | Sebastian, this session |
 | The caps limit wake turns and never drop an event. Causes queue and batch | Sebastian, this session |
+| The agent can watch something for a while: it rearms the one-shot while a reason stands | Sebastian, this session; the mechanism is this note's call |
 | Wakes fire on events, with a heartbeat as the failsafe. Intervals and caps set at build | Recommendation of the session |
