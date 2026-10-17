@@ -83,6 +83,22 @@ between them sharpens the log entry — build note, not ruled here.
 Sebastian is away; per `design/process.md` the director picks provisionally
 and his pick overrides, becoming the C-entry in `design/design-decisions.md`.
 
+## The build (phase 2, landed)
+
+The pick is in the code repository (2be0d7c on main, 2026-10-17). The
+settled row keeps its who line and folds to the reason word plus a content
+ellipsis; tap or click expands it back; the settled-row and badge rules
+match `cand/c2.css`. The badge is two pills, amber `1` and bordered `1`,
+behind one aria-label, and the read inform settles with its word, "seen".
+Evidence from the console lab's poke scenario, same region before and
+after, in [ev/](ev/): the settled row, three dimmed lines at 146 px,
+becomes the who line plus fold at 74 px; the thread row's single badge
+becomes the split pair; `ev-montage.png` holds both pairs labeled. Both
+checks on the final tree green: `go test -race ./...` (21 packages) and
+the lab (239 shots, every control present). The live check stays open:
+answering an escalation on the live board and watching its row settle is
+Sebastian's first look.
+
 ## Cost
 
 | step | calls | cost |
