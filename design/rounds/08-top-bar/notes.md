@@ -79,3 +79,7 @@ Actual gen cost ran ~$0.150 per image, above the $0.10 sidecar estimate, so the 
 | **total** | 4.15 | **≈ 6.15** |
 
 Over the $5 cap by ≈ $1.15. The sidecar estimate, not the tool's reported actual, was tracked during generation; the discrepancy surfaced only at the final accounting. No further spend after the fix images.
+
+## Build
+
+Implemented in the code repository (C23). The pixel evidence pass caught a phone bug the DOM numbers hid: at 390 px the bar overflowed — Menu clipped mid-word at the content edge, the theme toggle off-canvas. Cause: the wordmark, the select and the nav all claimed width they did not need. Fix: below 900 px the wordmark hides (Board targets the same page) and the select keeps its natural width with a 40 % cap instead of growing. Verified by ink profiles of the real render: at 320, 375 and 390 every element ends inside the content edge, in both themes.
