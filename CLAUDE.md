@@ -11,6 +11,7 @@ This repository holds the design docs and the build plan. Code lives in two sibl
 ## Read first
 
 - `docs/goal.md`: requirements and constraints.
+- `docs/spec-driven.md`: the built spec-driven process in simple terms, with diagrams. The short orientation on how work runs from spec to merge.
 - `docs/software_factory_conversation_export.md`: the exported design conversation. Treat it as the architectural baseline, not just background.
 - `docs/ai-software-factory-ux-conversation.md`: the exported conversation on the human's side of the factory. Treat it as the baseline of the human interface, as the export above is for the architecture.
 
