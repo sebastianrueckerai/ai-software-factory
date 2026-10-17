@@ -63,6 +63,13 @@ Read off the templates in `internal/console/templates/` on 2026-10-13 (code comm
 - New task: project, title, description, track (direct or plan, direct the default), priority, size, File the issue (225).
 - New project: name, process, template, GitHub source and token (import), merge rule, File the project; then the status panel with steps and Merge.
 
+## The notifications page (C19)
+
+- Connect Telegram: a button that becomes the deep link "Open Telegram and tap Start to connect" (t.me/<bot>?start=<one-time code>, a fresh code per press).
+- Connect Discord: a link to the OAuth start, when Discord is configured.
+- Connections list: one row per live link (venue, address), Disconnect per row.
+- Level per project: a table (project, Now, Set). Now shows the member's own word or "default: <word>". Set is a select of off / needs-you / all with Save, one per row.
+
 ## The routines (C16)
 
 - Board head: the control "↻ routines ▾" with the radios all, within a period (a number and days or hours, 1 day at first), none. State in the URL.

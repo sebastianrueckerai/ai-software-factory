@@ -132,4 +132,10 @@ The badge. The switcher's inbox badge splits into two pills behind one aria-labe
 
 What goes: the runner-up's reason on the right, a bare reason-only line, hiding the who line or the avatar.
 
+## C19. The notifications page as one instrument readout, lamps on every state (2026-10-17, the director under delegation)
+
+From round 07 ([design/rounds/07-notifications/index.html](rounds/07-notifications/index.html), roadmap 145), eight directions in both themes, then a fix loop and a compare pass with both critics. Sebastian delegated the pick ("You pick the design you think best!"); this entry is provisional until he confirms it.
+
+One monospaced readout, no card fills: a Connections table first (venue, state, action) over a hairline rule, then Level per project. Every state carries a small square lamp, both sections in one language: lit cyan for connected and for a level the member set, amber for needs-you, unlit for off and not connected. A derived default states itself in words, "default: needs-you", in dim text; the member's own word stands at full strength. The actions stay phase 1's controls, styled quiet: Connect, Disconnect, a select with off / needs-you / all, Save per row. The phone stacks the rows, the select goes full width, every target 44 px. What goes: the card look, explainer lines, preview strips, the log's one-line rows (the runner-up; its quiet is worth stealing for a read-only surface). The reference is [cand/instrument-fix-dark.png](rounds/07-notifications/cand/instrument-fix-dark.png); the reasons are in [the round's notes](rounds/07-notifications/notes.md).
+
 

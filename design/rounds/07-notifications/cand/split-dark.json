@@ -1,0 +1,15 @@
+{
+  "model": "google/nano-banana-2.1",
+  "prompt": "A desktop settings page of a software-factory console, 1440 px wide, shown without browser chrome. Top bar: the project name \"demo\", a moon-and-sun theme toggle, the user \"sebastian\", \"Log out\". Nav row under it: \"Board\", \"Notifications\" (the current page), \"factory\", \"costs\", \"alerts\". Page heading: \"Notifications\".\n\nSection \"Connections\":\n- Telegram, connected: name \"Telegram\", detail \"@sebastian\", a quiet \"Disconnect\" button.\n- Discord, not connected: name \"Discord\", a \"Connect\" action.\n\nSection \"Level per project\", caption \"The level you set for each project you read, with the default of needs-you where the project pings you, else off.\"\nFour rows, each: project name, its current state, a way to set one of \"off\", \"needs-you\", \"all\":\n- demo-app, now \"default: needs-you\"\n- ai-software-factory, now \"default: off\"\n- trading-socially, now \"all\" (the member's own setting)\n- womb-site, now \"off\" (the member's own setting)\nDESIGN DIRECTION \"split pane\": a settings split. Left, a narrow sticky column (about a quarter wide) headed \"Connections\" holding the two messenger rows stacked with room to breathe. Right, the wider column headed \"Level per project\" with the four rows as a clean table. A single vertical hairline divides the panes. The two panes have different visual weight: the left quieter, the right the work area. THEME: dark. Near-black page background, light text, one cyan accent for current things, amber for needs-you states, hairline borders, quiet.",
+  "refs": [],
+  "video": null,
+  "params": {},
+  "seed": null,
+  "description": "",
+  "label": "split-dark",
+  "est_cost_usd": 0.1,
+  "created": "2026-10-17T17:36:31",
+  "outputs": [
+    "split-dark.png"
+  ]
+}

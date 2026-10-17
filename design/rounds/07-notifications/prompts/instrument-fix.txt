@@ -1,0 +1,14 @@
+A desktop settings page of a software-factory console, 1440 px wide, shown without browser chrome. Top bar: the project name "demo", a moon-and-sun theme toggle, the user "sebastian", "Log out". Nav row under it: "Board", "Notifications" (the current page), "factory", "costs", "alerts". Page heading: "Notifications".
+
+Section "Connections":
+- Telegram, connected: name "Telegram", detail "@sebastian", a quiet "Disconnect" button.
+- Discord, not connected: name "Discord", a "Connect" action.
+
+Section "Level per project", caption "The level you set for each project you read, with the default of needs-you where the project pings you, else off."
+Four rows, each: project name, its current state, a way to set one of "off", "needs-you", "all":
+- demo-app, now "default: needs-you"
+- ai-software-factory, now "default: off"
+- trading-socially, now "all" (the member's own setting)
+- womb-site, now "off" (the member's own setting)
+DESIGN DIRECTION "instrument table": the whole page is one monospaced instrument readout, like a spacecraft status board. Connections are three text columns (venue, state, act) above a thin rule; each project row is a line of mono type with a small square status lamp at its left. Almost no boxes, no card fills: rules, type and lamps carry the layout. Density high, whitespace tight, everything on a grid.
+FIXES from review: borders are hairlines only, 1 px and faint, never heavy or doubled. The connections rows carry the same small square lamps as the project rows: lit cyan lamp for a connected venue, unlit grey lamp for a not-connected one, so both tables speak one language. Actions are quiet monospaced text buttons in brackets: [Connect], [Disconnect], and per project row [off] [needs-you] [all] with the current one lit, plus [Save] at the row end. Derived-default rows show the state as "default: needs-you" in dim text with the lamp amber or dim; the member's own rows show the word alone in full-strength text. The project-name column flexes and long names wrap onto a second line; the state and action columns keep one fixed width, nothing clips.

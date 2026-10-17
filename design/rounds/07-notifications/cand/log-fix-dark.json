@@ -1,0 +1,15 @@
+{
+  "model": "google/nano-banana-2.1",
+  "prompt": "A desktop settings page of a software-factory console, 1440 px wide, shown without browser chrome. Top bar: the project name \"demo\", a moon-and-sun theme toggle, the user \"sebastian\", \"Log out\". Nav row under it: \"Board\", \"Notifications\" (the current page), \"factory\", \"costs\", \"alerts\". Page heading: \"Notifications\".\n\nSection \"Connections\":\n- Telegram, connected: name \"Telegram\", detail \"@sebastian\", a quiet \"Disconnect\" button.\n- Discord, not connected: name \"Discord\", a \"Connect\" action.\n\nSection \"Level per project\", caption \"The level you set for each project you read, with the default of needs-you where the project pings you, else off.\"\nFour rows, each: project name, its current state, a way to set one of \"off\", \"needs-you\", \"all\":\n- demo-app, now \"default: needs-you\"\n- ai-software-factory, now \"default: off\"\n- trading-socially, now \"all\" (the member's own setting)\n- womb-site, now \"off\" (the member's own setting)\nDESIGN DIRECTION \"quiet log\": everything on the page is a one-line monospaced row, like a log you can act on. Each row starts at the same left edge: a marker glyph, then the thing (venue or project), then its state, then a right-aligned word or action. The page looks like terminal output that has been tamed into a setting.\nFIXES from review: every action is a visible bracketed text button, unmistakably clickable: [Connect], [Disconnect], and per project row [off] [needs-you] [all] with the current one marked by a small square lamp before the state word, plus [Save] at the row end. No chevrons and no folded rows; each row shows all of itself. A derived default states itself in the line as \"default: needs-you\" in dim text; the member's own setting shows the word alone at full strength. All state words start at the same column on every row, all actions at another, on a strict monospaced grid.\nTHEME: dark. Near-black page background, light text, one cyan accent for current things, amber for needs-you states, hairline borders, quiet.",
+  "refs": [],
+  "video": null,
+  "params": {},
+  "seed": null,
+  "description": "",
+  "label": "log-fix-dark",
+  "est_cost_usd": 0.1,
+  "created": "2026-10-17T18:00:21",
+  "outputs": [
+    "log-fix-dark.png"
+  ]
+}

@@ -96,6 +96,10 @@ The oklch ladder and the state hues of proposal v1 stay as the base tokens (`bas
 
 Every existing test keeps passing or gets the one-line change its new markup needs, with the reason in the commit.
 
+## The notifications page (C19)
+
+A secondary page under the shell, one `h2`, two sections in one monospaced readout: no card fills, hairline rules carry the layout (the instrument direction of round 07). Connections first: a table of venue, state, action. Every state carries a small square lamp, one language for both sections: lit cyan for connected and for a level the member set, amber for needs-you, unlit for off and not connected. A derived default states itself in words, "default: needs-you", dim; the member's own word stands at full strength. The actions are phase 1's controls styled quiet: Connect, Disconnect, a select of off / needs-you / all, Save per row. On the phone the rows stack, the select goes full width, every target 44 px.
+
 ## The routines (C16)
 
 Every routine of the project stands as a ghost card at the foot of the lane its card will land in: a human-card routine under Needs you, an agent-card or pull-request routine under Queued. The ghost shows the title with ↻, the schedule in words, the next run, the last run with its outcome, and the acts Skip once and Run now. A lane's count stays the count of its real cards. The board's head holds "↻ routines ▾" right of the find box with three radios, all, within a period (a number and days or hours, 1 day at first), none, kept in the URL beside the filters. A lane with hidden ghosts ends in one faint line that opens the control. The instrument strip gets one cell only when a run is under an hour away or held. A ghost opens the routine's drawer (Overview, Runs, Config). A card a routine filed carries the chip "↻ routine" and the provenance line in its drawer. The chat creates, changes and deletes routines through tools. On the phone the ghosts sit at the foot of their lane's section and the control is a row in the board's head.

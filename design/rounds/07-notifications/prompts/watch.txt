@@ -1,0 +1,13 @@
+A desktop settings page of a software-factory console, 1440 px wide, shown without browser chrome. Top bar: the project name "demo", a moon-and-sun theme toggle, the user "sebastian", "Log out". Nav row under it: "Board", "Notifications" (the current page), "factory", "costs", "alerts". Page heading: "Notifications".
+
+Section "Connections":
+- Telegram, connected: name "Telegram", detail "@sebastian", a quiet "Disconnect" button.
+- Discord, not connected: name "Discord", a "Connect" action.
+
+Section "Level per project", caption "The level you set for each project you read, with the default of needs-you where the project pings you, else off."
+Four rows, each: project name, its current state, a way to set one of "off", "needs-you", "all":
+- demo-app, now "default: needs-you"
+- ai-software-factory, now "default: off"
+- trading-socially, now "all" (the member's own setting)
+- womb-site, now "off" (the member's own setting)
+DESIGN DIRECTION "watch list": the level table is the page. Each project row reads like a watched repository: project name in a readable sans, its current level as a small pill ("needs-you" amber-tinted, "off" gray, "all" cyan-tinted), and one ▾ menu control at the row end. A slim one-line strip above the table holds both messengers: "Telegram @sebastian · Disconnect Discord · Connect". Generous row height, very few other elements.
