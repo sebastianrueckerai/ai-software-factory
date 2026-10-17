@@ -1,0 +1,1 @@
+PHONE FORM of "lamp": the bar holds home glyph, project, theme, Menu. The Menu opens as a second row expanding in place under the bar, pushing the page down: the eight destinations as small-capitals chips in a wrapped row of 44 px targets, the current chip with its cyan square lamp, Notifications with its amber lamp.

@@ -1,0 +1,1 @@
+PHONE FORM of "mono": the bar holds home glyph, project, theme, Menu. The Menu opens an anchored panel of monospaced rows at 44 px: board, notifications, new task, projects, resources, costs, policy, alerts, logout; a cyan square lamp before the current row, an amber lamp before notifications while an ask is open, none before the rest.

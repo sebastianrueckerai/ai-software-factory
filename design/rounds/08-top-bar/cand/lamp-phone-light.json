@@ -1,0 +1,15 @@
+{
+  "model": "google/nano-banana-2.1",
+  "prompt": "The top 330 px of the same software-factory console on a phone, 390 px wide, shown without browser chrome. The top bar, 44 px tall with a 1 px bottom hairline, holds: a home glyph, the project select \"demo \u25be\", a moon-and-sun theme toggle, and a \"Menu\" control; the Menu is shown open as the direction says. Under it the page shows the status strip \"working \u00b7 2 working \u00b7 1 needs you \u00b7 \u20ac0.42 of \u20ac10 \u00b7 4%\" in monospace and the top of the card column \"Needs you\" with one card (slug, state word, time). The eight destinations are Board (the current page), Notifications, New task, Projects, Resources, Costs, Policy, Alerts, plus \"Log out\". A quiet mission-control instrument look: hairline borders, monospaced figures, small-capitals labels, one cyan accent for the current thing, amber only for needs-you.\nPHONE FORM of \"lamp\": the bar holds home glyph, project, theme, Menu. The Menu opens as a second row expanding in place under the bar, pushing the page down: the eight destinations as small-capitals chips in a wrapped row of 44 px targets, the current chip with its cyan square lamp, Notifications with its amber lamp.\nTHEME: light. Light warm page background, dark text, the same cyan and amber accents, hairline borders, quiet.",
+  "refs": [],
+  "video": null,
+  "params": {},
+  "seed": null,
+  "description": "",
+  "label": "lamp phone light",
+  "est_cost_usd": 0.1,
+  "created": "2026-10-17T22:14:48",
+  "outputs": [
+    "lamp-phone-light.png"
+  ]
+}

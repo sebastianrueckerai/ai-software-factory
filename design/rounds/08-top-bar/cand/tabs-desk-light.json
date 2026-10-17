@@ -1,0 +1,15 @@
+{
+  "model": "google/nano-banana-2.1",
+  "prompt": "The top 430 px of a software-factory console's board page, 1440 px wide, shown without browser chrome. Under the top bar: the status strip \"working \u00b7 2 working \u00b7 1 needs you \u00b7 \u20ac0.42 of \u20ac10 \u00b7 4%\" in monospace, then the board, three hairline-framed card columns \"Working\", \"Needs you\", \"Queued\", each with two small cards (a card shows a task slug, a state word, a time like \"14:02\"). The top bar, 44 px tall on the page background with a 1 px bottom hairline, holds: \"Factory console\" (the home link), the project select \"demo \u25be\", the links \"Board\" (the current page), \"Notifications\", \"New task\", \"Projects\", \"Resources\", \"Costs\", \"Policy\", \"Alerts\", a small moon-and-sun theme toggle, the user \"sebastian\", \"Log out\". A quiet mission-control instrument-panel look: hairline borders, monospaced type for figures and times, small-capitals labels, one cyan accent reserved for the current thing, amber only for needs-you states.\nDESIGN DIRECTION \"tabs\": the links leave the top bar and become a second row of tabs under it. The bar holds only Factory console, the project select, and at the right the theme toggle, sebastian, Log out. The tab row, 34 px, left-aligned with the content, on the page background with its own 1 px bottom hairline: Board, Notifications, New task, Projects, Resources, Costs, Policy, Alerts, evenly spaced, no grouping marks. The current tab: full-strength word with a 2 px cyan underline spanning it; the others dim.\nTHEME: light. Light warm page background, dark text, the same cyan and amber accents, hairline borders, quiet.",
+  "refs": [],
+  "video": null,
+  "params": {},
+  "seed": null,
+  "description": "",
+  "label": "tabs desk light",
+  "est_cost_usd": 0.1,
+  "created": "2026-10-17T22:10:11",
+  "outputs": [
+    "tabs-desk-light.png"
+  ]
+}

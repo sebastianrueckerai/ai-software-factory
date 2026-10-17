@@ -1,0 +1,1 @@
+THEME: dark. Near-black page background, light text, one cyan accent for current things, amber for needs-you states, hairline borders, quiet.

@@ -1,0 +1,15 @@
+{
+  "model": "google/nano-banana-2.1",
+  "prompt": "The top 430 px of a software-factory console's board page, 1440 px wide, shown without browser chrome. Under the top bar: the status strip \"working \u00b7 2 working \u00b7 1 needs you \u00b7 \u20ac0.42 of \u20ac10 \u00b7 4%\" in monospace, then the board, three hairline-framed card columns \"Working\", \"Needs you\", \"Queued\", each with two small cards (a card shows a task slug, a state word, a time like \"14:02\"). The top bar, 44 px tall on the page background with a 1 px bottom hairline, holds: \"Factory console\" (the home link), the project select \"demo \u25be\", the links \"Board\" (the current page), \"Notifications\", \"New task\", \"Projects\", \"Resources\", \"Costs\", \"Policy\", \"Alerts\", a small moon-and-sun theme toggle, the user \"sebastian\", \"Log out\". A quiet mission-control instrument-panel look: hairline borders, monospaced type for figures and times, small-capitals labels, one cyan accent reserved for the current thing, amber only for needs-you states.\n\nFIXED FORM of \"panel\": the eight links sit mid-bar in one hairline-framed segmented panel, 32 px tall, 1 px outer border, internal dividers only at group boundaries: Board | New task | Projects  Resources  Costs | Policy  Alerts  Notifications. The Board segment is filled with the raised panel colour and its word cyan. New task follows Board and carries a 1 px border of its own inside its segment, the panel's only bordered word. Generous horizontal padding inside the panel and calm space around it so the bar breathes. Left of the panel: Factory console, the project select. Right: theme toggle, sebastian, Log out.\n\nTHEME: light. Light warm page background, dark text, the same cyan and amber accents, hairline borders, quiet.",
+  "refs": [],
+  "video": null,
+  "params": {},
+  "seed": null,
+  "description": "",
+  "label": "fix panel desk light",
+  "est_cost_usd": 0.15,
+  "created": "2026-10-17T22:46:35",
+  "outputs": [
+    "fix-panel-desk-light.png"
+  ]
+}

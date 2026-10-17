@@ -1,0 +1,1 @@
+PHONE FORM of "act-right": the bar holds home glyph, project, theme, Menu. The Menu opens a full sheet from the top: the seven destinations as 44 px rows, the current word cyan, and New task pinned as a full-width bordered action at the sheet's foot, Log out above it.

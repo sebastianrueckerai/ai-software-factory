@@ -1,0 +1,1 @@
+PHONE FORM of "underline": the bar holds home glyph, project, theme, Menu. The Menu opens an anchored dropdown panel hanging under the bar's right edge, hairline-framed, listing the eight destinations as 44 px rows with thin dividers and Log out last; the current row's word underlined in cyan.

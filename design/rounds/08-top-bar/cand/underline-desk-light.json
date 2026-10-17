@@ -1,0 +1,15 @@
+{
+  "model": "google/nano-banana-2.1",
+  "prompt": "The top 430 px of a software-factory console's board page, 1440 px wide, shown without browser chrome. Under the top bar: the status strip \"working \u00b7 2 working \u00b7 1 needs you \u00b7 \u20ac0.42 of \u20ac10 \u00b7 4%\" in monospace, then the board, three hairline-framed card columns \"Working\", \"Needs you\", \"Queued\", each with two small cards (a card shows a task slug, a state word, a time like \"14:02\"). The top bar, 44 px tall on the page background with a 1 px bottom hairline, holds: \"Factory console\" (the home link), the project select \"demo \u25be\", the links \"Board\" (the current page), \"Notifications\", \"New task\", \"Projects\", \"Resources\", \"Costs\", \"Policy\", \"Alerts\", a small moon-and-sun theme toggle, the user \"sebastian\", \"Log out\". A quiet mission-control instrument-panel look: hairline borders, monospaced type for figures and times, small-capitals labels, one cyan accent reserved for the current thing, amber only for needs-you states.\nDESIGN DIRECTION \"underline\": one bar holds everything. Factory console, the project select, then the links in three clusters separated by thin vertical hairlines: Board, then New task Projects Resources Costs, then Policy Alerts Notifications. The current page: full-strength word with a 2 px cyan underline spanning it, the rest dim. At 1024 the last cluster folds into a \"More \u25be\" link after the second divider.\nTHEME: light. Light warm page background, dark text, the same cyan and amber accents, hairline borders, quiet.",
+  "refs": [],
+  "video": null,
+  "params": {},
+  "seed": null,
+  "description": "",
+  "label": "underline desk light",
+  "est_cost_usd": 0.1,
+  "created": "2026-10-17T22:11:59",
+  "outputs": [
+    "underline-desk-light.png"
+  ]
+}

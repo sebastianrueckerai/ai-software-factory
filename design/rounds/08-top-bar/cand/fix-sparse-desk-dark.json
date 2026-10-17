@@ -1,0 +1,15 @@
+{
+  "model": "google/nano-banana-2.1",
+  "prompt": "The top 430 px of a software-factory console's board page, 1440 px wide, shown without browser chrome. Under the top bar: the status strip \"working \u00b7 2 working \u00b7 1 needs you \u00b7 \u20ac0.42 of \u20ac10 \u00b7 4%\" in monospace, then the board, three hairline-framed card columns \"Working\", \"Needs you\", \"Queued\", each with two small cards (a card shows a task slug, a state word, a time like \"14:02\"). The top bar, 44 px tall on the page background with a 1 px bottom hairline, holds: \"Factory console\" (the home link), the project select \"demo \u25be\", the links \"Board\" (the current page), \"Notifications\", \"New task\", \"Projects\", \"Resources\", \"Costs\", \"Policy\", \"Alerts\", a small moon-and-sun theme toggle, the user \"sebastian\", \"Log out\". A quiet mission-control instrument-panel look: hairline borders, monospaced type for figures and times, small-capitals labels, one cyan accent reserved for the current thing, amber only for needs-you states.\n\nFIXED FORM of \"sparse\": at 1440 all eight destinations sit in the bar as quiet small-capitals words with generous space between groups and no boxes around them: \"Board\" alone as the working surface, then \"New task\" as the bar's only bordered quiet action, then the reference group \"Projects   Resources   Costs\", then, set apart by wider space, the group \"Policy   Alerts   Notifications\". The current page's word carries the cyan and a short cyan underline beneath it. \"More \u22ef\" exists only when the width falls under 1200 and then holds the six non-action destinations; at 1440 it is absent. Factory console and the project select at the left, theme, sebastian, Log out at the right. Nothing wraps at 1440.\n\nTHEME: dark. Near-black page background, light text, one cyan accent for current things, amber for needs-you states, hairline borders, quiet.",
+  "refs": [],
+  "video": null,
+  "params": {},
+  "seed": null,
+  "description": "",
+  "label": "fix sparse desk dark",
+  "est_cost_usd": 0.15,
+  "created": "2026-10-17T22:44:37",
+  "outputs": [
+    "fix-sparse-desk-dark.png"
+  ]
+}
