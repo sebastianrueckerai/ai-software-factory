@@ -139,3 +139,18 @@ From round 07 ([design/rounds/07-notifications/index.html](rounds/07-notificatio
 One monospaced readout, no card fills: a Connections table first (venue, state, action) over a hairline rule, then Level per project. Every state carries a small square lamp, both sections in one language: lit cyan for connected and for a level the member set, amber for needs-you, unlit for off and not connected. A derived default states itself in words, "default: needs-you", in dim text; the member's own word stands at full strength. The actions stay phase 1's controls, styled quiet: Connect, Disconnect, a select with off / needs-you / all, Save per row. The phone stacks the rows, the select goes full width, every target 44 px. What goes: the card look, explainer lines, preview strips, the log's one-line rows (the runner-up; its quiet is worth stealing for a read-only surface). The reference is [cand/instrument-fix-dark.png](rounds/07-notifications/cand/instrument-fix-dark.png); the reasons are in [the round's notes](rounds/07-notifications/notes.md).
 
 
+## C20. The pulse band goes: the strip carries the status line (2026-10-17, Sebastian)
+
+Decided in conversation, 2026-10-17 evening, no image round: the model-written pulse and its folded bullets leave the project screen. What the band carried is covered with actions attached: "does anything need me" is the status strip (working · N working · M need you · spend of envelope · percent, all read from the tables), "what needs me" is the highlighted needs-you column and the inbox rows with their answer buttons, "what is happening" is the board, "what happened while I was away" is the inbox feed. On 2026-10-17 the band was the only surface that lied: it showed a three-hour-old ask as current while board and inbox were right (card #1013, defects a and b). A headline that can contradict the rest of the screen is worse than no headline, and the design principle holds: no rule in a prompt that a table can carry.
+
+The screen after: the strip stays as it is; the SPEND / provider / configuration panel renders always, without an expand control; the band's markup, the Pulser loop and the pulse's model calls are deleted. The chat task stays for the conversation. The model's voice keeps its place in the chat. The build card is "the pulse band leaves the screen: the strip carries the status line" (filed 2026-10-17).
+
+What goes: the pulse sentence, the folded bullets, the prominent state, the pulse's share of the chat budget, the expansion interaction.
+
+## C21. The tab title counts asks as a bare number (2026-10-17, Sebastian)
+
+An amendment to C18's badge line. The browser tab title's marker drops its words: not "(1 needs you · 3 new)" but "(4)", the sum of open asks and unseen rows, falling to nothing once read or answered. Accepted shorthand for one message. The switcher's pills keep their wording and aria labels.
+
+## C22. A timestamp never breaks inside its value (2026-10-17, Sebastian)
+
+From the card drawer's Last activity rows, where a narrow column split a date mid-value ("2026-10-" over "17 19:35"). Every timestamp in the console stays whole on one line; a column that cannot hold it overflows or ellipses, but a date never reads as two values.
