@@ -68,3 +68,7 @@ The round's cap was $5. About 40 minutes.
 ## What worked
 
 Two critics who split on the first pass (Gemini: log; GLM: instrument) agreed once the fix loop had named the affordance question: the page is a control surface, and the log look hides its controls. The fix loop with named fixes did more than a second scoring pass would have. The sums alone would have picked log; the overruled double-bracket claim and the compare pass carried instrument. Checking every legibility claim against the pixels earned its keep twice.
+
+## Built (2026-10-17)
+
+C19 is built: lamps 8 px in both themes (pixel-checked), the act column flush to the row rule (17 px gap, was a 290 px tail), the phone stacked with the select full width. Before and after, magnified, in [ev/](ev/): the whole desk panel, the set column, and the phone rows.
