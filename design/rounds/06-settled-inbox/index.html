@@ -1,0 +1,36 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Console design round 06: the settled inbox</title>
+<style>body{font:14px/1.5 system-ui;margin:24px;color:#222;background:#f4f4f2}h1{font-size:20px}h2{font-size:16px;margin:32px 0 4px}p,li{max-width:80ch}p{margin:0 0 8px}figure{display:inline-block;vertical-align:top;margin:0 12px 12px 0;width:min(46%,680px)}figure img{width:100%;border:1px solid #ccc;background:#fff}figure.wide{width:min(96%,1400px)}figure.phone{width:min(30%,390px)}figcaption{font-size:12px;color:#555}table{border-collapse:collapse;margin:8px 0 12px}td,th{border:1px solid #ccc;padding:3px 10px;text-align:left;font-size:13px;vertical-align:top}td.n{text-align:right}</style></head><body>
+<h1>Console design round 06: the settled inbox</h1>
+<p>The inbox thread is where the factory pokes its owner, and today every poke looks equally current forever. The rule was ruled before this round (item 292: a settled row carries a reason of word, actor and time; the badge splits into open asks and unseen new rows; amber stays only on open asks). This round shaped the form: how far a settled row recedes, where the reason sits, what the badge looks like. <a href="brief.md">The brief</a> set the limits; six candidates were built as real markup over the console's own stylesheet, no generation. <a href="notes.md">The notes</a> hold the run, the scores and the claims the director checked.</p>
+<p><b>The recommendation: 02, quiet-log — provisional.</b> The settled row folds to one line, the reason in grey monospace first, the first words of the message after it: the thread's history becomes an index of what passed, and the open ask stands alone at full voice. The badge is two pills, amber for the open asks, bordered for the unseen new rows. Both critics picked it in the compare loop (9 of 10 each), flipping their first-round preference for the dimmed full row once the dividing question was explicit: what happens when the history grows. Runner-up: 05, right-reason — the full row dimmed, the reason at the right edge of the name line, now wearing the same two-pill badge. Sebastian is away; his pick overrides and becomes the C-entry in the design decisions.</p>
+
+<h2>The finalists</h2>
+<figure class="wide"><a href="compare-dark.png"><img src="compare-dark.png" alt="The two finalists in the dark theme, desk and phone"></a><figcaption>the finalists, dark: A quiet-log and B right-reason, desk and phone</figcaption></figure>
+<figure class="wide"><a href="compare-light.png"><img src="compare-light.png" alt="The two finalists in the light theme, desk and phone"></a><figcaption>the finalists, light</figcaption></figure>
+<figure><a href="shots/c2-1440.png"><img src="shots/c2-1440.png" alt="quiet-log, desk, dark" loading="lazy"></a><figcaption>the pick, desk at 1440, dark</figcaption></figure>
+<figure><a href="shots/c2l-1440.png"><img src="shots/c2l-1440.png" alt="quiet-log, desk, light" loading="lazy"></a><figcaption>the pick, light</figcaption></figure>
+<figure class="phone"><a href="shots/c2-390.png"><img src="shots/c2-390.png" alt="quiet-log on the phone, dark" loading="lazy"></a><figcaption>the pick, phone at 390, dark</figcaption></figure>
+<figure class="phone"><a href="shots/c2l-390.png"><img src="shots/c2l-390.png" alt="quiet-log on the phone, light" loading="lazy"></a><figcaption>the pick, phone, light</figcaption></figure>
+<p>One behavior rides with the pick: a folded row expands on click or tap, so the audit trail stays one gesture away — both critics named it, and it answers the one thing the fold gives up. Two claims were checked and dismissed: the light-theme greys measure 7.0:1 and 5.2:1, above the floor, and nothing clips on the phone.</p>
+
+<h2>All six candidates</h2>
+<p>00 is today's console, the baseline: nothing settles, the badge counts four unseen.</p>
+<figure class="wide"><a href="sheet-desk-dark.png"><img src="sheet-desk-dark.png" alt="All candidates in the dark theme, desk" loading="lazy"></a><figcaption>desk, dark</figcaption></figure>
+<figure class="wide"><a href="sheet-desk-light.png"><img src="sheet-desk-light.png" alt="All candidates in the light theme, desk" loading="lazy"></a><figcaption>desk, light</figcaption></figure>
+<figure class="wide"><a href="sheet-phone-dark.png"><img src="sheet-phone-dark.png" alt="All candidates in the dark theme, phone" loading="lazy"></a><figcaption>phone, dark</figcaption></figure>
+<figure class="wide"><a href="sheet-phone-light.png"><img src="sheet-phone-light.png" alt="All candidates in the light theme, phone" loading="lazy"></a><figcaption>phone, light</figcaption></figure>
+
+<h2>The critics</h2>
+<p>Scores out of 10, first loop over all six, then the compare. The badge was the one verdict that never moved: the two-pill form won every round.</p>
+<table><tr><th>candidate</th><th>Gemini</th><th>GLM</th><th>compare · Gemini</th><th>compare · GLM</th></tr>
+<tr><td>00 today (baseline)</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>01 dim-line</td><td class="n">8</td><td class="n">5</td><td>—</td><td>—</td></tr>
+<tr><td>02 quiet-log</td><td class="n">7</td><td class="n">9</td><td class="n">9</td><td class="n">9</td></tr>
+<tr><td>03 ink-swap</td><td class="n">4</td><td class="n">3</td><td>—</td><td>—</td></tr>
+<tr><td>04 settled-run</td><td class="n">3</td><td class="n">6</td><td>—</td><td>—</td></tr>
+<tr><td>05 right-reason</td><td class="n">9</td><td class="n">8</td><td class="n">6</td><td class="n">5</td></tr>
+<tr><td>06 half-fade</td><td class="n">6</td><td class="n">6</td><td>—</td><td>—</td></tr></table>
+
+<h2>Cost</h2>
+<p>Five critic calls at $0.03, $0.15 of the $3 cap. No images generated: the candidates are real markup over the console's stylesheet, shot in a browser.</p>
+</body></html>

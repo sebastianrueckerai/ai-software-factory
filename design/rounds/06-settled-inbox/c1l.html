@@ -1,0 +1,181 @@
+<!doctype html>
+<!-- Round 06's shared page. The thread's content and order are the round's
+     fixed material; every candidate renders it whole and changes only its
+     treatment through its style block. Markup mirrors the console's own
+     chat.js: .msg.agent.poke rows, .who/.said/.choices, the .ttable switcher. -->
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Round 06 · dim-line · light</title>
+<link rel="stylesheet" href="refs/console.css">
+<style>
+/* the page shell: today's console plus the round's hooks, all hidden until a
+   candidate shows them. The default look is the inbox as it ships today. */
+body { margin: 0; }
+.stage { max-width: 1040px; margin: 20px auto; padding: 0 16px; }
+.chat.with-threads { height: 700px; }
+.why, .bside, .bchip, .fold, .bsplit, .bpills, .hcount { display: none; }
+.chat-form { display: flex; gap: 8px; align-items: flex-end; }
+.chat-form textarea { flex: 1; max-width: none; resize: none; }
+@media (max-width: 899px) {
+  .stage { margin: 0; padding: 0; }
+  .chat.with-threads { height: auto; }
+  .chat-log { flex: none; height: auto; max-height: none; }
+}
+</style>
+<style>
+/* 01 dim-line: the plain ruling refined. The settled row's colour drains to
+   muted, no amber anywhere on it, the reason line follows the text in the
+   decider line's idiom, the badge is one text line with the ask's half amber. */
+
+.settled .av { border-color: var(--line-strong); color: var(--text-faint); }
+.settled .av::before { background: var(--text-faint); }
+.settled .who .name { color: var(--text-muted); }
+.settled .who time { color: var(--text-faint); }
+.settled .said { color: var(--text-muted); }
+.settled .choices { display: none; }
+.settled .why { display: block; margin: 4px 0 0; color: var(--text-faint); font: 11.5px var(--font-mono); }
+
+.trow.inbox .badge, .trow.inbox .bpills { display: none; }
+.trow.inbox .bsplit { display: inline; justify-self: end; color: var(--text-muted); font: 11px var(--font-mono); white-space: nowrap; }
+.trow.inbox .bsplit b { color: var(--need-text); font-weight: 600; }
+
+</style>
+</head>
+<body>
+<div class="stage">
+<section class="chat with-threads" id="sw">
+
+  <header class="chat-head">
+    <h2>Chat</h2>
+    <span class="chat-who">sebastian · writer · the agent reads, explains and acts as you</span>
+  </header>
+
+  <button type="button" class="sw-sum" aria-expanded="false">Threads <span class="n">3</span> · <span class="badge">4</span> unread<span class="chev" aria-hidden="true">⌄</span></button>
+
+  <div class="ttable">
+    <div class="thr"><span>threads</span><button type="button" class="swtg" aria-label="Fold the threads">⋯</button></div>
+    <div class="trows">
+      <button type="button" class="trow on unread inbox" aria-current="true" title="Inbox, 1 needs you, 3 new">
+        <span class="tmark inbox" aria-hidden="true">⌂</span>
+        <span class="ttitle">Inbox</span>
+        <span class="badge" aria-label="4 unread">4</span>
+        <span class="bsplit"><b>1 needs you</b> · 3 new</span>
+        <span class="bpills"><span class="badge">1</span><span class="bplain">3</span></span>
+      </button>
+      <button type="button" class="trow" title="release 0.3 hardening, a turn in flight">
+        <span class="tmark working"><i class="dot" aria-hidden="true"></i><span class="visually-hidden">a turn in flight</span></span>
+        <span class="ttitle">release 0.3 hardening</span>
+        <span class="tat">14:22</span>
+      </button>
+      <button type="button" class="trow unread" title="Cards and models, 2 unread">
+        <span class="tmark" aria-hidden="true"></span>
+        <span class="ttitle">Cards and models</span>
+        <span class="badge" aria-label="2 unread">2</span>
+      </button>
+    </div>
+    <div class="tarch">
+      <span class="tarch-l">archived</span>
+      <span class="trow arch"><span class="tmark" aria-hidden="true">arc</span><button type="button" class="ttitle open-arch">first spike</button><button type="button" class="linkbtn restore">restore</button></span>
+    </div>
+  </div>
+
+  <div class="chat-main">
+    <div class="thead inbox">
+      <h3 class="ttl"><span class="tmark inbox" aria-hidden="true">⌂</span>Inbox</h3>
+      <span class="thint">the factory's thread: the agent speaks here uninvited<span class="hcount"> · 1 ask waits</span></span>
+    </div>
+
+    <div class="chat-log">
+
+      <!-- a seen inform, settled: the marker passed it -->
+      <div class="msg agent poke settled run" data-message="91">
+        <span class="av" aria-hidden="true"></span>
+        <p class="who"><span class="name">the factory</span> <time>10-17 13:12Z</time>
+          <span class="bside">seen by sebastian · 13:39</span> <span class="bchip">seen by sebastian · 13:39</span></p>
+        <div class="said"><p><a href="#issue-826" class="cardref" data-issue="826">#826</a> moved to review by the factory.</p></div>
+        <p class="why">seen by sebastian · 13:39</p>
+        <p class="fold"><span class="fw">seen by sebastian · 13:39</span> <span class="ft"><a href="#issue-826" class="cardref" data-issue="826">#826</a> moved to review</span></p>
+      </div>
+
+      <!-- an answered ask: the newest settling event is the answer -->
+      <div class="msg agent poke settled" data-message="92">
+        <span class="av" aria-hidden="true"></span>
+        <p class="who"><span class="name">the factory</span> <time>10-17 13:41Z</time>
+          <span class="bside">answered by sebastian · 13:47</span> <span class="bchip">answered by sebastian · 13:47</span></p>
+        <div class="said"><p><a href="#issue-833" class="cardref" data-issue="833">#833</a> needs a base image for the load test runner: alpine or debian?</p></div>
+        <p class="why">answered by sebastian · 13:47</p>
+        <p class="fold"><span class="fw">answered by sebastian · 13:47</span> <span class="ft"><a href="#issue-833" class="cardref" data-issue="833">#833</a> base image for the load test runner</span></p>
+      </div>
+
+      <!-- the member's reply, the row above settled by it -->
+      <div class="msg you">
+        <span class="av" aria-hidden="true">S</span>
+        <p class="who"><span class="name">sebastian</span> <time>10-17 13:47Z</time></p>
+        <p class="said">the alpine one</p>
+      </div>
+
+      <!-- a superseded ask: a newer ask for the same card replaced it -->
+      <div class="msg agent poke settled run" data-message="93">
+        <span class="av" aria-hidden="true"></span>
+        <p class="who"><span class="name">the factory</span> <time>10-17 13:58Z</time>
+          <span class="bside">superseded by the factory · 14:02</span> <span class="bchip">superseded by the factory · 14:02</span></p>
+        <div class="said"><p>approve the plan for <a href="#issue-841" class="cardref" data-issue="841">#841</a>, the retry backoff?</p></div>
+        <p class="why">superseded by the factory · 14:02</p>
+        <p class="fold"><span class="fw">superseded by the factory · 14:02</span> <span class="ft">approve the plan for <a href="#issue-841" class="cardref" data-issue="841">#841</a></span></p>
+      </div>
+
+      <!-- three new informs, unseen: current, counted as new, not asks -->
+      <div class="msg agent poke" data-message="94">
+        <span class="av" aria-hidden="true"></span>
+        <p class="who"><span class="name">the factory</span> <time>10-17 14:09Z</time></p>
+        <div class="said"><p><a href="#issue-838" class="cardref" data-issue="838">#838</a> moved to done.</p></div>
+      </div>
+      <div class="msg agent poke" data-message="95">
+        <span class="av" aria-hidden="true"></span>
+        <p class="who"><span class="name">the factory</span> <time>10-17 14:11Z</time></p>
+        <div class="said"><p>routine deps-nightly ran: 2 updates, both green.</p></div>
+      </div>
+      <div class="msg agent poke" data-message="96">
+        <span class="av" aria-hidden="true"></span>
+        <p class="who"><span class="name">the factory</span> <time>10-17 14:16Z</time></p>
+        <div class="said"><p><a href="#issue-837" class="cardref" data-issue="837">#837</a> build finished green · 214 tests, no races.</p></div>
+      </div>
+
+      <!-- the open ask: full amber, a repeat bump on it -->
+      <div class="msg agent poke esc" data-message="97">
+        <span class="av" aria-hidden="true"></span>
+        <p class="who"><span class="name">the factory</span> <time>10-17 14:31Z</time> <span class="rep">2 times</span> <span class="esc-l">needs you</span></p>
+        <div class="esc-b">
+          <div class="said"><p><a href="#issue-841" class="cardref" data-issue="841">#841</a> the run passed its hour budget: raise 12 → 18 hours to finish the merge?</p></div>
+          <p class="choices">
+            <button type="button">Raise to 18 hours</button>
+            <button type="button">Stop the run</button>
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="answer">
+      <span class="answer-l">Answer:</span>
+      <button type="button">Raise to 18 hours</button>
+      <button type="button">Stop the run</button>
+      <span class="answer-or">or in your words below</span>
+    </div>
+
+    <form class="chat-form">
+      <textarea rows="1" placeholder="Ask or tell the project agent"></textarea>
+      <button type="submit" class="primary">Send</button>
+    </form>
+  </div>
+
+</section>
+</div>
+<script>
+// the phone folds the switcher to its summary row, as the console's own chat view does
+if (matchMedia("(max-width: 899px)").matches) document.getElementById("sw").classList.add("sw-collapsed");
+</script>
+</body>
+</html>

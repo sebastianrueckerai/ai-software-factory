@@ -1,0 +1,13 @@
+/* 03 ink-swap: the text keeps its full colour; only the amber leaves (the
+   ring, the name, the label) and a bordered reason chip sits in the name
+   line; the badge is the amber ask count beside a plain "3 new". */
+
+.settled .av { border-color: var(--line-strong); color: var(--text-faint); }
+.settled .av::before { background: var(--text-faint); }
+.settled .who .name { color: var(--text-muted); }
+.settled .choices { display: none; }
+.settled .bchip { display: inline-flex; align-items: center; height: 16px; padding: 0 5px; border: 1px solid var(--line); border-radius: 2px; color: var(--text-faint); font: 10.5px var(--font-mono); white-space: nowrap; }
+
+.trow.inbox > .badge, .trow.inbox .bsplit { display: none; }
+.trow.inbox .bpills { display: inline-flex; gap: 4px; justify-self: end; align-items: center; color: var(--text-muted); font: 11px var(--font-mono); }
+.trow.inbox .bpills .bplain { display: inline; border: 0; padding: 0; height: auto; min-width: 0; }

@@ -1,0 +1,18 @@
+/* 02 quiet-log: the settled row folds to one line, reason first, the first
+   words after it, like an index of what passed; the head names the waiting
+   ask; the badge is an amber ask pill beside a plain new pill. */
+
+.settled .av { border-color: var(--line-strong); color: var(--text-faint); }
+.settled .av::before { background: var(--text-faint); }
+.settled .who .name { color: var(--text-muted); }
+.settled .said, .settled .choices { display: none; }
+.settled .fold { display: flex; gap: 8px; align-items: baseline; margin: 0 0 2px; color: var(--text-faint); font: 11.5px var(--font-mono); min-width: 0; }
+.settled .fold .fw { flex: none; color: var(--text-muted); }
+.settled .fold .ft { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.settled .fold .ft a { color: inherit; }
+
+.hcount { display: inline; color: var(--need-text); }
+
+.trow.inbox .badge, .trow.inbox .bsplit { display: none; }
+.trow.inbox .bpills { display: inline-flex; gap: 4px; justify-self: end; align-items: center; }
+.bplain { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; border: 1px solid var(--line-strong); border-radius: 9px; color: var(--text-muted); font: 600 11px/18px var(--font-mono); }

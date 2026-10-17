@@ -1,0 +1,15 @@
+/* 01 dim-line: the plain ruling refined. The settled row's colour drains to
+   muted, no amber anywhere on it, the reason line follows the text in the
+   decider line's idiom, the badge is one text line with the ask's half amber. */
+
+.settled .av { border-color: var(--line-strong); color: var(--text-faint); }
+.settled .av::before { background: var(--text-faint); }
+.settled .who .name { color: var(--text-muted); }
+.settled .who time { color: var(--text-faint); }
+.settled .said { color: var(--text-muted); }
+.settled .choices { display: none; }
+.settled .why { display: block; margin: 4px 0 0; color: var(--text-faint); font: 11.5px var(--font-mono); }
+
+.trow.inbox .badge, .trow.inbox .bpills { display: none; }
+.trow.inbox .bsplit { display: inline; justify-self: end; color: var(--text-muted); font: 11px var(--font-mono); white-space: nowrap; }
+.trow.inbox .bsplit b { color: var(--need-text); font-weight: 600; }

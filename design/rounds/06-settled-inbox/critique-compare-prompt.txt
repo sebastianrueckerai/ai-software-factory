@@ -1,0 +1,19 @@
+You compare two finalists for one surface and pick one: the inbox thread of an operations console for an AI software factory. The console's design is called "Mission control": a near-black blue room (dark theme, the default) or a warm cream day version (light theme) of thin-bordered instrument panels, cyan as the system colour, amber as the one signal that needs a person, monospace figures, everything exact and calm.
+
+The inbox thread is where the factory pokes its owner: questions, approval requests, and small informs, newest at the bottom. Today every poke looks equally current forever, so a row the owner already handled still reads as waiting. The ruled fix, already decided: a settled row carries a reason of word, actor and time ("answered by sebastian · 13:47"); the thread's badge splits into an amber pill for open asks and a bordered pill for unseen new rows; amber stays only on open asks.
+
+You see two compare sheets, dark and light. The top row of each is the desk at 1440 px, the bottom row the phone at 390 px. Column A and column B are the two finalists, both carrying the same fixed thread: three settled rows at top (an inform seen, an ask answered with the owner's reply below, an approval ask superseded), three new informs from 14:09, one open escalation at 14:31 with a repeat bump and its two choice buttons, then the answer bar.
+
+- A, quiet-log: each settled row folds to a single line — the reason in grey monospace, then the first words of the message, ellipsis at the edge. The thread reads like an index of what passed; a long history costs almost no scroll.
+- B, right-reason: each settled row keeps its full shape but dims — muted text, quiet avatar — and the reason sits at the right edge of the name line in faint monospace. The message column keeps every word of what was asked; a long history costs full scroll.
+
+Both wear the two-pill badge in the switcher row. Judge on: the first-second glance ("what needs me" vs "what passed"); whether the audit trail — what was asked, in full words — survives; the reason's readability at 1x in both themes and on the phone; quietness and fit with the instrument idiom; and how each behaves when the settled history grows to a dozen rows. Look at the pixels before you claim a detail is lost.
+
+Answer in JSON only, no prose around it:
+{
+  "ranking": [ {"finalist": "A-quiet-log", "score": 0-10, "why": "two sentences"}, ... both, best first ],
+  "pick": "the one finalist to ship, by letter and slug",
+  "why_pick": "one paragraph: why this one over the runner-up",
+  "fix_before_ship": ["at most three concrete changes to the pick, each one sentence"],
+  "risks": "what could go wrong with the pick in use, one paragraph"
+}

@@ -1,0 +1,16 @@
+/* 05 right-reason: the dim of dim-line, with the reason at the right edge of
+   the name line and the repeat counter's place kept for it; the badge is an
+   amber ask pill beside a plain new pill (the critics' fix loop: the two-pill
+   badge from 02, the head count dropped). */
+
+.settled .av { border-color: var(--line-strong); color: var(--text-faint); }
+.settled .av::before { background: var(--text-faint); }
+.settled .who .name { color: var(--text-muted); }
+.settled .who time { color: var(--text-faint); }
+.settled .said { color: var(--text-muted); }
+.settled .choices { display: none; }
+.settled .bside { display: inline; margin-left: auto; color: var(--text-faint); font: 11.5px var(--font-mono); white-space: nowrap; }
+
+.trow.inbox .badge, .trow.inbox .bsplit { display: none; }
+.trow.inbox .bpills { display: inline-flex; gap: 4px; justify-self: end; align-items: center; }
+.bplain { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; border: 1px solid var(--line-strong); border-radius: 9px; color: var(--text-muted); font: 600 11px/18px var(--font-mono); }

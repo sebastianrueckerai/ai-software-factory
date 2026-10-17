@@ -1,0 +1,12 @@
+/* 06 half-fade: the settled row keeps its whole layout, amber name and all,
+   and fades to half, reason line under the text; the uniform-fade direction.
+   The badge is the amber ask pill beside a plain new pill. */
+
+.settled { opacity: .55; }
+.settled .choices { display: none; }
+.settled .why { display: block; margin: 4px 0 0; color: var(--text-faint); font: 11.5px var(--font-mono); }
+.settled:hover { opacity: 1; }
+
+.trow.inbox .badge, .trow.inbox .bsplit { display: none; }
+.trow.inbox .bpills { display: inline-flex; gap: 4px; justify-self: end; align-items: center; }
+.bplain { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; border: 1px solid var(--line-strong); border-radius: 9px; color: var(--text-muted); font: 600 11px/18px var(--font-mono); }

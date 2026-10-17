@@ -1,0 +1,36 @@
+You judge six candidates for one surface: the inbox thread of an operations console for an AI software factory. The console's design is called "Mission control": a near-black blue room (dark theme) or a warm cream day version (light theme) of thin-bordered instrument panels, cyan as the system colour, amber as the one signal that needs a person, monospace figures, everything exact and calm. Dark is the default theme.
+
+The inbox thread is where the factory pokes its owner: questions, approval requests, and small informs, newest at the bottom. Today every poke looks equally current forever, so a row the owner already handled still reads as waiting. The ruled fix, already decided and not yours to judge: a settled row carries a reason line of word, actor and time ("answered by sebastian · 13:47"); the thread's badge splits into open asks and unseen new rows ("1 needs you · 3 new"); amber stays only on open asks. What you judge is the FORM: how far a settled row recedes, where the reason sits, and what the badge looks like.
+
+You see four contact sheets: desk at 1440 px and phone at 390 px, each in dark and light. Each cell is one candidate, labelled 00 to 06. Row 00 is today's console, the baseline: nothing settles, the badge counts four unseen. Every candidate shows the same fixed thread: at the top three settled rows (an inform seen at 13:39, an ask answered at 13:47 with the owner's reply "the alpine one" right below, an approval ask superseded by the factory at 14:02), then three new informs from 14:09 to 14:16, then one open escalation at 14:31 with a repeat bump ("2 times", "needs you") and its two choice buttons, then the answer bar.
+
+The candidates:
+
+01 dim-line: the settled row keeps its shape but its text dims to the muted colour, its avatar ring goes quiet, and the reason sits as a faint monospace line under the message text; badge is one text line, "1 needs you" in amber-weight.
+02 quiet-log: the settled row folds to a single line, the reason in grey followed by the first words of the message, ellipsis at the edge; the head of the thread gains an amber count "· 1 ask waits"; badge is two pills, the amber number 1 and a bordered number 3.
+03 ink-swap: the settled row keeps full text brightness but every trace of amber and repeat noise leaves it, and the reason sits in a small bordered monospace chip on the name line; badge is the amber number 1 beside a plain "3 new".
+04 settled-run: like 02 the rows fold, but the whole settled run is fenced off: a hairline above with a small-caps "settled" label, a wider gap before the live rows; badge is the 01 text line.
+05 right-reason: the 01 dimming, but the reason sits at the right edge of the name line in faint monospace, so the message column stays clean; the head count "· 1 ask waits" appears; badge is the 01 text line.
+06 half-fade: the settled row simply drops to half opacity over its full shape, reason under the text as in 01, and comes back to full on hover; badge is the 02 two pills.
+
+Judge each candidate across both themes and both widths on:
+
+1. Glanceability: in the first second, do the rows that still need the owner separate from the ones he can ignore? Is the open ask unmistakably the loudest thing in the thread?
+2. Recede distance: does the settled run actually recede — or does it vanish so far that the owner loses the audit trail of what he answered and when?
+3. Reason placement: under the text, right of the name, in a chip, or folded into the line: where does the reason read best at 1x without stealing room from the message?
+4. Badge: which form tells "1 needs you, 3 new" fastest, in the switcher row, without turning the row into a dashboard?
+5. Amber discipline: does amber stay only on open asks, or does any candidate spend it elsewhere?
+6. Quietness and fit: thin lines, instrument character, exact and calm; does the treatment look native to Mission control?
+7. Legibility at 1x in both themes, and on the 390 px phone: any candidate whose reason text or fold turns into smudge, or whose phone layout clips.
+
+Answer in JSON only, no prose around it:
+{
+  "ranking": [ {"candidate": "01-dim-line", "score": 0-10, "why": "two sentences"}, ... all six, best first ],
+  "carry": ["the two candidates worth carrying, by slug, one sentence each on why and what to fix"],
+  "drop": ["the others, one short reason each"],
+  "recede_risks": ["candidates that recede too far or not far enough, and how"],
+  "legibility_risks": ["candidates whose reason, chip or fold fails at 1x or on the phone, and which detail"],
+  "badge": "which badge form wins and why, one paragraph",
+  "recommendation": "the one candidate you would ship, and the one change you would make to it first, one paragraph",
+  "notes": "anything every candidate misses about settled rows in an inbox, one paragraph"
+}
