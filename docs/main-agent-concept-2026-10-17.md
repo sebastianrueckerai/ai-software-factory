@@ -59,6 +59,15 @@ The level column is the initial split. The level review at the end of the build,
 
 Wake turns are model turns on the chat budget, so they carry the pulse's guards: an event debounce, a rate cap of one wake turn per 10 seconds at most, one wake per card per minute. The exact numbers are settled at build time against the pulse's. The monthly cap stands. When the gateway refuses the chat task's spend, factoryd raises the fund ask in code, once, and no wake runs until it is answered. That is card #1013's lesson: a wake on budget death must ask for money, never spin.
 
+## One thread, rendered lean
+
+Decision of 2026-10-17, after weighing a split: notifications and agent acts stay in the one inbox thread. The ask, the attempt's analysis and the answer button are one unit, and the record's value is the chronology of cause, attempt, question. A second thread for agent activity was rejected: the streams would re-merge at every ask, and the queue never depends on the feed anyway. The needs-you column holds open asks whatever the scroll position, and settled rows already fold.
+
+Two guards for the build:
+
+- A wake turn renders as one row with expand, the poke's shape. Never a transcript dump.
+- If volume ever hurts, the tool is a view filter on the inbox, all rows, asks only, agent acts only. Not a split.
+
 ## The ask attempt
 
 Decision of 2026-10-17: at autonomous and full auto, every ask that would reach a human gets one model attempt before the human sees it. Below those levels, asks reach the human as today. "Requesting human help should be the exception, and only after exhausting what the AI can do" becomes the ladder's rule on the chat plane too, where the worker plane already has it.
@@ -140,3 +149,4 @@ The roadmap is Sebastian's to curate. No items are filed here.
 | Threads become project-visible. Question 213 and the search non-goal are reversed | Sebastian, this session |
 | Every needs-you card gets a bound thread with the ask as its first message | Sebastian, this session |
 | Wakes fire on events, with a heartbeat as the failsafe. Intervals and caps settled at build | Recommendation of the session, unopposed |
+| Notifications and agent acts stay in the one inbox thread, rendered lean. A split was weighed and rejected | Sebastian, this session |
