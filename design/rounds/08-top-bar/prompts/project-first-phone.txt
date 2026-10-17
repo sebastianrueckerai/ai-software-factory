@@ -1,0 +1,1 @@
+PHONE FORM of "project-first": the bar holds home glyph, the project name in small capitals, theme, Menu. The Menu opens a sheet listing the destinations as 44 px rows, the current underlined in cyan, then sebastian and Log out as the last rows.

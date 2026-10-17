@@ -1,0 +1,1 @@
+PHONE FORM of "panel": the bar holds home glyph, project, theme, Menu. The Menu opens an anchored panel under the bar in the same segmented language stacked: full-width 44 px rows with thin internal dividers, the current row filled with the raised colour and its word cyan, Log out last.

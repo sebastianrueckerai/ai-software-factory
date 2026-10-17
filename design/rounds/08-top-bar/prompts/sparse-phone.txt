@@ -1,0 +1,1 @@
+PHONE FORM of "sparse": the bar holds home glyph, project, theme, a compact bordered "+" action for New task, and the More control. More opens a sheet with Projects, Resources, Costs, Policy, Alerts, Notifications as 44 px rows plus Log out; Board is the sheet's first row with its cyan lamp, the bar keeps the "+" for the one action.

@@ -1,0 +1,15 @@
+{
+  "model": "google/nano-banana-2.1",
+  "prompt": "The top 330 px of the same software-factory console on a phone, 390 px wide, shown without browser chrome. The top bar, 44 px tall with a 1 px bottom hairline, holds: a home glyph, the project select \"demo \u25be\", a moon-and-sun theme toggle, and a \"Menu\" control; the Menu is shown open as the direction says. Under it the page shows the status strip \"working \u00b7 2 working \u00b7 1 needs you \u00b7 \u20ac0.42 of \u20ac10 \u00b7 4%\" in monospace and the top of the card column \"Needs you\" with one card (slug, state word, time). The eight destinations are Board (the current page), Notifications, New task, Projects, Resources, Costs, Policy, Alerts, plus \"Log out\". A quiet mission-control instrument look: hairline borders, monospaced figures, small-capitals labels, one cyan accent for the current thing, amber only for needs-you.\nPHONE FORM of \"mono\": the bar holds home glyph, project, theme, Menu. The Menu opens an anchored panel of monospaced rows at 44 px: board, notifications, new task, projects, resources, costs, policy, alerts, logout; a cyan square lamp before the current row, an amber lamp before notifications while an ask is open, none before the rest.\nTHEME: dark. Near-black page background, light text, one cyan accent for current things, amber for needs-you states, hairline borders, quiet.",
+  "refs": [],
+  "video": null,
+  "params": {},
+  "seed": null,
+  "description": "",
+  "label": "mono phone dark",
+  "est_cost_usd": 0.1,
+  "created": "2026-10-17T22:21:37",
+  "outputs": [
+    "mono-phone-dark.png"
+  ]
+}

@@ -1,0 +1,1 @@
+PHONE FORM of "tabs": the bar holds home glyph, project, theme, Menu. The Menu opens a full sheet sliding from the top over the page: the eight destinations as full-width 44 px rows in one quiet list, Log out as the last row; the current row marked by a 2 px cyan underline spanning its word, the sheet otherwise hairline-ruled.

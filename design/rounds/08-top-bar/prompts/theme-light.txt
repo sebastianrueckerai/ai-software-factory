@@ -1,0 +1,1 @@
+THEME: light. Light warm page background, dark text, the same cyan and amber accents, hairline borders, quiet.
