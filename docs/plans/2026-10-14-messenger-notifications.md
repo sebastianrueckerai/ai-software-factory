@@ -1,6 +1,6 @@
 # Plan: notifications on Telegram and Discord
 
-Draft, 2026-10-14. This is the messenger part of roadmap item 145. A member connects Telegram or Discord once and opts in per project. The factory then sends each notification that pulls the member back in as one line with a link to the card. The proposed decisions below wait for Sebastian's ruling.
+Ruled 2026-10-17. This is the messenger part of roadmap item 145. A member connects Telegram or Discord once and sets a level per project. The factory then sends each notification that pulls the member back in as one line with a link to the card. Decisions 1 to 3 below are Sebastian's rulings of 2026-10-17, the inbound path is his ruling of 2026-10-14, and decisions 4 and 5 stand as drafted.
 
 ## What and why
 
@@ -8,11 +8,11 @@ Today the factory reaches a member only inside the console: the inbox thread col
 
 The bot accounts exist since 2026-10-13: the Telegram bot and the Discord application `ai-software-factory`, with a test message delivered on both. Their tokens are in the gitignored `.env.tools`.
 
-## Proposed decisions (for Sebastian)
+## Decisions
 
-1. **No chat over the messengers.** The messenger is a pager, and the console stays the one place to read and act. The reasons are in "Why no chat over the messengers" below. This replaces the "chat over the messengers" section of notifications.md once ruled.
-2. **A notification carries a link, not answer buttons.** A button that approves a merge from Telegram must act as the member on Forgejo. The console session that holds the member's Forgejo token lives 12 hours at most, so buttons need a second, long-lived grant per messenger. A taken-over messenger account could then approve merges. The link costs one tap more and needs no new grant.
-3. **Opt-in per member and project, three levels:** off (the default), needs you, and all. Delivery goes to every messenger the member connected.
+1. **No chat over the messengers.** Ruled 2026-10-17. The messenger is a pager, and the console stays the one place to read and act. The reasons are in "Why no chat over the messengers" below. This replaces the "chat over the messengers" section of notifications.md.
+2. **A notification carries a link, not answer buttons.** Ruled 2026-10-17. A button that approves a merge from Telegram must act as the member on Forgejo. The console session that holds the member's Forgejo token lives 12 hours at most, so buttons need a second, long-lived grant per messenger. A taken-over messenger account could then approve merges. The link costs one tap more and needs no new grant.
+3. **A level per member and project, three levels: off, needs you, and all.** Ruled 2026-10-17, with a derived default in place of the old off-everywhere default. No level row means: needs you in a project whose resolved notify list (the file's `notify` list, else the approvers) includes the member, off in every other project. A member of a project's notify list is paged with its asks without touching a setting; the finished-and-failed informs reach them only at all. Delivery goes to every messenger the member connected.
 4. **Telegram connects through a deep link, Discord through OAuth2.** Both take one tap from the console.
 5. **A project file may forbid messenger delivery** with `messengers: false`. A notification line leaves the factory for Telegram's or Discord's servers, and neither encrypts bot chats end to end.
 
@@ -34,9 +34,9 @@ A repeat counts on its inbox row and sends nothing new. Routine agent activity n
 
 ## Recipients
 
-The poke writer sends a row to the project file's `notify` list, else to the project's approvers. That stays. A member who opts in to a project joins the recipients of that project's rows, so their inbox holds every row their messenger gets.
+The poke writer sends a row to the project file's `notify` list, else to the project's approvers. That stays. A member whose effective level for a project is needs you or all joins the recipients of that project's rows, so their inbox holds every row their messenger gets. A member of the notify list keeps their inbox rows whatever their level: the level stops the messenger, never the inbox.
 
-A member opts in only to a project they can read in the console. The sender checks the read access again before each send, with the factory's read token and a 10-minute cache. A member who lost access loses the opt-in, and the console says so.
+A member sets a level only for a project they can read in the console. The sender checks access again before each send. Forgejo's per-user permission endpoint refuses every token but a site admin's (rulings 101 and 101a), so the sender re-derives access with the tokens the factory already holds, the org-read token and the project's read token, through the `RepoWriters` composition (`internal/factoryd/forgejo.go:308`), which fails closed. A member counts as a reader when the composition grants them write: members are Forgejo writers (ruling 254), and finer read roles wait on item 149. The result is cached for 10 minutes. A member who lost access loses the level, and the console says so.
 
 ## Connecting a messenger
 
@@ -62,7 +62,10 @@ A member disconnects in the console, or with `/stop` on Telegram. A send that fa
 
 Delivery goes through an outbox, so a notification survives a factoryd restart and a messenger outage.
 
-- The poke transaction writes the inbox rows, the poke cursor and one delivery row per opted-in connection together. A notification is never lost between the event and the send.
+- The poke transaction writes the inbox rows, the poke cursor and one delivery row per connection whose member's effective level passes the row's level. A notification is never lost between the event and the send.
+- A poke born while the member's inbox turn runs lands queued and takes a new id when it lands (`StartQueued`). The sender sends only rows that have landed, and the landing cascade rewrites the pending delivery row's inbox row id in the same transaction, so an ask born mid-turn still reaches the phone, once.
+- The sender derives a row's state before it sends, with the settling rule of roadmap 292: an ask already settled sends nothing, so a notification queued for a card that moved on dies in the outbox.
+- A settling event finds the sent message by its stored id and edits the text to carry its reason word, "answered by sebastian · 14:02". Telegram and Discord both let a bot edit its own message. Informs send once and stay as history; no seen marker exists on a messenger and none is added.
 - A sender loop sends the pending rows every 5 seconds. It keeps one message per second per Telegram chat, honours `retry_after` on a Telegram 429 and `Retry-After` on a Discord 429, and backs off on a 5xx. After 6 failed tries over about an hour it marks the row failed and logs it.
 - The text is `<project>: <inbox row text>`, cut to fit Telegram's 4096 and Discord's 2000 characters. One link button opens the card in the console (Telegram's inline URL button, Discord's link button). A link button needs no inbound path on either venue.
 - The bot token never reaches a log or an error. The saved push work already scrubs it, see "Reuse".
@@ -80,7 +83,7 @@ Four tables, in one migration after `20261015140000_chat_notes.sql`:
 
 - `messenger_links`: login, venue, address (the Telegram chat or the Discord DM channel), the venue's user id and the creation time. One link per member and venue.
 - `messenger_codes`: the code's hash, the login and the expiry.
-- `notify_levels`: login, repository and level (`needs-you` or `all`). No row means off.
+- `notify_levels`: login, repository and level (`off`, `needs-you` or `all`). No row means the derived default of decision 3: needs you when the project's resolved notify list includes the member, else off.
 - `notify_deliveries`: the inbox row, the link, the state (pending, sent, failed), the tries, the next try, the sent message's id and the last error.
 
 ## Configuration and secrets
@@ -92,7 +95,7 @@ Four tables, in one migration after `20261015140000_chat_notes.sql`:
 
 ## The console
 
-A notifications panel holds the member's connections (connect, disconnect, and why a connection ended) and the level per project. The panel's look goes to a UX round in the design session before phase 2, as C14 did for the multi-chat console. New routes enter `getRoutes` or `postRoutes` and the access table: the Telegram code, the Discord start and callback, disconnect, and the level per project (a reader of the project).
+A notifications panel holds the member's connections (connect, disconnect, and why a connection ended) and the level per project. The panel's look goes to one condensed design round under [design/process.md](../../design/process.md) before phase 2, as C14 did for the multi-chat console. New routes enter `getRoutes` or `postRoutes` and the access table: the Telegram code, the Discord start and callback, disconnect, and the level per project (a reader of the project).
 
 ## Phases
 
@@ -104,9 +107,10 @@ A notifications panel holds the member's connections (connect, disconnect, and w
 
 - A code works once and not after 10 minutes. A group chat cannot connect.
 - The webhook refuses a wrong secret with 401 and reads nothing.
-- Delivery rows come only for opted-in members with a connection, at the row's level. A repeat writes none. A project with `messengers: false` writes none.
+- Delivery rows come only for members with a connection whose effective level passes the row's level, the explicit row or the derived default. A member of a project's notify list with no level row receives its asks without touching a setting. A repeat writes none. A project with `messengers: false` writes none.
+- A poke born mid-turn delivers when it lands, once.
 - The sender's retry on 429 and 5xx, its stop after 6 tries, and the disconnect on a blocked bot.
-- A member who lost read access gets nothing and loses the opt-in.
+- A member who lost read access gets nothing and the level row goes.
 - No token in any error or log line.
 - The access table counts and the lab checks.
 
@@ -143,7 +147,7 @@ The one real advantage is answering where the notification arrives, and the link
 
 From the code survey of main at 9307c16:
 
-- Poke classes and recipients: `internal/factoryd/pokes.go:30-31`, `:95-98`, `:112-197`. `Poke` returns no row ids today (`:48`, `:248`), so phase 1 changes it to return the inserted ids per login.
+- Poke classes and recipients: `internal/factoryd/pokes.go:30-31`, `:95-98`, `:112-197`. `Poke` already answers each login's new row id, 0 for a repeat (`:56`, `:287`), so the delivery rows can name their rows.
 - The `notify` list is a plain list of logins: `internal/policy/project.go:220-222`.
 - Console sessions live 12 hours, absolute: `internal/console/console.go:46`. The tokens are sealed per row: `internal/console/session_store.go:34-56`.
 - A route with an empty access rule needs no session and no CSRF token: `internal/console/access.go:262-266`.
