@@ -151,3 +151,41 @@ Breadth 16 ≈ $2.43, montages $0.00, first critiques $0.06, fix images
 $0.61, gemini-fix $0.03; build judging gemini+glm dark+light $0.12,
 fix checks gemini+glm $0.06. Round total ≈ $3.31 of the $8 cap.
 Running total ≈ $30.75 of $100.
+
+## The live gap (2026-10-18)
+
+Sebastian pasted the live console against the reference: not the same.
+Four real gaps, all build-side, closed as 191991ba in the code
+repository (on edc623ac):
+
+1. Closed rows carried no quiet ground. The build had generalised the
+   standing rule's no-tint to every row; the reference sits the
+   released row on a raised fill. `tr.closed` (state outside open)
+   now dims; the standing top rule stands.
+2. A project with no rows dangled after its figures. It now says
+   "none open or closed in the last 7 days".
+3. Lease ends printed full UTC stamps that wrapped to two lines, plus
+   a "released by" second line. The cell now words short ("in 2 h",
+   "2 d ago") via the new `until` helper; the stamp and the releaser
+   ride the cell's title, as the jobs table words its ages.
+4. Money spelled "EUR". The reference and the board face's own eur2
+   use €; the secondary pages now carry € too.
+
+Evidence, magnified same-region crops (dark, 1440, busy scene):
+[ev/fix2-table-before.png](ev/fix2-table-before.png) against
+[ev/fix2-table-after.png](ev/fix2-table-after.png),
+[ev/fix2-sections-before.png](ev/fix2-sections-before.png) against
+[ev/fix2-sections-after.png](ev/fix2-sections-after.png). A pixel scan
+of the full page: the raised ground appears on exactly one 48-px band
+(the released row, y 563 to 610) and on nothing before the fix. Race
+suite exit 0.
+
+Kept on purpose against the mock: the bar is C23's landed bar (the
+mock's interim bar carried the project select, which is the board's),
+and the page head keeps the console's 15-px h2 with its meta
+paragraph (the mock's 36-px title was generator flourish the grammar
+never specified).
+
+Lab catch-up in the same push (ee298260): main's C20 roll made the
+status panel static, and the lab's chevron click hung the shoot on
+pure main; the lab now reads the panel where it sits.
