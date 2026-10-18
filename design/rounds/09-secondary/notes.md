@@ -189,3 +189,7 @@ never specified).
 Lab catch-up in the same push (ee298260): main's C20 roll made the
 status panel static, and the lab's chevron click hung the shoot on
 pure main; the lab now reads the panel where it sits.
+
+C25 later corrected C20's record: the panel folds again, closed behind
+the strip's click, built in the code repository as pull 1085. The lab
+checks above ride that fold.
