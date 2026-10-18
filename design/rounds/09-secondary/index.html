@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Round 09 — the secondary pages</title>
+<style>
+body { max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; font: 15px/1.55 ui-sans-serif, system-ui, sans-serif; color: #1c2430; background: #fbfaf7; }
+h1 { font-size: 1.5rem; } h2 { font-size: 1.15rem; margin-top: 2.2rem; }
+img { width: 100%; height: auto; display: block; border: 1px solid #d8d2c4; }
+figure { margin: 1.2rem 0; }
+figcaption { color: #666056; font-size: .85rem; margin-top: .35rem; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+th, td { text-align: left; padding: .3rem .5rem; border-bottom: 1px solid #e4dfd3; }
+code { font-size: .85em; }
+details { margin: .8rem 0; } summary { cursor: pointer; color: #666056; }
+</style>
+</head>
+<body>
+
+<h1>Round 09 — the secondary pages</h1>
+
+<p>One section, one system: Board and Alerts go (the home link is the board,
+verdicts live on the escalation card), Projects becomes Settings driven by
+the bar's project select, and Costs · Resources · Settings · Policy are
+redesigned under one grammar. The Resources page is the round's probe: the
+same busy page in eight directions, both themes, judged by two critics and
+a director's pixel pass.</p>
+
+<h2>Scope rulings</h2>
+<ul>
+<li>Board goes — "Factory console" opens it.</li>
+<li>New task stays — the bar's one bordered action.</li>
+<li>Projects becomes Settings, one page per project behind the select; the envelope moves to Resources; "New project" is a quiet link at the foot.</li>
+<li>Alerts goes — the verdict buttons stay on the board's escalation card, the route and the chat tool stay, the supervisor's action and diagnosis moved into the tool read.</li>
+<li>Costs, Resources, Policy stay, under one system.</li>
+<li>The bar's groups: the figures (Costs · Resources) and how the factory runs (Settings · Policy · Notifications).</li>
+</ul>
+
+<h2>The eight directions</h2>
+<table>
+<tr><th>#</th><th>name</th><th>the idea</th></tr>
+<tr><td>1</td><td>readout</td><td>the notification page's grammar, extended: small-caps label, figures line, rows</td></tr>
+<tr><td>2</td><td>ledger</td><td>one continuous ruled table, small-caps project dividers, strict columns</td></tr>
+<tr><td>3</td><td>sheet</td><td>dotted leaders, an accounting sheet</td></tr>
+<tr><td>4</td><td>figures</td><td>the envelope as big numerals</td></tr>
+<tr><td>5</td><td>rail</td><td>a sticky index rail of projects</td></tr>
+<tr><td>6</td><td>cards</td><td>the classic control-panel card stack</td></tr>
+<tr><td>7</td><td>terminal</td><td>monospace everything, prompt lines</td></tr>
+<tr><td>8</td><td>fold</td><td>44 px disclosure rows per project</td></tr>
+</table>
+
+<figure><img src="cand/sheet-dark.png" alt="Eight directions, dark"><figcaption>dark — readout, ledger, sheet, figures / rail, cards, terminal, fold</figcaption></figure>
+<figure><img src="cand/sheet-light.png" alt="Eight directions, light"><figcaption>light — the same eight</figcaption></figure>
+
+<h2>Critics</h2>
+<table>
+<tr><th>run</th><th>best</th><th>second</th><th>worst</th></tr>
+<tr><td>gemini</td><td>ledger</td><td>fold</td><td>sheet, figures</td></tr>
+<tr><td>glm</td><td>readout</td><td>ledger</td><td>cards, figures</td></tr>
+</table>
+<p>Both flag invented content: hero numbers (figures), a search box (cards),
+badges (terminal), a nav rail (rail), disclosure mechanics (fold). Full
+answers: <a href="critique/gemini.md">gemini</a>, <a href="critique/glm.md">glm</a>.</p>
+
+<h2>Director's pixel pass and overrules</h2>
+<ul>
+<li>Fold dropped: its extra click hides live rows — the page's whole point.</li>
+<li>All four finalists (readout, ledger × dark, light) are content-clean against the deck; the defects were minor typography, not faults of the directions.</li>
+</ul>
+
+<h2>Fix loop and compare</h2>
+<p>Readout and ledger revised in both themes (<code>prompts/genfix.sh</code>);
+both fix lists landed. One compare pass (<a href="critique/gemini-fix.md">gemini</a>)
+on the revised four: <strong>readout becomes the system</strong> — its grammar
+is the notification page's, and Settings' key: value rows and Policy's small
+tables live in it naturally; ledger's lateral alignment already exists inside
+readout's tables.</p>
+
+<figure><img src="cand/01-readout-fix-dark.png" alt="readout, revised, dark"><figcaption>readout, revised — dark</figcaption></figure>
+<figure><img src="cand/02-ledger-fix-dark.png" alt="ledger, revised, dark"><figcaption>ledger, revised — dark (runner-up)</figcaption></figure>
+<figure><img src="cand/01-readout-fix-light.png" alt="readout, revised, light"><figcaption>readout, revised — light</figcaption></figure>
+
+<h2>The build</h2>
+<p>Built into the console in one pass: per-project figures lines, right-aligned
+figure columns, C19 lamps on state and enabled cells, hairline rows on
+Settings, the policy version as one figures line, policy.yaml and the gateway
+YAML collapsed. The deck's overrules and why: <a href="notes.md">notes</a>.</p>
+
+<h2>The build, judged</h2>
+<p>Both critics hunted defects on the built pages, dark and light: Costs and
+Policy CLEAN; every other item traced to a recorded ruling, a misread, or one
+real fault — the standing row's stronger top rule sat at header weight, so it
+read as nothing. It now carries the reference's measured weight (2 px of the
+button-border token), pixel-verified in both themes; the critics' pipelines
+cannot resolve a 1-vs-2 px line, which the <a href="notes.md">notes</a>
+record with the evidence. Full answers: <a
+href="critique/gemini-built-dark.md">gemini dark</a>, <a
+href="critique/gemini-built-light.md">light</a>, <a
+href="critique/glm-built-dark.md">glm dark</a>, <a
+href="critique/glm-built-light.md">light</a>; the fix checks: <a
+href="critique/gemini-built-fix2.md">gemini</a>, <a
+href="critique/glm-built-fix.md">glm</a>.</p>
+
+<figure><img src="build/resources-dark.png" alt="the built Resources page, dark"><figcaption>the built Resources page — dark; the standing row's rule is the heavier line under the header</figcaption></figure>
+<figure><img src="build/resources-light.png" alt="the built Resources page, light"><figcaption>the built Resources page — light</figcaption></figure>
+<figure><img src="build/costs-dark.png" alt="the built Costs page, dark"><figcaption>the built Costs page — dark</figcaption></figure>
+
+<p>The build then rebased onto the landed C23 bar when origin/main moved
+mid-round: round 08's CSS stands, this round's words ride it. The rebase,
+its verification, and the three lab checks that fail byte-identically on
+pure origin/main (the notifications session's in-flight expectations) are
+recorded in <a href="notes.md">the notes</a>.</p>
+
+</body>
+</html>

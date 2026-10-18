@@ -54,11 +54,13 @@ Read off the templates in `internal/console/templates/` on 2026-10-13 (code comm
 
 ## Other pages
 
+The four secondary pages follow the readout grammar of C24: a small-caps section label, one monospaced figures line, rows on the page ground between hairline rules, C19 lamps on states, figure columns right-aligned.
+
 - Costs: today's spend against the day cap and the policy version; per-day table by kind with totals; per task and line.
-- Resources: per project a table (task, resource and purpose, type, IPv4, lease end or standing, EUR/h, cost so far, state, Promote with its note and Release); the envelope block (task block, this month's use, standing block, standing now, the project's file link).
-- Projects: intro with the Git link and New project; per project: settings list (repository, objects, agents, merge rule, notify, namespaces, quota, environments, Forgejo state, GitHub export with Remove and Sync latest, tokens); Export to GitHub form (remote, login, token, mode); the envelope; gateway YAML details.
-- Alerts: the newest n alerts table (alert, kind, task, source and bound, raised, resolved, verdict or verdict buttons, supervisor action).
-- Policy: version, commit, loaded, in force since; the config directory note and edit link; per process a stages table (stage, findings go to, enabled, when); projects table; policy.yaml.
+- Resources: per project the envelope figures line (task block, this month's use, standing block, standing now, the project's file link or the envelope_default note) and a table (task, resource and purpose, type, IPv4, lease end or standing, EUR/h, cost so far, state, Promote with its note and Release); at the foot the cluster's jobs table (name, kind, namespace, schedule, last run, last ok, suspended).
+- Settings, per project (`?project=`): settings list (repository, objects, agents, merge rule, notify, namespaces, quota, environments, Forgejo state, GitHub export with Remove and Sync latest, tokens); Export to GitHub form (remote, login, token, mode); gateway YAML details; New project as a quiet foot link.
+- Policy: the version figures line (version, commit, loaded, in force since); the config directory note and edit link; per process a stages table (stage, findings go to, enabled, when); projects table; policy.yaml.
+- Alerts is not a page: the board's escalation card carries the verdict buttons, the chat's alerts tool answers for them, and the supervisor's action and diagnosis ride the alert text.
 - Timeline: the card face, the gates table, the steps table.
 - New task: project, title, description, track (direct or plan, direct the default), priority, size, File the issue (225).
 - New project: name, process, template, GitHub source and token (import), merge rule, File the project; then the status panel with steps and Merge.
