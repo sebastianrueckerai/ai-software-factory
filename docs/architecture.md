@@ -2877,7 +2877,9 @@ batch, every ask exactly one attempt, so three cards that hit their cap
 in a minute make one turn that reads all three; card wakes combine per
 card; timers never combine. At most one wake turn runs per 10 seconds,
 one wake judges a watched card per minute, a pass reads 100 events, and
-a wake that fails holds the project's next for a minute. When the
+a wake that fails holds the project's next for a minute. A wake whose
+thread is gone, deleted or archived, is not a failure to retry: the
+watch or timer row goes with the thread. When the
 gateway refuses the chat task's spend, the Waker asks for money in code,
 once, the month-cap card, and no wake runs until the answer comes.
 
@@ -2913,7 +2915,9 @@ its owner's.
 
 The timers, both the agent's own and stored on the thread that set them.
 A watch, `watch_card` ended by `unwatch_card`, wakes the watching thread
-when the watched card moves. A one-shot timer, `set_timer` with 1 to
+when the watched card moves. One watch per card: a second thread's watch
+is refused with the watcher named, since one card's moves make one turn.
+A one-shot timer, `set_timer` with 1 to
 1440 minutes, a note of 1 to 200 characters and an optional card to die
 with, fires one turn that names the note and the check it stood for. The
 rearm covers watching a thing for a while: a wake turn whose reason
