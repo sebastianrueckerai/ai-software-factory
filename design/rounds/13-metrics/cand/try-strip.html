@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metrics — Factory console</title>
+<style>
+  :root { color-scheme: dark; }
+  [data-theme="dark"] {
+    --bg: #070b12; --panel: #0b111a; --rule: #1a2636; --grid: #121b28;
+    --text: #dfe7f1; --muted: #93a1b5; --faint: #7c8ba0;
+    --cyan: #4fcbe2; --bord: #33465e;
+  }
+  [data-theme="light"] {
+    color-scheme: light;
+    --bg: #f1ece0; --panel: #faf6ec; --rule: #d8cfba; --grid: #e6ddc9;
+    --text: #0f1d33; --muted: #5d6b80; --faint: #7a8698;
+    --cyan: #0a6a80; --bord: #bfb193;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { overflow-x: hidden; max-width: 100%; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 13px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+  .mono, .v, .m, .wk { font-family: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, "Liberation Mono", monospace; font-variant-numeric: tabular-nums; }
+
+  /* ---- top bar ---- */
+  .bar {
+    display: flex; align-items: center; gap: 26px;
+    height: 44px; padding: 0 22px;
+    border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  }
+  .bar .brand { font-size: 11px; font-weight: 600; letter-spacing: .11em; color: var(--text); opacity: .92; white-space: nowrap; }
+  .bar button { font: inherit; background: none; border: none; cursor: pointer; color: var(--muted); }
+  .proj { font-size: 11.5px; font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace; white-space: nowrap; max-width: 34vw; overflow: hidden; text-overflow: ellipsis; }
+  .new { font-size: 11px; letter-spacing: .06em; border: 1px solid var(--bord); border-radius: 2px; padding: 4px 10px; white-space: nowrap; }
+  .grp { display: flex; align-items: center; gap: 13px; white-space: nowrap; }
+  .fig-grp { margin-left: 62px; } .run-grp { margin-left: 62px; }
+  .grp a { font-size: 11px; letter-spacing: .1em; color: var(--muted); text-decoration: none; cursor: pointer; position: relative; }
+  .grp a:hover { color: var(--text); }
+  .grp i { font-style: normal; color: var(--faint); opacity: .55; font-size: 10px; }
+  .grp a.on { color: var(--cyan); }
+  .grp a.on:hover { color: var(--cyan); }
+  .grp a.on::after { content: ""; position: absolute; left: 50%; transform: translateX(-50%); bottom: -8px; width: 15px; height: 2px; background: var(--cyan); }
+  .bar .right { margin-left: auto; display: flex; align-items: center; gap: 18px; white-space: nowrap; }
+  #theme-toggle { display: flex; padding: 2px; }
+  #theme-toggle:hover { color: var(--text); }
+  #theme-toggle svg { width: 15px; height: 15px; }
+  [data-theme="dark"] #theme-toggle .sun { display: none; }
+  [data-theme="light"] #theme-toggle .moon { display: none; }
+  .who { font-size: 12px; color: var(--muted); }
+  .out { font-size: 11px; letter-spacing: .1em; color: var(--faint); text-decoration: none; cursor: pointer; }
+  .out:hover { color: var(--text); }
+
+  /* ---- page head ---- */
+  main { padding: 26px 34px 44px; }
+  .head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 8px 24px; margin-bottom: 18px; }
+  h1 { font-size: 19px; font-weight: 600; letter-spacing: .01em; }
+  .intro { margin-top: 5px; color: var(--muted); max-width: 62ch; }
+  .win { display: flex; align-items: baseline; gap: 10px; padding-top: 6px; margin-left: auto; font-size: 11.5px; letter-spacing: .09em; color: var(--faint); white-space: nowrap; }
+  .win i { font-style: normal; color: var(--faint); opacity: .55; }
+  .win .on { color: var(--text); font-weight: 600; }
+
+  /* ---- the strip ---- */
+  .strip { overflow-x: auto; }
+  .grid { min-width: 660px; display: grid; grid-template-columns: 196px minmax(0, 1fr) 182px; border-bottom: 1px solid var(--rule); }
+  .c { min-width: 0; }
+  .bt { border-top: 1px solid var(--rule); }
+
+  .ax { height: 26px; }
+  .ax .lb, .ax .fg { border: none; }
+  .wks { display: grid; grid-template-columns: repeat(5, 1fr); align-items: end; height: 26px; padding-bottom: 7px; }
+  .wks span { text-align: center; font-size: 11px; color: var(--faint); }
+  .wks span:last-child { color: var(--muted); }
+
+  .sec { height: 30px; }
+  .sec .lb { padding-top: 14px; font-size: 10.5px; font-weight: 600; letter-spacing: .17em; color: var(--muted); white-space: nowrap; }
+
+  .row { height: 35px; }
+  .lb { display: flex; align-items: center; padding-right: 20px; font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+  .ch { position: relative; }
+  .row .ch { height: 35px; }
+  .ch svg { position: absolute; left: 0; top: 7px; display: block; }
+  .gl { stroke: var(--grid); stroke-width: 1; }
+  .b  { fill: var(--muted); }
+  .tk { fill: var(--muted); }
+  .t2 { fill: var(--faint); }
+  .ln { fill: none; stroke: var(--muted); stroke-width: 1.25; }
+  .ln.t { stroke: var(--text); stroke-width: 1.8; }
+  .af { fill: var(--muted); opacity: .22; stroke: none; }
+  .note { position: absolute; left: 2px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+  .fg { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 1px; padding-left: 12px; }
+  .v { font-size: 13px; color: var(--text); white-space: nowrap; }
+  .m { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+
+  /* ---- narrow screens ---- */
+  @media (max-width: 940px) { .grp { display: none; } }
+  @media (max-width: 680px) { .new { display: none; } .bar { gap: 18px; } }
+  @media (max-width: 560px) { .brand { display: none; } .out { display: none; } }
+  @media (max-width: 480px) { main { padding: 20px 16px 36px; } .bar { padding: 0 16px; } }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <span class="brand">FACTORY CONSOLE</span>
+  <button class="proj" type="button">ai-software-factory-code ▾</button>
+  <button class="new" type="button">New task</button>
+  <nav class="grp fig-grp" aria-label="figures">
+    <a>COSTS</a><i>·</i><a class="on">METRICS</a><i>·</i><a>RESOURCES</a>
+  </nav>
+  <nav class="grp run-grp" aria-label="running">
+    <a>SETTINGS</a><i>·</i><a>POLICY</a><i>·</i><a>NOTIFICATIONS</a>
+  </nav>
+  <span class="right">
+    <button id="theme-toggle" type="button" aria-label="Switch theme">
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+    <span class="who">sebastian</span>
+    <a class="out">LOG OUT</a>
+  </span>
+</header>
+
+<main>
+  <header class="head">
+    <div>
+      <h1>Metrics</h1>
+      <p class="intro">How the project runs its work, over the window and against the one before.</p>
+    </div>
+    <div class="win" aria-label="window">
+      <span>7 DAYS</span><i>·</i><span class="on">28 DAYS</span><i>·</i><span>90 DAYS</span>
+    </div>
+  </header>
+
+  <section class="strip" aria-label="metrics by week">
+    <div class="grid" id="g"></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  var qs = new URLSearchParams(location.search);
+  if (qs.get("theme") === "light" || qs.get("theme") === "dark") {
+    document.documentElement.dataset.theme = qs.get("theme");
+  }
+  document.getElementById("theme-toggle").addEventListener("click", function () {
+    var h = document.documentElement;
+    h.dataset.theme = h.dataset.theme === "dark" ? "light" : "dark";
+  });
+
+  var WEEKS = ["W−4", "W−3", "W−2", "W−1", "now"];
+
+  var SECTIONS = [
+    { name: "DELIVERY", rows: [
+      { label: "deploys / week",         kind: "bars",   data: [9,13,15,17,22,26,24],          value: "23",               move: "+4" },
+      { label: "lead time, push to live",kind: "line",   data: [4.95,4.7,4.5,4.25,4.0,3.7,3.35], strong: true, value: "3 h 20", move: "−25 m" },
+      { label: "card cycle",             kind: "line",   data: [4.9,5.05,5.2,5.4,5.55,5.75,6.05], value: "6 h 05",        move: "+40 m" },
+      { label: "throughput",             kind: "bars",   data: [15,18,21,23,26,29,33],         value: "31 cards",         move: "+6" }
+    ]},
+    { name: "STABILITY", rows: [
+      { label: "change failure",         kind: "ticks",  data: [4,4,3,3,2,1,1],               value: "6 %",              move: "−2" },
+      { label: "reverted · refiled",     kind: "ticks2", a: [0,1,1,0,1,0,0], b: [0,1,0,0,0,1,0], value: "2 · 1",          move: "" },
+      { label: "time to restore",        kind: "line",   data: [14.5,13.8,13.2,12.4,11.0,10.2,9.5], value: "9 h 30",     move: "−1 h" }
+    ]},
+    { name: "COST", rows: [
+      { label: "spend / week",           kind: "area",   data: [57,63,71,76,68,84,92],         value: "€87.40",           move: "+€9.10" },
+      { label: "per card, median",       kind: "line",   data: [3.45,3.35,3.25,3.05,2.85,2.7,2.6], value: "€2.60",       move: "−€0.30" },
+      { label: "tokens / card",          kind: "line",   data: [82,83,84,83,85,84,84],         value: "84 k",             move: "" },
+      { label: "model mix",              kind: "note",   note: "frontier 71 % · review 18 % · chat 11 %", value: "" }
+    ]},
+    { name: "AUTONOMY", rows: [
+      { label: "interventions / card",   kind: "line",   data: [2.3,2.25,2.1,1.95,1.75,1.55,1.4], value: "1.4",          move: "−0.3" },
+      { label: "escalations",            kind: "ticks",  data: [1,1,1,1,1,1,1],               value: "5",                move: "" },
+      { label: "human-blocked",          kind: "line",   data: [30,28,27,25,22,20,18],         value: "18 %",             move: "−4" },
+      { label: "review acceptance",      kind: "line",   data: [74,74,76,77,79,81,82],         value: "82 %",             move: "+3" }
+    ]},
+    { name: "THE FACTORY ITSELF", rows: [
+      { label: "self-deploys / week",    kind: "ticks",  data: [0,1,1,0,1,1,0],               value: "2",                move: "" },
+      { label: "diff size, median",      kind: "line",   data: [9,9,9,9,9,9,9],               value: "9 files · +240 −95", move: "" },
+      { label: "chat tool work",         kind: "line",   data: [40,44,47,52,60,68,77],        value: "312 calls · 41 min", move: "+38" }
+    ]}
+  ];
+
+  var H = 21; /* trace band height */
+
+  function el(tag, cls, txt) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (txt != null) e.textContent = txt;
+    return e;
+  }
+
+  var rows = [];
+
+  function build() {
+    var g = document.getElementById("g");
+
+    var axLb = el("div", "c lb"), axCh = el("div", "c ch");
+    var wks = el("div", "wks");
+    WEEKS.forEach(function (w) { wks.appendChild(el("span", null, w)); });
+    axCh.appendChild(wks);
+    var axFg = el("div", "c fg");
+    [axLb, axCh, axFg].forEach(function (c) { c.classList.add("ax"); g.appendChild(c); });
+
+    SECTIONS.forEach(function (sec) {
+      var sl = el("div", "c lb sec", sec.name);
+      var sc = el("div", "c ch sec"), sf = el("div", "c fg sec");
+      [sl, sc, sf].forEach(function (c) { c.classList.add("bt"); g.appendChild(c); });
+
+      sec.rows.forEach(function (r) {
+        var lb = el("div", "c lb bt", r.label);
+        var ch = el("div", "c ch bt row");
+        var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("aria-hidden", "true");
+        ch.appendChild(svg);
+        if (r.kind === "note") {
+          var n = el("span", "note", r.note);
+          ch.appendChild(n);
+        }
+        var fg = el("div", "c fg bt");
+        if (r.value) fg.appendChild(el("span", "v", r.value));
+        if (r.move) fg.appendChild(el("span", "m", r.move));
+        g.appendChild(lb); g.appendChild(ch); g.appendChild(fg);
+        rows.push({ r: r, ch: ch, svg: svg });
+      });
+    });
+  }
+
+  function gridLines(w) {
+    var s = "", col = w / 5;
+    for (var i = 1; i < 5; i++) {
+      var x = Math.round(i * col) + 0.5;
+      s += '<line class="gl" x1="' + x + '" y1="0" x2="' + x + '" y2="' + H + '"/>';
+    }
+    return s;
+  }
+
+  function steps(data, w) {
+    var min = Math.min.apply(null, data), max = Math.max.apply(null, data);
+    if (max === min) { min -= 1; max += 1; }
+    var col = w / 5, top = 3.5, span = H - 7;
+    var y = function (v) { return (H - top) - (v - min) / (max - min) * span; };
+    var d = "M0 " + y(data[0]).toFixed(1);
+    for (var i = 1; i < data.length; i++) {
+      d += " H" + (i * col).toFixed(1) + " V" + y(data[i]).toFixed(1);
+    }
+    return d + " H" + w;
+  }
+
+  function trace(r, w) {
+    var s = gridLines(w), col = w / 5;
+    var cx = function (i) { return i * col + col / 2; };
+    var d = r.data ? r.data.slice(-5) : null;
+
+    if (r.kind === "bars") {
+      var max = Math.max.apply(null, d);
+      var bw = Math.min(30, col * 0.28);
+      d.forEach(function (v, i) {
+        var bh = Math.max(2, Math.round(v / max * (H - 3)));
+        s += '<rect class="b" x="' + (cx(i) - bw / 2).toFixed(1) + '" y="' + (H - 1 - bh) + '" width="' + bw.toFixed(1) + '" height="' + bh + '"/>';
+      });
+    } else if (r.kind === "area") {
+      var p = steps(d, w);
+      s += '<path class="af" d="' + p + " L" + w + " " + H + " L0 " + H + ' Z"/>';
+      s += '<path class="ln" stroke-width="1.4" d="' + p + '"/>';
+    } else if (r.kind === "line") {
+      s += '<path class="ln' + (r.strong ? " t" : "") + '" d="' + steps(d, w) + '"/>';
+    } else if (r.kind === "ticks") {
+      d.forEach(function (n, i) {
+        for (var j = 0; j < n; j++) {
+          var y = H - 1.5 - (j + 1) * 6.5;
+          s += '<rect class="tk" x="' + (cx(i) - 1).toFixed(1) + '" y="' + y + '" width="2" height="5"/>';
+        }
+      });
+    } else if (r.kind === "ticks2") {
+      var A = r.a.slice(-5), B = r.b.slice(-5);
+      A.forEach(function (n, i) {
+        for (var j = 0; j < n; j++)
+          s += '<rect class="tk" x="' + (cx(i) - 6).toFixed(1) + '" y="' + (H - 1.5 - (j + 1) * 6.5) + '" width="2" height="5"/>';
+      });
+      B.forEach(function (n, i) {
+        for (var j = 0; j < n; j++)
+          s += '<rect class="t2" x="' + (cx(i) + 4).toFixed(1) + '" y="' + (H - 1.5 - (j + 1) * 6.5) + '" width="2" height="5"/>';
+      });
+    }
+    return s;
+  }
+
+  function draw() {
+    rows.forEach(function (o) {
+      var w = Math.round(o.ch.clientWidth);
+      if (!w) return;
+      o.svg.setAttribute("width", w);
+      o.svg.setAttribute("height", H);
+      o.svg.setAttribute("viewBox", "0 0 " + w + " " + H);
+      o.svg.innerHTML = trace(o.r, w);
+    });
+  }
+
+  build();
+  requestAnimationFrame(draw);
+
+  var t;
+  window.addEventListener("resize", function () {
+    clearTimeout(t);
+    t = setTimeout(draw, 120);
+  });
+})();
+</script>
+</body>
+</html>

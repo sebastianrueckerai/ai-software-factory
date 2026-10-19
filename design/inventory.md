@@ -61,6 +61,7 @@ The four secondary pages follow the readout grammar of C24: a small-caps section
 - Settings, per project (`?project=`): settings list (repository, objects, agents, merge rule, notify, namespaces, quota, environments, Forgejo state, GitHub export with Remove and Sync latest, tokens); Export to GitHub form (remote, login, token, mode); gateway YAML details; New project as a quiet foot link.
 - Policy: the version figures line (version, commit, loaded, in force since); the config directory note and edit link; per process a stages table (stage, findings go to, enabled, when); projects table; policy.yaml.
 - Alerts is not a page: the board's escalation card carries the verdict buttons, the chat's alerts tool answers for them, and the supervisor's action and diagnosis ride the alert text.
+- Metrics, per project (`/projects/{name}/metrics`): the window control 7 · 28 · 90 days in the URL (28 the default), five sections (Delivery, Stability, Cost, Autonomy, The factory itself), one row per figure: name · value · signed move against the previous window · the last 7 weeks as a monochrome server-rendered SVG spark (trace faint, endpoint dot in text ink); model mix as a long value row without a spark (C30).
 - Timeline: the card face, the gates table, the steps table.
 - New task: project, title, description, track (direct or plan, direct the default), priority, size, File the issue (225).
 - New project: name, process, template, GitHub source and token (import), merge rule, File the project; then the status panel with steps and Merge.

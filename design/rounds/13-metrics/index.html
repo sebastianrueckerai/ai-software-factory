@@ -1,0 +1,171 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>13-metrics</title>
+<style>
+body{font:15px/1.5 system-ui,sans-serif;margin:0;padding:24px;background:#f4f4f2;color:#111}
+h1{margin:0 0 4px} .meta{color:#666;margin-bottom:24px}
+main{display:grid;grid-template-columns:repeat(auto-fill,minmax(520px,1fr));gap:24px}
+section{background:#fff;padding:16px;border-radius:6px} h2{margin:0 0 12px;font-size:18px}
+.imgs{display:flex;gap:8px;align-items:flex-start} .imgs a{flex:1} .imgs img{width:100%;display:block;border:1px solid #ddd}
+pre{white-space:pre-wrap;font-size:12px;background:#f7f7f7;padding:8px} details{margin-top:8px}
+.notes,.crit{background:#fff;padding:16px;margin-bottom:24px;border-radius:6px}
+</style>
+<h1>13-metrics</h1><div class="meta">0 images · ~$1.86</div>
+<div class="notes"><pre># Round 13 notes — the metrics page
+
+2026-10-19. Breadth round: six directions × both themes, `google/nano-banana-2.1`, off the fixed C23 bar, the exact content deck and the console palettes. Stage 0 was Sebastian&#x27;s ASCII pick in chat: instrument rows, with the strip carried as a direction. The judge approved the round plan before any generation.
+
+## The director&#x27;s pixel pass
+
+- **rows** carries the picked grammar exactly: name · value · move · spark, sparks aligned down the page. The strongest render of the hierarchy in both themes.
+- **twin** balances five sections into two columns at 1440 without scrolling; the section order survives column-major. The light render&#x27;s delta language (plain ink for good moves, amber only on a bad one) is a candidate answer to the delta question.
+- **strip** is the best single picture of &quot;how the weeks developed&quot;: one shared axis, weekly bars and marks per family, lead time as a stepped line, the 28-day figures in a right column. As predicted, the values live at the margin; it is a second view, not the page.
+- **headline** kept the deck&#x27;s real numbers best (31 cards +6, 23 deploys +4) and drew the ghosted previous window genuinely well — but the hero chart is loud and the word &quot;Headline&quot; leaked into the render. The ghost idea is worth stealing later, not the layout.
+- **figures** and **free** die: giant invented numerals, card fills, widget soup. Neither is a mission-control readout.
+- Content fidelity is poor everywhere (invented sections and figures); the known image-model limit. The directions are judged as layouts; the build renders the real deck.
+
+## The critics
+
+| Direction | Gemini (glance/row/delta/fidelity/calm) | GLM (same) |
+|---|---|---|
+| rows | 10 / 10 / 8 / 4 / 10 | 6 / 9 / 7 / 9 / 10 |
+| twin | 3 / 6 / ? / ? / ? | 8 / 9 / 7 / 9 / 9 |
+| strip | 3rd rank | 5 / 6 / 7 / 7 / 8 |
+| headline | 5 / 7 / 8 / 2 / 4 | 7 / 8 / 7 / 9 / 6 |
+| free | 2 / 4 / 7 / 1 / 6 | 3 / 8 / 7 / 5 / 4 |
+| figures | last rank | 4 / 5 / 7 / 8 / 4 |
+
+Gemini ranks rows, twin, strip, headline, free, figures. GLM puts twin&#x27;s glance above rows&#x27; (&quot;no visual weight differentiation between sections&quot;) and scores rows&#x27; text fidelity 9 against Gemini&#x27;s 4 — the critics disagree on how much invented text to hold against a layout.
+
+Overruled by the director, with reasons:
+
+- GLM&#x27;s fidelity demerit for &quot;reflies&quot; — the deck&#x27;s own word is REFILED; the render matched the deck. The critic judged without the content deck.
+- Gemini&#x27;s glance 3 for twin — the sections keep their order column-major; the real cost is that the eye must jump columns, which the pixel pass weighs as acceptable at 1440, not a hierarchy break.
+- Gemini&#x27;s calm 4 for headline — the ghosted-previous-window idea is not the loud part; the hero scale is. The idea survives as a later option.
+
+## The recommendation (provisional)
+
+**rows** as the page: one column of sectioned figure rows at the console&#x27;s content width, the window control in the page head, plain signed moves in ink, amber reserved for a figure that crosses into an exceptional state. **Runner-up: twin**, the two-column arrangement, if one column proves too tall in the lab. The strip returns later as a toggleable weeks view; the ghosted previous window returns later as an optional delivery chart. Both die for v1.
+
+Cost: 12 images and 3 critic calls, about $0.40 of the $15 cap (see `cost` in the round&#x27;s sidecars against the tool&#x27;s $35.36 of $100 across rounds). Sebastian&#x27;s pick becomes the C-entry.
+</pre></div>
+<main></main>
+<h2>Critiques</h2><div class="crit"><details><summary>gemini-sheet (google/gemini-2.5-pro)</summary><pre>Of course. Here is a detailed scoring and ranking of the six design directions based on your criteria.
+
+---
+
+### Scoring (0-10)
+
+#### **1. ROWS**
+*   **Glance:** 10/10. The single-column layout perfectly follows the specified `delivery -&gt; stability -&gt; cost` weight order and is immediately scannable.
+*   **The figure row:** 10/10. It perfectly executes the `name · value · move · spark` pattern with clearly aligned sparklines, allowing for easy vertical comparison.
+*   **The deltas:** 8/10. The `+` and `−` prefixes are clear, but without colour or icons, the user must know that a positive move for `cost` is bad.
+*   **Text fidelity:** 4/10. Text is frequently garbled (dark: &quot;cyclc time&quot;, &quot;code-genarated&quot;; light: &quot;reggessnsg&quot;, &quot;cunsumpation&quot;, &quot;spowned&quot;).
+*   **Calm:** 10/10. This is the epitome of a calm, mission-control readout; its hairlines and typography are quiet and functional.
+
+#### **2. TWIN**
+*   **Glance:** 3/10. The two-column layout breaks the required hierarchy, placing `COST` next to `DELIVERY` and forcing the eye to scan down, then jump up and scan again.
+*   **The figure row:** 6/10. The pattern is maintained within each column, but the global vertical alignment of sparklines is broken, preventing a single-glance comparison of all trends.
+*   **The deltas:** 8/10. The deltas are presented identically to the `rows` direction, with the same strengths and weaknesses.
+*   **Text fidelity:** 6/10. Text rendering is better than `rows`, but errors persist (dark: &quot;Stordge cost&quot;, &quot;Aagent dispatch&quot;; light: &quot;DELPOYMENT&quot;, &quot;INFRUSE&quot;).
+*   **Calm:** 10/10. The design maintains a quiet, high-density information display without any decorative noise.
+
+#### **3. STRIP**
+*   **Glance:** 1/10. This direction completely abandons the specified hierarchy, instead grouping by metric type against a shared timeline, making a weighted overview impossible.
+*   **The figure row:** 1/10. It does not use the `name · value · move · spark` row format, opting for a shared time axis with values in a right-hand column.
+*   **The deltas:** 5/10. The move figure is present but disconnected from the main value, and the lack of a clear plus or minus sign reduces its immediacy.
+*   **Text fidelity:** 7/10. The text is surprisingly legible with few errors (light: &quot;refiles&quot; for what might be &quot;retries&quot;).
+*   **Calm:** 8/10. While the core is quiet, the prominent tick marks and repeated bar charts add more visual noise than the line-based sparklines.
+
+#### **4. FIGURES**
+*   **Glance:** 2/10. Large typography breaks any sense of hierarchy; the eye is drawn to random large numbers, not the section order, making a quick assessment difficult.
+*   **The figure row:** 1/10. It discards the specified row structure entirely in favour of large, disjointed figures that prevent any form of rhythmic scanning.
+*   **The deltas:** 7/10. The `+` and `−` prefixes are large and clear, but their visual prominence contributes to the overall loudness of the page.
+*   **Text fidelity:** 3/10. The text is a disaster of invented words and figures (&quot;CPU-HRS&quot;, &quot;SUCC&quot;, &quot;14 ERRORS&quot;, &quot;C24 Figures&quot;, &quot;18BM AVG&quot;).
+*   **Calm:** 1/10. This is the opposite of calm; its huge, bold figures shout for attention, turning a mission-control readout into a noisy marketing dashboard.
+
+#### **5. HEADLINE**
+*   **Glance:** 5/10. It attempts a hybrid approach, but the oversized headline metric disrupts the flow and gives undue weight to one fact over the section-based hierarchy.
+*   **The figure row:** 7/10. Below the headline, it reverts to a standard `name · value · move · spark` row with good alignment, but the overall page lacks consistency.
+*   **The deltas:** 8/10. The deltas in the row-based section are clear and follow the standard convention established in other directions.
+*   **Text fidelity:** 2/10. This direction has catastrophic text invention (dark: &quot;Headline&quot;, &quot;31 cardis&quot;; light: &quot;Throughput and deploys over the window&quot;, &quot;previous 28 days&quot;).
+*   **Calm:** 4/10. The headline element is a loud, decorative gesture that undermines the otherwise quiet, functional layout of the rows below it.
+
+#### **6. FREE**
+*   **Glance:** 2/10. The card-based layout completely scrambles the information hierarchy, grouping metrics in arbitrary ways that prevent a weighted, top-down reading.
+*   **The figure row:** 4/10. The `name · value · move` pattern exists within cards, but sparklines are inconsistently used and misaligned, destroying any chance of comparison.
+*   **The deltas:** 7/10. Deltas are presented clearly within each card, but their scattered placement makes it impossible to compare them systematically.
+*   **Text fidelity:** 1/10. Text is almost entirely invented or nonsensical (&quot;FINANCIALS &amp; BURRATE&quot;, &quot;test-success-rate&quot;, &quot;stalic-analyitic-warnings&quot;, &quot;deployment-failures&quot;).
+*   **Calm:** 6/10. While the typography is quiet, the card boundaries and irregular whitespace create a disjointed, less serene feel than a simple row-based layout.
+
+---
+
+### Ranking (Best to Worst)
+
+1.  **ROWS:** It is the only direction that correctly and elegantly implements all of the specified constraints, resulting in a supremely legible and functional page.
+2.  **TWIN:** While it fails on the primary hierarchy requirement, it maintains a high density of clean, readable data in an otherwise calm presentation.
+3.  **STRIP:** It’s a valid, but entirely different, design for comparing trends over time, though it completely fails to meet the specified hierarchical layout.
+4.  **HEADLINE:** This direction is a confused hybrid, undermining the calm, systematic readout with a single loud &quot;headline&quot; metric that breaks the visual rhythm.
+5.  **FREE:** The chaotic, card-based layout destroys the intended information hierarchy and makes it impossible to compare metrics systematically across groups.
+6.  **FIGURES:** This design is a loud, jarring failure that ignores every rule of a mission-control interface in favour of shouting numbers that are largely invented gibberish.</pre></details><details><summary>glm-sheet (glm-5v-turbo)</summary><pre>Here are the scores and ranking for the six directions.
+
+### Scoring (0–10)
+
+| Direction | 1. Glance | 2. Figure Row | 3. Deltas | 4. Text Fidelity | 5. Calm |
+|-----------|-----------|---------------|-----------|------------------|---------|
+| **rows**  | 6         | 9             | 7         | 9                | 10      |
+| **twin**  | 8         | 9             | 7         | 9                | 9       |
+| **strip** | 5         | 6             | 7         | 7                | 8       |
+| **figures**| 4        | 5             | 7         | 8                | 4       |
+| **headline**| 7       | 8             | 7         | 9                | 6       |
+| **free**  | 3         | 8             | 7         | 5                | 4       |
+
+**Reasoning summaries:**
+
+1.  **rows:** The single-column list presents sections sequentially but without visual weight differentiation—delivery does not command more authority than operations.  
+2.  **twin:** The two-column split (Delivery/Stability left, Cost/Automy/Factory right) creates a clear left-to-right hierarchy while keeping the internal row discipline intact.  
+3.  **strip:** The shared time-axis destroys the required section hierarchy entirely, reducing the page to a temporal comparison rather than a structural status readout.  
+4.  **figures:** Big bold numerics create a “billboard” effect that scrambles the information architecture; the eye lands on random KPIs (CPU-HRS, IOPS, NODES) instead of the narrative arc from delivery to factory health.  
+5.  **headline:** The hero area-chart gives an immediate “throughput” answer, but the metric rows below are slightly disconnected from the visual weight above.  
+6.  **free:** The layout is a widget soup—active tasks sit next to burn rate next to agent errors—with no guiding hierarchy or visual path.
+
+---
+
+2.  **rows:** The canonical `label · value · Δ · [spark]` row with right-aligned sparklines lets the eye scan the trend column as a single waveform; flawless execution of the pattern.  
+3.  **twin:** Identical row integrity within each column; sparks align perfectly inside their panels, preserving scanability despite the split layout.  
+4.  **strip:** Replaces the compact sparkline with a full time-series bar/line, which breaks the “one fact per row” density and forces horizontal scanning instead of vertical.  
+5.  **figures:** The “row” is exploded into a headline card where value, delta, and sub-metrics compete for space; sparks (if present) are buried or inconsistent in scale.  
+6.  **headline:** The lower section (Pipeline Velocity, Build Success, etc.) maintains excellent row alignment, though the upper chart breaks the pattern.  
+7.  **free:** The rows themselves are technically well-formed and aligned, but they are lost in a noisy grid of unequal card heights.
+
+---
+
+3.  **All directions** score similarly (7/10) because none attempt semantic color-coding (correctly, per the brief), and all rely on explicit `+`/`−` symbols or arrows that are legible. None solve the “up is good for throughput, bad for cost” problem through design alone—they all rely on the reader’s domain knowledge. No extra credit or penalty applies here; the field is even.
+
+---
+
+4.  **rows:** Text is crisp and consistent across both themes; no invented words or dropped characters detected.  
+5.  **twin:** Extremely high fidelity; minor note: “UTILISATION” (British spelling) and abbreviated “SELF-HEAL” are acceptable but worth noting.  
+6.  **strip:** **Demerit for “reflies”** in the light-mode row label (dark mode correctly shows “retries”)—a classic image-model hallucination that would require a QA fix.  
+7.  **figures:** Dense but accurate; numbers and units (TB, IOPS, Gbps) are plausible and consistent.  
+8.  **headline:** Clean transcription; no errors found in either theme.  
+9.  **free:** **Critical failure:** “token‑hurr‑rate” (light mode) is gibberish (should be “burn‑rate” or “hourly”), and “APILATENCY” (dark mode) drops the space. These erode trust in the data.
+
+---
+
+10. **rows:** The gold standard—hairline rules, monospaced numerals, no fills, no decoration; it reads like a telemetry terminal.  
+11. **twin:** Nearly as calm; the two-column structure adds minimal noise and feels like a professional partitioned console.  
+12. **strip:** The rhythmic repetition of mini-charts is soothing, but the filled bars introduce more visual mass than a simple sparkline; still acceptable for a control-room aesthetic.  
+13. **figures:** **Loud.** Heavy font weights, high-contrast values, and blocky progress indicators turn the page into an executive slide deck, not a mission-control readout.  
+14. **headline:** The area chart (with its filled gradient and stepped line) is the loudest element on any of the six pages; it dominates the calm of the rows below.  
+15. **free:** Cluttered with mixed font sizes, task-status pills (“running 02:44”), and too many competing borders; it resembles a noisy DevOps toolset rather than a focused instrument panel.
+
+---
+
+### Final Ranking (Best → Worst)
+
+1.  **twin** – The only direction that honors the required section hierarchy (Delivery &gt; Stability &gt; Cost…) through spatial weighting while preserving perfect row-level scanability and remaining aesthetically disciplined.  
+2.  **rows** – The safest, calmest execution of the figure-row pattern, but its flat vertical list fails to visually prioritize delivery over cost, making the “glance” slightly slower.  
+3.  **headline** – A strong compromise that uses a hero chart for immediate context, then settles into clean rows below; the chart’s visual noise prevents it from beating the pure tabular designs.  
+4.  **strip** – An interesting temporal comparison that unfortunately sacrifices the mandatory categorical hierarchy for a time-axis view; also penalized for the “reflies” text error.  
+5.  **figures** – A loud, executive-style dashboard that scrambles the information architecture into unstructured KPI cards; anti-thetical to the “mission-control” brief.  
+6.  **free** – The weakest entry: chaotic layout, no discernible hierarchy, and embarrassing text hallucinations (“token-hurr-rate”) that would be unacceptable in production software.</pre></details></div>

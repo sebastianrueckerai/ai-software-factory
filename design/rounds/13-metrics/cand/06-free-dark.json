@@ -1,0 +1,15 @@
+{
+  "model": "google/nano-banana-2.1",
+  "prompt": "A web console page for an autonomous software factory, seen whole. The top\nbar is decided and fixed: one 44 px strip between two 1 px hairline rules,\nquiet small-capitals words, no boxes or pills around links. Left to right:\n\"FACTORY CONSOLE\" (the product name, slightly heavier), the project select\n\"ai-software-factory-code \u25be\", then the one bordered word \"New task\"; a wide\ngap; the figures group \"COSTS \u00b7 METRICS \u00b7 RESOURCES\"; a wide gap; the\nrunning group \"SETTINGS \u00b7 POLICY \u00b7 NOTIFICATIONS\"; at the right a moon\nicon, \"sebastian\", \"LOG OUT\". The open page's word \"METRICS\" is cyan with a\nshort underline beneath it; no other bar word is colored. The page below\nfills the rest.\n\nThe page's exact content, and nothing more \u2014 do not invent rows, sections,\nnumbers, badges, filters, search boxes, pagination or chart kinds beyond\nthe sparks the content names. Only the content between the CONTENT markers.\nAll text must be crisp and legible, spelled exactly as given.\nDirection FREE. The same fixed content and palette, but the composition is\nyours: arrange the five sections and their figure rows the way a calm\ninstrument panel would, so that one glance answers \"how is this project\ndoing and where is it heading\". Keep every row's reading name \u00b7 value \u00b7\nmove somewhere legible; the sparks may take whatever size, column or\nalignment serves that glance. No new content, no invented figures.\nPALETTE (dark, the console's default): page background #070b12 (near-black\nblue), no page gradient; panel background where a surface is needed #0b111a;\nhairline rules #1a2636 (1 px); text #dfe7f1; muted text #93a1b5; faint text\n#7c8ba0; cyan #4fcbe2 reserved for the open page's word in the bar and for\nlinks, nothing else; amber #f4b13e only where a state needs attention, and\nsparingly. Sparks and bars are instrument traces, not decoration: they read\nas quiet ink (muted or faint text colour), never as a saturated accent.\nWords in a 13 px humanist sans; every figure, ID, unit and time in a tabular\nmonospace. Dense but calm: a mission-control readout, not a marketing page.\nRendered at 1440\u00d7900, desktop.",
+  "refs": [],
+  "video": null,
+  "params": {},
+  "seed": null,
+  "description": "",
+  "label": "13 free dark",
+  "est_cost_usd": 0.15,
+  "created": "2026-10-19T23:21:56",
+  "outputs": [
+    "06-free-dark.png"
+  ]
+}

@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metrics — Factory console</title>
+<script>
+(function () { var t = new URLSearchParams(location.search).get("theme"); if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); })();
+</script>
+<style>
+:root {
+  --bg: #070b12; --panel: #0b111a; --line: #1a2636; --line-strong: #263649;
+  --text: #dfe7f1; --muted: #93a1b5; --faint: #7c8ba0;
+  --accent: #4fcbe2; --focus: #7fdcff; --btn-line: #4a5f7a;
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", "Noto Sans", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", "Noto Sans Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
+}
+[data-theme=light] {
+  --bg: #f1ece0; --panel: #faf6ec; --line: #d8cfba; --line-strong: #b3b1a9;
+  --text: #0f1d33; --muted: #5d6b80; --faint: #7a8698;
+  --accent: #0a6a80; --focus: #0a6a80; --btn-line: #858e9d;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 13px/1.45 var(--font-ui); -webkit-font-smoothing: antialiased; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* the top bar (C23): one 44 px strip between hairlines, quiet small-capitals
+   words, no box around links, New task the only bordered word, the open
+   page's word cyan with a short underline */
+header.top { position: relative; z-index: 15; display: flex; align-items: center; gap: 0 18px; height: 44px; padding: 0 16px; border-bottom: 1px solid var(--line); background: var(--bg); }
+header .home { color: var(--text); font-size: 14px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+header .home:hover { color: var(--accent); }
+.psel { display: flex; align-items: center; }
+.psel select { height: 26px; max-width: 100%; padding: 0 24px 0 8px; border: 1px solid var(--btn-line); border-radius: 3px; background: transparent; color: var(--text); font: 12px var(--font-mono); appearance: none; -webkit-appearance: none; cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 12px) 11px, calc(100% - 8px) 11px; background-size: 4px 4px; background-repeat: no-repeat; }
+.psel select:hover { border-color: var(--faint); }
+header nav { display: flex; align-self: stretch; flex: 1; gap: 0 26px; min-width: 0; }
+header nav .ng { display: flex; align-self: stretch; gap: 0 2px; }
+header nav a { display: flex; align-items: center; padding: 0 8px; color: var(--muted); font-size: 13.5px; font-variant-caps: all-small-caps; letter-spacing: .06em; text-decoration: none; white-space: nowrap; }
+header nav a:hover { color: var(--text); }
+header nav a[aria-current=page] { color: var(--accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 7px; }
+header nav .act { margin: auto 0; height: 24px; padding: 0 10px; border: 1px solid var(--btn-line); border-radius: 3px; color: var(--text); }
+header nav .act .p { display: none; }
+.me { display: flex; align-items: center; gap: 0 10px; }
+#theme-toggle { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 22px; padding: 0; border: 1px solid var(--line-strong); border-radius: 3px; background: transparent; color: var(--muted); cursor: pointer; }
+#theme-toggle:hover { color: var(--text); background: var(--panel); }
+#theme-toggle svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+#theme-toggle .sun { display: none; }
+[data-theme=light] #theme-toggle .sun { display: block; }
+[data-theme=light] #theme-toggle .moon { display: none; }
+.who { color: var(--muted); font-size: 13px; white-space: nowrap; }
+.logout { height: 24px; padding: 0 8px; border: 1px solid transparent; border-radius: 3px; background: transparent; color: var(--muted); font: 400 13px var(--font-ui); font-variant-caps: all-small-caps; letter-spacing: .05em; cursor: pointer; }
+.logout:hover { color: var(--text); border-color: var(--btn-line); }
+
+/* the page: one content column, C24's readout grammar — a small-caps section
+   label, then rows on the page ground between hairline rules */
+.page { max-width: 64rem; margin: 0 auto; padding: 0 20px 64px; }
+.pagehead { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin: 26px 0 6px; }
+.pagehead h2 { margin: 0 0 6px; font-size: 15px; font-weight: 600; }
+.intro { margin: 0; color: var(--muted); font-size: 13px; }
+.window { display: flex; align-items: baseline; gap: 0 10px; color: var(--faint); font: 400 12px var(--font-mono); font-variant-caps: all-small-caps; letter-spacing: .07em; white-space: nowrap; }
+.window button { margin: 0; padding: 0; border: 0; background: transparent; color: var(--muted); font: inherit; letter-spacing: inherit; cursor: pointer; }
+.window button:hover { color: var(--text); }
+.window button[aria-pressed=true] { color: var(--text); }
+.sec { margin-top: 36px; }
+.sec:first-of-type { margin-top: 26px; }
+.sec h3 { margin: 0 0 2px; color: var(--muted); font: 600 13px var(--font-ui); font-variant-caps: all-small-caps; letter-spacing: .08em; }
+.rows { list-style: none; margin: 0; padding: 0; }
+.row { display: grid; grid-template-columns: 16rem minmax(0, max-content) minmax(0, max-content) minmax(24px, 1fr) 24rem; align-items: center; padding: 10px 0; }
+.row + .row { border-top: 1px solid var(--line); }
+.name { grid-column: 1; color: var(--muted); font-size: 13px; padding-right: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.val { grid-column: 2; color: var(--text); font: 600 15px/1.3 var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.val.long { grid-column: 2 / 6; }
+.move { grid-column: 3; padding-left: 12px; color: var(--muted); font: 400 12.5px/1.3 var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.spark { grid-column: 5; display: block; width: 100%; height: 30px; }
+.spark .trace { fill: none; stroke: var(--faint); stroke-width: 1; stroke-linejoin: round; stroke-linecap: round; }
+.spark .now { fill: var(--text); }
+
+/* the bar folds as the width falls: the figures and running words go, the
+   open page's word stays; on the phone the wordmark and the member go,
+   New task becomes its + */
+@media (max-width: 1180px) {
+  header nav a:not(.act):not([aria-current=page]) { display: none; }
+  header nav { gap: 0 14px; }
+}
+@media (max-width: 759px) {
+  .pagehead { display: block; margin-top: 22px; }
+  .window { margin-top: 12px; }
+  .sec { margin-top: 30px; }
+  .row { display: block; padding: 12px 0; }
+  .val.long { white-space: normal; line-height: 1.5; }
+  .name { display: block; white-space: normal; line-height: 1.35; margin-bottom: 5px; }
+  .move { display: inline; padding-left: 10px; }
+  .spark { display: block; margin-top: 9px; height: 26px; }
+}
+@media (min-width: 760px) and (max-width: 1023px) {
+  .row { grid-template-columns: 13rem minmax(0, max-content) minmax(0, max-content) minmax(12px, 1fr) minmax(150px, 16rem); }
+  .val { font-size: 14px; }
+}
+@media (max-width: 640px) {
+  header.top { gap: 0 10px; padding: 0 12px; }
+  header .home, .who { display: none; }
+  header nav .act { padding: 0 9px; }
+  header nav .act .w { display: none; }
+  header nav .act .p { display: inline; }
+  .psel select { max-width: 34vw; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+<a class="home" href="#">Factory console</a>
+<label class="psel"><span class="visually-hidden">Project</span><select title="ai-software-factory-code"><option selected>ai-software-factory-code</option></select></label>
+<nav aria-label="Main">
+<span class="ng"><a class="act" href="#"><span class="w">New task</span><span class="p">+</span></a></span>
+<span class="ng"><a href="#">Costs</a><a href="#" aria-current="page">Metrics</a><a href="#">Resources</a></span>
+<span class="ng"><a href="#">Settings</a><a href="#">Policy</a><a href="#">Notifications</a></span>
+</nav>
+<div class="me">
+<button type="button" id="theme-toggle" aria-label="Switch to the light theme">
+<svg class="moon" viewBox="1.5 1 18 18" aria-hidden="true"><path d="M10.5 5.25a3.17 3.17 0 0 0 4.75 4.75 4.75 4.75 0 1 1-4.75-4.75Z"/></svg>
+<svg class="sun" viewBox="20.75 1 18 18" aria-hidden="true"><circle cx="29.75" cy="10" r="2.5"/><path d="M29.75 4.6v1.2M29.75 14.2v1.2M24.35 10h1.2M33.95 10h1.2M25.93 6.18l.85.85M32.72 12.97l.85.85M25.93 13.82l.85-.85M32.72 7.03l.85-.85"/></svg>
+</button>
+<span class="who">sebastian</span>
+<button type="button" class="logout">Log out</button>
+</div>
+</header>
+<main class="page">
+<div class="pagehead">
+<div>
+<h2>Metrics</h2>
+<p class="intro">How the project runs its work, over the window and against the one before.</p>
+</div>
+<p class="window" aria-label="Window">
+<button type="button" aria-pressed="false">7 days</button><span aria-hidden="true">·</span><button type="button" aria-pressed="true">28 days</button><span aria-hidden="true">·</span><button type="button" aria-pressed="false">90 days</button>
+</p>
+</div>
+<section class="sec" aria-labelledby="s-delivery">
+<h3 id="s-delivery">Delivery</h3>
+<ul class="rows">
+<li class="row" data-fig="deploys"><span class="name">deploys / week</span><span class="val">23</span><span class="move">+4</span><svg class="spark" aria-hidden="true"></svg></li>
+<li class="row" data-fig="lead"><span class="name">lead time, push to live</span><span class="val">3 h 20</span><span class="move">−25 m</span><svg class="spark" aria-hidden="true"></svg></li>
+<li class="row" data-fig="cycle"><span class="name">card cycle</span><span class="val">6 h 05</span><span class="move">+40 m</span><svg class="spark" aria-hidden="true"></svg></li>
+<li class="row" data-fig="throughput"><span class="name">throughput</span><span class="val">31 cards</span><span class="move">+6</span><svg class="spark" aria-hidden="true"></svg></li>
+</ul>
+</section>
+<section class="sec" aria-labelledby="s-stability">
+<h3 id="s-stability">Stability</h3>
+<ul class="rows">
+<li class="row" data-fig="failure"><span class="name">change failure</span><span class="val">6 %</span><span class="move">−2</span><svg class="spark" aria-hidden="true"></svg></li>
+<li class="row" data-fig="reverted"><span class="name">reverted · refiled</span><span class="val">2 · 1</span><svg class="spark" aria-hidden="true"></svg></li>
+<li class="row" data-fig="restore"><span class="name">time to restore</span><span class="val">9 h 30</span><span class="move">−1 h</span><svg class="spark" aria-hidden="true"></svg></li>
+</ul>
+</section>
+<section class="sec" aria-labelledby="s-cost">
+<h3 id="s-cost">Cost</h3>
+<ul class="rows">
+<li class="row" data-fig="spend"><span class="name">spend / week</span><span class="val">€87.40</span><span class="move">+€9.10</span><svg class="spark" aria-hidden="true"></svg></li>
+<li class="row" data-fig="percard"><span class="name">per card, median</span><span class="val">€2.60</span><span class="move">−€0.30</span><svg class="spark" aria-hidden="true"></svg></li>
+<li class="row" data-fig="tokens"><span class="name">tokens / card</span><span class="val">84 k</span><svg class="spark" aria-hidden="true"></svg></li>
+<li class="row"><span class="name">model mix</span><span class="val long">frontier 71 % · review 18 % · chat 11 %</span></li>
+</ul>
+</section>
+<section class="sec" aria-labelledby="s-autonomy">
+<h3 id="s-autonomy">Autonomy</h3>
+<ul class="rows">
+<li class="row" data-fig="interventions"><span class="name">interventions / card</span><span class="val">1.4</span><span class="move">−0.3</span><svg class="spark" aria-hidden="true"></svg></li>
+<li class="row" data-fig="escalations"><span class="name">escalations</span><span class="val">5</span><svg class="spark" aria-hidden="true"></svg></li>
+<li class="row" data-fig="blocked"><span class="name">human-blocked</span><span class="val">18 %</span><span class="move">−4</span><svg class="spark" aria-hidden="true"></svg></li>
+<li class="row" data-fig="acceptance"><span class="name">review acceptance</span><span class="val">82 %</span><span class="move">+3</span><svg class="spark" aria-hidden="true"></svg></li>
+</ul>
+</section>
+<section class="sec" aria-labelledby="s-factory">
+<h3 id="s-factory">The factory itself</h3>
+<ul class="rows">
+<li class="row" data-fig="selfdeploys"><span class="name">self-deploys / week</span><span class="val">2</span><svg class="spark" aria-hidden="true"></svg></li>
+<li class="row" data-fig="diff"><span class="name">diff size, median</span><span class="val">9 files · +240 −95</span><svg class="spark" aria-hidden="true"></svg></li>
+<li class="row" data-fig="chatwork"><span class="name">chat tool work</span><span class="val">312 calls · 41 min</span><span class="move">+38</span><svg class="spark" aria-hidden="true"></svg></li>
+</ul>
+</section>
+</main>
+<script>
+(function () {
+"use strict";
+// the last 7 weeks per figure, each ending on the value the row shows; span
+// widens the y-range of the near-constant figures so flat reads as flat
+var WEEKS = {
+  deploys:      { v: [16, 17, 15, 18, 19, 21, 23] },
+  lead:         { v: [4.1, 4.05, 3.9, 3.75, 3.6, 3.45, 3.33] },
+  cycle:        { v: [5.4, 5.5, 5.65, 5.8, 5.9, 6.0, 6.08], span: 1.6 },
+  throughput:   { v: [19, 21, 23, 25, 27, 29, 31] },
+  failure:      { v: [11, 10, 9, 7, 7, 6, 6] },
+  reverted:     { v: [2, 3, 2, 2, 3, 2, 2], span: 8 },
+  restore:      { v: [15, 14, 13, 11, 10.5, 10, 9.5] },
+  spend:        { v: [70, 74, 72, 78, 81, 84, 87.4] },
+  percard:      { v: [3.4, 3.3, 3.2, 3.0, 2.8, 2.7, 2.6] },
+  tokens:       { v: [82, 84, 83, 84, 84, 83, 84], span: 25 },
+  interventions:{ v: [2.1, 2.0, 1.9, 1.8, 1.6, 1.5, 1.4] },
+  escalations:  { v: [4, 5, 4, 5, 4, 5, 5], span: 12 },
+  blocked:      { v: [26, 25, 23, 21, 20, 19, 18] },
+  acceptance:   { v: [76, 77, 78, 79, 80, 81, 82], span: 16 },
+  selfdeploys:  { v: [1, 2, 1, 0, 2, 1, 2] },
+  diff:         { v: [9, 8, 9, 9, 8, 9, 9], span: 12 },
+  chatwork:     { v: [220, 240, 255, 270, 285, 300, 312] }
+};
+function draw(row) {
+  var fig = WEEKS[row.getAttribute("data-fig")];
+  var svg = row.querySelector("svg.spark");
+  if (!fig || !svg) return;
+  var w = svg.clientWidth, h = svg.clientHeight || 30;
+  if (!w) return;
+  svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+  var v = fig.v, min = Math.min.apply(null, v), max = Math.max.apply(null, v), lo = min, hi = max;
+  if (fig.span && fig.span > max - min) { var c = (min + max) / 2; lo = c - fig.span / 2; hi = c + fig.span / 2; }
+  var pad = 5, top = pad, bot = h - pad, d = "", i, x, y;
+  for (i = 0; i < v.length; i++) {
+    x = 1 + i * (w - 2) / (v.length - 1);
+    y = bot - (v[i] - lo) / (hi - lo) * (bot - top);
+    d += (i ? "L" : "M") + x.toFixed(1) + " " + y.toFixed(1);
+  }
+  svg.innerHTML = '<path class="trace" d="' + d + '"/><circle class="now" cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="2"/>';
+}
+function drawAll() { document.querySelectorAll(".row[data-fig]").forEach(draw); }
+drawAll();
+var raf = null;
+window.addEventListener("resize", function () { if (raf) cancelAnimationFrame(raf); raf = requestAnimationFrame(drawAll); });
+
+var toggle = document.getElementById("theme-toggle");
+function setTheme(t) {
+  document.documentElement.setAttribute("data-theme", t);
+  toggle.setAttribute("aria-label", t === "dark" ? "Switch to the light theme" : "Switch to the dark theme");
+}
+toggle.addEventListener("click", function () {
+  setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
+});
+
+var wins = document.querySelectorAll(".window button");
+wins.forEach(function (b) {
+  b.addEventListener("click", function () {
+    wins.forEach(function (o) { o.setAttribute("aria-pressed", o === b ? "true" : "false"); });
+  });
+});
+})();
+</script>
+</body>
+</html>

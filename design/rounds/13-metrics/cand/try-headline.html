@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metrics · Factory console</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #070b12; --panel: #0b111a;
+    --line: #1a2636;
+    --text: #dfe7f1; --muted: #93a1b5; --faint: #7c8ba0;
+    --accent: #4fcbe2;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", "Noto Sans", system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", "Noto Sans Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
+  }
+  [data-theme=light] {
+    color-scheme: light;
+    --bg: #f1ece0; --panel: #faf6ec;
+    --line: #d8cfba;
+    --text: #0f1d33; --muted: #5d6b80; --faint: #7a8698;
+    --accent: #0a6a80;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--text); font: 400 13px/1.45 var(--sans); -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  a { color: inherit; text-decoration: none; }
+  .caps, .bar a, .bar .product, .bar .new, .bar .logout, h3, .win span {
+    font-variant-caps: all-small-caps; letter-spacing: .06em;
+  }
+  .mono, .figv, .figm, .val, .mv, .select { font-family: var(--mono); font-variant-numeric: tabular-nums; font-variant-ligatures: none; }
+
+  /* ── the top bar: one 44 px strip between two hairlines ── */
+  .bar { display: flex; align-items: center; gap: 14px; height: 44px; padding: 0 16px;
+         border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .bar .product { font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+  .bar .select { font-size: 12px; color: var(--muted); padding: 2px 0; white-space: nowrap; }
+  .bar .new { font-size: 12.5px; padding: 3px 10px 4px; border: 1px solid color-mix(in srgb, var(--muted) 45%, transparent); border-radius: 2px; white-space: nowrap; }
+  .bar nav { display: flex; white-space: nowrap; }
+  .bar nav a { padding: 0 8px; font-size: 13.5px; color: var(--muted); }
+  .bar .figures { margin-left: auto; }
+  .bar .running { margin-left: clamp(18px, 3.5vw, 56px); }
+  .bar nav a[aria-current=page] { color: var(--accent); text-decoration: underline;
+                                   text-decoration-thickness: 1px; text-underline-offset: 7px; }
+  .bar .right { margin-left: auto; display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+  #theme-toggle { display: grid; place-items: center; width: 26px; height: 26px; color: var(--muted); }
+  #theme-toggle:hover { color: var(--text); }
+  #theme-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  .bar .who { color: var(--muted); font-size: 13px; }
+  .bar .logout { font-size: 13px; color: var(--muted); padding: 0; }
+  .bar .logout:hover { color: var(--text); }
+
+  /* ── the page ── */
+  main { max-width: 1128px; margin: 0; padding: 18px 16px 40px; }
+  .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .head h2 { margin: 0; font-size: 15px; font-weight: 600; }
+  .head p { margin: 3px 0 0; color: var(--muted); }
+  .win { display: flex; align-items: baseline; gap: 8px; font-size: 12.5px; padding-bottom: 1px; }
+  .win span { color: var(--muted); }
+  .win span[aria-current] { color: var(--text); }
+  .win i { font-style: normal; color: var(--faint); }
+
+  /* ── the chart: quiet ink, a stepped area and its ghost ── */
+  .chartwrap { margin-top: 16px; padding: 8px 0 6px;
+               border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+               display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 26px; align-items: center; }
+  #plot { position: relative; height: 178px; cursor: crosshair; }
+  #plot svg { display: block; }
+  #plot .tick { font-family: var(--mono); font-size: 10px; fill: var(--faint); }
+  #plot .unit { font-size: 9.5px; fill: var(--faint); font-variant-caps: all-small-caps; letter-spacing: .08em; }
+  #plot .region { font-size: 10px; letter-spacing: .08em; font-variant-caps: all-small-caps; }
+  #plot .region.prev { fill: var(--faint); }
+  #plot .region.cur { fill: var(--muted); }
+  #plot .grid { stroke: var(--line); stroke-width: 1; }
+  #plot .wash { fill: var(--text); fill-opacity: .07; }
+  #plot .ghost { fill: none; stroke: var(--faint); stroke-width: 2; stroke-linejoin: round; }
+  #plot .cur-cards { fill: none; stroke: var(--text); stroke-width: 2; stroke-linejoin: round; }
+  #plot .cur-deploys { fill: none; stroke: var(--muted); stroke-width: 2; stroke-linejoin: round; }
+  #plot .end { stroke: var(--bg); stroke-width: 2; }
+  #cross { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--muted); opacity: .45; display: none; pointer-events: none; }
+  #tip { position: absolute; top: 0; left: 0; display: none; pointer-events: none; z-index: 2;
+         font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 11px; line-height: 1.5;
+         color: var(--text); background: var(--panel); border: 1px solid var(--line); padding: 3px 7px; white-space: nowrap; }
+  #tip .p { color: var(--faint); }
+  .chartfigs { display: flex; flex-direction: column; gap: 9px; align-items: flex-end; padding-right: 2px; }
+  .figv { display: flex; align-items: baseline; gap: 9px; font-size: 13px; }
+  .figv .key { width: 14px; height: 2px; align-self: center; }
+  .key.k-cards { background: var(--text); }
+  .key.k-deploys { background: var(--muted); }
+  .figv b { font-weight: 400; }
+  .figm { font-size: 13px; color: var(--muted); }
+
+  /* ── the figure rows ── */
+  section { margin-top: 26px; }
+  h3 { margin: 0; font-size: 12px; font-weight: 600; color: var(--muted);
+       letter-spacing: .08em; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  .row { display: grid; grid-template-columns: minmax(0, 1fr) 19ch 6ch 120px;
+         column-gap: 16px; align-items: center; padding: 7px 0; }
+  .row + .row { border-top: 1px solid var(--line); }
+  .name { font-size: 13px; min-width: 0; }
+  .val { font-size: 12.5px; text-align: right; white-space: nowrap; }
+  .mv { font-size: 12.5px; color: var(--muted); text-align: right; white-space: nowrap; }
+  .spk { width: 120px; height: 24px; justify-self: end; }
+  .spk svg { display: block; width: 100%; height: 100%; }
+  .spk polyline { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .row.long .val { grid-column: 2 / 5; text-align: left; white-space: normal; line-height: 1.5; }
+
+  @media (max-width: 760px) {
+    .bar .select, .bar .new, .bar .figures, .bar .running { display: none; }
+    main { padding-top: 14px; }
+  }
+  @media (max-width: 620px) {
+    .chartwrap { grid-template-columns: minmax(0, 1fr); row-gap: 2px; }
+    #plot { height: 158px; }
+    .chartfigs { flex-direction: row; justify-content: space-between; width: 100%; padding: 2px 0 4px; }
+    .row { grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 12px; }
+    .spk { grid-column: 1 / -1; grid-row: 2; width: 100%; height: 26px; justify-self: stretch; margin-top: 2px; }
+    .row.long .val { grid-column: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <span class="product">Factory console</span>
+  <button class="select" type="button">ai-software-factory-code ▾</button>
+  <button class="new" type="button">New task</button>
+  <nav class="figures" aria-label="Figures">
+    <a href="#">Costs</a><a href="#" aria-current="page">Metrics</a><a href="#">Resources</a>
+  </nav>
+  <nav class="running" aria-label="Running">
+    <a href="#">Settings</a><a href="#">Policy</a><a href="#">Notifications</a>
+  </nav>
+  <span class="right">
+    <button id="theme-toggle" type="button" aria-label="Switch theme"></button>
+    <span class="who">sebastian</span>
+    <button class="logout" type="button">Log out</button>
+  </span>
+</header>
+
+<main>
+  <div class="head">
+    <div>
+      <h2>Metrics</h2>
+      <p>How the project runs its work, over the window and against the one before.</p>
+    </div>
+    <div class="win" aria-label="Window">
+      <span>7 days</span><i>·</i><span aria-current="yes">28 days</span><i>·</i><span>90 days</span>
+    </div>
+  </div>
+
+  <div class="chartwrap">
+    <div id="plot"></div>
+    <div class="chartfigs">
+      <div class="figv"><span class="key k-cards" aria-hidden="true"></span><b>31 cards</b><span class="figm">+6</span></div>
+      <div class="figv"><span class="key k-deploys" aria-hidden="true"></span><b>23 deploys</b><span class="figm">+4</span></div>
+    </div>
+  </div>
+</main>
+
+<script>
+"use strict";
+// The weekly counts: four weeks of the previous window, then the four of the
+// current one. 25→31 cards and 19→23 deploys carry the deck's +6 and +4.
+var WEEKS = {
+  cards:   [6, 6, 6, 7,  6, 7, 8, 10],
+  deploys: [4, 5, 5, 5,  4, 5, 6, 8]
+};
+
+var FIGURES = [
+  { section: "Delivery", rows: [
+    { name: "deploys / week",            value: "23",       move: "+4",     spark: WEEKS.deploys.slice(1) },
+    { name: "lead time, push to live",   value: "3 h 20",   move: "−25 m",  spark: [3.9, 3.8, 3.75, 3.65, 3.55, 3.45, 3.33] },
+    { name: "card cycle",                value: "6 h 05",   move: "+40 m",  spark: [5.4, 5.5, 5.6, 5.75, 5.85, 6.0, 6.08] },
+    { name: "throughput",                value: "31 cards", move: "+6",     spark: WEEKS.cards.slice(1) }
+  ]},
+  { section: "Stability", rows: [
+    { name: "change failure",            value: "6 %",      move: "−2",     spark: [8, 8, 7, 7, 6, 6, 6] },
+    { name: "reverted · refiled",        value: "2 · 1",                    spark: [1, 1, 1, 0, 1, 1, 1] },
+    { name: "time to restore",           value: "9 h 30",   move: "−1 h",   spark: [13, 12.5, 12, 11.5, 11, 10.5, 9.5] }
+  ]},
+  { section: "Cost", rows: [
+    { name: "spend / week",              value: "€87.40",   move: "+€9.10", spark: [76, 78, 80, 82, 74, 89, 95] },
+    { name: "per card, median",          value: "€2.60",    move: "−€0.30", spark: [2.95, 2.9, 2.85, 2.8, 2.75, 2.7, 2.6] },
+    { name: "tokens / card",             value: "84 k",                     spark: [83, 84, 84, 85, 84, 84, 84] },
+    { name: "model mix",                 value: "frontier 71 % · review 18 % · chat 11 %", long: true }
+  ]},
+  { section: "Autonomy", rows: [
+    { name: "interventions / card",      value: "1.4",      move: "−0.3",   spark: [1.8, 1.75, 1.7, 1.6, 1.55, 1.5, 1.4] },
+    { name: "escalations",               value: "5",                        spark: [4, 5, 5, 4, 5, 5, 5] },
+    { name: "human-blocked",             value: "18 %",     move: "−4",     spark: [23, 22, 22, 21, 20, 19, 18] },
+    { name: "review acceptance",         value: "82 %",     move: "+3",     spark: [77, 78, 78, 79, 80, 81, 82] }
+  ]},
+  { section: "The factory itself", rows: [
+    { name: "self-deploys / week",       value: "2",                        spark: [1, 1, 2, 1, 0, 1, 2] },
+    { name: "diff size, median",         value: "9 files · +240 −95",       spark: [10, 9, 9, 10, 9, 9, 9] },
+    { name: "chat tool work",            value: "312 calls · 41 min", move: "+38", spark: [230, 240, 255, 260, 275, 290, 312] }
+  ]}
+];
+
+function sparkSVG(vals) {
+  var w = 120, h = 24, min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
+  var span = (max - min) || 1, pts = vals.map(function (v, i) {
+    var x = 2 + (i / (vals.length - 1)) * (w - 4);
+    var y = h - 3 - ((v - min) / span) * (h - 6);
+    return x.toFixed(1) + "," + y.toFixed(1);
+  }).join(" ");
+  return '<svg viewBox="0 0 ' + w + " " + h + '" preserveAspectRatio="none" aria-hidden="true">' +
+         '<polyline points="' + pts + '" vector-effect="non-scaling-stroke"></polyline></svg>';
+}
+
+var main = document.querySelector("main");
+FIGURES.forEach(function (sec) {
+  var el = document.createElement("section");
+  el.innerHTML = "<h3></h3><div class=\"rows\">" + sec.rows.map(function (r) {
+    return "<div class=\"row" + (r.long ? " long" : "") + "\">" +
+      "<span class=\"name\"></span>" +
+      "<span class=\"val\"></span>" +
+      (r.long ? "" : "<span class=\"mv\">" + (r.move || "") + "</span>" +
+                     "<span class=\"spk\">" + (r.spark ? sparkSVG(r.spark) : "") + "</span>") +
+      "</div>";
+  }).join("") + "</div>";
+  el.querySelector("h3").textContent = sec.section;
+  var names = el.querySelectorAll(".name"), vals = el.querySelectorAll(".val");
+  sec.rows.forEach(function (r, i) { names[i].textContent = r.name; vals[i].textContent = r.value; });
+  main.appendChild(el);
+});
+
+/* ── the wide chart: weekly steps, the previous window ghosted ── */
+var plot = document.getElementById("plot");
+
+function renderChart() {
+  var W = plot.clientWidth, H = plot.clientHeight;
+  var ml = 34, mr = 10, mt = 22, mb = 16;
+  var top = mt, base = H - mb, left = ml, right = W - mr;
+  var n = WEEKS.cards.length, half = n / 2;
+  var bw = (right - left) / n;
+  var max = 10; // a clean scale over the largest weekly count
+  function y(v) { return base - (v / max) * (base - top); }
+  function steps(vals, i0, count) {
+    var d = "";
+    for (var k = 0; k < count; k++) {
+      var x = left + (i0 + k) * bw, yy = y(vals[i0 + k]);
+      d += (k ? "" : "M" + x + " " + yy) + " H" + (x + bw).toFixed(1);
+      if (k < count - 1) d += " V" + y(vals[i0 + k + 1]).toFixed(1);
+    }
+    return d;
+  }
+  function area(vals, i0, count) {
+    var x0 = left + i0 * bw, x1 = x0 + count * bw;
+    return steps(vals, i0, count) + " V" + base + " H" + x0 + " Z";
+  }
+  var boundary = left + half * bw;
+  var grid = "", ticks = [0, 5, 10];
+  ticks.forEach(function (t) {
+    var gy = y(t);
+    grid += '<line class="grid" x1="' + left + '" x2="' + right + '" y1="' + gy + '" y2="' + gy + '"/>' +
+            '<text class="tick" x="' + (left - 8) + '" y="' + (gy + 3) + '" text-anchor="end">' + t + "</text>";
+  });
+  var endDot = function (vals, colour) {
+    var v = vals[n - 1];
+    return '<circle class="end" cx="' + (right - 1) + '" cy="' + y(v) + '" r="3.5" fill="var(--' + colour + ')"/>';
+  };
+  plot.innerHTML =
+    '<svg width="' + W + '" height="' + H + '" role="img" ' +
+        'aria-label="Cards and deploys per week, the previous 28 days against the last 28">' +
+      grid +
+      '<text class="unit" x="' + (left - 8) + '" y="' + (base + 12) + '" text-anchor="end">per week</text>' +
+      '<line class="grid" x1="' + boundary + '" x2="' + boundary + '" y1="' + top + '" y2="' + base + '"/>' +
+      '<text class="region prev" x="' + (left + (boundary - left) / 2) + '" y="' + 13 + '" text-anchor="middle">previous 28 days</text>' +
+      '<text class="region cur" x="' + (boundary + (right - boundary) / 2) + '" y="' + 13 + '" text-anchor="middle">28 days</text>' +
+      '<path class="wash" d="' + area(WEEKS.cards, half, half) + '"/>' +
+      '<path class="ghost" d="' + steps(WEEKS.cards, 0, half) + '"/>' +
+      '<path class="ghost" d="' + steps(WEEKS.deploys, 0, half) + '"/>' +
+      '<path class="cur-deploys" d="' + steps(WEEKS.deploys, half, half) + '"/>' +
+      '<path class="cur-cards" d="' + steps(WEEKS.cards, half, half) + '"/>' +
+      endDot(WEEKS.deploys, "muted") + endDot(WEEKS.cards, "text") +
+    "</svg>" +
+    '<div id="cross"></div><div id="tip"></div>';
+  armHover(bw);
+}
+
+var raf = 0;
+window.addEventListener("resize", function () {
+  cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(renderChart);
+});
+
+function armHover(bw) {
+  var cross = document.getElementById("cross"), tip = document.getElementById("tip");
+  var left = 34;
+  plot.onpointermove = function (e) {
+    var r = plot.getBoundingClientRect();
+    var x = e.clientX - r.left, i = Math.max(0, Math.min(7, Math.floor((x - left) / bw)));
+    var bx = left + i * bw;
+    cross.style.display = "block";
+    cross.style.left = (bx + bw / 2) + "px";
+    var prev = i < 4;
+    tip.style.display = "block";
+    tip.innerHTML = (prev ? '<span class="p">previous · </span>' : "") +
+      "cards " + WEEKS.cards[i] + " · deploys " + WEEKS.deploys[i];
+    var tw = tip.offsetWidth;
+    tip.style.left = Math.max(0, Math.min(r.width - tw, bx + bw / 2 - tw / 2)) + "px";
+    tip.style.top = "2px";
+  };
+  plot.onpointerleave = function () { cross.style.display = "none"; tip.style.display = "none"; };
+}
+
+/* ── the theme: the moon in the bar, ?theme= honoured ── */
+var moon = '<svg viewBox="1.5 1 18 18" aria-hidden="true"><path d="M10.5 5.25a3.17 3.17 0 0 0 4.75 4.75 4.75 4.75 0 1 1-4.75-4.75Z"/></svg>';
+var sun = '<svg viewBox="1.5 1 18 18" aria-hidden="true"><circle cx="10" cy="10" r="2.6"/><path d="M10 4.4v1.3M10 14.3v1.3M4.4 10h1.3M14.3 10h1.3M6.05 6.05l.9.9M13.05 13.05l.9.9M6.05 13.95l.9-.9M13.05 6.95l.9-.9"/></svg>';
+var toggle = document.getElementById("theme-toggle");
+function setTheme(t) {
+  document.documentElement.setAttribute("data-theme", t);
+  toggle.innerHTML = t === "light" ? sun : moon;
+  toggle.setAttribute("aria-label", t === "light" ? "Switch to the dark theme" : "Switch to the light theme");
+  try { localStorage.setItem("theme", t); } catch (e) {}
+}
+toggle.addEventListener("click", function () {
+  setTheme(document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light");
+});
+var asked = new URLSearchParams(location.search).get("theme");
+if (asked === "light" || asked === "dark") setTheme(asked);
+else setTheme(document.documentElement.getAttribute("data-theme"));
+renderChart();
+</script>
+</body>
+</html>
