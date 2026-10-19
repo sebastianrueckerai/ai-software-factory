@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Round 11 — the compact screen, reorganized</title>
+<style>
+:root { color-scheme: dark; --bg: #10151d; --bg-panel: #151b25; --line: #232b38; --text: #dfe7f1; --muted: #93a1b5; --faint: #7c8ba0; --accent: #53d6e2; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.65 system-ui, sans-serif; }
+main { max-width: 68rem; margin: 0 auto; padding: 28px 22px 80px; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+h2 { font-size: 13px; font-variant-caps: all-small-caps; letter-spacing: .08em; color: var(--faint); margin: 34px 0 8px; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+p, li { color: var(--text); }
+p { margin: 8px 0; max-width: 78ch; }
+code, .mono { font: 12.5px/1.6 ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: var(--muted); }
+code { color: var(--accent); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+table { border-collapse: collapse; margin: 12px 0; font: 12.5px/1.6 ui-monospace, Menlo, Consolas, monospace; }
+th, td { border: 1px solid var(--line); padding: 4px 10px; text-align: left; }
+th { font-variant-caps: all-small-caps; letter-spacing: .06em; color: var(--muted); font-family: system-ui; }
+td.win { color: var(--accent); }
+figure { margin: 14px 0; }
+figure img { max-width: 100%; border: 1px solid var(--line); display: block; }
+figcaption { color: var(--muted); font-size: 12px; margin-top: 4px; max-width: 78ch; }
+ul { margin: 8px 0; padding-left: 22px; }
+li { margin: 3px 0; }
+.meta { color: var(--muted); font-size: 12.5px; }
+.pick { border: 1px solid var(--accent); padding: 10px 14px; margin: 12px 0; }
+.pick strong { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+<h1>Round 11 — the compact screen, reorganized</h1>
+<p class="meta">2026-10-19 · one session · no generation: 7 candidates built as HTML in the console's own stylesheet, 30 Playwright shots · 4 critic runs · ≈ $0.12 of the $1 cap · <a href="notes.md">notes</a> · <a href="brief.md">brief</a></p>
+
+<p class="pick"><strong>The pick request.</strong> <strong>A, the bundle</strong> (recommended): chat floor 24 rem, composer spans the chat under threads and conversation, glyph toggle in the chat head (Esc also exits), lamp chips in the panel, Chat tab in the drawer — every move an organization in the pinned style. Or <strong>B, d3-tabs</strong>: the thread list behind a CHAT | THREADS tab pair, which reverses C14 and buys the conversation the panel's full width.</p>
+
+<h2>The composer crush, answered from the code</h2>
+<p>At the compact split the chat is 24 rem wide; the threads table takes 212 px of it, leaving the conversation column ~172 px. The composer lives inside that column as a flex row (<code>.prompt</code>, console.css:795), so its textarea is crushed to 34 px — Sebastian's screenshots show exactly this. The round's answer is organizational: the composer becomes the chat's third grid row, spanning threads and conversation alike (<code>.chat.with-threads { grid-template-rows: auto minmax(0,1fr) auto }</code>), and the thread table ends above it. Measured: the textarea grows from 34 px to 246 × 110 — five whole lines at the narrowest split, with no new token, no new color, no JS.</p>
+
+<h2>The seven directions</h2>
+<ol>
+<li><strong>d1-edge</strong> — the control lives on the divider: a hover grip with the expand glyph at its middle</li>
+<li><strong>d1-full</strong> — the chat alone: a vertical "board" tab clings to the left edge; Esc also returns</li>
+<li><strong>d2-head</strong> — the glyph toggle sits in the chat head beside the who-line; the glyph flips when full</li>
+<li><strong>d3-tabs</strong> — the threads become a CHAT | THREADS tab pair (the C14 reversal question)</li>
+<li><strong>d4-floor</strong> — the chat floor rises to 24 rem, the thread table tightens to 176 px</li>
+<li><strong>d5-strip</strong> — d4 plus the panel's services collapse into one row of lamp chips, spend gauges kept</li>
+<li><strong>d6-drawer</strong> — d4 plus the drawer carries Overview · Session · Activity · Files · Chat</li>
+</ol>
+<p>Every candidate is a static page in the production <a href="cand/console.css">console.css</a>, drawn with the same busy content — four lanes, a five-line draft mid-composition, the panel open or compressed — and shot at 1440 and 390 in both themes. The style never moves; only the arrangement does. Full set in <a href="cand/">cand/</a>; the sheets below.</p>
+<figure><img src="cand/montage-dark.png" alt="contact sheet, seven directions, dark" loading="lazy"><figcaption>The breadth sheet, dark. The light twin: <a href="cand/montage-light.png">montage-light.png</a>.</figcaption></figure>
+
+<h2>Critics, breadth pass</h2>
+<table>
+<tr><th>rank</th><th>gemini</th><th>glm</th></tr>
+<tr><td>1</td><td class="win">d3-tabs</td><td class="win">d3-tabs</td></tr>
+<tr><td>2</td><td>d2-head</td><td>d1-edge</td></tr>
+<tr><td>3</td><td>d6-drawer</td><td>d6-drawer</td></tr>
+<tr><td>4</td><td>d1-edge</td><td>d2-head</td></tr>
+<tr><td>5</td><td>d4-floor</td><td>d4-floor</td></tr>
+<tr><td>6</td><td>d1-full</td><td>d5-strip</td></tr>
+<tr><td>7</td><td>d5-strip</td><td>d1-full</td></tr>
+</table>
+<p>Both crown d3 on one argument: the tab pair gives the composer the panel's full width. Both put d6 third — the drawer's Chat tab earns its place twice. Gemni would drop d5; glm would drop d1-full as "a mode, not a layout".</p>
+
+<h2>Director's pixel pass and overrules</h2>
+<p>The critics judged contact-sheet cells; the candidates were also measured in the browser. Every "composer cramped, clipped, or absent" claim — d1, d2, d4, d5, across both critics — is disproven by the same geometry: the form spans the chat (13→395 against the chat's 12→396), the thread table ends exactly at the composer's top edge (709 = 709), the textarea is 246 × 110 with zero hidden overflow. Gemni's "d5 has no chat at all" and glm's "the chat collapses to a strip" are the same cell misread at sheet scale. Overruled.</p>
+<p>Gemini's "d1-full returns via a '&lt; FACTORY CONSOLE' back link" and glm's "back-chevron": no such element exists; the way back is the edge tab plus Esc. glm's "d4 extends the dock to the viewport floor": the floor is a minimum width, not a bar. Overruled.</p>
+<p>And the measurement that decides the round: <strong>d3 and d5 give the composer the identical 246 × 110 box</strong>. The spanning move equals the tab pair where the critics thought d3 won; d3's remaining edge is only the wider conversation column (382 vs 206 px) — bought with the C14 reversal and threads behind a tab.</p>
+<p>One finding kept from the misreads themselves: at the spanning composer, the threads column ends flush at its top-left corner, and even strong vision critics read that seam as "something sits beside the composer". The build adds a hairline above the thread table's end so the span reads clean at a glance.</p>
+
+<h2>Compare loop</h2>
+<p>Candidate A, the bundle: d5's compact rest plus d6's drawer — floor, spanning composer, head toggle, chips, drawer Chat tab. Candidate B, the single: d3's tab pair.</p>
+<table>
+<tr><th>critic</th><th>verdict</th><th>the one change asked</th></tr>
+<tr><td>gemini</td><td class="win">A</td><td>New button above the thread list</td></tr>
+<tr><td>glm</td><td class="win">A</td><td>draggable splitter or a wider floor</td></tr>
+</table>
+<p>Gemini: "the ability to maintain peripheral awareness of other threads … is not a luxury but a core requirement"; the chips "reduce noise, they do not create it"; the drawer chat is "not a second chat" but a scoped one. GLM: "the thread list is not a navigation menu — it is a secondary radar"; A keeps the mental place where B keeps only the physical.</p>
+<p>GLM's strip judgment — chips as "noise" — was rendered on flipped images: it attributed A's chips to B and B's text rows to A. Overruled on the mapping; the substance half-stands as a build note: a <em>down</em> chip carries its age inline ("postgres · down 51s"); up chips keep dot · name with age on hover. Its "make the splitter draggable" asks for what exists — the divider drag with its hover grip; the 24 rem floor is round 10's settlement and stays.</p>
+
+<h2>Recommendation</h2>
+<p><strong>A, the bundle.</strong> Both critics pick it on the workflow argument, not the cosmetics; its five moves are organizations in the pinned style, so nothing here restyles what round 10 settled; and it fixes the composer crush — a defect the current console ships — without moving the threads off the screen. d3-tabs stays the recorded alternative: pick it to reverse C14 and buy the wider conversation column, knowing the composer gains nothing the spanning move does not already give.</p>
+<p>The build inherits, recorded: the hairline above the thread table's end; the New button above the thread list; inline age on down chips; Esc exits full chat; tooltips on the intake, the grip, the lamps; the full state holds the 48 rem reading measure with threads and conversation centered as a group.</p>
+
+<h2>Cost</h2>
+<p>$0.12 critics (4 runs) of the $1 cap; no image generation. Round time: one session, 2026-10-19.</p>
+</main>
+</body>
+</html>
