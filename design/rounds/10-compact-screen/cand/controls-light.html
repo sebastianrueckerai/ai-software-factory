@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>Round 10 — the controls images cannot draw</title>
+<link rel="stylesheet" href="console.css">
+<style>
+/* Round 10 candidate css — glyphs, grip, lamp chips, painted tooltip.
+   Everything else is the console's own stylesheet (code repo eb59bac3). */
+.wc { margin: 26px 0 6px; font: 600 12.5px/1.4 var(--font-ui); font-variant-caps: all-small-caps; letter-spacing: .08em; color: var(--text-faint); }
+.wc-note { margin: 2px 0 10px; color: var(--text-faint); font-size: 12px; max-width: 90ch; }
+.chat { max-width: 640px; box-shadow: inset 0 2px 0 var(--accent); }
+.chat-head { padding-bottom: 8px; }
+.ctl { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 24px; min-width: 24px; padding: 0 5px; margin-left: 6px; border: 1px solid var(--btn-line); border-radius: 3px; background: none; color: var(--text-muted); font: 12px var(--font-ui); cursor: pointer; }
+.ctl:hover { color: var(--text); border-color: var(--text-faint); }
+.ctl[aria-pressed=true] { background: var(--bg-hover); color: var(--text); }
+.ctl svg { display: block; }
+/* the divider candidate: a hairline that grows a grip on hover */
+.div-wrap { position: relative; height: 64px; display: grid; grid-template-columns: 1fr 10px 1fr; max-width: 640px; border: 1px solid var(--line-strong); }
+.div-wrap > div { background: var(--bg-panel); }
+#chat-divider2 { position: relative; cursor: col-resize; }
+#chat-divider2::after { content: ""; position: absolute; inset: 0 4px; background: var(--line); }
+.div-wrap:hover #chat-divider2::after { background: var(--accent); }
+#chat-divider2 .grip { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; gap: 3px; padding: 4px 3px; background: var(--bg-raised); border: 1px solid var(--line-strong); border-radius: 4px; opacity: 0; }
+.div-wrap:hover #chat-divider2 .grip, #chat-divider2 .grip.shown { opacity: 1; }
+.grip i { width: 2px; height: 2px; border-radius: 50%; background: var(--text-muted); }
+/* the dependency lamp chips */
+.dep-chips { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 8px 0; font: 12px var(--font-mono); color: var(--text-muted); }
+.dep-chips .chip2 { position: relative; display: inline-flex; align-items: center; gap: 7px; padding: 3px 2px; cursor: default; }
+.dep-chips .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--st-done); }
+.dep-chips .down { color: var(--st-failed); }
+.dep-chips .down .dot { background: var(--st-failed); }
+/* the painted tooltip (the doc-peek look) */
+.tip { position: absolute; left: 0; top: calc(100% + 6px); z-index: 5; padding: 5px 9px; background: var(--bg-raised); border: 1px solid var(--line-strong); box-shadow: 0 12px 32px rgba(0, 0, 0, .4); font: 12.5px/1.5 var(--font-ui); color: var(--text); white-space: nowrap; }
+.tip.mono { font: 12px var(--font-mono); color: var(--text-muted); }
+.rel { position: relative; }
+</style>
+</head>
+<body>
+<main style="max-width: 960px; padding: 20px 24px 60px;">
+
+<p class="wc">Candidate A — glyph flips, name stays (the VS Code / Gmail grammar)</p>
+<p class="wc-note">One icon button; pressed flips the glyph to its collapse twin. The accessible name never changes. Tooltip names both directions.</p>
+<section class="chat">
+  <div class="chat-head"><h2>Chat</h2> <span class="chat-who">project agent · sf/ai-software-factory-code</span>
+    <span class="rel"><button type="button" class="ctl" aria-pressed="false" aria-label="The chat across the whole screen" title="The chat across the whole screen, the board hidden; click for the board back"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3h3v3M6 13H3v-3M5.2 10.8 10.8 5.2"/></svg></button></span>
+    <button type="button" class="ctl intake" aria-pressed="false" title="The project's intake: open takes the agent's own filings, closed refuses them; your ask always files.">intake <span>open</span></button>
+    <button type="button" class="ctl" title="Start a new thread">New</button>
+  </div>
+</section>
+<section class="chat" style="margin-top: 4px;">
+  <div class="chat-head"><h2>Chat</h2> <span class="chat-who">project agent · sf/ai-software-factory-code</span>
+    <span class="rel"><button type="button" class="ctl" aria-pressed="true" aria-label="The chat across the whole screen" title="The chat across the whole screen, the board hidden; click for the board back"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 8.8 7.2M8.8 5.4v1.8h1.8M4 12l3.2-3.2M7.2 10.6V8.8H5.4"/></svg></button><span class="tip">The chat across the whole screen, the board hidden; click for the board back</span></span>
+    <button type="button" class="ctl intake" aria-pressed="false">intake <span>open</span></button>
+    <button type="button" class="ctl">New</button>
+  </div>
+</section>
+
+<p class="wc">Candidate B — the word states the action now (the compromise)</p>
+<p class="wc-note">The visible word swaps with state; the accessible name must stay constant — the ARIA trap the survey named. Shown for comparison.</p>
+<section class="chat" style="margin-top: 4px;">
+  <div class="chat-head"><h2>Chat</h2> <span class="chat-who">project agent · sf/ai-software-factory-code</span>
+    <button type="button" class="ctl" aria-pressed="false" aria-label="The chat across the whole screen" title="The chat across the whole screen, the board hidden">Full screen</button>
+    <button type="button" class="ctl intake">intake <span>open</span></button>
+    <button type="button" class="ctl">New</button>
+  </div>
+</section>
+<section class="chat" style="margin-top: 4px;">
+  <div class="chat-head"><h2>Chat</h2> <span class="chat-who">project agent · sf/ai-software-factory-code</span>
+    <button type="button" class="ctl" aria-pressed="true" aria-label="The chat across the whole screen" title="The board comes back">‹ Board</button>
+    <button type="button" class="ctl intake">intake <span>open</span></button>
+    <button type="button" class="ctl">New</button>
+  </div>
+</section>
+
+<p class="wc">Candidate C — glyph and word together, word stable</p>
+<section class="chat" style="margin-top: 4px;">
+  <div class="chat-head"><h2>Chat</h2> <span class="chat-who">project agent · sf/ai-software-factory-code</span>
+    <button type="button" class="ctl" aria-pressed="false" aria-label="The chat across the whole screen" title="The chat across the whole screen, the board hidden; click for the board back"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3h3v3M6 13H3v-3M5.2 10.8 10.8 5.2"/></svg> Full</button>
+    <button type="button" class="ctl intake">intake <span>open</span></button>
+    <button type="button" class="ctl">New</button>
+  </div>
+</section>
+<section class="chat" style="margin-top: 4px;">
+  <div class="chat-head"><h2>Chat</h2> <span class="chat-who">project agent · sf/ai-software-factory-code</span>
+    <button type="button" class="ctl" aria-pressed="true" aria-label="The chat across the whole screen" title="The chat across the whole screen, the board hidden; click for the board back"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 8.8 7.2M8.8 5.4v1.8h1.8M4 12l3.2-3.2M7.2 10.6V8.8H5.4"/></svg> Full</button>
+    <button type="button" class="ctl intake">intake <span>open</span></button>
+    <button type="button" class="ctl">New</button>
+  </div>
+</section>
+
+<p class="wc">Candidate D — the chevron pair (VS Code's panel grammar)</p>
+<section class="chat" style="margin-top: 4px;">
+  <div class="chat-head"><h2>Chat</h2> <span class="chat-who">project agent · sf/ai-software-factory-code</span>
+    <button type="button" class="ctl" aria-pressed="false" aria-label="The chat across the whole screen" title="The chat across the whole screen, the board hidden; click for the board back">⌃</button>
+    <button type="button" class="ctl intake">intake <span>open</span></button>
+    <button type="button" class="ctl">New</button>
+  </div>
+</section>
+<section class="chat" style="margin-top: 4px;">
+  <div class="chat-head"><h2>Chat</h2> <span class="chat-who">project agent · sf/ai-software-factory-code</span>
+    <button type="button" class="ctl" aria-pressed="true" aria-label="The chat across the whole screen" title="The chat across the whole screen, the board hidden; click for the board back">⌄</button>
+    <button type="button" class="ctl intake">intake <span>open</span></button>
+    <button type="button" class="ctl">New</button>
+  </div>
+</section>
+
+<p class="wc">The divider — hairline, grip on hover (grip forced visible on the second)</p>
+<p class="wc-note">Tooltip: "Drag to resize — double-click to reset". The grip dots appear on hover; the whole 10 px column is the target.</p>
+<div class="div-wrap" style="margin-top: 8px;"><div></div><div id="chat-divider2" title="Drag to resize — double-click to reset"></div><div></div></div>
+<div class="div-wrap" style="margin-top: 4px;"><div></div><div id="chat-divider2"><span class="grip shown"><i></i><i></i><i></i></span></div><div></div></div>
+
+<p class="wc">The dependencies as lamp chips — ages on hover, down stays loud</p>
+<p class="wc-note">Replaces the five text rows of the status detail. One chip's tooltip painted.</p>
+<div class="dep-chips">
+  <span class="chip2"><span class="dot"></span>forgejo</span>
+  <span class="chip2"><span class="dot"></span>object storage</span>
+  <span class="chip2 rel"><span class="dot"></span>provider api<span class="tip mono">up · under a minute ago</span></span>
+  <span class="chip2"><span class="dot"></span>postgres</span>
+  <span class="chip2"><span class="dot"></span>temporal</span>
+</div>
+<div class="dep-chips">
+  <span class="chip2"><span class="dot"></span>forgejo</span>
+  <span class="chip2 down"><span class="dot"></span>postgres — down · 3 min</span>
+  <span class="chip2"><span class="dot"></span>provider api</span>
+</div>
+
+<p class="wc">The composer — no grow control, auto-grown with the draft</p>
+<section class="chat" style="margin-top: 8px;">
+  <form class="chat-form composer">
+    <div class="prompt"><span class="ps">›</span>
+      <textarea rows="4" style="flex: 1; border: 0; background: none; font-size: 14px; line-height: 22px; resize: none;">before we merge: does the dot also
+show up on the phone view?
+and while you are in there, count
+the title words honestly too</textarea>
+      <button type="submit">Send</button>
+    </div>
+  </form>
+</section>
+
+</main>
+</body>
+</html>

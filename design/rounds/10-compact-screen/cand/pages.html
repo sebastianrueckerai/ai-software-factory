@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Round 10 — the secondary pages, measured and read</title>
+<link rel="stylesheet" href="console.css">
+<style>
+/* Round 10 candidate css — the measured page, the readout Settings, the
+   compact Costs. Everything else is the console's own stylesheet
+   (code repo eb59bac3). */
+.page { max-width: 62rem; }
+.pg-cap { margin: 26px 0 6px; font: 600 12.5px/1.4 var(--font-ui); font-variant-caps: all-small-caps; letter-spacing: .08em; color: var(--text-faint); }
+.pg-note { margin: 2px 0 12px; color: var(--text-faint); font-size: 12px; max-width: 78ch; }
+/* Settings as a readout: small-caps term, value; hairlines between groups */
+.facts { margin: 0; border-top: 1px solid var(--line); }
+.facts > div { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: 0 18px; padding: 5px 0; border-bottom: 1px solid var(--line); }
+.facts dt { margin: 0; font: 600 12px var(--font-ui); font-variant-caps: all-small-caps; letter-spacing: .06em; color: var(--text-muted); }
+.facts dd { margin: 0; font-size: 13px; color: var(--text); }
+.facts dd .id { font: 12px var(--font-mono); font-variant-numeric: tabular-nums; }
+.facts .grp { padding-top: 14px; }
+.facts .grp dt { color: var(--text-faint); }
+/* the day cap as a thin gauge, C19's lamp language */
+.capbar { display: flex; align-items: center; gap: 10px; margin: 6px 0 2px; }
+.capbar .bar { position: relative; width: 180px; height: 4px; background: var(--bg-hover); border-radius: 2px; overflow: hidden; }
+.capbar .bar i { position: absolute; inset: 0 auto 0 0; width: 34%; background: var(--accent); }
+.capbar .fig { font: 12px var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<header class="top">
+<a class="home" href="#">Factory console</a>
+<nav aria-label="Main"><span class="ng ng-work"><a href="#"><span class="w">New task</span><span class="p">+</span></a></span><span class="ng ng-ref"><a class="act" href="#">Costs</a><a href="#">Resources</a></span><span class="ng ng-gov"><a class="act" href="#">Settings</a><a href="#">Policy</a><a href="#">Notifications</a></span></nav>
+<div id="theme-switch" class="theme-switch" role="group" aria-label="Theme"><button type="button" data-theme-set="dark" aria-pressed="true" aria-label="Dark theme"> </button><button type="button" data-theme-set="light" aria-pressed="false" aria-label="Light theme"> </button></div>
+<form method="post" class="logout"><span>sebastian</span> <button type="submit">Log out</button></form>
+</header>
+<main>
+<div class="page">
+
+<p class="pg-cap">Settings — the pseudo-table becomes a readout; the page takes a measure</p>
+<p class="pg-note">62 rem measure: the columns stop sprawling at wide windows. Terms small-caps, identifiers mono, values in the body font — the strip's grammar (C24), not a table.</p>
+<div class="pagehead"><h2>Settings</h2><form method="get" class="auto-submit"><label class="visually-hidden" for="s1">Project</label><select id="s1"><option>sf/ai-software-factory-code</option><option>sf/ai-software-factory-infra</option></select></form></div>
+<p class="meta">How the factory works on sf/ai-software-factory-code: the project owns its CI/CD; the factory owns the gates, these settings and the hardware limits. The settings are the project's file in the configuration: change them <a href="#">in Git</a>.</p>
+<dl class="facts">
+<div><dt>Repository</dt><dd><span class="id">forgejo:factory/sf-ai-software-factory-code</span></dd></div>
+<div><dt>Objects</dt><dd>factory — the infra repository and the seed make them, factoryd reads and reports</dd></div>
+<div><dt>Agents</dt><dd>four</dd></div>
+<div class="grp"><dt>Merge rule</dt><dd>merge when the gates pass and no review asks for the human</dd></div>
+<div><dt>Notify</dt><dd>sebastian@example.net (the project's approvers)</dd></div>
+<div><dt>Namespaces</dt><dd><span class="id">sf-code-dev, sf-code-run</span></dd></div>
+<div><dt>Quota / namespace</dt><dd><span class="id">6 CPU, 12 Gi memory, 100 Gi storage</span></dd></div>
+<div><dt>Environments</dt><dd>dev (the cluster's dev nodes); run (the run nodes, two)</dd></div>
+<div class="grp"><dt>Forgejo</dt><dd>organisation, repository, CI user and tokens made</dd></div>
+<div><dt>Tokens</dt><dd><span class="id">read 3, Actions 1, merge 1</span></dd></div>
+<div><dt>GitHub export</dt><dd><span class="id">github:someone/ai-software-factory-code</span>, mirror, in sync; last sync <span class="id">14 min</span> ago · <button type="button" class="intake" style="height:auto">Sync latest</button> <button type="button" class="intake" style="height:auto">Remove</button></dd></div>
+</dl>
+
+<p class="pg-cap">Costs — the cap as a gauge, the tables kept compact</p>
+<p class="pg-note">Same measure. The day cap line keeps its figure and gains a thin gauge; the tables stay mono and right-rulled, never wider than the measure.</p>
+<h2>Costs</h2>
+<div class="capbar"><span class="bar"><i></i></span><span class="fig">Today (UTC): €4.02 of the €12.00 day cap · policy v7</span></div>
+<table>
+<caption>Per day, 2026-10-13 to 2026-10-19, €</caption>
+<thead><tr><th scope="col">Day</th><th scope="col" class="num">model</th><th scope="col" class="num">review</th><th scope="col" class="num">tool</th><th scope="col" class="num">Total</th></tr></thead>
+<tbody>
+<tr><th scope="row">10-19</th><td class="num">2.1130</td><td class="num">1.4020</td><td class="num">0.5080</td><td class="num">4.0230</td></tr>
+<tr><th scope="row">10-18</th><td class="num">1.8790</td><td class="num">0.9210</td><td class="num">0.4310</td><td class="num">3.2310</td></tr>
+<tr><th scope="row">10-17</th><td class="num">2.5400</td><td class="num">1.1050</td><td class="num">0.3970</td><td class="num">4.0420</td></tr>
+</tbody>
+</table>
+<table>
+<caption>Per task and line (kind and ref: a model, a factoryd purpose such as review with its model, a tool), 2026-10-13 to 2026-10-19, €</caption>
+<thead><tr><th scope="col">Task, line</th><th scope="col" class="num">€</th></tr></thead>
+<tbody>
+<tr><th scope="row"><a href="#">0198</a></th><td class="num">1.9020</td></tr>
+<tr class="line"><td>model claude-haiku-5-5</td><td class="num">1.1930</td></tr>
+<tr class="line"><td>review with claude-sonnet-5-5</td><td class="num">0.7090</td></tr>
+<tr><th scope="row"><a href="#">0195</a></th><td class="num">1.2070</td></tr>
+<tr class="line"><td>model claude-haiku-5-5</td><td class="num">0.8440</td></tr>
+<tr class="line"><td>tool forgejo-runner</td><td class="num">0.3630</td></tr>
+</tbody>
+</table>
+
+</div>
+</main>
+</body>
+</html>
