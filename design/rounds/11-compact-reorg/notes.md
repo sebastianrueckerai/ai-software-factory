@@ -159,3 +159,20 @@ New above the thread list; inline age on down chips.
 ## Costs, final
 
 4 critic runs × ≈ $0.03 = ≈ $0.12 of the $1 cap. No generation.
+
+## Try pages (after Sebastian's request)
+
+The shot candidates were static; Sebastian could not find or use the
+affordances. Built two live prototypes, wired in vanilla JS on the same
+markup: cand/try-a-bundle.html (d5 rest + d6 drawer, panes for the five
+tabs) and cand/try-b-tabs.html (d3 with the thread table back behind
+the tab). Behaviors: divider drag and arrow keys with the 24 rem floor,
+glyph toggle to full with the flipped glyph and the edge tab, Esc
+(drawer first, then full), tooltips on every quiet control via
+data-tip, card and need-card click opens the drawer with its number and
+title, drawer tab switching, intake toggle, theme switch, both composers
+append the sent message. Playwright-verified: every behavior asserted,
+zero page errors (cand/test-try.js). Control circles drawn from
+measured rectangles (cand/annotate-try.py) onto three annotated PNGs;
+circle placement verified. The static d-pages stay as the round's
+record; the try pages are the pick instruments.

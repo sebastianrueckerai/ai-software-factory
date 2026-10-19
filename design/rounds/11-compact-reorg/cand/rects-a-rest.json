@@ -1,0 +1,58 @@
+{
+ "#chat-full": {
+  "s": "#chat-full",
+  "x": 206,
+  "y": 228,
+  "w": 24,
+  "h": 24
+ },
+ "#chat-divider": {
+  "s": "#chat-divider",
+  "x": 396,
+  "y": 217,
+  "w": 10,
+  "h": 671
+ },
+ ".chiprow": {
+  "s": ".chiprow",
+  "x": 796,
+  "y": 126,
+  "w": 605,
+  "h": 54
+ },
+ "article.need": {
+  "s": "article.need",
+  "x": 413,
+  "y": 290,
+  "w": 317,
+  "h": 179
+ },
+ "#drawer .tabs": {
+  "s": "#drawer .tabs",
+  "x": 0,
+  "y": 0,
+  "w": 0,
+  "h": 0
+ },
+ "#drawer-close": {
+  "s": "#drawer-close",
+  "x": 0,
+  "y": 0,
+  "w": 0,
+  "h": 0
+ },
+ ".edge-tab": {
+  "s": ".edge-tab",
+  "x": 0,
+  "y": 0,
+  "w": 0,
+  "h": 0
+ },
+ "#intake-btn": {
+  "s": "#intake-btn",
+  "x": 240,
+  "y": 229,
+  "w": 88,
+  "h": 22
+ }
+}

@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>d3 tabs — round 11</title>
+<link rel="stylesheet" href="./console.css">
+<style>
+/* the window control: a glyph that flips, nothing new but the element */
+.wctl { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; padding: 0; border: 0; background: none; color: var(--text-muted); cursor: pointer; }
+.wctl:hover { color: var(--text); background: var(--bg-hover); }
+.wctl[aria-pressed="true"] { color: var(--accent); background: var(--bg-hover); }
+.wctl svg { width: 15px; height: 15px; }
+/* the divider's hover grip: the whole 10px column stays the target */
+#chat-divider .grip { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 30px; border: 1px solid var(--line-strong); background: var(--bg-raised); color: var(--text-faint); font: 11px/1 var(--font-mono); opacity: 0; transition: opacity .12s; pointer-events: none; }
+#chat-divider:hover .grip, #chat-divider:focus-visible .grip { opacity: 1; }
+/* the tooltip the round owes every quiet control */
+.tip { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; padding: 3px 8px; border: 1px solid var(--line-strong); background: var(--bg-raised); color: var(--text-muted); font: 11px/1.5 var(--font-mono); box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+
+/* C14 put the threads beside the conversation; d3 asks the reverse: the table behind a tab, the conversation full width */
+.ctabs { display: inline-flex; gap: 16px; align-items: baseline; }
+.ctab { padding: 0; border: 0; background: none; color: var(--text-muted); font: 12.5px var(--font-ui); font-variant-caps: all-small-caps; letter-spacing: .06em; cursor: pointer; }
+.ctab.on { color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent); }
+.ctab .cbadge { font: 10px/1 var(--font-mono); color: var(--text-faint); }
+
+/* try wiring: the glyph flips, the edge tab returns, tooltips on every quiet control */
+.wctl .col { display: none; }
+.wctl[aria-pressed="true"] .exp { display: none; }
+.wctl[aria-pressed="true"] .col { display: block; }
+#screen { position: relative; }
+.edge-tab { display: none; position: absolute; left: 0; top: 50%; transform: translateY(-50%); z-index: 30; padding: 10px 4px; border: 1px solid var(--line-strong); border-left: 0; border-radius: 0 3px 3px 0; background: var(--bg-raised); color: var(--text); font: 11px/1 var(--font-mono); writing-mode: vertical-rl; letter-spacing: .08em; cursor: pointer; }
+.edge-tab:hover { color: var(--accent); border-color: var(--accent); }
+#screen.chat-only .edge-tab { display: inline-flex; align-items: center; }
+#chat-divider { cursor: col-resize; }
+.tip { display: none; }
+[data-tip] { position: relative; }
+[data-tip]:hover::after, [data-tip]:focus-visible::after { content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; padding: 3px 8px; border: 1px solid var(--line-strong); background: var(--bg-raised); color: var(--text-muted); font: 11px/1.5 var(--font-mono); box-shadow: 0 8px 24px rgba(0,0,0,.35); z-index: 80; pointer-events: none; }
+#chat-divider[data-tip]:hover::after, #chat-divider[data-tip]:focus-visible::after { left: 14px; bottom: 50%; transform: translateY(50%); }
+
+#screen.chat-only .chat-main { max-width: 48rem; margin: 0 auto; width: 100%; }
+#switcher { display: none; }
+.chat.threads-view .chat-main { display: none; }
+.chat.threads-view #switcher { display: block; }
+</style>
+</head>
+<body>
+<header class="top">
+<a class="home" href="#">Factory console</a>
+<form method="get" action="" class="switch auto-submit"><label for="project-filter" class="visually-hidden">Project</label><select id="project-filter" name="project"><option selected>demo</option></select></form>
+<nav aria-label="Main"><span class="ng ng-work"><a class="act" href="#"><span class="w">New task</span><span class="p">+</span></a></span><span class="ng ng-ref"><a href="#">Costs</a><a href="#">Resources</a></span><span class="ng ng-gov"><a href="#">Settings</a><a href="#">Policy</a><a href="#">Notifications</a></span></nav><details class="menu"><summary><span class="w">More</span><span class="p">Menu</span></summary><div class="sheet"><div class="sg g-work"><a class="s-work" href="#">New task</a></div><div class="sg"><a class="s-ref" href="#">Costs</a><a class="s-ref" href="#">Resources</a></div><div class="sg"><a class="s-gov" href="#">Settings</a><a class="s-gov" href="#">Policy</a><a class="s-gov" href="#">Notifications</a></div><form method="post" action="/logout" class="logout s-out"><button type="submit">Log out</button></form></div></details>
+<div id="theme-switch" class="theme-switch" role="group" aria-label="Theme"><button type="button" data-theme-set="dark" aria-pressed="true" aria-label="Dark theme" data-tip="Dark theme, the default; your choice is remembered"><svg viewBox="1.5 1 18 18" aria-hidden="true"><path d="M10.5 5.25a3.17 3.17 0 0 0 4.75 4.75 4.75 4.75 0 1 1-4.75-4.75Z"/></svg></button><button type="button" data-theme-set="light" aria-pressed="false" aria-label="Light theme" data-tip="Light theme; your choice is remembered"><svg viewBox="20.75 1 18 18" aria-hidden="true"><circle cx="29.75" cy="10" r="2.5"/><path d="M29.75 4.6v1.2M29.75 14.2v1.2M24.35 10h1.2M33.95 10h1.2M25.93 6.18l.85.85M32.72 12.97l.85.85M25.93 13.82l.85-.85M32.72 7.03l.85-.85"/></svg></button></div>
+<form method="post" action="/logout" class="logout"><span>sebastian</span> <button type="submit">Log out</button></form>
+</header>
+<main>
+<p id="flash" class="problem" role="alert" hidden></p>
+<details id="status-line" class="status" aria-label="Status" open><summary class="strip">
+<span class="cell state" data-state="running"><i class="dot" aria-hidden="true"></i>
+working</span>
+<span class="cell"><span><b class="n">2</b> working</span></span>
+<a href="#needs-you" class="cell needs on"><span><b class="n">1</b> need you</span></a>
+<a href="/costs" class="cell spend" data-tip="spend this UTC month against the project's month cap"><span><b class="n">€0.42</b> <span class="of">/ €10.00</span></span><span class="gauge"><meter min="0" max="100" value="4" aria-label="Spend of the month cap">4 percent</meter></span><span class="pct">4%</span></a>
+<span class="cell deps up" data-tip="every factory dependency answers; the status in detail lists them"><i class="dot" aria-hidden="true"></i>
+dependencies</span>
+</summary>
+<div class="sp" id="status-panel" role="region" aria-label="The status in detail">
+<section>
+<h3>Spend</h3>
+<div class="sp-g"><span class="lbl">today</span><span class="fig">€0.42 of €1.00 day cap</span><span class="gauge"><meter min="0" max="100" value="42" aria-label="today">42 percent</meter></span></div>
+<div class="sp-g"><span class="lbl">this month</span><span class="fig">€8.13 of €10.00</span><span class="gauge"><meter min="0" max="100" value="81" aria-label="this month">81 percent</meter></span></div>
+</section>
+<section>
+<h3>Provider, GitHub, configuration</h3>
+<dl class="sp-dl">
+<dt>provider</dt><dd>ok</dd>
+<dt>GitHub</dt><dd><a href="#" target="_blank" rel="noopener">GitHub: sebastianrueckerai/demo</a></dd>
+<dt>configuration</dt><dd>version 29 · <a href="#" target="_blank" rel="noopener"><code>191991ba</code></a></dd>
+</dl>
+</section>
+<section>
+<h3>Dependencies</h3>
+<dl class="sp-dl">
+<dt>forgejo</dt><dd class="up"><i class="dot" aria-hidden="true"></i>up · git.aisoftwarefactory.world · 4m ago</dd>
+<dt>postgres</dt><dd class="up"><i class="dot" aria-hidden="true"></i>up · 17 migrations · 4m ago</dd>
+<dt>provider api</dt><dd class="up"><i class="dot" aria-hidden="true"></i>up · fal · 51s ago</dd>
+<dt>s3</dt><dd class="up"><i class="dot" aria-hidden="true"></i>up · objects · 2m ago</dd>
+<dt>runner</dt><dd class="up"><i class="dot" aria-hidden="true"></i>up · 3 pods · 4m ago</dd>
+</dl>
+</section>
+</div>
+</details>
+<div id="screen" class="main with-chat" style="--chat-share: 24rem">
+<button type="button" class="edge-tab" data-tip="The board back; Esc also works">board</button>
+<section id="chat" class="chat" aria-labelledby="chat-title">
+<div class="chat-head">
+<h2 id="chat-title">Chat</h2>
+<span class="chat-who">project agent · demo</span>
+<nav class="ctabs" aria-label="The chat's views">
+<button type="button" class="ctab on" aria-current="true">chat</button>
+<button type="button" class="ctab" data-tip="Your threads">threads <span class="cbadge">1</span></button>
+</nav>
+
+<button type="button" id="chat-full" class="wctl" aria-pressed="false" aria-label="Chat and board" data-tip="Grow the chat to the whole screen; the glyph flips, click again or press Esc for the board back">
+<svg viewBox="0 0 16 16" aria-hidden="true"><path class="exp" d="M9.5 2.5h4v4M6.5 13.5h-4v-4M3 13l10-10" fill="none" stroke="currentColor" stroke-width="1.5"/><path class="col" d="M13.5 6.5v-4h-4M2.5 9.5v4h4M13 3L3 13" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+</button>
+<button type="button" id="intake-btn" class="intake" data-intake="open" aria-pressed="false" data-tip="The project's intake: open takes the agent's own filings, closed refuses them; your ask always files.">
+intake <span class="intake-name">open</span>
+</button>
+<button type="button" id="chat-new" class="chat-new" data-tip="Start a new thread">New</button>
+</div>
+<nav id="switcher" class="ttable" aria-label="Your threads">
+<div class="thr">
+<span aria-hidden="true">mark · thread · last</span>
+<button type="button" class="swtg" data-swtoggle aria-expanded="true" aria-label="Fold the threads" data-tip="Fold the threads">⌄</button>
+</div>
+<div id="thread-rows" class="trows">
+<button type="button" class="trow unread"><span class="tmark inbox">●</span><span class="ttitle">intake: gateway yaml</span><span class="tat">14:02</span></button>
+<button type="button" class="trow"><span class="tmark working"><span class="dot"></span></span><span class="ttitle">roll 1130 · deps green</span><span class="tat">13:58</span></button>
+<button type="button" class="trow on"><span class="tmark"></span><span class="ttitle">roadmap 300 · documents</span><span class="tat">13:41</span></button>
+<button type="button" class="trow"><span class="tmark"></span><span class="ttitle">roadmap 299 · always-on</span><span class="tat">11:20</span></button>
+<button type="button" class="trow others"><span class="tmark"></span><span class="ttitle"><span class="twhose">sebastian · </span>plan 558</span><span class="tat">10:12</span></button>
+<div class="tarch">
+<p class="tarch-l">archived</p>
+<button type="button" class="trow arch"><span class="tmark"></span><span class="ttitle">nightly deps roll · nov</span></button>
+<button type="button" class="trow arch"><span class="tmark"></span><span class="ttitle">tokens rotation</span></button>
+</div>
+</div>
+</nav>
+
+<div class="chat-main">
+<div id="thread-head" class="thead">
+<span class="ttl">roadmap 300 · documents in the conversation</span>
+</div>
+<div id="chat-log" class="chat-log" role="log" aria-label="The conversation with the project agent">
+<div class="msg you"><span class="av" aria-hidden="true"></span><p class="who"><span class="name">sebastian</span> <time>13:41</time></p><div class="said"><p>documents in the conversation: drag one into the chat and the agent reads it by tool. what does the card need?</p></div></div>
+<div class="msg"><span class="av" aria-hidden="true"></span><p class="who"><span class="name">agent</span> <time>13:42</time></p><div class="said"><p>a pinned place on the card, a reader tool, and a save that lands as one commit. the drawer already holds the card's documents; the drag only has to reach it.</p></div></div>
+<div class="msg you"><span class="av" aria-hidden="true"></span><p class="who"><span class="name">sebastian</span> <time>13:44</time></p><div class="said"><p>then keep the drawer as the home. draft the gateway yaml note while you are there.</p></div></div>
+<div class="msg"><span class="av" aria-hidden="true"></span><p class="who"><span class="name">agent</span> <time>13:45</time></p><div class="said"><p>written to <code>docs/gateway-yaml.md</code> and pinned. the replica note is in its own section.</p></div></div>
+</div>
+<form id="chat-form" class="chat-form composer" method="post" action="#">
+<input type="hidden" name="csrf" value="x">
+<div class="prompt">
+<span class="ps" aria-hidden="true">›</span>
+<label for="chat-input" class="visually-hidden">Your message to the project agent</label>
+<textarea id="chat-input" name="message" rows="5" maxlength="8192" placeholder="Ask or tell the project agent…">the gateway yaml you wrote — drop the replica count to one for now: the box cannot hold two agents at once, and the lab shows the same. check the node selector before it merges.</textarea>
+<button type="submit">Send</button>
+</div>
+<div class="own">
+<div class="own-l">
+<span class="cmds"><button type="button" class="cmd" data-cmd="plan" data-tip="Words a plan for the next task">/plan</button><button type="button" class="cmd" data-cmd="status" data-tip="Words a status readout">/status</button><button type="button" class="cmd" data-cmd="costs" data-tip="Words this month's costs">/costs</button></span>
+</div>
+<span class="lvlctl">
+<button type="button" id="level-btn" data-level="edit" aria-haspopup="menu" aria-expanded="false" aria-label="The project's autonomy level: edit"><i aria-hidden="true"></i><span class="lvl-name">edit</span></button>
+</span>
+</div>
+</form>
+</div>
+</section>
+<div id="chat-divider" role="separator" aria-orientation="vertical" aria-label="Drag it, or press the arrow keys, to resize the chat and the board" tabindex="0" data-tip="Drag to resize; past 80% the chat takes the screen"><span class="grip" aria-hidden="true">⤥</span></div>
+<div id="board" data-project="demo">
+<div class="board-head">
+<h2 id="board-title">Board</h2>
+<form class="find" id="find" role="search" method="get" action="#">
+<label class="visually-hidden" for="q">Find on the board</label>
+<input id="q" name="q" type="text" placeholder="Find: a word, #612, plan:558" autocomplete="off" spellcheck="false" aria-keyshortcuts="f">
+<a class="find-x" href="#" aria-label="Clear the find" data-tip="Clear the find">×</a>
+</form>
+<button type="button" id="documents" class="documents" aria-controls="doc-view" aria-expanded="false" data-tip="The project's documents; the last one opens where you left it">Documents</button>
+</div>
+<div class="lane five">
+<section class="column lit" aria-labelledby="col-0" id="needs-you">
+<h3 id="col-0">Needs you <span class="count">2</span></h3>
+<div class="cards">
+<article class="need">
+<p class="line1"><span class="ref">#617</span> <strong class="title">two agents on one box: the gateway yaml asks for replicas</strong></p>
+<div class="choices">
+<button type="button">drop to one replica</button>
+<button type="button" class="deny">keep two, move the box</button>
+</div>
+<p class="why">the note you pinned says the box cannot hold two at once.</p>
+</article>
+<article class="need">
+<p class="line1"><span class="ref">#612</span> <strong class="title">resource: 2 vCPU runner for the roll</strong></p>
+<div class="choices">
+<button type="button">approve · €4.10 a month</button>
+<button type="button" class="deny">deny</button>
+</div>
+</article>
+</div>
+</section>
+<section class="column" aria-labelledby="col-1">
+<h3 id="col-1">Queued <span class="count">2</span></h3>
+<div class="cards">
+<article class="card face" data-card="t613">
+<p class="line1"><span class="ref">#613</span> <strong class="title">docs: the merge rule in plain words</strong></p>
+<div class="dmeta"><span class="st">queued</span></div>
+</article>
+<article class="card face" data-card="t614">
+<p class="line1"><span class="ref">#614</span> <strong class="title">plan 558: the waiting-cards actions</strong></p>
+<div class="dmeta"><span class="st">queued</span></div>
+</article>
+</div>
+</section>
+<section class="column" aria-labelledby="col-2">
+<h3 id="col-2">In progress <span class="count">2</span></h3>
+<div class="cards">
+<article class="card face" data-card="t615">
+<p class="line1"><span class="ref">#615</span> <strong class="title">roadmap 300: documents in the conversation</strong></p>
+<div class="dmeta"><span class="st"><span class="g" aria-hidden="true">●</span>running</span><span class="elapsed">12m</span></div>
+</article>
+<article class="card face" data-card="t616">
+<p class="line1"><span class="ref">#616</span> <strong class="title">roll 1130: the deps dot goes always-on green</strong></p>
+<div class="dmeta"><span class="st">verifying</span><span class="elapsed">4m</span></div>
+</article>
+</div>
+</section>
+<section class="column fold" aria-labelledby="col-3">
+<h3 id="col-3">Done <span class="count">3</span></h3>
+<div class="cards">
+<article class="card face final d-done" data-card="t609">
+<p class="line1"><span class="ref">#609</span> <strong class="title">roadmap 299: always-on green</strong></p>
+<div class="dmeta"><span class="st">done</span><span class="elapsed">2h in all</span></div>
+</article>
+</div>
+</section>
+</div>
+</div>
+<aside id="drawer" class="drawer" aria-label="The card" hidden></aside>
+</div>
+<footer id="live" role="status"></footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  var screen = document.getElementById("screen");
+  var divider = document.getElementById("chat-divider");
+  var full = document.getElementById("chat-full");
+  var edge = document.querySelector(".edge-tab");
+
+  function isFull() { return screen.classList.contains("chat-only"); }
+  function setFull(on) {
+    screen.classList.toggle("chat-only", on);
+    if (full) full.setAttribute("aria-pressed", on ? "true" : "false");
+  }
+  if (full) full.addEventListener("click", function () { setFull(!isFull()); });
+  if (edge) edge.addEventListener("click", function () { setFull(false); });
+
+  if (divider) {
+    var drag = false;
+    divider.addEventListener("pointerdown", function (e) { drag = true; try { divider.setPointerCapture(e.pointerId); } catch (x) {} });
+    divider.addEventListener("pointermove", function (e) {
+      if (!drag) return;
+      var min = 384, max = Math.max(min, window.innerWidth - 502);
+      screen.style.setProperty("--chat-share", Math.round(Math.max(min, Math.min(max, e.clientX - 7))) + "px");
+    });
+    ["pointerup", "pointercancel"].forEach(function (n) { divider.addEventListener(n, function () { drag = false; }); });
+    divider.addEventListener("keydown", function (e) {
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      var cur = parseFloat(screen.style.getPropertyValue("--chat-share")) || 384;
+      var next = Math.max(384, Math.min(window.innerWidth - 502, cur + (e.key === "ArrowRight" ? 24 : -24)));
+      screen.style.setProperty("--chat-share", Math.round(next) + "px");
+      e.preventDefault();
+    });
+  }
+
+  var drawer = document.getElementById("drawer");
+  var dclose = document.getElementById("drawer-close");
+  function closeDrawer() { if (drawer && !drawer.hidden) { drawer.hidden = true; return true; } return false; }
+  if (dclose) dclose.addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    if (closeDrawer()) return;
+    setFull(false);
+  });
+
+  document.querySelectorAll(".card, article.need").forEach(function (card) {
+    card.setAttribute("data-tip", "Open the card");
+    card.addEventListener("click", function () {
+      if (!drawer) return;
+      var ref = drawer.querySelector(".dr-ref"), h = drawer.querySelector(".dr-title h2");
+      var cr = card.querySelector(".ref"), ct = card.querySelector(".title");
+      if (ref && cr) ref.textContent = cr.textContent;
+      if (h && ct) h.textContent = ct.textContent;
+      drawer.hidden = false;
+      var t = drawer.querySelector('[role="tab"]'); if (t) t.focus();
+    });
+  });
+
+  var tabs = drawer ? drawer.querySelectorAll('[role="tab"]') : [];
+  tabs.forEach(function (t) {
+    t.addEventListener("click", function () {
+      tabs.forEach(function (o) { o.setAttribute("aria-selected", o === t ? "true" : "false"); });
+      drawer.querySelectorAll(".pane").forEach(function (p) { p.hidden = p.getAttribute("data-pane") !== t.getAttribute("data-tab"); });
+    });
+  });
+
+  var cts = document.querySelectorAll(".ctab");
+  var chatSec = document.getElementById("chat");
+  cts.forEach(function (t) {
+    t.addEventListener("click", function () {
+      cts.forEach(function (o) { o.classList.toggle("on", o === t); o.setAttribute("aria-current", o === t ? "true" : "false"); });
+      chatSec.classList.toggle("threads-view", /threads/.test(t.textContent));
+    });
+  });
+
+  document.querySelectorAll("#theme-switch [data-theme-set]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.documentElement.setAttribute("data-theme", b.getAttribute("data-theme-set"));
+      document.querySelectorAll("#theme-switch [data-theme-set]").forEach(function (o) { o.setAttribute("aria-pressed", o === b ? "true" : "false"); });
+    });
+  });
+
+  var intake = document.getElementById("intake-btn");
+  if (intake) intake.addEventListener("click", function () {
+    var open = intake.getAttribute("data-intake") === "open";
+    intake.setAttribute("data-intake", open ? "closed" : "open");
+    intake.setAttribute("aria-pressed", open ? "true" : "false");
+    var n = intake.querySelector(".intake-name"); if (n) n.textContent = open ? "closed" : "open";
+  });
+
+  var sw = document.querySelector("[data-swtoggle]");
+  if (sw) sw.addEventListener("click", function () {
+    var rows = document.getElementById("thread-rows");
+    var open = sw.getAttribute("aria-expanded") === "true";
+    sw.setAttribute("aria-expanded", open ? "false" : "true");
+    sw.textContent = open ? "›" : "⌄";
+    if (rows) rows.hidden = open;
+  });
+
+  function wireForm(form, logSel) {
+    if (!form) return;
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var ta = form.querySelector("textarea"); if (!ta || !ta.value.trim()) return;
+      var log = document.querySelector(logSel);
+      if (log) {
+        var proto = log.querySelector(".msg:last-of-type");
+        if (proto) {
+          var d = proto.cloneNode(true);
+          var ps = d.querySelectorAll("p");
+          var now = new Date(), hh = ("0" + now.getHours()).slice(-2) + ":" + ("0" + now.getMinutes()).slice(-2);
+          if (ps.length > 1) { ps[0].textContent = "you " + hh; ps[ps.length - 1].textContent = ta.value; }
+          log.appendChild(d);
+          log.scrollTop = log.scrollHeight;
+        }
+      }
+      ta.value = "";
+    });
+  }
+  wireForm(document.getElementById("chat-form"), "#chat-log");
+  wireForm(drawer ? drawer.querySelector("form") : null, "#drawer .chat-log");
+})();
+</script>
+</body>
+</html>
