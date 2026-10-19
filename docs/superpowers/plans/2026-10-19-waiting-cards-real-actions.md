@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** A card that waits for a human always names its ask and offers a real action: the weekly-bump human card can be handed to the factory or closed with a note, every ask shows the same buttons on every surface, and the browser tab title counts only what waits for the member now.
+**Goal:** A card that waits for a human always names its ask and offers a real action: a routine carries one live toggle, needs me or runs on its own, flippable on the card until the run fires; a waiting human card can be handed to the factory or closed with a note; every ask shows the same buttons on every surface; and the browser tab title counts only what waits for the member now.
 
-**Architecture:** The ask becomes durable data before a card ever waits (intake events written and failing loudly ahead of the status transition), one hand-over action (`Runner.Go`) files the agent card from a human card's own text through the existing `FileAgentTask` path, the console renders go and close-with-note where it today renders a meaningless answer form, and the settle rule already derived for the chat badge grows a third count (`waits_you`) that replaces unread rows in the tab title.
+**Architecture:** The ask becomes durable data before a card ever waits (intake events written and failing loudly ahead of the status transition), the routine's mode lives in `routine_state` beside the skip and is read once when the run fires (the config's `files` value is only the toggle's starting side), one hand-over action (`Runner.Go`) files the agent card from a human card's own text through the existing `FileAgentTask` path, the console renders go and close-with-note where it today renders a meaningless answer form, and the settle rule already derived for the chat badge grows a third count (`waits_you`) that replaces unread rows in the tab title.
 
 **Tech Stack:** Go (html/template + htmx console inside factoryd), PostgreSQL (CNPG), plain JS in `internal/console/static/chat.js`. No new dependencies.
 
@@ -12,7 +12,7 @@
 
 ## Decisions
 
-- **Two ways to create routine work** (Sebastian, 2026-10-19): fully automated, or on his "go" so he can review and choose the time. Fully automated is `files: "agent"` in the routine config and works today. The "go" way is `files: "human"` plus a real hand-over action on the card; the weekly bump keeps `files: "human"` (roadmap 267's supply-chain checkpoint) and gains that action. No new config value.
+- **One routine, one live toggle** (Sebastian, 2026-10-19): a routine is not created one way or the other; it carries a toggle, **needs me** ↔ **runs on its own**. The difference only matters when the run fires; until then he can flip it back and forth on the card. The config's `files` value (`human`/`agent`) sets the toggle's starting side, and the live toggle overrides it from then on — no new config value. The weekly bump keeps `files: "human"` (roadmap 267's supply-chain checkpoint), so it starts at needs me. A waiting card's **go** action is the same choice made after the run fired: flip this one to run now.
 - **The tab title counts what waits now** (Sebastian, 2026-10-19): open asks and notes about cards still waiting for the member. Settled asks and notes about finished cards never count, read or not. On 2026-10-19 the honest number was 1 (the weekly bump), not 5.
 - **The ask is durable before the wait** (from the #1131 analysis): a card that shows `waiting-human` always has its intake escalation row; a failure to write it fails the escalation instead of only logging.
 - **Ask buttons live on every surface**: a chat-filed escalation's question reaches the board and drawer through the same intake row the runner's escalations write, not only through the chat thread.
@@ -20,7 +20,8 @@
 
 ## Non-goals
 
-- No automation of the weekly bump (`files` stays `"human"`).
+- No automation of the weekly bump (`files` stays `"human"`); the toggle starts it at needs me, and he flips it when he stops caring.
+- No per-occurrence scheduling: the toggle persists where he leaves it, and each run reads it as it fires.
 - No change to the two-pill thread badge (amber asks, bordered new) or the status strip.
 - The eight waiting cards on the infra project board are real waits, not defects; nothing here touches them.
 - A waiting card named in two threads counts twice in the title. Accepted corner; both rows point at one card and the click settles both.
@@ -37,10 +38,12 @@
 ## Review Focus
 
 1. **A card gains an ask between render and the go POST** (two tabs, slow hands): `doGo` re-checks kind, status and open ask server-side and refuses; the agent card is filed at most once. Pinned in Task 3's handler test.
-2. **The live DB still holds chat-filed waiting cards whose question never left the chat thread** (card #102's shape): the Task 2 backfill writes their intake rows, and the Task 4 gate reads the row, so those cards show their ask, not go. Pinned in Task 2's backfill test.
+2. **The live DB still holds chat-filed waiting cards whose question never left the chat thread** (card #102's shape): the Task 2 backfill writes their intake rows, and the Task 5 gate reads the row, so those cards show their ask, not go. Pinned in Task 2's backfill test.
 3. **`escalateStale` runs with `in == nil`** (no Forgejo, no timeline): the intake insert still happens first and its failure returns the error before any transition. Pinned in Task 1's stale test.
-4. **An ask-less human card in `backlog`** (not yet waiting): go and close-with-note are offered there too; the drawer's Open block appears for waiting cards only. Pinned in Task 4's face test.
-5. **The same waiting card named by an ask row and a poke row in one thread**: the title counts it once (`waits_you` counts distinct cards). Pinned in Task 5's settleCounts test.
+4. **The toggle is flipped in the moment the run fires**: the run reads the mode once at its start, so a flip mid-run changes only the next run, never the one under way. Pinned in Task 4's runner test.
+5. **A routine whose `files` is `pull-request` or a report**: no toggle renders and none is read; those kinds have no needs-me side. Pinned in Task 4's console and runner tests.
+6. **An ask-less human card in `backlog`** (not yet waiting): go and close-with-note are offered there too; the drawer's Open block appears for waiting cards only. Pinned in Task 5's face test.
+7. **The same waiting card named by an ask row and a poke row in one thread**: the title counts it once (`waits_you` counts distinct cards). Pinned in Task 6's settleCounts test.
 
 ---
 
@@ -157,7 +160,47 @@ git add internal/factoryd/ internal/console/ cmd/factoryd/main.go
 git commit -m "factoryd: Go files a human card's work as an agent card and hands it over"
 ```
 
-### Task 4: The board and drawer offer go and close-with-note
+### Task 4: The routine's toggle
+
+**Files:**
+- Create: migration `internal/schema/migrations/factoryd/` (next number after `20261019100000_criteria_verdicts.sql`): `routine_state` gains `needs_me boolean` (NULL = follow the config's `files`).
+- Modify: `internal/factoryd/routine_store.go` (the state row and its read carry the column; a setter beside the skip's upsert at line ~140)
+- Modify: `internal/factoryd/routine_run.go:92-111` (the fire-time read)
+- Modify: `internal/console/routines.go` + `internal/console/console.go` (route), `internal/console/board.go` (the ghost's fill), `internal/console/templates/board.html` (`ghost` at line 283, beside `routine-acts` at 292)
+- Test: `internal/factoryd/routine_store_test.go`, `internal/factoryd/routine_run_test.go`, `internal/console/routines_test.go` (or the file holding `doRoutineSkip`'s tests)
+
+**Interfaces:**
+- Consumes: the skip's whole pattern — `routine_state` upsert, `doRoutineSkip`'s permission gate and route shape, the ghost's data.
+- Produces: `SetRoutineNeedsMe(ctx, project, routine string, needsMe bool, by string) error`; `RoutineState.NeedsMe *bool`; route `POST /routines/{project}/{name}/needs-me` → `c.routineNeedsMe` (form field `undo=1` flips back to following the config, the skip's pattern); the runner honours it only for `files` `human`/`agent`.
+
+- [ ] **Step 1: Write the failing tests**
+
+Store (PG): set then read round-trips `needs_me` and `by`; a routine never touched reads NULL. Runner: config `human` + state `needs_me=false` → the run files an agent card (the `FilesAgent` branch's shapes, labels `["routine"]`); config `agent` + state `needs_me=true` → a waiting human card with the needs-you poke; state NULL → the config's side; config `pull-request` → the toggle is ignored, template pass runs. Console: the ghost of a `human`/`agent` routine shows the toggle's current side and the flip form posting to the route; a `pull-request` routine's ghost shows none; the permission refusal mirrors `doRoutineSkip`'s test. Hand-derive all expectations.
+
+- [ ] **Step 2: Run them to verify they fail**
+
+Run: `go test ./internal/factoryd/ -run 'TestRoutine' -race` and `go test ./internal/console/ -run 'TestRoutine' -race`
+Expected: FAIL — no column, no read, no route.
+
+- [ ] **Step 3: Implement the store and runner sides**
+
+Migration: `ALTER TABLE routine_state ADD COLUMN needs_me boolean` (and `needs_me_by text`, the skip's `skip_by` pattern). `routineStateColumns` and `scanRoutineState` grow the column; `SetRoutineNeedsMe` upserts beside `SetSkip`. In `RoutineRun`, where `rt.Files` switches: when `rt.Files` is `policy.FilesHuman` or `policy.FilesAgent`, read the state once (`RoutineState` for the project/routine) and let a non-NULL `NeedsMe` pick the branch — read it before the switch, decide the effective `files` there, nothing else changes.
+
+- [ ] **Step 4: Implement the console side**
+
+Route in `console.go`'s table beside the skip's; `doRoutineNeedsMe` mirrors `doRoutineSkip`'s gate, actor and note (the note names the side: `Weekly bump runs on its own.` / `Weekly bump needs you.` / `Weekly bump follows its config.`). The ghost's fill carries the current side (config's, or the override) and the form reuses `routine-acts`' inline pattern, `hx-target` per `routine-act-target`. The toggle renders only for `files` `human`/`agent` routines.
+
+- [ ] **Step 5: Run both packages with PG; commit**
+
+Run: `go test ./internal/factoryd/ ./internal/console/ -race` with `FACTORYD_TEST_DATABASE_URL` set.
+Expected: PASS.
+
+```bash
+git add internal/schema/migrations/ internal/factoryd/ internal/console/
+git commit -m "routines: one live toggle, needs me or runs on its own, read when the run fires"
+```
+
+### Task 5: The board and drawer offer go and close-with-note
 
 **Files:**
 - Modify: `internal/console/board.go` (`card` struct fields, `boardCard`'s escalation block ~1865-1883, `setForms` ~2000-2011, the drawer's `Need`/`Door` block ~3262-3272)
@@ -194,7 +237,7 @@ git add internal/console/
 git commit -m "console: a waiting human card without an ask offers the factory or a close with note"
 ```
 
-### Task 5: The title counts what waits
+### Task 6: The title counts what waits
 
 **Files:**
 - Modify: `internal/factoryd/chat.go:183-216` (`ChatConversation.WaitsYou`), `internal/factoryd/chat.go:822-839` (a sibling read of `ChatAsks`, or a widened one if no other caller breaks — check callers first)
@@ -231,4 +274,4 @@ git commit -m "console: the tab title counts the cards that wait for the member"
 
 ## Rollout
 
-Factoryd and console ride the next roll as usual (image pin bump through the factory's own PR flow). After the roll, on the live console: the weekly bump card shows both actions; pressing go files the agent card, closes #1131 with the note, and the title drops to the honest count.
+Factoryd and console ride the next roll as usual (image pin bump through the factory's own PR flow). After the roll, on the live console: the weekly bump's ghost shows the toggle at needs me; its card shows both actions; pressing go files the agent card, closes #1131 with the note, and the title drops to the honest count.
