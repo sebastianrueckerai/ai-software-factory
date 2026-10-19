@@ -202,3 +202,39 @@ absolute placement is re-asserted after it. Measured: close at
 x 1388, position absolute; the title text ends at 1376 against the
 36 px right padding console.css already reserves; no intersection
 (test-try.js a_drawer.closeClear true). Both annotated PNGs reshot.
+
+## The build (2026-10-19)
+
+The pick, A with the input sizer, is built as ceabfe8d on branch
+round-11-build in the code repository (15 files, +326/−74). What landed:
+
+- The chat's floor is 24 rem and the composer spans threads and
+  conversation as the chat grid's third row, the queue chips under the
+  input. The Grow button is gone: the box grows itself, capped at
+  60 vh.
+- The sizer seam on the composer's top edge (.growbar, a separator
+  role, focusable): drag between 44 px and 60 vh, double-click resets,
+  ArrowUp and ArrowDown step 24 px.
+- The glyph in the chat head takes the screen: aria-pressed flips the
+  twin paths, the name stays "Chat and board", the vertical "board"
+  edge tab clings to the left edge, Esc exits unless a palette, pop,
+  dialog or drawer holds the screen or a field has the caret, and the
+  full state holds the 48 rem measure centered. The state persists.
+- The panel's services are lamp chips: the age on hover, a down
+  service carries its age inline; the spend gauges stay, the
+  provider-ok row is gone.
+- The drawer's fifth tab is Chat: the card's own conversation, the
+  same POST and stream as the main chat (drawer.html had a real bug
+  here, a template field that lost its $ scope inside the row loop;
+  the new tab test caught it).
+- The five secondary pages hold the 62 rem measure, pinned by a test;
+  the board alone spans. Quiet controls carry native titles.
+
+Race suite green (21 ok, no failures). The lab: 269 shots in both
+themes, the structural check green, with the glyph, the sizer and the
+five-tab drawer asserted in the browser, plus three new shots
+(chat-full, chat-sizer, costs-1920). Build evidence:
+[build/](build/) — the spanning composer on the board, the full chat
+with its edge tab, the grown input under the sizer's grip, the lamp
+chips behind the strip's click, the drawer's Chat tab, and the costs
+page at 1920 on its 62 rem measure.

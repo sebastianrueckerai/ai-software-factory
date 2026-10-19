@@ -202,3 +202,15 @@ The build is the attachments spine end to end (Forgejo 4ad14fcd, 40ae0cef, 738d8
 When a pressed Do it is refused — the ready check wanting acceptance tests a plan card did not carry — the refusal is not a dead end. The do- row keeps the refused colour and the check's words, and the refusal feeds the model a new turn, exactly as an in-turn tool refusal does. The agent's correction arrives as a new proposal that visibly carries what the refusal asked for, waiting on its own Do it. The record reads as recovery: refusal named, remedy proposed, nothing hidden. The tool's shape teaches the rule up front: new_card takes the acceptance tests as its own parameter, so the filing that knows the rule never meets the refusal.
 
 The build is the acceptance parameter and the refused-apply turn (Forgejo 4a7536bb), reviewed in round 12.
+
+## C29. The chat keeps its column: a spanning composer with a sizer seam, and a glyph that takes the screen (2026-10-19, Sebastian)
+
+From round 11 ([design/rounds/11-compact-reorg/index.html](rounds/11-compact-reorg/index.html)), six directions built in the real stylesheet rather than generated, two of them wired as live try pages. Sebastian tried both live and picked A, adding one demand: the input itself must be resizable.
+
+A keeps threads and conversation side by side, and the composer spans both as the chat grid's third row. The chat's floor rises from 18 rem to 24 rem. The Grow button goes: the box grows itself, capped at 60 vh. The sizer seam sits on the composer's top edge, a focusable separator: drag between 44 px and 60 vh, double-click resets, ArrowUp and ArrowDown step 24 px. The glyph in the chat head takes the whole screen: the conversation holds its 48 rem reading measure centered, a vertical "board" edge tab clings to the left edge, Esc also exits, and the glyph's twin paths flip with aria-pressed while the name stays "Chat and board". The status panel's services render as lamp chips, the age on hover and inline on a down chip. The spend gauges stay and the provider-ok row goes. The drawer gains a fifth tab, Chat: the card's own conversation, posting and streaming like the main chat. Quiet controls carry native titles.
+
+What goes: B's tab that put the thread table behind the chat, the Grow button, the services row list, the provider-ok row.
+
+The wide window settles in the same round: the five secondary pages hold the 62 rem measure, the board alone spans, and a test pins the measure so it cannot drift.
+
+The build is ceabfe8d on branch round-11-build in the code repository. The race suite is green (21 ok), and the lab's 269 shots and its structural check came back green, with the glyph, the sizer and the five-tab drawer asserted in the browser. Build evidence: [rounds/11-compact-reorg/build/](rounds/11-compact-reorg/build/).
