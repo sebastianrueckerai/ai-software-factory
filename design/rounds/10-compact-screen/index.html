@@ -1,102 +1,140 @@
-# Round 10 — the compact screen
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Round 10 — the compact screen</title>
+<style>
+:root { color-scheme: dark; --bg: #10151d; --bg-panel: #151b25; --line: #232b38; --text: #dfe7f1; --muted: #93a1b5; --faint: #7c8ba0; --accent: #53d6e2; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.65 system-ui, sans-serif; }
+main { max-width: 68rem; margin: 0 auto; padding: 28px 22px 80px; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+h2 { font-size: 13px; font-variant-caps: all-small-caps; letter-spacing: .08em; color: var(--faint); margin: 34px 0 8px; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+p, li { color: var(--text); }
+p { margin: 8px 0; max-width: 78ch; }
+code, .mono { font: 12.5px/1.6 ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: var(--muted); }
+code { color: var(--accent); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+table { border-collapse: collapse; margin: 12px 0; font: 12.5px/1.6 ui-monospace, Menlo, Consolas, monospace; }
+caption { text-align: left; color: var(--muted); font: 600 12.5px system-ui; padding: 4px 0; }
+th, td { border: 1px solid var(--line); padding: 4px 10px; text-align: left; }
+th { font-variant-caps: all-small-caps; letter-spacing: .06em; color: var(--muted); font-family: system-ui; }
+td.win { color: var(--accent); }
+figure { margin: 14px 0; }
+figure img { max-width: 100%; border: 1px solid var(--line); display: block; }
+figcaption { color: var(--muted); font-size: 12px; margin-top: 4px; max-width: 78ch; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
+ul { margin: 8px 0; padding-left: 22px; }
+li { margin: 3px 0; }
+.meta { color: var(--muted); font-size: 12.5px; }
+.pick { border: 1px solid var(--accent); padding: 10px 14px; margin: 12px 0; }
+.pick strong { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+<h1>Round 10 — the compact screen</h1>
+<p class="meta">2026-10-19 · one session · 20 generated images (nano-banana-2.1) + 2 lab-built sheets · 6 critic runs · ≈ $3.00 of the $8 cap · <a href="notes.md">notes</a> · <a href="brief.md">brief</a> · <a href="references.md">survey</a></p>
 
-Sebastian's four screenshots named the accumulated frictions: the chat's window states (no evident way back from full, the Full/Grow word buttons nobody can read), the threads squeezing the conversation at the chat's minimum, the status detail's five service rows, the secondary pages' sprawl and Settings' pseudo-table — plus tooltips for everything non-obvious, and one question first: what does "provider ok" even say?
+<div class="pick">
+<p style="margin:0"><strong>The pick request.</strong> Main view: <strong>02r glyph-cluster</strong> (recommended) or 06r one-instrument. Window control: <strong>A, the glyph that flips</strong> (recommended) or C, glyph plus the word.</p>
+</div>
 
-## "provider ok", answered from the code
+<h2>"provider ok", answered from the code</h2>
+<p><code>provider</code> in the panel counts this project's cards that are <code>running</code> whose newest timeline step is <code>provider_refused</code> with no later session start or hold (<code>onProvider</code>, board.go:680, 2217-2218). "provider ok" = <strong>no run is stalled waiting on the model provider</strong> (a 429/backoff refusal). It is not a connectivity probe. The probe is the dependency "provider api" (<code>dephealth.go</code>, <code>p.Control.Probe</code>) two rows below: another "provider" meaning something else, side by side. The strip already carries the nonzero state ("N waiting on the provider"); the panel's "ok" restates the zero state next to a different provider. The round folds this: the stalled count stays as a warn lamp, the bare "ok" row goes.</p>
 
-`provider` in the panel counts this project's cards that are `running` whose newest timeline step is `provider_refused` with no later session start or hold (`onProvider`, board.go:680, 2217-2218). "provider ok" = **no run is stalled waiting on the model provider** (a 429/backoff refusal). It is not a connectivity probe — that is the dependency "provider api" (`dephealth.go`, `p.Control.Probe`) two rows below: another "provider" meaning something else, side by side. The strip already carries the nonzero state ("N waiting on the provider"); the panel's "ok" restates the zero state next to a different provider. The round folds this: the stalled count stays (a warn lamp), the bare "ok" row goes.
+<h2>The eight directions</h2>
+<table>
+<thead><tr><th>#</th><th>name</th><th>the idea</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>edge-tabs</td><td>the controls ride the divider edge; ⤢ glyph in the head; no grow button</td></tr>
+<tr><td>2</td><td>glyph-cluster</td><td>an editor-style icon cluster in the chat head; ghost board edge when full</td></tr>
+<tr><td>3</td><td>swap-words</td><td>the word states the action now: "Full screen" ↔ "‹ Board"</td></tr>
+<tr><td>4</td><td>snap-drag</td><td>no full button: drag past 80% snaps full; "‹ BOARD" tab clings left</td></tr>
+<tr><td>5</td><td>popover</td><td>the status detail becomes a popover docked at the strip's right end</td></tr>
+<tr><td>6</td><td>one-instrument</td><td>the notifications lamp language takes over the whole screen</td></tr>
+<tr><td>7</td><td>quiet-hover</td><td>nothing visible at rest; controls appear on hover</td></tr>
+<tr><td>8</td><td>panel-tabs</td><td>the chat becomes a tabbed panel: CHAT | THREADS</td></tr>
+</tbody>
+</table>
+<p>Each drawn at 1440 in dark and light, the same busy content throughout: five board columns, the thread list unfolded, a four-line draft being typed, the strip with its detail open. Full set in <a href="cand/">cand/</a>; the sheets below.</p>
 
-## The eight directions
+<figure><img src="cand/contact-dark.jpg" alt="contact sheet, eight directions, dark" loading="lazy"><figcaption>The breadth sheet, dark. The light twin: <a href="cand/contact-light.jpg">contact-light.jpg</a>.</figcaption></figure>
 
-| # | name | the idea |
-|---|------|----------|
-| 1 | edge-tabs | the controls ride the divider edge; ⤢ glyph in the head; no grow button |
-| 2 | glyph-cluster | an editor-style icon cluster in the chat head; ghost board edge when full |
-| 3 | swap-words | the word states the action now: "Full screen" ↔ "‹ Board" |
-| 4 | snap-drag | no full button: drag past 80% snaps full; "‹ BOARD" tab clings left |
-| 5 | popover | the status detail becomes a popover docked at the strip's right end |
-| 6 | one-instrument | the notifications lamp language takes over the whole screen |
-| 7 | quiet-hover | nothing visible at rest; controls appear on hover |
-| 8 | panel-tabs | the chat becomes a tabbed panel: CHAT \| THREADS |
+<h2>Products survey</h2>
+<p>VS Code's toggle-in-place is the model: one glyph button, the glyph flips to its collapse twin when pressed, the tooltip names both directions, <code>aria-pressed</code> carries the state, Esc also exits. Gmail's ⤢ diagonal arrows is the accepted "grow this surface" glyph. The composer market settled long ago: auto-grow with typing up to a cap, then scroll inside. Status pages keep per-service rows while actionable; menubar monitors show one lamp with detail on hover. A strip wants the menubar form. Material 3 and the ARIA APG agree: icon-only controls need tooltips, and a toggle's accessible name should not change when its state changes. Details and sources: <a href="references.md">references.md</a>.</p>
 
-Each drawn at 1440 in dark and light by nano-banana-2.1 (16 images + sidecars), the same busy content throughout: five board columns, the thread list unfolded, a four-line draft being typed, the strip with its detail open.
+<h2>Critics, breadth pass</h2>
+<table>
+<thead><tr><th>rank</th><th>gemini-2.5-pro</th><th>glm-5v-turbo</th></tr></thead>
+<tbody>
+<tr><td>1</td><td class="win">06 one-instrument</td><td class="win">06 one-instrument</td></tr>
+<tr><td>2</td><td>04 snap-drag</td><td>04 snap-drag</td></tr>
+<tr><td>3</td><td>02 glyph-cluster</td><td>02 glyph-cluster</td></tr>
+<tr><td>4</td><td>08 panel-tabs</td><td>08 panel-tabs</td></tr>
+<tr><td>5</td><td>03 swap-words</td><td>01 edge-tabs</td></tr>
+<tr><td>6</td><td>01 edge-tabs</td><td>03 swap-words</td></tr>
+<tr><td>7</td><td>05 popover</td><td>05 popover</td></tr>
+<tr><td>8</td><td>07 quiet-hover</td><td>07 quiet-hover</td></tr>
+</tbody>
+</table>
+<p>Both drop 07 outright (hiding failure signals; light theme unusable) and both would carry 06 + 04.</p>
 
-## Products survey (references.md)
+<h2>Director's pixel pass and overrules</h2>
+<ul>
+<li>A 4.5-model pre-read of the lab-built control sheet raised four defects; all four overruled at 3× pixels: the collapse glyph is clean SVG (no tofu), the painted tooltip sits on provider api (not postgres), the grip reads as a vertical pill (an accepted drag affordance, and the whole 10 px column is the target), the composer renders intact. The light sheet's "unreadable headings": <code>--text-faint</code> #5b6678 on near-white measures ≈ 5.5:1, which passes AA. Overruled.</li>
+<li>nano-banana garbles service names ("borges" for forgejo in 01) and scatters bracketed pseudo-text in board cards (worst in 08). Tolerable at direction level; pinned exactly in the fix-loop prompts. Not overruled; fixed by construction.</li>
+<li>Gemini's "06's explicit FULL button… flawless craft": the craft holds, but the FULL word button is the incumbent control Sebastian rejected, and 06's composer shows a manual drag handle against the survey's settled auto-grow. Not overruled. Named as the fix loop's main job on 06.</li>
+<li>Both critics' praise of 04's snap-drag sits beside their own flags: "less immediately discoverable" (Gemini), the return "doesn't rely on memory" (GLM). Undiscoverability is Sebastian's own complaint axis. Recorded as the reason 04 does not carry.</li>
+</ul>
 
-VS Code's toggle-in-place is the model: one glyph button, the glyph flips to its collapse twin when pressed, the tooltip names both directions, `aria-pressed` carries the state, Esc also exits. Gmail's ⤢ diagonal arrows is the accepted "grow this surface" glyph. The composer market settled long ago: auto-grow with typing up to a cap, then scroll inside; an explicit expand control only for long-form writing. Status pages keep per-service rows while actionable; menubar monitors show one lamp with detail on hover — a strip wants the menubar form. Material 3 and the ARIA APG agree on the discipline: icon-only controls need tooltips, and a toggle's accessible name should not change when its state changes — which is the known compromise in direction 3.
+<h2>Carried two</h2>
+<p><strong>06 one-instrument</strong> (both critics' #1) and <strong>02 glyph-cluster</strong> (both critics' #3), overruling the critics' 04 on discoverability grounds. 04 is not lost: its snap-drag and its "‹ BOARD" edge tab merge into both revised directions as secondary affordances.</p>
 
-## Critics, breadth pass
+<h2>Fix loop</h2>
+<p>Revised prompts <a href="prompts/06r-one-instrument.md">06r</a> and <a href="prompts/02r-glyph-cluster.md">02r</a>: the glyph-flip control replaces every word button (16 px arrows on a 24 px target, the square stays lit when full, tooltip visible naming both directions), the dependencies compress to five lamp chips in one row (never stacked), the composer auto-grows with the four-line draft (no handle, no button), the chat floor is 24 rem with threads unfolded, exact service spellings pinned, no pseudo-text.</p>
 
-| rank | gemini-2.5-pro | glm-5v-turbo |
-|---|---|---|
-| 1 | 06 one-instrument | 06 one-instrument |
-| 2 | 04 snap-drag | 04 snap-drag |
-| 3 | 02 glyph-cluster | 02 glyph-cluster |
-| 4 | 08 panel-tabs | 08 panel-tabs |
-| 5 | 03 swap-words | 01 edge-tabs |
-| 6 | 01 edge-tabs | 03 swap-words |
-| 7 | 05 popover | 05 popover |
-| 8 | 07 quiet-hover | 07 quiet-hover |
+<div class="grid">
+<figure><img src="cand/02r-glyph-cluster-dark.png" alt="02r glyph-cluster, dark" loading="lazy"><figcaption>02r dark. The glyph cluster in the chat head, tooltip painted, chips row, auto-grown draft. Light: <a href="cand/02r-glyph-cluster-light.png">02r-light</a>.</figcaption></figure>
+<figure><img src="cand/06r-one-instrument-dark.png" alt="06r one-instrument, dark" loading="lazy"><figcaption>06r dark. Square lamps on the strip cells, the same glyph toggle, one wrapper box too many. Light: <a href="cand/06r-one-instrument-light.png">06r-light</a>.</figcaption></figure>
+</div>
 
-Both drop 07 outright (hiding failure signals; light theme unusable) and both would carry 06 + 04.
+<h2>Lab-built candidates (what images cannot draw)</h2>
+<p><a href="cand/controls.html">cand/controls.html</a> in the console's real stylesheet (code @eb59bac3): four window-control candidates in both states (A glyph flips with a constant name, B the word swaps with state, C glyph + stable word, D the chevron pair), plus the hover-grip divider, the dependency lamp chips with a painted tooltip ("up · under a minute ago"; down stays red and loud), and the auto-grown composer. Shot at 1440 and 390 in both themes.</p>
+<figure><img src="cand/controls-1440.png" alt="the four control candidates, both states, divider, chips, composer" loading="lazy"><figcaption>Candidates A-D in both states, the grip, the chips, the composer. Light: <a href="cand/controls-light-1440.png">controls-light</a>.</figcaption></figure>
+<p><a href="cand/pages.html">cand/pages.html</a>: the secondary pages rebuilt. Settings as a readout (small-caps terms, mono identifiers, hairline groups: identity, rules, Forgejo, GitHub export) instead of the ul pseudo-table; Costs with a thin day-cap gauge; both inside a 62 rem measure so the tables stop sprawling at wide windows.</p>
+<figure><img src="cand/pages-1440.png" alt="Settings readout and Costs gauge inside a 62 rem measure" loading="lazy"><figcaption>The pages candidate. Light: <a href="cand/pages-light-1440.png">pages-light</a>.</figcaption></figure>
 
-## Director's pixel pass and overrules
+<h2>Lab before-run (recorded, not this round's making)</h2>
+<p>The console lab ran the "before" at code HEAD <code>eb59bac3</code>: 261 shots, check red with 11 findings (tab title not split; busy missing "Two cards need your decision"; busy horizontal scroll at 1440; drawer missing its Chat tab; drawer and docs panels over the chat; busy columns' bodies scrolling sideways; idle/quiet missing status lines; phone targets under 44 px in threads and escalation). No code was touched by this round; the build stage clears these together with the picked design. Sebastian's four before-screenshots: <a href="ev/before-1-chat-full.png">1</a> <a href="ev/before-2-status-detail.png">2</a> <a href="ev/before-3-submenu.png">3</a> <a href="ev/before-4-settings.png">4</a>.</p>
 
-Checked against the full PNGs, not the compressed sheets:
+<h2>Compare loop</h2>
+<table>
+<thead><tr><th>critic</th><th>02r glyph-cluster</th><th>06r one-instrument</th><th>control pick</th></tr></thead>
+<tbody>
+<tr><td>gemini-2.5-pro</td><td class="win">carry, the recommendation</td><td>fails: chips nested in a labeled instrument box; prompt-text leaked under the light composer</td><td>C — glyph + stable word</td></tr>
+<tr><td>glm-5v-turbo</td><td class="win">carry, minor fixes</td><td>carry, minor fixes</td><td>A — glyph flips, constant name</td></tr>
+</tbody>
+</table>
+<ul>
+<li>Gemini's light-composer pseudo-text in 06r: <strong>stands</strong> (verified at 3×, a leaked instruction line under the draft).</li>
+<li>Gemini's "instrument box" around 06r's chips: <strong>half stands</strong>. One hairline container does wrap them. A judgment, recorded as a build fix: chips sit directly in the panel row-set.</li>
+<li>Gemini's Costs header misalignment: <strong>overruled</strong>. Pixels show the <code>.num</code> columns right-aligned under their headers (console.css:1244), and the headers it quoted do not exist in the sheet.</li>
+<li>GLM's "Send button contradicts no-button": <strong>overruled</strong>. The no-button rule retired the Grow control, not Send; sending stays.</li>
+<li>GLM's circle-vs-square lamps: <strong>stands as a build note</strong>. nano-banana drew dots where the spec said squares; the build uses the lamp language's shape.</li>
+<li>GLM's "Settings uses sentence case": <strong>overruled</strong>. It read the strip's mono readout line (sentence case by C24's design); the Settings terms render small-caps in the sheet.</li>
+</ul>
 
-- A 4.5-model pre-read of the lab-built control sheet raised four defects; all four overruled at 3× pixels: the collapse glyph is a clean SVG (no tofu), the painted tooltip sits on provider api (not postgres), the grip reads as a vertical pill (an accepted drag affordance, and the whole 10 px column is the target), the composer renders intact. The light sheet's "unreadable headings": `--text-faint` #5b6678 on near-white measures ≈ 5.5:1 — passes AA. Overruled.
-- nano-banana garbles service names ("borges" for forgejo in 01) and scatters bracketed pseudo-text in board cards (worst in 08) — tolerable at direction level, pinned exactly in the fix-loop prompts. Not overruled; fixed by construction.
-- Gemini's "06's explicit FULL button… flawless craft": the craft holds, but the FULL word button is the incumbent control Sebastian rejected, and 06's composer shows a manual drag handle against the survey's settled auto-grow. Not overruled — named as the fix loop's main job on 06.
-- Both critics' praise of 04's snap-drag sits beside their own flags: "less immediately discoverable" (Gemini), the return "doesn't rely on memory" (GLM). Undiscoverability is Sebastian's own complaint axis. Recorded as the reason 04 does not carry.
+<h2>Recommendation</h2>
+<p><strong>02r glyph-cluster</strong> as the main view, <strong>06r one-instrument</strong> as runner-up. 02r wins the compare on both cards (Gemini's outright recommendation; GLM's carry with only cosmetic fixes), it is the direction closest to the products survey's settled grammar, and its failures are generator cosmetics, not structure. 06r's maximalism is one container and one prompt leak from equal; the parts worth keeping (square lamps on the strip's cells) fold into 02r's build.</p>
+<p><strong>Control candidate A</strong>, the glyph flips, the accessible name never changes: the VS Code/Gmail grammar, both critics' ARIA-safe set, GLM's pick. C (glyph + the word "Full") is the recorded fallback if the glyph alone reads too quiet in daily use, but it keeps the very word Sebastian called unclear. B fails the ARIA name-stability rule. D's chevrons say "collapse a panel", not "take the screen".</p>
+<p>The secondary pages (Settings readout, Costs gauge, 62 rem measure) pass both critics unopposed and join the build as-is.</p>
+<p>The build also inherits, recorded: the lab before-run's 11 findings; square lamp shapes; chips without the wrapper box; the "waiting on the provider" warn cell survives and the bare "provider ok" row goes; Esc exits full chat as a second way back; tooltips on every non-obvious control (the divider's drag, the intake, the thread glyph, the lamps' ages).</p>
 
-## Carried two
-
-**06 one-instrument** (both critics' #1) and **02 glyph-cluster** (both critics' #3) — overruling the critics' 04 on discoverability grounds above. 04 is not lost: its snap-drag and its "‹ BOARD" edge tab merge into both revised directions as secondary affordances.
-
-## Fix loop
-
-Revised prompts `06r-one-instrument.md` and `02r-glyph-cluster.md`: the glyph-flip control replaces every word button (16 px arrows on a 24 px target, the square stays lit when full, tooltip visible naming both directions), the dependencies compress to five lamp chips in one row (never stacked), the composer auto-grows with the four-line draft (no handle, no button), the chat floor is 24 rem with threads unfolded, exact service spellings pinned, no pseudo-text.
-
-## Lab-built candidates (what images cannot draw)
-
-`cand/controls.html` in the console's real stylesheet (code @eb59bac3): four window-control candidates in both states — A glyph flips with a constant name (the VS Code/Gmail grammar), B the word swaps with state (the ARIA compromise), C glyph + stable word, D the chevron pair — plus the hover-grip divider, the dependency lamp chips with a painted tooltip ("up · under a minute ago"; down stays red and loud), and the auto-grown composer. Shot at 1440 and 390 in both themes; 3× crops in the director's pass above.
-
-`cand/pages.html`: the secondary pages rebuilt — Settings as a readout (small-caps terms, mono identifiers, hairline groups: identity, rules, Forgejo, GitHub export) instead of the ul pseudo-table, Costs with a thin day-cap gauge, both inside a 62 rem measure so the tables stop sprawling at wide windows. Both themes, 1440 and 390.
-
-## Lab before-run (recorded, not this round's making)
-
-The console lab ran the "before" at code HEAD `eb59bac3`: 261 shots, check red with 11 findings (tab title not split; busy missing "Two cards need your decision"; busy horizontal scroll at 1440; drawer missing its Chat tab; drawer and docs panels over the chat; busy columns' bodies scrolling sideways; idle/quiet missing status lines; phone targets under 44 px in threads and escalation). No code was touched by this round; the build stage clears these together with the picked design.
-
-## Compare loop
-
-Prompt `critique/_prompt-compare.md`; the four revised images plus the two lab-pair sheets to both critics.
-
-| critic | 02r glyph-cluster | 06r one-instrument | control pick |
-|---|---|---|---|
-| gemini-2.5-pro | carry, the recommendation | fails: chips nested in a labeled instrument box; prompt-text leaked under the light composer | C — glyph + stable word |
-| glm-5v-turbo | carry, minor fixes | carry, minor fixes | A — glyph flips, constant name |
-
-Director's pixel pass on the compare claims:
-
-- Gemini's light-composer pseudo-text in 06r: **stands** (verified at 3×, a leaked instruction line under the draft).
-- Gemini's "instrument box" around 06r's chips: **half stands** — one hairline container does wrap them; a judgment, recorded as a build fix (chips sit directly in the panel row-set).
-- Gemini's Costs header misalignment: **overruled** — pixels show the `.num` columns right-aligned under their headers (console.css:1244), and the headers it quoted do not exist in the sheet.
-- GLM's "Send button contradicts no-button": **overruled** — the no-button rule retired the Grow control, not Send; sending stays.
-- GLM's circle-vs-square lamps: **stands as a build note** — nano-banana drew dots where the spec said squares; the build uses the lamp language's shape.
-- GLM's "Settings uses sentence case": **overruled** — it read the strip's mono readout line (sentence case by C24's design); the Settings terms render small-caps in the sheet.
-
-## Recommendation
-
-**02r glyph-cluster** as the main view, **06r one-instrument** as runner-up. 02r wins the compare on both cards (Gemini's outright recommendation; GLM's carry with only cosmetic fixes), it is the direction closest to the products survey's settled grammar, and its failures are generator cosmetics, not structure. 06r's maximalism is one container and one prompt leak from equal — the parts worth keeping (square lamps on the strip's cells) fold into 02r's build.
-
-**Control candidate A** — the glyph flips, the accessible name never changes: the VS Code/Gmail grammar, both critics' ARIA-safe set, and GLM's pick. C (glyph + the word "Full") is the recorded fallback if the glyph alone reads too quiet in daily use — but it keeps the very word Sebastian called unclear. B fails the ARIA name-stability rule; D's chevrons say "collapse a panel", not "take the screen".
-
-The secondary pages (Settings readout, Costs gauge, 62 rem measure) pass both critics unopposed and join the build as-is.
-
-The build also inherits, recorded: the lab before-run's 11 findings; square lamp shapes; chips without the wrapper box; the "waiting on the provider" warn cell survives and the bare "provider ok" row goes; Esc exits full chat as a second way back; tooltips on every non-obvious control (the divider's drag, the intake, the thread glyph, the lamps' ages).
-
-Sebastian picks: the direction (02r recommended / 06r), and the control (A recommended / C).
-
-## Cost
-
-$2.88 generation (20 images, nano-banana-2.1) + $0.12 critics (6 runs) ≈ $3.00 of the $8 cap. Round time: one session, 2026-10-19.
+<h2>Cost</h2>
+<p class="mono">$2.88 generation (20 images) + $0.12 critics (6 runs) ≈ $3.00 of the $8 cap. Round time: one session, 2026-10-19.</p>
+</main>
+</body>
+</html>
