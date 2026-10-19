@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Round 12 — the chat's asks, images and filings</title>
+<style>
+:root { color-scheme: dark; --bg: #10151d; --bg-panel: #151b25; --line: #232b38; --text: #dfe7f1; --muted: #93a1b5; --faint: #7c8ba0; --accent: #53d6e2; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.65 system-ui, sans-serif; }
+main { max-width: 68rem; margin: 0 auto; padding: 28px 22px 80px; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+h2 { font-size: 13px; font-variant-caps: all-small-caps; letter-spacing: .08em; color: var(--faint); margin: 34px 0 8px; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+p, li { color: var(--text); }
+p { margin: 8px 0; max-width: 78ch; }
+code, .mono { font: 12.5px/1.6 ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: var(--muted); }
+code { color: var(--accent); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+table { border-collapse: collapse; margin: 12px 0; font: 12.5px/1.6 ui-monospace, Menlo, Consolas, monospace; }
+th, td { border: 1px solid var(--line); padding: 4px 10px; text-align: left; }
+th { font-variant-caps: all-small-caps; letter-spacing: .06em; color: var(--muted); font-family: system-ui; }
+td.win { color: var(--accent); }
+figure { margin: 14px 0; }
+figure img { max-width: 100%; border: 1px solid var(--line); display: block; }
+figcaption { color: var(--muted); font-size: 12px; margin-top: 4px; max-width: 78ch; }
+ul { margin: 8px 0; padding-left: 22px; }
+li { margin: 3px 0; }
+.meta { color: var(--muted); font-size: 12.5px; }
+.pick { border: 1px solid var(--accent); padding: 10px 14px; margin: 12px 0; }
+.pick strong { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+<h1>Round 12 — the chat's asks, images and filings</h1>
+<p class="meta">2026-10-19 · one session · no generation: the landed build shot in the console lab, 2 Playwright shots · 2 critic runs · $0.06 of the $3 cap · <a href="notes.md">notes</a> · <a href="brief.md">brief</a></p>
+
+<p class="pick"><strong>Ship as built.</strong> The three controls the chat gained with roadmap 300's opening move — the ask row with pressable answers, the pasted image as chip and thumbnail, the refused filing that self-corrects — hold the pinned style and both critics reach the same verdict on all three. The design was shaped by Sebastian's plan rulings (images by tool, presses send at once, a member-sent image approves its spend); the pick is his. The one defect a critic claimed, the thumbnail's legibility, fell to a 3× crop: overruled, no fix loop. The round's records: <a href="#c-entries">C26, C27, C28</a> in design-decisions.md.</p>
+
+<h2>The story in one scroll</h2>
+<p>The review unit is the real console, not a candidate: the build landed as six streams (Forgejo 4a7536bb through 4fa42a0c), and the lab's busy scene now tells the whole story in one thread. The tall shot below, read top to bottom: the member's request; the agent's question with its <strong>Answer</strong> row of choices, pressed ("One card" lands as the member's own row, the Answer row gone); the pressed filing the ready check refused, in the refused colour, naming what it wants; the corrected proposal carrying its two acceptance tests, waiting on <strong>Do it</strong>; the screenshot the member sent as <strong>img1</strong>, its thumbnail in their row; the agent's <code>analyze_image</code> call that read it by name and answered from it; and the open ask at the foot with its two choices above the composer.</p>
+<figure>
+<img src="shots/chat-tall-1440.png" alt="the chat opened tall: request, answered ask, refused filing, corrected proposal, the img1 thumbnail with its analyze_image answer, open ask" loading="lazy">
+<figcaption>The whole story in one scroll, dark, 1440 px. The refused row keeps the console's red; the corrected proposal's description carries its acceptance tests; the open ask's choices sit between the log and the composer.</figcaption>
+</figure>
+
+<h2>The chip</h2>
+<p>A pasted image rides the composer as a chip in the queue-chip pattern: the thumbnail, the name <code>img1</code> the member can refer to in the message, and an × that removes it. Nothing uploads until Send. The sent row then shows the image as a 96×96 thumbnail with a 1px line and 4px radius — a fact of the message, a link that opens the full image in a new tab.</p>
+<figure>
+<img src="shots/chat-paste-1440.png" alt="the composer holding a pasted image as its chip: thumbnail, img1, ×; the textarea free below" loading="lazy">
+<figcaption>The composer at rest with the chip: the textarea stays the primary input; the chip is a pending fact, removable before it is sent.</figcaption>
+</figure>
+
+<h2>Critics</h2>
+<p>One pass, both critics of design/models.md, the same <a href="critique/_prompt.md">prompt</a> and the same two images. Answers as JSON sidecars: <a href="critique/gemini.json">gemini</a>, <a href="critique/glm.json">glm</a>.</p>
+<table>
+<tr><th>control</th><th>gemini 2.5 pro</th><th>glm-5v-turbo</th></tr>
+<tr><td>the ask row</td><td class="win">ship — "an instrument of clarification, not a conversational flourish"</td><td class="win">ship — "respects both click-happy and keyboard-only members"</td></tr>
+<tr><td>the image</td><td class="win">ship — "evidence attached to a statement, not a gallery display"</td><td class="win">ship — "a complete, auditable chain"</td></tr>
+<tr><td>the refused filing</td><td class="win">ship — "an unemotional, factual report... followed by a quiet, competent correction"</td><td class="win">ship — "transparent, actionable"</td></tr>
+<tr><td>defects found</td><td>one claim: the thumbnail illegible</td><td>none</td></tr>
+</table>
+
+<h2>The one claim that did not survive the pixels</h2>
+<p>Gemini called the thumbnail "effectively illegible... a near-black rectangle... no value as a visual reminder of which image". The 3× crop in the notes disproves both legs: the terminal's content rows and the red error bar read clearly at 96px, and the image is genuinely a dark screenshot — a faithful small render of a dark picture is dark. Reading text inside a screenshot at 96px is not the control's job; the name is the handle, the click opens the full image. Overruled; the round's one fix loop stays unused. glm's two descriptive slips (the thumbnail "sized to the cap-height of the 13px sans word"; the capture "tall, narrow") and its lightbox nitpick (already built: the thumbnail is a link) are recorded in the notes.</p>
+
+<h2>Beyond the round</h2>
+<p>Both critics reached for the same thing from opposite sides: gemini a "decision summary" view over the log's asks and proposals, glm a diff hint on a corrected filing. Both are real wants and both are new work; neither belongs to this round. They go to the ledger as candidates for a later round.</p>
+
+<h2 id="c-entries">The records</h2>
+<ul>
+<li><strong>C26</strong> — the agent's chat question carries C14's answer row; a press sends at once.</li>
+<li><strong>C27</strong> — a member's image rides the composer as a chip and lands as a thumbnail; the agent reads it by tool.</li>
+<li><strong>C28</strong> — a refused filing names what to fix and feeds a turn; the correction lands as a new proposal.</li>
+</ul>
+</main>
+</body>
+</html>

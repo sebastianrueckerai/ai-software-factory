@@ -48,8 +48,8 @@ Read off the templates in `internal/console/templates/` on 2026-10-13 (code comm
 ### Chat panel
 
 - Title; "project agent · project"; New conversation; old conversations select.
-- Log: start line; your messages; agent replies (markdown); tool calls as collapsed blocks (name, arguments, result's first line, duration); proposals (title, list of changes, details, Do it, Skip); applied lines with undo; refused lines; expired; error; streaming cursor.
-- "This is your own conversation" line. Textarea (Enter sends, Shift+Enter breaks, / focuses). Send. The queue of waiting messages, each editable and removable.
+- Log: start line; your messages (image attachments as thumbnails, each a link to the full image); agent replies (markdown); asks, the newest unanswered one with an answer row of choices that sends at once (C26); tool calls as collapsed blocks (name, arguments, result's first line, duration); proposals (title, list of changes, details, Do it, Skip); applied lines with undo; refused lines, a refused apply followed by the agent's corrected proposal (C28); expired; error; streaming cursor.
+- "This is your own conversation" line. Pending images from paste and drop as chips above the box (picture, name img1, × removes, nothing uploads until Send; C27). Textarea (Enter sends, Shift+Enter breaks, / focuses). Send. The queue of waiting messages, each editable and removable.
 - Narrow screens: Board and Chat tabs, the Chat tab with an open-proposals count.
 
 ## Other pages

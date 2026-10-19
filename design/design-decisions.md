@@ -184,3 +184,21 @@ Sebastian held the live page against the reference on 2026-10-18 and called the 
 A correction of C20's record, not a change of mind. C20's line "the SPEND / provider / configuration panel renders always, without an expand control" was wrong when written. The standing want is C7's, said many times since: one thin status line, closed, that expands on click. C20's real decision, the pulse band going, stands untouched.
 
 The build: the strip is the summary of a details element whose only other child is the panel. The line stays one thin row of figures until clicked, and the open state survives the board's swap and the poll, which replace only the innerHTML. Keyboard and screen readers follow the native summary. The build card is "console: the status line is one thin strip again, the panel behind its click" (Forgejo pull 1085).
+
+## C26. The agent's chat question carries C14's answer row; a press sends at once (2026-10-19, Sebastian)
+
+The ask tool's question renders in the conversation and the newest unanswered one carries the C14 answer row: the choices as buttons, "or in your words below", free text always open. A press sends the choice at once as the member's own chat message, which starts the model turn — the same record a typed answer makes, per the question-format concept. Any later row settles the ask; the row is gone from the settled one. Escalations keep their own shape: ask is for chat questions, escalate files a needs-you card.
+
+The build is the ask tool and its row (Forgejo 018b96c3), reviewed in round 12.
+
+## C27. A member's image rides the composer as a chip and lands as a thumbnail; the agent reads it by tool (2026-10-19, Sebastian)
+
+Paste and drop collect pending images as chips in the queue-chip pattern — the picture, the name img1 the member can refer to in the text, an × that removes — and nothing uploads until Send. The sent row shows each image as a 96×96 thumbnail, a link to the full image. The agent never sees the pixels in its context: analyze_image resolves the name newest-first and answers from one priced vision call. A member-sent image is spend they approved — Sebastian's ruling, verbatim: "If I send an image somewhere as the human, we can assume I OK that spend." — so the look carries no confirm gate; the chat's monthly budget stays the hard bound.
+
+The build is the attachments spine end to end (Forgejo 4ad14fcd, 40ae0cef, 738d83ee, the vision alias in the infra repo), reviewed in round 12.
+
+## C28. A refused filing names what to fix and feeds a turn; the correction lands as a new proposal (2026-10-19, Sebastian)
+
+When a pressed Do it is refused — the ready check wanting acceptance tests a plan card did not carry — the refusal is not a dead end. The do- row keeps the refused colour and the check's words, and the refusal feeds the model a new turn, exactly as an in-turn tool refusal does. The agent's correction arrives as a new proposal that visibly carries what the refusal asked for, waiting on its own Do it. The record reads as recovery: refusal named, remedy proposed, nothing hidden. The tool's shape teaches the rule up front: new_card takes the acceptance tests as its own parameter, so the filing that knows the rule never meets the refusal.
+
+The build is the acceptance parameter and the refused-apply turn (Forgejo 4a7536bb), reviewed in round 12.
