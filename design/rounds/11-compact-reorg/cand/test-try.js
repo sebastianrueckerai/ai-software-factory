@@ -22,6 +22,8 @@ const { chromium } = require("playwright");
     full: document.getElementById("screen").classList.contains("chat-only"),
     pressed: document.getElementById("chat-full").getAttribute("aria-pressed"),
     edgeVisible: getComputedStyle(document.querySelector(".edge-tab")).display !== "none",
+    edgePos: getComputedStyle(document.querySelector(".edge-tab")).position,
+    edgeX: Math.round(document.querySelector(".edge-tab").getBoundingClientRect().x),
     colGlyph: getComputedStyle(document.querySelector("#chat-full .col")).display !== "none"
   }));
   await p.keyboard.press("Escape");
@@ -38,7 +40,12 @@ const { chromium } = require("playwright");
   out.a_drawer = await p.evaluate(() => ({
     shown: !document.getElementById("drawer").hidden,
     ref: document.querySelector("#drawer .dr-ref").textContent,
-    title: document.querySelector("#drawer .dr-title h2").textContent
+    title: document.querySelector("#drawer .dr-title h2").textContent,
+    closeClear: (() => {
+      const c = document.querySelector("#drawer-close").getBoundingClientRect();
+      const h = document.querySelector("#drawer .dr-title h2").getBoundingClientRect();
+      return !(c.x < h.right && h.x < c.right && c.y < h.bottom && h.y < c.bottom);
+    })()
   }));
   await p.click('[data-tab="overview"]');
   out.a_tabOverview = await p.evaluate(() => ({
@@ -67,6 +74,33 @@ const { chromium } = require("playwright");
   // tooltip on hover
   await p.hover("#chat-full");
   out.a_tip = await p.evaluate(() => getComputedStyle(document.querySelector("#chat-full"), "::after").content !== "none");
+  // the input sizer: drag, reset, keys, auto-grow
+  out.a_growInit = await p.evaluate(() => {
+    const form = document.querySelector("#chat-form");
+    const bar = form.querySelector(".growbar");
+    return {
+      bar: !!bar,
+      firstChild: form.firstElementChild === bar,
+      atTop: Math.abs(bar.getBoundingClientRect().top + bar.getBoundingClientRect().height / 2 - form.getBoundingClientRect().top) <= 1,
+      taH: Math.round(form.querySelector("textarea").getBoundingClientRect().height)
+    };
+  });
+  const bar = await p.evaluate(() => {
+    const r = document.querySelector("#chat-form .growbar").getBoundingClientRect();
+    return { x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) };
+  });
+  await p.mouse.move(bar.x, bar.y);
+  await p.mouse.down();
+  await p.mouse.move(bar.x, bar.y - 120, { steps: 6 });
+  await p.mouse.up();
+  out.a_growDrag = await p.evaluate(() => Math.round(document.querySelector("#chat-form textarea").getBoundingClientRect().height));
+  await p.dblclick("#chat-form .growbar");
+  out.a_growReset = await p.evaluate(() => Math.round(document.querySelector("#chat-form textarea").getBoundingClientRect().height));
+  await p.focus("#chat-form .growbar");
+  await p.keyboard.press("ArrowUp");
+  out.a_growKeys = await p.evaluate(() => Math.round(document.querySelector("#chat-form textarea").getBoundingClientRect().height));
+  await p.fill("#chat-form textarea", "x".repeat(600));
+  out.a_growAuto = await p.evaluate(() => Math.round(document.querySelector("#chat-form textarea").getBoundingClientRect().height));
   out.a_errs = errs;
   await p.close();
 
@@ -95,6 +129,16 @@ const { chromium } = require("playwright");
   }));
   await p.keyboard.press("Escape");
   out.b_esc = await p.evaluate(() => !document.getElementById("screen").classList.contains("chat-only"));
+  // B shares the input sizer
+  const bBar = await p.evaluate(() => {
+    const r = document.querySelector("form.composer .growbar").getBoundingClientRect();
+    return { x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) };
+  });
+  await p.mouse.move(bBar.x, bBar.y);
+  await p.mouse.down();
+  await p.mouse.move(bBar.x, bBar.y - 80, { steps: 6 });
+  await p.mouse.up();
+  out.b_grow = await p.evaluate(() => Math.round(document.querySelector("form.composer textarea").getBoundingClientRect().height));
   out.b_errs = errsB;
   await p.close();
 

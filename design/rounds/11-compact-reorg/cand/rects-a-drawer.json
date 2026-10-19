@@ -20,17 +20,24 @@
   "w": 605,
   "h": 54
  },
+ "article.need": {
+  "s": "article.need",
+  "x": 413,
+  "y": 290,
+  "w": 317,
+  "h": 179
+ },
  "#drawer .tabs": {
   "s": "#drawer .tabs",
   "x": 773,
-  "y": 302,
+  "y": 280,
   "w": 657,
   "h": 39
  },
  "#drawer-close": {
   "s": "#drawer-close",
-  "x": 777,
-  "y": 244,
+  "x": 1388,
+  "y": 230,
   "w": 28,
   "h": 22
  },
@@ -47,5 +54,19 @@
   "y": 229,
   "w": 88,
   "h": 22
+ },
+ "#chat-form .growbar": {
+  "s": "#chat-form .growbar",
+  "x": 13,
+  "y": 705,
+  "w": 382,
+  "h": 10
+ },
+ "#chat-form": {
+  "s": "#chat-form",
+  "x": 13,
+  "y": 709,
+  "w": 382,
+  "h": 178
  }
 }

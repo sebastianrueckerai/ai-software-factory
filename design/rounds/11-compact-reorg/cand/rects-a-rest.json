@@ -54,5 +54,19 @@
   "y": 229,
   "w": 88,
   "h": 22
+ },
+ "#chat-form .growbar": {
+  "s": "#chat-form .growbar",
+  "x": 13,
+  "y": 705,
+  "w": 382,
+  "h": 10
+ },
+ "#chat-form": {
+  "s": "#chat-form",
+  "x": 13,
+  "y": 709,
+  "w": 382,
+  "h": 178
  }
 }

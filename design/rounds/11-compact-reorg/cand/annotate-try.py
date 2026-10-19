@@ -15,7 +15,7 @@ def mark(im, d, rect, n, label_pos):
 def load(name):
     return json.load(open(cand + name))
 
-# A, rest: 1 toggle, 2 divider grip, 3 chips, 4 a card, 5 intake
+# A, rest: 1 toggle, 2 divider grip, 3 chips, 4 a card, 5 intake, 6 input sizer
 r = load("rects-a-rest.json")
 im = Image.open(cand + "try-a-rest.png").convert("RGB")
 d = ImageDraw.Draw(im)
@@ -26,6 +26,9 @@ mark(im, d, grip, 2, (340, mid["y"] + mid["h"] // 2 - 66))
 mark(im, d, r[".chiprow"], 3, (742, 92))
 mark(im, d, r["article.need"], 4, (r["article.need"]["x"] + 6, r["article.need"]["y"] - 56))
 mark(im, d, r["#intake-btn"], 5, (232, 186))
+bar = r["#chat-form .growbar"]
+sizer = {"x": bar["x"] + bar["w"] // 2 - 15, "y": bar["y"] + 5 - 9, "w": 30, "h": 18}
+mark(im, d, sizer, 6, (sizer["x"] + 46, sizer["y"] - 12))
 im.save(cand + "try-a-annotated.png")
 
 # A, drawer: 1 tabs, 2 close

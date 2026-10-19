@@ -10,6 +10,13 @@ const fs = require("fs");
   await p.waitForTimeout(1200);
   if (action === "drawer") await p.click("article.need");
   if (action === "threads") await p.click(".ctab:nth-child(2)");
+  if (action === "rest") {
+    const bar = await p.evaluate(() => {
+      const b = document.querySelector("#chat-form .growbar").getBoundingClientRect();
+      return { x: Math.round(b.x + b.width / 2), y: Math.round(b.y + b.height / 2) };
+    });
+    await p.mouse.move(bar.x, bar.y);
+  }
   await p.waitForTimeout(400);
   const rects = await p.evaluate(() => {
     const r = s => {
@@ -19,7 +26,7 @@ const fs = require("fs");
       return { s, x: Math.round(b.x), y: Math.round(b.y), w: Math.round(b.width), h: Math.round(b.height) };
     };
     const out = {};
-    const want = ["#chat-full", "#chat-divider", ".chiprow", "article.need", "#drawer .tabs", "#drawer-close", ".ctabs", ".edge-tab", "#intake-btn"];
+    const want = ["#chat-full", "#chat-divider", ".chiprow", "article.need", "#drawer .tabs", "#drawer-close", ".ctabs", ".edge-tab", "#intake-btn", "#chat-form .growbar", "#chat-form"];
     want.forEach(s => { const v = r(s); if (v) out[s] = v; });
     return out;
   });

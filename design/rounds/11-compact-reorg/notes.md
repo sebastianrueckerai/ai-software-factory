@@ -176,3 +176,29 @@ zero page errors (cand/test-try.js). Control circles drawn from
 measured rectangles (cand/annotate-try.py) onto three annotated PNGs;
 circle placement verified. The static d-pages stay as the round's
 record; the try pages are the pick instruments.
+
+## Sebastian's live verdict and the two fixes (2026-10-19)
+
+Sebastian tried both, picked A, and asked for the input itself to be
+resizable; he also reported the drawer's X overlapping the title.
+
+The input sizer: a 10 px drag seam on the composer's top edge
+(.growbar, a separator role, focusable). Drag sizes the input between
+44 px and 60 vh; double-click resets; ArrowUp/ArrowDown step 24 px;
+typing past the box grows it to fit, capped at 60 vh. The grip shows on
+hover and focus as a small bordered glyph centered on the seam. Wired
+in build-try.py for both try pages; verified: drag 110→230 px, reset to
+110, key step to 134, auto-grow to 264 on 600 characters, B 110→190;
+zero page errors (test-try.js a_grow*, b_grow). The rest shot hovers
+the seam so the grip shows; circle 6 marks it.
+
+The X overlap: root cause was my own tooltip anchor,
+[data-tip] { position: relative }, which sits after console.css in the
+cascade and unseated .drawer-close's absolute placement once the
+title-to-data-tip conversion reached it. Same mechanism would have
+unseated the absolutely placed edge tab. Fixed in CSS_COMMON: the
+[data-tip] rule now comes first in the block, and .drawer-close's
+absolute placement is re-asserted after it. Measured: close at
+x 1388, position absolute; the title text ends at 1376 against the
+36 px right padding console.css already reserves; no intersection
+(test-try.js a_drawer.closeClear true). Both annotated PNGs reshot.

@@ -24,6 +24,7 @@
 .ctab .cbadge { font: 10px/1 var(--font-mono); color: var(--text-faint); }
 
 /* try wiring: the glyph flips, the edge tab returns, tooltips on every quiet control */
+[data-tip] { position: relative; }
 .wctl .col { display: none; }
 .wctl[aria-pressed="true"] .exp { display: none; }
 .wctl[aria-pressed="true"] .col { display: block; }
@@ -32,10 +33,15 @@
 .edge-tab:hover { color: var(--accent); border-color: var(--accent); }
 #screen.chat-only .edge-tab { display: inline-flex; align-items: center; }
 #chat-divider { cursor: col-resize; }
+form.composer { position: relative; }
+.growbar { position: absolute; top: -5px; left: 0; right: 0; height: 10px; cursor: row-resize; z-index: 5; }
+.growbar::after { content: "\2965"; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-45deg); display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 18px; border: 1px solid var(--line-strong); border-radius: 3px; background: var(--bg-raised); color: var(--text-faint); font: 11px/1 var(--font-mono); opacity: 0; transition: opacity .12s; }
+.growbar:hover::after, .growbar:focus-visible::after { opacity: 1; }
 .tip { display: none; }
-[data-tip] { position: relative; }
 [data-tip]:hover::after, [data-tip]:focus-visible::after { content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; padding: 3px 8px; border: 1px solid var(--line-strong); background: var(--bg-raised); color: var(--text-muted); font: 11px/1.5 var(--font-mono); box-shadow: 0 8px 24px rgba(0,0,0,.35); z-index: 80; pointer-events: none; }
 #chat-divider[data-tip]:hover::after, #chat-divider[data-tip]:focus-visible::after { left: 14px; bottom: 50%; transform: translateY(50%); }
+/* the tooltip anchor must not unseat the console's absolutely placed controls */
+.drawer-close { position: absolute; top: 12px; right: 14px; }
 
 #screen.chat-only .chat-main { max-width: 48rem; margin: 0 auto; width: 100%; }
 #switcher { display: none; }
@@ -316,6 +322,44 @@ intake <span class="intake-name">open</span>
     intake.setAttribute("data-intake", open ? "closed" : "open");
     intake.setAttribute("aria-pressed", open ? "true" : "false");
     var n = intake.querySelector(".intake-name"); if (n) n.textContent = open ? "closed" : "open";
+  });
+
+  // the input's top edge: drag to size, double-click to reset, grows with typing
+  document.querySelectorAll("form.composer").forEach(function (form) {
+    var ta = form.querySelector("textarea");
+    if (!ta) return;
+    var bar = document.createElement("div");
+    bar.className = "growbar";
+    bar.setAttribute("data-tip", "Drag to size the input; double-click resets it");
+    bar.setAttribute("role", "separator");
+    bar.setAttribute("aria-orientation", "horizontal");
+    bar.setAttribute("tabindex", "0");
+    form.insertBefore(bar, form.firstChild);
+    var y0 = 0, h0 = 0, on = false;
+    bar.addEventListener("pointerdown", function (e) {
+      on = true; y0 = e.clientY; h0 = ta.getBoundingClientRect().height;
+      try { bar.setPointerCapture(e.pointerId); } catch (x) {}
+      e.preventDefault();
+    });
+    bar.addEventListener("pointermove", function (e) {
+      if (!on) return;
+      var h = Math.round(Math.max(44, Math.min(window.innerHeight * 0.6, h0 + (y0 - e.clientY))));
+      ta.style.height = h + "px";
+    });
+    ["pointerup", "pointercancel"].forEach(function (n) { bar.addEventListener(n, function () { on = false; }); });
+    bar.addEventListener("dblclick", function () { ta.style.height = ""; });
+    bar.addEventListener("keydown", function (e) {
+      if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+      var cur = ta.getBoundingClientRect().height;
+      var h = Math.round(Math.max(44, Math.min(window.innerHeight * 0.6, cur + (e.key === "ArrowUp" ? 24 : -24))));
+      ta.style.height = h + "px";
+      e.preventDefault();
+    });
+    ta.addEventListener("input", function () {
+      if (ta.scrollHeight > ta.clientHeight) {
+        ta.style.height = Math.min(Math.round(window.innerHeight * 0.6), ta.scrollHeight) + "px";
+      }
+    });
   });
 
   var sw = document.querySelector("[data-swtoggle]");
