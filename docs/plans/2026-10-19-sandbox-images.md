@@ -8,7 +8,7 @@
 
 **Tech Stack:** Go 1.26 (factoryd, imagegen), Dockerfiles + BuildKit on the build VMs, cosign, Forgejo package API, the factory policy tree (YAML), Forgejo Actions.
 
-**Spec:** [docs/sandbox-images-design-2026-10-19.md](../../sandbox-images-design-2026-10-19.md) (same repository; executors read both)
+**Spec:** [docs/sandbox-images-design-2026-10-19.md](../sandbox-images-design-2026-10-19.md) (same repository; executors read both)
 
 ## Global Constraints
 
