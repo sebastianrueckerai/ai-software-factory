@@ -1,3 +1,4 @@
+const { execFileSync } = require("node:child_process");
 const fs = require("node:fs");
 const path = require("node:path");
 const { chromium } = require("playwright");
@@ -68,11 +69,12 @@ async function run(page, action, mouse) {
 }
 
 async function record(browser, name, commits) {
+  const own = new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(\\.(webm|mp4|json)|-\\d+\\.png)$`);
+  for (const f of fs.readdirSync(OUT)) {
+    if (own.test(f)) fs.rmSync(path.join(OUT, f));
+  }
   const scene = require(`./scenes/${name}.js`);
   const { viewport, scale } = VIEWPORTS[scene.viewport];
-  for (const f of fs.readdirSync(OUT)) {
-    if (new RegExp(`^${name}(\\.(webm|mp4|json)|-\\d+\\.png)$`).test(f)) fs.rmSync(path.join(OUT, f));
-  }
   const tmp = fs.mkdtempSync(path.join(OUT, `.${name}-`));
   const context = await browser.newContext({
     viewport, deviceScaleFactor: scale, recordVideo: { dir: tmp, size: viewport }, colorScheme: scene.theme,
@@ -124,9 +126,12 @@ async function record(browser, name, commits) {
   }
   fs.renameSync(webm, path.join(OUT, `${name}.webm`));
   fs.rmSync(tmp, { recursive: true, force: true });
+  const videoMs = Math.round(1000 * Number(execFileSync("ffprobe", [
+    "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path.join(OUT, `${name}.webm`),
+  ], { encoding: "utf8" })));
   const { title, story, group, theme, viewport: vp } = scene;
   fs.writeFileSync(path.join(OUT, `${name}.json`), JSON.stringify({
-    name, title, story, group, theme, viewport: vp, ...commits, recordedAt: new Date(t0).toISOString(), durationMs, steps: marks,
+    name, title, story, group, theme, viewport: vp, ...commits, recordedAt: new Date(t0).toISOString(), durationMs, videoMs, steps: marks,
   }, null, 2) + "\n");
 }
 

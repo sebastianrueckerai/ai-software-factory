@@ -13,4 +13,6 @@ A scene module. `state(now)` returns the lab's scene JSON, or null for no seed. 
       steps: [{ state: (now) => state.scene(now, { tasks: [...] }), actions: [{ goto: "/" }], hold: 1500 }],
     };
 
+Sidecar clock: `atMs` and `durationMs` count from the creation of the recording context, which is the video's time zero (measured: the board is on screen within 0.1 s of it). `durationMs` is the script's span; `videoMs` is the webm's measured length. They differ by about 0.1 s (the video can end slightly before the script does); cut by `atMs` and `videoMs`.
+
 Tests: `node --test demo/test/*.test.js`.
