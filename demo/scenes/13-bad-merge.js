@@ -53,7 +53,10 @@ const fix = {
 
 // the week's earlier cards are done: issue, done after, spend; #104 of week 1 for its alert. The weekly bump's #115 is
 // on its run's clock.
-const finished = [[104, HOUR, 0.48], [116, 1.5 * HOUR, 1.04], [117, 9.5 * HOUR, 0.45], [120, 9.8 * HOUR, 0.86], [121, 9.3 * HOUR, 0.46]];
+const finished = [
+  [104, HOUR, 0.48], [116, 1.5 * HOUR, 1.04], [117, 9.5 * HOUR, 0.45], [120, 9.8 * HOUR, 0.86], [121, 9 * HOUR + 20 * MIN, 0.46],
+  [122, story.merges[122].live, 0.61],
+];
 
 const reading = state.reply(state.say(story.replies.alertsRead), state.call("alerts", { state: "all" }));
 const settled = state.reply(state.say(story.replies.schedule500));

@@ -21,6 +21,15 @@ module.exports = {
   objective: '#drawer [data-sec="objective"] > summary',
   links: '#drawer [data-sec="links"] > summary',
   doIt: "#chat-log .proposal [data-doit]",
+  // choice is a Needs you card's answer button that posts label
+  choice: (issue, label) => `#board article.escalation[data-card="${state.id(issue)}"] .choices button[value="${label}"]`,
+  // answer is the chat's answer row button that answers the inbox's open escalation with label
+  answer: (label) => `#chat-answer [data-answer="${label}"]`,
+  approve: (pr) => `#board article.approval button[aria-label^="Approve merge PR #${pr} "]`,
+  approval: (pr) => `#board article.approval:has(a[href$="/pulls/${pr}"])`,
+  // the chat's autonomy control under Send: its button and a level of its menu
+  level: "#level-btn",
+  levelPick: (name) => `#level-pop [data-lvl="${name}"]`,
   // the chat's first tool call, folded to its first line
   tool: "#chat-log details.tool > summary",
   ghost: (routine) => `#board [data-ghost="${project.name}/${routine}"]`,
@@ -29,4 +38,6 @@ module.exports = {
   home: "a.home",
   // park is a spot for the cursor off every word: the body of Needs you, on a board where nothing waits
   park: "#needs-you .cards",
+  // idle is the same spot in In progress, on a board where nothing runs
+  idle: '#board .column[aria-labelledby="col-2"] .cards',
 };

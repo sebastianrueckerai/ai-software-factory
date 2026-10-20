@@ -9,7 +9,8 @@ const BOARD = ui.board(["security-scan", "dependency-bump", "performance-read"],
 
 // the week's other cards are done: issue, done after, spend
 const finished = [
-  [116, 1.5 * HOUR, 1.04], [117, 9.5 * HOUR, 0.45], [118, 77 * 60, 0.36], [119, 34 * 60, 0.29], [120, 9.8 * HOUR, 0.86], [121, 9.3 * HOUR, 0.46],
+  [116, 1.5 * HOUR, 1.04], [117, 9.5 * HOUR, 0.45], [118, 77 * 60, 0.36], [119, 34 * 60, 0.29], [120, 9.8 * HOUR, 0.86], [121, 9 * HOUR + 20 * 60, 0.46],
+  [122, story.merges[122].live, 0.61],
 ];
 
 // board is the board of scene 17 now, the story's time as long after the performance read of week 2 as now is after

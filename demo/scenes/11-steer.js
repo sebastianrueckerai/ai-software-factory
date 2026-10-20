@@ -8,20 +8,14 @@ const steer = story.steers.refund;
 
 const steering = state.reply(state.say(steer.reply), state.call("steer", { task_id: state.id(steer.issue), text: steer.text }));
 
-// #122 builds its first session from a minute after its filing; offsets in seconds after its creation
-const refund = {
-  phases: [{ from: 0, status: "queued" }, { from: MIN, status: "running", gate: "session", model: "small", spent: 0.04 }, { from: 8 * MIN, spent: 0.21 }],
-  steps: [state.intake(0, 20), state.sessionStart(MIN, { model: "small" })],
-};
-
 // the week's earlier cards are done: issue, age, done after (hours) and spend; the weekly bump's #115 is on its run's
 // clock
-const finished = [[116, 49, 1.5, 1.04], [117, 30.75, 9.5, 0.45], [120, 30.8, 9.8, 0.86], [121, 30.7, 9.3, 0.46]];
+const finished = [[116, 49, 1.5, 1.04], [117, 30.75, 9.5, 0.45], [120, 30.8, 9.8, 0.86], [121, 30.7, 9 + 1 / 3, 0.46]];
 
 // thursday is the board a minutes after #122's filing; o adds the chat and the events
 function thursday(now, a, o = {}) {
   const b = story.board([
-    story.life(now, steer.issue, a * MIN, refund),
+    story.life(now, steer.issue, a * MIN, story.lives[steer.issue]),
     story.routineCard(now, 115),
     ...finished.map(([issue, age, after, spent]) => story.done(now, issue, age * HOUR, after * HOUR, spent)),
   ]);
@@ -32,9 +26,10 @@ function thursday(now, a, o = {}) {
 // session's answer to it
 function after(now) {
   const t = state.steeredThread(now, { said: steer.request, reply: steer.reply, issue: steer.issue, title: story.cards[steer.issue].title, text: steer.text, age: 8 });
-  return thursday(now, 14.25, {
+  const a = 14.25;
+  return thursday(now, a, {
     chat: t.rows, seen: state.seen(t.rows), usedProposals: [t.proposal],
-    events: [state.event(now, { issue: steer.issue, kind: "card_steered", actor: "sebastian", via: "chat", age: 5, detail: { text: steer.text } })],
+    events: [state.event(now, { issue: steer.issue, kind: "card_steered", actor: "sebastian", via: "chat", age: a * MIN - steer.at, detail: { text: steer.text } })],
   });
 }
 

@@ -10,8 +10,12 @@ const stamp = (date) => date.toISOString().slice(0, 19) + "Z";
 const present = (obj) => Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
 const sha256 = (text) => crypto.createHash("sha256").update(text).digest("hex");
 
+// The lab's SessionFunded fake refuses a session only to its fire scene's capped card #610, so #110, the card the
+// budget stops, takes that card's id, and the board offers its approvers the Fund action.
+const LAB_IDS = { 110: 610 };
+
 function id(issue) {
-  return "t-" + sha256(`lab ${issue}`).slice(0, 12);
+  return "t-" + sha256(`lab ${LAB_IDS[issue] ?? issue}`).slice(0, 12);
 }
 
 function card(now, o) {
@@ -46,6 +50,7 @@ function card(now, o) {
     Choices: o.choices,
     EscalatedAt: o.escalatedAt === undefined ? undefined : iso(now, o.escalatedAt),
     EscalationAlert: o.escalationAlert,
+    WaitingOn: o.waitingOn,
     AlertFingerprint: o.fingerprint,
     ChainState: o.chain,
   });
@@ -85,6 +90,17 @@ const findings = (at, { stage, round = 1, to, attempt, list }) => ({ at, step: "
 
 // queueTurn ends the merge-queue gate: the card's turn to merge.
 const queueTurn = (from, at) => ({ at, from, step: "queue_turn", project: project.repository });
+
+// policyGate ends the policy gate on the pull request: its risk class, the class's outcome and the merge rule in force.
+const policyGate = (from, at, { pr, risk, outcome, mergeRule = "human", changed, lines }) =>
+  ({ at, from, step: "gate_policy", pr, class: risk, outcome, changed, lines, merge_rule: mergeRule });
+
+// approvalRequested is the merge's approval request opening: the pull request waits on a person.
+const approvalRequested = (at, { approval: n, pr, commit, risk }) => ({ at, step: "approval_requested", approval: n, pr, commit, class: risk });
+
+// autoMerge is factoryd's note that factory-merge merges on the merge rule auto, without an approval card.
+const autoMerge = (at, { pr, commit, risk, reproduction, review }) =>
+  ({ at, step: "auto_merge", pr, commit, class: risk, merge_rule: "auto", reproduction, review });
 
 // merged ends the merge gate: factory-merge merged the pull request at its gated head commit, on approver's approval.
 const merged = (from, at, { pr, commit, approver = project.login }) => ({ at, from, step: "merged", pr, commit, approver, merged_by: "factory-merge" });
@@ -154,6 +170,22 @@ const mergedPoke = (now, { issue, age, conversation }) =>
 const livePoke = (now, { issue, title, spent, age, conversation }) =>
   poke(now, { issue, content: `#${issue} is done and live: ${title}. €${spent.toFixed(2)} in all.`, age, birth: "task_ended", conversation });
 
+// asked is factoryd's inbox row of a question on issue's card, its choices the answer row's; one a budget stops says so.
+function asked(now, { issue, question, choices, age, budget, conversation }) {
+  const content = `#${issue} ${budget ? "is stopped by its budget" : "needs you"}: ${question}`;
+  return { ...poke(now, { issue, content, age, birth: "question_asked", conversation }), kind: "escalation", choices };
+}
+
+// mergeAsked is factoryd's inbox row of a merge approval request on issue's card.
+const mergeAsked = (now, { issue, pr, risk, age, conversation }) => ({
+  ...poke(now, { issue, content: `#${issue} waits for you: merge PR #${pr}, ${risk} risk.`, age, birth: "approval_requested", conversation }),
+  kind: "escalation", choices: ["Approve"],
+});
+
+// wake is the user row of a turn the factory's waker starts on the inbox, born of kind ("wake_ask"); the agent's rows
+// after it fold into it.
+const wake = (now, { kind, text, age, conversation }) => message(now, { role: "user", content: text, age, conversation, birth: kind });
+
 function approval(now, o) {
   for (const key of ["brief", "detail"]) {
     if (!o[key]) throw new Error(`approval ${o.id}: ${key} is empty; the console shows nothing for it`);
@@ -173,8 +205,8 @@ function approval(now, o) {
   });
 }
 
-function message(now, { role, content = "", age, kind, choices, toolCalls, conversation }) {
-  return present({ role, content, at: iso(now, age), kind, choices, tool_calls: toolCalls, conversation });
+function message(now, { role, content = "", age, kind, choices, toolCalls, conversation, birth }) {
+  return present({ role, content, at: iso(now, age), kind, choices, tool_calls: toolCalls, conversation, birth_kind: birth });
 }
 
 function ask(now, { question, choices, age }) {
@@ -242,31 +274,58 @@ function pressed(now, p, { age, result }) {
 function steering(now, { issue, title, text }) {
   return proposal(now, {
     tool: "steer", args: { task_id: id(issue), text },
-    description: `Message a running card, #${issue} ${id(issue)} ${JSON.stringify(title)}, text ${truncate(text, 120)}`,
+    description: `Message a running card, ${ref(issue, title)}, text ${truncate(text, 120)}`,
   });
 }
 
-// pressedThread is the rows a press of Do it on p leaves, as the console stores them: the member's line at age, the
-// agent's reply proposing p a second later, and the Do it's row with the tool's result two seconds after that.
-function pressedThread(now, p, { line, reply, result, age }) {
+// UNDOABLE are the chat's writes that carry an undo.
+const UNDOABLE = ["move_card", "comment", "set_summary", "set_accent", "set_dependency"];
+
+// pressedThread is the rows the presses of Do it on each of ps leave, as the console stores them: the member's line at
+// age, the agent's reply proposing them all a second later, and from two seconds after that a Do it's row a second, each
+// with its tool's result and the console's word on its undo.
+function pressedThread(now, ps, { line, reply, results, age }) {
+  const undo = (p) => (UNDOABLE.includes(p.Tool) ? "The member may undo it." : "It cannot be undone.");
   return {
     rows: [
       message(now, { role: "user", content: line, age }),
-      message(now, { role: "assistant", content: reply, age: age - 1, toolCalls: [proposedCall(now, p, { id: "call_1", age: age - 1 })] }),
-      pressed(now, p, { age: age - 3, result: `${result} It cannot be undone.` }),
+      message(now, { role: "assistant", content: reply, age: age - 1, toolCalls: ps.map((p, i) => proposedCall(now, p, { id: `call_${i + 1}`, age: age - 1 })) }),
+      ...ps.map((p, i) => pressed(now, p, { age: age - 3 - i, result: `${results[i]} ${undo(p)}` })),
     ],
-    proposal: p,
+    proposals: ps,
   };
+}
+
+// one is the thread of a single press, its proposal named.
+function one(t) {
+  return { rows: t.rows, proposal: t.proposals[0] };
 }
 
 // filedThread is the thread of a filing from the chat.
 function filedThread(now, { said: line, reply, args, issue, age }) {
-  return pressedThread(now, cardFiling(now, args), { line, reply, age, result: `Filed ${project.repository}#${issue} in lane ${args.lane}.` });
+  return one(pressedThread(now, [cardFiling(now, args)], { line, reply, age, results: [`Filed ${project.repository}#${issue} in lane ${args.lane}.`] }));
 }
 
 // steeredThread is the thread of a steer from the chat.
 function steeredThread(now, { said: line, reply, issue, title, text, age }) {
-  return pressedThread(now, steering(now, { issue, title, text }), { line, reply, age, result: `The session of #${issue} has your message.` });
+  return one(pressedThread(now, [steering(now, { issue, title, text })], { line, reply, age, results: [`The session of #${issue} has your message.`] }));
+}
+
+// ref is a card as a proposal's description names it.
+const ref = (issue, title) => `#${issue} ${id(issue)} ${JSON.stringify(title)}`;
+
+// depending is the set_dependency proposal of issue's card on dep's, or with remove no longer, described as the console
+// describes it; each is an [issue, title] pair.
+function depending(now, [issue, title], [dep, depTitle], remove = false) {
+  return proposal(now, {
+    tool: "set_dependency", args: present({ task_id: id(issue), depends_on: id(dep), remove: remove || undefined }),
+    description: `Set a dependency, ${ref(issue, title)}, ${remove ? "no longer depends on" : "depends on"} ${ref(dep, depTitle)}`,
+  });
+}
+
+// closing is the close proposal of issue's card with note, described as the console describes it.
+function closing(now, { issue, title, note }) {
+  return proposal(now, { tool: "close", args: { task_id: id(issue), note }, description: `Close a card, ${ref(issue, title)}, note ${truncate(note, 120)}` });
 }
 
 // plan is issue's plan revision as the planner stores it: the plan's JSON and its sha256, which an accept pins.
@@ -391,12 +450,13 @@ function scene(now, o = {}) {
   for (const t of tasks) objects[`sessions/${t.ID}/timeline.jsonl`] ??= "";
   return present({
     Project: { Name: project.name, Repository: project.repository, Login: project.login },
-    Projects: project.rows,
-    Config: project.config,
+    Projects: o.mergeRule ? project.rows.map((r) => ({ ...r, MergeRule: o.mergeRule })) : project.rows,
+    Config: o.mergeRule ? { ...project.config, merge_rule: o.mergeRule } : project.config,
     MonthCap: project.monthCap,
     PRFiles: o.prFiles && Object.fromEntries(Object.entries(o.prFiles)
       .map(([pr, files]) => [`/api/v1/repos/${project.repository}/pulls/${pr}/files`, JSON.stringify(files)])),
     Tasks: tasks,
+    Deps: o.deps && Object.fromEntries(Object.entries(o.deps).map(([issue, on]) => [id(issue), on.map(id)])),
     Plans: o.plans && byTask(o.plans),
     Questions: o.questions && byRevision(o.questions),
     Approvals: o.approvals,
@@ -424,7 +484,8 @@ function scene(now, o = {}) {
 }
 
 module.exports = {
-  AGENT_ASKS, id, card, intake, sessionStart, session, checks, modelReview, findings, queueTurn, merged, recorded, final, supervisor, timeline, said,
-  transcript, event, status, alert, poke, mergedPoke, livePoke, approval, message, ask, proposal, proposedCall, cardFiling, steering, pressed, filedThread, steeredThread, seen,
+  AGENT_ASKS, id, card, intake, sessionStart, session, checks, modelReview, findings, queueTurn, policyGate, approvalRequested, autoMerge, merged, recorded,
+  final, supervisor, timeline, said, transcript, event, status, alert, poke, mergedPoke, livePoke, asked, mergeAsked, wake, approval, message, ask,
+  proposal, proposedCall, cardFiling, steering, closing, depending, pressed, pressedThread, filedThread, steeredThread, seen,
   plan, say, call, reply, metrics, nextCron, prevCron, routineRun, routineView, scene,
 };

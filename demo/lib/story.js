@@ -112,12 +112,12 @@ const cards = {
     acceptance: ["a dragged class keeps all its bookings", "a slot another class holds refuses the drop"],
   },
   113: {
-    title: "Calendar: the week grid and its navigation", size: "small", parent: 110, pr: 210,
+    title: "Calendar: the week grid and its navigation", size: "small", pr: 210,
     body: "Split from #110 after it reached its budget: the empty week grid of the studio's hours, with the previous and next week",
     acceptance: ["the grid shows the studio's hours for seven days", "previous and next move a week"],
   },
   114: {
-    title: "Calendar: class blocks in the week grid", size: "small", parent: 110, pr: 211,
+    title: "Calendar: class blocks in the week grid", size: "small", pr: 211,
     body: "Split from #110 after it reached its budget: each class as a block in the grid of #113, with its free places and Book",
     acceptance: ["every class of the week is a block with its free places", "a member books from a block"],
   },
@@ -187,6 +187,11 @@ const cards = {
     title: "Cost review: the month's spend by card", size: "small", routine: "cost-review",
     body: "The monthly cost review: the month's spend by card and by kind against the project's cap. Read it, then close the card",
   },
+  125: {
+    title: "Class page: add the class to your own calendar", size: "small", pr: 222,
+    body: "The class page offers the class as a calendar file, the one the reminder mail of #117 attaches",
+    acceptance: ["Add to calendar on the class page downloads the class as a calendar file", "the file names the studio's address and the room"],
+  },
 };
 
 function card(issue) {
@@ -194,6 +199,9 @@ function card(issue) {
   if (!c) throw new Error(`no card #${issue} in the story`);
   return c;
 }
+
+// title is issue's card as factoryd's CardTitle names it: a planned card by its key, any other by its title.
+const title = (issue) => card(issue).key ?? card(issue).title;
 
 // description is issue's text as a person writes it: the prose and the Acceptance list.
 function description(issue) {
@@ -210,7 +218,8 @@ function body(issue) {
 function boardCard(now, issue, o) {
   const c = card(issue);
   return state.card(now, {
-    issue, title: c.title, body: body(issue), size: c.size, budget: budgets[c.size], parent: c.parent ?? c.plan, planKey: c.key, ...o,
+    issue, title: c.title, body: body(issue), size: c.size, budget: budgets[c.size], parent: c.plan, planKey: c.key,
+    source: c.plan ? "plan" : undefined, ...o,
   });
 }
 
@@ -229,6 +238,8 @@ const requests = {
   checkout: "Is checkout still failing?",
   scheduleCheck: "Is the schedule all right since #118 went live?",
   schedule500: "Has the schedule alert settled?",
+  split: "Split #110 into smaller cards instead of raising its budget.",
+  repoint: "Let #112 wait on #114 instead of #110, then close #110.",
 };
 
 // asks are the questions the agent and the factory put to a person, by story.
@@ -241,24 +252,67 @@ const asks = {
     answer: "By mail",
   },
   move: { issue: 105, question: "Does moving a class mail the members booked on it?", choices: ["Mail every booked member", "Only when the day changes"] },
+  // factoryd's own question at a budget stop, not the agent's; alert is each ask's escalation alert
   budget: {
-    issue: 110,
+    issue: 110, budget: true, alert: 15,
     question: "The card has €0.40 of its €5.00 budget left, and a session on big needs €0.60. Fund one more session?",
     choices: ["Fund one more session", "End the card"],
-    split: [113, 114],
   },
   library: {
-    issue: 113,
+    issue: 113, alert: 17,
     question: "Which calendar library does the week grid build on? FullCalendar is the most used, Schedule-X the smallest, " +
       "TOAST UI Calendar the one with drag built in.",
     choices: ["FullCalendar", "Schedule-X", "TOAST UI Calendar"],
+    answer: "TOAST UI Calendar",
   },
+  // the overnight asks, in the order the morning answers them: #120 and #121 at once, #117 two minutes later
   morning: [
-    { issue: 117, question: "Does the reminder carry the class as a calendar file for the member's own calendar?", choices: ["Attach it", "Leave it out"] },
-    { issue: 120, question: "Does an unused class of an expired pass come back as credit?", choices: ["No refund", "Refund as credit"] },
-    { issue: 121, question: "Do cancelled bookings show in the account page's list?", choices: ["Show them, struck through", "Hide them"] },
+    {
+      issue: 120, alert: 18, question: "Does an unused class of an expired pass come back as credit?", choices: ["No refund", "Refund as credit"],
+      answer: "No refund",
+    },
+    {
+      issue: 121, alert: 19, question: "Do cancelled bookings show in the account page's list?", choices: ["Show them, struck through", "Hide them"],
+      answer: "Show them, struck through",
+    },
+    {
+      issue: 117, alert: 20, question: "Does the reminder carry the class as a calendar file for the member's own calendar?",
+      choices: ["Attach it", "Leave it out"], answer: "Attach it",
+    },
   ],
+  // the calendar file's ask, which at full auto the agent settles in its wake turn from #117's merged file
+  calendarFile: {
+    issue: 125, alert: 21,
+    question: "Does the calendar file put the room in its location, after the studio's address, or only in its description?",
+    choices: ["In the location", "Only in the description"],
+    answer: "In the location",
+  },
 };
+
+// escalation is a card's escalation text of ask: factoryd's own question at a budget stop, else the agent's.
+const escalation = (ask) => (ask.budget ? ask.question : state.AGENT_ASKS + ask.question);
+
+// asking is what ask, put age seconds ago, leaves beside its card: factoryd's question_asked row, the escalation alert
+// and the inbox's row in conversation, whose answer row offers the choices.
+function asking(now, ask, age, conversation) {
+  const source = ask.budget ? "budget" : "agent";
+  return {
+    events: [state.event(now, { issue: ask.issue, kind: "question_asked", age, detail: { question: ask.question, choices: ask.choices, source } })],
+    alerts: [state.alert(now, { id: ask.alert, kind: "escalation", source, task: ask.issue, age })],
+    inbox: state.asked(now, { issue: ask.issue, question: ask.question, choices: ask.choices, age, budget: ask.budget, conversation }),
+  };
+}
+
+// answered is sebastian's answer to ask age seconds ago, by via, "button" or "chat".
+const answered = (now, ask, age, via) =>
+  state.event(now, { issue: ask.issue, kind: "question_answered", actor: project.login, via, age, detail: { answer: ask.answer } });
+
+// answerRows are the rows a press of ask's answer in the chat's answer row stores age seconds ago: the member's choice
+// and the factory's word on it.
+const answerRows = (now, ask, age, conversation) => [
+  state.message(now, { role: "user", content: ask.answer, age, conversation }),
+  state.poke(now, { issue: ask.issue, content: `Answered #${ask.issue} with “${ask.answer}”; the card goes on.`, age, conversation }),
+];
 
 // replies are the agent's words in the intake chats, beside its tool calls.
 const replies = {
@@ -278,7 +332,20 @@ const replies = {
   checkout: "No. **CheckoutErrors** settled when #104 went live, with the verdict real, and no alert is open.",
   schedule500: "It has. **ScheduleErrors** rose minutes after the merge of #118 and settled when #119 went live, with the verdict real; " +
     "no alert is open.",
+  split: "#110 has €0.40 of its €5.00 left and failed its acceptance twice on the class blocks. Two small cards fit a budget each: " +
+    "the empty week grid now, and the class blocks on it, in the backlog until the grid is in:",
+  repoint: "Dragging a class needs its block, so #112 waits on #114 in #110's place. Then #110 closes with the split in its note:",
+  // calendarFile is the agent's settling of #125's ask in its wake turn
+  calendarFile: "#117's reminder file, merged and live, puts the room in the location after the studio's address. " +
+    "#125 offers the same file, so I answered **In the location**; nothing in it is direction or money.",
 };
+
+// wakeAsk is the waker's text of a wake on the asks of a batch, as factoryd's askText words it: each ask with its card.
+function wakeAsk(list) {
+  return `Wake: ${list.length} asks wait for a human.` + list.map((a) => `\n#${a.issue}: ${a.question}`).join("") +
+    "\n\nRead each card. Settle what your permissions allow. For what stays the human's, record what you found with attach_analysis. " +
+    "An ask already answered is done.";
+}
 
 // alerts are the alert rows of the two weeks; a scene passes now and the ages to state.alert. raised and resolved
 // date the telemetry's alerts on the calendar: the latency alert settled itself three times the week before, and an
@@ -297,7 +364,6 @@ const alerts = {
     raised: date(1, "tue", "12:59"), resolved: date(1, "tue", "14:00"),
     detail: { summary: "POST /checkout/confirm answers 500 on 41% of requests", error: cards[104].body.split("\n\n")[1] },
   },
-  budget: { id: 15, kind: "escalation", source: "cap", task: 110 },
   badMerge: {
     id: 16, kind: "alert", source: "ScheduleErrors", task: 119, fingerprint: "e07c4a92d15b8f3e", verdict: "real", resolvedBy: "factoryd",
     raised: date(2, "thu", "17:19"), resolved: date(2, "thu", "17:54"),
@@ -328,12 +394,24 @@ const approvals = {
       "last, as it needs both views. One question is open: whether a moved class mails its booked members.",
   },
   refund: {
-    id: 31, kind: "merge", task: 122, pr: cards[122].pr,
+    id: 31, kind: "merge", task: 122, pr: cards[122].pr, risk: "high",
     reason: "risk class high: the change touches src/payments",
     brief: "Refunds a class the studio cancels to each paying member's card, once per booking.",
     detail: "Adds refundBooking in src/payments/refund.ts, called when the studio cancels a class. It creates one Stripe refund " +
       "per paid booking with an idempotency key, so a cancel sent twice refunds once. The charge.refunded webhook marks the " +
       "booking refunded; a failed refund shows on the class's page. Tests cover a double cancel and a declined refund.",
+    recommendation: "Merge it: the refunds key on the booking's id, and the tests send a cancel twice and find one refund.",
+    whyHuman: ["the project's merge rule is human", "risk class high is requires_approval"],
+  },
+  // calendarFile is #125's merge at manual: a class of normal risk still waits on the human merge rule
+  calendarFile: {
+    id: 33, kind: "merge", task: 125, pr: cards[125].pr, risk: "normal",
+    reason: "the project's merge rule is human",
+    brief: "The class page offers the class as a calendar file, the reminder's own.",
+    detail: "Adds Add to calendar on the class page. It serves the calendar file src/mail/ics.ts builds for the reminder of #117, " +
+      "with the studio's address and the room in its location. Tests download the file and read its fields.",
+    recommendation: "Merge it: the page reuses the reminder's file, and the tests read the address and the room from it.",
+    whyHuman: ["the project's merge rule is human"],
   },
 };
 
@@ -369,6 +447,10 @@ const merges = {
   108: { queued: 26 * MIN, at: 43 * MIN, live: 50 * MIN, run: 60 },
   115: { queued: 27 * MIN, at: 44 * MIN, live: 52 * MIN, run: 66 },
   123: { queued: 53 * MIN, at: 58 * MIN, live: 64 * MIN, run: 90 },
+  // the refund enters the merge queue on Sebastian's approval
+  122: { queued: 64 * MIN, at: 66 * MIN, live: 72 * MIN, run: 86 },
+  // the calendar file at full auto merges on the merge rule auto, the agent having settled its ask
+  125: { queued: 32.5 * MIN, at: 34.5 * MIN, live: 40.5 * MIN, run: 91, approver: "merge rule auto" },
 };
 
 // nightly are the security scan's runs from week 1's Monday to week 2's Sunday, run 52 the first: no finding, but
@@ -558,8 +640,25 @@ const sessions = {
   120: { "s-1": { commit: "b3e81f6", words: [] } },
   121: { "s-1": { commit: "f16d07a", words: [] } },
   123: { "s-1": { commit: "7a4f0e3", words: [] } },
+  110: { "s-1": { commit: "8e2a5d1", words: [] }, "s-2": { commit: "c47b0f9", words: [] } },
+  113: {
+    "s-1": {
+      words: [
+        [40, "Reading src/calendar: the events model of #109 and the month view of #111, which draws its own table."],
+        [100, "The week grid needs a calendar library or a hand-built grid. Every calendar card after this one lives with that choice, so I ask."],
+      ],
+    },
+    "s-2": {
+      words: [
+        [30, "The answer is TOAST UI Calendar: its week view takes the studio's hours, and its drag serves #112 later. Adding it to package.json."],
+        [6 * MIN, "The grid shows the studio's hours for seven days; previous and next move a week. Next, the tests."],
+      ],
+    },
+  },
+  125: { "s-1": { words: [] }, "s-2": { commit: "5e9c3b2", words: [] } },
   122: {
     "s-1": {
+      commit: "d4c8a21",
       words: [
         [40, "Reading the class cancel in src/classes/cancel.ts and the Stripe client in src/payments/stripe.ts."],
         [6 * MIN, "A studio cancel marks every booking of the class cancelled. I add refundBooking in src/payments/refund.ts for the paid ones."],
@@ -567,6 +666,7 @@ const sessions = {
         // the answer to the steer of steers.refund, which reaches the session 13 minutes in
         [13.2 * MIN, "Taking your message: refundBooking passes the booking's id to Stripe as the idempotency key, " +
           "and a test sends the cancel twice and finds one refund."],
+        [21 * MIN, "npm test: 12 new tests pass, among them a cancel sent twice and a declined refund. Pushing and opening the pull request."],
       ],
     },
   },
@@ -585,17 +685,20 @@ function session(issue, n, start, end, { model, outcome }) {
 // life is issue's card age seconds after its creation and the objects its drawer reads. phases are its states, each
 // from its from (seconds after the creation) and keeping what it does not set of the one before: status, gate, model,
 // spent, pr, whether its pull request is open, and chain, the verdict of the run that carries it once it merged.
-// admitted is when it took a slot, if not at its creation. steps are its timeline; each session started by then
+// admitted is when it took a slot, if not at its creation. A waiting-human phase's ask is the question the card waits
+// on since that phase, with its choices and its escalation alert. steps are its timeline; each session started by then
 // carries its words said by then. card sets the rest of the card: who filed it and from where.
 function life(now, issue, age, { phases, admitted, steps = [], card: o = {} }) {
   const passed = phases.filter((p) => p.from <= age);
   const p = Object.assign({}, ...passed);
   const since = age - passed.findLast((q) => "status" in q || "gate" in q).from;
   const final = ["done", "failed", "closed"].includes(p.status);
+  const ask = p.status === "waiting-human" ? p.ask : undefined;
   const task = boardCard(now, issue, {
     lane: "ready", age, status: p.status, model: p.model, spent: p.spent, pr: p.pr ? cards[issue].pr : undefined, chain: p.chain,
     gate: final ? undefined : p.gate, gateSince: final || !p.gate ? undefined : since, finished: final ? since : undefined,
-    admitted: admitted === undefined || admitted > age ? undefined : age - admitted, ...o,
+    admitted: admitted === undefined || admitted > age ? undefined : age - admitted,
+    escalation: ask && escalation(ask), choices: ask?.choices, escalatedAt: ask && since, escalationAlert: ask?.alert, ...o,
   });
   const objects = { [`sessions/${task.ID}/timeline.jsonl`]: state.timeline(now, age, { steps }) };
   for (const s of steps) {
@@ -619,6 +722,13 @@ const filed = {
   115: date(2, "mon", "06:00"), 116: date(2, "tue", "08:00"), 117: date(2, "wed", "02:15"), 118: date(2, "thu", "16:00"),
   119: new Date(date(2, "thu", "17:19").getTime() + 30 * 1000), 120: date(2, "wed", "02:08"), 121: date(2, "wed", "02:18"),
   123: date(2, "fri", "07:00"),
+  // the calendar: the plan #105 waits from Wednesday until Sebastian accepts it on Thursday evening, which files its four
+  // cards; on Friday morning he splits #110, stopped by its budget overnight, from the chat
+  105: date(1, "wed", "10:00"), 109: date(1, "thu", "20:00"), 110: date(1, "thu", "20:00"), 111: date(1, "thu", "20:00"),
+  112: date(1, "thu", "20:00"), 113: date(1, "fri", "08:40"), 114: date(1, "fri", "08:40"),
+  // the refund #122 is filed a quarter hour before scene 11's steer
+  122: date(2, "thu", "08:46"),
+  125: date(2, "fri", "10:00"),
 };
 
 // ageAt is issue's card's age in seconds at the story's time at.
@@ -659,7 +769,19 @@ const reviews = {
   120: [{ verdict: "approve", summary: "A pass of 10 classes bought by card; each booking takes one, and the account page shows what is left." }],
   121: [{ verdict: "approve", summary: "Lists a member's bookings of the last 12 months, newest first, scoped to the member." }],
   123: [{ verdict: "approve", summary: "The schedule loads a week's teachers in one query, not one per class; the load test measures GET /schedule at 0.29 s at the p95." }],
+  122: [{ verdict: "approve", summary: "Refunds each paid booking of a cancelled class once, keyed on the booking's id; the tests cover a cancel sent twice and a declined refund." }],
+  125: [{ verdict: "approve", summary: "The class page serves the reminder's calendar file; the tests read the studio's address and the room in its location." }],
 };
+
+// mergeSpec is the spec of approval a's merge request as factoryd writes it: the risk class, the review's verdict, the
+// head the merge takes, the agent's recommendation and why a human approves.
+function mergeSpec(a) {
+  const rv = reviews[a.task].at(-1);
+  return {
+    risk_class: a.risk, migration: false, verdict_summary: rv.summary, review: { verdict: rv.verdict, summary: rv.summary },
+    head_sha: Object.values(sessions[a.task]).findLast((s) => s.commit).commit, recommendation: a.recommendation, why_human: a.whyHuman,
+  };
+}
 
 // review is round n of the review of issue's pull request, from from to at, on the commit of session sid.
 function review(issue, n, from, at, sid) {
@@ -669,18 +791,19 @@ function review(issue, n, from, at, sid) {
 // checksFailed are the findings of a card's failed checks, sent on to its next session.
 const checksFailed = {
   107: "acceptance: a webhook delivered twice sends one mail: 2 mails sent, want 1",
+  110: "acceptance: a member books from a block: the week view draws no block for a weekly class's later weeks",
 };
 
 // merge is the steps of issue's merge, in seconds after its creation: its turn in the merge queue it entered at
 // queued, a minute before factory-merge merges the head its last session pushed at at, and its end at live, when the
 // green run run of its chain covers it.
-function merge(issue, { queued, at, live, run }) {
+function merge(issue, { queued, at, live, run, approver }) {
   const pr = cards[issue].pr;
   const head = Object.values(sessions[issue]).findLast((s) => s.commit).commit;
   const reason = `live: covered by run ${run}`;
   return [
     state.queueTurn(queued, at - MIN),
-    state.merged(at - MIN, at, { pr, commit: head }),
+    state.merged(at - MIN, at, { pr, commit: head, approver }),
     state.recorded(at, "pull_request_merged", { pr, by: "factory-merge" }),
     state.final(at, "merged", "pull request merged"),
     state.final(live, "done", reason),
@@ -702,8 +825,102 @@ function mergeEvents(now, issue, age, m) {
   ].filter(([at]) => at <= age).map(([at, kind, detail]) => state.event(now, { issue, kind, age: age - at, detail }));
 }
 
+// sources are files of the repository at main, as the chat's file tool reads them.
+const sources = {
+  "src/mail/ics.ts": [
+    "// The class as a calendar file: the reminder of #117 attaches it.",
+    "export function classEvent(c: BookedClass): string {",
+    "  return [",
+    '    "BEGIN:VEVENT",',
+    "    `UID:${c.occurrenceId}@nord-booking.example`,",
+    "    `DTSTART;TZID=Europe/Berlin:${local(c.startsAt)}`,",
+    "    `SUMMARY:${c.name} with ${c.teacher}`,",
+    "    `LOCATION:${STUDIO_ADDRESS}\\\\, ${c.room}`,",
+    '    "END:VEVENT",',
+    '  ].join("\\r\\n");',
+    "}",
+    "",
+  ].join("\n"),
+};
+
+// supervisor is the supervisor's step in #117's first session: the flip-flop detector's trip, and the insight the
+// next session starts from.
+const supervisor = {
+  issue: 117,
+  detector: "flip_flop",
+  trip: "after src/mail/reminder.ts returned to a content it had before, `npm test -- reminder` failed again, unchanged",
+  decision: "redirect",
+  reason: "Both versions of reminder.ts subtract 24 hours from the class's start, and the test's class is on 25 October, the night " +
+    "the clocks go back: 24 hours before 18:00 is 19:00 on Saturday. Subtract one calendar day in Europe/Berlin instead.",
+};
+
+// answeredAt are the morning's answers to the overnight asks on week 2's Wednesday: #120 and #121 at once, #117 two
+// minutes later. Each card asked at its intake, a minute after its filing.
+const answeredAt = { 120: date(2, "wed", "10:58"), 121: date(2, "wed", "10:58"), 117: date(2, "wed", "11:00") };
+const ASKED = MIN;
+
+// waited are the phases of issue's card from its filing until it takes its slot with the morning's answer.
+function waited(issue) {
+  return [
+    { from: 0, status: "queued" },
+    { from: ASKED, status: "waiting-human", ask: asks.morning.find((a) => a.issue === issue) },
+    { from: (answeredAt[issue] - filed[issue]) / 1000, status: "queued" },
+  ];
+}
+
+// built is issue's card that took its slot with the morning's answer, then built, pushed, passed its checks and
+// review and merged; the offsets in minutes after the answer, spent at each of the four.
+function built(issue, { start, push, reviewed, merged, spent }) {
+  const M = (answeredAt[issue] - filed[issue]) / 1000;
+  const at = (m) => M + m * MIN;
+  return {
+    admitted: M,
+    phases: [
+      ...waited(issue),
+      { from: at(start), status: "running", gate: "session", model: "small", spent: spent[0] },
+      { from: at(push + 0.5), status: "in-review", gate: "checks", spent: spent[1], pr: true },
+      { from: at(push + 7), gate: "review" },
+      { from: at(reviewed + 1), gate: "merge-queue", spent: spent[2] },
+      { from: at(merged), status: "done", spent: spent[3] },
+    ],
+    steps: [
+      state.intake(0, 20),
+      ...session(issue, 1, at(start), at(push), { model: "small" }),
+      state.checks(at(push + 0.5), at(push + 7)),
+      review(issue, 1, at(push + 7), at(reviewed), "s-1"),
+    ],
+  };
+}
+
+// A is #117's answer, seconds after its filing.
+const A = (answeredAt[117] - filed[117]) / 1000;
+
 // lives are the cards whose life more than one scene shows, offsets in seconds after each card's creation.
 const lives = {
+  // the reminder takes its slot with the morning's answer: its first session circles on the same failing test, the
+  // flip-flop detector trips, and the supervisor redirects it to a second session
+  117: {
+    admitted: A,
+    phases: [
+      ...waited(117),
+      { from: A + MIN, status: "running", gate: "session", model: "small", spent: 0.04 },
+      { from: A + 8 * MIN, spent: 0.13 },
+      { from: A + 14 * MIN, spent: 0.22 },
+      { from: A + 16 * MIN, gate: "session", spent: 0.26 },
+      { from: A + 22 * MIN, spent: 0.33 },
+      { from: A + 25.5 * MIN, status: "in-review", gate: "checks", spent: 0.38, pr: true },
+    ],
+    steps: [
+      state.intake(0, 20),
+      state.supervisor(A + 15 * MIN, supervisor),
+      ...session(117, 1, A + MIN, A + 15 * MIN + 5, { model: "small", outcome: "redirect" }),
+      ...session(117, 2, A + 16 * MIN, A + 25 * MIN, { model: "small" }),
+      state.checks(A + 25.5 * MIN, A + 32 * MIN),
+    ],
+  },
+  // the class pass and the account page build side by side from the morning's answer
+  120: built(120, { start: 1.5, push: 33, reviewed: 47, merged: 58, spent: [0.05, 0.71, 0.83, 0.86] }),
+  121: built(121, { start: 1, push: 19, reviewed: 31, merged: 40, spent: [0.04, 0.36, 0.44, 0.46] }),
   // the waitlist waits in the merge queue on Monday afternoon, merges, and is live two hours after its filing
   101: {
     phases: [{ from: 92 * MIN, status: "in-review", gate: "merge-queue", model: "small", spent: 0.71, pr: true }, ...merging(merges[101], 1.12)],
@@ -836,6 +1053,127 @@ const lives = {
     ],
     card: { author: "factory-agent", source: "routine" },
   },
+  // the week view takes its slot when the events model #109 is live; two sessions on big fail the acceptance on the
+  // class blocks, and the third session's start finds €0.40 of its €5.00 left: the budget stops it overnight. The split
+  // closes it in the morning.
+  110: {
+    admitted: 160 * MIN,
+    phases: [
+      { from: 0, status: "queued" },
+      { from: 161 * MIN, status: "running", gate: "session", model: "big", spent: 0.08 },
+      { from: 236 * MIN, status: "in-review", gate: "checks", spent: 2.05, pr: true },
+      { from: 243 * MIN, status: "running", gate: "session", spent: 2.2 },
+      { from: 300 * MIN, spent: 3.5 },
+      { from: 356 * MIN, status: "in-review", gate: "checks", spent: 4.6 },
+      { from: 363 * MIN, status: "waiting-human", gate: undefined, ask: asks.budget },
+      { from: (filed[113] - filed[110]) / 1000 + 15, status: "closed" },
+    ],
+    steps: [
+      state.intake(0, 20),
+      ...session(110, 1, 161 * MIN, 235 * MIN, { model: "big" }),
+      state.checks(235.5 * MIN, 242 * MIN, "acceptance"),
+      state.findings(242 * MIN + 5, { stage: "checks", to: "agent", attempt: 1, list: [checksFailed[110]] }),
+      ...session(110, 2, 243 * MIN, 355 * MIN, { model: "big" }),
+      state.checks(355.5 * MIN, 362 * MIN, "acceptance"),
+    ],
+    card: { attempts: 2 },
+  },
+  // the week grid, filed by the split: its first session asks which calendar library, and the answer in the chat 25
+  // minutes later starts its second
+  113: {
+    phases: [
+      { from: 0, status: "queued" },
+      { from: MIN, status: "running", gate: "session", model: "small", spent: 0.02 },
+      { from: 2.75 * MIN, status: "waiting-human", gate: undefined, spent: 0.06, ask: asks.library },
+      { from: 28.5 * MIN, status: "running", gate: "session" },
+      { from: 33 * MIN, spent: 0.17 },
+    ],
+    steps: [
+      state.intake(0, 20),
+      ...session(113, 1, MIN, 2.75 * MIN, { model: "small", outcome: "needs_info" }),
+      state.sessionStart(28.5 * MIN, { session: "s-2", model: "small", attempt: 2 }),
+    ],
+  },
+  // drag to move waits on the views: on #110 until the split points it at #114
+  112: { phases: [{ from: 0, status: "waiting-deps" }] },
+  // the class blocks wait in the backlog until the grid is in
+  114: { phases: [{ from: 0, status: "backlog" }], card: { lane: "backlog" } },
+  // the refund: its session takes scene 11's steer 13 minutes in; its high risk stops it at the merge gate until
+  // Sebastian approves, 64 minutes after its filing
+  122: {
+    phases: [
+      { from: 0, status: "queued" },
+      { from: MIN, status: "running", gate: "session", model: "small", spent: 0.04 },
+      { from: 8 * MIN, spent: 0.21 },
+      { from: 16 * MIN, spent: 0.38 },
+      { from: 24.5 * MIN, status: "in-review", gate: "checks", spent: 0.52, pr: true },
+      { from: 31 * MIN, gate: "review" },
+      { from: 38.5 * MIN, gate: "approval", spent: 0.61 },
+      { from: merges[122].queued, gate: "merge-queue" },
+      ...merging(merges[122], 0.61),
+    ],
+    steps: [
+      state.intake(0, 20),
+      ...session(122, 1, MIN, 24 * MIN, { model: "small" }),
+      state.checks(24.5 * MIN, 31 * MIN),
+      review(122, 1, 31 * MIN, 38 * MIN, "s-1"),
+      state.policyGate(38 * MIN, 38.5 * MIN, { pr: cards[122].pr, risk: "high", outcome: "requires_approval", changed: 5, lines: 207 }),
+      state.approvalRequested(38.5 * MIN, { approval: approvals.refund.id, pr: cards[122].pr, commit: sessions[122]["s-1"].commit, risk: "high" }),
+      ...merge(122, merges[122]),
+    ],
+  },
+};
+
+// calendarFile is #125's life at two autonomy levels. At manual its ask waits five minutes for Sebastian's answer and
+// its pull request for his approval at the merge gate. At full auto the agent's wake turn answers the ask at once, and
+// factory-merge merges on the merge rule auto, without an approval.
+const calendarFile = {
+  manual: {
+    phases: [
+      { from: 0, status: "queued" },
+      { from: MIN, status: "running", gate: "session", model: "small", spent: 0.03 },
+      { from: 4 * MIN, status: "waiting-human", gate: undefined, spent: 0.07, ask: asks.calendarFile },
+      { from: 9.5 * MIN, status: "running", gate: "session" },
+      { from: 25.5 * MIN, status: "in-review", gate: "checks", spent: 0.36, pr: true },
+      { from: 32 * MIN, gate: "review" },
+      { from: 37.5 * MIN, gate: "approval", spent: 0.41 },
+    ],
+    answered: 9 * MIN,
+    steps: [
+      state.intake(0, 20),
+      ...session(125, 1, MIN, 4 * MIN, { model: "small", outcome: "needs_info" }),
+      ...session(125, 2, 9.5 * MIN, 25 * MIN, { model: "small" }),
+      state.checks(25.5 * MIN, 32 * MIN),
+      review(125, 1, 32 * MIN, 37 * MIN, "s-2"),
+      state.policyGate(37 * MIN, 37.5 * MIN, { pr: cards[125].pr, risk: "normal", outcome: "auto", changed: 3, lines: 86 }),
+      state.approvalRequested(37.5 * MIN, { approval: approvals.calendarFile.id, pr: cards[125].pr, commit: sessions[125]["s-2"].commit, risk: "normal" }),
+    ],
+  },
+  auto: {
+    phases: [
+      { from: 0, status: "queued" },
+      { from: MIN, status: "running", gate: "session", model: "small", spent: 0.03 },
+      { from: 4 * MIN, status: "waiting-human", gate: undefined, spent: 0.07, ask: asks.calendarFile },
+      { from: 5 * MIN, status: "running", gate: "session", spent: 0.09 },
+      { from: 20.5 * MIN, status: "in-review", gate: "checks", spent: 0.36, pr: true },
+      { from: 27 * MIN, gate: "review" },
+      { from: merges[125].queued, gate: "merge-queue", spent: 0.41 },
+      ...merging(merges[125], 0.41),
+    ],
+    answered: 4.5 * MIN,
+    steps: [
+      state.intake(0, 20),
+      ...session(125, 1, MIN, 4 * MIN, { model: "small", outcome: "needs_info" }),
+      ...session(125, 2, 5 * MIN, 20 * MIN, { model: "small" }),
+      state.checks(20.5 * MIN, 27 * MIN),
+      review(125, 1, 27 * MIN, 32 * MIN, "s-2"),
+      state.policyGate(32 * MIN, 32.5 * MIN, { pr: cards[125].pr, risk: "normal", outcome: "auto", mergeRule: "auto", changed: 3, lines: 86 }),
+      state.autoMerge(32.5 * MIN, {
+        pr: cards[125].pr, commit: sessions[125]["s-2"].commit, risk: "normal", reproduction: "npm test -- calendar-file", review: reviews[125][0].summary,
+      }),
+      ...merge(125, merges[125]),
+    ],
+  },
 };
 
 // files are the changed files of a pull request, as Forgejo lists them.
@@ -845,24 +1183,20 @@ const files = {
     { filename: "src/classes/ClassPage.tsx", status: "modified", additions: 12, deletions: 1 },
     { filename: "src/classes/ClassPage.test.tsx", status: "modified", additions: 41, deletions: 0 },
   ],
-};
-
-// supervisor is the supervisor's step in #117's first session: the flip-flop detector's trip, and the insight the
-// next session starts from.
-const supervisor = {
-  issue: 117,
-  detector: "flip_flop",
-  trip: "after src/mail/reminder.ts returned to a content it had before, `npm test -- reminder` failed again, unchanged",
-  decision: "redirect",
-  reason: "Both versions of reminder.ts subtract 24 hours from the class's start, and the test's class is on 25 October, the night " +
-    "the clocks go back: 24 hours before 18:00 is 19:00 on Saturday. Subtract one calendar day in Europe/Berlin instead.",
+  220: [
+    { filename: "src/payments/refund.ts", status: "added", additions: 64, deletions: 0 },
+    { filename: "src/classes/cancel.ts", status: "modified", additions: 9, deletions: 2 },
+    { filename: "src/payments/webhook.ts", status: "modified", additions: 18, deletions: 1 },
+    { filename: "src/classes/ClassAdminPage.tsx", status: "modified", additions: 11, deletions: 0 },
+    { filename: "src/payments/refund.test.ts", status: "added", additions: 92, deletions: 0 },
+  ],
 };
 
 // steers are the messages Sebastian sends a running card from the chat: what he types, the agent's words with the
-// proposal, and the text the session gets.
+// proposal, the text the session gets, and when it gets it, in seconds after the card's creation.
 const steers = {
   refund: {
-    issue: 122,
+    issue: 122, at: 14.25 * MIN - 5,
     request: "Tell #122 to use the booking's id as the Stripe idempotency key, so a cancel sent twice refunds once.",
     reply: "I pass it to the running session of #122; it reads it at its next step:",
     text: "Use the booking's id as the Stripe idempotency key, so a cancel sent twice refunds once.",
@@ -870,7 +1204,8 @@ const steers = {
 };
 
 module.exports = {
-  date, cards, description, body, card: boardCard, filing, requests, asks, replies, alerts, alertsAt, approvals, plans, planCards, routines, runsAt,
-  cronOf, filedAge, anchoredAt, routineCard, routinesAt, scanned, sessions, words, life, lives, merges, merge, merging, mergeEvents, done, filed, ageAt, doneAt, board, session, reviews, review, files,
-  checksFailed, supervisor, steers,
+  date, cards, title, description, body, card: boardCard, filing, requests, asks, escalation, asking, answered, answerRows, replies, wakeAsk, alerts, alertsAt, approvals,
+  mergeSpec, plans, planCards, routines, runsAt, cronOf, filedAge, anchoredAt, routineCard, routinesAt, scanned, sessions, words, life, lives, calendarFile,
+  merges, merge, merging, mergeEvents, done, filed, answeredAt, ageAt, doneAt, board, session, reviews, review, files, sources, checksFailed, supervisor,
+  steers,
 };

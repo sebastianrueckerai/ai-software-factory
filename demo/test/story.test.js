@@ -79,3 +79,64 @@ test("life admits a card at its admitted offset", () => {
   assert.equal(task.AdmittedAt, "2026-10-20T11:50:00.000Z");
   assert.equal(task.CreatedAt, "2026-10-20T11:43:20.000Z");
 });
+test("a waiting-human phase's ask is the card's escalation, its choices and its alert, since the phase began", () => {
+  const ask = { issue: 113, question: "Which library?", choices: ["A", "B"], alert: 17 };
+  const phases = [{ from: 0, status: "queued" }, { from: 60, status: "waiting-human", ask }, { from: 600, status: "running", gate: "session" }];
+  const waiting = story.life(now, 113, 300, { phases }).task;
+  assert.equal(waiting.Escalation, "The agent asks: Which library?");
+  assert.deepEqual(waiting.Choices, ["A", "B"]);
+  assert.equal(waiting.EscalatedAt, "2026-10-20T11:56:00.000Z");
+  assert.equal(waiting.EscalationAlert, 17);
+  const running = story.life(now, 113, 700, { phases }).task;
+  assert.deepEqual(["Escalation", "Choices", "EscalatedAt", "EscalationAlert"].filter((k) => k in running), []);
+});
+test("a budget stop's escalation is factoryd's own question, not the agent's", () => {
+  assert.equal(story.escalation({ budget: true, question: "Fund one more session?" }), "Fund one more session?");
+  assert.equal(story.escalation({ question: "Which?" }), "The agent asks: Which?");
+});
+test("asking leaves the question's row, its escalation alert and the inbox's row", () => {
+  const a = story.asking(now, story.asks.library, 120, 1);
+  assert.deepEqual([a.events[0].Kind, a.events[0].At, a.events[0].Detail.source], ["question_asked", "2026-10-20T11:58:00.000Z", "agent"]);
+  assert.deepEqual([a.alerts[0].ID, a.alerts[0].Kind, a.alerts[0].Source, a.alerts[0].TaskID], [17, "escalation", "agent", "t-37c411e42a03"]);
+  assert.match(a.inbox.content, /^#113 needs you: Which calendar library/);
+  assert.equal(story.asking(now, story.asks.budget, 0, 1).alerts[0].Source, "budget");
+});
+test("answerRows are the member's choice and the factory's word on it", () => {
+  const [mine, note] = story.answerRows(now, story.asks.library, 30, 1);
+  assert.deepEqual([mine.role, mine.content], ["user", "TOAST UI Calendar"]);
+  assert.equal(note.content, "Answered #113 with “TOAST UI Calendar”; the card goes on.");
+  assert.equal(note.kind, "poke");
+});
+test("wakeAsk is the waker's text of a batch of asks", () => {
+  assert.equal(story.wakeAsk([{ issue: 125, question: "Where does the room go?" }]),
+    "Wake: 1 asks wait for a human.\n#125: Where does the room go?\n\nRead each card. Settle what your permissions allow. " +
+    "For what stays the human's, record what you found with attach_analysis. An ask already answered is done.");
+});
+test("a planned card is named by its key, any other by its title", () => {
+  assert.equal(story.title(110), "week-view");
+  assert.equal(story.title(122), "Payments: refund a class the studio cancels");
+});
+test("a merge's spec takes the head of the card's last session that pushed", () => {
+  const spec = story.mergeSpec(story.approvals.calendarFile);
+  assert.equal(spec.head_sha, "5e9c3b2");
+  assert.equal(spec.risk_class, "normal");
+  assert.deepEqual(spec.why_human, ["the project's merge rule is human"]);
+});
+test("the week view stops at its budget overnight and closes with the split", () => {
+  const stop = story.life(now, 110, 363 * 60 + 600, story.lives[110]).task;
+  assert.equal(stop.Status, "waiting-human");
+  assert.equal(stop.EscalatedAt, "2026-10-20T11:50:00.000Z");
+  assert.equal(stop.SpentEUR, 4.6);
+  // filed Thursday 20:00, split Friday 08:40, closed 15 seconds into the split
+  const closed = story.life(now, 110, 12 * 3600 + 40 * 60 + 20, story.lives[110]).task;
+  assert.equal(closed.Status, "closed");
+  assert.equal(closed.FinishedAt, "2026-10-20T11:59:55.000Z");
+});
+test("the morning's cards wait on their questions until the answers, then take their slots", () => {
+  // #120 is filed at 02:08 and answered at 10:58, 8 h 50 min later
+  const waiting = story.life(now, 120, 8 * 3600 + 49 * 60, story.lives[120]).task;
+  assert.equal(waiting.Status, "waiting-human");
+  assert.equal(waiting.Escalation, "The agent asks: Does an unused class of an expired pass come back as credit?");
+  const running = story.life(now, 120, 8 * 3600 + 52 * 60, story.lives[120]).task;
+  assert.deepEqual([running.Status, running.AdmittedAt], ["running", "2026-10-20T11:58:00.000Z"]);
+});

@@ -11,7 +11,8 @@ const BOARD = ui.board(["performance-read"]);
 
 // the week's other cards are done: issue, done after, spend
 const finished = [
-  [116, 1.5 * HOUR, 1.04], [117, 9.5 * HOUR, 0.45], [118, 77 * 60, 0.36], [119, 34 * 60, 0.29], [120, 9.8 * HOUR, 0.86], [121, 9.3 * HOUR, 0.46],
+  [116, 1.5 * HOUR, 1.04], [117, 9.5 * HOUR, 0.45], [118, 77 * 60, 0.36], [119, 34 * 60, 0.29], [120, 9.8 * HOUR, 0.86], [121, 9 * HOUR + 20 * 60, 0.46],
+  [122, story.merges[122].live, 0.61],
 ];
 
 // board is the board now: #123, the weekly bump's #115 and the week's other cards; Sebastian has set the bump to wait

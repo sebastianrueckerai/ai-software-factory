@@ -316,3 +316,72 @@ test("scene carries the routines' clock", () => {
   assert.equal(s.scene(now, { routinesAt: new Date("2026-10-02T09:30:00Z") }).RoutinesAt, "2026-10-02T09:30:00.000Z");
   assert.equal("RoutinesAt" in s.scene(now, {}), false);
 });
+test("#110 carries the id of the lab's capped card #610, whose session the lab refuses", () => {
+  assert.equal(s.id(110), "t-1e372e329aae");
+  assert.equal(s.id(610), "t-1e372e329aae");
+  assert.equal(s.id(112), "t-ec1e5b3bb779");
+});
+test("asked is factoryd's inbox row of a question, worded for a budget stop", () => {
+  const q = s.asked(now, { issue: 113, question: "Which library?", choices: ["A", "B"], age: 60, conversation: 1 });
+  assert.equal(q.content, "#113 needs you: Which library?");
+  assert.equal(q.kind, "escalation");
+  assert.equal(q.birth_kind, "question_asked");
+  assert.equal(q.task_id, "t-37c411e42a03");
+  assert.deepEqual(q.choices, ["A", "B"]);
+  assert.equal(q.at, "2026-10-20T11:59:00.000Z");
+  assert.equal(s.asked(now, { issue: 110, question: "Fund?", choices: [], age: 0, budget: true }).content, "#110 is stopped by its budget: Fund?");
+});
+test("mergeAsked offers Approve on a merge request", () => {
+  const m = s.mergeAsked(now, { issue: 122, pr: 220, risk: "high", age: 0 });
+  assert.equal(m.content, "#122 waits for you: merge PR #220, high risk.");
+  assert.deepEqual(m.choices, ["Approve"]);
+  assert.equal(m.birth_kind, "approval_requested");
+});
+test("wake is the waker's user row with its birth kind", () => {
+  const w = s.wake(now, { kind: "wake_ask", text: "Wake: 1 asks wait for a human.", age: 10, conversation: 2 });
+  assert.deepEqual([w.role, w.birth_kind, w.conversation, w.at], ["user", "wake_ask", 2, "2026-10-20T11:59:50.000Z"]);
+});
+test("the policy gate, the approval request and the auto merge as the timeline records them", () => {
+  const rows = s.timeline(now, 600, {
+    steps: [
+      s.policyGate(100, 130, { pr: 9, risk: "normal", outcome: "auto", mergeRule: "auto", changed: 3, lines: 80 }),
+      s.approvalRequested(130, { approval: 4, pr: 9, commit: "abc", risk: "normal" }),
+      s.autoMerge(140, { pr: 9, commit: "abc", risk: "normal", reproduction: "npm test", review: "fine" }),
+    ],
+  }).trim().split("\n").map((l) => JSON.parse(l));
+  assert.deepEqual(rows[0], {
+    step: "gate_policy", pr: 9, class: "normal", outcome: "auto", changed: 3, lines: 80, merge_rule: "auto",
+    time: "2026-10-20T11:52:10Z", started: "2026-10-20T11:51:40Z",
+  });
+  assert.deepEqual(rows[1], { step: "approval_requested", approval: 4, pr: 9, commit: "abc", class: "normal", time: "2026-10-20T11:52:10Z" });
+  assert.equal(rows[2].merge_rule, "auto");
+  assert.equal(rows[2].time, "2026-10-20T11:52:20Z");
+});
+test("pressedThread proposes every call in one reply and presses each a second apart, with its undo word", () => {
+  const dep = s.depending(now, [112, "drag-move"], [114, "Blocks"]);
+  const close = s.closing(now, { issue: 110, title: "week-view", note: "Split." });
+  const t = s.pressedThread(now, [dep, close], { line: "Go.", reply: "So:", results: ["#112 depends on #114 now.", "Closed #110."], age: 10 });
+  assert.equal(t.rows.length, 4);
+  assert.deepEqual(t.rows[1].tool_calls.map((c) => c.id), ["call_1", "call_2"]);
+  assert.deepEqual(t.rows.map((r) => r.at), ["2026-10-20T11:59:50.000Z", "2026-10-20T11:59:51.000Z", "2026-10-20T11:59:53.000Z", "2026-10-20T11:59:54.000Z"]);
+  assert.equal(t.rows[2].tool_calls[0].result, "#112 depends on #114 now. The member may undo it.");
+  assert.equal(t.rows[3].tool_calls[0].result, "Closed #110. It cannot be undone.");
+  assert.deepEqual(t.proposals, [dep, close]);
+});
+test("depending and closing describe the call as the console does", () => {
+  assert.equal(s.depending(now, [112, "drag-move"], [110, "week-view"], true).Description,
+    'Set a dependency, #112 t-ec1e5b3bb779 "drag-move", no longer depends on #110 t-1e372e329aae "week-view"');
+  assert.deepEqual(s.depending(now, [112, "drag-move"], [114, "Blocks"]).Args, { task_id: "t-ec1e5b3bb779", depends_on: "t-87e7980ddcc7" });
+  assert.equal(s.closing(now, { issue: 110, title: "week-view", note: "Split into #113 and #114." }).Description,
+    'Close a card, #110 t-1e372e329aae "week-view", note Split into #113 and #114.');
+});
+test("scene sets the merge rule in the project's file and row, and the dependencies by task", () => {
+  const sc = s.scene(now, { mergeRule: "auto", deps: { 112: [114] } });
+  assert.equal(sc.Config.merge_rule, "auto");
+  assert.equal(sc.Projects[0].MergeRule, "auto");
+  assert.deepEqual(sc.Deps, { "t-ec1e5b3bb779": ["t-87e7980ddcc7"] });
+  assert.equal(s.scene(now, {}).Config.merge_rule, "human");
+});
+test("a waiting card names what it waits on", () => {
+  assert.equal(s.card(now, { issue: 112, status: "waiting-deps", lane: "ready", age: 60, title: "t", body: "b", waitingOn: "#114" }).WaitingOn, "#114");
+});
