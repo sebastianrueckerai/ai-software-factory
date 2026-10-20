@@ -34,7 +34,8 @@ status=0
 node "$here/record.js" "${scenes[@]}" || status=1
 for s in "${scenes[@]}"; do
   if [ -f "$here/out/$s.webm" ]; then
-    ffmpeg -y -loglevel error -i "$here/out/$s.webm" -c:v libx264 -pix_fmt yuv420p -movflags +faststart "$here/out/$s.mp4"
+    secs=$(node -p "require('$here/out/$s.json').durationMs / 1000")
+    ffmpeg -y -loglevel error -i "$here/out/$s.webm" -t "$secs" -c:v libx264 -pix_fmt yuv420p -movflags +faststart "$here/out/$s.mp4"
   fi
 done
 exit $status

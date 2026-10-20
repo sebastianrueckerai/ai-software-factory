@@ -13,6 +13,6 @@ A scene module. `state(now)` returns the lab's scene JSON, or null for no seed. 
       steps: [{ state: (now) => state.scene(now, { tasks: [...] }), actions: [{ goto: "/" }], hold: 1500 }],
     };
 
-Sidecar clock: `atMs` and `durationMs` count from the creation of the recording context, which is the video's time zero (measured: the board is on screen within about half a second of it). `durationMs` is the script's span; `videoMs` is the webm's measured length. The file's end is not tied to the script's: measured `videoMs` ran from 0.1 s shorter to 1.8 s longer than `durationMs` (a static tail), so cut by `atMs` and `durationMs` and read `videoMs` before trusting the end.
+Sidecar clock: `atMs` and `durationMs` count from the creation of the recording context, which is the video's time zero (measured: the board is on screen within about half a second of it). `durationMs` is the script's span; The mp4 is cut to `durationMs`; the webm keeps its static tail (`context.close()` takes a variable time), and `videoMs` is its measured length.
 
 Tests: `node --test demo/test/*.test.js`.
