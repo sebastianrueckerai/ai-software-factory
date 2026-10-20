@@ -75,7 +75,11 @@ module.exports = {
     },
     { state: (now) => monday(now, 26), actions: [{ click: ui.tab("files") }, { waitFor: "#drawer table.files" }], hold: 3000 },
     { state: (now) => monday(now, 40), actions: [{ click: ui.tab("activity") }, { waitFor: "#drawer table.gates" }], hold: 3500 },
-    { state: (now) => monday(now, 52), actions: [{ click: ui.tab("activity") }, { waitFor: ui.gate("merge-queue") }], hold: 3500 },
+    {
+      state: (now) => monday(now, 52),
+      actions: [{ click: ui.tab("activity") }, { waitFor: ui.row("merge-queue") }, { hover: `${ui.row("merge-queue")} meter` }],
+      hold: 3500,
+    },
     { state: (now) => monday(now, 84), actions: [{ click: "#drawer-close" }, { hover: ui.face(103) }], hold: 2500 },
   ],
 };

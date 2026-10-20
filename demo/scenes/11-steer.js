@@ -26,8 +26,8 @@ function thursday(now, a, o = {}) {
   return state.scene(now, { ...b, spend: 16.2, chatSpend: 0.84, ...o });
 }
 
-// after is the state the Do it left seconds ago, a quarter minute after the first step: the thread as the console
-// stored it, the steer among the card's events, and the session's answer to it; the open chat keeps the stamps it drew
+// after is the state the Do it left: the thread as the console stored it, the steer among the card's events, and the
+// session's answer to it
 function after(now) {
   const t = state.steeredThread(now, { said: steer.request, reply: steer.reply, issue: steer.issue, title: story.cards[steer.issue].title, text: steer.text, age: 8 });
   return thursday(now, 14.25, {

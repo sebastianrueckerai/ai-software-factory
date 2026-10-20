@@ -65,6 +65,7 @@ async function run(page, action, mouse) {
   else if (kind === "press") await page.keyboard.press(arg);
   else if (kind === "wait") await sleep(arg);
   else if (kind === "waitFor") await target(arg).waitFor();
+  else if (kind === "scroll") await target(arg).evaluate((el) => el.scrollIntoView({ block: "start" }));
   else throw new Error(`unknown action ${kind}`);
 }
 

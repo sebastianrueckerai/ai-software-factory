@@ -6,7 +6,7 @@ A bank of scripted recordings of the real console, served by the console lab ove
 
 Output, ignored by git: `demo/out/<scene>.webm`, `.mp4`, `.json` (the sidecar) and `<scene>-<step>.png`. A scene that fails (a rejected seed, a page error, a 4xx or 5xx from the console) leaves no output, is named on stderr, and makes the run exit 1.
 
-A scene module. `state(now)` returns the lab's scene JSON, or null for no seed. An action has one key: `goto`, `click`, `type: [selector, text]`, `press`, `hover`, `wait`, `waitFor`.
+A scene module. `state(now)` returns the lab's scene JSON, or null for no seed. An action has one key: `goto`, `click`, `type: [selector, text]`, `press`, `hover`, `wait`, `waitFor`, `scroll` (the element to the top of its scroll box).
 
     module.exports = {
       title: "Smoke", story: "One card runs, then is done.", group: "smoke", theme: "dark", viewport: "desk",

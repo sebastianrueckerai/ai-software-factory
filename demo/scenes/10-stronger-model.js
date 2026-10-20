@@ -5,6 +5,8 @@ const ui = require("../lib/ui");
 const MIN = 60;
 const HOUR = 3600;
 const agent = "#drawer .top-block dd:last-of-type .mono";
+// the second session's start row, on big; the cursor rests on its time, off the words
+const bigStart = `${ui.step("session_start")}:has(code:has-text('"model":"big"'))`;
 
 // #107's life, offsets in seconds after its creation: the first attempt on small fails the acceptance job, its finding
 // goes to the stronger class, and the second attempt runs on big and passes.
@@ -51,8 +53,13 @@ module.exports = {
   viewport: "desk",
   steps: [
     { state: (now) => wednesday(now, 25.5), actions: [{ goto: "/" }, { click: ui.open(107) }, { waitFor: agent }], hold: 3000 },
-    { state: () => null, actions: [{ click: ui.tab("activity") }, { waitFor: ui.step("stage_findings") }, { hover: ui.step("stage_findings") }], hold: 4000 },
-    { state: (now) => wednesday(now, 31), actions: [{ click: ui.tab("chat") }, { waitFor: "#session-log .msg" }], hold: 4000 },
+    { state: () => null, actions: [{ click: ui.tab("activity") }, { waitFor: ui.row("failure") }, { hover: `${ui.row("failure")} meter` }], hold: 3500 },
+    {
+      state: (now) => wednesday(now, 31),
+      actions: [{ click: ui.tab("activity") }, { waitFor: bigStart }, { hover: `${bigStart} td:first-child` }],
+      hold: 4000,
+    },
+    { state: () => null, actions: [{ click: ui.tab("chat") }, { waitFor: "#session-log .msg" }], hold: 4000 },
     { state: (now) => wednesday(now, 53.5), actions: [{ click: ui.tab("overview") }, { waitFor: agent }], hold: 3500 },
   ],
 };

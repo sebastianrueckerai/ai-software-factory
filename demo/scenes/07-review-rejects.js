@@ -46,11 +46,19 @@ module.exports = {
   steps: [
     {
       state: (now) => week2(now, 41),
-      actions: [{ goto: "/" }, { click: ui.open(116) }, { waitFor: ui.tab("activity") }, { click: ui.tab("activity") }, { waitFor: ui.gate("review") }],
+      actions: [{ goto: "/" }, { click: ui.open(116) }, { waitFor: ui.tab("activity") }, { click: ui.tab("activity") }, { waitFor: ui.row("review") }],
       hold: 3000,
     },
-    { state: (now) => week2(now, 46), actions: [{ click: ui.tab("activity") }, { waitFor: ui.step("stage_findings") }, { hover: ui.step("stage_findings") }], hold: 4500 },
+    {
+      state: (now) => week2(now, 46),
+      actions: [{ click: ui.tab("activity") }, { waitFor: ui.row("concerns") }, { hover: `${ui.row("concerns")} meter` }],
+      hold: 4000,
+    },
     { state: (now) => week2(now, 56), actions: [{ click: ui.tab("chat") }, { waitFor: "#session-log .msg" }], hold: 4000 },
-    { state: (now) => week2(now, 75), actions: [{ click: ui.tab("activity") }, { waitFor: ui.gate("merge-queue") }, { hover: ui.gate("merge-queue") }], hold: 3500 },
+    {
+      state: (now) => week2(now, 75),
+      actions: [{ click: ui.tab("activity") }, { waitFor: ui.row("merge-queue") }, { scroll: "#drawer table.gates" }, { hover: `${ui.row("approve")} meter` }],
+      hold: 4000,
+    },
   ],
 };
