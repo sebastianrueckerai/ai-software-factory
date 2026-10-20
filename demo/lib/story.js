@@ -474,7 +474,7 @@ const routines = {
     { run: 7, due: date(2, "fri", "07:00"), took: merges[123].live, outcome: "done", issue: 123, cost: 0.62, note: "GET /schedule p95 0.74 s, up from 0.31 s since #118" },
   ],
   "cost-review": [
-    { run: 3, due: date(2, "thu", "08:00"), took: 11 * HOUR, outcome: "done", issue: 124, note: "€41.20 of the €60 cap, €1.79 per card" },
+    { run: 3, due: date(2, "thu", "08:00"), took: 11 * HOUR, outcome: "done", issue: 124, note: "€16.50 of the €60 cap, €0.99 per card" },
   ],
 };
 
@@ -717,6 +717,7 @@ function done(now, issue, age, after, spent) {
 // filed are the cards' filings on the calendar, as the earlier scenes' ages place them, for the scenes that count a
 // card's age from the story's time.
 const filed = {
+  100: date(-1, "tue", "11:00"),
   101: date(1, "mon", "11:00"), 102: date(1, "mon", "11:36"), 103: date(1, "mon", "12:36"), 104: date(1, "tue", "13:00"),
   106: date(1, "wed", "15:30"), 107: date(1, "wed", "16:00"), 108: date(1, "thu", "02:00"),
   115: date(2, "mon", "06:00"), 116: date(2, "tue", "08:00"), 117: date(2, "wed", "02:15"), 118: date(2, "thu", "16:00"),
@@ -731,8 +732,9 @@ const filed = {
   125: date(2, "fri", "10:00"),
 };
 
-// ageAt is issue's card's age in seconds at the story's time at.
+// ageAt is issue's card's age in seconds at the story's time at, and at the story's time seconds after its filing.
 const ageAt = (issue, at) => (at - filed[issue]) / 1000;
+const at = (issue, seconds) => new Date(filed[issue].getTime() + seconds * 1000);
 
 // doneAt are cards done by the story's time at: each [issue, done after its filing in seconds, spend].
 function doneAt(now, at, list) {
@@ -1203,9 +1205,191 @@ const steers = {
   },
 };
 
+// ledger is every card of the two weeks that spent, and #100 before them, as the factory's figures read it; offsets are
+// seconds after the card's filing. A card spends spent on model from start (its filing, or the slot an answer gave it)
+// to stop (its end) and ends at end, done unless closed; a done card with a lead went live at its end, lead after its
+// merge. asks are its escalations, raised at at and judged at answered by human or ai, or by factoryd at the card's end
+// when it closed unjudged; waits are its other spans waiting on a person. review false marks a first review that asked
+// for changes, null a card no review read; diff is its pull request's files, insertions and deletions; acts are the
+// human acts on it, booked at its end.
+const morning = (issue) => ageAt(issue, answeredAt[issue]);
+const live = (issue) => ({ end: merges[issue].live, lead: merges[issue].live - merges[issue].at });
+const ledger = {
+  100: { end: DAY, spent: 0.38, lead: 8 * MIN, diff: [2, 34, 6], acts: 2 },
+  101: { ...live(101), spent: 1.12, diff: [6, 212, 14], acts: 2 },
+  102: { end: 174 * MIN, spent: 0.64, lead: 9 * MIN, diff: [3, 88, 21], acts: 2 },
+  103: { end: 84 * MIN, spent: 0.31, lead: 8 * MIN, diff: [3, 59, 3], acts: 2 },
+  104: { end: HOUR, spent: 0.48, lead: 8 * MIN, diff: [2, 41, 4], acts: 1 },
+  105: { end: ageAt(105, filed[110]), stop: 20 * MIN, spent: 0.46, model: "big", waits: [[20 * MIN, ageAt(105, filed[110])]], review: null, acts: 2 },
+  107: { ...live(107), spent: 1.18, model: "big", diff: [3, 74, 12], acts: 2 },
+  108: { ...live(108), spent: 0.29, diff: [2, 6, 6], acts: 1 },
+  109: { end: 155 * MIN, spent: 1.84, lead: 6 * MIN, diff: [9, 318, 141], acts: 1 },
+  // the split's presses, the filing of #114 and the two dependencies of #112 among them, book on #110's close
+  110: {
+    status: "closed", end: ageAt(110, filed[113]) + 15, start: 161 * MIN, stop: 356 * MIN, spent: 4.6, model: "big",
+    asks: [{ at: 363 * MIN, by: "factoryd" }], review: null, acts: 4,
+  },
+  111: { end: 270 * MIN, start: 155 * MIN, spent: 0.92, lead: 6 * MIN, diff: [4, 131, 9], acts: 1 },
+  113: { end: 125 * MIN, spent: 0.43, lead: 7 * MIN, asks: [{ at: 2.75 * MIN, answered: 28.5 * MIN, by: "human" }], diff: [5, 164, 22], acts: 3 },
+  115: { ...live(115), spent: 0.38, diff: [2, 186, 171], acts: 1 },
+  116: { end: 90 * MIN, spent: 1.04, lead: 6 * MIN, review: false, diff: [4, 118, 17], acts: 2 },
+  117: { end: 570 * MIN, start: morning(117), spent: 0.45, lead: 6 * MIN, asks: [{ at: ASKED, answered: morning(117), by: "human" }], diff: [2, 47, 9], acts: 2 },
+  118: { end: 77 * MIN, spent: 0.36, lead: 7 * MIN, diff: [3, 64, 11], acts: 2 },
+  119: { end: 34 * MIN, spent: 0.29, lead: 6 * MIN, diff: [2, 19, 3], acts: 1 },
+  120: { end: 588 * MIN, start: morning(120), spent: 0.86, lead: 6 * MIN, asks: [{ at: ASKED, answered: morning(120), by: "human" }], diff: [5, 176, 12], acts: 2 },
+  121: { end: 560 * MIN, start: morning(121), spent: 0.46, lead: 6 * MIN, asks: [{ at: ASKED, answered: morning(121), by: "human" }], diff: [3, 82, 5], acts: 2 },
+  122: { ...live(122), spent: 0.61, diff: [5, 194, 3], acts: 3 },
+  123: { ...live(123), spent: 0.62, diff: [2, 38, 21], acts: 1 },
+  // at full auto the agent's wake turn answers the ask
+  125: { ...live(125), spent: 0.41, asks: [{ at: 4 * MIN, answered: calendarFile.auto.answered, by: "ai" }], diff: [3, 79, 7], acts: 1 },
+};
+
+// chats are the project agent's spend in the chat, cumulative, at the times the scenes' chats reach it.
+const chats = [
+  [date(1, "mon", "11:30"), 0.13], [date(1, "mon", "12:30"), 0.18], [date(1, "tue", "12:55"), 0.21], [date(1, "wed", "09:50"), 0.31],
+  [date(1, "wed", "15:50"), 0.38], [date(1, "thu", "06:00"), 0.4], [date(1, "fri", "08:30"), 0.52], [date(1, "fri", "09:00"), 0.55],
+  [date(2, "tue", "07:30"), 0.61], [date(2, "wed", "11:00"), 0.66], [date(2, "thu", "08:40"), 0.84], [date(2, "thu", "09:20"), 0.86],
+  [date(2, "thu", "17:00"), 0.92], [date(2, "fri", "10:00"), 1.02],
+];
+const chatAt = (at) => chats.findLast(([t]) => t <= at)?.[1] ?? 0;
+
+// spentAt is what issue's card had spent by the story's time at.
+function spentAt(issue, at) {
+  const c = ledger[issue];
+  const start = c.start ?? 0;
+  return c.spent * Math.min(1, Math.max(0, ((at - filed[issue]) / 1000 - start) / ((c.stop ?? c.end) - start)));
+}
+
+const cents = (eur) => Math.round(eur * 100) / 100;
+const sum = (xs) => xs.reduce((a, b) => a + b, 0);
+
+// spending is the board's spend by the story's time at: what the two weeks' cards and the chat had spent.
+function spending(at) {
+  const chatSpend = chatAt(at);
+  const cardsSpent = sum(Object.keys(ledger).filter((issue) => filed[issue] >= WEEK1).map((issue) => spentAt(issue, at)));
+  return { spend: cents(cardsSpent + chatSpend), chatSpend };
+}
+
+// weekEnd is Sunday evening of week, when the metrics read the week whole.
+const weekEnd = (week) => date(week, "sun", "20:00");
+
+// The lab's costs page books 12 % of a card's spend on its review, which runs on big, and the rest on the card's
+// class; the chat runs on big. Of every day it books 2 % on tools.
+const REVIEW = 0.12;
+const TOOLS = 0.02;
+const SERVED = { big: "zai/glm-5.3", small: "zai/glm-5.3-flash" };
+const TOOL_MIX = [{ alias: "web_search", share: 64 }, { alias: "web_scrape", share: 36 }];
+// TOKENS are the tokens a euro of the cards' calls moves, blended over the classes; the chat makes CALLS tool calls
+// and spends MINUTES minutes on them a euro of its spend.
+const TOKENS = 120000;
+const CALLS = 50;
+const MINUTES = 7;
+// SELF are the factory's own deploys a week, by the story's week: 0 is the week before week 1.
+const SELF = { [-6]: 2, [-5]: 1, [-4]: 3, [-3]: 2, [-2]: 2, [-1]: 3, 0: 1, 1: 3, 2: 2 };
+const CI = 400000;
+
+const median = (xs) => {
+  if (!xs.length) return undefined;
+  const s = [...xs].sort((a, b) => a - b);
+  const m = s.length >> 1;
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+};
+const ratio = (n, d) => (d ? n / d : undefined);
+const rounded = (round) => (v) => (v === undefined ? undefined : round(v));
+const minutes = rounded((ms) => Math.round(ms / 60000) * 60000);
+const tenths = rounded((v) => Math.round(v * 10) / 10);
+
+// report is the metrics page's report of the days that end with the story's time at, read from the ledger as factoryd
+// reads its figures: the window, the window before it, and seven weekly sparks that end with the window. Only what
+// happened by at counts.
+function report(now, at, days) {
+  const DAY_MS = DAY * 1000;
+  const end = Date.UTC(at.getUTCFullYear(), at.getUTCMonth(), at.getUTCDate()) + DAY_MS;
+  const win = [end - days * DAY_MS, end];
+  const prev = [end - 2 * days * DAY_MS, end - days * DAY_MS];
+  const weeks = Array.from({ length: 7 }, (_, b) => [end - (7 - b) * 7 * DAY_MS, end - (6 - b) * 7 * DAY_MS]);
+  const within = (t, [lo, hi]) => t >= lo && t < hi && t <= at;
+  const cards = Object.entries(ledger).map(([issue, c]) => {
+    const f = filed[issue].getTime();
+    return { ...c, issue, model: c.model ?? "small", review: c.review === undefined ? true : c.review, endAt: f + c.end * 1000, f };
+  });
+  const asks = cards.flatMap((c) => (c.asks ?? []).map((a) => ({ ...a, raised: c.f + a.at * 1000, judged: c.f + (a.answered ?? c.end) * 1000 })));
+  const done = (span) => cards.filter((c) => c.status !== "closed" && within(c.endAt, span));
+  const deployed = (span) => done(span).filter((c) => c.lead !== undefined);
+  const spent = (c, [lo, hi]) => Math.max(0, spentAt(c.issue, new Date(Math.min(hi, at))) - spentAt(c.issue, new Date(lo)));
+  const chat = ([lo, hi]) => Math.max(0, chatAt(new Date(Math.min(hi, at))) - chatAt(new Date(lo)));
+  const spend = (span) => sum(cards.map((c) => spent(c, span))) + chat(span);
+  const read = (fn, round = (v) => v) => state.figure(round(fn(win)), round(fn(prev)), weeks.map((w) => round(fn(w)) ?? 0));
+  const weekly = (fn) => {
+    const ws = weeks.map(fn);
+    return state.figure(ws[6], ws[5], ws);
+  };
+  const mix = (span) => {
+    const by = { big: chat(span), small: 0 };
+    for (const c of cards) {
+      const s = spent(c, span);
+      const review = s && (s * cents(c.spent * REVIEW)) / c.spent;
+      by.big += review;
+      by[c.model] += s - review;
+    }
+    const total = by.big + by.small;
+    if (!total) return [];
+    return Object.entries(by).filter(([, v]) => v > 0).sort((x, y) => y[1] - x[1]).map(([alias, v]) => ({ alias, share: (100 * v) / total }));
+  };
+  const blocked = (c) => sum([...(c.asks ?? []).map((a) => [a.at, a.answered ?? c.end]), ...(c.waits ?? [])].map(([a, b]) => b - a));
+  const judged = (span, by) => asks.filter((a) => within(a.raised, span) && a.judged <= at && a.by === by).length;
+  const restored = (span) => median(Object.values(alerts).filter((a) => a.task && within(a.raised.getTime(), span)).flatMap((a) => {
+    const fix = cards.find((c) => Number(c.issue) === a.task);
+    return fix && fix.endAt <= at ? [fix.endAt - a.raised.getTime()] : [];
+  }));
+  const diffs = (span, k) => median(done(span).filter((c) => c.diff).map((c) => c.diff[k]));
+  const calls = (span) => Math.round(chat(span) * CALLS);
+  const week = (w) => Math.floor((w[0] - WEEK1) / (7 * DAY_MS)) + 1;
+  const mixed = mix(win);
+  return state.metrics(now, days, {
+    deploys: weekly((w) => deployed(w).length),
+    lead_time: read((span) => median(deployed(span).map((c) => c.lead * 1000)), minutes),
+    card_cycle: read((span) => median(done(span).map((c) => c.end * 1000)), minutes),
+    throughput: read((span) => done(span).length),
+    change_failure: read((span) => ratio(0, done(span).length)),
+    reverted_refiled: { reverted: 0, refiled: 0, prev: [0, 0], has: false, weeks: Array(7).fill(0) },
+    time_to_restore: read(restored, minutes),
+    spend: weekly((w) => cents(spend(w))),
+    per_card: read((span) => median(done(span).map((c) => c.spent)), rounded(cents)),
+    tokens_per_card: read((span) => {
+      const n = done(span).length;
+      return n ? Math.round((sum(cards.map((c) => spent(c, span))) * TOKENS) / n / 1000) * 1000 : undefined;
+    }),
+    model_spend: mixed,
+    served_by: mixed.map((m) => ({ ...m, alias: SERVED[m.alias] })),
+    tool_spend: weekly((w) => cents(spend(w) * TOOLS)),
+    tool_mix: mixed.length ? TOOL_MIX : [],
+    interventions: read((span) => ratio(sum(cards.filter((c) => within(c.endAt, span)).map((c) => c.acts)), done(span).length), tenths),
+    escalations: read((span) => asks.filter((a) => within(a.raised, span)).length),
+    escalated_share: read((span) => ratio(done(span).filter((c) => c.asks).length, done(span).length)),
+    escalations_handled: {
+      human: judged(win, "human"), ai: judged(win, "ai"), unjudged: judged(win, "factoryd"),
+      prev: [judged(prev, "human"), judged(prev, "ai"), judged(prev, "factoryd")], weeks: weeks.map((w) => judged(w, "human")),
+    },
+    human_blocked: read((span) => ratio(sum(done(span).map(blocked)), sum(done(span).map((c) => c.end)))),
+    review_acceptance: read((span) => {
+      const reviewed = done(span).filter((c) => c.review !== null);
+      return ratio(reviewed.filter((c) => c.review).length, reviewed.length);
+    }),
+    self_deploys: weekly((w) => SELF[week(w)] ?? 2),
+    diff_size: {
+      files: diffs(win, 0) ?? 0, insertions: diffs(win, 1) ?? 0, deletions: diffs(win, 2) ?? 0,
+      prev: [0, 1, 2].map((k) => diffs(prev, k) ?? 0), has: diffs(win, 0) !== undefined, prev_has: diffs(prev, 0) !== undefined,
+      weeks: weeks.map((w) => diffs(w, 0) ?? 0),
+    },
+    chat_tool_work: { calls: calls(win), minutes: chat(win) * MINUTES, prev_calls: calls(prev), prev_minutes: chat(prev) * MINUTES, weeks: weeks.map(calls) },
+    ci_duration: read((span) => (done(span).length ? CI : undefined)),
+  });
+}
+
 module.exports = {
   date, cards, title, description, body, card: boardCard, filing, requests, asks, escalation, asking, answered, answerRows, replies, wakeAsk, alerts, alertsAt, approvals,
   mergeSpec, plans, planCards, routines, runsAt, cronOf, filedAge, anchoredAt, routineCard, routinesAt, scanned, sessions, words, life, lives, calendarFile,
   merges, merge, merging, mergeEvents, done, filed, answeredAt, ageAt, doneAt, board, session, reviews, review, files, sources, checksFailed, supervisor,
-  steers,
+  steers, at, ledger, spentAt, spending, weekEnd, report,
 };

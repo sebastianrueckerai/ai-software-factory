@@ -58,7 +58,7 @@ function board(now, { thread, tasks = [], replies }) {
     tasks: [waitlist(now), ...tasks],
     objects: { [`sessions/${state.id(101)}/timeline.jsonl`]: state.timeline(now, 30 * 60, { alias: "small" }) },
     alerts: alerts(now), chat, open: 2, seen: state.seen(chat), usedProposals: [first.used, ...(thread ? [thread.used] : [])],
-    spend: 0.55, chatSpend: 0.13, replies,
+    ...story.spending(story.at(101, 38 * 60)), replies,
   });
 }
 

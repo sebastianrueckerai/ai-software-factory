@@ -39,7 +39,7 @@ function morning(now, read) {
   if (!read) delete seen[INBOX];
   return state.scene(now, {
     ...story.board([story.routineCard(now, 108, t), ...story.doneAt(now, t, finished)]), chat, seen, inbox: INBOX, open: INBOX, usedProposals: [report.proposal],
-    spend: 8.2, chatSpend: 0.4,
+    ...story.spending(t),
   });
 }
 

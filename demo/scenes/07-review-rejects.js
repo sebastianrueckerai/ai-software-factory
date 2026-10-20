@@ -32,7 +32,7 @@ const cancel = {
 
 // week2 is the board a minutes after #116's filing, the week's dependency bump done
 function week2(now, a) {
-  return state.scene(now, { ...story.board([story.life(now, 116, a * MIN, cancel), story.routineCard(now, 115)]), spend: 12.4, chatSpend: 0.61 });
+  return state.scene(now, { ...story.board([story.life(now, 116, a * MIN, cancel), story.routineCard(now, 115)]), ...story.spending(story.at(116, a * MIN)) });
 }
 
 module.exports = {

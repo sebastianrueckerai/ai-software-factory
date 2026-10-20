@@ -140,3 +140,92 @@ test("the morning's cards wait on their questions until the answers, then take t
   const running = story.life(now, 120, 8 * 3600 + 52 * 60, story.lives[120]).task;
   assert.deepEqual([running.Status, running.AdmittedAt], ["running", "2026-10-20T11:58:00.000Z"]);
 });
+
+const pct = (x) => Math.round(x * 100) / 100;
+const figure = (f) => [f.value, f.prev, f.has, f.prev_has];
+
+test("week 1's report reads its ten done cards against the quiet week before it", () => {
+  const r = story.report(now, story.weekEnd(1), 7);
+  assert.deepEqual([r.from, r.to], ["2026-10-14T00:00:00.000Z", "2026-10-20T00:00:00.000Z"]);
+  // live by Sunday: #101 to #104, #107 to #109, #111 and #113; #105 is the plan, done at its accept; #100 lived in
+  // the week before last
+  assert.deepEqual(figure(r.deploys), [9, 0, true, true]);
+  assert.deepEqual(r.deploys.weeks, [0, 0, 0, 0, 1, 0, 9]);
+  assert.deepEqual(figure(r.throughput), [10, 0, true, true]);
+  // merge to live in minutes 8 9 8 8 6 7 6 6 7: the median is 7
+  assert.deepEqual(figure(r.lead_time), [7 * 60000, 0, true, false]);
+  // filing to done in minutes 50 60 64 84 120 125 155 174 270 2040: (120 + 125) / 2 rounds to 123
+  assert.deepEqual(figure(r.card_cycle), [123 * 60000, 0, true, false]);
+  // spends 0.29 0.31 0.43 0.46 0.48 0.64 0.92 1.12 1.18 1.84: (0.48 + 0.64) / 2
+  assert.deepEqual(figure(r.per_card), [0.56, 0, true, false]);
+  // the cards' 12.27 with #110's 4.60, and the chat's 0.55
+  assert.deepEqual(figure(r.spend), [12.82, 0, true, true]);
+  assert.deepEqual(figure(r.tool_spend), [0.26, 0, true, true]);
+  // CheckoutErrors rose at 12:59 and #104 was live at 14:00
+  assert.deepEqual(figure(r.time_to_restore), [61 * 60000, 0, true, false]);
+  // #110's budget and #113's library; #110 closed unjudged, so only #113 is a done card that asked
+  assert.deepEqual(figure(r.escalations), [2, 0, true, true]);
+  assert.deepEqual(figure(r.escalated_share), [0.1, 0, true, false]);
+  assert.deepEqual([r.escalations_handled.human, r.escalations_handled.ai, r.escalations_handled.unjudged], [1, 0, 1]);
+  // #105 waited from 20 minutes to its accept at 2040, #113 from 2.75 to 28.5, over 3142 minutes of the cards' lives
+  assert.equal(pct(r.human_blocked.value), pct((2020 + 25.75) / 3142));
+  assert.deepEqual(figure(r.review_acceptance), [1, 0, true, false]);
+  // big: 5.49 of #105, #107 and #110 past their reviews, the reviews' 1.47 and the chat's 0.55; small: the rest's 5.31
+  assert.deepEqual(r.model_spend.map((m) => [m.alias, pct(m.share)]), [["big", pct((100 * 7.51) / 12.82)], ["small", pct((100 * 5.31) / 12.82)]]);
+  assert.deepEqual(r.served_by.map((m) => m.alias), ["zai/glm-5.3", "zai/glm-5.3-flash"]);
+  assert.deepEqual(figure(r.interventions), [2.1, 0, true, false]);
+});
+test("week 2's report reads the week against week 1: cheaper and quicker cards, more asks", () => {
+  const r = story.report(now, story.weekEnd(2), 7);
+  assert.deepEqual(figure(r.deploys), [10, 9, true, true]);
+  assert.deepEqual(figure(r.throughput), [10, 10, true, true]);
+  assert.deepEqual(figure(r.lead_time), [6 * 60000, 7 * 60000, true, true]);
+  // minutes 34 40.5 52 64 72 77 90 560 570 588: (72 + 77) / 2 rounds to 75
+  assert.deepEqual(figure(r.card_cycle), [75 * 60000, 123 * 60000, true, true]);
+  // spends 0.29 0.36 0.38 0.41 0.45 0.46 0.61 0.62 0.86 1.04: (0.45 + 0.46) / 2 rounds to 0.46
+  assert.deepEqual(figure(r.per_card), [0.46, 0.56, true, true]);
+  // the cards' 5.48 and the chat's 1.02 - 0.55
+  assert.deepEqual(figure(r.spend), [5.95, 12.82, true, true]);
+  assert.deepEqual(figure(r.tool_spend), [0.12, 0.26, true, true]);
+  // ScheduleErrors rose at 17:19 and #119 was live at 17:53:30
+  assert.deepEqual(figure(r.time_to_restore), [35 * 60000, 61 * 60000, true, true]);
+  // the morning's #117, #120 and #121, answered by Sebastian, and #125's, answered by the agent at full auto
+  assert.deepEqual(figure(r.escalations), [4, 2, true, true]);
+  assert.deepEqual(figure(r.escalated_share), [0.4, 0.1, true, true]);
+  assert.deepEqual(r.escalations_handled, { human: 3, ai: 1, unjudged: 0, prev: [1, 0, 1], weeks: [0, 0, 0, 0, 0, 1, 3] });
+  assert.equal(pct(r.human_blocked.value), pct((524 + 529 + 519 + 0.5) / 2147.5));
+  // #116's first review found the race
+  assert.deepEqual(figure(r.review_acceptance), [0.9, 1, true, true]);
+  // every card ran on small: the reviews' 0.64 and the chat's 0.47 are big
+  assert.deepEqual(r.model_spend.map((m) => [m.alias, pct(m.share)]), [["small", pct((100 * 4.84) / 5.95)], ["big", pct((100 * 1.11) / 5.95)]]);
+  assert.deepEqual([r.diff_size.files, r.diff_size.insertions, r.diff_size.deletions, r.diff_size.prev], [3, 80.5, 10, [3, 88, 12]]);
+  assert.deepEqual(figure(r.interventions), [1.7, 2.1, true, true]);
+});
+test("Monday's 28 days count #101 as the week's first deploy once it is live", () => {
+  const before = story.report(now, story.at(103, 17 * 60), 28);
+  const after = story.report(now, story.at(103, 26 * 60), 28);
+  assert.deepEqual([figure(before.deploys), figure(after.deploys)], [[0, 1, true, true], [1, 1, true, true]]);
+  // #100's day, then #100's and #101's two hours
+  assert.deepEqual([before.card_cycle.value, after.card_cycle.value], [24 * 3600000, 13 * 3600000]);
+});
+test("spending is the cards' spend so far and the chat's", () => {
+  // #101 done, #102 84 of its 174 minutes into 0.64, #103 24 of 84 into 0.31, the chat 0.18
+  assert.deepEqual(story.spending(story.date(1, "mon", "13:00")), { spend: 1.7, chatSpend: 0.18 });
+  assert.deepEqual(story.spending(story.weekEnd(1)), { spend: 12.82, chatSpend: 0.55 });
+  assert.deepEqual(story.spending(story.weekEnd(2)), { spend: 18.77, chatSpend: 1.02 });
+  // the overnight cards spend from the morning's answer, #110 until its budget stopped it
+  assert.equal(story.spentAt(117, story.date(2, "wed", "10:59")), 0);
+  assert.equal(story.spentAt(110, story.date(1, "fri", "08:00")), 4.6);
+});
+test("the ledger's spends are the spends the cards' lives end on", () => {
+  const last = (life) => life.phases.findLast((p) => "spent" in p).spent;
+  for (const issue of [101, 107, 108, 110, 115, 120, 121, 122, 123]) assert.equal(story.ledger[issue].spent, last(story.lives[issue]), `#${issue}`);
+  assert.equal(story.ledger[125].spent, last(story.calendarFile.auto));
+});
+test("the cost review reads September from the ledger", () => {
+  // #100's 0.38, week 1's cards' 12.27, week 2's Monday to Wednesday's #115, #116, #117, #120 and #121, and the chat's 0.66
+  const october = story.date(2, "thu", "00:00");
+  assert.equal(pct(story.spending(october).spend + story.spentAt(100, october)), 16.5);
+  // 15.84 of the cards over the sixteen done by then
+  assert.equal(story.routines["cost-review"][0].note, "€16.50 of the €60 cap, €0.99 per card");
+});

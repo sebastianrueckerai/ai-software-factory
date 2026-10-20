@@ -24,7 +24,7 @@ function monday(now, filed) {
       }),
       [`sessions/${schedule.ID}/timeline.jsonl`]: state.timeline(now, 19 * MIN, { steps: [state.intake(0, 0), state.sessionStart(MIN, { model: "small" })] }),
     },
-    spend: 1.24, chatSpend: 0.18,
+    ...story.spending(story.at(101, 95 * MIN)),
   });
 }
 

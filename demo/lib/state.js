@@ -350,40 +350,15 @@ const say = (text) => ({ Say: text });
 const call = (tool, args) => ({ Call: [[tool, JSON.stringify(args)]] });
 const reply = (...chunks) => chunks;
 
-function metrics(now, overrides = {}) {
-  const move = (value, prev, weeks) => ({ value, prev, has: true, prev_has: true, weeks });
-  const flat = (value) => ({ value, prev: 0, has: true, prev_has: false, weeks: Array(7).fill(value) });
-  return {
-    repository: project.repository,
-    from: iso(now, 27 * 86400),
-    to: iso(now, 0),
-    deploys: move(23, 21, [16, 17, 15, 18, 19, 21, 23]),
-    lead_time: move(12000000, 13500000, [16800000, 16200000, 15600000, 15000000, 13800000, 12900000, 12000000]),
-    card_cycle: move(21900000, 19500000, [18600000, 19200000, 20100000, 19800000, 21000000, 21600000, 21900000]),
-    throughput: move(31, 25, [21, 23, 25, 26, 28, 29, 31]),
-    change_failure: move(0.06, 0.08, [0.11, 0.10, 0.09, 0.08, 0.07, 0.06, 0.06]),
-    reverted_refiled: { reverted: 2, refiled: 1, prev: [2, 1], has: true, weeks: Array(7).fill(2) },
-    time_to_restore: move(34200000, 37800000, [44400000, 42000000, 40200000, 38400000, 36600000, 35400000, 34200000]),
-    spend: move(87.4, 82.6, [61.2, 68.4, 74.9, 71.8, 79.2, 82.6, 87.4]),
-    per_card: move(2.6, 2.9, [3.4, 3.3, 3.1, 3.0, 2.9, 2.7, 2.6]),
-    tokens_per_card: flat(84000),
-    model_spend: [{ alias: "big", share: 89 }, { alias: "small", share: 11 }],
-    served_by: [
-      { alias: "zai/glm-5.3", share: 71 }, { alias: "dashscope/qwen3.8-max", share: 18 },
-      { alias: "zai/glm-5.3-flash", share: 9 }, { alias: "other", share: 2 },
-    ],
-    interventions: move(1.4, 1.7, [1.9, 1.8, 1.7, 1.6, 1.5, 1.5, 1.4]),
-    escalations: flat(5),
-    escalated_share: move(0.16, 0.19, [0.23, 0.22, 0.21, 0.20, 0.19, 0.18, 0.16]),
-    tool_spend: move(0.42, 0.37, [0.28, 0.31, 0.35, 0.33, 0.36, 0.37, 0.42]),
-    tool_mix: [{ alias: "web_scrape", share: 61 }, { alias: "web_search", share: 35 }, { alias: "fal_run", share: 4 }],
-    human_blocked: move(0.18, 0.22, [0.24, 0.23, 0.22, 0.21, 0.20, 0.19, 0.18]),
-    review_acceptance: move(0.824, 0.794, [0.74, 0.76, 0.77, 0.78, 0.79, 0.80, 0.824]),
-    self_deploys: move(2, 1, [1, 2, 1, 1, 2, 1, 2]),
-    diff_size: { files: 9, insertions: 240, deletions: 95, prev: [9, 240, 95], has: true, weeks: Array(7).fill(9) },
-    chat_tool_work: { calls: 312, minutes: 41, prev_calls: 274, prev_minutes: 36, weeks: [238, 251, 262, 274, 288, 299, 312] },
-    ...overrides,
-  };
+// figure is a deck number as factoryd's Figure carries it: the window's value and the previous window's, each undefined
+// over an empty cohort, and the seven weekly sparks.
+const figure = (value, prev, weeks) => ({ value: value ?? 0, prev: prev ?? 0, has: value !== undefined, prev_has: prev !== undefined, weeks });
+
+// metrics is factoryd's MetricsReport of the project over the days that end with now's UTC day, figures its figures by
+// their JSON names.
+function metrics(now, days, figures) {
+  const to = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  return { repository: project.repository, from: new Date(to - (days - 1) * 86400000).toISOString(), to: new Date(to).toISOString(), ...figures };
 }
 
 const HOUR = 3600 * 1000;
@@ -487,5 +462,5 @@ module.exports = {
   AGENT_ASKS, id, card, intake, sessionStart, session, checks, modelReview, findings, queueTurn, policyGate, approvalRequested, autoMerge, merged, recorded,
   final, supervisor, timeline, said, transcript, event, status, alert, poke, mergedPoke, livePoke, asked, mergeAsked, wake, approval, message, ask,
   proposal, proposedCall, cardFiling, steering, closing, depending, pressed, pressedThread, filedThread, steeredThread, seen,
-  plan, say, call, reply, metrics, nextCron, prevCron, routineRun, routineView, scene,
+  plan, say, call, reply, figure, metrics, nextCron, prevCron, routineRun, routineView, scene,
 };

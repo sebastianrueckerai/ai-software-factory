@@ -113,7 +113,7 @@ function thursday(now, t, o = {}) {
   const b = story.board([...lives, story.routineCard(now, 115, at), ...story.doneAt(now, at, finished)]);
   const events = [118, 119].filter((i) => age(i) >= 0).flatMap((i) => story.mergeEvents(now, i, age(i), merges[i]));
   const chat = t > ASKED ? checked(now, t, lives[0].task) : undefined;
-  return state.scene(now, { ...b, events, alerts: story.alertsAt(now, at), chat, seen: chat && state.seen(chat), spend: 18.4, chatSpend: 0.92, ...o });
+  return state.scene(now, { ...b, events, alerts: story.alertsAt(now, at), chat, seen: chat && state.seen(chat), ...story.spending(at), ...o });
 }
 
 const named = '#chat-log .msg.agent:has-text("e41b7c9")';

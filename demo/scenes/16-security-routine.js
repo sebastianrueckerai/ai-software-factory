@@ -21,7 +21,7 @@ function night(now) {
   const card = story.routineCard(now, 108, at);
   return state.scene(now, {
     ...story.board([card, ...story.doneAt(now, at, finished)]), ...story.routinesAt(now, at, { cards: [card.task] }),
-    events: story.mergeEvents(now, 108, story.filedAge(now, 108, at), story.merges[108]), spend: 7.9 + (card.task.SpentEUR ?? 0), chatSpend: 0.38,
+    events: story.mergeEvents(now, 108, story.filedAge(now, 108, at), story.merges[108]), ...story.spending(at),
   });
 }
 

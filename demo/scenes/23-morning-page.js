@@ -23,7 +23,7 @@ function wednesday(now, t, answered) {
   const chat = asked.map((x) => x.inbox);
   return state.scene(now, {
     ...b, events: [...asked.flatMap((x) => x.events), ...answers], alerts: asked.flatMap((x) => x.alerts),
-    chat, seen: { [INBOX]: answers.length ? chat.length : 0 }, inbox: INBOX, open: INBOX, spend: 12.4, chatSpend: 0.61,
+    chat, seen: { [INBOX]: answers.length ? chat.length : 0 }, inbox: INBOX, open: INBOX, ...story.spending(t),
   });
 }
 

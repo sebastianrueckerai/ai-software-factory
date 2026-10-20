@@ -19,7 +19,7 @@ function thursday(now, a, o = {}) {
     story.routineCard(now, 115),
     ...finished.map(([issue, age, after, spent]) => story.done(now, issue, age * HOUR, after * HOUR, spent)),
   ]);
-  return state.scene(now, { ...b, spend: 16.2, chatSpend: 0.84, ...o });
+  return state.scene(now, { ...b, ...story.spending(story.at(steer.issue, a * MIN)), ...o });
 }
 
 // after is the state the Do it left: the thread as the console stored it, the steer among the card's events, and the

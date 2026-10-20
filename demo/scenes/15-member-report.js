@@ -23,7 +23,7 @@ function wednesday(now, m, o = {}) {
     : story.card(now, 106, { status: "closed", lane: "backlog", age: (30 + m) * MIN, finished: m * MIN - merge.at, author: reporter });
   const fix = m >= 0 ? [story.life(now, 107, m * MIN, story.lives[107])] : [];
   const b = story.board([...fix, ...finished.map(([issue, age, after, spent]) => story.done(now, issue, (age + m / 60) * HOUR, after * HOUR, spent))]);
-  return state.scene(now, { ...b, tasks: [report, ...b.tasks], spend: 6.4 + (fix[0]?.task.SpentEUR ?? 0), chatSpend: 0.38, ...o });
+  return state.scene(now, { ...b, tasks: [report, ...b.tasks], ...story.spending(story.at(107, m * MIN)), ...o });
 }
 
 // filed is the state the Do it left, m minutes later: the thread as the console stored it, the filing among #107's

@@ -239,12 +239,17 @@ test("scene keys a pull request's files by their Forgejo path", () => {
   const sc = s.scene(now, { prFiles: { 203: [{ filename: "a.ts", status: "modified", additions: 1, deletions: 0 }] } });
   assert.deepEqual(sc.PRFiles, { "/api/v1/repos/nord/booking/pulls/203/files": '[{"filename":"a.ts","status":"modified","additions":1,"deletions":0}]' });
 });
-test("metrics report is the nord-booking window", () => {
-  const m = s.metrics(now);
-  assert.equal(m.repository, "nord/booking");
-  assert.equal(m.to, "2026-10-20T12:00:00.000Z");
-  assert.equal(m.from, "2026-09-23T12:00:00.000Z");
-  assert.equal(m.deploys.value, 23);
+test("a figure has a value and a previous one unless its cohort is empty", () => {
+  const weeks = [0, 0, 0, 0, 1, 0, 9];
+  assert.deepEqual(s.figure(9, 0, weeks), { value: 9, prev: 0, has: true, prev_has: true, weeks });
+  assert.deepEqual(s.figure(420000, undefined, weeks), { value: 420000, prev: 0, has: true, prev_has: false, weeks });
+  assert.deepEqual(s.figure(undefined, 0.5, weeks), { value: 0, prev: 0.5, has: false, prev_has: true, weeks });
+});
+test("metrics report is nord/booking's window of days to now's UTC day", () => {
+  const deploys = s.figure(10, 9, [0, 0, 0, 1, 0, 9, 10]);
+  const m = s.metrics(now, 7, { deploys });
+  assert.deepEqual(m, { repository: "nord/booking", from: "2026-10-14T00:00:00.000Z", to: "2026-10-20T00:00:00.000Z", deploys });
+  assert.equal(s.metrics(now, 28, {}).from, "2026-09-23T00:00:00.000Z");
 });
 test("a card filed by someone else is no writer's, and carries its alert and its chain", () => {
   const c = s.card(now, {

@@ -31,7 +31,7 @@ function friday(now, run, o) {
   const chat = [asked.inbox, ...o.rows];
   return state.scene(now, {
     ...b, events: [...asked.events, ...o.events], alerts: asked.alerts, approvals: o.approvals, chat, seen: { [INBOX]: chat.length - (o.unread ?? 0) },
-    inbox: INBOX, open: INBOX, autonomy: o.autonomy, mergeRule: o.mergeRule, spend: 21.3, chatSpend: 1.02,
+    inbox: INBOX, open: INBOX, autonomy: o.autonomy, mergeRule: o.mergeRule, ...story.spending(t),
   });
 }
 

@@ -57,7 +57,7 @@ function friday(now, s, o = {}) {
   return state.scene(now, {
     tasks: [plan, ...b.tasks], objects: b.objects, deps: { 112: deps }, events: [...asked.events, ...(o.events ?? [])],
     alerts: [...asked.alerts, ...(o.alerts ?? [])], chat, seen: { [INBOX]: o.unread ? chat.length - o.unread : chat.length },
-    inbox: INBOX, open: INBOX, usedProposals: o.used, replies: o.replies, drawer: o.drawer, spend: 11.6, chatSpend: 0.52,
+    inbox: INBOX, open: INBOX, usedProposals: o.used, replies: o.replies, drawer: o.drawer, ...story.spending(t),
   });
 }
 

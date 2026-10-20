@@ -14,7 +14,7 @@ function morning(now, a) {
     story.life(now, 120, since(120, a), story.lives[120]), story.life(now, 121, since(121, a), story.lives[121]),
     story.routineCard(now, 115), story.done(now, 116, 21 * HOUR, 90 * MIN, 1.04),
   ];
-  return state.scene(now, { ...story.board(cards), spend: 13.8 + a * 0.02, chatSpend: 0.66 });
+  return state.scene(now, { ...story.board(cards), ...story.spending(story.at(120, since(120, a))) });
 }
 
 module.exports = {

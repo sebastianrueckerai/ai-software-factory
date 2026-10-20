@@ -6,26 +6,18 @@ const MIN = 60;
 const merge = story.merges[101];
 const live = `${ui.step("final")}:has(code:has-text("live: covered"))`;
 
-// metrics is the report with deploys this week; the waitlist's deploy is the week's 23rd
-function metrics(now, deploys) {
-  const m = state.metrics(now);
-  return { ...m, deploys: { ...m.deploys, value: deploys, weeks: [...m.deploys.weeks.slice(0, 6), deploys] } };
-}
-
 // monday is Monday afternoon's board a minutes after #103's filing, as scene 6 has it: the waitlist #101 merges
-// out of the merge queue and goes live
+// out of the merge queue and goes live, the week's first deploy. The metrics page opens on its default 28 days.
 function monday(now, a) {
-  const age = (96 + a) * MIN;
+  const t = new Date(story.filed[103].getTime() + a * MIN * 1000);
+  const age = story.ageAt(101, t);
   const b = story.board([
     story.life(now, 101, age, story.lives[101]), story.life(now, 102, (57 + a) * MIN, story.lives[102]), story.life(now, 103, a * MIN, story.lives[103]),
   ]);
-  return state.scene(now, {
-    ...b, events: story.mergeEvents(now, 101, age, merge), metrics: metrics(now, age >= merge.live ? 23 : 22),
-    spend: 0.31 + b.tasks.reduce((sum, t) => sum + (t.SpentEUR ?? 0), 0), chatSpend: 0.18,
-  });
+  return state.scene(now, { ...b, events: story.mergeEvents(now, 101, age, merge), metrics: story.report(now, t, 28), ...story.spending(t) });
 }
 
-const deploys = ".mrow:has(.mname:text-is('deploys / week'))";
+const deploys = ui.figure("deploys / week");
 
 module.exports = {
   title: "Merge to done",

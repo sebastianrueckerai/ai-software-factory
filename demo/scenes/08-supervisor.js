@@ -13,7 +13,7 @@ const reminder = story.lives[sup.issue];
 // morning is the board a minutes after #117 took its slot; Monday's bump and #116 are done
 function morning(now, a) {
   const cards = [story.life(now, sup.issue, A + a * MIN, reminder), story.routineCard(now, 115), story.done(now, 116, 21 * HOUR, 90 * MIN, 1.04)];
-  return state.scene(now, { ...story.board(cards), spend: 13.1, chatSpend: 0.66 });
+  return state.scene(now, { ...story.board(cards), ...story.spending(story.at(sup.issue, A + a * MIN)) });
 }
 
 module.exports = {

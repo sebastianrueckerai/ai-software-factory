@@ -23,7 +23,7 @@ function board(now) {
   return state.scene(now, {
     ...story.board([...cards, ...story.doneAt(now, at, finished)]),
     ...story.routinesAt(now, at, { needsMe: "dependency-bump", cards: cards.map((c) => c.task) }),
-    spend: 19.1, chatSpend: 0.92,
+    ...story.spending(at),
   });
 }
 

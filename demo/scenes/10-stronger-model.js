@@ -17,7 +17,7 @@ function wednesday(now, a) {
     story.life(now, 107, a * MIN, story.lives[107]),
     ...finished.map(([issue, age, after, spent]) => story.done(now, issue, age * HOUR, after * HOUR, spent)),
   ]);
-  return state.scene(now, { ...b, spend: 6.4 + (b.tasks[0].SpentEUR ?? 0), chatSpend: 0.38 });
+  return state.scene(now, { ...b, ...story.spending(story.at(107, a * MIN)) });
 }
 
 module.exports = {

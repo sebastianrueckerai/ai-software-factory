@@ -35,7 +35,7 @@ function thursday(now, s) {
   return state.scene(now, {
     ...b, events, chat, seen: { [INBOX]: approved ? chat.length : 0 }, inbox: INBOX, open: INBOX, prFiles: { [a.pr]: story.files[a.pr] },
     approvals: approved ? undefined : [state.approval(now, { ...a, spec: story.mergeSpec(a), age: s - OPENED })],
-    spend: 16.9, chatSpend: 0.86,
+    ...story.spending(t),
   });
 }
 

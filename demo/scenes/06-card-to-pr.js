@@ -11,7 +11,7 @@ const pr = story.cards[103].pr;
 // monday is the board a minutes after #103's filing
 function monday(now, a) {
   const b = story.board([story.life(now, 101, (96 + a) * MIN, story.lives[101]), story.life(now, 102, (57 + a) * MIN, story.lives[102]), story.life(now, 103, a * MIN, story.lives[103])]);
-  return state.scene(now, { ...b, prFiles: { [pr]: story.files[pr] }, spend: 0.31 + b.tasks.reduce((sum, t) => sum + (t.SpentEUR ?? 0), 0), chatSpend: 0.18 });
+  return state.scene(now, { ...b, prFiles: { [pr]: story.files[pr] }, ...story.spending(story.at(103, a * MIN)) });
 }
 
 module.exports = {

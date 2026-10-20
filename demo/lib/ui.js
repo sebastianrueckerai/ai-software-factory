@@ -36,6 +36,15 @@ module.exports = {
   // nav is the header's link to a page: /settings, /notifications, metrics
   nav: (page) => (page === "metrics" ? `nav a[href="/projects/${project.name}/metrics"]` : `nav a[href="${page}"]`),
   home: "a.home",
+  // metrics is the metrics page at the window of days to today, as its window control asks for it; it reads the clock
+  // when a recording loads the scene
+  metrics: (days) => {
+    const day = (back) => new Date(Date.now() - back * 86400000).toISOString().slice(0, 10);
+    return `/projects/${project.name}/metrics?from=${day(days - 1)}&to=${day(0)}`;
+  },
+  // figure is the metrics page's row of the figure named name, and section its section of id, as m-cost
+  figure: (name) => `.mrow:has(.mname:text-is("${name}"))`,
+  section: (id) => `section[aria-labelledby="${id}"]`,
   // park is a spot for the cursor off every word: the body of Needs you, on a board where nothing waits
   park: "#needs-you .cards",
   // idle is the same spot in In progress, on a board where nothing runs

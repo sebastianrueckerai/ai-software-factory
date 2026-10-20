@@ -42,7 +42,7 @@ function tuesday(now, m, o = {}) {
     story.life(now, 104, m * MIN, checkout),
     ...monday.map(([issue, age, after, spent]) => story.done(now, issue, (age + m / 60) * HOUR, after * HOUR, spent)),
   ]);
-  return state.scene(now, { ...b, events: story.mergeEvents(now, 104, m * MIN, merge), alerts: story.alertsAt(now, at), spend: 3.9, chatSpend: 0.21, ...o });
+  return state.scene(now, { ...b, events: story.mergeEvents(now, 104, m * MIN, merge), alerts: story.alertsAt(now, at), ...story.spending(at), ...o });
 }
 
 const answered = '#chat-log .msg.agent:has-text("settled when #104 went live")';

@@ -44,7 +44,8 @@ function waiting(now) {
   };
 }
 
-const scene = (now, o) => state.scene(now, { spend: 4.82, chatSpend: 0.31, ...o });
+// scene is the board s seconds after #105's filing
+const scene = (now, s, o) => state.scene(now, { ...story.spending(story.at(105, s)), ...o });
 
 module.exports = {
   title: "Too large, split",
@@ -53,15 +54,15 @@ module.exports = {
   theme: "dark",
   viewport: "desk",
   steps: [
-    { state: (now) => scene(now, { tasks: week(now), replies: [filing] }), actions: [{ goto: "/" }], hold: 1500 },
+    { state: (now) => scene(now, 0, { tasks: week(now), replies: [filing] }), actions: [{ goto: "/" }], hold: 1500 },
     {
       state: () => null,
       actions: [{ click: "#chat-input" }, { type: ["#chat-input", story.requests.calendar] }, { press: "Enter" }, { waitFor: doIt }, { wait: 3000 }, { hover: doIt }],
       hold: 600,
     },
     { state: () => null, actions: [{ click: doIt }, { waitFor: "#chat-log .applied" }, { waitFor: card }], hold: 2000 },
-    { state: (now) => scene(now, { ...thread(now), ...planning(now) }), actions: [{ hover: card }], hold: 2500 },
-    { state: (now) => scene(now, { ...thread(now), ...waiting(now) }), actions: [{ hover: accept }], hold: 2500 },
+    { state: (now) => scene(now, 6, { ...thread(now), ...planning(now) }), actions: [{ hover: card }], hold: 2500 },
+    { state: (now) => scene(now, PLANNED, { ...thread(now), ...waiting(now) }), actions: [{ hover: accept }], hold: 2500 },
     {
       state: () => null,
       actions: [{ click: `#board article.approval.plan[data-card="${state.id(105)}"] a.open` }, { click: '#drawer [data-sec="plan"] > summary' }],
