@@ -54,8 +54,8 @@ module.exports = {
     { state: () => null, actions: [{ click: ui.tab("files") }, { waitFor: "#drawer table.files" }, { hover: "#drawer table.files caption" }], hold: 3500 },
     {
       state: () => null,
-      actions: [{ click: "#drawer-close" }, { wait: 500 }, { hover: ui.approve(a.pr) }, { wait: 800 }, { click: ui.approve(a.pr) }, { wait: 1500 }],
-      hold: 500,
+      actions: [{ click: "#drawer-close" }, { wait: 500 }, { hover: ui.approve(a.pr) }, { wait: 800 }, { click: ui.approve(a.pr) }, { wait: 400 }],
+      hold: 300,
     },
     // the seed's redraw takes the press's banner away, so the banner and the settled counts show one step apart
     { state: (now) => thursday(now, m.at + 30), actions: [{ goto: "/" }, { hover: ui.park }], hold: 4000 },

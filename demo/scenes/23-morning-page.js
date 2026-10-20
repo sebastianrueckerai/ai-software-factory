@@ -28,8 +28,6 @@ function wednesday(now, t, answered) {
 }
 
 const before = new Date(story.answeredAt[asks[0].issue].getTime() - 30 * 1000);
-// seen are the story's times the board shows after each press, once the answered card builds: #120 from 10:59:30, #121
-// from 10:59, #117 from 11:01
 const seen = [100, 105].map((s) => new Date(story.answeredAt[asks[0].issue].getTime() + s * 1000))
   .concat(new Date(story.answeredAt[asks[2].issue].getTime() + 90 * 1000));
 
