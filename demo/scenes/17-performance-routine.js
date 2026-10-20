@@ -3,6 +3,7 @@ const story = require("../lib/story");
 const ui = require("../lib/ui");
 
 const HOUR = 3600;
+const BOARD = ui.board(["performance-read"]);
 
 // Friday of week 2: the weekly performance read at 07:00 measures GET /schedule at 0.74 s at the p95, up from 0.31 s,
 // and files #123 a minute later; it waits for a slot.
@@ -30,7 +31,7 @@ module.exports = {
   theme: "dark",
   viewport: "desk",
   steps: [
-    { state: (now) => friday(now, "07:03"), actions: [{ goto: "/" }, { hover: `${ui.face(123)} .chip.routine` }], hold: 2500 },
+    { state: (now) => friday(now, "07:03"), actions: [{ goto: BOARD }, { hover: `${ui.face(123)} .chip.routine` }], hold: 2500 },
     {
       state: () => null,
       actions: [{ click: ui.open(123) }, { waitFor: ui.objective }, { click: ui.objective }],

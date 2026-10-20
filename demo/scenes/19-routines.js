@@ -6,6 +6,7 @@ const HOUR = 3600;
 const bump = ui.ghost("dependency-bump");
 const read = ui.ghost("performance-read");
 const AT = story.date(2, "fri", "07:30");
+const BOARD = ui.board(["security-scan", "dependency-bump", "performance-read"], "performance-read");
 
 // the week's cards are done: issue, done after, spend
 const finished = [
@@ -28,12 +29,12 @@ const skip = `${read} button[aria-label="Skip Performance read once"]`;
 
 module.exports = {
   title: "Routines on the board",
-  story: "The four routines wait in Queued with their next runs; the weekly bump waits on Sebastian, and he skips the next performance read once while #123 is on it.",
+  story: "The routines wait in Queued with their next runs; the weekly bump waits on Sebastian, and he skips the next performance read once while #123 is on it.",
   group: "operate",
   theme: "dark",
   viewport: "desk",
   steps: [
-    { state: friday, actions: [{ goto: "/" }, { waitFor: bump }, { hover: `${bump} .ttl` }], hold: 3000 },
+    { state: friday, actions: [{ goto: BOARD }, { waitFor: bump }, { hover: `${bump} .ttl` }], hold: 3000 },
     {
       state: () => null,
       actions: [{ hover: skip }, { wait: 600 }, { click: skip }, { waitFor: `${read} button[aria-label^="Undo the skip"]` }, { wait: 1200 }, { hover: `${read} .ttl` }],

@@ -49,7 +49,7 @@ module.exports = {
   steps: [
     {
       state: (now) => wednesday(now, -28),
-      actions: [{ goto: "/" }, { click: ui.open(106) }, { waitFor: ui.objective }, { click: ui.objective }],
+      actions: [{ goto: "/" }, { click: ui.open(106) }, { waitFor: ui.objective }, { click: ui.objective }, { click: ui.links }],
       hold: 4000,
     },
     {
@@ -61,7 +61,7 @@ module.exports = {
       hold: 600,
     },
     { state: () => null, actions: [{ click: ui.doIt }, { waitFor: "#chat-log .applied" }, { waitFor: ui.face(107) }, { hover: ui.open(107) }], hold: 2000 },
-    { state: (now) => filed(now, 59), actions: [{ hover: ui.open(107) }], hold: 2500 },
+    { state: (now) => filed(now, 59), actions: [{ goto: "/" }, { hover: ui.open(107) }], hold: 2500 },
     {
       state: (now) => filed(now, 66),
       actions: [{ goto: "/" }, { click: ui.open(107) }, { waitFor: ui.objective }, { click: ui.objective }],

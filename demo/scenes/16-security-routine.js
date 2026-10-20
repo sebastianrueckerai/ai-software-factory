@@ -5,6 +5,7 @@ const ui = require("../lib/ui");
 const MIN = 60;
 const HOUR = 3600;
 const scan = ui.ghost("security-scan");
+const BOARD = ui.board(["security-scan"]);
 
 // Thursday night of week 1: the nightly scan at 02:00 finds path-to-regexp 0.1.7 through express 4.19.2 and files
 // #108 a minute later; the bump merges and is live before 03:00. Offsets are seconds after #108's creation.
@@ -31,7 +32,7 @@ const bump = {
 // the week's cards so far are done: issue, done after, spend
 const finished = [[101, 2 * HOUR, 1.12], [102, 2.9 * HOUR, 0.64], [103, 1.4 * HOUR, 0.31], [104, HOUR, 0.48], [107, 64 * MIN, 1.18]];
 
-// night is the board at hm on Thursday: the four routines in Queued, the scan's card open until it is done
+// night is the board at hm on Thursday: the routines in Queued, the scan's card open until it is done
 function night(now, hm) {
   const at = story.date(1, "thu", hm);
   const age = story.ageAt(108, at);
@@ -50,7 +51,7 @@ module.exports = {
   theme: "dark",
   viewport: "desk",
   steps: [
-    { state: (now) => night(now, "02:02"), actions: [{ goto: "/" }, { hover: `${ui.face(108)} .chip.routine` }], hold: 2500 },
+    { state: (now) => night(now, "02:02"), actions: [{ goto: BOARD }, { hover: `${ui.face(108)} .chip.routine` }], hold: 2500 },
     {
       state: () => null,
       actions: [{ click: `${scan} button.open` }, { waitFor: ui.tab("runs") }, { click: ui.tab("runs") }, { waitFor: "#drawer .life.runs" }, { hover: "#drawer .acts" }],
@@ -58,10 +59,10 @@ module.exports = {
     },
     {
       state: (now) => night(now, "02:22"),
-      // the board settles its stream's first redraw before the drawer opens
-      actions: [{ goto: "/" }, { wait: 1000 }, { click: ui.open(108) }, { waitFor: ui.tab("overview") }, { click: ui.tab("overview") }, { waitFor: ui.objective }, { click: ui.objective }],
+      // the board settles its stream's first redraw before the drawer opens, and the drawer its overview before a click
+      actions: [{ goto: BOARD }, { wait: 1000 }, { click: ui.open(108) }, { waitFor: ui.tab("overview") }, { click: ui.tab("overview") }, { wait: 1000 }, { waitFor: ui.objective }, { click: ui.objective }],
       hold: 4500,
     },
-    { state: (now) => night(now, "03:10"), actions: [{ goto: "/" }, { hover: scan }], hold: 3000 },
+    { state: (now) => night(now, "03:10"), actions: [{ goto: BOARD }, { hover: scan }], hold: 3000 },
   ],
 };

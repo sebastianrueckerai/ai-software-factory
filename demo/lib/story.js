@@ -9,8 +9,8 @@ const MIN = 60;
 const HOUR = 3600;
 const DAY = 86400;
 
-// The two weeks' calendar in UTC: week 1's Monday is 21 September 2026. The routines' runs are dated on it, as their
-// drawers show them; a card's ages count back from the recording.
+// The two weeks' calendar in UTC: week 1's Monday is 21 September 2026. A scene's time on it stands for the recording's
+// now: a card's age counts back from now, and a routine's runs fall on its cron times before now.
 const WEEK1 = Date.UTC(2026, 8, 21);
 const WEEKDAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
@@ -79,8 +79,7 @@ const cards = {
   },
   107: {
     title: "Confirmation mail: send it once the payment settles", size: "small", pr: 205,
-    body: "Reported in #106: a booking whose card payment settles after the checkout page closed sends no confirmation mail. " +
-      "Send it from the payment_intent.succeeded webhook, once per booking",
+    body: "Reported in #106: a payment settling after checkout closed sends no confirmation. The webhook sends it, once per booking",
     acceptance: [
       "a booking whose payment settles after the checkout page closed gets its confirmation mail",
       "a webhook delivered twice sends one mail",
@@ -142,7 +141,7 @@ const cards = {
     acceptance: ["a booking gets one reminder 24 hours before its class", "a booking made later than that gets none"],
   },
   118: {
-    title: "Schedule: filter by teacher", size: "small", pr: 216, merge: "e41b7c9",
+    title: "Schedule: filter by teacher", size: "small", pr: 216,
     body: "Members follow a teacher. The schedule gets a teacher filter, kept in the URL so a link shares it",
     acceptance: ["the schedule shows only the chosen teacher's classes", "the filter survives a reload"],
   },
@@ -228,6 +227,7 @@ const requests = {
   calendar: "Rewrite the calendar.",
   report: "File a fix card for maria.k's report #106.",
   checkout: "Is checkout still failing?",
+  scheduleCheck: "Is the schedule all right since #118 went live?",
   schedule500: "Has the schedule alert settled?",
 };
 
@@ -271,6 +271,10 @@ const replies = {
   report: "maria.k paid, and her confirmation never came, while a friend's did: the mail goes out only when the payment " +
     "settles before the checkout page closes. The fix sends it from Stripe's webhook, once per booking:",
   alertsRead: "I read the alerts.",
+  scheduleCheckRead: "I read the open alerts and #118.",
+  // scheduleBroken is the answer with the times the tools gave, as "14:07"
+  scheduleBroken: (live, raised) => `No. **ScheduleErrors** has been open since ${raised} UTC, two minutes after #118 went live at ${live}, ` +
+    "and #118 merged at its head **e41b7c9**. The factory files the fix from the alert.",
   checkout: "No. **CheckoutErrors** settled when #104 went live, with the verdict real, and no alert is open.",
   schedule500: "It has. **ScheduleErrors** rose minutes after the merge of #118 and settled when #119 went live, with the verdict real; " +
     "no alert is open.",
@@ -301,14 +305,15 @@ const alerts = {
   },
 };
 
-// alertsAt are the telemetry's alert rows raised by the story's time at, newest first, each settled with its verdict
-// once at passed its resolve.
+// alertsAt are the telemetry's alert rows raised by the story's time at, newest first, each naming its card once the
+// card is filed and settled with its verdict once at passed its resolve.
 function alertsAt(now, at) {
   const age = (d) => (at - d) / 1000;
   return [alerts.badMerge, alerts.checkout, ...alerts.scheduleLatency.slice().reverse()].filter((a) => a.raised <= at).map((a) => {
     const settled = a.resolved <= at;
     return state.alert(now, {
-      ...a, age: age(a.raised), resolvedAge: settled ? age(a.resolved) : undefined, verdict: settled ? a.verdict : undefined, resolvedBy: settled ? a.resolvedBy : undefined,
+      ...a, task: filed[a.task] <= at ? a.task : undefined, age: age(a.raised), resolvedAge: settled ? age(a.resolved) : undefined,
+      verdict: settled ? a.verdict : undefined, resolvedBy: settled ? a.resolvedBy : undefined,
     });
   });
 }
@@ -382,28 +387,33 @@ const routines = {
   ],
 };
 
-// runsAt are routine name's runs by the story's time at, newest first, as the routine's drawer reads them.
-function runsAt(name, at) {
+// runsAt are routine name's runs by the story's time at, newest first, as the routine's drawer reads them at now: the
+// newest falls on the routine's last cron time before now, each older one on the cron time before that.
+function runsAt(now, name, at) {
+  const cron = project.routines.find((r) => r.name === name).schedule[0].cron;
+  let due = now;
   return routines[name].filter((r) => r.due <= at).reverse().map((r) => {
-    const ended = new Date(r.due.getTime() + r.took * 1000);
-    const open = ended > at;
-    return state.routineRun(name, { ...r, outcome: open ? "filed" : r.outcome, ended: open ? undefined : ended, cost: open ? undefined : r.cost });
+    due = state.prevCron(cron, due);
+    const open = r.due.getTime() + r.took * 1000 > at;
+    return state.routineRun(name, {
+      ...r, due, outcome: open ? "filed" : r.outcome, ended: open ? undefined : new Date(due.getTime() + r.took * 1000), cost: open ? undefined : r.cost,
+    });
   });
 }
 
 // routinesAt are the four routines on the board at the story's time at, which now stands for: their views, their
 // runs and the routines' clock. o sets a routine's Skip once (skip), its live toggle (needsMe) and its open card
 // (open, a card as the board has it). The lab's Skip once reads the next run back from its Next against the seed's
-// own clock, a few milliseconds after now; the routines' clock a second past at keeps that read past the next run.
+// own clock, a few milliseconds after now; the routines' clock a second past now keeps that read past the next run.
 function routinesAt(now, at, o = {}) {
-  const runs = Object.fromEntries(project.routines.map((r) => [r.name, runsAt(r.name, at)]));
+  const runs = Object.fromEntries(project.routines.map((r) => [r.name, runsAt(now, r.name, at)]));
   const open = (t) => t && { ID: t.ID, IssueNumber: t.IssueNumber, Status: t.Status };
   return {
-    routines: project.routines.map((r) => state.routineView(now, at, r, {
+    routines: project.routines.map((r) => state.routineView(now, r, {
       runs: runs[r.name], skip: o.skip === r.name, needsMe: o.needsMe === r.name ? true : undefined, open: open(o.open?.[r.name]),
     })),
     runs,
-    routinesAt: new Date(at.getTime() + 1000),
+    routinesAt: new Date(now.getTime() + 1000),
   };
 }
 
@@ -446,7 +456,7 @@ const sessions = {
     },
   },
   108: { "s-1": { commit: "6f2e8b1", words: [] } },
-  118: { "s-1": { commit: "d3a5f92", words: [] } },
+  118: { "s-1": { commit: "e41b7c9", words: [] } },
   119: { "s-1": { commit: "0b8e4c6", words: [] } },
   107: {
     "s-1": {

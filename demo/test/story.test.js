@@ -9,19 +9,25 @@ test("the calendar's week 1 starts on Monday 21 September 2026", () => {
   assert.equal(story.date(2, "thu", "08:00").toISOString(), "2026-10-01T08:00:00.000Z");
 });
 test("a run reads filed while its card is open, and its outcome with its end after", () => {
-  const open = story.runsAt("security-scan", story.date(1, "thu", "02:30"));
-  assert.deepEqual([open[0].Run, open[0].Outcome, "Ended" in open[0], "CostEUR" in open[0], open[1].Run, open[1].Outcome], [55, "filed", false, false, 54, "no change"]);
-  const ended = story.runsAt("security-scan", story.date(1, "thu", "03:00"))[0];
-  assert.deepEqual([ended.Outcome, ended.Ended, ended.CostEUR], ["done", "2026-09-24T02:51:00.000Z", 0.29]);
-  assert.equal(story.runsAt("performance-read", story.date(1, "thu", "03:00")).length, 0);
+  // now is Tuesday 20 October 12:00: the newest scan falls on that day's 02:00, the one before on Monday's
+  const open = story.runsAt(now, "security-scan", story.date(1, "thu", "02:30"));
+  assert.deepEqual([open[0].Run, open[0].Due, open[0].Outcome, "Ended" in open[0], "CostEUR" in open[0]], [55, "2026-10-20T02:00:00.000Z", "filed", false, false]);
+  assert.deepEqual([open[1].Run, open[1].Due, open[1].Outcome], [54, "2026-10-19T02:00:00.000Z", "no change"]);
+  const ended = story.runsAt(now, "security-scan", story.date(1, "thu", "03:00"))[0];
+  assert.deepEqual([ended.Outcome, ended.Ended, ended.CostEUR], ["done", "2026-10-20T02:51:00.000Z", 0.29]);
+  assert.equal(story.runsAt(now, "performance-read", story.date(1, "thu", "03:00")).length, 0);
+  const bump = story.runsAt(now, "dependency-bump", story.date(2, "fri", "07:30"));
+  assert.deepEqual(bump.map((r) => [r.Run, r.Due, r.Ended]), [[8, "2026-10-19T06:00:00.000Z", "2026-10-19T09:00:00.000Z"], [7, "2026-10-12T06:00:00.000Z", "2026-10-12T06:00:50.000Z"]]);
 });
-test("routinesAt skips one routine and holds another for sebastian", () => {
+test("routinesAt skips one routine and holds another for sebastian, on a clock a second past now", () => {
   const r = story.routinesAt(now, story.date(2, "fri", "09:30"), { skip: "performance-read", needsMe: "dependency-bump" });
   const by = Object.fromEntries(r.routines.map((v) => [v.Routine.name, v]));
-  assert.equal(by["performance-read"].State.SkipNext, true);
+  // Friday 23 October's read is skipped: the next is Friday 30 October, over a week on
+  assert.deepEqual([by["performance-read"].State.SkipNext, by["performance-read"].NextWords], [true, "Fri 30 Oct 07:00"]);
   assert.equal(by["dependency-bump"].State.NeedsMe, true);
   assert.equal("NeedsMe" in by["security-scan"].State, false);
   assert.equal(r.runs["cost-review"][0].Issue, 124);
+  assert.equal(r.routinesAt.toISOString(), "2026-10-20T12:00:01.000Z");
 });
 test("a card merged waits for its chain, and is done without a chain verdict once live", () => {
   const merged = story.life(now, 101, 113 * 60, story.lives[101]).task;

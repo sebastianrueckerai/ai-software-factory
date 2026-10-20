@@ -281,6 +281,14 @@ test("nextCron is the first time strictly after from", () => {
   assert.equal(s.nextCron("0 8 1 * *", from).toISOString(), "2026-11-01T08:00:00.000Z");
   assert.equal(s.nextCron("0 2 * * *", new Date("2026-10-21T02:00:00Z")).toISOString(), "2026-10-22T02:00:00.000Z");
 });
+test("prevCron is the last time strictly before before", () => {
+  const before = new Date("2026-10-20T12:00:00Z"); // a Tuesday
+  assert.equal(s.prevCron("0 2 * * *", before).toISOString(), "2026-10-20T02:00:00.000Z");
+  assert.equal(s.prevCron("0 6 * * 1", before).toISOString(), "2026-10-19T06:00:00.000Z");
+  assert.equal(s.prevCron("0 7 * * 5", before).toISOString(), "2026-10-16T07:00:00.000Z");
+  assert.equal(s.prevCron("0 8 1 * *", before).toISOString(), "2026-10-01T08:00:00.000Z");
+  assert.equal(s.prevCron("0 2 * * *", new Date("2026-10-20T02:00:00Z")).toISOString(), "2026-10-19T02:00:00.000Z");
+});
 test("routineRun is a run as the routines' store keeps it; an open one has no end", () => {
   const due = new Date("2026-09-24T02:00:00Z");
   assert.deepEqual(s.routineRun("security-scan", { run: 55, due, ended: new Date("2026-09-24T02:51:00Z"), outcome: "done", issue: 108, cost: 0.29, note: "n" }), {
@@ -289,21 +297,20 @@ test("routineRun is a run as the routines' store keeps it; an open one has no en
   });
   assert.equal("Ended" in s.routineRun("security-scan", { run: 55, due, outcome: "filed", issue: 108 }), false);
 });
-test("routineView words the next run at the story's time and counts it from now", () => {
-  const at = new Date("2026-10-02T09:30:00Z"); // a Friday
+test("routineView words the next run and counts it from now", () => {
   const scan = { name: "security-scan", title: "Security scan", schedule: [{ cron: "0 2 * * *" }], files: "agent" };
-  const run = s.routineRun("security-scan", { run: 63, due: new Date("2026-10-02T02:00:00Z"), outcome: "no change" });
-  const v = s.routineView(now, at, scan, { runs: [run] });
-  // Saturday 02:00 is 16 h 30 min after the story's time
-  assert.deepEqual([v.Next, v.NextWords, v.Soon, v.Last.Run, v.State.Runs, v.Lane], ["2026-10-21T04:30:30.000Z", "Sat 02:00", false, 63, 63, "queued"]);
+  const run = s.routineRun("security-scan", { run: 63, due: new Date("2026-10-20T02:00:00Z"), outcome: "no change" });
+  const v = s.routineView(now, scan, { runs: [run] });
+  // now is Tuesday 12:00: the next scan is Wednesday 02:00, 14 hours on
+  assert.deepEqual([v.Next, v.NextWords, v.Soon, v.Last.Run, v.State.Runs, v.Lane], ["2026-10-21T02:00:30.000Z", "Wed 02:00", false, 63, 63, "queued"]);
   assert.equal("SkipNext" in v.State, false);
-  const skipped = s.routineView(now, at, scan, { runs: [run], skip: true });
-  assert.deepEqual([skipped.Next, skipped.NextWords, skipped.State.SkipNext, skipped.State.SkipBy], ["2026-10-22T04:30:30.000Z", "Sun 02:00", true, "sebastian"]);
-  const held = s.routineView(now, at, scan, { needsMe: true });
+  const skipped = s.routineView(now, scan, { runs: [run], skip: true });
+  assert.deepEqual([skipped.Next, skipped.NextWords, skipped.State.SkipNext, skipped.State.SkipBy], ["2026-10-22T02:00:30.000Z", "Thu 02:00", true, "sebastian"]);
+  const held = s.routineView(now, scan, { needsMe: true });
   assert.deepEqual([held.State.NeedsMe, held.State.NeedsMeBy, held.State.Runs], [true, "sebastian", 0]);
-  const review = s.routineView(now, at, { ...scan, schedule: [{ cron: "0 8 1 * *" }] });
+  const review = s.routineView(now, { ...scan, schedule: [{ cron: "0 8 1 * *" }] });
   assert.equal(review.NextWords, "Sun 1 Nov 08:00");
-  assert.equal(s.routineView(now, new Date("2026-10-02T01:30:00Z"), scan).Soon, true);
+  assert.equal(s.routineView(new Date("2026-10-21T01:30:00Z"), scan).Soon, true);
 });
 test("scene carries the routines' clock", () => {
   assert.equal(s.scene(now, { routinesAt: new Date("2026-10-02T09:30:00Z") }).RoutinesAt, "2026-10-02T09:30:00.000Z");

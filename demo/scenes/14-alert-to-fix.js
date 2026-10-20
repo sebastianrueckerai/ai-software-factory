@@ -64,14 +64,14 @@ module.exports = {
     { state: (now) => tuesday(now, 12), actions: [{ click: ui.tab("chat") }, { waitFor: "#session-log .msg" }], hold: 4000 },
     {
       state: (now) => tuesday(now, 62, { replies: [reading, settled] }),
-      actions: [{ goto: "/" }, { hover: `${ui.face(104)} .elapsed` }],
+      actions: [{ goto: "/" }, { hover: ui.park }],
       hold: 2500,
     },
     {
       state: () => null,
       actions: [
         { click: "#chat-input" }, { type: ["#chat-input", story.requests.checkout] }, { press: "Enter" },
-        { waitFor: answered }, { click: ui.tool }, { hover: `${ui.face(104)} .elapsed` },
+        { waitFor: answered }, { click: ui.tool }, { hover: ui.park },
       ],
       hold: 4000,
     },

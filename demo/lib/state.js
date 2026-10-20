@@ -331,27 +331,29 @@ const HOUR = 3600 * 1000;
 const WEEKDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTH = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-// nextCron is the first time after from that cron names, in UTC, the factory's zone. It reads the routines' forms:
-// a minute and an hour, and a number or * for the day of the month, the month and the weekday.
-function nextCron(cron, from) {
+// cronFrom is the first time cron names after from (step 1) or before it (step -1), in UTC, the factory's zone. It
+// reads the routines' forms: a minute and an hour, and a number or * for the day of the month, the month and the weekday.
+function cronFrom(cron, from, step) {
   const [minute, hour, dom, month, dow] = cron.split(" ");
   const hit = (field, v) => field === "*" || Number(field) === v;
   const day = new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate()));
-  for (let i = 0; i < 400; i++, day.setUTCDate(day.getUTCDate() + 1)) {
+  for (let i = 0; i < 400; i++, day.setUTCDate(day.getUTCDate() + step)) {
     const at = new Date(day.getTime() + (Number(hour) * 60 + Number(minute)) * 60000);
-    if (at > from && hit(dom, day.getUTCDate()) && hit(month, day.getUTCMonth() + 1) && hit(dow, day.getUTCDay())) return at;
+    if ((at - from) * step > 0 && hit(dom, day.getUTCDate()) && hit(month, day.getUTCMonth() + 1) && hit(dow, day.getUTCDay())) return at;
   }
-  throw new Error(`cron ${cron} names no time in the 400 days after ${from.toISOString()}`);
+  throw new Error(`cron ${cron} names no time in the 400 days ${step > 0 ? "after" : "before"} ${from.toISOString()}`);
 }
+const nextCron = (cron, from) => cronFrom(cron, from, 1);
+const prevCron = (cron, before) => cronFrom(cron, before, -1);
 
 // cronWords is a run's time as factoryd's views word it: "Mon 15:04" within a week, else "Mon 2 Jan 15:04".
-function cronWords(next, at) {
+function cronWords(next, now) {
   const hm = next.toISOString().slice(11, 16);
-  if (next - at < 7 * 24 * HOUR) return `${WEEKDAY[next.getUTCDay()]} ${hm}`;
+  if (next - now < 7 * 24 * HOUR) return `${WEEKDAY[next.getUTCDay()]} ${hm}`;
   return `${WEEKDAY[next.getUTCDay()]} ${next.getUTCDate()} ${MONTH[next.getUTCMonth()]} ${hm}`;
 }
 
-// routineRun is run run of routine name, due on the story's calendar; a run whose card is open has no ended.
+// routineRun is run run of routine name, due and started at due; a run whose card is open has no ended.
 function routineRun(name, { run, due, ended, outcome, issue, note, cost }) {
   return present({
     Project: project.name, Routine: name, Run: run, Due: due.toISOString(), Started: due.toISOString(), Ended: ended?.toISOString(),
@@ -359,13 +361,13 @@ function routineRun(name, { run, due, ended, outcome, issue, note, cost }) {
   });
 }
 
-// routineView is routine r as factoryd's views show it at story time at, which now stands for, as the lab's labNext
-// words it: the next cron run 30 seconds past its minute (with a Skip once, the run after it), soon when it is under
-// an hour away and the run after it a day or more later, and runs, newest first, the newest its last. needsMe is the
-// live toggle sebastian set; open the card of the newest run while it is open.
-function routineView(now, at, r, { runs = [], skip = false, needsMe, open, held } = {}) {
+// routineView is routine r as factoryd's views show it at now, as the lab's labNext words it: the next cron run 30
+// seconds past its minute (with a Skip once, the run after it), soon when it is under an hour away and the run after it
+// a day or more later, and runs, newest first, the newest its last. needsMe is the live toggle sebastian set; open the
+// card of the newest run while it is open.
+function routineView(now, r, { runs = [], skip = false, needsMe, open, held } = {}) {
   const cron = r.schedule[0].cron;
-  const first = nextCron(cron, at);
+  const first = nextCron(cron, now);
   const next = skip ? nextCron(cron, first) : first;
   return present({
     Project: project.name, Routine: r,
@@ -373,9 +375,9 @@ function routineView(now, at, r, { runs = [], skip = false, needsMe, open, held 
       Project: project.name, Routine: r.name, Runs: runs[0]?.Run ?? 0, SkipNext: skip || undefined, SkipBy: skip ? project.login : undefined,
       NeedsMe: needsMe, NeedsMeBy: needsMe === undefined ? undefined : project.login,
     }),
-    Next: new Date(now.getTime() + (next - at) + 30000).toISOString(),
-    Soon: next - at < HOUR && nextCron(cron, next) - next >= 23 * HOUR,
-    NextWords: cronWords(next, at),
+    Next: new Date(next.getTime() + 30000).toISOString(),
+    Soon: next - now < HOUR && nextCron(cron, next) - next >= 23 * HOUR,
+    NextWords: cronWords(next, now),
     Last: runs[0],
     Open: open,
     Held: held,
@@ -424,5 +426,5 @@ function scene(now, o = {}) {
 module.exports = {
   AGENT_ASKS, id, card, intake, sessionStart, session, checks, modelReview, findings, queueTurn, merged, recorded, final, supervisor, timeline, said,
   transcript, event, status, alert, poke, mergedPoke, livePoke, approval, message, ask, proposal, proposedCall, cardFiling, steering, pressed, filedThread, steeredThread, seen,
-  plan, say, call, reply, metrics, nextCron, routineRun, routineView, scene,
+  plan, say, call, reply, metrics, nextCron, prevCron, routineRun, routineView, scene,
 };
