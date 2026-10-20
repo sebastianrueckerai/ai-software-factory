@@ -239,3 +239,15 @@ The lock. From the press on, the card takes no other press, on the board and in 
 The truth. The card keeps its new place until the factory's board shows it out of the column it left. An approval's decision shows in the answer itself. An answer waits for the workflow's next step, seconds later. A refusal or a lost request puts the card back at once, with the reason in the flash. A card the factory has not moved within a minute goes back too. The column counts stay the factory's until its board answers.
 
 The build is c35ec615 on main of the code repository. The lab's structural check presses an escalation and asserts the move, the single press, the jump back on a refusal and the hold through a board that still shows the card waiting.
+
+## C32. The level sets on one click, and the lamp's blue follows the level (2026-10-20, Sebastian)
+
+Sebastian: the confirm's Set "takes a few seconds to react, so I can click it more than once and I think the additional clicks cause errors. Get rid of this whole dialogue, let users change the level with one click." And on the light: blue only for full auto, or "full auto is our blue but brighter and manual is a subdued blue, something like that". C14's confirm in place ("Set the project's autonomy to …? Set, Keep") is out.
+
+The pick. A row in the menu sets the level at once: the menu closes, the control reads the new level, and the write goes out as before, the approver's pull request on the project file. The menu's head reads "autonomy · one click sets it".
+
+The lock. From the pick until the write lands the control is disabled, so a second press has nothing to press. A refused or lost write puts the old level back, with the reason in the flash.
+
+The lamp. One blue, the accent, at four strengths, the implementer's call within Sebastian's direction: manual at 35 percent over the ground without a glow, assisted at 60 with a faint glow, autonomous at 85 with the glow of before, full auto the whole accent with the widest glow. The menu's checked row carries the same lamp. The ramp fades toward the ground, so it reads the same in both themes.
+
+The build is 41698315 on main of the code repository. [Before and after](rounds/02-multi-chat/ev/ev-level-montage.png): the menu at assisted, then at full auto after one click; [the lamp at the four levels in both themes](rounds/02-multi-chat/ev/ev-level-lamps.png). The lab's structural check picks full auto and asserts the menu closed, the control set at once and unlocked after the write, and the lamp's colour changed. The lock's window is the write's own time; the lab's fake answers at once, so the check does not see the locked control.
