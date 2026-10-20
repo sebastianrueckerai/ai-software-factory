@@ -19,6 +19,7 @@ module.exports = {
   display: "Studio Nord",
   rows: [{
     Name: "nord-booking", Repository: "nord/booking", MergeRule: "human", Objects: "factory", Agents: "coder",
+    GitToken: "minted",
     Namespaces: namespaces, Environments: environments, Process: "spec", Lanes: lanes, File: true,
   }],
   config: {
