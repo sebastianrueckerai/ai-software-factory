@@ -114,8 +114,8 @@ func TestLabSceneJSON(t *testing.T) {
 	r := newRig(t)
 	now := time.Now()
 	body := fmt.Sprintf(`{"Project":{"Name":"nord-booking","Repository":"nord/booking","Login":"sebastian"},
-	 "Tasks":[{"Task":{"ID":"t-1","Kind":"agent","Status":"running","Lane":"ready","Repository":"nord/booking","IssueNumber":12,
-	   "Objective":"Waitlist","CreatedAt":%q,"Gate":"session"}}],
+	 "Tasks":[{"ID":"t-1","Kind":"agent","Status":"running","Lane":"ready","Repository":"nord/booking","IssueNumber":12,
+	   "Objective":"Waitlist","CreatedAt":%q,"Gate":"session"}],
 	 "Objects":{"sessions/t-1/timeline.jsonl":""}}`, now.Add(-time.Hour).Format(time.RFC3339))
 	var j labSceneJSON
 	dec := json.NewDecoder(strings.NewReader(body))
@@ -135,10 +135,10 @@ func TestLabSceneJSON(t *testing.T) {
 func TestLabSceneJSONRefuses(t *testing.T) {
 	now := time.Now()
 	for _, tc := range []struct{ name, body, want string }{
-		{"status", `{"Tasks":[{"Task":{"ID":"t-1","Status":"flying","Lane":"ready","CreatedAt":"2026-01-01T00:00:00Z"}}],"Objects":{"sessions/t-1/timeline.jsonl":""}}`, `status "flying"`},
-		{"timeline", `{"Tasks":[{"Task":{"ID":"t-1","Status":"running","Lane":"ready","CreatedAt":"2026-01-01T00:00:00Z"}}]}`, `sessions/t-1/timeline.jsonl`},
-		{"future", fmt.Sprintf(`{"Tasks":[{"Task":{"ID":"t-1","Status":"backlog","Lane":"backlog","CreatedAt":%q}}],"Objects":{"sessions/t-1/timeline.jsonl":""}}`, now.Add(time.Hour).Format(time.RFC3339)), "CreatedAt"},
-		{"parent", `{"Tasks":[{"Task":{"ID":"t-1","Status":"backlog","Lane":"backlog","Parent":"t-9","CreatedAt":"2026-01-01T00:00:00Z"}}],"Objects":{"sessions/t-1/timeline.jsonl":""}}`, `parent "t-9"`},
+		{"status", `{"Tasks":[{"ID":"t-1","Status":"flying","Lane":"ready","CreatedAt":"2026-01-01T00:00:00Z"}],"Objects":{"sessions/t-1/timeline.jsonl":""}}`, `status "flying"`},
+		{"timeline", `{"Tasks":[{"ID":"t-1","Status":"running","Lane":"ready","CreatedAt":"2026-01-01T00:00:00Z"}]}`, `sessions/t-1/timeline.jsonl`},
+		{"future", fmt.Sprintf(`{"Tasks":[{"ID":"t-1","Status":"backlog","Lane":"backlog","CreatedAt":%q}],"Objects":{"sessions/t-1/timeline.jsonl":""}}`, now.Add(time.Hour).Format(time.RFC3339)), "CreatedAt"},
+		{"parent", `{"Tasks":[{"ID":"t-1","Status":"backlog","Lane":"backlog","Parent":"t-9","CreatedAt":"2026-01-01T00:00:00Z"}],"Objects":{"sessions/t-1/timeline.jsonl":""}}`, `parent "t-9"`},
 	} {
 		var j labSceneJSON
 		if err := json.Unmarshal([]byte(tc.body), &j); err != nil {
@@ -152,7 +152,7 @@ func TestLabSceneJSONRefuses(t *testing.T) {
 }
 ```
 
-Check the Task struct's field names in `internal/factoryd/store.go:25` and `BoardTask` in `console_store.go:32` and fix the JSON keys in the tests to match (Go matches JSON keys to exported field names case-insensitively, tags win where present).
+`BoardTask` embeds `Task` (`console_store.go:32`), so `encoding/json` flattens a board task: its keys are `Task`'s fields and `BoardTask`'s own (`Escalation`, `Choices`, …) at one level. Go matches JSON keys to exported field names case-insensitively; a tag wins where present. Check the field names in `internal/factoryd/store.go:25` before writing the tests.
 
 - [ ] **Step 2: Run them to see them fail**
 
@@ -287,7 +287,7 @@ git push origin main && git push github main
 - Produces, `project.js`: `module.exports = { name: "nord-booking", repository: "nord/booking", login: "sebastian", display: "Studio Nord", rows: [...], config: {...}, monthCap: 60, routines: [...] }`. `rows` is the single `factoryd.Project` row of the fake project with staging and production environments; `config` is a `policy.ProjectConfig` with `Repository: "nord/booking", MergeRule: "human", Objects: "factory", Agents: "coder", Process: "spec", Namespaces: ["nord-staging", "nord-prod"]`. Read the Go types for the field names: `internal/factoryd/project.go:27`, `internal/policy/project.go` (`ProjectConfig`).
 - Produces, `state.js`, all taking `now` (a `Date`) where a time is involved:
   - `id(issue)`: the task id for an issue number, deterministic, `t-` plus 12 hex digits of a hash of the issue, as the lab's `labID` does.
-  - `card(now, {issue, status, lane, age, title, body, gate, gateSince, pr, spent, budget, model, size, source, parent, planKey, escalation, choices, escalatedAt, attempts, finished, kind})` returning a `factoryd.BoardTask` object. Defaults: `kind: "agent"`, `size: "small"`, `budget: 3`, `process: "spec"`, `repository` from the project. `age`, `gateSince`, `escalatedAt`, `finished` are seconds before `now`.
+  - `card(now, {issue, status, lane, age, title, body, gate, gateSince, pr, spent, budget, model, size, source, parent, planKey, escalation, choices, escalatedAt, attempts, finished, kind})` returning a `factoryd.BoardTask` object with flat keys (`BoardTask` embeds `Task`, so `ID`, `Status`, `Escalation` sit at one level). Defaults: `kind: "agent"`, `size: "small"`, `budget: 3`, `process: "spec"`, `repository` from the project. `age`, `gateSince`, `escalatedAt`, `finished` are seconds before `now`.
   - `timeline(now, start, {alias, failed, steps})` returning the JSONL text of `sessions/<id>/timeline.jsonl`, with the same step shapes as the lab's `pushedTimeline` and `checksStep`: `session_start`, `pushed`, `checks` (with `failed` naming the failing check or ""), `model_review`, `session_end`. Copy the keys exactly from `lab_test.go:705-730`.
   - `transcript(now, start, rows)` returning the JSONL of a session's rows: `{time, kind: "model_call"|"tool_call", detail: {text, cost} | {tool}}`.
   - `event(now, {issue, kind, actor, via, age, detail})`, `status(now, issue, status, gate, age)` as `labEvent` and `labStatus`.
@@ -310,9 +310,9 @@ const now = new Date("2026-10-20T12:00:00Z");
 test("id is stable", () => assert.equal(s.id(12), s.id(12)));
 test("card ages from now", () => {
   const c = s.card(now, { issue: 12, status: "running", lane: "ready", age: 3600, title: "Waitlist", body: "." });
-  assert.equal(c.Task.CreatedAt, "2026-10-20T11:00:00.000Z");
-  assert.equal(c.Task.Repository, "nord/booking");
-  assert.equal(c.Task.Kind, "agent");
+  assert.equal(c.CreatedAt, "2026-10-20T11:00:00.000Z");
+  assert.equal(c.Repository, "nord/booking");
+  assert.equal(c.Kind, "agent");
 });
 test("scene fills every timeline", () => {
   const sc = s.scene(now, { tasks: [s.card(now, { issue: 12, status: "backlog", lane: "backlog", age: 60, title: "x", body: "y" })] });
