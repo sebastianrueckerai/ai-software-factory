@@ -66,6 +66,7 @@ async function run(page, action, mouse) {
   else if (kind === "wait") await sleep(arg);
   else if (kind === "waitFor") await target(arg).waitFor();
   else if (kind === "scroll") await target(arg).evaluate((el) => el.scrollIntoView({ block: "start" }));
+  else if (kind === "seed") await seed(page, { state: arg }, new Date());
   else throw new Error(`unknown action ${kind}`);
 }
 
