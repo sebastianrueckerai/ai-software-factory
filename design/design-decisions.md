@@ -225,6 +225,9 @@ The build renders the [concept's catalogue](../docs/metrics-visualization-concep
 
 Runner-up: twin, the same rows in two columns, if the one column proves too tall in the lab. Kept for later: the strip's weeks view as a toggleable second view, and headline's ghosted previous window as an optional delivery chart. Both die for v1, with the loud hero chart and every card fill.
 
+Sebastian read the section labels as too small on the live page (2026-10-20): the secondary pages' shared label, C24's small-caps grammar, rises from 13px in the muted colour to 15px in the text colour on every secondary page, the grammar itself unchanged.
+
+
 ## C31. A card's press moves the card at once and registers once (2026-10-20, Sebastian)
 
 Sebastian asked for a board that answers a press at once. A pressed card moves from Needs you to In progress before the factory answers, and it jumps back only when the expected change does not happen. One press registers, so a card never takes Approve and Deny both.
