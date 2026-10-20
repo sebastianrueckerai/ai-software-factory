@@ -18,26 +18,26 @@ const cookie = `${cookieName}=${cookieValue}`;
 const ring = () => {
   const el = document.createElement("div");
   el.style.cssText = "position:fixed;left:0;top:0;width:14px;height:14px;margin:-7px 0 0 -7px;border:2px solid #ff3b30;"
-    + "border-radius:50%;box-sizing:border-box;pointer-events:none;z-index:2147483647;transition:transform 80ms;";
+    + "border-radius:50%;box-sizing:border-box;pointer-events:none;z-index:2147483647;transition:transform 80ms;visibility:hidden;";
   let x = 0;
   let y = 0;
   let scale = 1;
   const draw = () => { el.style.transform = `translate(${x}px,${y}px) scale(${scale})`; };
-  addEventListener("mousemove", (e) => { x = e.clientX; y = e.clientY; draw(); }, true);
+  addEventListener("mousemove", (e) => { x = e.clientX; y = e.clientY; if (x || y) el.style.visibility = "visible"; draw(); }, true);
   addEventListener("mousedown", () => { scale = 0.6; draw(); }, true);
   addEventListener("mouseup", () => { scale = 1; draw(); }, true);
   draw();
   document.addEventListener("DOMContentLoaded", () => document.documentElement.appendChild(el));
 };
 
-async function seed(step, now) {
+async function seed(page, step, now) {
   const body = step.state(now);
   if (body === null) return;
   const res = await fetch(BASE + "/lab/scene", {
     method: "POST", headers: { cookie, "content-type": "application/json" }, body: JSON.stringify(body),
   });
   if (res.status !== 204) throw new Error(`seed answered ${res.status}: ${(await res.text()).trim()}`);
-  await sleep(REDRAW_MS);
+  if (page.url() !== "about:blank") await sleep(REDRAW_MS);
 }
 
 async function run(page, action, mouse) {
@@ -70,6 +70,9 @@ async function run(page, action, mouse) {
 async function record(browser, name, commits) {
   const scene = require(`./scenes/${name}.js`);
   const { viewport, scale } = VIEWPORTS[scene.viewport];
+  for (const f of fs.readdirSync(OUT)) {
+    if (new RegExp(`^${name}(\\.(webm|mp4|json)|-\\d+\\.png)$`).test(f)) fs.rmSync(path.join(OUT, f));
+  }
   const tmp = fs.mkdtempSync(path.join(OUT, `.${name}-`));
   const context = await browser.newContext({
     viewport, deviceScaleFactor: scale, recordVideo: { dir: tmp, size: viewport }, colorScheme: scene.theme,
@@ -80,7 +83,7 @@ async function record(browser, name, commits) {
   await context.addInitScript((theme) => localStorage.setItem("theme", theme), scene.theme);
   await context.addInitScript(ring);
   const page = await context.newPage();
-  const t0 = Date.now();
+  const t0 = Date.now(); // the video clock starts with the page
   let problem = null;
   page.on("pageerror", (e) => { problem ??= `page error: ${e.message}`; });
   page.on("response", (r) => {
@@ -96,7 +99,7 @@ async function record(browser, name, commits) {
     for (const [i, step] of scene.steps.entries()) {
       n = i + 1;
       marks.push({ index: n, atMs: Date.now() - t0 });
-      await seed(step, new Date());
+      await seed(page, step, new Date());
       check();
       for (const action of step.actions) {
         await run(page, action, mouse);
