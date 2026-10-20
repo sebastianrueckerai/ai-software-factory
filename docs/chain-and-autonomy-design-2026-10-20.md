@@ -577,3 +577,103 @@ the served check's re-read (6.2), the poll age gauge (6.2), the merge commit
 mapping (6.2), one writer per status outcome (6.6), the stall ladder's
 degradation on Forgejo 15 (8), the pool's ledger as the sum of funded events
 (7.4), and `fund` confirmed below autonomous (7.4).
+
+## 11. The processes in charts
+
+### 11.1 From merge to live, and where the roll card is spawned
+
+The factory's own repository. A template project has no roller box: its
+staging and promote jobs are the run's tail, and the poller reads the run.
+
+```mermaid
+flowchart TD
+  subgraph CARD["Feature card"]
+    M["Merge to main"] --> FIN["Finish at merge: credentials revoked, session closed, branch deleted. State: merged"]
+    FIN --> WAIT["In progress: chain running, then blocked by roll N"]
+  end
+
+  subgraph CI["Forgejo CI on main, one job at a time on the runner"]
+    M --> RUN["Push run: tests, three image builds. No rollout job"]
+    RUN -->|green| IMG["Run green after about 10 minutes"]
+    RUN -->|red| RED["Run red"]
+  end
+
+  subgraph ROLLER["The roller, every minute: every commit on main with green images"]
+    IMG --> J{"Did the images change?"}
+    J -->|no| SKIP["Status factory/roll = success: nothing to roll"]
+    J -->|yes, no roll open| FILE["Spawn the roll card: issue and pull request bumping the digests in k8s/. Status factory/roll = pending. roll_requests row lists the cards it carries"]
+    J -->|yes, a roll open| FOLD["Fold into the open roll card: its own roll_requests row. Status factory/roll = pending"]
+  end
+
+  subgraph ROLL["The roll card, on the board"]
+    FILE --> NY["Needs you below full auto: approve. At full auto: merges on its own"]
+    FOLD --> NY
+    NY --> FLUX["Merged. Flux restarts the Deployments"]
+    FLUX --> MEAS["The roll card measures: do the Deployments run the new digests?"]
+    MEAS -->|yes| RDONE["Roll card done. Status factory/roll = success on every carried commit"]
+    MEAS -->|not within the bound| RFAIL["Retries, then Needs you. Status factory/roll = failure"]
+  end
+
+  subgraph POLL["Chain poller, every minute, from facts only"]
+    P["Read every run and status on main. Write chain_runs: each row is its commit's verdict, the runs AND the required statuses"]
+    P --> Q{"For each merged card: a green row at or after its merge?"}
+    Q -->|yes| DONE["Finish with done: live, covered by run N. Done poke, issue label"]
+    Q -->|not yet| WAIT
+    Q -->|red or stalled| LAD["The ladders of 11.2"]
+  end
+
+  IMG --> P
+  SKIP --> P
+  RDONE --> P
+  RFAIL --> P
+  RED --> P
+```
+
+### 11.2 Red and stalled: the ladders
+
+```mermaid
+flowchart TD
+  P["Poller tick"] --> V{"Head verdict"}
+  V -->|green| G["Alerts resolved, open stall card closed. Covered cards end"]
+  V -->|red| X["Alert chain red. Agent repair card: read the log, fix, push. The factory's own repository: mainfix"]
+  X --> Z["The fix merges. A later green run covers every card before it"]
+  Z --> P
+  V -->|pending past the stall bound| S1["Alert chain stalled. First move, no human: re-run the run once through the rerun API. A pending required status is its deployer's, not re-run"]
+  S1 --> P
+  S1 -->|still pending at the next bound, or no rerun API| S2["Needs you card, one per repository, the factory's own included: what is pending since when, the run, the cards it holds. Choices: re-run again, check again, dismiss"]
+  S2 -->|you act, or the chain moves on its own| P
+  V -->|merged card with no carry row past the bound| U["Alert chain uncarried, naming the card"]
+  U --> P
+```
+
+### 11.3 The merge gate: who wrote the change decides
+
+Proof means: a reproduction that failed at the base and passes at the head,
+or a recorded fault, or the review's criteria all met.
+
+```mermaid
+flowchart TD
+  PR["Pull request through its gates: checks, review, audit"] --> W{"Who wrote it?"}
+  W -->|"the factory: roll, revert, template update, schema copy, sync"| F{"Merge rule auto?"}
+  F -->|"yes, checks green, a roll touches only k8s/"| AM["Merges on its own"]
+  F -->|no| H["Needs you: approve"]
+  W -->|an agent| C{"Risk class"}
+  C -->|forbidden or migration| H
+  C -->|high| HA{"Merge rule auto, audit pass, review approves, proof?"}
+  HA -->|yes| AM
+  HA -->|no| H2["Needs you, every unmet condition named"]
+  C -->|normal| N{"Merge rule auto, review approves, proof?"}
+  N -->|yes| AM
+  N -->|no| H2
+```
+
+### 11.4 Money: a card at its budget
+
+```mermaid
+flowchart TD
+  A["A card at its budget stops and asks"] --> W["The waker wakes the project agent on the ask"]
+  W --> R{"The raise it judges needed: within raise_max_eur, the month's pool, and task_max_eur?"}
+  R -->|"yes, at autonomous or full auto"| F["fund: the budget raised, card_funded event, the card resumes"]
+  R -->|"yes, at manual or assisted"| C["fund proposed, the member confirms"]
+  R -->|no| H["Needs you, with the agent's analysis attached"]
+```
