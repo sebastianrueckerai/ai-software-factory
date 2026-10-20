@@ -246,3 +246,66 @@ test("metrics report is the nord-booking window", () => {
   assert.equal(m.from, "2026-09-23T12:00:00.000Z");
   assert.equal(m.deploys.value, 23);
 });
+test("a card filed by someone else is no writer's, and carries its alert and its chain", () => {
+  const c = s.card(now, {
+    issue: 119, status: "merged", lane: "ready", age: 60, title: "t", body: "b", author: "factory-agent", source: "alert",
+    fingerprint: "e07c4a92d15b8f3e", chain: "pending",
+  });
+  assert.deepEqual([c.Author, c.AuthorWriter, c.Source, c.AlertFingerprint, c.ChainState], ["factory-agent", false, "alert", "e07c4a92d15b8f3e", "pending"]);
+  const own = s.card(now, { issue: 12, status: "queued", lane: "ready", age: 60, title: "t", body: "b" });
+  assert.deepEqual([own.Author, own.AuthorWriter, "AlertFingerprint" in own, "ChainState" in own], ["sebastian", true, false, false]);
+});
+test("a merge is the queue's turn, factory-merge's merge, its event and the card's end at merged", () => {
+  const steps = [
+    s.queueTurn(600, 1200), s.merged(1200, 1260, { pr: 201, commit: "4be1c07" }),
+    s.recorded(1260, "pull_request_merged", { pr: 201, by: "factory-merge" }), s.final(1260, "merged", "pull request merged"),
+  ];
+  const rows = s.timeline(now, 3600, { steps }).trim().split("\n").map(JSON.parse);
+  assert.deepEqual(rows, [
+    { step: "queue_turn", project: "nord/booking", time: "2026-10-20T11:20:00Z", started: "2026-10-20T11:10:00Z" },
+    { step: "merged", pr: 201, commit: "4be1c07", approver: "sebastian", merged_by: "factory-merge", time: "2026-10-20T11:21:00Z", started: "2026-10-20T11:20:00Z" },
+    { step: "event", event: "pull_request_merged", pr: 201, by: "factory-merge", time: "2026-10-20T11:21:00Z" },
+    { step: "final", state: "merged", reason: "pull request merged", time: "2026-10-20T11:21:00Z" },
+  ]);
+});
+test("poke is factoryd's inbox row about a card", () => {
+  assert.deepEqual(s.poke(now, { issue: 108, content: "#108 merged; the chain is running.", age: 60, birth: "pull_request_merged", conversation: 2 }), {
+    role: "assistant", content: "#108 merged; the chain is running.", at: "2026-10-20T11:59:00.000Z", kind: "poke", conversation: 2,
+    task_id: s.id(108), birth_kind: "pull_request_merged",
+  });
+});
+test("nextCron is the first time strictly after from", () => {
+  const from = new Date("2026-10-20T12:00:00Z");
+  assert.equal(s.nextCron("0 2 * * *", from).toISOString(), "2026-10-21T02:00:00.000Z");
+  assert.equal(s.nextCron("0 6 * * 1", from).toISOString(), "2026-10-26T06:00:00.000Z");
+  assert.equal(s.nextCron("0 8 1 * *", from).toISOString(), "2026-11-01T08:00:00.000Z");
+  assert.equal(s.nextCron("0 2 * * *", new Date("2026-10-21T02:00:00Z")).toISOString(), "2026-10-22T02:00:00.000Z");
+});
+test("routineRun is a run as the routines' store keeps it; an open one has no end", () => {
+  const due = new Date("2026-09-24T02:00:00Z");
+  assert.deepEqual(s.routineRun("security-scan", { run: 55, due, ended: new Date("2026-09-24T02:51:00Z"), outcome: "done", issue: 108, cost: 0.29, note: "n" }), {
+    Project: "nord-booking", Routine: "security-scan", Run: 55, Due: "2026-09-24T02:00:00.000Z", Started: "2026-09-24T02:00:00.000Z",
+    Ended: "2026-09-24T02:51:00.000Z", Trigger: "cron", TaskID: s.id(108), Issue: 108, Outcome: "done", Note: "n", CostEUR: 0.29,
+  });
+  assert.equal("Ended" in s.routineRun("security-scan", { run: 55, due, outcome: "filed", issue: 108 }), false);
+});
+test("routineView words the next run at the story's time and counts it from now", () => {
+  const at = new Date("2026-10-02T09:30:00Z"); // a Friday
+  const scan = { name: "security-scan", title: "Security scan", schedule: [{ cron: "0 2 * * *" }], files: "agent" };
+  const run = s.routineRun("security-scan", { run: 63, due: new Date("2026-10-02T02:00:00Z"), outcome: "no change" });
+  const v = s.routineView(now, at, scan, { runs: [run] });
+  // Saturday 02:00 is 16 h 30 min after the story's time
+  assert.deepEqual([v.Next, v.NextWords, v.Soon, v.Last.Run, v.State.Runs, v.Lane], ["2026-10-21T04:30:30.000Z", "Sat 02:00", false, 63, 63, "queued"]);
+  assert.equal("SkipNext" in v.State, false);
+  const skipped = s.routineView(now, at, scan, { runs: [run], skip: true });
+  assert.deepEqual([skipped.Next, skipped.NextWords, skipped.State.SkipNext, skipped.State.SkipBy], ["2026-10-22T04:30:30.000Z", "Sun 02:00", true, "sebastian"]);
+  const held = s.routineView(now, at, scan, { needsMe: true });
+  assert.deepEqual([held.State.NeedsMe, held.State.NeedsMeBy, held.State.Runs], [true, "sebastian", 0]);
+  const review = s.routineView(now, at, { ...scan, schedule: [{ cron: "0 8 1 * *" }] });
+  assert.equal(review.NextWords, "Sun 1 Nov 08:00");
+  assert.equal(s.routineView(now, new Date("2026-10-02T01:30:00Z"), scan).Soon, true);
+});
+test("scene carries the routines' clock", () => {
+  assert.equal(s.scene(now, { routinesAt: new Date("2026-10-02T09:30:00Z") }).RoutinesAt, "2026-10-02T09:30:00.000Z");
+  assert.equal("RoutinesAt" in s.scene(now, {}), false);
+});

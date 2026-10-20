@@ -2,8 +2,23 @@
 // the scenes show. A scene reads a card's title and body from here, so a card reads the same in every scene.
 const state = require("./state");
 
+const project = require("./project");
+
 const budgets = { small: 2, medium: 5, large: 10 };
 const MIN = 60;
+const HOUR = 3600;
+const DAY = 86400;
+
+// The two weeks' calendar in UTC: week 1's Monday is 21 September 2026. The routines' runs are dated on it, as their
+// drawers show them; a card's ages count back from the recording.
+const WEEK1 = Date.UTC(2026, 8, 21);
+const WEEKDAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+
+// date is weekday of week at hm ("02:00").
+function date(week, weekday, hm) {
+  const [h, m] = hm.split(":").map(Number);
+  return new Date(WEEK1 + (((week - 1) * 7 + WEEKDAYS.indexOf(weekday)) * DAY + h * HOUR + m * MIN) * 1000);
+}
 
 // body is the prose the card is filed with; acceptance its Acceptance list; pr its pull request; plan and key mark a
 // planned card (its plan's issue and its key there). #100 is the last card before the two weeks: finished before the
@@ -211,6 +226,9 @@ const requests = {
   waitlist: "Members ask for a waitlist when a class is full.",
   schedule: "The schedule page feels slow.",
   calendar: "Rewrite the calendar.",
+  report: "File a fix card for maria.k's report #106.",
+  checkout: "Is checkout still failing?",
+  schedule500: "Has the schedule alert settled?",
 };
 
 // asks are the questions the agent and the factory put to a person, by story.
@@ -250,25 +268,50 @@ const replies = {
     "and settled each time without a fix. The card sets the bar at 400 ms:",
   calendar: "That is several cards: the week, the month, moving a class and the model under them. " +
     "I file it in the plan lane, where the planner splits it into cards in their order, and the plan waits for your accept:",
+  report: "maria.k paid, and her confirmation never came, while a friend's did: the mail goes out only when the payment " +
+    "settles before the checkout page closes. The fix sends it from Stripe's webhook, once per booking:",
+  alertsRead: "I read the alerts.",
+  checkout: "No. **CheckoutErrors** settled when #104 went live, with the verdict real, and no alert is open.",
+  schedule500: "It has. **ScheduleErrors** rose minutes after the merge of #118 and settled when #119 went live, with the verdict real; " +
+    "no alert is open.",
 };
 
-// alerts are the alert rows of the two weeks; a scene passes now and the ages to state.alert.
+// alerts are the alert rows of the two weeks; a scene passes now and the ages to state.alert. raised and resolved
+// date the telemetry's alerts on the calendar: the latency alert settled itself three times the week before, and an
+// alert that filed a card settles real when the card goes live.
 const alerts = {
   scheduleLatency: [
-    { id: 11, kind: "alert", source: "GET /schedule p95 above 1 s", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd" },
-    { id: 12, kind: "alert", source: "GET /schedule p95 above 1 s", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd" },
-    { id: 13, kind: "alert", source: "GET /schedule p95 above 1 s", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd" },
+    { id: 11, kind: "alert", source: "GET /schedule p95 above 1 s", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd",
+      raised: date(0, "fri", "20:00"), resolved: date(0, "fri", "20:30") },
+    { id: 12, kind: "alert", source: "GET /schedule p95 above 1 s", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd",
+      raised: date(0, "sat", "20:00"), resolved: date(0, "sat", "21:00") },
+    { id: 13, kind: "alert", source: "GET /schedule p95 above 1 s", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd",
+      raised: date(0, "sun", "20:00"), resolved: date(0, "sun", "21:00") },
   ],
   checkout: {
-    id: 14, kind: "alert", source: "CheckoutErrors", task: 104, fingerprint: "b81e2f04a9c63d17",
+    id: 14, kind: "alert", source: "CheckoutErrors", task: 104, fingerprint: "b81e2f04a9c63d17", verdict: "real", resolvedBy: "factoryd",
+    raised: date(1, "tue", "12:59"), resolved: date(1, "tue", "14:00"),
     detail: { summary: "POST /checkout/confirm answers 500 on 41% of requests", error: cards[104].body.split("\n\n")[1] },
   },
   budget: { id: 15, kind: "escalation", source: "cap", task: 110 },
   badMerge: {
-    id: 16, kind: "alert", source: "ScheduleErrors", task: 119, fingerprint: "e07c4a92d15b8f3e",
+    id: 16, kind: "alert", source: "ScheduleErrors", task: 119, fingerprint: "e07c4a92d15b8f3e", verdict: "real", resolvedBy: "factoryd",
+    raised: date(2, "thu", "17:19"), resolved: date(2, "thu", "17:54"),
     detail: { summary: "GET /schedule answers 500 on 63% of requests since e41b7c9", error: cards[119].body.split("\n\n")[1] },
   },
 };
+
+// alertsAt are the telemetry's alert rows raised by the story's time at, newest first, each settled with its verdict
+// once at passed its resolve.
+function alertsAt(now, at) {
+  const age = (d) => (at - d) / 1000;
+  return [alerts.badMerge, alerts.checkout, ...alerts.scheduleLatency.slice().reverse()].filter((a) => a.raised <= at).map((a) => {
+    const settled = a.resolved <= at;
+    return state.alert(now, {
+      ...a, age: age(a.raised), resolvedAge: settled ? age(a.resolved) : undefined, verdict: settled ? a.verdict : undefined, resolvedBy: settled ? a.resolvedBy : undefined,
+    });
+  });
+}
 
 // approvals are the plans and merges that wait on a person.
 const approvals = {
@@ -314,19 +357,65 @@ function planCards(issue) {
   });
 }
 
-// routines are the runs the four routines report, newest last.
+// nightly are the security scan's runs from week 1's Monday to week 2's Sunday, run 52 the first: no finding, but
+// Thursday's of week 1, which filed #108.
+const nightly = Array.from({ length: 14 }, (_, d) => ({
+  run: 52 + d, due: new Date(date(1, "mon", "02:00").getTime() + d * DAY * 1000), took: 40, outcome: "no change", note: "no finding",
+}));
+nightly[3] = { ...nightly[3], outcome: "done", issue: 108, took: 51 * MIN, cost: 0.29, note: "1 high: path-to-regexp 0.1.7 through express 4.19.2, CVE-2024-45296" };
+
+// routines are the four routines' runs, oldest first: run, due on the calendar, outcome once the run's card ended,
+// the card, how long the run took to its card's end, its cost and its note. A run whose card is open at a scene's
+// time reads filed.
 const routines = {
-  "dependency-bump": [{ week: 2, outcome: "filed", issue: 115, note: "12 packages behind the newest release of their line" }],
-  "security-scan": [
-    { week: 1, outcome: "filed", issue: 108, note: "1 high: path-to-regexp 0.1.7 through express 4.19.2, CVE-2024-45296" },
-    { week: 2, outcome: "no change", note: "no finding" },
+  "dependency-bump": [
+    { run: 7, due: date(1, "mon", "06:00"), took: 50, outcome: "no change", note: "every dependency on the newest release of its line" },
+    { run: 8, due: date(2, "mon", "06:00"), took: 3 * HOUR, outcome: "done", issue: 115, cost: 0.38, note: "12 packages behind the newest release of their line" },
   ],
+  "security-scan": nightly,
   "performance-read": [
-    { week: 1, outcome: "no change", note: "GET /schedule p95 0.31 s, every page under 400 ms" },
-    { week: 2, outcome: "filed", issue: 123, note: "GET /schedule p95 0.74 s, up from 0.31 s since #118" },
+    { run: 6, due: date(1, "fri", "07:00"), took: 70, outcome: "no change", note: "GET /schedule p95 0.31 s, every page under 400 ms" },
+    { run: 7, due: date(2, "fri", "07:00"), took: 2 * DAY, outcome: "done", issue: 123, cost: 0.62, note: "GET /schedule p95 0.74 s, up from 0.31 s since #118" },
   ],
-  "cost-review": [{ week: 2, outcome: "filed", issue: 124, note: "€41.20 of the €60 cap, €1.79 per card" }],
+  "cost-review": [
+    { run: 3, due: date(2, "thu", "08:00"), took: 11 * HOUR, outcome: "done", issue: 124, note: "€41.20 of the €60 cap, €1.79 per card" },
+  ],
 };
+
+// runsAt are routine name's runs by the story's time at, newest first, as the routine's drawer reads them.
+function runsAt(name, at) {
+  return routines[name].filter((r) => r.due <= at).reverse().map((r) => {
+    const ended = new Date(r.due.getTime() + r.took * 1000);
+    const open = ended > at;
+    return state.routineRun(name, { ...r, outcome: open ? "filed" : r.outcome, ended: open ? undefined : ended, cost: open ? undefined : r.cost });
+  });
+}
+
+// routinesAt are the four routines on the board at the story's time at, which now stands for: their views, their
+// runs and the routines' clock. o sets a routine's Skip once (skip), its live toggle (needsMe) and its open card
+// (open, a card as the board has it). The lab's Skip once reads the next run back from its Next against the seed's
+// own clock, a few milliseconds after now; the routines' clock a second past at keeps that read past the next run.
+function routinesAt(now, at, o = {}) {
+  const runs = Object.fromEntries(project.routines.map((r) => [r.name, runsAt(r.name, at)]));
+  const open = (t) => t && { ID: t.ID, IssueNumber: t.IssueNumber, Status: t.Status };
+  return {
+    routines: project.routines.map((r) => state.routineView(now, at, r, {
+      runs: runs[r.name], skip: o.skip === r.name, needsMe: o.needsMe === r.name ? true : undefined, open: open(o.open?.[r.name]),
+    })),
+    runs,
+    routinesAt: new Date(at.getTime() + 1000),
+  };
+}
+
+// scanned is the security scan's poke in the inbox for its run that filed a card, its decider line the routine's
+// schedule in words.
+function scanned(now, { run, age, conversation }) {
+  const r = routines["security-scan"].find((x) => x.run === run);
+  return state.poke(now, {
+    issue: r.issue, content: `Filed #${r.issue} ${JSON.stringify(cards[r.issue].title)}.`, age, conversation, birth: "routine_ran",
+    decider: `routine security-scan · run ${run} · daily 02:00`,
+  });
+}
 
 // sessions are the cards' agent sessions by issue and session: the commit a session pushed, and the agent's words,
 // each at its seconds after the session's start.
@@ -344,6 +433,21 @@ const sessions = {
       ],
     },
   },
+  104: {
+    "s-1": {
+      commit: "a71c3d0",
+      words: [
+        [30, "The alert's stack trace points at src/payments/webhook.ts:57: confirmBooking reads paymentIntent.charges.data[0]."],
+        [3 * MIN, "API version 2022-11-15 sends no charges list on a PaymentIntent, only latest_charge, so charges is undefined and " +
+          "every confirmation answers 500. confirmBooking now reads latest_charge."],
+        [9 * MIN, "A test replays a payment_intent.succeeded event of API version 2022-11-15: the booking is confirmed, 2xx."],
+        [14 * MIN, "npm test: 211 passing. Pushing and opening the pull request."],
+      ],
+    },
+  },
+  108: { "s-1": { commit: "6f2e8b1", words: [] } },
+  118: { "s-1": { commit: "d3a5f92", words: [] } },
+  119: { "s-1": { commit: "0b8e4c6", words: [] } },
   107: {
     "s-1": {
       commit: "9d2b6c4",
@@ -432,17 +536,18 @@ function session(issue, n, start, end, { model, outcome }) {
 
 // life is issue's card age seconds after its creation and the objects its drawer reads. phases are its states, each
 // from its from (seconds after the creation) and keeping what it does not set of the one before: status, gate, model,
-// spent, and pr, whether its pull request is open. admitted is when it took a slot, if not at its creation. steps are
-// its timeline; each session started by then carries its words said by then.
-function life(now, issue, age, { phases, admitted, steps = [] }) {
+// spent, pr, whether its pull request is open, and chain, the verdict of the run that carries it once it merged.
+// admitted is when it took a slot, if not at its creation. steps are its timeline; each session started by then
+// carries its words said by then. card sets the rest of the card: who filed it and from where.
+function life(now, issue, age, { phases, admitted, steps = [], card: o = {} }) {
   const passed = phases.filter((p) => p.from <= age);
   const p = Object.assign({}, ...passed);
   const since = age - passed.findLast((q) => "status" in q || "gate" in q).from;
   const final = ["done", "failed", "closed"].includes(p.status);
   const task = boardCard(now, issue, {
-    lane: "ready", age, status: p.status, model: p.model, spent: p.spent, pr: p.pr ? cards[issue].pr : undefined,
+    lane: "ready", age, status: p.status, model: p.model, spent: p.spent, pr: p.pr ? cards[issue].pr : undefined, chain: p.chain,
     gate: final ? undefined : p.gate, gateSince: final || !p.gate ? undefined : since, finished: final ? since : undefined,
-    admitted: admitted === undefined || admitted > age ? undefined : age - admitted,
+    admitted: admitted === undefined || admitted > age ? undefined : age - admitted, ...o,
   });
   const objects = { [`sessions/${task.ID}/timeline.jsonl`]: state.timeline(now, age, { steps }) };
   for (const s of steps) {
@@ -458,6 +563,24 @@ function done(now, issue, age, after, spent) {
   return life(now, issue, age, { phases: [{ from: after, status: "done", model: "small", spent, pr: true }] });
 }
 
+// filed are the cards' filings on the calendar, as the earlier scenes' ages place them, for the scenes that count a
+// card's age from the story's time.
+const filed = {
+  101: date(1, "mon", "11:00"), 102: date(1, "mon", "11:36"), 103: date(1, "mon", "12:36"), 104: date(1, "tue", "13:00"),
+  106: date(1, "wed", "15:30"), 107: date(1, "wed", "16:00"), 108: date(1, "thu", "02:01"),
+  115: date(2, "mon", "06:00"), 116: date(2, "tue", "08:00"), 117: date(2, "wed", "02:15"), 118: date(2, "thu", "16:00"),
+  119: new Date(date(2, "thu", "17:19").getTime() + 30 * 1000), 120: date(2, "wed", "02:08"), 121: date(2, "wed", "02:18"),
+  123: date(2, "fri", "07:01"),
+};
+
+// ageAt is issue's card's age in seconds at the story's time at.
+const ageAt = (issue, at) => (at - filed[issue]) / 1000;
+
+// doneAt are cards done by the story's time at: each [issue, done after its filing in seconds, spend].
+function doneAt(now, at, list) {
+  return list.map(([issue, after, spent]) => done(now, issue, ageAt(issue, at), after, spent));
+}
+
 // board is the tasks and objects of cards, each a life.
 function board(cards) {
   return { tasks: cards.map((c) => c.task), objects: Object.assign({}, ...cards.map((c) => c.objects)) };
@@ -468,6 +591,10 @@ const reviews = {
   101: [{ verdict: "approve", summary: "A full class takes waitlist sign-ups in order, and a cancellation mails the first in line a seat held for 2 hours." }],
   102: [{ verdict: "approve", summary: "Caches the week's schedule for a minute; the load test measures GET /schedule at 0.31 s at the p95." }],
   103: [{ verdict: "approve", summary: "Adds the teacher and the room to the class query and names them under the title, with tests for the page." }],
+  104: [{ verdict: "approve", summary: "confirmBooking reads latest_charge of API version 2022-11-15; a replayed event of that version confirms the booking." }],
+  108: [{ verdict: "approve", summary: "express 4.20.0 pins path-to-regexp 0.1.10; npm audit reports no high finding, and the route tests pass." }],
+  118: [{ verdict: "approve", summary: "The schedule takes a teacher filter from the URL; the tests cover a chosen teacher and a reload." }],
+  119: [{ verdict: "approve", summary: "parseTeacherFilter answers no filter when ?teacher is absent; a test covers the link without one." }],
   107: [{ verdict: "approve", summary: "Mails the confirmation once per booking from the webhook, keyed on the PaymentIntent; the tests deliver the event twice." }],
   116: [
     {
@@ -489,6 +616,133 @@ function review(issue, n, from, at, sid) {
   return state.modelReview(from, at, { pr: cards[issue].pr, commit: sessions[issue][sid].commit, round: n, ...reviews[issue][n - 1] });
 }
 
+// checksFailed are the findings of a card's failed checks, sent on to its next session.
+const checksFailed = {
+  107: "acceptance: a webhook delivered twice sends one mail: 2 mails sent, want 1",
+};
+
+// merge is the steps of issue's merge, in seconds after its creation: its turn in the merge queue it entered at
+// queued, a minute before factory-merge merges the head its last session pushed at at, and its end at live, when the
+// green run run of its chain covers it.
+function merge(issue, { queued, at, live, run }) {
+  const pr = cards[issue].pr;
+  const head = Object.values(sessions[issue]).findLast((s) => s.commit).commit;
+  const reason = `live: covered by run ${run}`;
+  return [
+    state.queueTurn(queued, at - MIN),
+    state.merged(at - MIN, at, { pr, commit: head }),
+    state.recorded(at, "pull_request_merged", { pr, by: "factory-merge" }),
+    state.final(at, "merged", "pull request merged"),
+    state.final(live, "done", reason),
+    state.recorded(live, "task_ended", { state: "done", reason }),
+  ];
+}
+
+// merging is the phases of a merge at at and its end at live, after the phases before: merged while its chain runs,
+// then done. A done card carries no chain verdict: the lab's board reads a done card after a card with one as not
+// live yet, and leaves it out of Done.
+const merging = ({ at, live }, spent) => [{ from: at, status: "merged", gate: undefined, chain: "pending" }, { from: live, status: "done", chain: undefined, spent }];
+
+// mergeEvents are the events rows of issue's merge m by its age: the merge, then the end.
+function mergeEvents(now, issue, age, m) {
+  const pr = cards[issue].pr;
+  return [
+    [m.at, "pull_request_merged", { pr, by: "factory-merge" }],
+    [m.live, "task_ended", { state: "done", reason: `live: covered by run ${m.run}` }],
+  ].filter(([at]) => at <= age).map(([at, kind, detail]) => state.event(now, { issue, kind, age: age - at, detail }));
+}
+
+// The merges more than one scene shows, seconds after each card's creation.
+const merges = {
+  101: { queued: 92 * MIN, at: 112 * MIN, live: 120 * MIN, run: 57 },
+  107: { queued: 53 * MIN, at: 58 * MIN, live: 64 * MIN, run: 61 },
+  108: { queued: 26 * MIN, at: 43 * MIN, live: 50 * MIN, run: 60 },
+};
+
+// lives are the cards whose life more than one scene shows, offsets in seconds after each card's creation.
+const lives = {
+  // the waitlist waits in the merge queue on Monday afternoon, merges, and is live two hours after its filing
+  101: {
+    phases: [{ from: 92 * MIN, status: "in-review", gate: "merge-queue", model: "small", spent: 0.71, pr: true }, ...merging(merges[101], 1.12)],
+    steps: [
+      state.intake(5 * MIN, 5.5 * MIN),
+      ...session(101, 1, 6 * MIN, 24 * MIN, { model: "small" }),
+      state.checks(24 * MIN + 10, 31 * MIN),
+      review(101, 1, 31 * MIN, 89 * MIN, "s-1"),
+      ...merge(101, merges[101]),
+    ],
+  },
+  // the schedule builds a second time after a failed test
+  102: {
+    phases: [
+      { from: 39 * MIN, status: "running", gate: "session", model: "small", spent: 0.22 },
+      { from: 65 * MIN, status: "in-review", gate: "checks", spent: 0.3, pr: true },
+      { from: 73 * MIN, status: "running", gate: "session", spent: 0.38 },
+      { from: 90 * MIN, spent: 0.47 },
+      { from: 107 * MIN, status: "in-review", gate: "checks", spent: 0.55 },
+      { from: 114 * MIN, gate: "review", spent: 0.64 },
+      { from: 121 * MIN, gate: "merge-queue" },
+    ],
+    steps: [
+      state.intake(38 * MIN, 38 * MIN),
+      ...session(102, 1, 39 * MIN, 65 * MIN, { model: "small" }),
+      state.checks(65 * MIN + 10, 72 * MIN, "test"),
+      ...session(102, 2, 73 * MIN, 107 * MIN, { model: "small" }),
+      state.checks(107 * MIN + 10, 114 * MIN),
+      review(102, 1, 114 * MIN, 120 * MIN, "s-2"),
+    ],
+  },
+  // the class page, filed on the form
+  103: {
+    phases: [
+      { from: 0, status: "queued" },
+      { from: 3 * MIN, status: "running", gate: "session", model: "small", spent: 0.08 },
+      { from: 22 * MIN, status: "in-review", gate: "checks", spent: 0.19, pr: true },
+      { from: 30 * MIN, gate: "review" },
+      { from: 45 * MIN, spent: 0.27 },
+      { from: 46 * MIN, gate: "merge-queue" },
+      { from: 84 * MIN, status: "done", spent: 0.31 },
+    ],
+    steps: [
+      state.intake(0, 20),
+      ...session(103, 1, 3 * MIN, 21.5 * MIN, { model: "small" }),
+      state.checks(22 * MIN, 30 * MIN),
+      review(103, 1, 30 * MIN, 45 * MIN, "s-1"),
+    ],
+  },
+  // the confirmation mail: the first attempt on small fails the acceptance job, its finding goes to the stronger
+  // class, the second attempt on big passes, and the card merges
+  107: {
+    phases: [
+      { from: 0, status: "queued" },
+      { from: 2 * MIN, status: "running", gate: "session", model: "small", spent: 0.05 },
+      { from: 18.5 * MIN, status: "in-review", gate: "checks", spent: 0.31, pr: true },
+      { from: 26 * MIN, status: "running", gate: "session", model: "big" },
+      { from: 29 * MIN, spent: 0.52 },
+      { from: 40.5 * MIN, status: "in-review", gate: "checks", spent: 1.06 },
+      { from: 47 * MIN, gate: "review" },
+      { from: 53 * MIN, gate: "merge-queue", spent: 1.18 },
+      ...merging(merges[107], 1.18),
+    ],
+    steps: [
+      state.intake(0, 20),
+      ...session(107, 1, 2 * MIN, 18 * MIN, { model: "small" }),
+      state.checks(18.5 * MIN, 25 * MIN, "acceptance"),
+      state.findings(25 * MIN + 5, { stage: "checks", to: "stronger", attempt: 1, list: [checksFailed[107]] }),
+      ...session(107, 2, 26 * MIN, 40 * MIN, { model: "big" }),
+      state.checks(40.5 * MIN, 47 * MIN),
+      review(107, 1, 47 * MIN, 52 * MIN, "s-2"),
+      ...merge(107, merges[107]),
+    ],
+  },
+  // the performance read's card waits for a slot, then builds through the morning
+  123: {
+    phases: [{ from: 0, status: "queued" }, { from: 5 * MIN, status: "running", gate: "session", model: "small", spent: 0.06 }, { from: 90 * MIN, spent: 0.34 }],
+    steps: [state.intake(0, 15), state.sessionStart(5 * MIN, { model: "small" })],
+    card: { author: "factory-agent", source: "routine" },
+  },
+};
+
 // files are the changed files of a pull request, as Forgejo lists them.
 const files = {
   203: [
@@ -496,11 +750,6 @@ const files = {
     { filename: "src/classes/ClassPage.tsx", status: "modified", additions: 12, deletions: 1 },
     { filename: "src/classes/ClassPage.test.tsx", status: "modified", additions: 41, deletions: 0 },
   ],
-};
-
-// checksFailed are the findings of a card's failed checks, sent on to its next session.
-const checksFailed = {
-  107: "acceptance: a webhook delivered twice sends one mail: 2 mails sent, want 1",
 };
 
 // supervisor is the supervisor's step in #117's first session: the flip-flop detector's trip, and the insight the
@@ -526,6 +775,7 @@ const steers = {
 };
 
 module.exports = {
-  cards, description, body, card: boardCard, filing, requests, asks, replies, alerts, approvals, plans, planCards, routines,
-  sessions, words, life, done, board, session, reviews, review, files, checksFailed, supervisor, steers,
+  date, cards, description, body, card: boardCard, filing, requests, asks, replies, alerts, alertsAt, approvals, plans, planCards, routines, runsAt,
+  routinesAt, scanned, sessions, words, life, lives, merges, merge, merging, mergeEvents, done, filed, ageAt, doneAt, board, session, reviews, review, files,
+  checksFailed, supervisor, steers,
 };

@@ -26,8 +26,8 @@ function card(now, o) {
     IssueNumber: issue,
     Objective: `${title}\n\n${body}`,
     Source: o.source ?? "webhook",
-    Author: project.login,
-    AuthorWriter: true,
+    Author: o.author ?? project.login,
+    AuthorWriter: o.author === undefined,
     RiskClass: "standard",
     BudgetEUR: o.budget ?? 3,
     SpentEUR: o.spent,
@@ -46,6 +46,8 @@ function card(now, o) {
     Choices: o.choices,
     EscalatedAt: o.escalatedAt === undefined ? undefined : iso(now, o.escalatedAt),
     EscalationAlert: o.escalationAlert,
+    AlertFingerprint: o.fingerprint,
+    ChainState: o.chain,
   });
 }
 
@@ -80,6 +82,18 @@ const modelReview = (from, at, { pr, commit, model = "big", round = 1, verdict, 
 
 // findings are a stage's findings sent on: to the agent's next session, or to a stronger model.
 const findings = (at, { stage, round = 1, to, attempt, list }) => ({ at, step: "stage_findings", stage, round, to, attempt, findings: list });
+
+// queueTurn ends the merge-queue gate: the card's turn to merge.
+const queueTurn = (from, at) => ({ at, from, step: "queue_turn", project: project.repository });
+
+// merged ends the merge gate: factory-merge merged the pull request at its gated head commit, on approver's approval.
+const merged = (from, at, { pr, commit, approver = project.login }) => ({ at, from, step: "merged", pr, commit, approver, merged_by: "factory-merge" });
+
+// recorded is an event as the card's timeline records it beside its events row.
+const recorded = (at, event, detail) => ({ at, step: "event", event, ...detail });
+
+// final is the card's end: merged while its chain runs, done once a green run covers it.
+const final = (at, state, reason) => ({ at, step: "final", state, reason });
 
 // supervisor is the supervisor's decision on a detector's trip in a session; the drawer shows the decision and reason.
 const supervisor = (at, { session = "s-1", detector, trip, decision, reason }) => ({ at, step: "supervisor", session, detector, trip, decision, reason });
@@ -128,6 +142,17 @@ function alert(now, o) {
     Detail: o.detail,
   });
 }
+
+// poke is a row factoryd writes into the inbox thread about issue's card, born of the event kind birth.
+function poke(now, { issue, content, age, decider, birth, conversation }) {
+  return present({ ...message(now, { role: "assistant", content, age, kind: "poke", conversation }), task_id: id(issue), decider, birth_kind: birth });
+}
+
+// mergedPoke and livePoke are factoryd's informs of a card's merge while its chain runs and of its end, live.
+const mergedPoke = (now, { issue, age, conversation }) =>
+  poke(now, { issue, content: `#${issue} merged; the chain is running.`, age, birth: "pull_request_merged", conversation });
+const livePoke = (now, { issue, title, spent, age, conversation }) =>
+  poke(now, { issue, content: `#${issue} is done and live: ${title}. €${spent.toFixed(2)} in all.`, age, birth: "task_ended", conversation });
 
 function approval(now, o) {
   for (const key of ["brief", "detail"]) {
@@ -302,6 +327,62 @@ function metrics(now, overrides = {}) {
   };
 }
 
+const HOUR = 3600 * 1000;
+const WEEKDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTH = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+// nextCron is the first time after from that cron names, in UTC, the factory's zone. It reads the routines' forms:
+// a minute and an hour, and a number or * for the day of the month, the month and the weekday.
+function nextCron(cron, from) {
+  const [minute, hour, dom, month, dow] = cron.split(" ");
+  const hit = (field, v) => field === "*" || Number(field) === v;
+  const day = new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate()));
+  for (let i = 0; i < 400; i++, day.setUTCDate(day.getUTCDate() + 1)) {
+    const at = new Date(day.getTime() + (Number(hour) * 60 + Number(minute)) * 60000);
+    if (at > from && hit(dom, day.getUTCDate()) && hit(month, day.getUTCMonth() + 1) && hit(dow, day.getUTCDay())) return at;
+  }
+  throw new Error(`cron ${cron} names no time in the 400 days after ${from.toISOString()}`);
+}
+
+// cronWords is a run's time as factoryd's views word it: "Mon 15:04" within a week, else "Mon 2 Jan 15:04".
+function cronWords(next, at) {
+  const hm = next.toISOString().slice(11, 16);
+  if (next - at < 7 * 24 * HOUR) return `${WEEKDAY[next.getUTCDay()]} ${hm}`;
+  return `${WEEKDAY[next.getUTCDay()]} ${next.getUTCDate()} ${MONTH[next.getUTCMonth()]} ${hm}`;
+}
+
+// routineRun is run run of routine name, due on the story's calendar; a run whose card is open has no ended.
+function routineRun(name, { run, due, ended, outcome, issue, note, cost }) {
+  return present({
+    Project: project.name, Routine: name, Run: run, Due: due.toISOString(), Started: due.toISOString(), Ended: ended?.toISOString(),
+    Trigger: "cron", TaskID: issue === undefined ? undefined : id(issue), Issue: issue, Outcome: outcome, Note: note, CostEUR: cost,
+  });
+}
+
+// routineView is routine r as factoryd's views show it at story time at, which now stands for, as the lab's labNext
+// words it: the next cron run 30 seconds past its minute (with a Skip once, the run after it), soon when it is under
+// an hour away and the run after it a day or more later, and runs, newest first, the newest its last. needsMe is the
+// live toggle sebastian set; open the card of the newest run while it is open.
+function routineView(now, at, r, { runs = [], skip = false, needsMe, open, held } = {}) {
+  const cron = r.schedule[0].cron;
+  const first = nextCron(cron, at);
+  const next = skip ? nextCron(cron, first) : first;
+  return present({
+    Project: project.name, Routine: r,
+    State: present({
+      Project: project.name, Routine: r.name, Runs: runs[0]?.Run ?? 0, SkipNext: skip || undefined, SkipBy: skip ? project.login : undefined,
+      NeedsMe: needsMe, NeedsMeBy: needsMe === undefined ? undefined : project.login,
+    }),
+    Next: new Date(now.getTime() + (next - at) + 30000).toISOString(),
+    Soon: next - at < HOUR && nextCron(cron, next) - next >= 23 * HOUR,
+    NextWords: cronWords(next, at),
+    Last: runs[0],
+    Open: open,
+    Held: held,
+    Lane: "queued",
+  });
+}
+
 function scene(now, o = {}) {
   const tasks = o.tasks ?? [];
   const objects = { ...o.objects };
@@ -334,13 +415,14 @@ function scene(now, o = {}) {
     Open: o.open,
     Routines: o.routines,
     Runs: o.runs,
+    RoutinesAt: o.routinesAt?.toISOString(),
     Metrics: o.metrics,
     Replies: o.replies,
   });
 }
 
 module.exports = {
-  AGENT_ASKS, id, card, intake, sessionStart, session, checks, modelReview, findings, supervisor, timeline, said, transcript, event,
-  status, alert, approval, message, ask, proposal, proposedCall, cardFiling, steering, pressed, filedThread, steeredThread, seen, plan, say, call, reply,
-  metrics, scene,
+  AGENT_ASKS, id, card, intake, sessionStart, session, checks, modelReview, findings, queueTurn, merged, recorded, final, supervisor, timeline, said,
+  transcript, event, status, alert, poke, mergedPoke, livePoke, approval, message, ask, proposal, proposedCall, cardFiling, steering, pressed, filedThread, steeredThread, seen,
+  plan, say, call, reply, metrics, nextCron, routineRun, routineView, scene,
 };
