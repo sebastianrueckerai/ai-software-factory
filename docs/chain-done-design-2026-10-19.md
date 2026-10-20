@@ -1,3 +1,5 @@
+The post-merge half of this design is replaced by [chain-and-autonomy-design-2026-10-20.md](chain-and-autonomy-design-2026-10-20.md) (2026-10-20). The rest stands.
+
 # Chain-done: a task is done when its change is live
 
 Design, 2026-10-19. Sebastian's rule, stated repeatedly and finally: for the
