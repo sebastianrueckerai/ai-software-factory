@@ -38,6 +38,7 @@ The factory's failure rate is richer than DORA's: the revert pass finds reverts 
 | Figure | Question | Source | Ready |
 |---|---|---|---|
 | Spend / week, by kind | what the factory costs | the ledger, `Costs` already computes it | yes |
+| Tools / week, tool mix | what the paid tools cost, and which | the ledger's rows of kind `tool`, by ref | yes |
 | Cost per card, median | what a card costs | ledger per task | yes |
 | Tokens per card, cached share | how much model work a card is | `audit` token columns per task | yes |
 | Model mix | which tiers did the work | `audit` by model alias per week | yes |
@@ -47,7 +48,7 @@ The factory's failure rate is richer than DORA's: the revert pass finds reverts 
 | Figure | Question | Source | Ready |
 |---|---|---|---|
 | Interventions / card | how often a human had to act | events where a human acted on a card, over done cards | yes |
-| Escalations | cards that needed you | events of kind escalation | yes |
+| Escalations | cards that needed you | alerts of kind escalation, and the share of done cards with at least one | yes |
 | Human-blocked share | the share of card time spent waiting on a human | gate and needs-you spans from the status history | yes, approximate |
 | Review acceptance | first-pass reviews vs changes asked | review outcomes in `audit`/events | yes |
 
