@@ -50,6 +50,7 @@ The factory's failure rate is richer than DORA's: the revert pass finds reverts 
 |---|---|---|---|
 | Interventions / card | how often a human had to act | events where a human acted on a card, over done cards | yes |
 | Escalations | cards that needed you | alerts of kind escalation, and the share of done cards with at least one | yes |
+| Escalations handled | who judged them | the escalation alerts by their resolver: a human, an AI (the project agent deciding at the autonomous level, or a member the policy's `ai_members` names), the rest closed unjudged when their card ended | yes |
 | Human-blocked share | the share of card time spent waiting on a human | gate and needs-you spans from the status history | yes, approximate |
 | Review acceptance | first-pass reviews vs changes asked | review outcomes in `audit`/events | yes |
 
