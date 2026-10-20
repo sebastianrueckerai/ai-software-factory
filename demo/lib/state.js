@@ -187,6 +187,20 @@ function pressed(now, p, { age, result }) {
   });
 }
 
+// filedThread is the rows a filing from the chat leaves, as the console stores them: the member's line at age, the
+// agent's reply proposing args a second later, and the Do it's row with the console's result two seconds after that.
+function filedThread(now, { said, reply, args, issue, age }) {
+  const p = cardFiling(now, args);
+  return {
+    rows: [
+      message(now, { role: "user", content: said, age }),
+      message(now, { role: "assistant", content: reply, age: age - 1, toolCalls: [proposedCall(now, p, { id: "call_1", age: age - 1 })] }),
+      pressed(now, p, { age: age - 3, result: `Filed ${project.repository}#${issue} in lane ${args.lane}. It cannot be undone.` }),
+    ],
+    proposal: p,
+  };
+}
+
 // plan is issue's plan revision as the planner stores it: the plan's JSON and its sha256, which an accept pins.
 function plan(now, { issue, revision = 1, age, summary, cards }) {
   const body = { summary, cards };
@@ -282,6 +296,6 @@ function scene(now, o = {}) {
 }
 
 module.exports = {
-  AGENT_ASKS, id, card, timeline, transcript, event, status, alert, approval, message, ask, proposal, proposedCall, cardFiling, pressed, seen, plan,
+  AGENT_ASKS, id, card, timeline, transcript, event, status, alert, approval, message, ask, proposal, proposedCall, cardFiling, pressed, filedThread, seen, plan,
   say, call, reply, metrics, scene,
 };

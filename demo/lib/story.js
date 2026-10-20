@@ -5,11 +5,17 @@ const state = require("./state");
 const budgets = { small: 2, medium: 5, large: 10 };
 
 // body is the prose the card is filed with; acceptance its Acceptance list; pr its pull request; plan and key mark a
-// planned card (its plan's issue and its key there).
+// planned card (its plan's issue and its key there). #100 is the last card before the two weeks: finished before the
+// board's seven days, it shows on no board, and the lab numbers the first filing on from it.
 const cards = {
+  100: {
+    title: "Footer: the studio's address and opening hours", size: "small", pr: 200,
+    body: "The footer names the studio's address, its opening hours and a link to the map",
+    acceptance: ["every page's footer shows the address, the hours and the map link"],
+  },
   101: {
     title: "Waitlist when a class is full", size: "medium", pr: 201,
-    body: "A full class takes waitlist sign-ups in order. A cancelled booking offers the seat to the first in line by mail.",
+    body: "A full class takes waitlist sign-ups in order. A cancelled booking offers the seat to the first in line by mail",
     acceptance: [
       "a full class shows Join the waitlist in place of Book",
       "a cancellation mails the first member in line a link that holds the seat for 2 hours",
@@ -18,15 +24,15 @@ const cards = {
   },
   102: {
     title: "Schedule page: GET /schedule under 400 ms at the p95", size: "small", pr: 202,
-    body: "GET /schedule answers in 1.42 s at the p95 over the last 7 days, five times the other pages. Members feel it.",
+    body: "The latency alert on GET /schedule fired three times this week: its p95 crossed 1 s, and nothing fixed it",
     acceptance: [
       "the p95 of GET /schedule stays under 400 ms over a day of production traffic",
-      "the schedule reads the booking counts of a week's classes in one query",
+      "the latency alert on GET /schedule stays quiet for a week",
     ],
   },
   103: {
     title: "Class page: show the teacher and the room", size: "small", pr: 203,
-    body: "Members want to know who teaches and in which room before they book.",
+    body: "Members want to know who teaches and in which room before they book",
     acceptance: ["the class page names the teacher and the room under its title"],
   },
   104: {
@@ -43,7 +49,7 @@ const cards = {
   },
   105: {
     title: "Calendar: rewrite it as week and month views", size: "large",
-    body: "The calendar is one hand-built table: it cannot show a week, move a class or repeat one. Rebuild it on one model.",
+    body: "The calendar is one hand-built table: it cannot show a week, move a class or repeat one. Rebuild it on one model",
     acceptance: [
       "the calendar shows a week and a month",
       "a teacher drags a class to another slot and its bookings move with it",
@@ -58,7 +64,7 @@ const cards = {
   107: {
     title: "Confirmation mail: send it once the payment settles", size: "small", pr: 205,
     body: "Reported in #106: a booking whose card payment settles after the checkout page closed sends no confirmation mail. " +
-      "Send it from the payment_intent.succeeded webhook, once per booking.",
+      "Send it from the payment_intent.succeeded webhook, once per booking",
     acceptance: [
       "a booking whose payment settles after the checkout page closed gets its confirmation mail",
       "a webhook delivered twice sends one mail",
@@ -67,47 +73,47 @@ const cards = {
   108: {
     title: "Security: express 4.20.0 for CVE-2024-45296 in path-to-regexp", size: "small", pr: 206,
     body: "The nightly scan found path-to-regexp 0.1.7 through express 4.19.2: CVE-2024-45296, high. A route with two " +
-      "parameters in one segment backtracks on a crafted path, a denial of service. express 4.20.0 pins path-to-regexp 0.1.10.",
+      "parameters in one segment backtracks on a crafted path, a denial of service. express 4.20.0 pins path-to-regexp 0.1.10",
     acceptance: ["npm audit reports no high finding", "the route tests pass on express 4.20.0"],
   },
   109: {
     title: "Calendar: one events model for classes and their repeats", size: "medium", plan: 105, key: "events-model", pr: 207,
-    body: "Card events-model of plan #105, accepted by sebastian. A class is an event with a series rule; a booking points at one occurrence.",
+    body: "Card events-model of plan #105, accepted by sebastian. A class is an event with a series rule; a booking points at one occurrence",
     acceptance: ["a weekly class is one row with its rule", "every booking keeps its occurrence after the migration"],
   },
   110: {
     title: "Calendar: the week view", size: "medium", plan: 105, key: "week-view", pr: 208,
-    body: "Card week-view of plan #105, accepted by sebastian. Seven columns of the studio's hours, each class a block with its free places.",
+    body: "Card week-view of plan #105, accepted by sebastian. Seven columns of the studio's hours, each class a block with its free places",
     acceptance: ["the week view shows every class of the week with its free places", "a member books from a block"],
   },
   111: {
     title: "Calendar: the month view", size: "small", plan: 105, key: "month-view", pr: 209,
-    body: "Card month-view of plan #105, accepted by sebastian. A month of days, each with its classes' names and a count of free places.",
+    body: "Card month-view of plan #105, accepted by sebastian. A month of days, each with its classes' names and a count of free places",
     acceptance: ["the month view lists each day's classes", "a click on a day opens its week"],
   },
   112: {
     title: "Calendar: drag a class to move it, its bookings follow", size: "medium", plan: 105, key: "drag-move", pr: 212,
-    body: "Card drag-move of plan #105, accepted by sebastian. A teacher drags a block to another slot, and its bookings move with it.",
+    body: "Card drag-move of plan #105, accepted by sebastian. A teacher drags a block to another slot, and its bookings move with it",
     acceptance: ["a dragged class keeps all its bookings", "a slot another class holds refuses the drop"],
   },
   113: {
     title: "Calendar: the week grid and its navigation", size: "small", parent: 110, pr: 210,
-    body: "Split from #110 after it reached its budget: the empty week grid of the studio's hours, with the previous and next week.",
+    body: "Split from #110 after it reached its budget: the empty week grid of the studio's hours, with the previous and next week",
     acceptance: ["the grid shows the studio's hours for seven days", "previous and next move a week"],
   },
   114: {
     title: "Calendar: class blocks in the week grid", size: "small", parent: 110, pr: 211,
-    body: "Split from #110 after it reached its budget: each class as a block in the grid of #113, with its free places and Book.",
+    body: "Split from #110 after it reached its budget: each class as a block in the grid of #113, with its free places and Book",
     acceptance: ["every class of the week is a block with its free places", "a member books from a block"],
   },
   115: {
     title: "Weekly dependency bump", size: "small", routine: "dependency-bump", pr: 213,
-    body: "Every dependency to the newest release of its line in one pull request; a major release gets a card of its own.",
+    body: "Every dependency to the newest release of its line in one pull request; a major release gets a card of its own",
     acceptance: ["the lockfile names the newest release of each line", "the test suite passes"],
   },
   116: {
     title: "Booking: cancel up to 12 hours before class", size: "medium", pr: 214,
-    body: "A member cancels a booking up to 12 hours before the class starts; the seat goes to the waitlist of #101.",
+    body: "A member cancels a booking up to 12 hours before the class starts; the seat goes to the waitlist of #101",
     acceptance: [
       "Cancel shows until 12 hours before the class and not after",
       "a cancelled seat goes to the first member on the waitlist",
@@ -116,12 +122,12 @@ const cards = {
   },
   117: {
     title: "Reminder mail: send it 24 hours before class", size: "small", pr: 215,
-    body: "Every booked member gets one reminder mail 24 hours before the class, with the room and a cancel link.",
+    body: "Every booked member gets one reminder mail 24 hours before the class, with the room and a cancel link",
     acceptance: ["a booking gets one reminder 24 hours before its class", "a booking made later than that gets none"],
   },
   118: {
     title: "Schedule: filter by teacher", size: "small", pr: 216, merge: "e41b7c9",
-    body: "Members follow a teacher. The schedule gets a teacher filter, kept in the URL so a link shares it.",
+    body: "Members follow a teacher. The schedule gets a teacher filter, kept in the URL so a link shares it",
     acceptance: ["the schedule shows only the chosen teacher's classes", "the filter survives a reload"],
   },
   119: {
@@ -135,7 +141,7 @@ const cards = {
   },
   120: {
     title: "Class pass: 10 classes, valid 6 months", size: "medium", pr: 218,
-    body: "A member buys a pass of 10 classes by card. Each booking takes one class off it; the pass ends after 6 months.",
+    body: "A member buys a pass of 10 classes by card. Each booking takes one class off it; the pass ends after 6 months",
     acceptance: [
       "a member with a pass books without paying again",
       "the account page shows the classes left and the end date",
@@ -144,12 +150,12 @@ const cards = {
   },
   121: {
     title: "Account page: a member's past bookings", size: "small", pr: 219,
-    body: "The account page lists a member's bookings of the last 12 months, newest first, with each class's date and teacher.",
+    body: "The account page lists a member's bookings of the last 12 months, newest first, with each class's date and teacher",
     acceptance: ["the account page lists the last 12 months of bookings", "a member sees only their own"],
   },
   122: {
     title: "Payments: refund a class the studio cancels", size: "medium", pr: 220,
-    body: "When the studio cancels a class, every member who paid for it by card gets a refund through Stripe, once.",
+    body: "When the studio cancels a class, every member who paid for it by card gets a refund through Stripe, once",
     acceptance: [
       "a class the studio cancels refunds every paid booking to its card",
       "a cancel sent twice refunds once",
@@ -159,12 +165,12 @@ const cards = {
   123: {
     title: "Schedule page: p95 up from 0.31 s to 0.74 s since #118", size: "small", routine: "performance-read", pr: 221,
     body: "The weekly performance read: GET /schedule answers in 0.74 s at the p95 this week, up from 0.31 s after #102. " +
-      "It rose with the merge of #118, whose teacher filter joins the teachers table per class.",
+      "It rose with the merge of #118, whose teacher filter joins the teachers table per class",
     acceptance: ["the p95 of GET /schedule is back under 400 ms over a day of production traffic"],
   },
   124: {
     title: "Cost review: the month's spend by card", size: "small", routine: "cost-review",
-    body: "The monthly cost review: the month's spend by card and by kind against the project's cap. Read it, then close the card.",
+    body: "The monthly cost review: the month's spend by card and by kind against the project's cap. Read it, then close the card",
   },
 };
 
@@ -174,11 +180,15 @@ function card(issue) {
   return c;
 }
 
-// body is issue's issue body as factoryd keeps it: the prose, the Acceptance list, the size line.
-function body(issue) {
+// description is issue's text as a person writes it: the prose and the Acceptance list.
+function description(issue) {
   const c = card(issue);
-  const list = c.acceptance ? "\n\nAcceptance:\n" + c.acceptance.map((a) => "- " + a).join("\n") : "";
-  return `${c.body}${list}\n\nSize: ${c.size}`;
+  return c.acceptance ? `${c.body}\n\nAcceptance:\n${c.acceptance.map((a) => "- " + a).join("\n")}` : c.body;
+}
+
+// body is issue's issue body as factoryd keeps it: the description and the size line the console appends.
+function body(issue) {
+  return `${description(issue)}\n\nSize: ${card(issue).size}`;
 }
 
 // boardCard is issue's card for the board: o sets its status, lane and age, and may override the rest.
@@ -235,8 +245,8 @@ const asks = {
 const replies = {
   waitlist: "By mail it is: the booking mails already go out through the mailer, so the seat offer uses it too. The card:",
   scheduleRead: "I measure it first: the telemetry's alerts on the page.",
-  schedule: "It is the slowest page by far: GET /schedule answers in **1.42 s** at the p95 over the last 7 days, " +
-    "five times the other pages, and its latency alert fired three times this week. The card carries the figure as its bar:",
+  schedule: "The alerts agree with you: the rule on GET /schedule's **p95 above 1 s** fired three times this week " +
+    "and settled each time without a fix. The card sets the bar at 400 ms:",
   calendar: "That is several cards: the week, the month, moving a class and the model under them. " +
     "I file it in the plan lane, where the planner splits it into cards in their order, and the plan waits for your accept:",
 };
@@ -244,9 +254,9 @@ const replies = {
 // alerts are the alert rows of the two weeks; a scene passes now and the ages to state.alert.
 const alerts = {
   scheduleLatency: [
-    { id: 11, kind: "alert", source: "SchedulePageLatency", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd" },
-    { id: 12, kind: "alert", source: "SchedulePageLatency", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd" },
-    { id: 13, kind: "alert", source: "SchedulePageLatency", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd" },
+    { id: 11, kind: "alert", source: "GET /schedule p95 above 1 s", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd" },
+    { id: 12, kind: "alert", source: "GET /schedule p95 above 1 s", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd" },
+    { id: 13, kind: "alert", source: "GET /schedule p95 above 1 s", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd" },
   ],
   checkout: {
     id: 14, kind: "alert", source: "CheckoutErrors", task: 104, fingerprint: "b81e2f04a9c63d17",
@@ -317,4 +327,4 @@ const routines = {
   "cost-review": [{ week: 2, outcome: "filed", issue: 124, note: "€41.20 of the €60 cap, €1.79 per card" }],
 };
 
-module.exports = { cards, body, card: boardCard, filing, requests, asks, replies, alerts, approvals, plans, planCards, routines };
+module.exports = { cards, description, body, card: boardCard, filing, requests, asks, replies, alerts, approvals, plans, planCards, routines };

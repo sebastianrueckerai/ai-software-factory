@@ -122,6 +122,25 @@ test("pressed is the do- row of the proposal's call", () => {
       result: "Filed nord/booking#101 in lane ready. It cannot be undone." }],
   });
 });
+test("filedThread is the member's line, the proposing reply and the Do it's row", () => {
+  const args = { title: "t", lane: "ready" };
+  const token = "lab9f848efee1198e7200730a5f249d5091c4423c04";
+  const f = s.filedThread(now, { said: "s", reply: "r", args, issue: 101, age: 10 });
+  assert.equal(f.proposal.Token, token);
+  assert.deepEqual(f.rows, [
+    { role: "user", content: "s", at: "2026-10-20T11:59:50.000Z" },
+    {
+      role: "assistant", content: "r", at: "2026-10-20T11:59:51.000Z",
+      tool_calls: [{ id: "call_1", name: "new_card", arguments: '{"title":"t","lane":"ready"}', read_at: "2026-10-20T11:59:51.000Z", proposal: token,
+        result: "Proposed to sebastian: File a card, title t, lane ready. Nothing runs until they press Do it." }],
+    },
+    {
+      role: "assistant", content: "", at: "2026-10-20T11:59:53.000Z",
+      tool_calls: [{ id: "do-lab9f848efee", name: "new_card", arguments: '{"title":"t","lane":"ready"}', read_at: "2026-10-20T11:59:53.000Z",
+        result: "Filed nord/booking#101 in lane ready. It cannot be undone." }],
+    },
+  ]);
+});
 test("seen marks each thread read to its newest row, rows numbered by place", () => {
   const chat = [{ conversation: 1 }, { conversation: 1 }, { conversation: 2 }, {}, { conversation: 2 }];
   assert.deepEqual(s.seen(chat), { 1: 4, 2: 5 });

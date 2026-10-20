@@ -3,20 +3,17 @@ const story = require("../lib/story");
 
 const c = story.cards[103];
 const MIN = 60;
+const filed = `#board [data-card="${state.id(103)}"]`;
 
-// the New task form reads the repository's labels from Forgejo
-const labels = JSON.stringify([
-  { id: 1, name: "agent" }, { id: 2, name: "human" }, { id: 3, name: "backlog" }, { id: 4, name: "plan" },
-]);
-
-// Monday afternoon: the waitlist card waits in the merge queue, the schedule card builds
+// Monday afternoon: the waitlist card waits in the merge queue, the schedule card builds; filed adds #103 as the lab
+// filed it from the form
 function monday(now, filed) {
   const waitlist = story.card(now, 101, {
     status: "in-review", lane: "ready", age: 95 * MIN, gate: "merge-queue", gateSince: 3 * MIN, model: "small", spent: 0.71, pr: story.cards[101].pr,
   });
   const schedule = story.card(now, 102, { status: "running", lane: "ready", age: 57 * MIN, gate: "session", gateSince: 18 * MIN, model: "small", spent: 0.22 });
   const tasks = [waitlist, schedule];
-  if (filed) tasks.push(story.card(now, 103, { status: "queued", lane: "ready", age: 4 }));
+  if (filed) tasks.push(story.card(now, 103, { status: "queued", lane: "ready", age: 6 }));
   return state.scene(now, {
     tasks,
     objects: {
@@ -30,12 +27,9 @@ function monday(now, filed) {
         ],
       }),
     },
-    prFiles: { "/api/v1/repos/nord/booking/labels": labels },
     spend: 1.24, chatSpend: 0.18,
   });
 }
-
-const body = `${c.body}\n\nAcceptance:\n${c.acceptance.map((a) => "- " + a).join("\n")}`;
 
 module.exports = {
   title: "A card from the board",
@@ -50,15 +44,14 @@ module.exports = {
       state: () => null,
       actions: [
         { click: "#title" }, { type: ["#title", c.title] },
-        { click: "#body" }, { type: ["#body", body] },
+        { click: "#body" }, { type: ["#body", story.description(103)] },
         { hover: "#lane" }, { type: ["#lane", "Ready"] },
         { hover: "#size" }, { type: ["#size", c.size] },
         { hover: 'form.newtask button[type="submit"]' },
       ],
       hold: 1200,
     },
-    // the form's File answers the board with its note; the lab's Forgejo files no issue, so the step lands there itself
-    { state: () => null, actions: [{ goto: "/?project=nord-booking&filed=103" }], hold: 1500 },
-    { state: (now) => monday(now, true), actions: [{ hover: `#board [data-card="${state.id(103)}"]` }], hold: 2500 },
+    { state: () => null, actions: [{ click: 'form.newtask button[type="submit"]' }, { waitFor: filed }], hold: 2000 },
+    { state: (now) => monday(now, true), actions: [{ hover: filed }], hold: 2500 },
   ],
 };
