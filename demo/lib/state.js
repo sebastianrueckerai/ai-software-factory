@@ -8,9 +8,10 @@ const EVENT_TASK_STATUS = "task_status";
 const iso = (now, secondsBefore) => new Date(now.getTime() - secondsBefore * 1000).toISOString();
 const stamp = (date) => date.toISOString().slice(0, 19) + "Z";
 const present = (obj) => Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
+const sha256 = (text) => crypto.createHash("sha256").update(text).digest("hex");
 
 function id(issue) {
-  return "t-" + crypto.createHash("sha256").update(`lab ${issue}`).digest("hex").slice(0, 12);
+  return "t-" + sha256(`lab ${issue}`).slice(0, 12);
 }
 
 function card(now, o) {
@@ -130,15 +131,15 @@ function ask(now, { question, choices, age }) {
   return message(now, {
     role: "assistant", content: question, age, kind: "ask", choices,
     toolCalls: [{
-      id: `ask-${crypto.createHash("sha256").update(question).digest("hex").slice(0, 8)}`, name: "ask",
-      arguments: JSON.stringify({ question, choices }), read_at: at,
+      id: `ask-${sha256(`${question} ${age}`).slice(0, 8)}`, name: "ask",
+      arguments: JSON.stringify({ ask: question, choices }), read_at: at,
       result: "Asked the member; this turn ends. A press or their next message answers it.",
     }],
   });
 }
 
 function proposal(now, { tool, args, description, ttl = 1800 }) {
-  const digest = crypto.createHash("sha256").update(tool + JSON.stringify(args)).digest("hex").slice(0, 40);
+  const digest = sha256(tool + JSON.stringify(args)).slice(0, 40);
   return {
     Token: "lab" + digest, Kind: "proposal", Repository: project.repository, Login: project.login, Tool: tool,
     Args: args, Description: description, ExpiresAt: iso(now, -ttl),
@@ -150,6 +151,58 @@ function proposedCall(now, p, { id: callId, age }) {
     id: callId, name: p.Tool, arguments: JSON.stringify(p.Args), read_at: iso(now, age), proposal: p.Token,
     result: `Proposed to ${project.login}: ${p.Description.replace(/\.$/, "")}. Nothing runs until they press Do it.`,
   };
+}
+
+// seen marks every thread of chat read to its newest row, as the seed numbers the rows: by place, from 1. A reseed
+// drops the console's own marks, and an unread thread is read again at the chat's next ten-second tick.
+function seen(chat) {
+  const out = {};
+  chat.forEach((m, i) => { out[m.conversation ?? 1] = i + 1; });
+  return out;
+}
+
+// truncate is textutil.Truncate: at most n bytes, cut on a character boundary, marked with an ellipsis.
+function truncate(s, n) {
+  const b = Buffer.from(s);
+  if (b.length <= n) return s;
+  while (n > 0 && (b[n] & 0xc0) === 0x80) n--;
+  return b.subarray(0, n).toString() + "…";
+}
+
+// cardFiling is the new_card proposal of args, described as the console describes it.
+function cardFiling(now, args, ttl) {
+  const parts = ["File a card"];
+  for (const key of ["title", "body", "lane", "size"]) {
+    if (args[key]) parts.push(`${key} ${truncate(args[key], 120)}`);
+  }
+  if (args.acceptance?.length) parts.push("acceptance " + args.acceptance.map((a) => truncate(a, 120)).join("; "));
+  return proposal(now, { tool: "new_card", args, description: parts.join(", "), ttl });
+}
+
+// pressed is the row a Do it on p leaves: the call its tool ran and the result.
+function pressed(now, p, { age, result }) {
+  return message(now, {
+    role: "assistant", age,
+    toolCalls: [{ id: "do-" + p.Token.slice(0, 12), name: p.Tool, arguments: JSON.stringify(p.Args), read_at: iso(now, age), result }],
+  });
+}
+
+// plan is issue's plan revision as the planner stores it: the plan's JSON and its sha256, which an accept pins.
+function plan(now, { issue, revision = 1, age, summary, cards }) {
+  const body = { summary, cards };
+  return { TaskID: id(issue), Revision: revision, Plan: body, SHA256: sha256(JSON.stringify(body)), CreatedAt: iso(now, age) };
+}
+
+function byTask(plans) {
+  const out = {};
+  for (const p of plans) (out[p.TaskID] ??= []).push(p);
+  return out;
+}
+
+function byRevision(questions) {
+  const out = {};
+  for (const { issue, revision = 1, text, choices } of questions) (out[`${id(issue)} ${revision}`] ??= []).push({ text, choices });
+  return out;
 }
 
 const say = (text) => ({ Say: text });
@@ -203,6 +256,8 @@ function scene(now, o = {}) {
     MonthCap: project.monthCap,
     PRFiles: o.prFiles,
     Tasks: tasks,
+    Plans: o.plans && byTask(o.plans),
+    Questions: o.questions && byRevision(o.questions),
     Approvals: o.approvals,
     Objects: objects,
     Events: o.events,
@@ -227,6 +282,6 @@ function scene(now, o = {}) {
 }
 
 module.exports = {
-  AGENT_ASKS, id, card, timeline, transcript, event, status, alert, approval, message, ask, proposal, proposedCall,
+  AGENT_ASKS, id, card, timeline, transcript, event, status, alert, approval, message, ask, proposal, proposedCall, cardFiling, pressed, seen, plan,
   say, call, reply, metrics, scene,
 };

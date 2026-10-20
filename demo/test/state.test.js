@@ -91,11 +91,62 @@ test("approval refuses an empty brief or detail", () => {
   assert.equal(a.Status, "pending");
   assert.equal(a.PRNumber, 7);
 });
-test("ask carries the verbatim result", () => {
+test("ask carries the verbatim result and the tool's own arguments", () => {
   const m = s.ask(now, { question: "Mail or app?", choices: ["Mail", "App"], age: 60 });
   assert.equal(m.kind, "ask");
   assert.equal(m.tool_calls[0].result, "Asked the member; this turn ends. A press or their next message answers it.");
-  assert.equal(m.tool_calls[0].arguments, '{"question":"Mail or app?","choices":["Mail","App"]}');
+  assert.equal(m.tool_calls[0].arguments, '{"ask":"Mail or app?","choices":["Mail","App"]}');
+});
+test("two asks of one text at two ages have two call ids", () => {
+  const a = s.ask(now, { question: "Mail or app?", choices: ["Mail", "App"], age: 60 });
+  const b = s.ask(now, { question: "Mail or app?", choices: ["Mail", "App"], age: 30 });
+  assert.equal(a.tool_calls[0].id, "ask-3ab7b50e");
+  assert.equal(b.tool_calls[0].id, "ask-e387d31e");
+});
+test("cardFiling describes the filing as the console does", () => {
+  const args = { title: "Waitlist", body: "Members join.", lane: "ready", size: "medium", acceptance: ["a", "b"] };
+  const p = s.cardFiling(now, args);
+  assert.equal(p.Tool, "new_card");
+  assert.deepEqual(p.Args, args);
+  assert.equal(p.Description, "File a card, title Waitlist, body Members join., lane ready, size medium, acceptance a; b");
+});
+test("cardFiling cuts a field at 120 bytes on a character boundary", () => {
+  const p = s.cardFiling(now, { title: "t", body: "x".repeat(119) + "äy", lane: "plan" });
+  assert.equal(p.Description, `File a card, title t, body ${"x".repeat(119)}…, lane plan`);
+});
+test("pressed is the do- row of the proposal's call", () => {
+  const p = { Token: "labABCDEFGHIJKLMN", Tool: "new_card", Args: { title: "t" } };
+  assert.deepEqual(s.pressed(now, p, { age: 5, result: "Filed nord/booking#101 in lane ready. It cannot be undone." }), {
+    role: "assistant", content: "", at: "2026-10-20T11:59:55.000Z",
+    tool_calls: [{ id: "do-labABCDEFGHI", name: "new_card", arguments: '{"title":"t"}', read_at: "2026-10-20T11:59:55.000Z",
+      result: "Filed nord/booking#101 in lane ready. It cannot be undone." }],
+  });
+});
+test("seen marks each thread read to its newest row, rows numbered by place", () => {
+  const chat = [{ conversation: 1 }, { conversation: 1 }, { conversation: 2 }, {}, { conversation: 2 }];
+  assert.deepEqual(s.seen(chat), { 1: 4, 2: 5 });
+});
+test("plan is the revision as the planner stores it, its digest over the plan's JSON", () => {
+  const cards = [{ key: "a", role: "foundation", title: "A", size: "small", depends_on: [] }];
+  const p = s.plan(now, { issue: 105, age: 600, summary: "Two cards.", cards });
+  assert.deepEqual(p, {
+    TaskID: s.id(105), Revision: 1, Plan: { summary: "Two cards.", cards },
+    SHA256: "32be0c1ecafdaf64b015041dd019f5d3e81403c8ee2e5110db5aabba055cf64d", CreatedAt: "2026-10-20T11:50:00.000Z",
+  });
+  assert.equal(s.plan(now, { issue: 105, revision: 2, age: 60, summary: "x", cards: [] }).Revision, 2);
+});
+test("scene keeps the plans by task, oldest first, and the questions by task and revision", () => {
+  const one = s.plan(now, { issue: 105, age: 600, summary: "one", cards: [] });
+  const two = s.plan(now, { issue: 105, revision: 2, age: 60, summary: "two", cards: [] });
+  const other = s.plan(now, { issue: 7, age: 60, summary: "other", cards: [] });
+  const sc = s.scene(now, {
+    plans: [one, other, two],
+    questions: [{ issue: 105, revision: 2, text: "Mail them?", choices: ["Yes", "No"] }, { issue: 105, revision: 2, text: "When?", choices: ["Now", "Later"] }],
+  });
+  assert.deepEqual(sc.Plans, { [s.id(105)]: [one, two], [s.id(7)]: [other] });
+  assert.deepEqual(sc.Questions, { [`${s.id(105)} 2`]: [{ text: "Mail them?", choices: ["Yes", "No"] }, { text: "When?", choices: ["Now", "Later"] }] });
+  assert.equal("Plans" in s.scene(now, {}), false);
+  assert.equal("Questions" in s.scene(now, {}), false);
 });
 test("proposal expires after its ttl and its call names the token", () => {
   const p = s.proposal(now, { tool: "steer", args: { task_id: "t-1" }, description: "Message a card", ttl: 1800 });

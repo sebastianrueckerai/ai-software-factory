@@ -25,6 +25,12 @@ module.exports = {
   config: {
     repository: "nord/booking", merge_rule: "human", objects: "factory", agents: "coder", process: "spec",
     namespaces, environments,
+    // policy.DefaultChat's confirm list: the lab's own chat block confirms nothing, so the chat's writes would run unasked
+    chat: {
+      confirm: ["new_card", "move_card", "answer", "tell_card", "steer", "start_plan", "retry", "accept_plan", "request_changes", "reject_plan",
+        "approve_merge", "deny_merge", "invite", "github_export", "github_sync", "close", "edit", "grant_session", "set_dependency", "split_card",
+        "alert_verdict", "promote_resource", "release_resource", "write_doc", "set_autonomy", "routine_write", "routine_delete", "routine_run", "routine_skip"],
+    },
   },
   monthCap: 60,
   routines: [
