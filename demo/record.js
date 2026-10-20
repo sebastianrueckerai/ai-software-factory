@@ -119,6 +119,16 @@ async function record(browser, name, commits) {
   const durationMs = Date.now() - t0;
   await context.close();
   const webm = await page.video().path();
+  let videoMs;
+  if (!failure) {
+    try {
+      videoMs = Math.round(1000 * Number(execFileSync("ffprobe", [
+        "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", webm,
+      ], { encoding: "utf8" })));
+    } catch (e) {
+      failure = `ffprobe: ${e.message}`;
+    }
+  }
   if (failure) {
     for (const f of pngs) fs.rmSync(f, { force: true });
     fs.rmSync(tmp, { recursive: true, force: true });
@@ -126,9 +136,6 @@ async function record(browser, name, commits) {
   }
   fs.renameSync(webm, path.join(OUT, `${name}.webm`));
   fs.rmSync(tmp, { recursive: true, force: true });
-  const videoMs = Math.round(1000 * Number(execFileSync("ffprobe", [
-    "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path.join(OUT, `${name}.webm`),
-  ], { encoding: "utf8" })));
   const { title, story, group, theme, viewport: vp } = scene;
   fs.writeFileSync(path.join(OUT, `${name}.json`), JSON.stringify({
     name, title, story, group, theme, viewport: vp, ...commits, recordedAt: new Date(t0).toISOString(), durationMs, videoMs, steps: marks,
