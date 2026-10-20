@@ -8,16 +8,38 @@ test("the calendar's week 1 starts on Monday 21 September 2026", () => {
   assert.equal(story.date(1, "mon", "02:00").toISOString(), "2026-09-21T02:00:00.000Z");
   assert.equal(story.date(2, "thu", "08:00").toISOString(), "2026-10-01T08:00:00.000Z");
 });
-test("a run reads filed while its card is open, and its outcome with its end after", () => {
-  // now is Tuesday 20 October 12:00: the newest scan falls on that day's 02:00, the one before on Monday's
-  const open = story.runsAt(now, "security-scan", story.date(1, "thu", "02:30"));
+test("a run reads filed until now passes its card's live end, and its outcome after", () => {
+  // the scan's run 55 falls on the last 02:00 before now, and its card is live 50 minutes later
+  const open = story.runsAt(new Date("2026-10-20T02:30:00Z"), "security-scan", story.date(1, "thu", "02:30"));
   assert.deepEqual([open[0].Run, open[0].Due, open[0].Outcome, "Ended" in open[0], "CostEUR" in open[0]], [55, "2026-10-20T02:00:00.000Z", "filed", false, false]);
   assert.deepEqual([open[1].Run, open[1].Due, open[1].Outcome], [54, "2026-10-19T02:00:00.000Z", "no change"]);
-  const ended = story.runsAt(now, "security-scan", story.date(1, "thu", "03:00"))[0];
-  assert.deepEqual([ended.Outcome, ended.Ended, ended.CostEUR], ["done", "2026-10-20T02:51:00.000Z", 0.29]);
+  const ended = story.runsAt(now, "security-scan", story.date(1, "thu", "02:30"))[0];
+  assert.deepEqual([ended.Outcome, ended.Ended, ended.CostEUR], ["done", "2026-10-20T02:50:00.000Z", 0.29]);
   assert.equal(story.runsAt(now, "performance-read", story.date(1, "thu", "03:00")).length, 0);
   const bump = story.runsAt(now, "dependency-bump", story.date(2, "fri", "07:30"));
-  assert.deepEqual(bump.map((r) => [r.Run, r.Due, r.Ended]), [[8, "2026-10-19T06:00:00.000Z", "2026-10-19T09:00:00.000Z"], [7, "2026-10-12T06:00:00.000Z", "2026-10-12T06:00:50.000Z"]]);
+  assert.deepEqual(bump.map((r) => [r.Run, r.Due, r.Ended]), [[8, "2026-10-19T06:00:00.000Z", "2026-10-19T06:52:00.000Z"], [7, "2026-10-12T06:00:00.000Z", "2026-10-12T06:00:50.000Z"]]);
+  // a run that files no card has no outcome while it runs
+  const running = story.runsAt(new Date("2026-10-19T06:00:30Z"), "dependency-bump", story.date(1, "mon", "09:00"))[0];
+  assert.deepEqual([running.Run, "Outcome" in running, "Ended" in running], [7, false, false]);
+});
+test("a routine's card counts its age from its run's start on the cron clock", () => {
+  assert.equal(story.filedAge(now, 115), 30 * 3600);
+  assert.equal(story.filedAge(now, 108), 10 * 3600);
+  // by Monday 03:00 of week 2 four scans followed run 55, so it falls four nights before the last
+  assert.equal(story.filedAge(now, 108, story.date(2, "mon", "03:00")), (4 * 24 + 10) * 3600);
+  // the performance read's last run was Friday 16 October 07:00, 4 days 5 hours before now
+  assert.equal(story.anchoredAt(now, 123).toISOString(), "2026-10-06T12:00:00.000Z");
+  assert.equal(story.anchoredAt(now, 108).toISOString(), "2026-09-24T12:00:00.000Z");
+  const building = story.routineCard(new Date("2026-10-16T07:30:00Z"), 123).task;
+  assert.deepEqual([building.Status, building.Gate, building.SpentEUR, building.CreatedAt, building.Source], ["running", "session", 0.34, "2026-10-16T07:00:00.000Z", "routine"]);
+  assert.deepEqual([story.routineCard(now, 123).task.Status, story.routineCard(now, 123).task.FinishedAt], ["done", "2026-10-16T08:04:00.000Z"]);
+});
+test("routinesAt names a routine's open card while its newest run is open", () => {
+  const at7 = new Date("2026-10-16T07:30:00Z");
+  const card = story.routineCard(at7, 123).task;
+  const read = (n, a) => story.routinesAt(n, a, { cards: [card] }).routines.find((v) => v.Routine.name === "performance-read");
+  assert.deepEqual(read(at7, story.anchoredAt(at7, 123)).Open, { ID: card.ID, IssueNumber: 123, Status: "running" });
+  assert.equal("Open" in read(now, story.anchoredAt(now, 123)), false);
 });
 test("routinesAt skips one routine and holds another for sebastian, on a clock a second past now", () => {
   const r = story.routinesAt(now, story.date(2, "fri", "09:30"), { skip: "performance-read", needsMe: "dependency-bump" });

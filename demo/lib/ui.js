@@ -1,7 +1,6 @@
 const state = require("./state");
 const project = require("./project");
-
-const cron = (name) => project.routines.find((r) => r.name === name).schedule[0].cron;
+const { cronOf: cron } = require("./story");
 
 // The console's elements the scenes act on.
 module.exports = {

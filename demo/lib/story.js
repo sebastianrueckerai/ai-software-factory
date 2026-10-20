@@ -86,7 +86,7 @@ const cards = {
     ],
   },
   108: {
-    title: "Security: express 4.20.0 for CVE-2024-45296 in path-to-regexp", size: "small", pr: 206,
+    title: "Security: express 4.20.0 for CVE-2024-45296 in path-to-regexp", size: "small", routine: "security-scan", pr: 206,
     body: "The nightly scan found path-to-regexp 0.1.7 through express 4.19.2: CVE-2024-45296, high. A route with two " +
       "parameters in one segment backtracks on a crafted path, a denial of service. express 4.20.0 pins path-to-regexp 0.1.10",
     acceptance: ["npm audit reports no high finding", "the route tests pass on express 4.20.0"],
@@ -362,55 +362,91 @@ function planCards(issue) {
   });
 }
 
+// The merges more than one scene shows, seconds after each card's creation.
+const merges = {
+  101: { queued: 92 * MIN, at: 112 * MIN, live: 120 * MIN, run: 57 },
+  107: { queued: 53 * MIN, at: 58 * MIN, live: 64 * MIN, run: 61 },
+  108: { queued: 26 * MIN, at: 43 * MIN, live: 50 * MIN, run: 60 },
+  115: { queued: 27 * MIN, at: 44 * MIN, live: 52 * MIN, run: 66 },
+  123: { queued: 53 * MIN, at: 58 * MIN, live: 64 * MIN, run: 90 },
+};
+
 // nightly are the security scan's runs from week 1's Monday to week 2's Sunday, run 52 the first: no finding, but
 // Thursday's of week 1, which filed #108.
 const nightly = Array.from({ length: 14 }, (_, d) => ({
   run: 52 + d, due: new Date(date(1, "mon", "02:00").getTime() + d * DAY * 1000), took: 40, outcome: "no change", note: "no finding",
 }));
-nightly[3] = { ...nightly[3], outcome: "done", issue: 108, took: 51 * MIN, cost: 0.29, note: "1 high: path-to-regexp 0.1.7 through express 4.19.2, CVE-2024-45296" };
+nightly[3] = { ...nightly[3], outcome: "done", issue: 108, took: merges[108].live, cost: 0.29, note: "1 high: path-to-regexp 0.1.7 through express 4.19.2, CVE-2024-45296" };
 
 // routines are the four routines' runs, oldest first: run, due on the calendar, outcome once the run's card ended,
-// the card, how long the run took to its card's end, its cost and its note. A run whose card is open at a scene's
-// time reads filed.
+// the card, how long the run took to its card's end, its cost and its note. A run that filed a card files it at its
+// start and ends when the card goes live.
 const routines = {
   "dependency-bump": [
     { run: 7, due: date(1, "mon", "06:00"), took: 50, outcome: "no change", note: "every dependency on the newest release of its line" },
-    { run: 8, due: date(2, "mon", "06:00"), took: 3 * HOUR, outcome: "done", issue: 115, cost: 0.38, note: "12 packages behind the newest release of their line" },
+    { run: 8, due: date(2, "mon", "06:00"), took: merges[115].live, outcome: "done", issue: 115, cost: 0.38, note: "12 packages behind the newest release of their line" },
   ],
   "security-scan": nightly,
   "performance-read": [
     { run: 6, due: date(1, "fri", "07:00"), took: 70, outcome: "no change", note: "GET /schedule p95 0.31 s, every page under 400 ms" },
-    { run: 7, due: date(2, "fri", "07:00"), took: 2 * DAY, outcome: "done", issue: 123, cost: 0.62, note: "GET /schedule p95 0.74 s, up from 0.31 s since #118" },
+    { run: 7, due: date(2, "fri", "07:00"), took: merges[123].live, outcome: "done", issue: 123, cost: 0.62, note: "GET /schedule p95 0.74 s, up from 0.31 s since #118" },
   ],
   "cost-review": [
     { run: 3, due: date(2, "thu", "08:00"), took: 11 * HOUR, outcome: "done", issue: 124, note: "€41.20 of the €60 cap, €1.79 per card" },
   ],
 };
 
+// cronOf is routine name's cron.
+const cronOf = (name) => project.routines.find((r) => r.name === name).schedule[0].cron;
+
 // runsAt are routine name's runs by the story's time at, newest first, as the routine's drawer reads them at now: the
-// newest falls on the routine's last cron time before now, each older one on the cron time before that.
+// newest falls on the routine's last cron time before now, each older one on the cron time before that. A run is open
+// until now passes its end, and its card reads filed meanwhile.
 function runsAt(now, name, at) {
-  const cron = project.routines.find((r) => r.name === name).schedule[0].cron;
   let due = now;
   return routines[name].filter((r) => r.due <= at).reverse().map((r) => {
-    due = state.prevCron(cron, due);
-    const open = r.due.getTime() + r.took * 1000 > at;
+    due = state.prevCron(cronOf(name), due);
+    const ended = new Date(due.getTime() + r.took * 1000);
+    const open = ended > now;
     return state.routineRun(name, {
-      ...r, due, outcome: open ? "filed" : r.outcome, ended: open ? undefined : new Date(due.getTime() + r.took * 1000), cost: open ? undefined : r.cost,
+      ...r, due, outcome: open ? (r.issue && "filed") : r.outcome, ended: open ? undefined : ended, cost: open ? undefined : r.cost,
     });
   });
 }
 
+// filedAge is the age in seconds at now of issue's card, which a routine filed at its run's start: the run as the
+// drawer dates it at the story's time at, or as the routine's newest run without at.
+function filedAge(now, issue, at) {
+  const name = card(issue).routine;
+  const own = routines[name].find((r) => r.issue === issue);
+  return (now - new Date(runsAt(now, name, at ?? own.due).find((r) => r.Run === own.run).Started)) / 1000;
+}
+
+// anchoredAt is the story's time now stands for in a scene about the run that filed issue: as long after that run's
+// due as now is after the routine's last cron time, so the run, its card and the story's other cards read on one clock.
+function anchoredAt(now, issue) {
+  const name = card(issue).routine;
+  const own = routines[name].find((r) => r.issue === issue);
+  return new Date(own.due.getTime() + (now - state.prevCron(cronOf(name), now)));
+}
+
+// routineCard is the card a routine filed, in the phase its age from its run's start reached.
+const routineCard = (now, issue, at) => life(now, issue, filedAge(now, issue, at), lives[issue]);
+
 // routinesAt are the four routines on the board at the story's time at, which now stands for: their views, their
-// runs and the routines' clock. o sets a routine's Skip once (skip), its live toggle (needsMe) and its open card
-// (open, a card as the board has it). The lab's Skip once reads the next run back from its Next against the seed's
-// own clock, a few milliseconds after now; the routines' clock a second past now keeps that read past the next run.
+// runs and the routines' clock. o sets a routine's Skip once (skip) and its live toggle (needsMe); cards are the
+// board's cards, of which a routine's open newest run names its open card. The lab's Skip once reads the next run back
+// from its Next against the seed's own clock, a few milliseconds after now; the routines' clock a second past now
+// keeps that read past the next run.
 function routinesAt(now, at, o = {}) {
   const runs = Object.fromEntries(project.routines.map((r) => [r.name, runsAt(now, r.name, at)]));
-  const open = (t) => t && { ID: t.ID, IssueNumber: t.IssueNumber, Status: t.Status };
+  const open = ([last]) => {
+    const t = last && !last.Ended && o.cards?.find((c) => c.ID === last.TaskID);
+    return t ? { ID: t.ID, IssueNumber: t.IssueNumber, Status: t.Status } : undefined;
+  };
   return {
     routines: project.routines.map((r) => state.routineView(now, r, {
-      runs: runs[r.name], skip: o.skip === r.name, needsMe: o.needsMe === r.name ? true : undefined, open: open(o.open?.[r.name]),
+      runs: runs[r.name], skip: o.skip === r.name, needsMe: o.needsMe === r.name ? true : undefined, open: open(runs[r.name]),
     })),
     runs,
     routinesAt: new Date(now.getTime() + 1000),
@@ -456,6 +492,7 @@ const sessions = {
     },
   },
   108: { "s-1": { commit: "6f2e8b1", words: [] } },
+  115: { "s-1": { commit: "2c9d4a7", words: [] } },
   118: { "s-1": { commit: "e41b7c9", words: [] } },
   119: { "s-1": { commit: "0b8e4c6", words: [] } },
   107: {
@@ -520,6 +557,7 @@ const sessions = {
   },
   120: { "s-1": { commit: "b3e81f6", words: [] } },
   121: { "s-1": { commit: "f16d07a", words: [] } },
+  123: { "s-1": { commit: "7a4f0e3", words: [] } },
   122: {
     "s-1": {
       words: [
@@ -577,10 +615,10 @@ function done(now, issue, age, after, spent) {
 // card's age from the story's time.
 const filed = {
   101: date(1, "mon", "11:00"), 102: date(1, "mon", "11:36"), 103: date(1, "mon", "12:36"), 104: date(1, "tue", "13:00"),
-  106: date(1, "wed", "15:30"), 107: date(1, "wed", "16:00"), 108: date(1, "thu", "02:01"),
+  106: date(1, "wed", "15:30"), 107: date(1, "wed", "16:00"), 108: date(1, "thu", "02:00"),
   115: date(2, "mon", "06:00"), 116: date(2, "tue", "08:00"), 117: date(2, "wed", "02:15"), 118: date(2, "thu", "16:00"),
   119: new Date(date(2, "thu", "17:19").getTime() + 30 * 1000), 120: date(2, "wed", "02:08"), 121: date(2, "wed", "02:18"),
-  123: date(2, "fri", "07:01"),
+  123: date(2, "fri", "07:00"),
 };
 
 // ageAt is issue's card's age in seconds at the story's time at.
@@ -603,6 +641,7 @@ const reviews = {
   103: [{ verdict: "approve", summary: "Adds the teacher and the room to the class query and names them under the title, with tests for the page." }],
   104: [{ verdict: "approve", summary: "confirmBooking reads latest_charge of API version 2022-11-15; a replayed event of that version confirms the booking." }],
   108: [{ verdict: "approve", summary: "express 4.20.0 pins path-to-regexp 0.1.10; npm audit reports no high finding, and the route tests pass." }],
+  115: [{ verdict: "approve", summary: "12 packages move to the newest release of their line, none a major release; the test suite passes." }],
   118: [{ verdict: "approve", summary: "The schedule takes a teacher filter from the URL; the tests cover a chosen teacher and a reload." }],
   119: [{ verdict: "approve", summary: "parseTeacherFilter answers no filter when ?teacher is absent; a test covers the link without one." }],
   107: [{ verdict: "approve", summary: "Mails the confirmation once per booking from the webhook, keyed on the PaymentIntent; the tests deliver the event twice." }],
@@ -619,6 +658,7 @@ const reviews = {
   ],
   120: [{ verdict: "approve", summary: "A pass of 10 classes bought by card; each booking takes one, and the account page shows what is left." }],
   121: [{ verdict: "approve", summary: "Lists a member's bookings of the last 12 months, newest first, scoped to the member." }],
+  123: [{ verdict: "approve", summary: "The schedule loads a week's teachers in one query, not one per class; the load test measures GET /schedule at 0.29 s at the p95." }],
 };
 
 // review is round n of the review of issue's pull request, from from to at, on the commit of session sid.
@@ -661,13 +701,6 @@ function mergeEvents(now, issue, age, m) {
     [m.live, "task_ended", { state: "done", reason: `live: covered by run ${m.run}` }],
   ].filter(([at]) => at <= age).map(([at, kind, detail]) => state.event(now, { issue, kind, age: age - at, detail }));
 }
-
-// The merges more than one scene shows, seconds after each card's creation.
-const merges = {
-  101: { queued: 92 * MIN, at: 112 * MIN, live: 120 * MIN, run: 57 },
-  107: { queued: 53 * MIN, at: 58 * MIN, live: 64 * MIN, run: 61 },
-  108: { queued: 26 * MIN, at: 43 * MIN, live: 50 * MIN, run: 60 },
-};
 
 // lives are the cards whose life more than one scene shows, offsets in seconds after each card's creation.
 const lives = {
@@ -745,10 +778,62 @@ const lives = {
       ...merge(107, merges[107]),
     ],
   },
-  // the performance read's card waits for a slot, then builds through the morning
+  // the scan's bump: built on small, merged and live 50 minutes after the scan filed it
+  108: {
+    phases: [
+      { from: 0, status: "queued" },
+      { from: MIN, status: "running", gate: "session", model: "small", spent: 0.03 },
+      { from: 13 * MIN, status: "in-review", gate: "checks", spent: 0.17, pr: true },
+      { from: 20 * MIN, gate: "review" },
+      { from: 26 * MIN, gate: "merge-queue", spent: 0.29 },
+      ...merging(merges[108], 0.29),
+    ],
+    steps: [
+      state.intake(0, 15),
+      ...session(108, 1, MIN, 12.5 * MIN, { model: "small" }),
+      state.checks(13 * MIN, 20 * MIN),
+      review(108, 1, 20 * MIN, 25 * MIN, "s-1"),
+      ...merge(108, merges[108]),
+    ],
+    card: { author: "factory-agent", source: "routine" },
+  },
+  // the weekly bump, the same way
+  115: {
+    phases: [
+      { from: 0, status: "queued" },
+      { from: MIN, status: "running", gate: "session", model: "small", spent: 0.04 },
+      { from: 14 * MIN, status: "in-review", gate: "checks", spent: 0.22, pr: true },
+      { from: 21 * MIN, gate: "review" },
+      { from: 27 * MIN, gate: "merge-queue", spent: 0.38 },
+      ...merging(merges[115], 0.38),
+    ],
+    steps: [
+      state.intake(0, 15),
+      ...session(115, 1, MIN, 13.5 * MIN, { model: "small" }),
+      state.checks(14 * MIN, 21 * MIN),
+      review(115, 1, 21 * MIN, 26 * MIN, "s-1"),
+      ...merge(115, merges[115]),
+    ],
+    card: { author: "factory-agent", source: "routine" },
+  },
+  // the performance read's card waits 5 minutes for a slot, builds on small and is live an hour after the read
   123: {
-    phases: [{ from: 0, status: "queued" }, { from: 5 * MIN, status: "running", gate: "session", model: "small", spent: 0.06 }, { from: 90 * MIN, spent: 0.34 }],
-    steps: [state.intake(0, 15), state.sessionStart(5 * MIN, { model: "small" })],
+    phases: [
+      { from: 0, status: "queued" },
+      { from: 5 * MIN, status: "running", gate: "session", model: "small", spent: 0.06 },
+      { from: 25 * MIN, spent: 0.34 },
+      { from: 40 * MIN, status: "in-review", gate: "checks", spent: 0.48, pr: true },
+      { from: 47 * MIN, gate: "review" },
+      { from: 53 * MIN, gate: "merge-queue", spent: 0.62 },
+      ...merging(merges[123], 0.62),
+    ],
+    steps: [
+      state.intake(0, 15),
+      ...session(123, 1, 5 * MIN, 39.5 * MIN, { model: "small" }),
+      state.checks(40 * MIN, 47 * MIN),
+      review(123, 1, 47 * MIN, 52 * MIN, "s-1"),
+      ...merge(123, merges[123]),
+    ],
     card: { author: "factory-agent", source: "routine" },
   },
 };
@@ -786,6 +871,6 @@ const steers = {
 
 module.exports = {
   date, cards, description, body, card: boardCard, filing, requests, asks, replies, alerts, alertsAt, approvals, plans, planCards, routines, runsAt,
-  routinesAt, scanned, sessions, words, life, lives, merges, merge, merging, mergeEvents, done, filed, ageAt, doneAt, board, session, reviews, review, files,
+  cronOf, filedAge, anchoredAt, routineCard, routinesAt, scanned, sessions, words, life, lives, merges, merge, merging, mergeEvents, done, filed, ageAt, doneAt, board, session, reviews, review, files,
   checksFailed, supervisor, steers,
 };

@@ -3,7 +3,6 @@ const story = require("../lib/story");
 const ui = require("../lib/ui");
 
 const MIN = 60;
-const HOUR = 3600;
 
 // #116's life, offsets in seconds after its creation: the review's first round finds a race, its finding goes back to
 // the agent, and the second session's push passes the second round.
@@ -33,7 +32,7 @@ const cancel = {
 
 // week2 is the board a minutes after #116's filing, the week's dependency bump done
 function week2(now, a) {
-  return state.scene(now, { ...story.board([story.life(now, 116, a * MIN, cancel), story.done(now, 115, 26 * HOUR, 3 * HOUR, 0.38)]), spend: 12.4, chatSpend: 0.61 });
+  return state.scene(now, { ...story.board([story.life(now, 116, a * MIN, cancel), story.routineCard(now, 115)]), spend: 12.4, chatSpend: 0.61 });
 }
 
 module.exports = {

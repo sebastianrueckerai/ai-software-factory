@@ -51,8 +51,9 @@ const fix = {
   card: { author: "factory-agent", source: "alert", fingerprint: alert.fingerprint },
 };
 
-// the week's earlier cards are done: issue, done after, spend; #104 of week 1 for its alert
-const finished = [[104, HOUR, 0.48], [115, 3 * HOUR, 0.38], [116, 1.5 * HOUR, 1.04], [117, 9.5 * HOUR, 0.45], [120, 9.8 * HOUR, 0.86], [121, 9.3 * HOUR, 0.46]];
+// the week's earlier cards are done: issue, done after, spend; #104 of week 1 for its alert. The weekly bump's #115 is
+// on its run's clock.
+const finished = [[104, HOUR, 0.48], [116, 1.5 * HOUR, 1.04], [117, 9.5 * HOUR, 0.45], [120, 9.8 * HOUR, 0.86], [121, 9.3 * HOUR, 0.46]];
 
 const reading = state.reply(state.say(story.replies.alertsRead), state.call("alerts", { state: "all" }));
 const settled = state.reply(state.say(story.replies.schedule500));
@@ -106,7 +107,7 @@ function thursday(now, t, o = {}) {
   const at = new Date(M.getTime() + t * MIN * 1000);
   const age = (issue) => story.ageAt(issue, at);
   const lives = [story.life(now, 118, age(118), filter), ...(age(119) >= 0 ? [story.life(now, 119, age(119), fix)] : [])];
-  const b = story.board([...lives, ...story.doneAt(now, at, finished)]);
+  const b = story.board([...lives, story.routineCard(now, 115, at), ...story.doneAt(now, at, finished)]);
   const events = [118, 119].filter((i) => age(i) >= 0).flatMap((i) => story.mergeEvents(now, i, age(i), merges[i]));
   const chat = t > ASKED ? checked(now, t, lives[0].task) : undefined;
   return state.scene(now, { ...b, events, alerts: story.alertsAt(now, at), chat, seen: chat && state.seen(chat), spend: 18.4, chatSpend: 0.92, ...o });

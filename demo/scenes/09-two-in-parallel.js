@@ -37,7 +37,7 @@ const account = built(121, M, { start: 1, push: 19, review: 31, done: 40, spent:
 function morning(now, a) {
   const cards = [
     story.life(now, 120, M + 10 * MIN + a * MIN, pass), story.life(now, 121, M + a * MIN, account),
-    story.done(now, 115, 47 * HOUR, 3 * HOUR, 0.38), story.done(now, 116, 21 * HOUR, 90 * MIN, 1.04),
+    story.routineCard(now, 115), story.done(now, 116, 21 * HOUR, 90 * MIN, 1.04),
   ];
   return state.scene(now, { ...story.board(cards), spend: 13.8 + a * 0.02, chatSpend: 0.66 });
 }
