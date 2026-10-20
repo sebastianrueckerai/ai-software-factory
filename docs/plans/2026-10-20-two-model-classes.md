@@ -20,3 +20,9 @@ Sebastian's ruling, 2026-10-20: the factory's text models are two classes, big a
 ## Page rows under Cost
 
 spend / week · per card, median · tokens / card · spend by model (big · small, euros from the ledger) · served by (deployments by euros from the audit) · tools / week · tool mix (ledger tools and every model call that is not big or small, so vision).
+
+## Rollout notes, 2026-10-20
+
+- The ledger is immutable by trigger (`ledger_immutable`), so its refs keep the old alias names. The metrics map them to their classes in one SQL expression (`ledgerAlias` in `internal/factoryd/metrics.go`). The audit row, the card's model and the compaction model are renamed by migration `gateway/20261020150000_model_classes.sql`.
+- The running factoryd rejected the first policy: `checkLinks` requires a class to allow the ladder model its lanes start on, and the old binary's ladder starts on `coding-cheap`. The transition policy lists both ladder names; the cleanup removes the old ones once the new binary is live.
+- LiteLLM prices alias names by name, so the old aliases stayed mapped on the classes through the transition.
