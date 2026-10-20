@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - Two repositories. Code: `/home/womb/repos/ai-software-factory-code`, default branch `main`, remotes `origin` and `github`. Design: `/home/womb/repos/ai-software-factory`, default branch `master`, same remotes. Work in a worktree of each, commit to the default branch, push both remotes.
-- `go test -race ./internal/console/` stays green. `scripts/console-lab/run.sh` stays green (its check prints `check ok`).
+- `go test -race ./internal/console/` stays green. `scripts/console-lab/run.sh` stays green (its check prints `ok: every control present, the mechanics work`). The lab's default directory `/tmp/claude-1000/console-lab` and port 8090 are shared with other worktrees' labs: run it with `CONSOLE_LAB_DIR=/tmp/claude-1000/console-lab-demo CONSOLE_LAB_ADDR=127.0.0.1:8147`, and the demo runner uses its own directory and port the same way.
 - The existing twelve lab scenes do not change in what they show.
 - No production code of the console changes. Everything in the code repository lands in `_test.go` files and `scripts/console-lab/`.
 - No recording shows the factory's own project (`ai-software-factory-code`, `sf/code`, `demo-app`, `linkshort`, `ai-software-factory-infra`), a real credential or a provider key.
@@ -84,7 +84,7 @@ Expected: PASS.
 - [ ] **Step 5: Run the lab's check**
 
 Run: `scripts/console-lab/run.sh /tmp/claude-1000/console-lab/shots-task1 2>&1 | tail -5`
-Expected: the last lines include `check ok`.
+Expected: the last lines include `ok: every control present, the mechanics work`.
 
 - [ ] **Step 6: Commit**
 
@@ -265,7 +265,7 @@ If the heartbeat alone does not redraw a writer's board (the stream's `look(fals
 - [ ] **Step 3: Run the lab's check and the package**
 
 Run: `scripts/console-lab/run.sh /tmp/claude-1000/console-lab/shots-task4 2>&1 | tail -3 && go test -race ./internal/console/`
-Expected: `check ok` and `ok`.
+Expected: `ok: every control present, the mechanics work` and `ok`.
 
 - [ ] **Step 4: Commit and push the code repository**
 
