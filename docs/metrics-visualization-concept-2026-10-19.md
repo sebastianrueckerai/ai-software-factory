@@ -18,10 +18,10 @@ Windows follow DORA's habit: the page defaults to 28 days against the previous 2
 
 | Figure | Question | Source | Ready |
 |---|---|---|---|
-| Deploys / week | how often the project ships | `project_rolls` count per week | yes |
-| Lead time, push → live | how long a commit takes to reach staging | `ci_runs.pushed_at` joined to `project_rolls` on commit, median per week | needs `ci_runs` |
+| Deploys / week | how often the project ships | `project_rolls` count per week; the factory's own project reads its `rolls`, one per commit | yes |
+| Lead time, push → live | how long a commit takes to reach staging | the merge that put the commit on main (`tasks.merge_commit`, its `pull_request_merged` event) to `project_rolls.ready_at`; the factory's own project: the rolled commit's `ci_runs.pushed_at` (the roll card's `sha`) to its roll's last image live | collects since 2026-10-20 |
 | Card cycle time | filed card to done, median per week | `tasks.created_at → finished_at`, done only | yes |
-| Throughput | cards done per week | `tasks.finished_at` | yes |
+| Throughput | cards done per week | `tasks.finished_at`; a card is a task that is neither chat nor a roll card, here and in every card figure | yes |
 
 ### Stability (DORA: change failure rate, time to restore)
 
@@ -55,7 +55,7 @@ The factory's failure rate is richer than DORA's: the revert pass finds reverts 
 
 | Figure | Question | Source | Ready |
 |---|---|---|---|
-| Self-deploys / week | how often the factory ships itself | the `rolls` table (the self-host loop) | yes |
+| Self-deploys / week | how often the factory ships itself | the `rolls` table (the self-host loop), one deploy per commit, not per image | yes |
 | CI duration, p50 | how long a project's check runs | `ci_runs` once it lands | needs `ci_runs` |
 | Diff size, median | how big a card's change is | `tasks.files / insertions / deletions` | yes |
 | Chat tool work | how much interactive work the agent did | chat tool calls' `at`/`ms` | yes |
