@@ -1,11 +1,12 @@
 const state = require("../lib/state");
 const story = require("../lib/story");
+const ui = require("../lib/ui");
 
 const HOUR = 3600;
 const PLANNED = 20 * 60;
 const args = story.filing(105, "plan");
-const doIt = "#chat-log .proposal [data-doit]";
-const card = `#board [data-card="${state.id(105)}"]`;
+const doIt = ui.doIt;
+const card = ui.face(105);
 const plan = story.plans[105];
 const approval = story.approvals.calendarPlan;
 const accept = `#board article.approval.plan[data-card="${state.id(105)}"] button[aria-label^="Accept revision"]`;
@@ -28,7 +29,7 @@ function thread(now) {
 // the planner's session runs on the card the lab filed
 function planning(now) {
   const filed = story.card(now, 105, { status: "running", lane: "plan", age: 6, gate: "session", gateSince: 2, model: "big" });
-  const steps = [{ at: 0, step: "session_start", session: "s-1", model: "big", attempt: 1 }];
+  const steps = [state.sessionStart(0, { model: "big" })];
   return { tasks: [...week(now), filed], objects: { [`sessions/${filed.ID}/timeline.jsonl`]: state.timeline(now, 2, { steps }) } };
 }
 

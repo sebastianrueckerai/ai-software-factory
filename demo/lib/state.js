@@ -39,6 +39,7 @@ function card(now, o) {
     Gate: o.gate,
     GateSince: o.gateSince === undefined ? undefined : iso(now, o.gateSince),
     CreatedAt: iso(now, age),
+    AdmittedAt: o.admitted === undefined ? undefined : iso(now, o.admitted),
     FinishedAt: o.finished === undefined ? undefined : iso(now, o.finished),
     Usage: o.attempts === undefined ? undefined : { Attempts: o.attempts },
     Escalation: o.escalation,
@@ -50,30 +51,55 @@ function card(now, o) {
 
 const jsonl = (rows) => rows.map((r) => JSON.stringify(r) + "\n").join("");
 
-function checksStep(start, end, failed) {
-  const jobs = ["test", "vet", "lint", "acceptance"].map((name) => ({ name, status: name === failed ? "failure" : "success", queue_s: 12, run_s: 140 }));
-  return { step: "checks", time: stamp(end), started: stamp(start), state: failed ? "failure" : "success", jobs };
-}
+// The steps of a card's timeline as factoryd records them. at is seconds after the timeline's start, and from, on a
+// step that ends a gate, the gate's start.
+const intake = (from, at) => ({ at, from, step: "intake", source: "webhook" });
+const sessionStart = (at, { session = "s-1", model, attempt = 1 }) => ({ at, step: "session_start", session, model, attempt });
+const sessionEnd = (from, at, { session = "s-1", attempt = 1, outcome }) => ({ at, from, step: "session_end", session, attempt, outcome });
+const pushed = (at, { session = "s-1", commit }) => ({ at, step: "pushed", session, commit });
 
-// start is seconds before now; a step of opts.steps is a raw step row whose at is seconds after start.
-function timeline(now, start, { alias, failed = "", steps = [] } = {}) {
-  const t0 = new Date(now.getTime() - start * 1000);
-  const after = (s) => new Date(t0.getTime() + s * 1000);
-  const rows = alias === undefined ? [] : [
-    { step: "intake", time: stamp(after(30)), started: stamp(t0), source: "webhook" },
-    { step: "session_start", time: stamp(after(60)), session: "s-1", model: alias, attempt: 1 },
-    { step: "session_end", time: stamp(after(19 * 60)), session: "s-1", started: stamp(after(60)), attempt: 1, outcome: "pushed" },
-    { step: "pushed", time: stamp(after(19 * 60 + 5)), session: "s-1", commit: "4be1c07" },
-    checksStep(after(19 * 60 + 10), after(26 * 60), failed),
+// session is the steps of session n, attempt n, from start to end: its start, its end with outcome, and the push of
+// commit 5 seconds later when it pushed.
+function session(start, end, { n = 1, model, outcome = "pushed", commit }) {
+  const id = `s-${n}`;
+  return [
+    sessionStart(start, { session: id, model, attempt: n }),
+    sessionEnd(start, end, { session: id, attempt: n, outcome }),
+    ...(outcome === "pushed" ? [pushed(end + 5, { session: id, commit })] : []),
   ];
-  for (const { at, ...row } of steps) rows.push({ ...row, time: stamp(after(at)) });
-  return jsonl(rows);
 }
 
-// A row's at is seconds after start.
+function checks(from, at, failed = "") {
+  const jobs = ["test", "vet", "lint", "acceptance"].map((name) => ({ name, status: name === failed ? "failure" : "success", queue_s: 12, run_s: 140 }));
+  return { at, from, step: "checks", state: failed ? "failure" : "success", jobs };
+}
+
+// modelReview is the review gate's verdict, approve or concerns, on the pull request's commit.
+const modelReview = (from, at, { pr, commit, model = "big", round = 1, verdict, summary, findings = [] }) =>
+  ({ at, from, step: "model_review", pr, commit, model, verdict, summary, findings, round });
+
+// findings are a stage's findings sent on: to the agent's next session, or to a stronger model.
+const findings = (at, { stage, round = 1, to, attempt, list }) => ({ at, step: "stage_findings", stage, round, to, attempt, findings: list });
+
+// supervisor is the supervisor's decision on a detector's trip in a session; the drawer shows the decision and reason.
+const supervisor = (at, { session = "s-1", detector, trip, decision, reason }) => ({ at, step: "supervisor", session, detector, trip, decision, reason });
+
+// start is seconds before now. The steps come out in time order, and a step after now is left out: it has not happened yet.
+function timeline(now, start, { alias, failed = "", steps = [] } = {}) {
+  const t0 = now.getTime() - start * 1000;
+  const after = (s) => (s === undefined ? undefined : stamp(new Date(t0 + s * 1000)));
+  const rows = alias === undefined ? [] : [intake(0, 30), ...session(60, 19 * 60, { model: alias, commit: "4be1c07" }), checks(19 * 60 + 10, 26 * 60, failed)];
+  return jsonl([...rows, ...steps].filter((r) => r.at <= start).sort((x, y) => x.at - y.at)
+    .map(({ at, from, ...row }) => present({ ...row, time: after(at), started: after(from) })));
+}
+
+// said is the agent's text of a model call, at seconds after the session's start.
+const said = (at, text, cost = 0.02) => ({ at, kind: "model_call", text, cost });
+
+// A row's at is seconds after start. A row after now is left out: it is not said yet.
 function transcript(now, start, rows) {
   const t0 = now.getTime() - start * 1000;
-  return jsonl(rows.map((r) => ({
+  return jsonl(rows.filter((r) => r.at <= start).map((r) => ({
     time: stamp(new Date(t0 + r.at * 1000)),
     kind: r.kind,
     detail: r.kind === "model_call" ? { text: r.text, cost: r.cost } : { tool: r.tool },
@@ -187,18 +213,35 @@ function pressed(now, p, { age, result }) {
   });
 }
 
-// filedThread is the rows a filing from the chat leaves, as the console stores them: the member's line at age, the
-// agent's reply proposing args a second later, and the Do it's row with the console's result two seconds after that.
-function filedThread(now, { said, reply, args, issue, age }) {
-  const p = cardFiling(now, args);
+// steering is the steer proposal of text to issue's running session, described as the console describes it.
+function steering(now, { issue, title, text }) {
+  return proposal(now, {
+    tool: "steer", args: { task_id: id(issue), text },
+    description: `Message a running card, #${issue} ${id(issue)} ${JSON.stringify(title)}, text ${truncate(text, 120)}`,
+  });
+}
+
+// pressedThread is the rows a press of Do it on p leaves, as the console stores them: the member's line at age, the
+// agent's reply proposing p a second later, and the Do it's row with the tool's result two seconds after that.
+function pressedThread(now, p, { line, reply, result, age }) {
   return {
     rows: [
-      message(now, { role: "user", content: said, age }),
+      message(now, { role: "user", content: line, age }),
       message(now, { role: "assistant", content: reply, age: age - 1, toolCalls: [proposedCall(now, p, { id: "call_1", age: age - 1 })] }),
-      pressed(now, p, { age: age - 3, result: `Filed ${project.repository}#${issue} in lane ${args.lane}. It cannot be undone.` }),
+      pressed(now, p, { age: age - 3, result: `${result} It cannot be undone.` }),
     ],
     proposal: p,
   };
+}
+
+// filedThread is the thread of a filing from the chat.
+function filedThread(now, { said: line, reply, args, issue, age }) {
+  return pressedThread(now, cardFiling(now, args), { line, reply, age, result: `Filed ${project.repository}#${issue} in lane ${args.lane}.` });
+}
+
+// steeredThread is the thread of a steer from the chat.
+function steeredThread(now, { said: line, reply, issue, title, text, age }) {
+  return pressedThread(now, steering(now, { issue, title, text }), { line, reply, age, result: `The session of #${issue} has your message.` });
 }
 
 // plan is issue's plan revision as the planner stores it: the plan's JSON and its sha256, which an accept pins.
@@ -268,7 +311,8 @@ function scene(now, o = {}) {
     Projects: project.rows,
     Config: project.config,
     MonthCap: project.monthCap,
-    PRFiles: o.prFiles,
+    PRFiles: o.prFiles && Object.fromEntries(Object.entries(o.prFiles)
+      .map(([pr, files]) => [`/api/v1/repos/${project.repository}/pulls/${pr}/files`, JSON.stringify(files)])),
     Tasks: tasks,
     Plans: o.plans && byTask(o.plans),
     Questions: o.questions && byRevision(o.questions),
@@ -296,6 +340,7 @@ function scene(now, o = {}) {
 }
 
 module.exports = {
-  AGENT_ASKS, id, card, timeline, transcript, event, status, alert, approval, message, ask, proposal, proposedCall, cardFiling, pressed, filedThread, seen, plan,
-  say, call, reply, metrics, scene,
+  AGENT_ASKS, id, card, intake, sessionStart, session, checks, modelReview, findings, supervisor, timeline, said, transcript, event,
+  status, alert, approval, message, ask, proposal, proposedCall, cardFiling, steering, pressed, filedThread, steeredThread, seen, plan, say, call, reply,
+  metrics, scene,
 };

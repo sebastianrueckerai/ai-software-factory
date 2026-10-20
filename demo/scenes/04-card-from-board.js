@@ -1,9 +1,10 @@
 const state = require("../lib/state");
 const story = require("../lib/story");
+const ui = require("../lib/ui");
 
 const c = story.cards[103];
 const MIN = 60;
-const filed = `#board [data-card="${state.id(103)}"]`;
+const filed = ui.face(103);
 
 // Monday afternoon: the waitlist card waits in the merge queue, the schedule card builds; filed adds #103 as the lab
 // filed it from the form
@@ -18,14 +19,10 @@ function monday(now, filed) {
     tasks,
     objects: {
       [`sessions/${waitlist.ID}/timeline.jsonl`]: state.timeline(now, 90 * MIN, {
-        alias: "small", steps: [{ at: 84 * MIN, step: "model_review", verdict: "approve", round: 1 }],
+        alias: "small",
+        steps: [story.review(101, 1, 26 * MIN, 84 * MIN, "s-1")],
       }),
-      [`sessions/${schedule.ID}/timeline.jsonl`]: state.timeline(now, 19 * MIN, {
-        steps: [
-          { at: 0, step: "intake", started: new Date(now - 19 * MIN * 1000).toISOString().slice(0, 19) + "Z", source: "webhook" },
-          { at: MIN, step: "session_start", session: "s-1", model: "small", attempt: 1 },
-        ],
-      }),
+      [`sessions/${schedule.ID}/timeline.jsonl`]: state.timeline(now, 19 * MIN, { steps: [state.intake(0, 0), state.sessionStart(MIN, { model: "small" })] }),
     },
     spend: 1.24, chatSpend: 0.18,
   });

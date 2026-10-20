@@ -1,11 +1,12 @@
 const state = require("../lib/state");
 const story = require("../lib/story");
+const ui = require("../lib/ui");
 
 const DAY = 86400;
 const ask = story.asks.waitlist;
 const args = story.filing(101, "ready");
-const doIt = "#chat-log .proposal [data-doit]";
-const filed = `#board [data-card="${state.id(101)}"]`;
+const doIt = ui.doIt;
+const filed = ui.face(101);
 
 // the agent's text is its question, so the thread reads the same live and when the console reads it again
 const asking = state.reply(state.say(ask.question), state.call("ask", { ask: ask.question, choices: ask.choices }));

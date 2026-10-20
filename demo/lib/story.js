@@ -3,6 +3,7 @@
 const state = require("./state");
 
 const budgets = { small: 2, medium: 5, large: 10 };
+const MIN = 60;
 
 // body is the prose the card is filed with; acceptance its Acceptance list; pr its pull request; plan and key mark a
 // planned card (its plan's issue and its key there). #100 is the last card before the two weeks: finished before the
@@ -327,4 +328,204 @@ const routines = {
   "cost-review": [{ week: 2, outcome: "filed", issue: 124, note: "€41.20 of the €60 cap, €1.79 per card" }],
 };
 
-module.exports = { cards, description, body, card: boardCard, filing, requests, asks, replies, alerts, approvals, plans, planCards, routines };
+// sessions are the cards' agent sessions by issue and session: the commit a session pushed, and the agent's words,
+// each at its seconds after the session's start.
+const sessions = {
+  101: { "s-1": { commit: "4be1c07", words: [] } },
+  102: { "s-1": { commit: "5b0d3e7", words: [] }, "s-2": { commit: "c92a4f1", words: [] } },
+  103: {
+    "s-1": {
+      commit: "8c1e5a2",
+      words: [
+        [30, "Reading the class page first: src/classes/ClassPage.tsx and its query in src/classes/queries.ts."],
+        [4 * MIN, "The class query already joins the schedule. I add the teacher's name and the room to it, so the page needs no second request."],
+        [9 * MIN, "The page names both under the title: \"with Lena · Room 2\". Next, the tests."],
+        [17 * MIN, "npm test: the 3 new tests of the class page pass, 214 in all. Pushing the branch and opening the pull request."],
+      ],
+    },
+  },
+  107: {
+    "s-1": {
+      commit: "9d2b6c4",
+      words: [
+        [40, "Reading the Stripe webhook in src/payments/webhook.ts and the confirmation mail in src/mail/confirmation.ts."],
+        [6 * MIN, "The confirmation now goes out from the payment_intent.succeeded handler, once the payment settles."],
+        [15 * MIN, "npm test passes. Pushing and opening the pull request."],
+      ],
+    },
+    "s-2": {
+      commit: "3e7f915",
+      words: [
+        [30, "The acceptance job failed on \"a webhook delivered twice sends one mail\": Stripe sent the event again, and two mails went out."],
+        [4 * MIN, "The handler mails before it records the mail. I record the confirmation keyed on the PaymentIntent's id, " +
+          "in the transaction that marks the booking paid, and mail only when that insert took."],
+        [12 * MIN, "npm test passes, and the acceptance test delivers the event twice: one mail. Pushing to the pull request."],
+      ],
+    },
+  },
+  116: {
+    "s-1": {
+      commit: "2d7f0b9",
+      words: [
+        [40, "Reading src/bookings/cancel.ts and offerSeat, the waitlist's hand-over from #101."],
+        [5 * MIN, "Cancel shows until 12 hours before the class; the check reads the class's start in the studio's time zone."],
+        [14 * MIN, "A cancel frees the seat, then offerSeat mails the first member in line. The tests of the window and the hand-over pass."],
+        [26 * MIN, "npm test: 9 new tests pass. Pushing and opening the pull request."],
+      ],
+    },
+    "s-2": {
+      commit: "e5a3c18",
+      words: [
+        [30, "The review found a race in cancel.ts: the seat is freed and offered in two transactions, and a claim between them books it twice."],
+        [4 * MIN, "cancelBooking now locks the class row with SELECT … FOR UPDATE, and frees and offers the seat in that one transaction."],
+        [11 * MIN, "A new test runs a cancel and a waitlist claim at the same moment, 50 times: one booking for the seat every time."],
+        [15 * MIN, "npm test: 10 new tests pass. Pushing to the pull request."],
+      ],
+    },
+  },
+  117: {
+    "s-1": {
+      words: [
+        [30, "Reading src/mail/reminder.ts and the job that sends it, src/jobs/reminders.ts."],
+        [3 * MIN, "The reminder goes out at the class's start minus 24 hours. Running npm test -- reminder."],
+        [6 * MIN, "npm test -- reminder fails: the class on Sunday 25 October at 18:00 wants its reminder at 18:00 on Saturday, " +
+          "and reminder.ts sends it at 19:00. I move the arithmetic from UTC to the studio's time zone."],
+        [10 * MIN, "npm test -- reminder fails the same way: 19:00, not 18:00. Back to UTC in reminder.ts, with the time zone applied after."],
+        [13 * MIN, "npm test -- reminder fails the same way again: 19:00, not 18:00."],
+      ],
+    },
+    "s-2": {
+      commit: "7a4c2e9",
+      words: [
+        [30, "Starting from the supervisor's note: both versions subtracted 24 hours, and the test's class falls on the night the clocks go back. " +
+          "I subtract one calendar day in Europe/Berlin."],
+        [5 * MIN, "npm test -- reminder: 6 passing. The class on 25 October gets its reminder at 18:00 on Saturday."],
+        [8 * MIN, "npm test: 221 passing. Pushing and opening the pull request."],
+      ],
+    },
+  },
+  120: { "s-1": { commit: "b3e81f6", words: [] } },
+  121: { "s-1": { commit: "f16d07a", words: [] } },
+  122: {
+    "s-1": {
+      words: [
+        [40, "Reading the class cancel in src/classes/cancel.ts and the Stripe client in src/payments/stripe.ts."],
+        [6 * MIN, "A studio cancel marks every booking of the class cancelled. I add refundBooking in src/payments/refund.ts for the paid ones."],
+        [11 * MIN, "refundBooking creates one Stripe refund per paid booking. Next, the charge.refunded webhook."],
+        // the answer to the steer of steers.refund, which reaches the session 13 minutes in
+        [13.2 * MIN, "Taking your message: refundBooking passes the booking's id to Stripe as the idempotency key, " +
+          "and a test sends the cancel twice and finds one refund."],
+      ],
+    },
+  },
+};
+
+// words are the agent's words in issue's session sid, as transcript rows.
+function words(issue, sid) {
+  return sessions[issue][sid].words.map(([at, text]) => state.said(at, text));
+}
+
+// session is the steps of issue's session n from start to end, with the commit the story gives it when it pushed.
+function session(issue, n, start, end, { model, outcome }) {
+  return state.session(start, end, { n, model, outcome, commit: sessions[issue][`s-${n}`]?.commit });
+}
+
+// life is issue's card age seconds after its creation and the objects its drawer reads. phases are its states, each
+// from its from (seconds after the creation) and keeping what it does not set of the one before: status, gate, model,
+// spent, and pr, whether its pull request is open. admitted is when it took a slot, if not at its creation. steps are
+// its timeline; each session started by then carries its words said by then.
+function life(now, issue, age, { phases, admitted, steps = [] }) {
+  const passed = phases.filter((p) => p.from <= age);
+  const p = Object.assign({}, ...passed);
+  const since = age - passed.findLast((q) => "status" in q || "gate" in q).from;
+  const final = ["done", "failed", "closed"].includes(p.status);
+  const task = boardCard(now, issue, {
+    lane: "ready", age, status: p.status, model: p.model, spent: p.spent, pr: p.pr ? cards[issue].pr : undefined,
+    gate: final ? undefined : p.gate, gateSince: final || !p.gate ? undefined : since, finished: final ? since : undefined,
+    admitted: admitted === undefined || admitted > age ? undefined : age - admitted,
+  });
+  const objects = { [`sessions/${task.ID}/timeline.jsonl`]: state.timeline(now, age, { steps }) };
+  for (const s of steps) {
+    if (s.step === "session_start" && s.at <= age && sessions[issue]?.[s.session]) {
+      objects[`sessions/${task.ID}/${s.session}.jsonl`] = state.transcript(now, age - s.at, words(issue, s.session));
+    }
+  }
+  return { task, objects };
+}
+
+// done is issue's card done after seconds of its age: built on small, its pull request merged, spent spent.
+function done(now, issue, age, after, spent) {
+  return life(now, issue, age, { phases: [{ from: after, status: "done", model: "small", spent, pr: true }] });
+}
+
+// board is the tasks and objects of cards, each a life.
+function board(cards) {
+  return { tasks: cards.map((c) => c.task), objects: Object.assign({}, ...cards.map((c) => c.objects)) };
+}
+
+// reviews are the review gate's verdicts on a card's pull request, round by round.
+const reviews = {
+  101: [{ verdict: "approve", summary: "A full class takes waitlist sign-ups in order, and a cancellation mails the first in line a seat held for 2 hours." }],
+  102: [{ verdict: "approve", summary: "Caches the week's schedule for a minute; the load test measures GET /schedule at 0.31 s at the p95." }],
+  103: [{ verdict: "approve", summary: "Adds the teacher and the room to the class query and names them under the title, with tests for the page." }],
+  107: [{ verdict: "approve", summary: "Mails the confirmation once per booking from the webhook, keyed on the PaymentIntent; the tests deliver the event twice." }],
+  116: [
+    {
+      verdict: "concerns",
+      summary: "The cancel window and the hand-over to the waitlist work, but a cancel and a waitlist claim at the same moment can both take the seat.",
+      findings: [
+        "src/bookings/cancel.ts:48: cancelBooking frees the seat, and offerSeat reads the waitlist in a second transaction; a claim between " +
+          "the two books the seat twice. Free and offer the seat in one transaction that locks the class row (SELECT … FOR UPDATE).",
+      ],
+    },
+    { verdict: "approve", summary: "Frees and offers the seat in one transaction under a lock on the class row; the concurrency test finds one booking per seat." },
+  ],
+  120: [{ verdict: "approve", summary: "A pass of 10 classes bought by card; each booking takes one, and the account page shows what is left." }],
+  121: [{ verdict: "approve", summary: "Lists a member's bookings of the last 12 months, newest first, scoped to the member." }],
+};
+
+// review is round n of the review of issue's pull request, from from to at, on the commit of session sid.
+function review(issue, n, from, at, sid) {
+  return state.modelReview(from, at, { pr: cards[issue].pr, commit: sessions[issue][sid].commit, round: n, ...reviews[issue][n - 1] });
+}
+
+// files are the changed files of a pull request, as Forgejo lists them.
+const files = {
+  203: [
+    { filename: "src/classes/queries.ts", status: "modified", additions: 6, deletions: 2 },
+    { filename: "src/classes/ClassPage.tsx", status: "modified", additions: 12, deletions: 1 },
+    { filename: "src/classes/ClassPage.test.tsx", status: "modified", additions: 41, deletions: 0 },
+  ],
+};
+
+// checksFailed are the findings of a card's failed checks, sent on to its next session.
+const checksFailed = {
+  107: "acceptance: a webhook delivered twice sends one mail: 2 mails sent, want 1",
+};
+
+// supervisor is the supervisor's step in #117's first session: the flip-flop detector's trip, and the insight the
+// next session starts from.
+const supervisor = {
+  issue: 117,
+  detector: "flip_flop",
+  trip: "after src/mail/reminder.ts returned to a content it had before, `npm test -- reminder` failed again, unchanged",
+  decision: "redirect",
+  reason: "Both versions of reminder.ts subtract 24 hours from the class's start, and the test's class is on 25 October, the night " +
+    "the clocks go back: 24 hours before 18:00 is 19:00 on Saturday. Subtract one calendar day in Europe/Berlin instead.",
+};
+
+// steers are the messages Sebastian sends a running card from the chat: what he types, the agent's words with the
+// proposal, and the text the session gets.
+const steers = {
+  refund: {
+    issue: 122,
+    request: "Tell #122 to use the booking's id as the Stripe idempotency key, so a cancel sent twice refunds once.",
+    reply: "I pass it to the running session of #122; it reads it at its next step:",
+    text: "Use the booking's id as the Stripe idempotency key, so a cancel sent twice refunds once.",
+  },
+};
+
+module.exports = {
+  cards, description, body, card: boardCard, filing, requests, asks, replies, alerts, approvals, plans, planCards, routines,
+  sessions, words, life, done, board, session, reviews, review, files, checksFailed, supervisor, steers,
+};

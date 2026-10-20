@@ -175,6 +175,70 @@ test("proposal expires after its ttl and its call names the token", () => {
   assert.equal(c.proposal, p.Token);
   assert.equal(c.result, "Proposed to sebastian: Message a card. Nothing runs until they press Do it.");
 });
+test("a card admitted after its creation carries AdmittedAt", () => {
+  const c = s.card(now, { issue: 117, status: "running", lane: "ready", age: 7200, title: "t", body: "b", admitted: 600 });
+  assert.equal(c.AdmittedAt, "2026-10-20T11:50:00.000Z");
+});
+test("timeline stamps a gate step's from as started and leaves out a step after now", () => {
+  const rows = s.timeline(now, 600, {
+    steps: [
+      s.modelReview(300, 420, { pr: 214, commit: "2d7f0b9", verdict: "concerns", summary: "race", findings: ["cancel.ts:48"] }),
+      s.sessionStart(700, { session: "s-2", model: "big", attempt: 2 }),
+    ],
+  }).trim().split("\n").map(JSON.parse);
+  assert.deepEqual(rows, [{
+    step: "model_review", pr: 214, commit: "2d7f0b9", model: "big", verdict: "concerns", summary: "race", findings: ["cancel.ts:48"], round: 1,
+    time: "2026-10-20T11:57:00Z", started: "2026-10-20T11:55:00Z",
+  }]);
+});
+test("findings sent to a stronger model", () => {
+  const rows = s.timeline(now, 3600, { steps: [s.findings(1900, { stage: "checks", to: "stronger", attempt: 1, list: ["acceptance failed"] })] })
+    .trim().split("\n").map(JSON.parse);
+  assert.deepEqual(rows, [
+    { step: "stage_findings", stage: "checks", round: 1, to: "stronger", attempt: 1, findings: ["acceptance failed"], time: "2026-10-20T11:31:40Z" },
+  ]);
+});
+test("session is its start, its end and its push; one that did not push has no push", () => {
+  const rows = s.timeline(now, 3600, { steps: s.session(60, 1800, { n: 2, model: "big", commit: "e5a3c18" }) }).trim().split("\n").map(JSON.parse);
+  assert.deepEqual(rows, [
+    { step: "session_start", session: "s-2", model: "big", attempt: 2, time: "2026-10-20T11:01:00Z" },
+    { step: "session_end", session: "s-2", attempt: 2, outcome: "pushed", time: "2026-10-20T11:30:00Z", started: "2026-10-20T11:01:00Z" },
+    { step: "pushed", session: "s-2", commit: "e5a3c18", time: "2026-10-20T11:30:05Z" },
+  ]);
+  assert.deepEqual(s.session(60, 900, { model: "small", outcome: "redirect" }).map((r) => r.step), ["session_start", "session_end"]);
+});
+test("timeline puts the steps in time order", () => {
+  const rows = s.timeline(now, 900, { steps: [s.supervisor(840, { detector: "flip_flop" }), s.sessionStart(60, { model: "small" })] })
+    .trim().split("\n").map(JSON.parse);
+  assert.deepEqual(rows.map((r) => r.step), ["session_start", "supervisor"]);
+});
+test("supervisor names the detector, the decision and the reason", () => {
+  const rows = s.timeline(now, 900, { steps: [s.supervisor(840, { detector: "flip_flop", trip: "t", decision: "redirect", reason: "r" })] })
+    .trim().split("\n").map(JSON.parse);
+  assert.deepEqual(rows, [{ step: "supervisor", session: "s-1", detector: "flip_flop", trip: "t", decision: "redirect", reason: "r", time: "2026-10-20T11:59:00Z" }]);
+});
+test("transcript leaves out a row not said yet", () => {
+  const rows = s.transcript(now, 600, [s.said(300, "said"), s.said(601, "later")]).trim().split("\n").map(JSON.parse);
+  assert.deepEqual(rows, [{ time: "2026-10-20T11:55:00Z", kind: "model_call", detail: { text: "said", cost: 0.02 } }]);
+});
+test("steering describes the steer as the console does", () => {
+  const p = s.steering(now, { issue: 122, title: "Payments: refund", text: "Use the id" });
+  assert.equal(p.Tool, "steer");
+  assert.deepEqual(p.Args, { task_id: "t-47db29d200e1", text: "Use the id" });
+  assert.equal(p.Description, 'Message a running card, #122 t-47db29d200e1 "Payments: refund", text Use the id');
+});
+test("steeredThread ends in the Do it's row with the steer's result", () => {
+  const f = s.steeredThread(now, { said: "tell it", reply: "r", issue: 122, title: "Payments: refund", text: "Use the id", age: 10 });
+  assert.deepEqual(f.rows.map((m) => [m.role, m.content, m.at]), [
+    ["user", "tell it", "2026-10-20T11:59:50.000Z"], ["assistant", "r", "2026-10-20T11:59:51.000Z"], ["assistant", "", "2026-10-20T11:59:53.000Z"],
+  ]);
+  assert.equal(f.rows[1].tool_calls[0].proposal, f.proposal.Token);
+  assert.equal(f.rows[2].tool_calls[0].result, "The session of #122 has your message. It cannot be undone.");
+});
+test("scene keys a pull request's files by their Forgejo path", () => {
+  const sc = s.scene(now, { prFiles: { 203: [{ filename: "a.ts", status: "modified", additions: 1, deletions: 0 }] } });
+  assert.deepEqual(sc.PRFiles, { "/api/v1/repos/nord/booking/pulls/203/files": '[{"filename":"a.ts","status":"modified","additions":1,"deletions":0}]' });
+});
 test("metrics report is the nord-booking window", () => {
   const m = s.metrics(now);
   assert.equal(m.repository, "nord/booking");

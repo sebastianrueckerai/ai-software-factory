@@ -1,11 +1,12 @@
 const state = require("../lib/state");
 const story = require("../lib/story");
+const ui = require("../lib/ui");
 
 const HOUR = 3600;
 const args = story.filing(102, "ready");
 const read = { state: "all" };
-const doIt = "#chat-log .proposal [data-doit]";
-const filed = `#board [data-card="${state.id(102)}"]`;
+const doIt = ui.doIt;
+const filed = ui.face(102);
 
 // the latency alert fired three times and settled itself each time
 const fired = [[14 * HOUR, 13 * HOUR], [38 * HOUR, 37 * HOUR], [62 * HOUR, 61.5 * HOUR]];
