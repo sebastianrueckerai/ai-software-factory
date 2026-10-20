@@ -38,10 +38,11 @@ The factory's failure rate is richer than DORA's: the revert pass finds reverts 
 | Figure | Question | Source | Ready |
 |---|---|---|---|
 | Spend / week, by kind | what the factory costs | the ledger, `Costs` already computes it | yes |
-| Tools / week, tool mix | what the paid tools cost, and which | the ledger's rows of kind `tool`, by ref | yes |
 | Cost per card, median | what a card costs | ledger per task | yes |
 | Tokens per card, cached share | how much model work a card is | `audit` token columns per task | yes |
-| Model mix | which tiers did the work | `audit` by model alias per week | yes |
+| Spend by model | cost per class, big and small | the ledger's model rows by the class in their ref | yes |
+| Served by | which deployment answered, how much the fallback carried | `audit.deployment` by call cost | since 2026-10-14 |
+| Tools / week, tool mix | what the tools cost, and which | the ledger's rows of kind `tool`, and every model row that is not a text class (vision), by ref | yes |
 
 ### Autonomy (factory-native, the dimension no DORA board has)
 
