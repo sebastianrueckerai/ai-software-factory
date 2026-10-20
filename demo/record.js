@@ -77,13 +77,13 @@ async function record(browser, name, commits) {
   const context = await browser.newContext({
     viewport, deviceScaleFactor: scale, recordVideo: { dir: tmp, size: viewport }, colorScheme: scene.theme,
   });
+  const t0 = Date.now(); // the video clock starts with the context
   await context.addCookies([{
     name: cookieName, value: cookieValue, domain: new URL(BASE).hostname, path: "/", secure: true, httpOnly: true, sameSite: "Lax",
   }]);
   await context.addInitScript((theme) => localStorage.setItem("theme", theme), scene.theme);
   await context.addInitScript(ring);
   const page = await context.newPage();
-  const t0 = Date.now(); // the video clock starts with the page
   let problem = null;
   page.on("pageerror", (e) => { problem ??= `page error: ${e.message}`; });
   page.on("response", (r) => {
