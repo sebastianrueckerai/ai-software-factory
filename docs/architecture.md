@@ -2364,7 +2364,22 @@ runs (Ruling 288). The stream's server heartbeat every 25 s reads the
 counters and sends a board event when a card's fingerprint (the stale
 ring, a provider wait, the checks, the minute ages) or the pulse's spend
 changes, and a reconnect reads the board once. A writer's stream reads the
-board at the heartbeat, and a reader's stream carries no event rows. Live,
+board at the heartbeat, and a reader's stream carries no event rows.
+Since 2026-10-20 the heartbeat is the event `ping`, which the stream also
+sends when it opens. Its data is the console's build, a hash of the
+templates and the static files. The page reopens a stream that is closed or
+silent for over a minute when the tab comes back to the front, when the
+network comes back and when the browser restores the page from its
+back-forward cache. A stream that a refused connect closed reads the board
+after 5 s and opens anew. An ended session answers that read with the login
+page, which htmx follows. A page whose build differs from the ping's reloads
+itself once the tab is hidden, if nothing on it is typed or streaming. The
+board's own failed reads flash nothing, and a member's action that the
+router answers in a roll's gap flashes that the factory restarts. The
+streams end when the console's server shuts down: Cilium's Envoy keeps
+sending to the stopping pod while no other pod is ready, and its closed
+listener refused those connects for the 5 s the streams held the shutdown
+open. Live,
 a 156 s network trace of a board held one EventSource and no request after
 0.4 s. Stage 15's build added event kinds: `task_status` on every status or gate
 change, `question_asked`, `card_commented`, `comment_deleted`,
