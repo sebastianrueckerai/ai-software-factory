@@ -131,7 +131,7 @@ Wide on purpose. The first shoot records every scene in groups A to F that the l
 
 ### E. The human at the gates
 
-20. **The cap fires.** The calendar card hits its budget. The factory asks: raise the cap or split. Sebastian presses Split in the chat. The plan appears.
+20. **The cap fires.** The calendar card hits its budget. The factory asks: fund one more session or end the card. Sebastian splits the card in the chat instead, and the agent files the two halves. (The budget question has no split answer of its own; the split is the human's move through the chat.)
 21. **A design question.** The agent asks which calendar library, with three choices. Sebastian answers. The card continues.
 22. **An approval.** A card touching payments waits for approval before merge. Sebastian reads the diff summary in the drawer and approves.
 23. **The morning page.** The board at 07:00: three asks. Sebastian answers all three in two minutes. The cards move.
