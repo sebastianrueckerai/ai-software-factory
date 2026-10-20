@@ -281,7 +281,7 @@ git push origin main && git push github main
 
 **Files:**
 - Create: `demo/lib/project.js`, `demo/lib/state.js`, `demo/test/state.test.js`
-- Test: `demo/test/state.test.js`, run with `node --test demo/test/`
+- Test: `demo/test/state.test.js`, run with `node --test demo/test/*.test.js`
 
 **Interfaces:**
 - Produces, `project.js`: `module.exports = { name: "nord-booking", repository: "nord/booking", login: "sebastian", display: "Studio Nord", rows: [...], config: {...}, monthCap: 60, routines: [...] }`. `rows` is the single `factoryd.Project` row of the fake project with staging and production environments; `config` is a `policy.ProjectConfig` with `Repository: "nord/booking", MergeRule: "human", Objects: "factory", Agents: "coder", Process: "spec", Namespaces: ["nord-staging", "nord-prod"]`. Read the Go types for the field names: `internal/factoryd/project.go:27`, `internal/policy/project.go` (`ProjectConfig`).
@@ -336,7 +336,7 @@ Field names come from the Go structs, not from guesses: read `internal/factoryd/
 
 - [ ] **Step 4: Run the tests**
 
-Run: `node --test demo/test/`
+Run: `node --test demo/test/*.test.js`
 Expected: PASS, 4 tests.
 
 - [ ] **Step 5: Seed one helper-built scene into the lab**
