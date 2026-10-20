@@ -224,3 +224,15 @@ The page. One column at the secondary pages' shared measure (C29's 62 rem; the p
 The build renders the [concept's catalogue](../docs/metrics-visualization-concept-2026-10-19.md) behind it: a named queries module, one SQL query per figure, Postgres the store of record, the JSON endpoint the seam, the hard-data ruling of 2026-10-13 honored — no LLM-computed metric anywhere.
 
 Runner-up: twin, the same rows in two columns, if the one column proves too tall in the lab. Kept for later: the strip's weeks view as a toggleable second view, and headline's ghosted previous window as an optional delivery chart. Both die for v1, with the loud hero chart and every card fill.
+
+## C31. A card's press moves the card at once and registers once (2026-10-20, Sebastian)
+
+Sebastian asked for a board that answers a press at once. A pressed card moves from Needs you to In progress before the factory answers, and it jumps back only when the expected change does not happen. One press registers, so a card never takes Approve and Deny both.
+
+The press. The card moves to the column its action leads to and slides there in 200 ms. Under reduced motion it moves without the slide. An answer, a fund or a plan's change request leads to In progress. A close leads to Done, and so does an accepted plan. An approval's decision leads to the column of its task's status. A human card that goes to the factory or closes leaves the board. The moved card shows at 55 percent opacity, without its buttons and forms. A press that moves nothing, such as Park or a hold-out's Okay, dims the card until the answer is in.
+
+The lock. From the press on, the card takes no other press, on the board and in its drawer. Its buttons are disabled, and the console drops a second request for the same card.
+
+The truth. The card keeps its new place until the factory's board shows it out of the column it left. An approval's decision shows in the answer itself. An answer waits for the workflow's next step, seconds later. A refusal or a lost request puts the card back at once, with the reason in the flash. A card the factory has not moved within a minute goes back too. The column counts stay the factory's until its board answers.
+
+The build is c35ec615 on main of the code repository. The lab's structural check presses an escalation and asserts the move, the single press, the jump back on a refusal and the hold through a board that still shows the card waiting.
