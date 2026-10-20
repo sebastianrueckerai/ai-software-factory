@@ -141,7 +141,7 @@ Wide on purpose. The first shoot records every scene in groups A to F that the l
 ### F. Metrics
 
 26. **The week in numbers.** The metrics page: deploys per week, lead time, cost per card, escalated share, tool spend.
-27. **Before and after.** The metrics page two weeks apart: escalated share and cost per card fall after the planning change.
+27. **Before and after.** The metrics page two weeks apart: cost per card, card cycle, lead time and spend fall after the planning change. The escalated share rises, because week 2 holds the morning's three asks and the design question; the figures stay true to the cards the board showed.
 28. **The costs page.** Spend by kind (model, tool, resource) and by card over fourteen days.
 
 ### G. Diagrams, animated in the browser
