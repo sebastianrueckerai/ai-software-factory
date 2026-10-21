@@ -9,28 +9,20 @@ Continue the launch work for the AI software factory: one 90-second film and a l
 
 Read first, in this order: launch/handover.md, launch/concept.md, launch/script.md, demo/handover/README.md.
 
-My answer on the spine of script.md section 4 (approve, or name the beats to change):
-
-The spine runs one card's life in 90 seconds: the calendar card born in the chat, its four planned children, the sandbox, the pull request, the rejected review, a steer while the agent runs, the green gates, the stall handling, the cost stop, merge and deploy, the alert and issue cards nobody typed, the reproduction gate red then green, full auto's three asks, the three layers, the week before and after, three title cards, the GitHub link. Three points await a word:
-- The hero line over the opening beat B0 is draft 1: "One board shows everything. One chat steers it. Agents do the rest in sandboxes on your own servers." Drafts 2 and 3 sit in concept section 5. Pick one or write one.
-- Beats B2 and B12 claim less than the concept's bangs: the criteria's kinds and the two terminals are not on screen. Both can become procedural overlays, half a day each. Say if either must.
-- The film's card is the calendar, #105, with the week view, #110, as its child. Another card changes the nodes after `landed`, not the beats.
-
-My answers to the eight decisions of concept.md section 10. All eight stand at the defaults the last session took; name any to change, a blank keeps it:
-1. Narration: titles on screen, so the film works muted where GitHub and LinkedIn autoplay without sound. A voice track joins later without a recut. The other choices are a generated voice or Sebastian's own.
-2. The fal cap: $10 for the generated clips. Group H spent about $2.88 of it.
-3. The film's three closing cards, seconds 80 to 87: the three layers. Your servers: rebuilt from Git, every euro held before it is spent. Your process: a YAML file, proofs named first. Your prompts: files you change.
-4. The hero line: draft 1 (the spine above). This decision names no default, so say the word if another line goes there.
-5. The perimeter claim in docs/pitch.md: the pitch sells code that never leaves the perimeter, and today every session sends diffs to hosted model APIs. Default: reword to "the model is your choice behind the gateway" and file the card that puts one self-hosted model behind the gateway, so the claim becomes true. The other way: keep the pitch and accept that a compliance reader catches it.
-6. The comparison table's names: GitHub Copilot cloud agent, Cursor cloud agents, Devin, GitLab Duo, OpenHands, Factory sixth. Default: yes.
-7. A known limits block on the page: five lines of concessions under the comparison table. A hiring reader reads it as judgement, an investor may read it as weakness. Default: yes.
-8. Prompts as data: the writing guide and the other guides are compiled into the binaries, so "bring your own prompts" is worded precisely today. Default: keep the wording and file the card that moves the guides into the config tree beside the process files.
+My answers, given 21 October and already carried by the page and the script:
+- The spine: approved in shape. The hero line is mine: "You control everything via chat." The closing cards carry my three-layers framing: the factory works out of the box and runs anywhere, everything is a YAML file, ours ships and yours plugs in. Two points stay open, both fine as the script has them: the criteria's kinds (B2) and the two terminals (B12) off screen, and the calendar as the film's card.
+- Narration: a generated voice. Draft the spoken lines from the spine's titles, generate the track under the cap, keep the titles on screen so the film still works muted. If I dislike the voice, I record my own and the track swaps without a recut.
+- The fal cap: $20.
+- The perimeter: claim only that the factory is easy to self-host, that nothing runs on someone else's computer unless I want it to, that model APIs and self-hosted LLMs sit behind the gateway, and that we do not push this as SaaS.
+- The comparison table's six names stand; I verify the cells.
+- The known limits block stays, its five lines.
+- Prompts as data is dropped as a point. The page claims the project's AGENTS.md as the prompts you change.
 
 Then do, in this order, each as its own round with a result I can look at:
 1. The spine scene and the two branch scenes of script.md section 6, recorded with demo/run.sh and on the results page.
-2. The cut list launch/cut.json and the film launch/film.mp4 from one command, with the titles of the script as procedural overlays. Show me the film.
+2. The cut list launch/cut.json and the film launch/film.mp4 from one command, with the titles of the script as procedural overlays and the generated voice track under them. Show me the film.
 3. The page's film slot filled, the twelve clip slots cut from the spine, the diagram slots from the procedural clips' frames.
-4. The public steps of concept section 9 phase 5: the secret scan of the three histories, the README, the pitch's four lines, the counts recounted.
+4. The public steps of concept section 9 phase 5: the secret scan of the three histories, the README, the pitch's remaining lines, the counts recounted.
 
 Rules: work in a git worktree, commit to master, push to origin and forgejo, and fetch forgejo first because the factory's own document writer pushes there. Every generated image or clip gets its sidecar JSON. No spend past a cap without asking. Never print a key. terraform.tfstate never enters a commit.
 ```
@@ -45,19 +37,20 @@ Rules: work in a git worktree, commit to master, push to origin and forgejo, and
 - Group H under [demo/generated/](../demo/generated/): 21 stills, four contact sheets, four critiques, six takes, every output with its sidecar. [notes.md](../demo/generated/notes.md) has the picks and the cost, about $2.88 of the $10 cap.
 - The results page, [demo/index.html](../demo/index.html), now with group P (procedural) and group H (generated) beside the bank.
 
-## The decisions, as taken
+## The decisions, as answered
 
-Sebastian left all eight blank, so the session took the concept's defaults: titles on screen, the $10 cap, the three layers as the tail's cards, the perimeter claim reworded, the five names plus Factory, the known limits block, prompts worded precisely. Decision 4 names no default, so draft 1 of concept section 5 is the hero line on the page and in beat B0. Any of them can still change; the page and the script carry them.
+Sebastian answered the eight on 21 October. A generated voice over the titles, so the film works muted and his own voice can replace the track without a recut. The fal cap is $20. The closing cards carry his three-layers framing: the factory is the base layer, it works out of the box and runs anywhere, everything is a YAML file, ours ships and yours plugs in; "every euro held before it is spent" is gone, he could not read it. The hero line is his: "You control everything via chat." The perimeter claim is replaced by the self-hosting claim: easy to self-host, nothing on someone else's computer unless he wants it, model APIs and self-hosted LLMs behind the gateway, not SaaS. The six table names stand, he verifies the cells. The known limits block stays. Prompts as data is dropped as a point: the page claims the project's AGENTS.md as the prompts you change.
 
-Two cards the defaults call for, for Sebastian to file (intake is closed to agents):
+Two cards for Sebastian to file (intake is closed to agents):
 
-- **A self-hosted model option behind the gateway.** Decision 5: the pitch sells code that stays inside the perimeter, and today every session sends diffs to hosted model APIs. One self-hosted model configured as a gateway route makes "the model is your choice" true. Acceptance: a project can name a self-hosted route for its small class, and a session runs on it end to end.
-- **The factory's guides move into the configuration tree.** Decision 8: the writing guide and the other guides are compiled into the binaries, so "bring your own prompts" needs a footnote. Acceptance: the guides live beside the process files, a project may override each, and the binaries read them from there.
+- **A self-hosted model option behind the gateway.** The new claim says self-hosted LLMs work behind the gateway, and today every session routes to hosted model APIs. An operator can add a LiteLLM route by hand, but no self-hosted route is configured or tested. The card makes the claim factory-tested. Acceptance: a project can name a self-hosted route for its small class, and a session runs on it end to end.
+- **The factory's guides move into the configuration tree.** Optional now that the prompts point is dropped. The writing guide and the other guides are compiled into the binaries; the card would let a project override each. File it only if that control matters to him.
 
 ## Open
 
-- The spine. Nothing of it records before Sebastian approves [script.md](script.md) section 4. Two beats claim less than the concept's bangs, said under the beats table: the criteria's kinds (B2) and the two terminals (B12) are procedural overlays if he wants them.
-- The pitch, [docs/pitch.md](../docs/pitch.md), still carries the four lines concept section 4 names. The page applies the replacements; the pitch is Sebastian's text.
+- The spine stands approved in shape. Two points stay open, both fine as the script has them: the criteria's kinds (B2) and the two terminals (B12) off screen, and the calendar as the film's card.
+- The spoken lines of the voice track are not written; the next session drafts them from the spine's titles.
+- The pitch, [docs/pitch.md](../docs/pitch.md), carries the self-hosting claim now; its other guarded lines ("the only way", the stale counts, Conductor) wait for phase 5. The pitch is Sebastian's text.
 - The secret scan of the three repositories' histories has not run.
 - The three factory cards of [factory-bugs.md](../demo/handover/factory-bugs.md) are not filed.
 
