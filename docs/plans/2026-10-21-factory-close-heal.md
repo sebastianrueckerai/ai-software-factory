@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** An issue the factory decided to close ends closed, even when Forgejo fails between the decision and the close.
+**Goal:** An issue the factory decided to close ends closed, even when Forgejo fails between the decision and the close. An alert whose agent card ended without a verdict gets one.
 
 **Architecture:** Every factory close of an issue goes through one function, `closeIssueAsFactory`. It writes the existing `factory_closed` intake row first, now carrying the comment, then posts the comment, closes the issue and confirms the row. The heal pass finishes every row left unconfirmed. The cleared-alert pass also judges its alert and ends its card in one transaction, so no half-written close remains on the database side either.
 
@@ -137,9 +137,28 @@ The heal pass already reads every open issue each minute (`ResyncIssues`, intake
 - [ ] **Step 4: Run** `go test -race -p 1 ./...` with the PG tests. Expected: every package ok.
 - [ ] **Step 5: Commit** `a cleared alert's verdict and its card's end are one write`.
 
-### Task 5: Land
+### Task 5: An alert whose card ended without a verdict is unjudged
+
+Alert 1604 ("5xx rate above 5 %" on the code repository) has waited for a verdict since its agent card #1103 failed on 2026-10-18. `alertVerdict` (internal/factoryd/signozwebhook.go:944) judges only a card that ended done (`real`) or whose issue a person closed (`noise`); every other end leaves the row open forever, and the agent's `alerts` tool keeps listing it.
+
+**Files:**
+- Modify: `internal/factoryd/activities.go` (the end path around 2238, where `alertVerdict` is read)
+- Create: `internal/schema/migrations/gateway/20261021090100_alert_unjudged_on_end.sql`
+- Test: the file that tests the end path's alert verdicts (`grep -rn "JudgeTaskAlerts\|alertVerdict" internal/factoryd/*_test.go`)
+
+**Interfaces:**
+- When `alertVerdict(final, reason)` returns "", the end path calls `r.store.JudgeTaskAlerts(ctx, taskID, AlertSigNoz, VerdictUnjudged, FactoryDecider)`. `JudgeTaskAlerts` touches only rows whose verdict is still null, so a person's earlier verdict stands.
+- The migration sets `verdict = 'unjudged'`, `resolved_by = 'factoryd'`, `resolved_at = now()` on every `alerts` row of kind `alert` whose verdict is null and whose task is final (`done`, `failed`, `closed`).
+
+- [ ] **Step 1: Write the failing test** `TestAFailedAlertCardLeavesItsAlertUnjudged`: an agent card of source `alert` ends `failed`; its alert row reads verdict `unjudged` by `factoryd`. A second case: the row already judged `real` by a person keeps `real`.
+- [ ] **Step 2: Run.** Expected: FAIL.
+- [ ] **Step 3: Implement** the call and the migration.
+- [ ] **Step 4: Run** `go test -race -p 1 ./...` with the PG tests. Expected: every package ok.
+- [ ] **Step 5: Commit** `an alert whose card ended without a verdict is unjudged`.
+
+### Task 6: Land
 
 - [ ] **Step 1:** Full race suite with the PG tests, `gofmt`, `go vet`, gosec, on a merge with the newest `origin/main`. Push `origin` and `github` main.
-- [ ] **Step 2:** The roll waits for Sebastian's approval. After it is live, the factoryd log shows the heal step and no errors from it.
+- [ ] **Step 2:** The roll waits for Sebastian's approval. After it is live, the factoryd log shows the heal step and no errors from it. Alert 1604 reads `unjudged` by `factoryd`.
 - [ ] **Step 3:** One audit, read only: list the final cards whose issue is open and whose `factory_closed` row predates the migration. Report the list to Sebastian; close nothing by hand without his word, since a person may have reopened them on purpose.
 - [ ] **Step 4:** Docs: `docs/architecture.md` gains one paragraph beside the human-lane close rules: a factory close records its intent with its comment, closes, confirms, and the heal pass finishes an unconfirmed one; a reopened issue after a confirmed close is left alone. The build ledger gets the round's entry.
