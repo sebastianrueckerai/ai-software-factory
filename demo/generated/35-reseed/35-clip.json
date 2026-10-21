@@ -1,0 +1,21 @@
+{
+  "model": "minimax/h3-max/image-to-video",
+  "prompt": "The three blocks power down and crumble to nothing, the grid clears, the seed point brightens, three new blocks rise in the same positions and their cyan status lines switch on one after another.",
+  "refs": [
+    "demo/generated/35-reseed/35-1.png"
+  ],
+  "video": null,
+  "params": {
+    "duration": 10,
+    "prompt_expansion_mode": "balanced",
+    "resolution": "768P"
+  },
+  "seed": null,
+  "description": null,
+  "label": "35 the wipe and re-seed, take 1 from still 1",
+  "est_cost_usd": 0.3,
+  "created": "2026-10-21T14:29:14",
+  "outputs": [
+    "35-clip.mp4"
+  ]
+}

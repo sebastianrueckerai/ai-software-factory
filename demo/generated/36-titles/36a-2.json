@@ -1,0 +1,17 @@
+{
+  "model": "recraft/v4.1/flash/text-to-image",
+  "prompt": "Near-black field with a fine mono grid in perspective, a single thin cyan horizon line, nothing else, no text, 16:9.",
+  "refs": [],
+  "video": null,
+  "params": {
+    "image_size": "landscape_16_9"
+  },
+  "seed": null,
+  "description": null,
+  "label": "36a title loop: the horizon",
+  "est_cost_usd": 0.007,
+  "created": "2026-10-21T14:23:47",
+  "outputs": [
+    "36a-2.png"
+  ]
+}

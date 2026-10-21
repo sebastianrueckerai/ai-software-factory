@@ -1,0 +1,19 @@
+{
+  "model": "blackforestlabs/flux-3/text-to-image",
+  "prompt": "Three small dark server blocks standing on a near-black grid, each with a thin cyan status line, a faint single bright seed point below them on the grid, no text, no people, wide shot, 16:9.",
+  "refs": [],
+  "video": null,
+  "params": {
+    "num_images": 4,
+    "image_size": "landscape_16_9"
+  },
+  "seed": null,
+  "description": null,
+  "label": "35 the wipe and re-seed",
+  "est_cost_usd": 0.05,
+  "created": "2026-10-21T14:15:55",
+  "outputs": [
+    "35-1.png"
+  ],
+  "note": "one image came back: the first call asked num_images 4 and image_size, which this model has no field for"
+}

@@ -1,0 +1,21 @@
+{
+  "model": "pixelcut/looping-video",
+  "prompt": "Seamless loop, slow drift of the grid toward the camera, the line stays still.",
+  "refs": [
+    "demo/generated/36-titles/36a-3.png"
+  ],
+  "video": null,
+  "params": {
+    "duration": 5,
+    "motion": "subtle",
+    "resolution": "1080p"
+  },
+  "seed": null,
+  "description": null,
+  "label": "36a title loop: the horizon, take 1 from still a3",
+  "est_cost_usd": 0.4,
+  "created": "2026-10-21T14:29:16",
+  "outputs": [
+    "36a-clip.mp4"
+  ]
+}

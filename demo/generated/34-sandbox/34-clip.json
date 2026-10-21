@@ -1,0 +1,21 @@
+{
+  "model": "minimax/h3-max/image-to-video",
+  "prompt": "The cell fades in from nothing, the token and the key slide in, the glow pulses twice, then the cell and everything in it dissolve into the dark grid, leaving the field empty.",
+  "refs": [
+    "demo/generated/34-sandbox/34-1.png"
+  ],
+  "video": null,
+  "params": {
+    "duration": 10,
+    "prompt_expansion_mode": "balanced",
+    "resolution": "768P"
+  },
+  "seed": null,
+  "description": null,
+  "label": "34 the sandbox life cycle, take 1 from still 1",
+  "est_cost_usd": 0.3,
+  "created": "2026-10-21T14:29:10",
+  "outputs": [
+    "34-clip.mp4"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "model": "pixelcut/looping-video",
+  "prompt": "Seamless loop, slow drift of the grid toward the camera, the line stays still, the thin cyan trace draws the rectangle once and holds it.",
+  "refs": [
+    "demo/generated/36-titles/36c-2.png"
+  ],
+  "video": null,
+  "params": {
+    "duration": 5,
+    "motion": "subtle",
+    "resolution": "1080p"
+  },
+  "seed": null,
+  "description": null,
+  "label": "36c title loop: the panel trace, take 1 from still c2",
+  "est_cost_usd": 0.4,
+  "created": "2026-10-21T14:29:22",
+  "outputs": [
+    "36c-clip.mp4"
+  ]
+}
