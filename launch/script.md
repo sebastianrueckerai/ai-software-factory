@@ -2,7 +2,7 @@
 
 Written 21 October 2026 by the method of [concept section 8](concept.md#8-the-script-one-cards-life-told-once). Three parts: the story graph with its nodes named, the beats with their entry and exit nodes, and the spine with timings and transitions. The fold pass between them says how the beats became the spine.
 
-Decisions this script rests on, answered by Sebastian on 21 October: a generated voice over the titles (decision 1), so the film works muted and the sound track swaps without a recut; the three layers as the tail's three cards in his framing (decision 3); his hero line (decision 4): "You run the factory from one chat. The kanban shows everything."
+Decisions this script rests on, answered by Sebastian on 21 October: a generated voice over the titles (decision 1), so the film works muted and the sound track swaps without a recut; the three layers as the tail's three cards in his framing (decision 3); his hero line (decision 4): "See everything on the kanban. Change anything from the chat."
 
 The film's card is the calendar. Sebastian asks for a calendar rewrite in the chat, the factory files #105, the planner splits it into four cards, and the week view, #110, is the child the film follows through its build. The branches off its running session, the stall and the cap, are states the story already gives this card: #110 is the card that stopped at its budget. The signals of the second half are the two cards nobody typed, #119 from an alert and #126 from an issue.
 
@@ -61,7 +61,7 @@ Every point of [tier 1](concept.md#2-tier-1-the-value) as a beat. Seconds are th
 
 | Id | Points | Entry | Action | Exit | s | On screen | Words on screen | Source |
 |---|---|---|---|---|---|---|---|---|
-| B0 | title | cut | | cut | 4 | The five planes ring on the dark field, the hero line over it | You run the factory from one chat. The kanban shows everything. Agents build in sandboxes on your own servers | Procedural loop (round 4), else generated clip 33 |
+| B0 | title | cut | | cut | 4 | The five planes ring on the dark field, the hero line over it | See everything on the kanban. Change anything from the chat. Agents build in sandboxes on your own servers | Procedural loop (round 4), else generated clip 33 |
 | B1 | 1, 2 | `idle` | "Rewrite the calendar." typed, Enter, the proposal, Do it | `landed` | 8 | The console at rest, the sentence, the agent's answer and its proposal panel, Do it pressed, the applied line, #105 in Queued | Say what you need. The factory writes the card. You press Do it | Scene 03 steps 1 to 3 (0.0 to 9.8 s) |
 | B2 | 3 | `landed` | The planner's verdict, the plan's cards, Accept | `accepted` | 6 | #105 running on big, then the plan in Needs you with its question, the drawer's four cards in dependency order with their roles and sizes, Accept plan, the four children in Queued | Too large. It plans before it builds. Some tests stay hidden until the end | Scene 03 steps 4 to 6 (9.8 to 24.9 s); the exit state is new |
 | B3 | 10 | cut | The sandbox's life | cut | 5 | A cell appears, a token and a key slide in, work glows, everything dissolves | Each card runs in its own throwaway sandbox. The agent never holds a push token | Generated clip 34, else scene 32 steps 1 to 4 |
@@ -99,7 +99,7 @@ The folds the concept foresaw hold. Points 1 and 2 are one shot (B1). The steer 
 
 | From s | To s | Beat | Transition in | On screen | Words on screen | Source |
 |---|---|---|---|---|---|---|
-| 0 | 4 | B0 | cut | The loop under the hero line | You run the factory from one chat. The kanban shows everything. Agents build in sandboxes on your own servers | Procedural loop, else clip 33 |
+| 0 | 4 | B0 | cut | The loop under the hero line | See everything on the kanban. Change anything from the chat. Agents build in sandboxes on your own servers | Procedural loop, else clip 33 |
 | 4 | 12 | B1 | cut | The console at rest. "Rewrite the calendar." The proposal. Do it. #105 lands | Say what you need. The factory writes the card. You press Do it | Scene 03 steps 1 to 3 |
 | 12 | 18 | B2 | continue | Too large: the plan's four cards in order, Accept, the children in Queued | Too large. It plans before it builds. Some tests stay hidden until the end | Scene 03 steps 4 to 6, a new exit state |
 | 18 | 23 | B3 | cut, interlude | The cell, the token, the key, the work, the dissolve | Each card runs in its own throwaway sandbox. The agent never holds a push token | Clip 34, else scene 32 |
@@ -145,7 +145,7 @@ Nothing records before Sebastian approves the spine. Then, in the material phase
 
 ## 7. For Sebastian
 
-- The hero line carries his combo in the active voice: "You run the factory from one chat. The kanban shows everything." B0 adds one sentence for the sandboxes and his servers. Say the word to change either.
+- The hero line carries his essence: all the positives of a kanban, none of the curating, one chat as the only control. "See everything on the kanban. Change anything from the chat." B0 adds one sentence for the sandboxes and his servers. Concept section 5 holds the alternates; one word swaps one in.
 - B2 now names the hidden hold-outs: "Some tests stay hidden until the end." If that sentence must go, the beat keeps "Too large. It plans before it builds."
 - B2 and B12 claim less than the concept's bangs, for the reasons under the beats table. Say if the criteria's kinds or the two terminals must be on screen; both are procedural overlays, half a day each.
 - The film's card is the calendar. If another card should carry it, every node after `landed` changes, the beats do not.
