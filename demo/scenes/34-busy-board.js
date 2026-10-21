@@ -51,10 +51,18 @@ function busy(now) {
 module.exports = {
   title: "A busy board",
   story: "One afternoon in one frame: three cards need Sebastian, one waits on another, five build and six are done. He answers " +
-    "the budget stop in the chat, and the agent proposes the split as two cards.",
+    "the budget stop in the chat: the agent proposes the split as two cards, he presses Do it on each, and both land in Queued.",
   group: "intake",
   theme: "dark",
   viewport: "desk",
+  // the third step is the landing page's hero still, so the cursor's ring stays off
+  cursor: false,
+  // the regions the film's overlays name: the chat, the four columns, the running card the camera dives into, the
+  // budget stop
+  boxes: {
+    chat: ".chat", needs: "#needs-you", queued: '#board .column[aria-labelledby="col-1"]', progress: '#board .column[aria-labelledby="col-2"]',
+    done: '#board .column[aria-labelledby="col-3"]', running: ui.face(102), budget: ui.face(110),
+  },
   steps: [
     { state: busy, actions: [{ goto: "/" }], hold: 1500 },
     {
@@ -62,7 +70,14 @@ module.exports = {
       actions: [{ click: "#chat-input" }, { type: ["#chat-input", story.requests.split] }, { press: "Enter" }, { waitFor: ui.doIt }, { wait: 2000 }],
       hold: 1500,
     },
-    // the reload draws the thread from the store and leaves the cursor's ring hidden, for a still with no pointer in it
-    { state: () => null, actions: [{ goto: "/" }, { waitFor: ui.doIt }], hold: 2500 },
+    // no reload before the presses: Do it on a proposal read back from the store asks the model again, and the lab has no
+    // reply left for that
+    { state: () => null, actions: [{ waitFor: ui.doIt }], hold: 2500, boxes: { doit: ui.doIt } },
+    // past the hero's still: Do it on each proposal, and the two cards land in Queued; the lab files them under the
+    // next free numbers, #126 and #127
+    { state: () => null, actions: [{ click: ui.doIt }, { waitFor: ui.face(126) }, { wait: 600 }], hold: 1200, boxes: { first: ui.face(126) } },
+    { state: () => null, actions: [{ click: ui.doIt }, { waitFor: ui.face(127) }], hold: 2500, boxes: { first: ui.face(126), second: ui.face(127) } },
   ],
 };
+
+module.exports.busy = busy;

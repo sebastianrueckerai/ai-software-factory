@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1600, height=900">
+<title>The film's opening</title>
+<link rel="stylesheet" href="diagram.css">
+<script src="gsap.min.js"></script>
+<script src="data.js"></script>
+<script src="film-fx.js"></script>
+<style>
+  .live { animation: none; }
+  #root { position: relative; width: 1600px; height: 900px; overflow: hidden; background: var(--bg); }
+  #frame { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; transform-origin: 0 0; overflow: hidden; }
+  #stage { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; transform-origin: 0 0; }
+  .media { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; }
+  #caps { position: absolute; left: 0; right: 0; top: 744px; height: 156px; background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--bg) 90%, transparent) 24%); opacity: 0; }
+  .fx-cap { position: absolute; left: 80px; right: 80px; top: 26px; text-align: center; font-size: 48px; line-height: 1.25; color: var(--text); }
+  .fx-cap b { color: var(--accent); font-weight: 600; }
+  .fx-cap.amber b { color: var(--need-text); }
+  #band { position: absolute; left: 0; top: 0; width: 1600px; height: 150px; }
+  .fx-call-t { font-size: 40px; font-weight: 600; color: var(--text); white-space: nowrap; }
+  .fx-call-s { font-size: 28px; color: var(--text-muted); white-space: nowrap; margin-top: 2px; }
+  .fx-br { top: 118px; height: 18px; border: 4px solid var(--accent); border-bottom: none; }
+  #side { position: absolute; inset: 0; pointer-events: none; }
+  .card-side { position: absolute; top: 300px; width: 470px; padding: 26px 30px; background: color-mix(in srgb, var(--bg-raised) 94%, transparent); border: 1px solid var(--line-strong); box-shadow: inset 4px 0 0 var(--accent); opacity: 0; }
+  .card-side.amber { box-shadow: inset 4px 0 0 var(--need); }
+  .card-side h2 { margin: 0 0 10px; font-size: 44px; line-height: 1.15; }
+  .card-side p { font-size: 30px; line-height: 1.35; color: var(--text-muted); }
+  .fx-clock { position: absolute; left: 550px; top: 360px; width: 500px; height: 110px; overflow: hidden; text-align: center; background: color-mix(in srgb, var(--bg) 88%, transparent); border: 1px solid var(--line-strong); }
+  .fx-clock span { position: absolute; left: 0; right: 0; top: 22px; font: 600 56px var(--font-mono); color: var(--text); }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="{{DURATION}}" data-width="1600" data-height="900">
+<div id="frame"><div id="stage">
+<!--MEDIA-->
+</div></div>
+<div id="band"></div>
+<div id="caps"></div>
+<div id="side"></div>
+<div id="clocks"></div>
+</div>
+
+<script>
+// One paused timeline drives the opening: the renderer seeks it frame by frame, so nothing here reads the clock.
+const tl = gsap.timeline({ paused: true });
+const F = window.FILM, style = F.style;
+const stage = document.querySelector("#stage"), frame = document.querySelector("#frame");
+const caps = document.querySelector("#caps"), band = document.querySelector("#band"), side = document.querySelector("#side"), clocks = document.querySelector("#clocks");
+// at is the output time of a step's still inside a segment; box is a named box of a scene's step
+const at = (id, step, field = "stillMs") => {
+  const s = F.seg[id], v = F.scenes[s.scene].steps[step - 1][field] / 1000;
+  return s.start + (v - s.mediaStart) / s.rate;
+};
+const box = (scene, step, key) => {
+  const b = F.scenes[scene].steps[step - 1].boxes;
+  if (!b || !b[key]) throw new Error(`${scene} step ${step} has no box ${key}`);
+  return b[key];
+};
+const topOf = (b, h = 440) => ({ x: b.x, y: b.y, width: b.width, height: Math.min(b.height, h) });
+const union = (a, b) => { const x = Math.min(a.x, b.x), y = Math.min(a.y, b.y); return { x, y, width: Math.max(a.x + a.width, b.x + b.width) - x, height: Math.max(a.y + a.height, b.y + b.height) - y }; };
+
+// the beats: when, the region, the words, the colour; every style draws the same beats
+const B = "34-busy-board", I = "03-too-large-split";
+const beats = [
+  { t: 2.0, box: box(B, 3, "chat"), title: "Change anything from one chat.", sub: "The agent proposes. You press Do it." },
+  { t: 5.2, box: box(B, 3, "needs"), title: "See what is stuck,", sub: "and what waits on you.", amber: true },
+  { t: 8.4, box: box(B, 3, "queued"), title: "Decide what runs next.", sub: "Priorities and a backlog." },
+  { t: F.seg.press.start, box: union(box(B, 3, "budget"), topOf(box(B, 3, "queued"), 320)), title: "Out of budget? Split it.", sub: "One sentence, then Do it.", amber: true },
+  { t: at("press", 5, "stillMs") - 0.3, box: union(box(B, 5, "first"), box(B, 5, "second")), title: "Two smaller cards", sub: "land in Queued." },
+  { t: F.seg.rewind.start, box: null, title: "Back to Monday.", sub: "How did the board fill up?" },
+  { t: F.seg.ingest1.start + 0.4, box: box(I, 2, "doit"), title: "Monday starts with one sentence:", sub: "build level 4, the asteroid belt." },
+  { t: at("ingest1", 3, "atMs") + 0.2, box: box(I, 3, "card"), title: "Too big for one card,", sub: "so the planner writes a plan." },
+  { t: F.seg.ingest2.start + 0.1, box: union(box(I, 5, "card"), box(I, 5, "accept")), title: "Twenty minutes later,", sub: "the plan waits for you.", amber: true },
+  { t: at("ingest2", 6, "atMs") + 0.3, box: box(I, 6, "plan"), title: "Four cards, in the order", sub: "they build on each other." },
+  { t: at("ingest2", 7, "atMs") + 0.4, box: box(I, 7, "queued"), title: "You accept, and the four cards land.", sub: "Now the agents build." },
+];
+const ends = beats.map((b, i) => (i + 1 < beats.length ? beats[i + 1].t : F.duration - 0.2));
+
+// the moments inside the footage: Do it pressed, the two cards landing
+const rings = [
+  [box(B, 3, "doit"), F.seg.press.start + 0.2, at("press", 4, "atMs") + 0.9],
+  [box(B, 4, "first"), at("press", 4), F.seg.press.start + F.seg.press.dur],
+  [box(B, 5, "second"), at("press", 5) - 0.3, F.seg.press.start + F.seg.press.dur],
+  [box(I, 5, "accept"), F.seg.ingest2.start + 0.2, at("ingest2", 6, "atMs")],
+];
+fx.clock(tl, clocks, "Fri 16:40", "Mon 09:00", F.seg.rewind.start + 0.3, Math.max(1.8, F.seg.rewind.dur - 0.6));
+fx.clock(tl, clocks, "Mon 09:01", "Mon 09:21", F.seg.ingest2.start + 0.1, 1.6);
+
+if (style === "spotlight") {
+  gsap.set(caps, { opacity: 1 });
+  beats.forEach((b, i) => {
+    if (b.box) fx.spotlight(tl, stage, b.box, b.t, { color: b.amber ? "#f4b13e" : "#4fcbe2" });
+    else fx.unspot(tl, stage, b.t);
+    const c = fx.caption(tl, caps, "", b.t + 0.15, ends[i], b.amber ? "amber" : "");
+    c.innerHTML = `<b>${b.title}</b> ${b.sub}`;
+  });
+  rings.forEach(([r, a, z]) => fx.ring(tl, stage, r, a, z));
+  fx.unspot(tl, stage, F.duration - 0.6);
+}
+
+if (style === "brackets") {
+  // the frame shrinks under a band of callouts, as the landing page's hero does
+  const map = { s: 0.82, x: 144, y: 150 };
+  gsap.set(frame, { scale: map.s, x: map.x, y: map.y });
+  beats.forEach((b, i) => {
+    if (!b.box) {
+      const c = fx.caption(tl, band, "", b.t, ends[i]);
+      Object.assign(c.style, { top: "28px", textAlign: "center", left: "0", right: "0", fontSize: "44px" });
+      c.innerHTML = `<b>${b.title}</b> ${b.sub}`;
+      return;
+    }
+    const k = fx.bracket(tl, band, b.box, map, b.title, b.sub, b.t, undefined, b.amber ? "#f4b13e" : "#4fcbe2");
+    tl.to([k.g, k.br], { opacity: 0, duration: 0.2 }, ends[i] - 0.2);
+    fx.ring(tl, stage, b.box, b.t + 0.1, ends[i] - 0.2, b.amber ? "#f4b13e" : "#4fcbe2");
+  });
+  rings.forEach(([r, a, z]) => fx.ring(tl, stage, r, a, z));
+}
+
+if (style === "camera") {
+  beats.forEach((b, i) => {
+    const card = document.createElement("div");
+    card.className = "card-side" + (b.amber ? " amber" : "");
+    card.innerHTML = `<h2>${b.title}</h2><p>${b.sub}</p>`;
+    side.appendChild(card);
+    if (!b.box) {
+      fx.home(tl, stage, b.t, 0.8);
+      Object.assign(card.style, { left: "565px", top: "520px" });
+    } else {
+      const f = topOf(b.box);
+      const left = f.x + f.width / 2 < 800;
+      fx.camera(tl, stage, f, b.t, { cx: left ? 1080 : 520, cy: 420, scale: Math.max(1.3, Math.min(2.6, 900 / f.width, 640 / f.height)), dur: 0.9 });
+      Object.assign(card.style, left ? { left: "60px" } : { right: "60px" });
+    }
+    tl.to(card, { opacity: 1, duration: 0.3 }, b.t + 0.4);
+    tl.to(card, { opacity: 0, duration: 0.25 }, ends[i] - 0.25);
+  });
+  rings.forEach(([r, a, z]) => fx.ring(tl, stage, r, a, z));
+  fx.home(tl, stage, F.duration - 1.2, 0.9);
+}
+
+window.__timelines = window.__timelines || {};
+window.__timelines["main"] = tl;
+</script>
+</body>
+</html>

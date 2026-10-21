@@ -164,7 +164,7 @@ function render(scenes, prereq, generated = []) {
 <body><main>
 <header>
 <h1>Demo scene bank</h1>
-<p class="lede">The real console, recorded over a scripted fake project, Studio Nord. Every scene is a short story with a video and the frames of its steps. <code>demo/run.sh</code> regenerates the bank and this page.</p>
+<p class="lede">The real console, recorded over a scripted fake project, the browser game Nebula Run. Every scene is a short story with a video and the frames of its steps. <code>demo/run.sh</code> regenerates the bank and this page.</p>
 <div class="numbers">${num(rec.length, "scenes recorded")}${num(scenes.length - rec.length, "scenes not recorded")}${num((ms / 60000).toFixed(1), "minutes of video")}${num(short(first && first.consoleCommit), "console commit")}${num(when, "recorded")}</div>
 <p class="legend">Click a frame to open it full size. The video plays in place.</p>
 </header>

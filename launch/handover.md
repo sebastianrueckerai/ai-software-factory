@@ -1,5 +1,7 @@
 # Launch: handover for the next session
 
+Update of 22 October: the film's plan changed. It now opens on the landing page's hero frame, and the demo project is a browser game. The working file is [film/notes.md](film/notes.md), and the variants to pick from are on [film/index.html](film/index.html). The script below describes the earlier calendar film and is superseded.
+
 Written 21 October 2026 at the end of the second launch session, the one that wrote the script, the issue scene, the page skeleton, the two procedural clips and group H. Read this, then [concept.md](concept.md), then [script.md](script.md), then [the demo handover](../demo/handover/README.md). The three sweeps under [research/](research/) are the evidence behind the concept.
 
 ## The prompt to paste

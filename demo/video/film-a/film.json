@@ -1,0 +1,677 @@
+{
+ "template": "../film.tpl.html",
+ "style": "spotlight",
+ "shared": [
+  "../film-fx.js",
+  "../loop/diagram.css",
+  "../vendor/gsap.min.js"
+ ],
+ "tail": 0.3,
+ "segments": [
+  {
+   "id": "hero",
+   "still": "34-busy-board-3.png",
+   "dur": 11.2
+  },
+  {
+   "id": "press",
+   "scene": "34-busy-board",
+   "from": [
+    4,
+    "atMs"
+   ],
+   "to": [
+    5,
+    "stillMs"
+   ],
+   "tail": 2.2
+  },
+  {
+   "id": "rewind",
+   "scene": "35-rewind",
+   "from": [
+    1,
+    "stillMs"
+   ],
+   "to": [
+    6,
+    "stillMs"
+   ],
+   "tail": 0.2,
+   "rate": 3.5
+  },
+  {
+   "id": "ingest1",
+   "scene": "03-too-large-split",
+   "from": [
+    2,
+    "atMs"
+   ],
+   "to": [
+    3,
+    "stillMs"
+   ],
+   "tail": 2.6,
+   "rate": 2
+  },
+  {
+   "id": "ingest2",
+   "scene": "03-too-large-split",
+   "from": [
+    5,
+    "stillMs"
+   ],
+   "lead": 3.4,
+   "to": [
+    7,
+    "stillMs"
+   ],
+   "tail": 2.4,
+   "rate": 1.6
+  },
+  {
+   "id": "approval",
+   "scene": "22-approval",
+   "from": [
+    1,
+    "stillMs"
+   ],
+   "lead": 3.0,
+   "to": [
+    5,
+    "stillMs"
+   ],
+   "tail": 0.5,
+   "rate": 2.2
+  },
+  {
+   "id": "autonomy",
+   "scene": "25-autonomy",
+   "from": [
+    1,
+    "stillMs"
+   ],
+   "lead": 1.0,
+   "to": [
+    5,
+    "stillMs"
+   ],
+   "tail": 0.5,
+   "rate": 2.4
+  },
+  {
+   "id": "stall",
+   "scene": "08-supervisor",
+   "from": [
+    1,
+    "stillMs"
+   ],
+   "lead": 2.0,
+   "to": [
+    3,
+    "stillMs"
+   ],
+   "tail": 0.3,
+   "rate": 1.3
+  },
+  {
+   "id": "ask",
+   "scene": "21-design-question",
+   "from": [
+    1,
+    "stillMs"
+   ],
+   "lead": 3.0,
+   "to": [
+    3,
+    "stillMs"
+   ],
+   "tail": 0.3,
+   "rate": 1.4
+  },
+  {
+   "id": "metrics",
+   "scene": "27-before-and-after",
+   "from": [
+    4,
+    "atMs"
+   ],
+   "to": [
+    6,
+    "stillMs"
+   ],
+   "tail": 0.4,
+   "rate": 1.2
+  },
+  {
+   "id": "sandbox",
+   "clip": "p-sandbox-b.mp4",
+   "dur": 21,
+   "rate": 1.1
+  },
+  {
+   "id": "close",
+   "still": "34-busy-board-3.png",
+   "dur": 4.2
+  }
+ ],
+ "beats": [
+  {
+   "at": 2.0,
+   "box": [
+    "34-busy-board",
+    3,
+    "chat"
+   ],
+   "cap": "<b>Change anything from one chat.</b> The agent proposes, you press Do it."
+  },
+  {
+   "at": 5.2,
+   "box": [
+    "34-busy-board",
+    3,
+    "needs"
+   ],
+   "amber": true,
+   "cap": "<b>See what is stuck</b> and what waits on you."
+  },
+  {
+   "at": 8.4,
+   "box": [
+    "34-busy-board",
+    3,
+    "queued"
+   ],
+   "cap": "<b>Decide what runs next:</b> priorities and a backlog."
+  },
+  {
+   "at": [
+    "press"
+   ],
+   "box": {
+    "union": [
+     [
+      "34-busy-board",
+      3,
+      "budget"
+     ],
+     [
+      "34-busy-board",
+      3,
+      "queued",
+      320
+     ]
+    ]
+   },
+   "amber": true,
+   "cap": "<b>Out of budget? Split it.</b> One sentence, then Do it."
+  },
+  {
+   "at": [
+    "press",
+    5,
+    "stillMs",
+    -0.3
+   ],
+   "box": {
+    "union": [
+     [
+      "34-busy-board",
+      5,
+      "first"
+     ],
+     [
+      "34-busy-board",
+      5,
+      "second"
+     ]
+    ]
+   },
+   "cap": "<b>Two smaller cards</b> land in Queued."
+  },
+  {
+   "at": [
+    "rewind"
+   ],
+   "box": null,
+   "cap": "<b>Back to Monday.</b> How did the board fill up?"
+  },
+  {
+   "at": [
+    "ingest1",
+    null,
+    null,
+    0.4
+   ],
+   "box": [
+    "03-too-large-split",
+    2,
+    "doit"
+   ],
+   "cap": "<b>Monday starts with one sentence:</b> build level 4, the asteroid belt."
+  },
+  {
+   "at": [
+    "ingest1",
+    3,
+    "atMs",
+    0.2
+   ],
+   "box": [
+    "03-too-large-split",
+    3,
+    "card"
+   ],
+   "cap": "<b>Too big for one card,</b> so the planner writes a plan."
+  },
+  {
+   "at": [
+    "ingest2",
+    null,
+    null,
+    0.1
+   ],
+   "box": {
+    "union": [
+     [
+      "03-too-large-split",
+      5,
+      "card"
+     ],
+     [
+      "03-too-large-split",
+      5,
+      "accept"
+     ]
+    ]
+   },
+   "amber": true,
+   "cap": "<b>Twenty minutes later,</b> the plan waits for you."
+  },
+  {
+   "at": [
+    "ingest2",
+    6,
+    "atMs",
+    0.3
+   ],
+   "box": [
+    "03-too-large-split",
+    6,
+    "plan"
+   ],
+   "cap": "<b>Four cards, in the order</b> they build on each other."
+  },
+  {
+   "at": [
+    "ingest2",
+    7,
+    "atMs",
+    0.4
+   ],
+   "box": [
+    "03-too-large-split",
+    7,
+    "queued"
+   ],
+   "cap": "<b>You accept, and the four cards land.</b> Now the agents build."
+  },
+  {
+   "at": [
+    "approval",
+    null,
+    null,
+    0.1
+   ],
+   "box": [
+    "22-approval",
+    1,
+    "approval"
+   ],
+   "amber": true,
+   "cap": "<b>A payments change waits for you.</b> On manual, every merge does."
+  },
+  {
+   "at": [
+    "approval",
+    2,
+    "stillMs",
+    -1.0
+   ],
+   "box": [
+    "22-approval",
+    2,
+    "drawer"
+   ],
+   "cap": "<b>You read the review and the files,</b>"
+  },
+  {
+   "at": [
+    "approval",
+    4,
+    "atMs"
+   ],
+   "box": [
+    "22-approval",
+    4,
+    "needs"
+   ],
+   "cap": "<b>then approve.</b> It merges and goes live."
+  },
+  {
+   "at": [
+    "autonomy",
+    null,
+    null,
+    0.1
+   ],
+   "box": [
+    "25-autonomy",
+    2,
+    "menu"
+   ],
+   "cap": "<b>Turn the dial to full auto,</b>"
+  },
+  {
+   "at": [
+    "autonomy",
+    3,
+    "atMs"
+   ],
+   "box": [
+    "25-autonomy",
+    3,
+    "wake"
+   ],
+   "cap": "<b>and the agent answers the next card's question</b> from the code."
+  },
+  {
+   "at": [
+    "autonomy",
+    5,
+    "atMs"
+   ],
+   "box": [
+    "25-autonomy",
+    5,
+    "merge"
+   ],
+   "cap": "<b>It merges once the gates pass.</b> Nobody waits at the gate."
+  },
+  {
+   "at": [
+    "stall",
+    null,
+    null,
+    0.1
+   ],
+   "box": [
+    "08-supervisor",
+    1,
+    "drawer"
+   ],
+   "cap": "<b>A session goes in circles.</b>"
+  },
+  {
+   "at": [
+    "stall",
+    2,
+    "atMs",
+    1.0
+   ],
+   "box": [
+    "08-supervisor",
+    2,
+    "row"
+   ],
+   "amber": true,
+   "cap": "<b>A detector trips, and the supervisor steps in.</b>"
+  },
+  {
+   "at": [
+    "stall",
+    3,
+    "atMs"
+   ],
+   "box": [
+    "08-supervisor",
+    3,
+    "drawer"
+   ],
+   "cap": "<b>The next session starts from what it learned.</b>"
+  },
+  {
+   "at": [
+    "ask",
+    null,
+    null,
+    0.1
+   ],
+   "box": [
+    "21-design-question",
+    1,
+    "ask"
+   ],
+   "amber": true,
+   "cap": "<b>What it cannot decide, it asks you,</b> with the choices."
+  },
+  {
+   "at": [
+    "ask",
+    2,
+    "atMs",
+    0.8
+   ],
+   "box": [
+    "21-design-question",
+    2,
+    "chat"
+   ],
+   "cap": "<b>One click answers.</b>"
+  },
+  {
+   "at": [
+    "ask",
+    3,
+    "atMs"
+   ],
+   "box": [
+    "21-design-question",
+    3,
+    "drawer"
+   ],
+   "cap": "<b>The card goes on with your pick.</b>"
+  },
+  {
+   "at": [
+    "metrics",
+    null,
+    null,
+    0.1
+   ],
+   "box": [
+    "27-before-and-after",
+    4,
+    "figure"
+   ],
+   "cap": "<b>The four DevOps delivery metrics,</b> week by week:"
+  },
+  {
+   "at": [
+    "metrics",
+    5,
+    "atMs"
+   ],
+   "box": [
+    "27-before-and-after",
+    5,
+    "figure"
+   ],
+   "cap": "<b>what a card costs,</b>"
+  },
+  {
+   "at": [
+    "metrics",
+    6,
+    "atMs"
+   ],
+   "box": [
+    "27-before-and-after",
+    6,
+    "figure"
+   ],
+   "cap": "<b>how often it needs you.</b> Tune models and prompts against them."
+  },
+  {
+   "at": [
+    "sandbox"
+   ],
+   "box": null
+  },
+  {
+   "at": [
+    "close"
+   ],
+   "box": null,
+   "shade": true,
+   "cls": "close",
+   "cap": "<b>The worst an agent can do is wreck its own sandbox.</b><small>github.com/sebastianrueckerai/ai-software-factory</small>"
+  }
+ ],
+ "rings": [
+  {
+   "box": [
+    "34-busy-board",
+    3,
+    "doit"
+   ],
+   "from": [
+    "press",
+    null,
+    null,
+    0.2
+   ],
+   "to": [
+    "press",
+    4,
+    "atMs",
+    0.9
+   ]
+  },
+  {
+   "box": [
+    "34-busy-board",
+    4,
+    "first"
+   ],
+   "from": [
+    "press",
+    4
+   ],
+   "to": [
+    "press",
+    "end"
+   ]
+  },
+  {
+   "box": [
+    "34-busy-board",
+    5,
+    "second"
+   ],
+   "from": [
+    "press",
+    5,
+    "stillMs",
+    -0.3
+   ],
+   "to": [
+    "press",
+    "end"
+   ]
+  },
+  {
+   "box": [
+    "03-too-large-split",
+    5,
+    "accept"
+   ],
+   "from": [
+    "ingest2",
+    null,
+    null,
+    0.2
+   ],
+   "to": [
+    "ingest2",
+    6,
+    "atMs"
+   ]
+  }
+ ],
+ "clocks": [
+  {
+   "at": [
+    "rewind",
+    null,
+    null,
+    0.3
+   ],
+   "from": "Fri 16:40",
+   "to": "Mon 09:00",
+   "dur": 2.6
+  },
+  {
+   "at": [
+    "ingest2",
+    null,
+    null,
+    0.1
+   ],
+   "from": "Mon 09:01",
+   "to": "Mon 09:21",
+   "dur": 1.6
+  }
+ ],
+ "titles": [
+  {
+   "at": [
+    "approval"
+   ],
+   "text": "By hand"
+  },
+  {
+   "at": [
+    "autonomy"
+   ],
+   "text": "Full auto"
+  },
+  {
+   "at": [
+    "stall"
+   ],
+   "text": "When it stalls"
+  },
+  {
+   "at": [
+    "ask"
+   ],
+   "text": "When it needs you"
+  },
+  {
+   "at": [
+    "metrics"
+   ],
+   "text": "Measured"
+  },
+  {
+   "at": [
+    "sandbox"
+   ],
+   "text": "Inside a card"
+  }
+ ],
+ "quiet": [
+  "sandbox"
+ ]
+}

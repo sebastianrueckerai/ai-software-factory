@@ -1,3 +1,5 @@
 .env*
 __pycache__/
 demo/out/
+demo/video/*/clips/
+demo/video/*/data.js

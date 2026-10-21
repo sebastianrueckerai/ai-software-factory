@@ -28,8 +28,9 @@ module.exports = {
       state: (now) => morning(now, 14.5),
       actions: [{ goto: "/" }, { click: ui.open(sup.issue) }, { waitFor: ui.tab("chat") }, { click: ui.tab("chat") }, { waitFor: "#session-log .msg" }],
       hold: 5000,
+      boxes: { drawer: "#drawer" },
     },
-    { state: (now) => morning(now, 16.5), actions: [{ click: ui.tab("activity") }, { waitFor: ui.step("supervisor") }, { hover: ui.step("supervisor") }], hold: 5500 },
-    { state: (now) => morning(now, 24.5), actions: [{ click: ui.tab("chat") }, { waitFor: "#session-log .msg" }], hold: 4500 },
+    { state: (now) => morning(now, 16.5), actions: [{ click: ui.tab("activity") }, { waitFor: ui.step("supervisor") }, { hover: ui.step("supervisor") }], hold: 5500, boxes: { drawer: "#drawer", row: ui.step("supervisor") } },
+    { state: (now) => morning(now, 24.5), actions: [{ click: ui.tab("chat") }, { waitFor: "#session-log .msg" }], hold: 4500, boxes: { drawer: "#drawer" } },
   ],
 };

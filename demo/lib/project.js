@@ -23,6 +23,8 @@ module.exports = {
     Namespaces: namespaces, Environments: environments, Process: "spec", Lanes: lanes, File: true,
   }],
   config: {
+    // a busy studio's board holds more than the default eight cards no agent has started yet
+    backlog_cap: 16,
     repository: "orbit/nebula-run", merge_rule: "human", objects: "factory", agents: "coder", process: "spec",
     namespaces, environments,
     // policy.DefaultChat's confirm list: the lab's own chat block confirms nothing, so the chat's writes would run unasked

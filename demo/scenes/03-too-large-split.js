@@ -44,29 +44,48 @@ function waiting(now) {
   };
 }
 
+// accepted is the board after the accept: the plan card done, its four cards filed in their order, the physics model
+// queued first and the rest waiting on what they build on
+function accepted(now) {
+  const kid = (issue, status) => story.card(now, issue, { status, lane: "ready", age: 20 });
+  return {
+    tasks: [...week(now), story.card(now, 105, { status: "done", lane: "plan", age: PLANNED + 60, finished: 30, spent: 0.46, model: "big" }),
+      kid(109, "queued"), kid(110, "waiting-deps"), kid(111, "waiting-deps"), kid(112, "waiting-deps")],
+    deps: { 110: [109], 111: [109], 112: [110, 111] },
+  };
+}
+
 // scene is the board s seconds after #105's filing
 const scene = (now, s, o) => state.scene(now, { ...story.spending(story.at(105, s)), ...o });
 
 module.exports = {
   title: "Too large, split",
-  story: "Sebastian asks for level 4, the asteroid belt. The agent files it in the plan lane, and the planner's four cards wait for his accept.",
+  story: "Sebastian asks for level 4, the asteroid belt. The agent files it in the plan lane, the planner's four cards wait for his " +
+    "accept, and once accepted they land on the board in their order.",
   group: "intake",
   theme: "dark",
   viewport: "desk",
+  boxes: { chat: ".chat", queued: '#board .column[aria-labelledby="col-1"]' },
   steps: [
     { state: (now) => scene(now, 0, { tasks: week(now), replies: [filing] }), actions: [{ goto: "/" }], hold: 1500 },
     {
       state: () => null,
       actions: [{ click: "#chat-input" }, { type: ["#chat-input", story.requests.belt] }, { press: "Enter" }, { waitFor: doIt }, { wait: 3000 }, { hover: doIt }],
       hold: 600,
+      boxes: { doit: doIt },
     },
-    { state: () => null, actions: [{ click: doIt }, { waitFor: "#chat-log .applied" }, { waitFor: card }], hold: 2000 },
-    { state: (now) => scene(now, 6, { ...thread(now), ...planning(now) }), actions: [{ hover: card }], hold: 2500 },
-    { state: (now) => scene(now, PLANNED, { ...thread(now), ...waiting(now) }), actions: [{ hover: accept }], hold: 2500 },
+    { state: () => null, actions: [{ click: doIt }, { waitFor: "#chat-log .applied" }, { waitFor: card }], hold: 2000, boxes: { card } },
+    { state: (now) => scene(now, 6, { ...thread(now), ...planning(now) }), actions: [{ hover: card }], hold: 2500, boxes: { card } },
+    { state: (now) => scene(now, PLANNED, { ...thread(now), ...waiting(now) }), actions: [{ hover: accept }], hold: 2500, boxes: { card, accept } },
     {
       state: () => null,
       actions: [{ click: `#board article.approval.plan[data-card="${state.id(105)}"] a.open` }, { click: '#drawer [data-sec="plan"] > summary' }],
       hold: 3500,
+      boxes: { plan: '#drawer [data-sec="plan"]' },
+    },
+    {
+      state: (now) => scene(now, PLANNED + 90, { ...thread(now), ...accepted(now) }), actions: [{ goto: "/" }, { waitFor: ui.face(112) }], hold: 3000,
+      boxes: { first: ui.face(109), last: ui.face(112) },
     },
   ],
 };

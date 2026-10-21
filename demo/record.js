@@ -95,7 +95,8 @@ async function record(browser, name, commits) {
       name: lab().name, value: lab().value, domain: new URL(BASE).hostname, path: "/", secure: true, httpOnly: true, sameSite: "Lax",
     }]);
     await context.addInitScript((theme) => localStorage.setItem("theme", theme), scene.theme);
-    await context.addInitScript(ring);
+    // a scene that becomes a still, the landing page's hero, records without the cursor's ring
+    if (scene.cursor !== false) await context.addInitScript(ring);
   }
   const page = await context.newPage();
   let problem = null;
@@ -127,6 +128,18 @@ async function record(browser, name, commits) {
       }
       await sleep(step.hold);
       await check();
+      // boxes are the page boxes of the elements the scene names, at the moment of the step's still, so the cut's
+      // overlays and zooms follow the console's layout and regenerate with the bank
+      const named = { ...scene.boxes, ...step.boxes };
+      if (Object.keys(named).length) {
+        marks[i].boxes = {};
+        for (const [key, selector] of Object.entries(named)) {
+          const box = await page.locator(selector).first().boundingBox();
+          if (!box) throw new Error(`box ${key}: ${selector} has no box`);
+          marks[i].boxes[key] = Object.fromEntries(Object.entries(box).map(([k, v]) => [k, Math.round(v)]));
+        }
+      }
+      marks[i].stillMs = Date.now() - t0;
       const png = path.join(OUT, `${name}-${n}.png`);
       pngs.push(png);
       await page.screenshot({ path: png });

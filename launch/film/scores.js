@@ -1,0 +1,1 @@
+for (const [k, v] of Object.entries({"opening-a": "3", "opening-b": "2", "opening-c": "3", "sandbox-a": "3", "sandbox-b": "3", "film-a": "2"})) { const e = document.getElementById('s-' + k); if (e) e.textContent = 'independent critic: ' + v + ' of 5'; }

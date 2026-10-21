@@ -30,13 +30,14 @@ module.exports = {
   theme: "dark",
   viewport: "desk",
   steps: [
-    { state: (now) => editor(now, ANSWERED - 30), actions: [{ goto: "/" }, { hover: `#chat-log .msg:has-text("#${ask.issue} needs you") .av` }], hold: 3500 },
-    { state: () => null, actions: [{ hover: ui.answer(ask.answer) }, { wait: 800 }, { click: ui.answer(ask.answer) }, { waitFor: answered }], hold: 2500 },
+    { state: (now) => editor(now, ANSWERED - 30), actions: [{ goto: "/" }, { hover: `#chat-log .msg:has-text("#${ask.issue} needs you") .av` }], hold: 3500, boxes: { ask: `#chat-log .msg:has-text("#${ask.issue} needs you")`, chat: ".chat" } },
+    { state: () => null, actions: [{ hover: ui.answer(ask.answer) }, { wait: 800 }, { click: ui.answer(ask.answer) }, { waitFor: answered }], hold: 2500, boxes: { chat: ".chat" } },
     // the reload reads the answer's rows on the seed's clock, which the session's stamps share
     {
       state: (now) => editor(now, ANSWERED + 90),
       actions: [{ goto: "/" }, { click: ui.open(ask.issue) }, { waitFor: ui.tab("chat") }, { click: ui.tab("chat") }, { waitFor: "#session-log .msg" }],
       hold: 4000,
+      boxes: { drawer: "#drawer" },
     },
   ],
 };

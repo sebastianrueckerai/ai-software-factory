@@ -92,16 +92,17 @@ module.exports = {
   theme: "dark",
   viewport: "desk",
   steps: [
-    { state: manual, actions: [{ goto: "/" }, { hover: ui.idle }], hold: 3500 },
-    { state: () => null, actions: [{ click: ui.level }, { waitFor: ui.levelPick("full auto") }, { hover: ui.levelPick("full auto") }], hold: 3500 },
+    { state: manual, actions: [{ goto: "/" }, { hover: ui.idle }], hold: 3500, boxes: { needs: "#needs-you", level: ui.level } },
+    { state: () => null, actions: [{ click: ui.level }, { waitFor: ui.levelPick("full auto") }, { hover: ui.levelPick("full auto") }], hold: 3500, boxes: { level: ui.level, menu: "#level-pop" } },
     // a pick sets the level at once, through a commit of the project's file; the lab's Forgejo fake holds no such file,
     // so the full auto level is the seed's
-    { state: full, actions: [{ goto: "/" }, { waitFor: wake }, { hover: ui.park }], hold: 3500 },
-    { state: () => null, actions: [{ click: `${wake} [data-fold]` }, { hover: `${wake} .av` }], hold: 4500 },
+    { state: full, actions: [{ goto: "/" }, { waitFor: wake }, { hover: ui.park }], hold: 3500, boxes: { wake } },
+    { state: () => null, actions: [{ click: `${wake} [data-fold]` }, { hover: `${wake} .av` }], hold: 4500, boxes: { wake } },
     {
       state: () => null,
       actions: [{ click: ui.open(ISSUE) }, { waitFor: ui.tab("activity") }, { click: ui.tab("activity") }, { waitFor: ui.step("auto_merge") }, { hover: `${ui.step("auto_merge")} td >> nth=2` }],
       hold: 4500,
+      boxes: { drawer: "#drawer", merge: ui.step("auto_merge") },
     },
   ],
 };

@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1600, height=900">
+<title>The sandbox, schematic</title>
+<link rel="stylesheet" href="diagram.css">
+<script src="gsap.min.js"></script>
+<style>
+  .live { animation: none; }
+  #root { position: relative; width: 1600px; height: 900px; overflow: hidden; background: var(--bg); }
+  .panel h2 { font-size: 34px; margin: 0 0 6px; }
+  .panel p { font-size: 26px; color: var(--text-muted); }
+  .pod { left: 570px; top: 160px; width: 460px; height: 340px; padding: 22px 26px; }
+  .pod .work { margin-top: 22px; font: 23px/1.8 var(--font-mono); color: var(--text-muted); }
+  .pod .work div { opacity: 0; }
+  .pod .work b { color: var(--accent); font-weight: 400; }
+  .walllabel { position: absolute; left: 554px; top: 96px; width: 492px; text-align: center; font: 26px var(--font-mono); color: var(--text); }
+  .target { left: 60px; width: 370px; height: 64px; padding: 14px 20px; border-color: var(--line); }
+  .target h2 { font-size: 26px; font-weight: 500; color: var(--text-faint); margin: 0; }
+  .blocknote { position: absolute; left: 60px; top: 516px; width: 480px; font: 25px/1.4 var(--font-mono); color: var(--text); }
+  .gw { left: 1130px; top: 160px; width: 410px; height: 196px; padding: 20px 24px; }
+  .key { display: inline-block; margin-top: 10px; padding: 4px 12px; border: 1px solid var(--accent); font: 24px var(--font-mono); color: var(--text); }
+  .apilabel { position: absolute; left: 1130px; top: 366px; width: 470px; text-align: left; font: 24px var(--font-mono); color: var(--text-muted); }
+  .meter { position: absolute; left: 1130px; top: 420px; width: 410px; }
+  .meter .lbl { display: flex; justify-content: space-between; font: 24px var(--font-mono); color: var(--text-muted); margin-bottom: 10px; }
+  .meter .lbl b { color: var(--text); font-weight: 400; }
+  .bar { position: relative; height: 34px; border: 1px solid var(--line-strong); background: var(--bg-panel); }
+  .seg { position: absolute; top: 0; bottom: 0; left: 0; width: 0; }
+  .seg.booked { background: color-mix(in srgb, var(--accent) 75%, transparent); }
+  .seg.held { background: color-mix(in srgb, var(--need) 85%, transparent); }
+  .ask { left: 1130px; top: 522px; width: 410px; padding: 16px 22px; background: var(--need-tint); border-color: color-mix(in srgb, var(--need) 72%, transparent); box-shadow: inset 3px 0 0 var(--need); opacity: 0; }
+  .ask::after { border-color: var(--need); }
+  .ask h2 { color: var(--need-text); font-size: 27px; }
+  .ask .btns { display: flex; gap: 10px; margin-top: 10px; }
+  .ask .btns span { padding: 6px 12px; border: 1px solid var(--need); color: var(--need-text); font: 20px var(--font-mono); }
+  .factory { left: 570px; top: 590px; width: 460px; height: 120px; padding: 18px 26px; }
+  .repo { left: 1250px; top: 600px; width: 290px; height: 140px; padding: 18px 22px; }
+  .token { position: absolute; left: 0; top: 0; padding: 6px 12px; background: var(--bg-raised); border: 1px solid var(--accent); font: 21px var(--font-mono); color: var(--accent); white-space: nowrap; opacity: 0; }
+  .dot { position: absolute; left: 0; top: 0; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 14px 3px color-mix(in srgb, var(--accent) 55%, transparent); opacity: 0; }
+  .flash { position: absolute; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; border: 3px solid var(--text-faint); opacity: 0; }
+  .caption { position: absolute; left: 0; right: 0; top: 744px; height: 156px; text-align: center; font-size: 48px; line-height: 1.25; color: var(--text); background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--bg) 88%, transparent) 22%); }
+  .caption span { position: absolute; left: 80px; right: 80px; top: 22px; opacity: 0; }
+  .state { position: absolute; font: 24px var(--font-mono); color: var(--text-muted); opacity: 0; }
+  .wall { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-dasharray: 10 7; }
+  .wire { stroke-width: 2.5; }
+  .wire.off { stroke: var(--line-strong); stroke-dasharray: 6 6; }
+  .x { stroke: var(--text-muted); stroke-width: 3.5; fill: none; opacity: 0; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="22" data-width="1600" data-height="900">
+<div id="scene" class="clip" data-start="0" data-duration="22" style="position:absolute;inset:0">
+
+<svg class="wires" viewBox="0 0 1600 900" aria-hidden="true">
+  <rect id="wall" class="wall" x="554" y="144" width="492" height="372"/>
+  <path class="wire off" data-off="0" d="M554 192 H430"/>
+  <path class="wire off" data-off="1" d="M554 276 H430"/>
+  <path class="wire off" data-off="2" d="M554 360 H430"/>
+  <path class="wire off" data-off="3" d="M554 444 H430"/>
+  <path class="x" data-x="0" d="M478 178 l28 28 M506 178 l-28 28"/>
+  <path class="x" data-x="1" d="M478 262 l28 28 M506 262 l-28 28"/>
+  <path class="x" data-x="2" d="M478 346 l28 28 M506 346 l-28 28"/>
+  <path class="x" data-x="3" d="M478 430 l28 28 M506 430 l-28 28"/>
+  <path class="wire" id="w-gw" d="M1046 245 H1130"/>
+  <path class="wire" id="w-api" d="M1540 245 H1600"/>
+  <path class="wire" id="w-push" d="M1030 655 H1250"/>
+</svg>
+
+<p class="walllabel" id="walllabel">one card · one throwaway pod</p>
+<section class="panel pod" id="pod">
+  <h2><span class="live" id="live"></span> The agent</h2>
+  <p>gVisor · non-root · read-only root</p>
+  <div class="work" id="work">
+    <div><b>$</b> edit src/level4/boss.ts</div>
+    <div><b>$</b> go test ./...</div>
+    <div><b>$</b> git commit</div>
+  </div>
+</section>
+
+<section class="panel target" data-t="0" style="top:160px"><h2>the internet</h2></section>
+<section class="panel target" data-t="1" style="top:244px"><h2>the host machine</h2></section>
+<section class="panel target" data-t="2" style="top:328px"><h2>cloud metadata</h2></section>
+<section class="panel target" data-t="3" style="top:412px"><h2>a push token</h2></section>
+<p class="blocknote" id="blocknote">blocked, and a probe proves it before the agent starts</p>
+
+<section class="panel gw" id="gw"><h2>Model gateway</h2><p>meters every call</p><span class="key" id="key">the model keys stay here</span></section>
+<p class="apilabel" id="apilabel">→ the model API, hosted or yours</p>
+<div class="meter" id="meter">
+  <div class="lbl"><span>the card's budget</span><b id="spent">€0.00 of €2.00</b></div>
+  <div class="bar"><i class="seg booked" id="booked"></i><i class="seg held" id="held"></i></div>
+</div>
+<section class="panel ask" id="ask"><h2>At the cap: fund it or end it?</h2><div class="btns"><span id="fund">Fund a session</span><span>End the card</span></div></section>
+<section class="panel factory" id="factory"><h2>The factory</h2><p id="factory-sub">starts one pod per card</p></section>
+<section class="panel repo" id="repo"><h2>Repository</h2><p id="repo-sub">&nbsp;</p></section>
+
+<i class="dot" id="probe"></i>
+<i class="dot" id="call"></i>
+<i class="flash" id="flash"></i>
+<span class="token" id="token">fresh token</span>
+<p class="state" id="s-killed" style="left:596px;top:330px">agent done,<br>its processes killed</p>
+<p class="state" id="s-deleted" style="left:700px;top:300px;font-size:32px;color:#dfe7f1">pod deleted</p>
+
+<div class="caption">
+  <span data-c="0">The factory starts one throwaway pod for each card.</span>
+  <span data-c="1">Before the agent starts, a probe proves the pod cannot reach the internet, the host or the cloud metadata.</span>
+  <span data-c="2">Every model call goes through the gateway and is held against the card's budget first.</span>
+  <span data-c="3">The agent never holds a push token or a model key.</span>
+  <span data-c="4">At the cap, the factory stops and asks you: fund it or end it.</span>
+  <span data-c="5">When the agent is done, the factory pushes once with a fresh token and deletes the pod.</span>
+</div>
+
+</div>
+</div>
+
+<script>
+// One paused timeline drives the clip: the renderer seeks it frame by frame, so nothing here reads the clock.
+const tl = gsap.timeline({ paused: true });
+const q = (s) => document.querySelector(s);
+const qa = (s) => [...document.querySelectorAll(s)];
+const caps = qa("[data-c]"), targets = qa("[data-t]"), offs = qa("[data-off]"), xs = qa("[data-x]");
+const Y = [192, 276, 360, 444];
+offs.forEach((w, i) => gsap.set(w, { attr: { d: `M554 ${Y[i]} H554` } }));
+gsap.set(["#w-gw", "#w-api", "#w-push"], { strokeDasharray: 100, strokeDashoffset: 100 });
+gsap.set([...targets, "#pod", "#wall", "#walllabel", "#blocknote", "#gw", "#apilabel", "#meter", "#factory", "#repo", "#w-gw"], { opacity: 0 });
+gsap.set("#pod", { y: 16 });
+
+const caption = (i, at, until) => {
+  tl.to(caps[i], { opacity: 1, duration: 0.35 }, at);
+  tl.to(caps[i], { opacity: 0, duration: 0.25 }, until - 0.3);
+};
+const go = (el, from, to, at, dur) => {
+  tl.set(el, { x: from[0], y: from[1], opacity: 1 }, at);
+  tl.to(el, { x: to[0], y: to[1], duration: dur, ease: "power1.inOut" }, at);
+};
+
+// 0 to 3.4: the factory starts the pod; the agent waits for the probe
+tl.to("#factory", { opacity: 1, duration: 0.4 }, 0.1);
+tl.to("#wall", { opacity: 1, duration: 0.6 }, 0.5);
+tl.to("#pod", { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 0.6);
+tl.to("#walllabel", { opacity: 1, duration: 0.5 }, 1.0);
+tl.set("#factory-sub", { textContent: "waits for the agent to finish" }, 3.3);
+caption(0, 0.5, 3.4);
+
+// 3.5 to 7.7: each blocked target, a probe that stops at the cross
+targets.forEach((t, i) => {
+  const at = 3.6 + i * 0.75, y = Y[i];
+  tl.to(t, { opacity: 1, duration: 0.3 }, at);
+  tl.to(offs[i], { attr: { d: `M554 ${y} H430` }, duration: 0.4, ease: "none" }, at);
+  go("#probe", [554, y], [492, y], at + 0.1, 0.32);
+  tl.set("#probe", { opacity: 0 }, at + 0.44);
+  tl.to(xs[i], { opacity: 1, duration: 0.15 }, at + 0.42);
+  tl.set("#flash", { left: 492, top: y, opacity: 0.9, scale: 0.4 }, at + 0.42);
+  tl.to("#flash", { scale: 1.5, opacity: 0, duration: 0.3 }, at + 0.43);
+});
+tl.to("#blocknote", { opacity: 1, duration: 0.4 }, 6.6);
+caption(1, 3.5, 7.8);
+
+// 7.9 to 11.8: the gateway, one call held, sent to the model API, booked
+qa("#work div").forEach((d, i) => tl.to(d, { opacity: 1, duration: 0.25 }, 7.9 + i * 0.45));
+tl.to(["#gw", "#apilabel", "#w-gw"], { opacity: 1, duration: 0.4 }, 7.9);
+tl.to(["#w-gw", "#w-api"], { strokeDashoffset: 0, duration: 0.4, ease: "none" }, 8.0);
+tl.to("#meter", { opacity: 1, duration: 0.4 }, 8.3);
+go("#call", [1046, 245], [1128, 245], 8.9, 0.4);
+tl.set("#call", { opacity: 0 }, 9.3);
+tl.to("#gw", { borderColor: "#f4b13e", duration: 0.15 }, 9.3);
+tl.to("#held", { width: 12, duration: 0.25 }, 9.3);
+tl.set("#spent", { textContent: "€0.06 held" }, 9.3);
+go("#call", [1542, 245], [1600, 245], 9.7, 0.3);
+tl.set("#call", { opacity: 0 }, 10.0);
+go("#call", [1600, 245], [1542, 245], 10.3, 0.3);
+tl.set("#call", { opacity: 0 }, 10.6);
+tl.to("#gw", { borderColor: "#263649", duration: 0.2 }, 10.85);
+tl.set("#held", { width: 0 }, 10.85);
+tl.set("#booked", { width: 8 }, 10.85);
+tl.set("#spent", { textContent: "€0.04 of €2.00" }, 10.85);
+go("#call", [1128, 245], [1046, 245], 10.9, 0.3);
+tl.set("#call", { opacity: 0 }, 11.2);
+caption(2, 7.9, 11.8);
+
+// 11.9 to 14.5: the keys stay in the gateway, the push token stays blocked
+tl.to("#key", { scale: 1.1, duration: 0.3, yoyo: true, repeat: 3, transformOrigin: "50% 50%" }, 12.1);
+tl.to(xs[3], { scale: 1.4, duration: 0.3, yoyo: true, repeat: 3, transformOrigin: "50% 50%" }, 12.1);
+caption(3, 11.9, 14.5);
+
+// 14.6 to 17.7: calls fill the budget to the cap, and the factory asks
+for (let k = 0; k < 4; k++) {
+  const at = 14.7 + k * 0.48;
+  go("#call", [1046, 245], [1128, 245], at, 0.24);
+  tl.set("#call", { opacity: 0 }, at + 0.26);
+  tl.set("#booked", { width: Math.min(410, 8 + (k + 1) * 101) }, at + 0.26);
+}
+tl.set("#spent", { textContent: "€2.00 of €2.00" }, 16.6);
+tl.to("#booked", { backgroundColor: "#f4b13e", duration: 0.3 }, 16.6);
+tl.to("#ask", { opacity: 1, duration: 0.4 }, 16.8);
+tl.to("#fund", { backgroundColor: "#f4b13e", color: "#070b12", duration: 0.15 }, 17.4);
+caption(4, 14.6, 17.9);
+
+// 17.9 to 22: the agent ends, the factory pushes once with a fresh token, the pod is deleted
+tl.to("#ask", { opacity: 0, duration: 0.3 }, 17.9);
+tl.set("#spent", { textContent: "€2.40 of €2.60" }, 17.9);
+tl.to("#booked", { backgroundColor: "#4fcbe2", width: 378, duration: 0.3 }, 17.9);
+tl.to("#work", { opacity: 0, duration: 0.3 }, 17.9);
+tl.to("#s-killed", { opacity: 1, duration: 0.3 }, 18.1);
+tl.to(["#factory", "#repo"], { opacity: 1, duration: 0.3 }, 18.1);
+tl.set("#factory-sub", { textContent: "mints a token now" }, 18.6);
+tl.to("#factory", { borderColor: "#4fcbe2", duration: 0.2 }, 18.6);
+tl.to("#w-push", { strokeDashoffset: 0, duration: 0.3, ease: "none" }, 18.7);
+tl.set("#token", { x: 1040, y: 612, opacity: 1 }, 18.8);
+tl.to("#token", { x: 1060, duration: 0.4 }, 18.9);
+tl.to("#token", { x: 1250, y: 640, scale: 0.4, opacity: 0, duration: 0.35, ease: "power2.in" }, 19.35);
+tl.set("#repo-sub", { innerHTML: "pushed once,<br>token revoked" }, 19.7);
+tl.to(["#pod", "#walllabel", "#s-killed"], { opacity: 0, duration: 0.5 }, 20.2);
+tl.to("#wall", { opacity: 0, duration: 0.6 }, 20.2);
+tl.to("#s-deleted", { opacity: 1, duration: 0.3 }, 20.5);
+caption(5, 17.9, 21.8);
+
+window.__timelines = window.__timelines || {};
+window.__timelines["main"] = tl;
+</script>
+</body>
+</html>

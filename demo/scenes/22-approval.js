@@ -49,13 +49,14 @@ module.exports = {
   theme: "dark",
   viewport: "desk",
   steps: [
-    { state: (now) => thursday(now, m.queued - 30), actions: [{ goto: "/" }, { hover: ui.idle }], hold: 3500 },
-    { state: () => null, actions: [{ click: details }, { waitFor: '#drawer [data-sec="reviews"][open]' }, { hover: ui.tab("files") }], hold: 4500 },
+    { state: (now) => thursday(now, m.queued - 30), actions: [{ goto: "/" }, { hover: ui.idle }], hold: 3500, boxes: { approval: ui.approval(a.pr) } },
+    { state: () => null, actions: [{ click: details }, { waitFor: '#drawer [data-sec="reviews"][open]' }, { hover: ui.tab("files") }], hold: 4500, boxes: { drawer: "#drawer" } },
     { state: () => null, actions: [{ click: ui.tab("files") }, { waitFor: "#drawer table.files" }, { hover: "#drawer table.files caption" }], hold: 3500 },
     {
       state: () => null,
       actions: [{ click: "#drawer-close" }, { wait: 500 }, { hover: ui.approve(a.pr) }, { wait: 800 }, { click: ui.approve(a.pr) }, { wait: 400 }],
       hold: 300,
+      boxes: { needs: "#needs-you" },
     },
     // the seed's redraw takes the press's banner away, so the banner and the settled counts show one step apart
     { state: (now) => thursday(now, m.at + 30), actions: [{ goto: "/" }, { hover: ui.park }], hold: 4000 },

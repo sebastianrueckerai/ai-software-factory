@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The film, version 1: variants</title>
+<style>
+:root { color-scheme: dark; --bg: #070b12; --panel: #0b111a; --line: #263649; --text: #dfe7f1; --muted: #93a1b5; --accent: #4fcbe2; --need: #f4b13e; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 system-ui, sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding: 32px 24px 64px; }
+h1 { font-size: 30px; margin: 0 0 8px; }
+h2 { font-size: 22px; margin: 40px 0 6px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+p { margin: 0 0 10px; color: var(--muted); max-width: 820px; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+video, img { width: 100%; height: auto; display: block; border: 1px solid var(--line); background: #000; }
+.cap { font: 13px ui-monospace, monospace; color: var(--muted); margin-top: 6px; }
+.score { color: var(--need); }
+a { color: var(--accent); }
+@media (max-width: 800px) { .pair { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+<h1>The film, version 1</h1>
+<p>Five pieces to pick from. All console footage is the real console over the demo project, now a browser game, recorded by <code>demo/run.sh</code>. The overlays are HyperFrames compositions built by <code>demo/video/film.js</code> from the recorder's element boxes. Captions only. No voice yet.</p>
+<p>The videos and sheets load from <code>demo/out/</code> of the main checkout. Open this page from there.</p>
+
+<h2>The rough cut, spotlight style</h2>
+<p>The whole film at 114 seconds. The hero frame and its three points, the budget split, the rewind to Monday, the plan filling the board, a merge approved by hand, full auto, the supervisor after a stall, a question only you answer, the metrics, the sandbox from inside a card, the closing line.</p>
+<div class="pair">
+<div><video src="../../demo/out/p-film-a.mp4" controls preload="metadata"></video><p class="cap">p-film-a.mp4</p></div>
+<div><img src="../../demo/out/p-film-a-sheet.png" alt="Contact sheet of the rough cut, one frame every six seconds."><p class="cap">one frame every 6 s · <span class="score" id="s-film-a"></span></p></div>
+</div>
+
+<h2>Opening A: spotlight</h2>
+<p>The frame dims except the region that matters. One caption line at the bottom says the point.</p>
+<div class="pair">
+<div><video src="../../demo/out/p-opening-a.mp4" controls preload="metadata"></video></div>
+<div><img src="../../demo/out/p-opening-a-sheet.png" alt="Contact sheet of opening A."><p class="cap">one frame every 3 s · <span class="score" id="s-opening-a"></span></p></div>
+</div>
+
+<h2>Opening B: brackets, as on the landing page</h2>
+<p>The frame shrinks under a band of callouts. A bracket spans the region each callout names, the same look as the page's hero.</p>
+<div class="pair">
+<div><video src="../../demo/out/p-opening-b.mp4" controls preload="metadata"></video></div>
+<div><img src="../../demo/out/p-opening-b-sheet.png" alt="Contact sheet of opening B."><p class="cap">one frame every 3 s · <span class="score" id="s-opening-b"></span></p></div>
+</div>
+
+<h2>Opening C: camera</h2>
+<p>The camera moves into each region and a side card carries the words. The console's text becomes readable, at the cost of losing the whole board for a moment.</p>
+<div class="pair">
+<div><video src="../../demo/out/p-opening-c.mp4" controls preload="metadata"></video></div>
+<div><img src="../../demo/out/p-opening-c-sheet.png" alt="Contact sheet of opening C."><p class="cap">one frame every 3 s · <span class="score" id="s-opening-c"></span></p></div>
+</div>
+
+<h2>Sandbox A: schematic</h2>
+<p>The landing page's sandbox diagram, animated: the pod, the probe's blocked targets, the gateway and its budget meter, the fund-or-end question, the factory's single push.</p>
+<div class="pair">
+<div><video src="../../demo/out/p-sandbox-a.mp4" controls preload="metadata"></video></div>
+<div><img src="../../demo/out/p-sandbox-a-sheet.png" alt="Contact sheet of sandbox A."><p class="cap">one frame every 2 s · <span class="score" id="s-sandbox-a"></span></p></div>
+</div>
+
+<h2>Sandbox B: from the card</h2>
+<p>The camera dives into a running card on the hero frame. The card becomes a cell, requests ripple off its wall, a ring gauge fills with each call, and the camera pulls back out. The rough cut uses this one.</p>
+<div class="pair">
+<div><video src="../../demo/out/p-sandbox-b.mp4" controls preload="metadata"></video></div>
+<div><img src="../../demo/out/p-sandbox-b-sheet.png" alt="Contact sheet of sandbox B."><p class="cap">one frame every 2 s · <span class="score" id="s-sandbox-b"></span></p></div>
+</div>
+</main>
+<script src="scores.js"></script>
+</body>
+</html>

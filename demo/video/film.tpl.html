@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1600, height=900">
+<title>The film, a rough cut</title>
+<link rel="stylesheet" href="diagram.css">
+<script src="gsap.min.js"></script>
+<script src="data.js"></script>
+<script src="film-fx.js"></script>
+<style>
+  .live { animation: none; }
+  #root { position: relative; width: 1600px; height: 900px; overflow: hidden; background: var(--bg); }
+  #stage { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; transform-origin: 0 0; }
+  .media { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; }
+  #caps { position: absolute; left: 0; right: 0; top: 744px; height: 156px; background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--bg) 90%, transparent) 24%); }
+  .fx-cap { position: absolute; left: 80px; right: 80px; top: 26px; text-align: center; font-size: 48px; line-height: 1.25; color: var(--text); }
+  .fx-cap b { color: var(--accent); font-weight: 600; }
+  .fx-cap.amber b { color: var(--need-text); }
+  .fx-cap.close { top: -330px; font-size: 64px; }
+  .fx-cap.close small { display: block; margin-top: 18px; font: 34px var(--font-mono); color: var(--text-muted); }
+  .fx-clock { position: absolute; left: 550px; top: 360px; width: 500px; height: 110px; overflow: hidden; text-align: center; background: color-mix(in srgb, var(--bg) 88%, transparent); border: 1px solid var(--line-strong); }
+  .fx-clock span { position: absolute; left: 0; right: 0; top: 22px; font: 600 56px var(--font-mono); color: var(--text); }
+  .title { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; opacity: 0; }
+  .title i { position: absolute; inset: 0; background: color-mix(in srgb, var(--bg) 82%, transparent); }
+  .title span { position: absolute; left: 0; right: 0; top: 380px; text-align: center; font: 600 88px var(--font-ui); color: var(--text); }
+  .title b { position: absolute; left: 700px; top: 500px; width: 200px; height: 4px; background: var(--accent); }
+  #shade { position: absolute; inset: 0; background: color-mix(in srgb, var(--bg) 70%, transparent); opacity: 0; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="{{DURATION}}" data-width="1600" data-height="900">
+<div id="stage">
+<!--MEDIA-->
+</div>
+<div id="shade"></div>
+<div id="caps"></div>
+<div id="titles"></div>
+<div id="clocks"></div>
+</div>
+
+<script>
+// One paused timeline drives the cut: the renderer seeks it frame by frame, so nothing here reads the clock. The
+// beats, rings, section titles and clocks come from film.json through data.js; this page only draws them.
+const tl = gsap.timeline({ paused: true });
+const F = window.FILM;
+const stage = document.querySelector("#stage"), caps = document.querySelector("#caps");
+const titles = document.querySelector("#titles"), clocks = document.querySelector("#clocks");
+// time: a number, ["seg"] for a segment's start, or ["seg", step, field, offset] for a step inside it
+const time = (a) => {
+  if (typeof a === "number") return a;
+  const [id, step, field = "stillMs", off = 0] = a, s = F.seg[id];
+  if (step === undefined || step === null) return s.start + off;
+  if (step === "end") return s.start + s.dur + off;
+  return s.start + (F.scenes[s.scene].steps[step - 1][field] / 1000 - s.mediaStart) / s.rate + off;
+};
+const clip = (b) => { const y = Math.max(0, b.y), h = Math.min(900, b.y + b.height) - y; return { x: b.x, y, width: b.width, height: h }; };
+const box = (spec) => {
+  if (!spec) return null;
+  if (spec.union) {
+    const bs = spec.union.map(box), x = Math.min(...bs.map((b) => b.x)), y = Math.min(...bs.map((b) => b.y));
+    return { x, y, width: Math.max(...bs.map((b) => b.x + b.width)) - x, height: Math.max(...bs.map((b) => b.y + b.height)) - y };
+  }
+  const [scene, step, key, h] = spec, b = (F.scenes[scene].steps[step - 1].boxes || {})[key];
+  if (!b) throw new Error(`${scene} step ${step} has no box ${key}`);
+  return clip(h ? { ...b, height: Math.min(b.height, h) } : b);
+};
+
+const beats = F.beats.map((b) => ({ ...b, t: time(b.at), r: box(b.box) }));
+beats.forEach((b, i) => {
+  const end = b.until ? time(b.until) : (i + 1 < beats.length ? beats[i + 1].t : F.duration - 0.2);
+  // a beat needs time to be read; one that starts on its successor is a mistake in film.json
+  if (b.cap && end - b.t < 1.2) throw new Error(`beat ${i} (${b.cap.slice(0, 30)}) lasts ${(end - b.t).toFixed(2)} s`);
+  if (b.shade) tl.to("#shade", { opacity: 1, duration: 0.5 }, b.t);
+  if (b.r) fx.spotlight(tl, stage, b.r, b.t, { color: b.amber ? "#f4b13e" : "#4fcbe2" });
+  else fx.unspot(tl, stage, b.t);
+  if (b.cap) {
+    const c = fx.caption(tl, caps, "", b.t + 0.15, end, (b.amber ? "amber " : "") + (b.cls || ""));
+    c.innerHTML = b.cap;
+  }
+});
+(F.rings || []).forEach((r) => fx.ring(tl, stage, box(r.box), time(r.from), time(r.to), r.amber ? "#f4b13e" : "#4fcbe2"));
+(F.clocks || []).forEach((c) => fx.clock(tl, clocks, c.from, c.to, time(c.at), c.dur || 2));
+// a section title: the frame dims, the name slides in with an accent rule, and both leave before the beat starts
+(F.titles || []).forEach((s) => {
+  const t = time(s.at), d = s.dur || 1.3;
+  const el = document.createElement("div");
+  el.className = "title";
+  el.innerHTML = `<i></i><span>${s.text}</span><b></b>`;
+  titles.appendChild(el);
+  tl.to(el, { opacity: 1, duration: 0.25 }, t);
+  tl.from(el.querySelector("span"), { y: 36, opacity: 0, duration: 0.45, ease: "power3.out" }, t);
+  tl.from(el.querySelector("b"), { scaleX: 0, duration: 0.45, ease: "power3.out" }, t + 0.1);
+  tl.to(el, { opacity: 0, duration: 0.3 }, t + d);
+});
+// quiet segments carry their own words: the caption band steps aside
+(F.quiet || []).forEach((id) => {
+  tl.to(caps, { opacity: 0, duration: 0.2 }, time([id]));
+  tl.to(caps, { opacity: 1, duration: 0.2 }, time([id, "end"]));
+});
+
+window.__timelines = window.__timelines || {};
+window.__timelines["main"] = tl;
+</script>
+</body>
+</html>
