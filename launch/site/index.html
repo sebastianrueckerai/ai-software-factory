@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI software factory</title>
-<meta name="description" content="An open source AI software factory, built and run by one person: a chat and a board, agents in sandboxes on servers you control.">
+<meta name="description" content="An AI software factory you run on your own servers: a kanban that fills itself, one chat to change anything, every card in its own sandbox, nothing merges until the checks pass.">
 <style>
 :root {
   color-scheme: dark;
   --bg: #070b12; --bg-panel: #0b111a; --bg-raised: #0f1723; --bg-card: #111b28;
   --line: #1a2636; --line-strong: #263649; --mark: #5a8aa3;
   --text: #dfe7f1; --text-muted: #93a1b5; --text-faint: #7c8ba0;
-  --accent: #4fcbe2; --need: #f4b13e; --need-text: #f6bd5a;
+  --accent: #4fcbe2; --need: #f4b13e;
   --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", "Noto Sans", system-ui, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", "Noto Sans Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
 }
@@ -34,47 +34,51 @@ h2 { font-size: 26px; font-weight: 600; line-height: 1.2; margin: 0 0 24px; padd
 h3 { font-size: 18px; font-weight: 600; line-height: 1.3; margin: 0 0 8px; }
 .lede { font-size: 20px; color: var(--text-muted); max-width: 760px; }
 .cap { font-size: 13px; color: var(--text-faint); }
-.links { display: flex; gap: 24px; flex-wrap: wrap; margin: 20px 0 28px; }
+.links { display: flex; gap: 16px; flex-wrap: wrap; margin: 20px 0 28px; }
 
 .media { position: relative; aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center; text-align: center; padding: 12px;
   background: var(--bg-panel); border: 1px solid var(--line-strong); color: var(--text-faint); font: 13px var(--font-mono); }
 .media::after { content: ""; position: absolute; inset: -1px; border: 1px solid var(--mark); pointer-events: none; --s: 7px;
   -webkit-mask: conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0 / calc(100% - var(--s)) calc(100% - var(--s));
           mask: conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0 / calc(100% - var(--s)) calc(100% - var(--s)); }
+.media img, .media video { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+.eyebrow { font: 600 12px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-faint); margin: 0 0 16px; }
+.btn { display: inline-block; padding: 10px 18px; border: 1px solid var(--line-strong); color: var(--text); text-decoration: none; font: 14px var(--font-mono); }
+.btn:hover, .btn:focus-visible { border-color: var(--accent); color: var(--accent); }
+.btn.primary { border-color: var(--accent); color: var(--accent); }
+.stack { max-width: 780px; }
+.band { border: 1px solid var(--line-strong); border-left: 3px solid var(--accent); background: var(--bg-panel); padding: 14px 22px; color: var(--text-muted); max-width: 880px; }
+.loop-line { text-align: center; font: 15px var(--font-mono); color: var(--text-muted); margin: 16px 0 0; }
 
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .block { background: var(--bg-panel); border: 1px solid var(--line); padding: 20px; display: flex; flex-direction: column; }
 .block .num { font-size: 14px; color: var(--text-faint); }
 .block p { color: var(--text-muted); }
-.block .media { margin-top: auto; }
+.block .cap { margin-top: auto; padding-top: 12px; }
 .span2 { grid-column: 1 / -1; }
-.mainmark { color: var(--accent); }
 figure { margin: 0; }
 figcaption { margin-top: 8px; text-align: center; }
 
 .principles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 32px; margin: 24px 0; }
 .principles p { color: var(--text-muted); }
-blockquote { margin: 0 0 16px; padding: 4px 0 4px 18px; border-left: 2px solid var(--mark); font-size: 18px; }
-blockquote p { margin: 0 0 4px; }
-ul.quotes { list-style: none; padding: 0; margin: 0; }
 
 .scroll { overflow-x: auto; border: 1px solid var(--line); margin: 20px 0; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
 th, td { text-align: left; vertical-align: top; padding: 9px 12px; border: 1px solid var(--line); }
 thead th { background: var(--bg-raised); font-weight: 600; }
-table.cmp { min-width: 960px; }
-table.cmp tbody th[scope=row] { font-weight: 600; min-width: 160px; }
+table.cmp { min-width: 1040px; }
+table.cmp tbody th[scope=row] { font-weight: 600; min-width: 170px; }
 table.cmp td { color: var(--text-muted); min-width: 90px; }
-table.cmp td:nth-child(2) { color: var(--text); min-width: 210px; }
-.layer th { background: var(--bg-raised); color: var(--accent); font: 600 13px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
-.conceded { display: block; margin-top: 4px; font-weight: 400; font-size: 13px; color: var(--text-faint); }
+table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
+
 .limits { border: 1px solid var(--line-strong); border-left: 3px solid var(--need); background: var(--bg-panel); padding: 18px 22px; }
 .limits h3 { margin-bottom: 10px; }
 .limits h3::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 10px; background: var(--need); vertical-align: 1px; }
 .limits ul { margin: 0; padding-left: 20px; color: var(--text-muted); }
+
 table.counts { width: auto; font-family: var(--font-mono); }
 table.counts td:last-child { text-align: right; }
-.empty { margin: 0 0 8px; padding: 0; min-height: 60px; border: 1px dashed var(--line-strong); list-style: none; }
 footer { padding: 48px 0 64px; }
 @media (max-width: 760px) {
   .grid, .principles { grid-template-columns: 1fr; }
@@ -90,127 +94,252 @@ footer { padding: 48px 0 64px; }
 <nav aria-label="Sections">
 <ul>
 <li><a href="#hero">Top</a></li>
-<li><a href="#what-you-get">What you get</a></li>
-<li><a href="#how-it-works">How it works</a></li>
-<li><a href="#construction">Built by construction</a></li>
-<li><a href="#why-not-the-others">Why not the others</a></li>
+<li><a href="#reach">What the agent can reach</a></li>
+<li><a href="#run">Run it yourself</a></li>
+<li><a href="#film">The film</a></li>
+<li><a href="#hood">Under the hood</a></li>
+<li><a href="#layers">Three layers</a></li>
+<li><a href="#numbers">Numbers</a></li>
+<li><a href="#compare">How it compares</a></li>
+<li><a href="#tradeoffs">Tradeoffs</a></li>
 <li><a href="#proof">Proof</a></li>
-<li><a href="#investors">For investors</a></li>
-<li><a href="#design">How it was designed</a></li>
 <li><a href="#contact">Contact</a></li>
 </ul>
 </nav>
 <main class="wrap">
 
 <section id="hero" aria-labelledby="hero-h">
+<p class="eyebrow">Source available · Self-hosted · Sandboxed agents</p>
 <h1 id="hero-h">See everything on the kanban. Feed it a roadmap. Change anything from the chat.</h1>
-<p class="lede">An open source AI software factory, built and run by one person. Say what you need in a chat; agents plan, build, test, review, ship and operate it in sandboxes on servers you control.</p>
-<div id="film" class="media" role="img" aria-label="The film slot">the film: 90 seconds, coming</div>
+<p class="lede">Write a roadmap. The factory turns it into cards and builds them. Each card runs in its own sandbox on your own servers. Nothing merges until the checks pass.</p>
+<p class="cap">Run it on your servers. Use hosted models or your own.</p>
 <div class="links">
-<a href="#">the repository</a>
-<a href="#">the design documents</a>
+<a class="btn" href="https://github.com/sebastianrueckerai/ai-software-factory">Source and setup</a>
+<a class="btn primary" href="#film">Watch the 90 seconds</a>
+</div>
+<figure>
+<div class="media"><img src="assets/hero.png" alt="The console: the chat with a typed sentence and the card proposal, the board behind it." width="1600" height="900"></div>
+<figcaption class="cap">Recorded on the real console. The project is a demo seeded for the film.</figcaption>
+</figure>
+</section>
+
+<section id="reach" aria-labelledby="reach-h">
+<h2 id="reach-h">The worst an agent can do is wreck its own sandbox.</h2>
+<p class="lede">That holds while it works. What it writes still has to pass the gates.</p>
+<div class="stack">
+<p>Each card runs in its own sandbox. When the card is done, the sandbox is deleted.</p>
+<p>The sandbox cannot see the machine it runs on. It runs in gVisor, as a non-root user, on a read-only root, with no service account token. The cluster's metadata address is blocked.</p>
+<p>The sandbox cannot reach the internet on its own. Its network is closed. It reaches the outside only through the tools the factory gives it, and each tool talks to one named host. Before the agent starts, a probe checks that the network is closed.</p>
+<p>The agent never holds a push token. When the agent is done, the factory kills every other process in the pod, then mints a write token, pushes once, and revokes it.</p>
+<p>Every model call costs money, and the money is capped. The gateway reserves the price of a call before the call runs. There are caps per task, per day, per month and per project. At a cap the factory stops and asks you: fund it, or end it.</p>
+<p>So the agent can break its sandbox. We do not care. It cannot break anything else.</p>
+<p>We have no prompt rules for safety. A prompt rule is a request to the model. A closed network is a fact.</p>
+<p>One risk stays. The model can write code that is wrong on purpose, and that code can pass the checks and reach your app. No system rules that out, short of a model you host and trust. The review, the hold-out tests and the audit all read the diff and make it hard. They do not make it impossible, and this page says so.</p>
 </div>
 </section>
 
-<section id="what-you-get" aria-labelledby="wyg-h">
-<h2 id="wyg-h">What you get</h2>
+<section id="who" aria-label="Who it is for">
+<div class="band"><p style="margin:0">Built for teams that cannot sign off a hosted coding agent: regulated industries, and companies where security and compliance decide the purchase.</p></div>
+</section>
+
+<section id="run" aria-labelledby="run-h">
+<h2 id="run-h">Your servers. Your files.</h2>
+<div class="stack">
+<p>The source is published. You read it, you run it on your own servers, and the licence says what you may do with it.</p>
+<p>The repository holds the Terraform for the tested Hetzner setup. You add the infrastructure credentials and the model and tool keys your setup uses, then follow the deployment guide. The page does not promise a time or a server size until an engineer who did not build the factory has installed it and we have the numbers.</p>
+<p>Model calls go through one gateway. Point it at a hosted API or at your own model. The factory has completed tasks on self-hosted models, and the evidence page links one.</p>
+<p>Everything you configure is a file in your repository. The development process is a set of YAML files. Your project's prompts are its own AGENTS.md. The caps are numbers in a file.</p>
+</div>
+</section>
+
+<section id="film" aria-labelledby="film-h">
+<h2 id="film-h">From roadmap to release, and back.</h2>
+<figure>
+<div class="media"><video src="assets/loop.mp4" autoplay muted loop playsinline aria-label="The loop as an animation: signals, control plane, sandboxes, gates, deploy, telemetry"></video></div>
+<figcaption class="cap">The loop as a procedural clip. The 90-second film, recorded on the real console, sits here when it is cut.</figcaption>
+</figure>
+<p class="loop-line">roadmap, plan, card, sandbox, pull request, gates, merge, deploy, issue or alert, next card</p>
+</section>
+
+<section id="hood" aria-labelledby="hood-h">
+<h2 id="hood-h">The model proposes. The system decides.</h2>
 <div class="grid">
-<article class="block"><span class="num">01</span><h3>The kanban fills itself</h3><p>You get everything a kanban is for: bottlenecks jump out, tasks move through their stages, done and undone at a glance. You never curate it. Say what you want and the factory writes the card; you press Do it. Feed it a roadmap and the project agent cascades it into specs and implementation cards. The same chat talks to a running agent.</p><div class="media">clip: scenes 01, 04, 05, 11, 23</div></article>
-<article class="block"><span class="num">02</span><h3>Say it, it ships</h3><p>The card becomes a sandbox, a pull request, a merge and a live deploy. No human in between.</p><div class="media">clip: scenes 06, 12</div></article>
-<article class="block"><span class="num">03</span><h3>It plans before it builds</h3><p>A vague request is measured. A big one is split into a plan whose criteria name their proofs before any code exists. The builders never see the hold-out tests: no brief carries them, no sandbox holds them. One blind run, then the gate opens them, and a red one goes to an audit that names the defective side: the test, the code or the spec.</p><div class="media">clip: scenes 02, 03, 21, 30</div></article>
-<article class="block"><span class="num">04</span><h3>Nothing merges unproven</h3><p>Checks, policy, reproduction, review, audit and the criteria gate stand before every merge. Silence never passes a gate.</p><div class="media">clip: scenes 07, 10, 30</div></article>
-<article class="block"><span class="num">05</span><h3>An issue lands, the fix ships</h3><p>An issue filed on Forgejo with a way to reproduce becomes a card within a minute. The gate proves the fault at the base commit and the fix at the head. A clear, reproducible error gets fixed with no human.</p><div class="media">clip: a new beat scene, scenes 15, 30</div></article>
-<article class="block"><span class="num">06</span><h3>Live software feeds back</h3><p>An alert minutes after a merge files a fix card. Routines sweep security and performance on a clock.</p><div class="media">clip: scenes 13, 14, 16, 17, 19</div></article>
-<article class="block"><span class="num">07</span><h3>It does not stall</h3><p>Thirteen detectors watch every session and answer in code first. A stalled session gets a nudge, then a supervisor, then a fresh session on the stronger model. No human before an agent tried once.</p><div class="media">clip: scenes 08, 10, 31</div></article>
-<article class="block"><span class="num">08</span><h3>No model call runs without its cost covered</h3><p>The gateway reserves the worst case of a model call before the call runs and refuses at the task, day, month and project caps. At a cap the factory stops and asks: fund or end.</p><div class="media">clip: scenes 20, 28</div></article>
-<article class="block"><span class="num">09</span><h3>You hold the roadmap and the money</h3><p>One dial, four positions. At full auto the factory merges on evidence and asks only for decisions and money. Forbidden paths and migrations stay human at every level.</p><div class="media">clip: scenes 22, 23, 24, 25</div></article>
-<article class="block"><span class="num">10</span><h3>The sandbox is the guardrail</h3><p>Each task runs in its own throwaway pod with its own identity. The network is closed except for named hosts. The agent never holds a push token. No prompt rule stands in for a wall.</p><div class="media">clip: scene 32, generated clip 34</div></article>
-<article class="block"><span class="num">11</span><h3>Three layers: the factory, your process, your prompts</h3><p>The base layer is the factory: sandboxes, workflows, gates. It works out of the box and runs on rented commodity servers. Everything you configure is a file. The development process is one: lanes, stages, merge rule. Ours is spec-driven; if you don't like it, bring your own, with a floor of checks and gates every process keeps. The prompts sit in your project's AGENTS.md: ours seeds it, you change it. The harness in the sandbox is an adapter behind one interface.</p><div class="media">clip: a new procedural diagram</div></article>
-<article class="block"><span class="num">12</span><h3>The numbers</h3><p>Cost per card, card cycle, lead time, spend. The week before against the week after.</p><div class="media">clip: scenes 26, 27, 28</div></article>
+<article class="block">
+<h3>The sandbox</h3>
+<p>gVisor, non-root, read-only root, no service account token, the metadata address blocked, default-deny egress, an egress probe before the agent starts, the write token minted after the agent is dead and used once.</p>
+<p class="cap"><a href="../../docs/evidence.md#10-the-sandbox-is-the-guardrail">the file · the test · the run</a></p>
+</article>
+<article class="block">
+<h3>The gates</h3>
+<p>Nine kinds of stage. Four of them stay in every process, and a process file cannot remove them. A deleted or weakened test is a finding. A review that gives no verdict is a finding on the reviewer's card. A separate session writes hold-out tests that no sandbox can see. When a hold-out fails, an audit names the defective side: the test, the code or the spec.</p>
+<p class="cap"><a href="../../docs/evidence.md#4-nothing-merges-unproven">the file · the test · the run</a></p>
+</article>
+<article class="block">
+<h3>The money</h3>
+<p>The hold is taken under a database lock. The model's output is clamped to the amount held. The real cost is booked after the call. A missing cap reads as zero, which stops all spend.</p>
+<p class="cap"><a href="../../docs/evidence.md#8-no-model-call-runs-without-its-cost-covered">the file · the test · the run</a></p>
+</article>
+<article class="block">
+<h3>Recovery</h3>
+<p>One durable workflow per task. Thirteen detectors watch each session for no write, repetition, the same failure, the same call, flip-flop, churn, wall clock and spend with no push. A stalled session gets a nudge, then a supervisor, then a fresh session on the stronger model. A human sees it only after the session cap.</p>
+<p class="cap"><a href="../../docs/evidence.md#7-it-does-not-stall">the file · the test · the run</a></p>
+</article>
 </div>
-</section>
-
-<section id="how-it-works" aria-labelledby="hiw-h">
-<h2 id="hiw-h">How it works</h2>
-<div class="grid">
-<figure><div class="media"></div><figcaption class="cap">the loop: five planes</figcaption></figure>
-<figure><div class="media"></div><figcaption class="cap">the gate chain</figcaption></figure>
-<figure><div class="media"></div><figcaption class="cap">the escalation ladder</figcaption></figure>
-<figure class="span2"><div class="media"></div><figcaption class="cap">the three layers: the factory, your process, your prompts <span class="mainmark">[the page's main diagram]</span></figcaption></figure>
-</div>
-</section>
-
-<section id="construction" aria-labelledby="bbc-h">
-<h2 id="bbc-h">Built by construction</h2>
-<p class="lede">Reliability comes from how an AI step is built, not from its prompt. Every guarantee lives in a schema, a check, a gate or a route.</p>
 <div class="principles">
-<div><h3>Reliability by construction, not by prompt</h3><p>Every guarantee lives in a schema, a check, a gate or a route. A prompt rule is the last resort.</p></div>
-<div><h3>The factory builds itself</h3><p>The roll is a card on its own board. Every commit carries the task, the session, who asked and who approved as trailers.</p></div>
-<div><h3>Hold-out tests graded blind</h3><p>A separate session writes tests no sandbox can see. A red one goes to an audit with three verdicts: wrong test, real gap, spec question.</p></div>
-<div><h3>Outsiders' issues are screened</h3><p>Screened for injection before any session runs. Issue text is scrubbed on the way in, agent text on the way out, secrets redacted from audit rows.</p></div>
-<div><h3>The console was designed by image models and a critic</h3><p>Every image has a sidecar with its model, prompt and cost. The method is the same as the factory's.</p></div>
+<p>Every guarantee lives in a schema, a check, a gate or a route. A prompt rule is the last resort.</p>
+<p>The factory builds itself. Every commit carries the task, the session, who asked and who approved.</p>
+<p>An outsider's issue is screened for injection before any session runs.</p>
+<p>The console was designed by image models and an independent critic. Every image has its sidecar.</p>
 </div>
-<ul class="quotes">
-<li><blockquote><p>Reliability comes from how an AI step is built, not from its prompt.</p><span class="cap">CLAUDE.md, "Design principle for every AI step", Sebastian, 2026-10-12</span></blockquote></li>
-<li><blockquote><p>Every wait has a bound, every bound has a verdict, every verdict has a worker.</p><span class="cap">docs/chain-and-autonomy-design-2026-10-20.md, section 5</span></blockquote></li>
-<li><blockquote><p>A click without reading is no control, the audit and the pinned mirror are.</p><span class="cap">docs/chain-and-autonomy-design-2026-10-20.md, section 7.2</span></blockquote></li>
-<li><blockquote><p>A test written after the code bends to whatever the code happens to do and proves nothing beyond itself. Named first, it is a claim made in public, at the cheapest moment to challenge it.</p><span class="cap">docs/spec-driven.md, "What the factory does that others do not"</span></blockquote></li>
-<li><blockquote><p>Normal states whisper. Exceptional states speak.</p><span class="cap">docs/architecture.md, section 5.7, from the UX conversation</span></blockquote></li>
-</ul>
 </section>
 
-<section id="why-not-the-others" aria-labelledby="wno-h">
-<h2 id="wno-h">Why not the others</h2>
-<p>The market research of 29 September 2026 scored 148 tools against this design. Seven of our eleven differences are rare or unique; four are common and we do not lead with them.</p>
-<div class="scroll" tabindex="0" role="region" aria-label="Comparison table, scrolls sideways on small screens">
+<section id="layers" aria-labelledby="layers-h">
+<h2 id="layers-h">Three layers: the factory, your process, your prompts</h2>
+<div class="grid">
+<figure>
+<div class="media"><video src="assets/layers.mp4" autoplay muted loop playsinline aria-label="The three layers as an animation"></video></div>
+<figcaption class="cap">The procedural clip.</figcaption>
+</figure>
+<div class="stack">
+<p>The factory is the bottom layer: sandboxes, workflows, gates. It works out of the box.</p>
+<p>The development process is the middle layer. It is a set of YAML files: the lanes, the stages, the merge rule. We ship a spec-driven process. If you want another, write your own. Four stages stay in every process, and no file can remove them.</p>
+<p>Your prompts are the top layer. They live in your project's AGENTS.md. We seed it from our template. You change it.</p>
+<p>The coding harness runs behind one interface. Today there is one adapter, opencode.</p>
+</div>
+</div>
+</section>
+
+<section id="numbers" aria-labelledby="numbers-h">
+<h2 id="numbers-h">The factory measures itself.</h2>
+<div class="stack">
+<p>The metrics page keeps the <a href="https://dora.dev/guides/dora-metrics-four-keys/">four DevOps delivery metrics</a>: deployment frequency, lead time for changes, change failure rate and time to restore. It also keeps cost per card, per project and per week. All of them read from the same ledger as the board. We tune the process against them.</p>
+</div>
+</section>
+
+<section id="compare" aria-labelledby="compare-h">
+<h2 id="compare-h">How it compares</h2>
+<p class="lede">A table of guarantees, not of features. The market sweep of 29 September 2026 scored 148 tools. Every cell is rechecked against the vendor's own page before this goes public; cells we have not verified say so.</p>
+<div class="scroll">
 <table class="cmp">
-<thead><tr><th scope="col">Row</th><th scope="col">This factory</th><th scope="col">GitHub Copilot cloud agent</th><th scope="col">Cursor cloud agents</th><th scope="col">Devin</th><th scope="col">GitLab Duo Agent Platform</th><th scope="col">OpenHands</th><th scope="col">Factory (vendor)</th></tr></thead>
+<thead>
+<tr><th scope="col">Guarantee</th><th scope="col">This factory</th><th scope="col">GitHub Copilot cloud agent</th><th scope="col">Cursor cloud agents</th><th scope="col">Devin</th><th scope="col">GitLab Duo Agent Platform</th><th scope="col">OpenHands</th><th scope="col">Factory</th></tr>
+</thead>
 <tbody>
-<tr class="layer"><th colspan="8" scope="colgroup">Layer: Factory (what runs it)</th></tr>
-<tr><th scope="row">Where each one leads<span class="conceded">Conceded in the same row</span></th><td>Rebuild from the repository and money held before each call, see the rows below</td><td>Sandbox and UX</td><td>Intake from signals, and UX</td><td>The VM sandbox, DeepWiki and live panes</td><td>Composite identity and the tool governance matrix</td><td>Live terminal, diff view and ACP</td><td>not verified</td></tr>
-<tr><th scope="row">Control plane runs on your servers</th><td>Open source and self-hosted on rented servers. No commercial product we surveyed lets you rebuild the control plane from Git.</td><td>no</td><td>no, worker only</td><td>no, sandbox only</td><td>partial, paid EE licence</td><td>yes, open core</td><td>no</td></tr>
-<tr><th scope="row">Per-task identity<span class="conceded">GitLab Duo leads with composite identity. Our token lives shorter.</span></th><td>A fresh identity per task, and the agent never holds a credential.</td><td>no, repository secrets</td><td>optional OIDC</td><td>Outposts path only</td><td>composite, token up to about 3 days</td><td>no, shared pool key</td><td>not verified</td></tr>
-<tr><th scope="row">Spend cap before a call</th><td>The factory reserves the money before each model call. At a cap: fund or end.</td><td>no, org budgets</td><td>no, "not instant"</td><td>no, session and cycle limits</td><td>no, credits ledger</td><td>not verified</td><td>not verified</td></tr>
-<tr><th scope="row">Policy outside the model<span class="conceded">GitLab Duo's tool matrix is richer than our file.</span></th><td>Listed as a property. Policy runs in code and network rules, not in the agent process.</td><td>yes</td><td>cloud yes, desktop no</td><td>yes, role-based</td><td>yes, strong</td><td>no, in the agent process</td><td>not verified</td></tr>
-<tr><th scope="row">Merge on evidence without a human</th><td>At full auto the factory asks only for decisions and money. Forbidden paths and migrations stay human.</td><td>no</td><td>review can approve under a prompt</td><td>no</td><td>no</td><td>no</td><td>not verified</td></tr>
-<tr><th scope="row">Live stream and diff<span class="conceded">OpenHands, Devin and Cursor lead here.</span></th><td>Live session text and a steer box in the drawer. No diff view with inline comments to the agent.</td><td>yes</td><td>yes</td><td>yes</td><td>session view</td><td>yes</td><td>not verified</td></tr>
-<tr class="layer"><th colspan="8" scope="colgroup">Layer: Process (how it builds)</th></tr>
-<tr><th scope="row">The process is a file with a floor</th><td>The process is a YAML file: lanes, stages, merge rule. A floor of four stages stays. A project may only tighten. Ours ships, bring your own.</td><td>not surveyed</td><td>not surveyed</td><td>not surveyed</td><td>not surveyed</td><td>not surveyed</td><td>not verified</td></tr>
-<tr><th scope="row">Criteria with named proofs</th><td>Among the 148 tools we surveyed, none runs the tests its criteria name and requires them green.</td><td>not surveyed</td><td>not surveyed</td><td>not surveyed</td><td>not surveyed</td><td>not surveyed</td><td>not verified</td></tr>
-<tr><th scope="row">Issues and alerts file the fix</th><td>An issue or an alert files the fix card. The fix must fail at base and pass at head.</td><td>not surveyed</td><td>not surveyed</td><td>not surveyed</td><td>not surveyed</td><td>not surveyed</td><td>not verified</td></tr>
-<tr class="layer"><th colspan="8" scope="colgroup">Layer: Prompts (what the agents read)</th></tr>
-<tr><th scope="row">The prompts are files you change</th><td>The project's prompts are its own AGENTS.md, seeded from a template and yours to edit.</td><td>not surveyed</td><td>not surveyed</td><td>not surveyed</td><td>not surveyed</td><td>not surveyed</td><td>not verified</td></tr>
-<tr class="layer"><th colspan="8" scope="colgroup">Layer: Harness (the agent in the sandbox)</th></tr>
-<tr><th scope="row">The harness is an adapter</th><td>One interface, one adapter today.</td><td>not surveyed</td><td>not surveyed</td><td>not surveyed</td><td>not surveyed</td><td>not surveyed</td><td>not verified</td></tr>
+<tr>
+<th scope="row">The control plane runs on your servers, source published</th>
+<td>Yes. Self-hosted on rented commodity servers, source published. No commercial product we surveyed rebuilds the control plane from Git.</td>
+<td>No.</td>
+<td>No, workers only.</td>
+<td>No, sandbox only.</td>
+<td>Partial. Self-hosts with its own models, paid licence.</td>
+<td>Yes, open core.</td>
+<td>No.</td>
+</tr>
+<tr>
+<th scope="row">Your own model behind the same gateway, with a recorded run</th>
+<td>Yes. Hosted APIs and self-hosted models sit behind one gateway. The evidence page links a run on a self-hosted model.</td>
+<td>No, hosted model list.</td>
+<td>No, hosted models.</td>
+<td>No, its own models.</td>
+<td>Partial, its own model list on self-hosted.</td>
+<td>Any API key, no published run.</td>
+<td>Not verified.</td>
+</tr>
+<tr>
+<th scope="row">The agent never holds a push token</th>
+<td>Yes. A fresh identity per task, minted after the agent is dead, used once, revoked.</td>
+<td>No, repository secrets.</td>
+<td>Not verified.</td>
+<td>Not verified.</td>
+<td>No, composite identity, token up to about 3 days.</td>
+<td>No, shared pool key.</td>
+<td>Not verified.</td>
+</tr>
+<tr>
+<th scope="row">The money is held before each call, and at the cap it asks</th>
+<td>Yes. The hold is taken under a database lock. At a cap: fund or end.</td>
+<td>No, org budgets.</td>
+<td>No, the cap is not instant.</td>
+<td>No, session and cycle limits.</td>
+<td>No, credits ledger.</td>
+<td>Not verified.</td>
+<td>Not verified.</td>
+</tr>
+<tr>
+<th scope="row">A fix must fail at base and pass at head</th>
+<td>Yes. An issue or an alert files the fix card. The gate runs the repro command at base and at head.</td>
+<td>Not surveyed.</td>
+<td>Partial, Automations fire on Sentry and PagerDuty.</td>
+<td>Not surveyed.</td>
+<td>Not surveyed.</td>
+<td>Not surveyed.</td>
+<td>Not verified.</td>
+</tr>
+<tr>
+<th scope="row">The gates run the tests the criteria name, and a file cannot lower the floor</th>
+<td>Yes. Nine stage kinds, a floor of four no process file can remove. Among the 148 tools surveyed, none runs the named tests and requires them green.</td>
+<td>Not surveyed.</td>
+<td>Not surveyed.</td>
+<td>Not surveyed.</td>
+<td>Not surveyed.</td>
+<td>Not surveyed.</td>
+<td>Not verified.</td>
+</tr>
+<tr>
+<th scope="row">The process is a set of YAML files</th>
+<td>Yes. Lanes, stages, merge rule. Ours is spec-driven; bring your own.</td>
+<td>Not surveyed.</td>
+<td>Not surveyed.</td>
+<td>Not surveyed.</td>
+<td>Not surveyed.</td>
+<td>Not surveyed.</td>
+<td>Not verified.</td>
+</tr>
+<tr>
+<th scope="row">Delete everything and rebuild from Git and a bucket</th>
+<td>Yes. Rehearsed on 13 October.</td>
+<td>No.</td>
+<td>No.</td>
+<td>No.</td>
+<td>Not verified.</td>
+<td>Not surveyed.</td>
+<td>Not verified.</td>
+</tr>
 </tbody>
 </table>
 </div>
+<p class="cap">Chat intake and model independence stay out of the table: every hyperscaler sells a gateway and 78 of 148 tools score high on chat.</p>
+</section>
+
+<section id="tradeoffs" aria-labelledby="tradeoffs-h">
 <div class="limits">
-<h3>Tradeoffs we made</h3>
+<h3 id="tradeoffs-h">Tradeoffs we made</h3>
 <ul>
-<li>gVisor, not a microVM, so cheap commodity servers are enough.</li>
-<li>Roadmap intake as linked Markdown, not Jira: we think Markdown is better, and a Jira adapter would be easy.</li>
-<li>Models are commodity APIs behind the gateway, like servers from Hetzner. Self-hosted LLMs fit behind the same gateway.</li>
-<li>Signals arrive from Forgejo and SigNoz: Forgejo speaks GitHub's protocol, SigNoz is the open telemetry stack we picked.</li>
+<li>gVisor, not a microVM. Cheap commodity servers are enough. The residual risk is in the threat model.</li>
+<li>The roadmap is linked Markdown, not Jira. Markdown lives in the repository. A Jira adapter is a small job.</li>
+<li>Model APIs are commodities behind the gateway. A trusted provider is like a server: you pick one. A self-hosted model sits behind the same gateway and has completed tasks.</li>
+<li>Forgejo and SigNoz are the signal sources. Forgejo speaks GitHub's protocol. SigNoz is the open telemetry stack we picked.</li>
+<li>Four stages stay in every process, and no file can remove them. A configuration mistake must not remove a check.</li>
 </ul>
 </div>
 </section>
 
 <section id="proof" aria-labelledby="proof-h">
-<h2 id="proof-h">Proof</h2>
+<h2 id="proof-h">Proof and limits</h2>
 <div class="grid">
-<div class="block"><h3>Real pull requests</h3><ul class="empty"></ul><span class="cap">five pull requests, to be chosen</span></div>
-<div class="block"><h3>The evidence</h3><span class="cap">the value table's proof as links, the file and the test per guarantee: <a href="#">docs/evidence.md</a></span></div>
-<div class="block"><h3>The factory's own numbers</h3><div class="media">a nightly static snapshot of the metrics page</div></div>
-<div class="block"><h3>The repositories</h3>
+<article class="block">
+<h3>The links, only when they are real</h3>
 <ul>
-<li><a href="#">ai-software-factory</a></li>
-<li><a href="#">ai-software-factory-code</a></li>
-<li><a href="#">ai-software-factory-infra</a></li>
-</ul></div>
-<div class="block"><h3>The counts</h3>
+<li><a href="https://github.com/sebastianrueckerai/ai-software-factory">The source</a>: three repositories, factory, code and infrastructure.</li>
+<li><a href="../../docs/architecture.md">The architecture</a>: the five planes and the three layers.</li>
+<li><a href="../../docs/threat-model.md">The threat model</a>: what the sandbox stops, what it does not stop, the known holes.</li>
+<li><a href="../../docs/evidence.md">The evidence page</a>: the file and the test per guarantee, a run where one exists, "not yet" where none does.</li>
+</ul>
+<p class="cap">The open limits live in the threat model: the hosted model APIs see diffs and briefs, the Go module proxy is a covert channel of a few hundred bytes per request, gVisor is not a microVM, and the model can write code that passes the checks.</p>
+</article>
+<article class="block">
+<h3>The counts, 21 October 2026, three repositories</h3>
 <table class="counts">
-<caption class="cap" style="text-align:left;padding-bottom:6px">21 October 2026, three repositories</caption>
 <tbody>
 <tr><td>Lines of Go</td><td>233,425</td></tr>
 <tr><td>Outside tests</td><td>94,277</td></tr>
@@ -218,25 +347,11 @@ footer { padding: 48px 0 64px; }
 <tr><td>Test files</td><td>279</td></tr>
 <tr><td>Test functions</td><td>2,940</td></tr>
 <tr><td>Commits since 24 September</td><td>3,467</td></tr>
-</tbody></table></div>
+</tbody>
+</table>
+<p class="cap">Recounted on the day the page goes public.</p>
+</article>
 </div>
-</section>
-
-<section id="investors" aria-labelledby="inv-h">
-<h2 id="inv-h">For investors</h2>
-<h3>The problem</h3>
-<p>Regulated industries are locked out of autonomous development. In banks and medtech firms, pilots of autonomous agents die in the compliance review: the work would run in a vendor's cloud, decisions are unauditable and nothing is reproducible. Writing assistants leave the team size unchanged. Closed platforms cannot pass the review. An in-house factory is a multi-year platform project.</p>
-<h3>The gap</h3>
-<p>What exists are closed vendor services, and open building blocks and boards without the factory: no gates and no feedback loop. None of the 148 tools we surveyed ships the whole loop. This one is open source and self-hosted, with policy enforced by code instead of by the AI. The control plane, the sandboxes and the code stay on your servers; the models sit behind a gateway, so the model is your choice. Every model call, tool call and commit is attributed. It is rebuilt from the repository and a backup bucket, rehearsed on 13 October.</p>
-<h3>The status</h3>
-<p>Design complete, core built, in daily use: it develops all of the author's current projects, from games to home tools. Three services in Go: the control plane, the model gateway and the agent workers. On 21 October 2026: 233,425 lines of Go, 279 test files and 3,467 commits across three repositories since 24 September. A live cluster of three rented commodity servers was verified on 13 October 2026.</p>
-<h3>Who built it</h3>
-<p>One person. The architecture and every design decision are mine, I wrote the specifications, and I directed the AI agents that wrote much of the code, reviewing and ruling on every step.</p>
-</section>
-
-<section id="design" aria-labelledby="des-h">
-<h2 id="des-h">How it was designed</h2>
-<p>The console's look was designed in rounds. Image models went wide, an independent vision critic judged, Sebastian picked, and code followed. Every generated image carries a sidecar with its model, prompt and cost. See <a href="#">the design rounds</a>.</p>
 </section>
 
 </main>
@@ -245,6 +360,8 @@ footer { padding: 48px 0 64px; }
 <p><strong>Sebastian Rücker</strong></p>
 <p><a href="mailto:mail@sebastianruecker.com">mail@sebastianruecker.com</a></p>
 <p class="cap">Hamburg</p>
+<p class="cap">Licence: Business Source License 1.1. Documentation: the architecture, the threat model, the evidence page, the spec-driven process.</p>
+<p class="cap">Built for teams that cannot sign off a hosted coding agent: regulated industries, and companies where security and compliance decide the purchase.</p>
 </footer>
 </body>
 </html>
