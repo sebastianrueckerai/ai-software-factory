@@ -62,7 +62,7 @@ def load_env():
 
 def spent():
     total = 0.0
-    for p in list((ROOT / "design").rglob("*.json")) + list((ROOT / "sites").rglob("*.json")):
+    for p in list((ROOT / "design").rglob("*.json")) + list((ROOT / "sites").rglob("*.json")) + list((ROOT / "demo" / "generated").rglob("*.json")):
         try:
             d = json.loads(p.read_text())
         except (json.JSONDecodeError, UnicodeDecodeError):
@@ -114,17 +114,26 @@ def cmd_gen(a):
     if a.video:
         import fal_client
         body["video_url"] = fal_client.upload_file(a.video)
-    if a.ref:
+    # a video model takes one still as image_url and runs minutes, so it goes through fal's queue
+    video_model = "image-to-video" in a.model or "looping-video" in a.model
+    if a.ref and video_model:
+        import fal_client
+        body["image_url"] = fal_client.upload_file(a.ref[0])
+    elif a.ref:
         key = "image_url" if a.model.startswith("fal-ai/birefnet") else "image_urls"
         uris = [data_uri(r, max_side=2048) for r in a.ref]
         body[key] = uris[0] if key == "image_url" else uris
         if key == "image_url":
             body.pop("prompt")
-    r = httpx.post(f"https://fal.run/{a.model}", json=body,
-                   headers={"Authorization": f"Key {os.environ['FAL_KEY']}"}, timeout=600)
-    if r.status_code != 200:
-        sys.exit(f"fal {r.status_code}: {r.text[:500]}")
-    res = r.json()
+    if video_model:
+        import fal_client
+        res = fal_client.subscribe(a.model, arguments=body)
+    else:
+        r = httpx.post(f"https://fal.run/{a.model}", json=body,
+                       headers={"Authorization": f"Key {os.environ['FAL_KEY']}"}, timeout=600)
+        if r.status_code != 200:
+            sys.exit(f"fal {r.status_code}: {r.text[:500]}")
+        res = r.json()
     imgs = res.get("images") or ([res["image"]] if res.get("image") else []) or ([res["video"]] if res.get("video") else [])
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)

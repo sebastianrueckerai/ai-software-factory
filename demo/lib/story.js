@@ -192,6 +192,15 @@ const cards = {
     body: "The class page offers the class as a calendar file, the one the reminder mail of #117 attaches",
     acceptance: ["Add to calendar on the class page downloads the class as a calendar file", "the file names the studio's address and the room"],
   },
+  // a developer's issue with a repro block: the webhook files it, and the reproduction gate proves the fix
+  126: {
+    title: "Cancel: a cancel exactly 12 hours before class is refused", size: "small", reporter: "lena.h", pr: 223,
+    body: "Cancel is offered up to 12 hours before a class, and a cancel at exactly 12 hours is refused with 409 too late. " +
+      "allowed() in src/booking/cancel.ts compares with > where the rule says up to.\n\n" +
+      "```repro\nnode -e \"const c=require('./src/booking/cancel');process.exit(c.allowed(12*3600)?0:1)\"\n```",
+    repro: "node -e \"const c=require('./src/booking/cancel');process.exit(c.allowed(12*3600)?0:1)\"",
+    acceptance: ["a cancel at exactly 12 hours before the class goes through", "a cancel a second after that is refused"],
+  },
 };
 
 function card(issue) {
@@ -219,7 +228,7 @@ function boardCard(now, issue, o) {
   const c = card(issue);
   return state.card(now, {
     issue, title: c.title, body: body(issue), size: c.size, budget: budgets[c.size], parent: c.plan, planKey: c.key,
-    source: c.plan ? "plan" : undefined, ...o,
+    source: c.plan ? "plan" : undefined, repro: c.repro, ...o,
   });
 }
 
@@ -451,6 +460,7 @@ const merges = {
   122: { queued: 64 * MIN, at: 66 * MIN, live: 72 * MIN, run: 86 },
   // the calendar file at full auto merges on the merge rule auto, the agent having settled its ask
   125: { queued: 32.5 * MIN, at: 34.5 * MIN, live: 40.5 * MIN, run: 91, approver: "merge rule auto" },
+  126: { queued: 23 * MIN, at: 26 * MIN, live: 32 * MIN, run: 92 },
 };
 
 // nightly are the security scan's runs from week 1's Monday to week 2's Sunday, run 52 the first: no finding, but
@@ -670,6 +680,17 @@ const sessions = {
       ],
     },
   },
+  126: {
+    "s-1": {
+      commit: "4f8b2d3",
+      words: [
+        [30, "Reading the issue's repro and src/booking/cancel.ts: allowed(secondsBefore) returns secondsBefore > 12 * 3600."],
+        [2 * MIN, "The repro at main exits 1: allowed(12 * 3600) is false. The rule says up to 12 hours, so the boundary belongs to the member: >= 12 * 3600."],
+        [5 * MIN, "A test cancels at exactly 12 hours before the class and a second after it: the first goes through, the second is refused."],
+        [8 * MIN, "npm test: 224 passing, and the issue's repro exits 0. Pushing and opening the pull request."],
+      ],
+    },
+  },
 };
 
 // words are the agent's words in issue's session sid, as transcript rows.
@@ -730,6 +751,8 @@ const filed = {
   // the refund #122 is filed a quarter hour before scene 11's steer
   122: date(2, "thu", "08:46"),
   125: date(2, "fri", "10:00"),
+  // lena.h's issue on Friday afternoon, its card filed by the webhook at the issue's time
+  126: date(2, "fri", "14:20"),
 };
 
 // ageAt is issue's card's age in seconds at the story's time at, and at the story's time seconds after its filing.
@@ -773,6 +796,7 @@ const reviews = {
   123: [{ verdict: "approve", summary: "The schedule loads a week's teachers in one query, not one per class; the load test measures GET /schedule at 0.29 s at the p95." }],
   122: [{ verdict: "approve", summary: "Refunds each paid booking of a cancelled class once, keyed on the booking's id; the tests cover a cancel sent twice and a declined refund." }],
   125: [{ verdict: "approve", summary: "The class page serves the reminder's calendar file; the tests read the studio's address and the room in its location." }],
+  126: [{ verdict: "approve", summary: "allowed() takes the boundary into the window; the tests cover a cancel at exactly 12 hours and one a second after, and the issue's repro passes at the head." }],
 };
 
 // mergeSpec is the spec of approval a's merge request as factoryd writes it: the risk class, the review's verdict, the

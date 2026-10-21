@@ -1,0 +1,10 @@
+{
+  "critic": "google/gemini-2.5-pro",
+  "images": [
+    "demo/generated/34-sandbox/contact-sheet.jpg"
+  ],
+  "prompt": "Four stills, labelled 1 to 4, candidates for a ten-second animated clip in a 90-second film about an AI software factory. The film's look is the factory's console: a near-black field, thin dark panels, one cyan accent, amber only for the one thing that matters, no text, no people. The chosen still becomes the first frame of an image-to-video model with this motion prompt: \"The cell fades in from nothing, the token and the key slide in, the glow pulses twice, then the cell and everything in it dissolve into the dark grid, leaving the field empty.\"\n\nRank the four and say which to animate and why. Name any defect the motion prompt cannot fix: text or letters, people, a palette off the look, a composition that will not read at a glance. Then answer: will it be clear at the end that everything inside the cell is gone, with nothing left on the grid, and are the token and the key readable as two distinct small things? At most 200 words, numbered.\n",
+  "answer": "1.  **Rank: 1, 2, 4, 3. Animate still 1.** Its sharp, isometric composition reads best as a technical console display. The token and key are clear and distinct. Unlike 2, its composition is balanced and direct, and unlike 3 and 4, it lacks a glow, allowing the motion prompt to generate it cleanly.\n\n2.  The unfixable defect is the static glow in stills 3 and 4. The motion prompt specifies the glow as an animated event (\"pulses twice\"). Starting with a pre-existing glow creates a visual contradiction that the motion prompt cannot fix. All stills are otherwise on-palette and compositionally sound.\n\n3.  Yes, the end state will be clear. The prompt explicitly says the elements \"dissolve into the dark grid, leaving the field empty.\" Yes, the token and key are readable as two distinct things. Their high-contrast colors (cyan vs. amber) and simple versus complex shapes ensure they are immediately distinguishable, even as small elements on screen.",
+  "est_cost_usd": 0.03,
+  "created": "2026-10-21T14:26:52"
+}

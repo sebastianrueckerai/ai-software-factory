@@ -1,0 +1,19 @@
+{
+  "model": "recraft/v4.1/flash/text-to-image",
+  "prompt": "Near-black field with a fine mono grid in perspective, a single thin cyan horizon line, a thin cyan trace drawing a 16:9 rectangle in the centre, nothing else, no text, 16:9.",
+  "refs": [],
+  "video": null,
+  "params": {
+    "num_images": 4,
+    "image_size": "landscape_16_9"
+  },
+  "seed": null,
+  "description": null,
+  "label": "36c title loop: the panel trace",
+  "est_cost_usd": 0.007,
+  "created": "2026-10-21T14:16:09",
+  "outputs": [
+    "36c-1.png"
+  ],
+  "note": "one image came back: the first call asked num_images 4 and image_size, which this model has no field for"
+}

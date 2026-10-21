@@ -1,0 +1,19 @@
+{
+  "model": "blackforestlabs/flux-3/text-to-image",
+  "prompt": "Five dark instrument panels arranged in a ring on a near-black field, thin cyan traces connecting them clockwise, one trace returning from the last panel to the first, subtle amber glow on the first panel, mono grid texture, no text, no people, cinematic depth, 16:9.",
+  "refs": [],
+  "video": null,
+  "params": {
+    "aspect_ratio": "16:9",
+    "resolution": "1k",
+    "output_format": "png"
+  },
+  "seed": null,
+  "description": null,
+  "label": "33 the opening: the loop",
+  "est_cost_usd": 0.05,
+  "created": "2026-10-21T14:20:36",
+  "outputs": [
+    "33-3.png"
+  ]
+}

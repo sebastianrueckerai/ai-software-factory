@@ -1,0 +1,21 @@
+{
+  "model": "pixelcut/looping-video",
+  "prompt": "Seamless loop, slow drift of the grid toward the camera, the line stays still, the soft amber pulse crosses the grid left to right and returns to where it started.",
+  "refs": [
+    "demo/generated/36-titles/36b-3.png"
+  ],
+  "video": null,
+  "params": {
+    "duration": 5,
+    "motion": "subtle",
+    "resolution": "1080p"
+  },
+  "seed": null,
+  "description": null,
+  "label": "36b title loop: the amber pulse, take 1 from still b3",
+  "est_cost_usd": 0.4,
+  "created": "2026-10-21T14:29:23",
+  "outputs": [
+    "36b-clip.mp4"
+  ]
+}

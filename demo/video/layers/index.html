@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1600, height=900">
+<title>Three layers</title>
+<link rel="stylesheet" href="diagram.css">
+<script src="gsap.min.js"></script>
+<style>
+  .live { animation: none; }
+  [data-step] { transition: none; }
+  #root { position: relative; width: 1600px; height: 900px; overflow: hidden; background: var(--bg); }
+  .band { left: 60px; width: 1480px; height: 190px; padding: 20px 26px; }
+  .band .n { position: absolute; left: 26px; top: 16px; }
+  .band h2 { position: absolute; left: 26px; top: 40px; margin: 0; width: 360px; font-size: 28px; }
+  .band .sub { position: absolute; left: 26px; top: 118px; width: 400px; font-size: 17px; color: var(--text-muted); }
+  .band .sub b { color: var(--text); font-weight: 600; }
+  .box { position: absolute; top: 56px; height: 78px; padding: 12px 16px; border: 1px solid var(--line-strong); background: var(--bg-card);
+    font: 15px/1.35 var(--font-mono); color: var(--text); white-space: nowrap; opacity: 0; }
+  .box small { display: block; font-size: 12.5px; color: var(--text-faint); }
+  .cell { position: absolute; top: 46px; width: 150px; height: 98px; border: 1px dashed var(--line-strong); opacity: 0; }
+  .cell .lbl { position: absolute; left: 8px; top: 6px; font: 12px var(--font-mono); color: var(--text-faint); }
+  .cell .pod { position: absolute; left: 8px; bottom: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
+  .slot { position: absolute; left: 24px; top: 24px; width: 102px; height: 50px; border: 1px dashed var(--accent); display: grid; place-items: center;
+    font: 11.5px/1.25 var(--font-mono); color: var(--accent); text-align: center; opacity: 0; }
+  .harness { position: absolute; left: 24px; top: 24px; width: 102px; height: 50px; border: 1px solid var(--line-strong); background: var(--bg-raised);
+    display: grid; place-items: center; font: 12px/1.3 var(--font-mono); color: var(--text); text-align: center; opacity: 0; }
+  .yaml { position: absolute; left: 520px; top: 16px; width: 560px; padding: 12px 16px; border: 1px solid var(--line-strong); background: var(--bg-card);
+    font: 14.5px/1.5 var(--font-mono); color: var(--text-muted); opacity: 0; }
+  .yaml .k { color: var(--accent); }
+  .yaml .v { color: var(--text); }
+  .yaml div { opacity: 0; }
+  .tag { position: absolute; left: 1110px; top: 56px; width: 340px; font-size: 17px; color: var(--text-muted); opacity: 0; }
+  .tag b { color: var(--need-text); font-weight: 600; }
+  .closing { position: absolute; left: 0; width: 1600px; top: 808px; margin: 0; font-size: 24px; text-align: center; color: var(--text); opacity: 0; }
+  .closing b { color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="24" data-width="1600" data-height="900">
+<div id="scene" class="clip" data-start="0" data-duration="24" style="position:absolute;inset:0">
+
+<h1 id="title">Three layers</h1>
+
+<section class="panel band" data-band="prompts" style="top:130px">
+  <span class="n">03</span>
+  <h2>Your prompts</h2>
+  <p class="sub">What the agents read. <b>Files you change.</b></p>
+  <div class="box" data-file="1" style="left:520px">AGENTS.md<small>yours, seeded from the template</small></div>
+  <div class="box" data-file="2" style="left:820px">the writing guide<small>every agent reads it</small></div>
+  <div class="box" data-file="3" style="left:1080px">the review brief<small>what the reviewer checks for</small></div>
+</section>
+
+<section class="panel band" data-band="process" style="top:350px">
+  <span class="n">02</span>
+  <h2>Your process</h2>
+  <p class="sub">How it builds. <b>One YAML file.</b> Ours ships, bring your own.</p>
+  <div class="yaml" id="yaml">
+    <div><span class="k">lanes:</span> <span class="v">ready, backlog, plan</span></div>
+    <div><span class="k">stages:</span> <span class="v">intake · session · checks · reproduction · review · merge</span></div>
+    <div><span class="k">floor:</span> <span class="v">four stages no file may lower</span></div>
+    <div><span class="k">merge_rule:</span> <span class="v">human</span></div>
+  </div>
+  <p class="tag" id="tag">A project may only <b>tighten</b>.</p>
+</section>
+
+<section class="panel band" data-band="factory" style="top:570px">
+  <span class="n">01</span>
+  <h2>Your servers</h2>
+  <p class="sub">What runs it. <b>The factory.</b> Sandboxes, workflows, gates. No opinion on how software is built.</p>
+  <div class="box" data-part="1" style="left:520px">control plane<small>task state, scheduler, policy</small></div>
+  <div class="box" data-part="2" style="left:760px">model gateway<small>every euro held first</small></div>
+  <div class="cell" data-cell="1" style="left:1000px"><span class="lbl">sandbox</span><span class="pod"></span>
+    <div class="slot" id="slot">one Harness<br>interface</div>
+    <div class="harness" id="harness">harness<br>opencode</div>
+  </div>
+  <div class="cell" data-cell="2" style="left:1170px"><span class="lbl">sandbox</span><span class="pod"></span></div>
+  <div class="cell" data-cell="3" style="left:1340px"><span class="lbl">sandbox</span><span class="pod"></span></div>
+</section>
+
+<p class="closing" id="closing"><b>Your servers.</b> <b>Your process.</b> <b>Your prompts.</b> The harness is an adapter: one interface, one adapter today.</p>
+
+</div>
+</div>
+
+<script>
+const tl = gsap.timeline({ paused: true });
+const qa = (s) => [...document.querySelectorAll(s)];
+const ACCENT = "#4fcbe2", LINE = "#263649";
+const bands = { prompts: document.querySelector('[data-band="prompts"]'), process: document.querySelector('[data-band="process"]'), factory: document.querySelector('[data-band="factory"]') };
+
+gsap.set("#title", { opacity: 0 });
+gsap.set(Object.values(bands), { opacity: 0, y: 14 });
+
+// 0 to 4 s: the title, then the three bands from the bottom up
+tl.to("#title", { opacity: 1, duration: 0.6 }, 0.3);
+[bands.factory, bands.process, bands.prompts].forEach((b, i) => tl.to(b, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 1 + i * 0.7));
+
+// 4 to 7 s: the factory's parts take their places
+qa("[data-part]").forEach((p, i) => tl.to(p, { opacity: 1, duration: 0.4 }, 4 + i * 0.4));
+qa("[data-cell]").forEach((c, i) => tl.to(c, { opacity: 1, duration: 0.4 }, 4.8 + i * 0.3));
+tl.to("#harness", { opacity: 1, duration: 0.4 }, 6.2);
+
+// 7 to 11 s: the process file slides in beside its band, its lines in turn, then the floor's tag
+tl.fromTo("#yaml", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 7.2);
+qa("#yaml div").forEach((l, i) => tl.to(l, { opacity: 1, duration: 0.3 }, 7.6 + i * 0.5));
+tl.to("#tag", { opacity: 1, duration: 0.5 }, 10);
+
+// 11 to 14 s: the prompt files
+qa("[data-file]").forEach((f, i) => tl.to(f, { opacity: 1, duration: 0.4 }, 11.2 + i * 0.5));
+
+// 15 to 21 s: the harness lifts out of its sandbox, the interface it stood on shows, and it drops back in
+tl.to("#harness", { y: -46, opacity: 0, duration: 0.6, ease: "power2.in" }, 15.5);
+tl.to("#slot", { opacity: 1, duration: 0.3 }, 16);
+tl.to("#slot", { borderColor: ACCENT, duration: 0.2 }, 17.5);
+tl.to("#slot", { opacity: 0, duration: 0.3 }, 18.6);
+tl.fromTo("#harness", { y: -46, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power2.out", immediateRender: false }, 18.8);
+
+// 21 to 24 s: the bands' marks light from the bottom up, and the line
+[bands.factory, bands.process, bands.prompts].forEach((b, i) => {
+  tl.to(b, { borderColor: ACCENT, duration: 0.25 }, 21 + i * 0.2);
+  tl.to(b, { borderColor: LINE, duration: 0.6 }, 21.8 + i * 0.2);
+});
+tl.to("#closing", { opacity: 1, duration: 0.6 }, 21.6);
+tl.to({}, { duration: 0.1 }, 23.9);
+
+window.__timelines = window.__timelines || {};
+window.__timelines["main"] = tl;
+tl.seek(0);
+</script>
+</body>
+</html>

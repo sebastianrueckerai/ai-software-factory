@@ -1,0 +1,19 @@
+{
+  "model": "blackforestlabs/flux-3/text-to-image",
+  "prompt": "Five dark instrument panels arranged in a ring on a near-black field, thin cyan traces connecting them clockwise, one trace returning from the last panel to the first, subtle amber glow on the first panel, mono grid texture, no text, no people, cinematic depth, 16:9.",
+  "refs": [],
+  "video": null,
+  "params": {
+    "num_images": 4,
+    "image_size": "landscape_16_9"
+  },
+  "seed": null,
+  "description": null,
+  "label": "33 the opening: the loop",
+  "est_cost_usd": 0.05,
+  "created": "2026-10-21T14:15:15",
+  "outputs": [
+    "33-1.png"
+  ],
+  "note": "one image came back: the first call asked num_images 4 and image_size, which this model has no field for"
+}

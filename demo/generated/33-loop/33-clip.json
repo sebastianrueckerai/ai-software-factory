@@ -1,0 +1,21 @@
+{
+  "model": "minimax/h3-max/image-to-video",
+  "prompt": "A slow push-in on the ring, the cyan trace travels clockwise panel to panel, the amber glow fades on the first panel and reappears on the last, loopable.",
+  "refs": [
+    "demo/generated/33-loop/33-2.png"
+  ],
+  "video": null,
+  "params": {
+    "duration": 10,
+    "prompt_expansion_mode": "balanced",
+    "resolution": "768P"
+  },
+  "seed": null,
+  "description": null,
+  "label": "33 the opening: the loop, take 1 from still 2",
+  "est_cost_usd": 0.3,
+  "created": "2026-10-21T14:29:07",
+  "outputs": [
+    "33-clip.mp4"
+  ]
+}

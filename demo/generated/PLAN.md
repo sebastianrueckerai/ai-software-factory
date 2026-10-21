@@ -1,6 +1,6 @@
 # Generated clips: the plan for group H
 
-Four clips the browser cannot record, made with the fal models of [design/models.md](../../design/models.md) by the process of [design/process.md](../../design/process.md): stills go wide, the independent critic judges, Sebastian picks, the chosen still is animated. Every output gets its sidecar JSON from `tools/img.py`. Nothing here runs before Sebastian sets the cap.
+Four clips the browser cannot record, made with the fal models of [design/models.md](../../design/models.md) by the process of [design/process.md](../../design/process.md): stills go wide, the independent critic judges, Sebastian picks, the chosen still is animated. Every output gets its sidecar JSON from `tools/img.py`. It ran on 21 October 2026 under the concept's default cap of $10; [notes.md](notes.md) has the picks, the critic's rankings and the cost, and the results page shows every output.
 
 ## Look
 

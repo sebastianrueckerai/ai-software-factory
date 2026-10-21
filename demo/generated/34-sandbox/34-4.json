@@ -1,0 +1,19 @@
+{
+  "model": "blackforestlabs/flux-3/text-to-image",
+  "prompt": "A single translucent glass cell floating over a dark grid, a small cyan token and a small amber key resting inside it, faint activity glow in the cell's centre, everything else empty and dark, no text, no people, 16:9.",
+  "refs": [],
+  "video": null,
+  "params": {
+    "aspect_ratio": "16:9",
+    "resolution": "1k",
+    "output_format": "png"
+  },
+  "seed": null,
+  "description": null,
+  "label": "34 the sandbox life cycle",
+  "est_cost_usd": 0.05,
+  "created": "2026-10-21T14:22:18",
+  "outputs": [
+    "34-4.png"
+  ]
+}
