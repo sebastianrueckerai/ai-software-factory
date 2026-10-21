@@ -95,29 +95,29 @@ test("a budget stop's escalation is factoryd's own question, not the agent's", (
   assert.equal(story.escalation({ question: "Which?" }), "The agent asks: Which?");
 });
 test("asking leaves the question's row, its escalation alert and the inbox's row", () => {
-  const a = story.asking(now, story.asks.library, 120, 1);
+  const a = story.asking(now, story.asks.editor, 120, 1);
   assert.deepEqual([a.events[0].Kind, a.events[0].At, a.events[0].Detail.source], ["question_asked", "2026-10-20T11:58:00.000Z", "agent"]);
   assert.deepEqual([a.alerts[0].ID, a.alerts[0].Kind, a.alerts[0].Source, a.alerts[0].TaskID], [17, "escalation", "agent", "t-37c411e42a03"]);
-  assert.match(a.inbox.content, /^#113 needs you: Which calendar library/);
+  assert.match(a.inbox.content, /^#113 needs you: Which map editor/);
   assert.equal(story.asking(now, story.asks.budget, 0, 1).alerts[0].Source, "budget");
 });
 test("answerRows are the member's choice and the factory's word on it", () => {
-  const [mine, note] = story.answerRows(now, story.asks.library, 30, 1);
-  assert.deepEqual([mine.role, mine.content], ["user", "TOAST UI Calendar"]);
-  assert.equal(note.content, "Answered #113 with “TOAST UI Calendar”; the card goes on.");
+  const [mine, note] = story.answerRows(now, story.asks.editor, 30, 1);
+  assert.deepEqual([mine.role, mine.content], ["user", "Tiled"]);
+  assert.equal(note.content, "Answered #113 with “Tiled”; the card goes on.");
   assert.equal(note.kind, "poke");
 });
 test("wakeAsk is the waker's text of a batch of asks", () => {
-  assert.equal(story.wakeAsk([{ issue: 125, question: "Where does the room go?" }]),
-    "Wake: 1 asks wait for a human.\n#125: Where does the room go?\n\nRead each card. Settle what your permissions allow. " +
+  assert.equal(story.wakeAsk([{ issue: 125, question: "Where does the link open?" }]),
+    "Wake: 1 asks wait for a human.\n#125: Where does the link open?\n\nRead each card. Settle what your permissions allow. " +
     "For what stays the human's, record what you found with attach_analysis. An ask already answered is done.");
 });
 test("a planned card is named by its key, any other by its title", () => {
-  assert.equal(story.title(110), "week-view");
-  assert.equal(story.title(122), "Payments: refund a class the studio cancels");
+  assert.equal(story.title(110), "belt-map");
+  assert.equal(story.title(122), "Store: refund a purchase the server rolls back");
 });
 test("a merge's spec takes the head of the card's last session that pushed", () => {
-  const spec = story.mergeSpec(story.approvals.calendarFile);
+  const spec = story.mergeSpec(story.approvals.shareLink);
   assert.equal(spec.head_sha, "5e9c3b2");
   assert.equal(spec.risk_class, "normal");
   assert.deepEqual(spec.why_human, ["the project's merge rule is human"]);
@@ -136,7 +136,7 @@ test("the morning's cards wait on their questions until the answers, then take t
   // #120 is filed at 02:08 and answered at 10:58, 8 h 50 min later
   const waiting = story.life(now, 120, 8 * 3600 + 49 * 60, story.lives[120]).task;
   assert.equal(waiting.Status, "waiting-human");
-  assert.equal(waiting.Escalation, "The agent asks: Does an unused class of an expired pass come back as credit?");
+  assert.equal(waiting.Escalation, "The agent asks: Does a tier not reached by the season's end come back as credit?");
   const running = story.life(now, 120, 8 * 3600 + 52 * 60, story.lives[120]).task;
   assert.deepEqual([running.Status, running.AdmittedAt], ["running", "2026-10-20T11:58:00.000Z"]);
 });
@@ -187,7 +187,7 @@ test("week 2's report reads the week against week 1: cheaper and quicker cards, 
   // the cards' 5.48 and the chat's 1.02 - 0.55
   assert.deepEqual(figure(r.spend), [5.95, 12.82, true, true]);
   assert.deepEqual(figure(r.tool_spend), [0.12, 0.26, true, true]);
-  // ScheduleErrors rose at 17:19 and #119 was live at 17:53:30
+  // LeaderboardErrors rose at 17:19 and #119 was live at 17:53:30
   assert.deepEqual(figure(r.time_to_restore), [35 * 60000, 61 * 60000, true, true]);
   // the morning's #117, #120 and #121, answered by Sebastian, and #125's, answered by the agent at full auto
   assert.deepEqual(figure(r.escalations), [4, 2, true, true]);
@@ -220,7 +220,7 @@ test("spending is the cards' spend so far and the chat's", () => {
 test("the ledger's spends are the spends the cards' lives end on", () => {
   const last = (life) => life.phases.findLast((p) => "spent" in p).spent;
   for (const issue of [101, 107, 108, 110, 115, 120, 121, 122, 123]) assert.equal(story.ledger[issue].spent, last(story.lives[issue]), `#${issue}`);
-  assert.equal(story.ledger[125].spent, last(story.calendarFile.auto));
+  assert.equal(story.ledger[125].spent, last(story.shareLink.auto));
 });
 test("the cost review reads September from the ledger", () => {
   // #100's 0.38, week 1's cards' 12.27, week 2's Monday to Wednesday's #115, #116, #117, #120 and #121, and the chat's 0.66

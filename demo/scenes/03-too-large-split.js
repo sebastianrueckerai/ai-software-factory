@@ -8,10 +8,10 @@ const args = story.filing(105, "plan");
 const doIt = ui.doIt;
 const card = ui.face(105);
 const plan = story.plans[105];
-const approval = story.approvals.calendarPlan;
+const approval = story.approvals.beltPlan;
 const accept = `#board article.approval.plan[data-card="${state.id(105)}"] button[aria-label^="Accept revision"]`;
 
-const filing = state.reply(state.say(story.replies.calendar), state.call("new_card", args));
+const filing = state.reply(state.say(story.replies.belt), state.call("new_card", args));
 
 // Monday's and Tuesday's cards are done by Wednesday morning; age and finished in hours
 const done = (now, issue, age, finished, spent) => story.card(now, issue, {
@@ -22,7 +22,7 @@ const week = (now) => [done(now, 101, 47, 45, 1.12), done(now, 102, 46.4, 43.5, 
 // thread is the filing as the console stored it after the Do it; the time-lapse leaves its ages, as the open chat keeps
 // the stamps it drew
 function thread(now) {
-  const f = state.filedThread(now, { said: story.requests.calendar, reply: story.replies.calendar, args, issue: 105, age: 9 });
+  const f = state.filedThread(now, { said: story.requests.belt, reply: story.replies.belt, args, issue: 105, age: 9 });
   return { chat: f.rows, seen: state.seen(f.rows), usedProposals: [f.proposal] };
 }
 
@@ -49,7 +49,7 @@ const scene = (now, s, o) => state.scene(now, { ...story.spending(story.at(105, 
 
 module.exports = {
   title: "Too large, split",
-  story: "Sebastian asks to rewrite the calendar; the agent files it in the plan lane, and the planner's four cards wait for his accept.",
+  story: "Sebastian asks for level 4, the asteroid belt. The agent files it in the plan lane, and the planner's four cards wait for his accept.",
   group: "intake",
   theme: "dark",
   viewport: "desk",
@@ -57,7 +57,7 @@ module.exports = {
     { state: (now) => scene(now, 0, { tasks: week(now), replies: [filing] }), actions: [{ goto: "/" }], hold: 1500 },
     {
       state: () => null,
-      actions: [{ click: "#chat-input" }, { type: ["#chat-input", story.requests.calendar] }, { press: "Enter" }, { waitFor: doIt }, { wait: 3000 }, { hover: doIt }],
+      actions: [{ click: "#chat-input" }, { type: ["#chat-input", story.requests.belt] }, { press: "Enter" }, { waitFor: doIt }, { wait: 3000 }, { hover: doIt }],
       hold: 600,
     },
     { state: () => null, actions: [{ click: doIt }, { waitFor: "#chat-log .applied" }, { waitFor: card }], hold: 2000 },

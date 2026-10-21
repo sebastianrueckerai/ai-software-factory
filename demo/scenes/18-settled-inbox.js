@@ -7,7 +7,7 @@ const HOUR = 3600;
 const INBOX = 2;
 const after = (issue, s) => new Date(story.filed[issue].getTime() + s * 1000);
 
-// Wednesday afternoon of week 1 the confirmation mail #107 merged and went live, and in the night the scan filed #108,
+// Wednesday afternoon of week 1 the receipt fix #107 merged and went live, and in the night the scan filed #108,
 // which merged and went live before 03:00. The story's time stands as long after that scan as now is after the scan's
 // last run, so the scan reads at its 02:00 whatever the recording's hour; a row after now is not written yet. Every
 // row of the inbox informs; none asks.

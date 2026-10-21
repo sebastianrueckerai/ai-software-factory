@@ -6,8 +6,8 @@ const MIN = 60;
 const HOUR = 3600;
 const INBOX = 1;
 const ISSUE = 125;
-const ask = story.asks.calendarFile;
-const a = story.approvals.calendarFile;
+const ask = story.asks.shareLink;
+const a = story.approvals.shareLink;
 const ASKED = 4 * MIN;
 const OPENED = 37.5 * MIN;
 // both runs are seen 47 minutes after #125's filing
@@ -38,8 +38,8 @@ function friday(now, run, o) {
 // manual is #125 at manual: Sebastian answered its question in the chat five minutes after it came, and its pull
 // request waits for him at the merge gate
 function manual(now) {
-  const answered = AT - story.calendarFile.manual.answered;
-  return friday(now, story.calendarFile.manual, {
+  const answered = AT - story.shareLink.manual.answered;
+  return friday(now, story.shareLink.manual, {
     // the request's poke comes two seconds after it, as an ask row at the request's time would read superseded
     rows: [...story.answerRows(now, ask, answered, INBOX), state.mergeAsked(now, { issue: ISSUE, pr: a.pr, risk: a.risk, age: AT - OPENED - 2, conversation: INBOX })],
     events: [
@@ -52,10 +52,10 @@ function manual(now) {
 }
 
 // full is #125 at full auto: the waker starts the agent's turn on its question ten seconds after it came, the agent
-// reads the reminder's calendar file and answers, and factory-merge merges on the merge rule auto
+// reads the challenge notice's link file and answers, and factory-merge merges on the merge rule auto
 function full(now) {
   const W = AT - ASKED - 10;
-  const run = story.calendarFile.auto;
+  const run = story.shareLink.auto;
   const m = story.merges[ISSUE];
   const read = (age) => new Date(now - age * 1000).toISOString();
   return friday(now, run, {
@@ -63,7 +63,7 @@ function full(now) {
       state.wake(now, { kind: "wake_ask", text: story.wakeAsk([ask]), age: W, conversation: INBOX }),
       state.message(now, {
         role: "assistant", age: W - 10, conversation: INBOX,
-        toolCalls: [{ id: "call_1", name: "file", arguments: JSON.stringify({ ref: "main", path: "src/mail/ics.ts" }), read_at: read(W - 10), result: story.sources["src/mail/ics.ts"] }],
+        toolCalls: [{ id: "call_1", name: "file", arguments: JSON.stringify({ ref: "main", path: "src/links/game.ts" }), read_at: read(W - 10), result: story.sources["src/links/game.ts"] }],
       }),
       state.message(now, {
         role: "assistant", age: AT - run.answered, conversation: INBOX,
@@ -72,7 +72,7 @@ function full(now) {
           result: `Answered #${ISSUE}. It cannot be undone.`,
         }],
       }),
-      state.message(now, { role: "assistant", content: story.replies.calendarFile, age: AT - run.answered - 5, conversation: INBOX }),
+      state.message(now, { role: "assistant", content: story.replies.shareLink, age: AT - run.answered - 5, conversation: INBOX }),
       state.mergedPoke(now, { issue: ISSUE, age: AT - m.at, conversation: INBOX }),
       state.livePoke(now, { issue: ISSUE, title: story.cards[ISSUE].title, spent: 0.41, age: AT - m.live, conversation: INBOX }),
     ],
@@ -85,8 +85,8 @@ const wake = "#chat-log .msg.wake";
 
 module.exports = {
   title: "Autonomy levels",
-  story: "One card at two levels. At manual the class page's calendar file waits twice for Sebastian: on its question and at the " +
-    "merge gate. At full auto the same card runs through: the agent's wake turn answers the question from the reminder's file, " +
+  story: "One card at two levels. At manual the replay's share link waits twice for Sebastian: on its question and at the " +
+    "merge gate. At full auto the same card runs through: the agent's wake turn answers the question from the challenge notice's file, " +
     "and the card merges on the merge rule without stopping at the gate.",
   group: "gates",
   theme: "dark",

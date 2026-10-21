@@ -1,6 +1,6 @@
 const environments = [
-  { namespace: "nord-staging", path: "deploy/staging", hostname: "staging.nord-booking.example" },
-  { namespace: "nord-prod", path: "deploy/prod", hostname: "nord-booking.example" },
+  { namespace: "nebula-run-staging", path: "deploy/staging", hostname: "staging.nebula-run.example" },
+  { namespace: "nebula-run-prod", path: "deploy/prod", hostname: "nebula-run.example" },
 ];
 const namespaces = environments.map((e) => e.namespace);
 
@@ -13,17 +13,17 @@ const lanes = [
 const cron = (expr) => [{ cron: expr }];
 
 module.exports = {
-  name: "nord-booking",
-  repository: "nord/booking",
+  name: "nebula-run",
+  repository: "orbit/nebula-run",
   login: "sebastian",
-  display: "Studio Nord",
+  display: "Nebula Run",
   rows: [{
-    Name: "nord-booking", Repository: "nord/booking", MergeRule: "human", Objects: "factory", Agents: "coder",
+    Name: "nebula-run", Repository: "orbit/nebula-run", MergeRule: "human", Objects: "factory", Agents: "coder",
     GitToken: "minted",
     Namespaces: namespaces, Environments: environments, Process: "spec", Lanes: lanes, File: true,
   }],
   config: {
-    repository: "nord/booking", merge_rule: "human", objects: "factory", agents: "coder", process: "spec",
+    repository: "orbit/nebula-run", merge_rule: "human", objects: "factory", agents: "coder", process: "spec",
     namespaces, environments,
     // policy.DefaultChat's confirm list: the lab's own chat block confirms nothing, so the chat's writes would run unasked
     chat: {

@@ -19,7 +19,7 @@ function morning(now, a) {
 
 module.exports = {
   title: "Two cards in parallel",
-  story: "The class pass and the account page build at the same time; each opens its pull request, passes its checks and review, and both merge.",
+  story: "The season pass and the profile's past runs build at the same time. Each opens its pull request, passes its checks and review, and both merge.",
   group: "build",
   theme: "dark",
   viewport: "desk",

@@ -26,8 +26,8 @@ const capped = `${tasks} tbody tr:has(a[href="/tasks/${state.id(110)}/timeline"]
 
 module.exports = {
   title: "The costs page",
-  story: "The costs page over the two weeks: each day by kind, model and tool, then each card and its lines; " +
-    "the costliest card is the calendar's week view that stopped at its budget.",
+  story: "The costs page over the two weeks: each day by kind, model and tool, then each card and its lines. " +
+    "The costliest card is level 4's map, which stopped at its budget.",
   group: "metrics",
   theme: "dark",
   viewport: "desk",

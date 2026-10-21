@@ -7,7 +7,7 @@ const HOUR = 3600;
 const ISSUE = 126;
 const c = story.cards[ISSUE];
 const merge = story.merges[ISSUE];
-// main's head when the issue came: the calendar file's commit, the last merge before it
+// main's head when the issue came: the share link's commit, the last merge before it
 const BASE = story.sessions[125]["s-2"].commit;
 
 // #126's life, offsets in seconds after the webhook filed it from lena.h's issue: one session reproduces the fault and

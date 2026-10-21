@@ -6,23 +6,23 @@ const c = story.cards[103];
 const MIN = 60;
 const filed = ui.face(103);
 
-// Monday afternoon: the waitlist card waits in the merge queue, the schedule card builds; filed adds #103 as the lab
+// Monday afternoon: the lobby queue card waits in the merge queue, the matchmaking card builds; filed adds #103 as the lab
 // filed it from the form
 function monday(now, filed) {
-  const waitlist = story.card(now, 101, {
+  const queue = story.card(now, 101, {
     status: "in-review", lane: "ready", age: 95 * MIN, gate: "merge-queue", gateSince: 3 * MIN, model: "small", spent: 0.71, pr: story.cards[101].pr,
   });
-  const schedule = story.card(now, 102, { status: "running", lane: "ready", age: 57 * MIN, gate: "session", gateSince: 18 * MIN, model: "small", spent: 0.22 });
-  const tasks = [waitlist, schedule];
+  const matchmaking = story.card(now, 102, { status: "running", lane: "ready", age: 57 * MIN, gate: "session", gateSince: 18 * MIN, model: "small", spent: 0.22 });
+  const tasks = [queue, matchmaking];
   if (filed) tasks.push(story.card(now, 103, { status: "queued", lane: "ready", age: 6 }));
   return state.scene(now, {
     tasks,
     objects: {
-      [`sessions/${waitlist.ID}/timeline.jsonl`]: state.timeline(now, 90 * MIN, {
+      [`sessions/${queue.ID}/timeline.jsonl`]: state.timeline(now, 90 * MIN, {
         alias: "small",
         steps: [story.review(101, 1, 26 * MIN, 84 * MIN, "s-1")],
       }),
-      [`sessions/${schedule.ID}/timeline.jsonl`]: state.timeline(now, 19 * MIN, { steps: [state.intake(0, 0), state.sessionStart(MIN, { model: "small" })] }),
+      [`sessions/${matchmaking.ID}/timeline.jsonl`]: state.timeline(now, 19 * MIN, { steps: [state.intake(0, 0), state.sessionStart(MIN, { model: "small" })] }),
     },
     ...story.spending(story.at(101, 95 * MIN)),
   });

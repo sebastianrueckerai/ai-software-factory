@@ -12,7 +12,7 @@ const read = (w) => [
 
 module.exports = {
   title: "Before and after",
-  story: "The metrics page a week apart: after the calendar's split into small cards, a card costs less and finishes sooner, " +
+  story: "The metrics page a week apart: after level 4's split into small cards, a card costs less and finishes sooner, " +
     "and the morning's questions raise the escalations.",
   group: "metrics",
   theme: "dark",

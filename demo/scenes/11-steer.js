@@ -35,7 +35,7 @@ function after(now) {
 
 module.exports = {
   title: "Steering a running card",
-  story: "Sebastian tells the refund card in the chat how to key its Stripe refunds; the agent proposes the message, he presses Do it, " +
+  story: "Sebastian tells the refund card in the chat how to key its Stripe refunds. The agent proposes the message, he presses Do it, " +
     "and the running session's transcript shows it arrive and the agent take it.",
   group: "build",
   theme: "dark",

@@ -6,7 +6,7 @@ const MIN = 60;
 
 // #116's life, offsets in seconds after its creation: the review's first round finds a race, its finding goes back to
 // the agent, and the second session's push passes the second round.
-const cancel = {
+const leave = {
   phases: [
     { from: 0, status: "queued" },
     { from: 2 * MIN, status: "running", gate: "session", model: "small", spent: 0.06 },
@@ -32,13 +32,13 @@ const cancel = {
 
 // week2 is the board a minutes after #116's filing, the week's dependency bump done
 function week2(now, a) {
-  return state.scene(now, { ...story.board([story.life(now, 116, a * MIN, cancel), story.routineCard(now, 115)]), ...story.spending(story.at(116, a * MIN)) });
+  return state.scene(now, { ...story.board([story.life(now, 116, a * MIN, leave), story.routineCard(now, 115)]), ...story.spending(story.at(116, a * MIN)) });
 }
 
 module.exports = {
   title: "The review rejects",
-  story: "The stronger model's review finds a race in the cancel card's pull request; the finding goes back to the agent, " +
-    "the second session takes the seat under a lock, and the review passes.",
+  story: "The stronger model's review finds a race in the leave card's pull request: two players leaving at once. The finding goes " +
+    "back to the agent, the second session frees the seat under a lock, and the review passes.",
   group: "build",
   theme: "dark",
   viewport: "desk",

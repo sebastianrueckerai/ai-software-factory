@@ -22,7 +22,7 @@ function wednesday(now, a) {
 
 module.exports = {
   title: "The stronger model after a failure",
-  story: "The confirmation mail's first attempt on the small class fails the acceptance job; the second attempt runs on the big class, " +
+  story: "The receipt card's first attempt on the small class fails the acceptance job. The second attempt runs on the big class, " +
     "and the drawer shows the model and the spend change.",
   group: "build",
   theme: "dark",

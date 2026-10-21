@@ -7,8 +7,8 @@ const MIN = 60;
 const HOUR = 3600;
 const alert = story.alerts.badMerge;
 
-// Thursday of week 2: the teacher filter #118 merges at 17:10 and goes live, and two minutes later the schedule
-// answers 500 to every link without a teacher. The factory files the fix #119 from the alert; offsets are seconds
+// Thursday of week 2: the ship filter #118 merges at 17:10 and goes live, and two minutes later the leaderboard
+// answers 500 to every link without a ship. The factory files the fix #119 from the alert; offsets are seconds
 // after each card's creation.
 const M = story.date(2, "thu", "17:10");
 const merges = {
@@ -59,7 +59,7 @@ const finished = [
 ];
 
 const reading = state.reply(state.say(story.replies.alertsRead), state.call("alerts", { state: "all" }));
-const settled = state.reply(state.say(story.replies.schedule500));
+const settled = state.reply(state.say(story.replies.leaderboard500));
 
 // Sebastian asks a quarter minute after the alert rose and before the factory files #119. The agent reads the open
 // alerts, #118's last events and #118; t is minutes after the merge.
@@ -67,11 +67,11 @@ const ASKED = 9.25;
 const tOf = (d) => (d - M) / (MIN * 1000);
 const LIVE = tOf(new Date(story.filed[118].getTime() + merges[118].live * 1000));
 const reads = [["alerts", { state: "open" }], ["card_history", { task_id: "118", n: 2 }], ["card", { task_id: "118" }]];
-const checking = state.reply(state.say(story.replies.scheduleCheckRead), ...reads.map(([tool, args]) => state.call(tool, args)));
+const checking = state.reply(state.say(story.replies.leaderboardCheckRead), ...reads.map(([tool, args]) => state.call(tool, args)));
 
 // clock is the wall time of minute m after the merge, seen at minute t, as the tools write it: "2026-10-20 14:07"
 const clock = (now, t, m) => new Date(now - (t - m) * MIN * 1000).toISOString().slice(0, 16).replace("T", " ");
-const broken = (now, t) => story.replies.scheduleBroken(clock(now, t, LIVE).slice(11), clock(now, t, tOf(alert.raised)).slice(11));
+const broken = (now, t) => story.replies.leaderboardBroken(clock(now, t, LIVE).slice(11), clock(now, t, tOf(alert.raised)).slice(11));
 
 // reads' answers as the tools gave them at the question, seen at minute t; k is #118's card
 function answers(now, t, k) {
@@ -96,9 +96,9 @@ function checked(now, t, k) {
   const results = answers(now, t, k);
   const readAt = new Date(now - (age - 1) * 1000).toISOString();
   return [
-    state.message(now, { role: "user", content: story.requests.scheduleCheck, age }),
+    state.message(now, { role: "user", content: story.requests.leaderboardCheck, age }),
     state.message(now, {
-      role: "assistant", content: story.replies.scheduleCheckRead, age: age - 1,
+      role: "assistant", content: story.replies.leaderboardCheckRead, age: age - 1,
       toolCalls: reads.map(([name, args], i) => ({ id: `call_${i + 1}`, name, arguments: JSON.stringify(args), read_at: readAt, result: results[i] })),
     }),
     state.message(now, { role: "assistant", content: broken(now, t), age: age - 2 }),
@@ -122,8 +122,8 @@ const toolRow = (n) => `#chat-log details.tool > summary >> nth=${n}`;
 
 module.exports = {
   title: "A bad merge",
-  story: "Minutes after the teacher filter goes live, the schedule answers 500 and the chat's alerts show it, beside the merge's " +
-    "commit; the factory files the fix from the alert, the fix goes live and the alert settles.",
+  story: "Minutes after the ship filter goes live, the leaderboard answers 500 and the chat's alerts show it, beside the merge's " +
+    "commit. The factory files the fix from the alert, the fix goes live and the alert settles.",
   group: "operate",
   theme: "dark",
   viewport: "desk",
@@ -132,7 +132,7 @@ module.exports = {
     {
       state: (now) => thursday(now, 9.2, { replies: [checking, state.reply(state.say(broken(now, 9.2)))] }),
       actions: [
-        { goto: "/" }, { click: "#chat-input" }, { type: ["#chat-input", story.requests.scheduleCheck] }, { press: "Enter" },
+        { goto: "/" }, { click: "#chat-input" }, { type: ["#chat-input", story.requests.leaderboardCheck] }, { press: "Enter" },
         { waitFor: named }, { click: toolRow(0) }, { hover: ui.park },
       ],
       hold: 5000,
@@ -151,7 +151,7 @@ module.exports = {
     {
       state: () => null,
       actions: [
-        { click: "#chat-input" }, { type: ["#chat-input", story.requests.schedule500] }, { press: "Enter" },
+        { click: "#chat-input" }, { type: ["#chat-input", story.requests.leaderboard500] }, { press: "Enter" },
         { waitFor: answered }, { click: toolRow(-1) }, { scroll: toolRow(-1) }, { hover: ui.park },
       ],
       hold: 4000,

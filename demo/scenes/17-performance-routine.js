@@ -5,7 +5,7 @@ const ui = require("../lib/ui");
 const HOUR = 3600;
 const BOARD = ui.board(["performance-read"]);
 
-// Friday of week 2: the weekly performance read at 07:00 measures GET /schedule at 0.74 s at the p95, up from 0.31 s,
+// Friday of week 2: the weekly performance read at 07:00 measures GET /leaderboard at 0.74 s at the p95, up from 0.31 s,
 // and files #123, which is live an hour later. The story's time stands as long after that read as now is after the
 // read's last run, so #123 shows in the state its age from that run reached.
 
@@ -29,7 +29,7 @@ function board(now) {
 
 module.exports = {
   title: "The performance routine",
-  story: "The weekly performance read finds the schedule page's p95 up from 0.31 s to 0.74 s since the teacher filter and files a card with the numbers.",
+  story: "The weekly performance read finds the leaderboard's p95 up from 0.31 s to 0.74 s since the ship filter and files a card with the numbers.",
   group: "operate",
   theme: "dark",
   viewport: "desk",

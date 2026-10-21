@@ -8,18 +8,18 @@ const sup = story.supervisor;
 
 // #117 waited overnight on its question and took a slot at A, the morning's answer, seconds after its filing
 const A = story.ageAt(sup.issue, story.answeredAt[sup.issue]);
-const reminder = story.lives[sup.issue];
+const challenge = story.lives[sup.issue];
 
 // morning is the board a minutes after #117 took its slot; Monday's bump and #116 are done
 function morning(now, a) {
-  const cards = [story.life(now, sup.issue, A + a * MIN, reminder), story.routineCard(now, 115), story.done(now, 116, 21 * HOUR, 90 * MIN, 1.04)];
+  const cards = [story.life(now, sup.issue, A + a * MIN, challenge), story.routineCard(now, 115), story.done(now, 116, 21 * HOUR, 90 * MIN, 1.04)];
   return state.scene(now, { ...story.board(cards), ...story.spending(story.at(sup.issue, A + a * MIN)) });
 }
 
 module.exports = {
   title: "The supervisor steps in",
-  story: "The reminder card's session runs the same failing test three times, flipping its code back and forth; the flip-flop detector trips, " +
-    "the supervisor ends the session, and the next one starts from its insight.",
+  story: "The daily challenge card's session runs the same failing test three times, flipping its code back and forth. The flip-flop detector " +
+    "trips, the supervisor ends the session, and the next one starts from its insight.",
   group: "build",
   theme: "dark",
   viewport: "desk",

@@ -1,4 +1,4 @@
-// Studio Nord's two weeks: every card by issue, and the texts of the requests, asks, alerts, approvals and routine runs
+// Nebula Run's two weeks: every card by issue, and the texts of the requests, asks, alerts, approvals and routine runs
 // the scenes show. A scene reads a card's title and body from here, so a card reads the same in every scene.
 const state = require("./state");
 
@@ -25,64 +25,65 @@ function date(week, weekday, hm) {
 // board's seven days, it shows on no board, and the lab numbers the first filing on from it.
 const cards = {
   100: {
-    title: "Footer: the studio's address and opening hours", size: "small", pr: 200,
-    body: "The footer names the studio's address, its opening hours and a link to the map",
-    acceptance: ["every page's footer shows the address, the hours and the map link"],
+    title: "Title screen: show the version and the server region", size: "small", pr: 200,
+    body: "The title screen names the game's version and the region of the server a player connects to",
+    acceptance: ["the title screen shows the version and the server region under the logo"],
   },
   101: {
-    title: "Waitlist when a class is full", size: "medium", pr: 201,
-    body: "A full class takes waitlist sign-ups in order. A cancelled booking offers the seat to the first in line by mail",
+    title: "Co-op: a full lobby queues players for the next free seat", size: "medium", pr: 201,
+    body: "A full co-op lobby queues the players who try to join, in order. A player who leaves frees a seat for the first in line",
     acceptance: [
-      "a full class shows Join the waitlist in place of Book",
-      "a cancellation mails the first member in line a link that holds the seat for 2 hours",
-      "a seat unclaimed after 2 hours passes to the next in line",
+      "a full lobby shows Join the queue in place of Join",
+      "a player leaving offers the seat to the first in line with a notice in the game that holds it for 30 seconds",
+      "a seat unclaimed after 30 seconds passes to the next in line",
     ],
   },
   102: {
-    title: "Schedule page: GET /schedule under 400 ms at the p95", size: "small", pr: 202,
-    body: "The latency alert on GET /schedule fired three times this week: its p95 crossed 1 s, and nothing fixed it",
+    title: "Matchmaking: GET /match under 400 ms at the p95", size: "small", pr: 202,
+    body: "The latency alert on GET /match fired three times this week: its p95 crossed 1 s, and nothing fixed it",
     acceptance: [
-      "the p95 of GET /schedule stays under 400 ms over a day of production traffic",
-      "the latency alert on GET /schedule stays quiet for a week",
+      "the p95 of GET /match stays under 400 ms over a day of production traffic",
+      "the latency alert on GET /match stays quiet for a week",
     ],
   },
   103: {
-    title: "Class page: show the teacher and the room", size: "small", pr: 203,
-    body: "Members want to know who teaches and in which room before they book",
-    acceptance: ["the class page names the teacher and the room under its title"],
+    title: "Ship select: show each ship's speed and shield", size: "small", pr: 203,
+    body: "Players want to compare the ships before they launch a run",
+    acceptance: ["the ship select screen shows each ship's speed and shield under its name"],
   },
   104: {
-    title: "Checkout: 500 after the Stripe webhook change", size: "small", pr: 204,
-    body: "SigNoz alert CheckoutErrors: POST /checkout/confirm answers 500 on 41% of requests since the Stripe webhook endpoint " +
+    title: "Store: 500 after the Stripe webhook change", size: "small", pr: 204,
+    body: "SigNoz alert StoreErrors: POST /store/confirm answers 500 on 41% of requests since the Stripe webhook endpoint " +
       "moved to API version 2022-11-15, whose PaymentIntent carries latest_charge in place of charges.\n\n" +
       "TypeError: Cannot read properties of undefined (reading 'data')\n" +
-      "    at confirmBooking (src/payments/webhook.ts:57:38)\n" +
+      "    at confirmPurchase (src/payments/webhook.ts:57:38)\n" +
       "    at handleStripeEvent (src/payments/webhook.ts:23:12)",
     acceptance: [
-      "POST /checkout/confirm answers 2xx for a card payment again",
+      "POST /store/confirm answers 2xx for a card payment again",
       "a test replays a payment_intent.succeeded event of API version 2022-11-15",
     ],
   },
   105: {
-    title: "Calendar: rewrite it as week and month views", size: "large",
-    body: "The calendar is one hand-built table: it cannot show a week, move a class or repeat one. Rebuild it on one model",
+    title: "Level 4: the asteroid belt", size: "large",
+    body: "Level 4 takes the crew through an asteroid belt: rocks that break apart, mining drones in waves and a boss at the end. " +
+      "The rocks, the drones and the boss move on one physics model",
     acceptance: [
-      "the calendar shows a week and a month",
-      "a teacher drags a class to another slot and its bookings move with it",
-      "a weekly class is one series, not a copy per week",
+      "the belt plays from the start gate to the boss",
+      "the mining drones come in waves along the map",
+      "the boss breaks into fragments that move like the rocks",
     ],
   },
   106: {
-    title: "No confirmation mail after booking", size: "small", reporter: "maria.k",
-    body: "I booked Thursday evening's Vinyasa class and paid, but no confirmation mail came. " +
-      "A friend booked the same class the same way and got hers. Is my booking real?",
+    title: "No receipt after buying a skin", size: "small", reporter: "maria.k",
+    body: "I bought the Nova skin for my ship and paid, but no receipt came. " +
+      "A friend bought the same skin the same way and got hers. Did my purchase go through?",
   },
   107: {
-    title: "Confirmation mail: send it once the payment settles", size: "small", pr: 205,
-    body: "Reported in #106: a payment settling after checkout closed sends no confirmation. The webhook sends it, once per booking",
+    title: "Store: send the receipt once the payment settles", size: "small", pr: 205,
+    body: "Reported in #106: a payment settling after the store page closed sends no receipt. The webhook sends it, once per purchase",
     acceptance: [
-      "a booking whose payment settles after the checkout page closed gets its confirmation mail",
-      "a webhook delivered twice sends one mail",
+      "a purchase whose payment settles after the store page closed gets its receipt",
+      "a webhook delivered twice sends one receipt",
     ],
   },
   108: {
@@ -92,34 +93,34 @@ const cards = {
     acceptance: ["npm audit reports no high finding", "the route tests pass on express 4.20.0"],
   },
   109: {
-    title: "Calendar: one events model for classes and their repeats", size: "medium", plan: 105, key: "events-model", pr: 207,
-    body: "Card events-model of plan #105, accepted by sebastian. A class is an event with a series rule; a booking points at one occurrence",
-    acceptance: ["a weekly class is one row with its rule", "every booking keeps its occurrence after the migration"],
+    title: "Asteroid field: one physics model for rocks and their fragments", size: "medium", plan: 105, key: "rock-physics", pr: 207,
+    body: "Card rock-physics of plan #105, accepted by sebastian. A rock is a body with mass and spin. A shot splits it into fragments that keep its momentum",
+    acceptance: ["a shot rock splits into fragments that keep its momentum", "the rocks of levels 1 to 3 move as before on the new model"],
   },
   110: {
-    title: "Calendar: the week view", size: "medium", plan: 105, key: "week-view", pr: 208,
-    body: "Card week-view of plan #105, accepted by sebastian. Seven columns of the studio's hours, each class a block with its free places",
-    acceptance: ["the week view shows every class of the week with its free places", "a member books from a block"],
+    title: "Level 4: the belt's map and its enemy waves", size: "medium", plan: 105, key: "belt-map", pr: 208,
+    body: "Card belt-map of plan #105, accepted by sebastian. The map scrolls from the start gate to the boss's arena, and the enemy waves come in along it",
+    acceptance: ["the map scrolls from the start gate to the boss's arena", "each enemy wave enters at its marker on the map"],
   },
   111: {
-    title: "Calendar: the month view", size: "small", plan: 105, key: "month-view", pr: 209,
-    body: "Card month-view of plan #105, accepted by sebastian. A month of days, each with its classes' names and a count of free places",
-    acceptance: ["the month view lists each day's classes", "a click on a day opens its week"],
+    title: "Level 4: the mining drone enemy", size: "small", plan: 105, key: "mining-drone", pr: 209,
+    body: "Card mining-drone of plan #105, accepted by sebastian. A drone that steers between the rocks and rams the nearest ship",
+    acceptance: ["the drone steers around the rocks to the nearest ship", "a ram costs the ship one shield point and destroys the drone"],
   },
   112: {
-    title: "Calendar: drag a class to move it, its bookings follow", size: "medium", plan: 105, key: "drag-move", pr: 212,
-    body: "Card drag-move of plan #105, accepted by sebastian. A teacher drags a block to another slot, and its bookings move with it",
-    acceptance: ["a dragged class keeps all its bookings", "a slot another class holds refuses the drop"],
+    title: "Level 4: the belt boss, its fragments follow the physics", size: "medium", plan: 105, key: "belt-boss", pr: 212,
+    body: "Card belt-boss of plan #105, accepted by sebastian. A hollow asteroid with three phases. Each phase it loses breaks off fragments that fly on the physics model",
+    acceptance: ["the boss's fragments fly like the rocks", "the boss enters only after the last wave"],
   },
   113: {
-    title: "Calendar: the week grid and its navigation", size: "small", pr: 210,
-    body: "Split from #110 after it reached its budget: the empty week grid of the studio's hours, with the previous and next week",
-    acceptance: ["the grid shows the studio's hours for seven days", "previous and next move a week"],
+    title: "Level 4: the belt's map and its camera", size: "small", pr: 210,
+    body: "Split from #110 after it reached its budget: the map from the start gate to the boss's arena, with a camera that follows the crew",
+    acceptance: ["the map scrolls from the start gate to the boss's arena", "the camera keeps every ship of the crew in view"],
   },
   114: {
-    title: "Calendar: class blocks in the week grid", size: "small", pr: 211,
-    body: "Split from #110 after it reached its budget: each class as a block in the grid of #113, with its free places and Book",
-    acceptance: ["every class of the week is a block with its free places", "a member books from a block"],
+    title: "Level 4: the enemy waves on the map", size: "small", pr: 211,
+    body: "Split from #110 after it reached its budget: each enemy wave enters at its marker on the map of #113, with its drones and its timing",
+    acceptance: ["each enemy wave enters at its marker on the map", "the next wave waits until the crew clears the last"],
   },
   115: {
     title: "Weekly dependency bump", size: "small", routine: "dependency-bump", pr: 213,
@@ -127,79 +128,79 @@ const cards = {
     acceptance: ["the lockfile names the newest release of each line", "the test suite passes"],
   },
   116: {
-    title: "Booking: cancel up to 12 hours before class", size: "medium", pr: 214,
-    body: "A member cancels a booking up to 12 hours before the class starts; the seat goes to the waitlist of #101",
+    title: "Lobby: leave a match without penalty in its first 60 seconds", size: "medium", pr: 214,
+    body: "A player may leave a match in its first 60 seconds without the quit penalty. The seat goes to the queue of #101",
     acceptance: [
-      "Cancel shows until 12 hours before the class and not after",
-      "a cancelled seat goes to the first member on the waitlist",
-      "a cancel and a waitlist claim at the same moment leave one booking for the seat",
+      "Leave without penalty shows for the first 60 seconds of a match and not after",
+      "a seat left goes to the first player in the queue",
+      "two players leaving at the same moment give their seats to two different players in the queue",
     ],
   },
   117: {
-    title: "Reminder mail: send it 24 hours before class", size: "small", pr: 215,
-    body: "Every booked member gets one reminder mail 24 hours before the class, with the room and a cancel link",
-    acceptance: ["a booking gets one reminder 24 hours before its class", "a booking made later than that gets none"],
+    title: "Daily challenge: notify players when a new one opens", size: "small", pr: 215,
+    body: "Every player who opted in gets one notice when the day's challenge opens at 18:00 Berlin time",
+    acceptance: ["a player who opted in gets one notice when each new challenge opens", "a player who opted out gets none"],
   },
   118: {
-    title: "Schedule: filter by teacher", size: "small", pr: 216,
-    body: "Members follow a teacher. The schedule gets a teacher filter, kept in the URL so a link shares it",
-    acceptance: ["the schedule shows only the chosen teacher's classes", "the filter survives a reload"],
+    title: "Leaderboard: filter by ship", size: "small", pr: 216,
+    body: "Players compare runs on the same ship. The leaderboard gets a ship filter, kept in the URL so a link shares it",
+    acceptance: ["the leaderboard shows only the runs on the chosen ship", "the filter survives a reload"],
   },
   119: {
-    title: "Schedule: 500 when no teacher is chosen", size: "small", pr: 217,
-    body: "SigNoz alert ScheduleErrors: GET /schedule answers 500 on 63% of requests since e41b7c9, the merge of #118. " +
-      "A schedule link without ?teacher fails.\n\n" +
+    title: "Leaderboard: 500 when no ship is chosen", size: "small", pr: 217,
+    body: "SigNoz alert LeaderboardErrors: GET /leaderboard answers 500 on 63% of requests since e41b7c9, the merge of #118. " +
+      "A leaderboard link without ?ship fails.\n\n" +
       "TypeError: Cannot read properties of undefined (reading 'split')\n" +
-      "    at parseTeacherFilter (src/schedule/filter.ts:12:27)\n" +
-      "    at getSchedule (src/schedule/routes.ts:31:19)",
-    acceptance: ["GET /schedule without ?teacher answers the whole week", "a test covers the link without a filter"],
+      "    at parseShipFilter (src/leaderboard/filter.ts:12:27)\n" +
+      "    at getLeaderboard (src/leaderboard/routes.ts:31:19)",
+    acceptance: ["GET /leaderboard without ?ship answers the runs of every ship", "a test covers the link without a filter"],
   },
   120: {
-    title: "Class pass: 10 classes, valid 6 months", size: "medium", pr: 218,
-    body: "A member buys a pass of 10 classes by card. Each booking takes one class off it; the pass ends after 6 months",
+    title: "Season pass: 10 tiers, valid for the season", size: "medium", pr: 218,
+    body: "A player buys a season pass of 10 reward tiers by card. Each tier unlocks at its season points, and the pass ends with the season",
     acceptance: [
-      "a member with a pass books without paying again",
-      "the account page shows the classes left and the end date",
-      "a pass past its 6 months books nothing",
+      "a player with the pass unlocks each tier at its season points",
+      "the profile shows the tiers unlocked and the season's end date",
+      "a pass past its season unlocks nothing",
     ],
   },
   121: {
-    title: "Account page: a member's past bookings", size: "small", pr: 219,
-    body: "The account page lists a member's bookings of the last 12 months, newest first, with each class's date and teacher",
-    acceptance: ["the account page lists the last 12 months of bookings", "a member sees only their own"],
+    title: "Profile: a player's past runs", size: "small", pr: 219,
+    body: "The profile lists a player's runs of the last 12 months, newest first, with each run's date, ship and score",
+    acceptance: ["the profile lists the last 12 months of runs", "a player sees only their own"],
   },
   122: {
-    title: "Payments: refund a class the studio cancels", size: "medium", pr: 220,
-    body: "When the studio cancels a class, every member who paid for it by card gets a refund through Stripe, once",
+    title: "Store: refund a purchase the server rolls back", size: "medium", pr: 220,
+    body: "When the game server rolls back a purchase it could not grant, the player who paid for it by card gets a refund through Stripe, once",
     acceptance: [
-      "a class the studio cancels refunds every paid booking to its card",
-      "a cancel sent twice refunds once",
-      "a failed refund shows on the class's page for the studio",
+      "a purchase the server rolls back refunds the player's card",
+      "a rollback sent twice refunds once",
+      "a failed refund shows on the purchase's page for support",
     ],
   },
   123: {
-    title: "Schedule page: p95 up from 0.31 s to 0.74 s since #118", size: "small", routine: "performance-read", pr: 221,
-    body: "The weekly performance read: GET /schedule answers in 0.74 s at the p95 this week, up from 0.31 s after #102. " +
-      "It rose with the merge of #118, whose teacher filter joins the teachers table per class",
-    acceptance: ["the p95 of GET /schedule is back under 400 ms over a day of production traffic"],
+    title: "Leaderboard: p95 up from 0.31 s to 0.74 s since #118", size: "small", routine: "performance-read", pr: 221,
+    body: "The weekly performance read: GET /leaderboard answers in 0.74 s at the p95 this week, up from 0.31 s the week before. " +
+      "It rose with the merge of #118, whose ship filter joins the ships table per run",
+    acceptance: ["the p95 of GET /leaderboard is back under 400 ms over a day of production traffic"],
   },
   124: {
     title: "Cost review: the month's spend by card", size: "small", routine: "cost-review",
     body: "The monthly cost review: the month's spend by card and by kind against the project's cap. Read it, then close the card",
   },
   125: {
-    title: "Class page: add the class to your own calendar", size: "small", pr: 222,
-    body: "The class page offers the class as a calendar file, the one the reminder mail of #117 attaches",
-    acceptance: ["Add to calendar on the class page downloads the class as a calendar file", "the file names the studio's address and the room"],
+    title: "Replays: share a run as a link", size: "small", pr: 222,
+    body: "The replay screen offers a link to the run, the same kind of game link the challenge notice of #117 carries",
+    acceptance: ["Share on the replay screen copies a link to the run", "the link carries the run's seed"],
   },
   // a developer's issue with a repro block: the webhook files it, and the reproduction gate proves the fix
   126: {
-    title: "Cancel: a cancel exactly 12 hours before class is refused", size: "small", reporter: "lena.h", pr: 223,
-    body: "Cancel is offered up to 12 hours before a class, and a cancel at exactly 12 hours is refused with 409 too late. " +
-      "allowed() in src/booking/cancel.ts compares with > where the rule says up to.\n\n" +
-      "```repro\nnode -e \"const c=require('./src/booking/cancel');process.exit(c.allowed(12*3600)?0:1)\"\n```",
-    repro: "node -e \"const c=require('./src/booking/cancel');process.exit(c.allowed(12*3600)?0:1)\"",
-    acceptance: ["a cancel at exactly 12 hours before the class goes through", "a cancel a second after that is refused"],
+    title: "Boss fight: pausing in phase two freezes the game", size: "small", reporter: "lena.h", pr: 223,
+    body: "Pausing in phase two of the level 3 boss freezes the game: after Resume the boss never moves again and the arena stays shut. " +
+      "Resume() in server/boss/phase.go restores the phase timer only when b.phase == 1. The headless sim exits 1 while the boss stays frozen.\n\n" +
+      "```repro\ngo run ./server/cmd/sim -level 3 -pause-in-phase 2\n```",
+    repro: "go run ./server/cmd/sim -level 3 -pause-in-phase 2",
+    acceptance: ["a boss paused and resumed in phase two fights on", "a boss paused and resumed in phase one or three fights on as before"],
   },
 };
 
@@ -240,61 +241,61 @@ function filing(issue, lane) {
 
 // requests are what Sebastian types into the chat.
 const requests = {
-  waitlist: "Members ask for a waitlist when a class is full.",
-  schedule: "The schedule page feels slow.",
-  calendar: "Rewrite the calendar.",
+  queue: "Players ask for a queue when a co-op lobby is full.",
+  matchmaking: "Matchmaking feels slow.",
+  belt: "Build level 4, the asteroid belt.",
   report: "File a fix card for maria.k's report #106.",
-  checkout: "Is checkout still failing?",
-  scheduleCheck: "Is the schedule all right since #118 went live?",
-  schedule500: "Has the schedule alert settled?",
+  store: "Is the store still failing?",
+  leaderboardCheck: "Is the leaderboard all right since #118 went live?",
+  leaderboard500: "Has the leaderboard alert settled?",
   split: "Split #110 into smaller cards instead of raising its budget.",
   repoint: "Let #112 wait on #114 instead of #110, then close #110.",
 };
 
 // asks are the questions the agent and the factory put to a person, by story.
 const asks = {
-  waitlist: {
+  queue: {
     issue: 101,
-    question: "A waitlist fits the booking flow: a full class takes sign-ups in order, and a cancellation offers the seat " +
-      "to the first in line. How does that member hear the seat is free?",
-    choices: ["By mail", "In the app"],
-    answer: "By mail",
+    question: "A queue fits the lobby: a full lobby takes players in order, and a player leaving offers the seat " +
+      "to the first in line. How does that player hear the seat is free?",
+    choices: ["In the game", "By push notification"],
+    answer: "In the game",
   },
-  move: { issue: 105, question: "Does moving a class mail the members booked on it?", choices: ["Mail every booked member", "Only when the day changes"] },
+  bossHealth: { issue: 105, question: "Does the boss's health grow with the size of the crew?", choices: ["Grow with the crew", "Same for every crew"] },
   // factoryd's own question at a budget stop, not the agent's; alert is each ask's escalation alert
   budget: {
     issue: 110, budget: true, alert: 15,
     question: "The card has €0.40 of its €5.00 budget left, and a session on big needs €0.60. Fund one more session?",
     choices: ["Fund one more session", "End the card"],
   },
-  library: {
+  editor: {
     issue: 113, alert: 17,
-    question: "Which calendar library does the week grid build on? FullCalendar is the most used, Schedule-X the smallest, " +
-      "TOAST UI Calendar the one with drag built in.",
-    choices: ["FullCalendar", "Schedule-X", "TOAST UI Calendar"],
-    answer: "TOAST UI Calendar",
+    question: "Which map editor does the belt's map build on? Tiled is the most used, LDtk the newest, " +
+      "Ogmo the smallest.",
+    choices: ["Tiled", "LDtk", "Ogmo"],
+    answer: "Tiled",
   },
   // the overnight asks, in the order the morning answers them: #120 and #121 at once, #117 two minutes later
   morning: [
     {
-      issue: 120, alert: 18, question: "Does an unused class of an expired pass come back as credit?", choices: ["No refund", "Refund as credit"],
+      issue: 120, alert: 18, question: "Does a tier not reached by the season's end come back as credit?", choices: ["No refund", "Refund as credit"],
       answer: "No refund",
     },
     {
-      issue: 121, alert: 19, question: "Do cancelled bookings show in the account page's list?", choices: ["Show them, struck through", "Hide them"],
-      answer: "Show them, struck through",
+      issue: 121, alert: 19, question: "Do abandoned runs show in the profile's list?", choices: ["Show them, greyed out", "Hide them"],
+      answer: "Show them, greyed out",
     },
     {
-      issue: 117, alert: 20, question: "Does the reminder carry the class as a calendar file for the member's own calendar?",
-      choices: ["Attach it", "Leave it out"], answer: "Attach it",
+      issue: 117, alert: 20, question: "Does the notice carry a link that opens the game at the new challenge?",
+      choices: ["Link it", "Leave it out"], answer: "Link it",
     },
   ],
-  // the calendar file's ask, which at full auto the agent settles in its wake turn from #117's merged file
-  calendarFile: {
+  // the share link's ask, which at full auto the agent settles in its wake turn from #117's merged file
+  shareLink: {
     issue: 125, alert: 21,
-    question: "Does the calendar file put the room in its location, after the studio's address, or only in its description?",
-    choices: ["In the location", "Only in the description"],
-    answer: "In the location",
+    question: "Does the share link open the replay in the game, or on a web page with the run's score?",
+    choices: ["In the game", "On a web page"],
+    answer: "In the game",
   },
 };
 
@@ -325,28 +326,28 @@ const answerRows = (now, ask, age, conversation) => [
 
 // replies are the agent's words in the intake chats, beside its tool calls.
 const replies = {
-  waitlist: "By mail it is: the booking mails already go out through the mailer, so the seat offer uses it too. The card:",
-  scheduleRead: "I measure it first: the telemetry's alerts on the page.",
-  schedule: "The alerts agree with you: the rule on GET /schedule's **p95 above 1 s** fired three times this week " +
+  queue: "In the game it is: the lobby already sends its state over the match socket, so the seat offer goes out on it too. The card:",
+  matchmakingRead: "I measure it first: the telemetry's alerts on matchmaking.",
+  matchmaking: "The alerts agree with you: the rule on GET /match's **p95 above 1 s** fired three times this week " +
     "and settled each time without a fix. The card sets the bar at 400 ms:",
-  calendar: "That is several cards: the week, the month, moving a class and the model under them. " +
+  belt: "That is several cards: the map, the drones, the boss and the physics under them. " +
     "I file it in the plan lane, where the planner splits it into cards in their order, and the plan waits for your accept:",
-  report: "maria.k paid, and her confirmation never came, while a friend's did: the mail goes out only when the payment " +
-    "settles before the checkout page closes. The fix sends it from Stripe's webhook, once per booking:",
+  report: "maria.k paid, and her receipt never came, while a friend's did: the receipt goes out only when the payment " +
+    "settles before the store page closes. The fix sends it from Stripe's webhook, once per purchase:",
   alertsRead: "I read the alerts.",
-  scheduleCheckRead: "I read the open alerts and #118.",
-  // scheduleBroken is the answer with the times the tools gave, as "14:07"
-  scheduleBroken: (live, raised) => `No. **ScheduleErrors** has been open since ${raised} UTC, two minutes after #118 went live at ${live}, ` +
+  leaderboardCheckRead: "I read the open alerts and #118.",
+  // leaderboardBroken is the answer with the times the tools gave, as "14:07"
+  leaderboardBroken: (live, raised) => `No. **LeaderboardErrors** has been open since ${raised} UTC, two minutes after #118 went live at ${live}, ` +
     "and #118 merged at its head **e41b7c9**. The factory files the fix from the alert.",
-  checkout: "No. **CheckoutErrors** settled when #104 went live, with the verdict real, and no alert is open.",
-  schedule500: "It has. **ScheduleErrors** rose minutes after the merge of #118 and settled when #119 went live, with the verdict real; " +
-    "no alert is open.",
-  split: "#110 has €0.40 of its €5.00 left and failed its acceptance twice on the class blocks. Two small cards fit a budget each: " +
-    "the empty week grid now, and the class blocks on it, in the backlog until the grid is in:",
-  repoint: "Dragging a class needs its block, so #112 waits on #114 in #110's place. Then #110 closes with the split in its note:",
-  // calendarFile is the agent's settling of #125's ask in its wake turn
-  calendarFile: "#117's reminder file, merged and live, puts the room in the location after the studio's address. " +
-    "#125 offers the same file, so I answered **In the location**; nothing in it is direction or money.",
+  store: "No. **StoreErrors** settled when #104 went live, with the verdict real, and no alert is open.",
+  leaderboard500: "It has. **LeaderboardErrors** rose minutes after the merge of #118 and settled when #119 went live, with the verdict real. " +
+    "No alert is open.",
+  split: "#110 has €0.40 of its €5.00 left and failed its acceptance twice on the enemy waves. Two small cards fit a budget each: " +
+    "the map and its camera now, and the enemy waves on it, in the backlog until the map is in:",
+  repoint: "The boss enters after the last wave, so #112 waits on #114 in #110's place. Then #110 closes with the split in its note:",
+  // shareLink is the agent's settling of #125's ask in its wake turn
+  shareLink: "#117's challenge link, merged and live, opens the game at its target through src/links/game.ts. " +
+    "#125 builds the same kind of link, so I answered **In the game**. Nothing in it is direction or money.",
 };
 
 // wakeAsk is the waker's text of a wake on the asks of a batch, as factoryd's askText words it: each ask with its card.
@@ -360,23 +361,23 @@ function wakeAsk(list) {
 // date the telemetry's alerts on the calendar: the latency alert settled itself three times the week before, and an
 // alert that filed a card settles real when the card goes live.
 const alerts = {
-  scheduleLatency: [
-    { id: 11, kind: "alert", source: "GET /schedule p95 above 1 s", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd",
+  matchLatency: [
+    { id: 11, kind: "alert", source: "GET /match p95 above 1 s", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd",
       raised: date(0, "fri", "20:00"), resolved: date(0, "fri", "20:30") },
-    { id: 12, kind: "alert", source: "GET /schedule p95 above 1 s", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd",
+    { id: 12, kind: "alert", source: "GET /match p95 above 1 s", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd",
       raised: date(0, "sat", "20:00"), resolved: date(0, "sat", "21:00") },
-    { id: 13, kind: "alert", source: "GET /schedule p95 above 1 s", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd",
+    { id: 13, kind: "alert", source: "GET /match p95 above 1 s", fingerprint: "5d3a9c71e04b2f86", verdict: "noise", resolvedBy: "factoryd",
       raised: date(0, "sun", "20:00"), resolved: date(0, "sun", "21:00") },
   ],
-  checkout: {
-    id: 14, kind: "alert", source: "CheckoutErrors", task: 104, fingerprint: "b81e2f04a9c63d17", verdict: "real", resolvedBy: "factoryd",
+  store: {
+    id: 14, kind: "alert", source: "StoreErrors", task: 104, fingerprint: "b81e2f04a9c63d17", verdict: "real", resolvedBy: "factoryd",
     raised: date(1, "tue", "12:59"), resolved: date(1, "tue", "14:00"),
-    detail: { summary: "POST /checkout/confirm answers 500 on 41% of requests", error: cards[104].body.split("\n\n")[1] },
+    detail: { summary: "POST /store/confirm answers 500 on 41% of requests", error: cards[104].body.split("\n\n")[1] },
   },
   badMerge: {
-    id: 16, kind: "alert", source: "ScheduleErrors", task: 119, fingerprint: "e07c4a92d15b8f3e", verdict: "real", resolvedBy: "factoryd",
+    id: 16, kind: "alert", source: "LeaderboardErrors", task: 119, fingerprint: "e07c4a92d15b8f3e", verdict: "real", resolvedBy: "factoryd",
     raised: date(2, "thu", "17:19"), resolved: date(2, "thu", "17:54"),
-    detail: { summary: "GET /schedule answers 500 on 63% of requests since e41b7c9", error: cards[119].body.split("\n\n")[1] },
+    detail: { summary: "GET /leaderboard answers 500 on 63% of requests since e41b7c9", error: cards[119].body.split("\n\n")[1] },
   },
 };
 
@@ -384,7 +385,7 @@ const alerts = {
 // card is filed and settled with its verdict once at passed its resolve.
 function alertsAt(now, at) {
   const age = (d) => (at - d) / 1000;
-  return [alerts.badMerge, alerts.checkout, ...alerts.scheduleLatency.slice().reverse()].filter((a) => a.raised <= at).map((a) => {
+  return [alerts.badMerge, alerts.store, ...alerts.matchLatency.slice().reverse()].filter((a) => a.raised <= at).map((a) => {
     const settled = a.resolved <= at;
     return state.alert(now, {
       ...a, task: filed[a.task] <= at ? a.task : undefined, age: age(a.raised), resolvedAge: settled ? age(a.resolved) : undefined,
@@ -395,45 +396,47 @@ function alertsAt(now, at) {
 
 // approvals are the plans and merges that wait on a person.
 const approvals = {
-  calendarPlan: {
+  beltPlan: {
     id: 21, kind: "plan", task: 105,
-    brief: "The planner splits the calendar rewrite into four cards: the events model, the week and month views beside each other, then drag to move.",
-    detail: "The events model comes first, because both views read it: a weekly class becomes one series with its rule, and every " +
-      "booking keeps its occurrence. The week view and the month view then build side by side. Moving a class by drag comes " +
-      "last, as it needs both views. One question is open: whether a moved class mails its booked members.",
+    brief: "The planner splits level 4 into four cards: the physics model, the map and the mining drone beside each other, then the boss.",
+    detail: "The physics model comes first, because the map's rocks and the drone both move on it: a rock and its fragments are one " +
+      "kind of body, and a shot splits a rock into fragments that keep its momentum. The map with its waves and the mining drone " +
+      "then build side by side. The boss comes last, as it needs both. One question is open: whether the boss's health grows " +
+      "with the size of the crew.",
   },
   refund: {
     id: 31, kind: "merge", task: 122, pr: cards[122].pr, risk: "high",
     reason: "risk class high: the change touches src/payments",
-    brief: "Refunds a class the studio cancels to each paying member's card, once per booking.",
-    detail: "Adds refundBooking in src/payments/refund.ts, called when the studio cancels a class. It creates one Stripe refund " +
-      "per paid booking with an idempotency key, so a cancel sent twice refunds once. The charge.refunded webhook marks the " +
-      "booking refunded; a failed refund shows on the class's page. Tests cover a double cancel and a declined refund.",
-    recommendation: "Merge it: the refunds key on the booking's id, and the tests send a cancel twice and find one refund.",
+    brief: "Refunds a purchase the game server rolls back to the player's card, once per purchase.",
+    detail: "Adds refundPurchase in src/payments/refund.ts, called when the game server rolls back a purchase. It creates one Stripe " +
+      "refund per paid purchase with an idempotency key, so a rollback sent twice refunds once. The charge.refunded webhook marks " +
+      "the purchase refunded, and a failed refund shows on the purchase's page for support. Tests cover a double rollback and a " +
+      "declined refund.",
+    recommendation: "Merge it: the refunds key on the purchase's id, and the tests send a rollback twice and find one refund.",
     whyHuman: ["the project's merge rule is human", "risk class high is requires_approval"],
   },
-  // calendarFile is #125's merge at manual: a class of normal risk still waits on the human merge rule
-  calendarFile: {
+  // shareLink is #125's merge at manual: a change of normal risk still waits on the human merge rule
+  shareLink: {
     id: 33, kind: "merge", task: 125, pr: cards[125].pr, risk: "normal",
     reason: "the project's merge rule is human",
-    brief: "The class page offers the class as a calendar file, the reminder's own.",
-    detail: "Adds Add to calendar on the class page. It serves the calendar file src/mail/ics.ts builds for the reminder of #117, " +
-      "with the studio's address and the room in its location. Tests download the file and read its fields.",
-    recommendation: "Merge it: the page reuses the reminder's file, and the tests read the address and the room from it.",
+    brief: "The replay screen offers the run as a link, built like the challenge notice's own.",
+    detail: "Adds Share on the replay screen. It builds the link with gameLink from src/links/game.ts, which the challenge notice " +
+      "of #117 uses, so the link opens the game at the replay with its seed. Tests build the link and read its path and seed.",
+    recommendation: "Merge it: the screen reuses the notice's link builder, and the tests read the replay's path and seed from the link.",
     whyHuman: ["the project's merge rule is human"],
   },
 };
 
-// plans are the planner's plans: the calendar rewrite, its cards by key with the issues they become on accept.
+// plans are the planner's plans: level 4, its cards by key with the issues they become on accept.
 const plans = {
   105: {
-    summary: "Four cards: the events model first, then the week and the month views side by side, then moving a class by drag.",
-    question: asks.move,
+    summary: "Four cards: the physics model first, then the map and the mining drone side by side, then the boss.",
+    question: asks.bossHealth,
     cards: [
-      { key: "events-model", role: "foundation", issue: 109, dependsOn: [] },
-      { key: "week-view", role: "feature", issue: 110, dependsOn: ["events-model"] },
-      { key: "month-view", role: "feature", issue: 111, dependsOn: ["events-model"] },
-      { key: "drag-move", role: "integration", issue: 112, dependsOn: ["week-view", "month-view"] },
+      { key: "rock-physics", role: "foundation", issue: 109, dependsOn: [] },
+      { key: "belt-map", role: "feature", issue: 110, dependsOn: ["rock-physics"] },
+      { key: "mining-drone", role: "feature", issue: 111, dependsOn: ["rock-physics"] },
+      { key: "belt-boss", role: "integration", issue: 112, dependsOn: ["belt-map", "mining-drone"] },
     ],
   },
 };
@@ -443,7 +446,7 @@ function planCards(issue) {
   return plans[issue].cards.map((p) => {
     const c = card(p.issue);
     return {
-      key: p.key, role: p.role, title: c.title, brief: c.body.replace(/^Card [^.]+\. /, ""), directories: ["src/calendar"],
+      key: p.key, role: p.role, title: c.title, brief: c.body.replace(/^Card [^.]+\. /, ""), directories: ["src/levels/belt", "server/levels/belt"],
       depends_on: p.dependsOn, acceptance: c.acceptance.map((text) => ({ text })), size: c.size,
     };
   });
@@ -458,7 +461,7 @@ const merges = {
   123: { queued: 53 * MIN, at: 58 * MIN, live: 64 * MIN, run: 90 },
   // the refund enters the merge queue on Sebastian's approval
   122: { queued: 64 * MIN, at: 66 * MIN, live: 72 * MIN, run: 86 },
-  // the calendar file at full auto merges on the merge rule auto, the agent having settled its ask
+  // the share link at full auto merges on the merge rule auto, the agent having settled its ask
   125: { queued: 32.5 * MIN, at: 34.5 * MIN, live: 40.5 * MIN, run: 91, approver: "merge rule auto" },
   126: { queued: 23 * MIN, at: 26 * MIN, live: 32 * MIN, run: 92 },
 };
@@ -480,8 +483,8 @@ const routines = {
   ],
   "security-scan": nightly,
   "performance-read": [
-    { run: 6, due: date(1, "fri", "07:00"), took: 70, outcome: "no change", note: "GET /schedule p95 0.31 s, every page under 400 ms" },
-    { run: 7, due: date(2, "fri", "07:00"), took: merges[123].live, outcome: "done", issue: 123, cost: 0.62, note: "GET /schedule p95 0.74 s, up from 0.31 s since #118" },
+    { run: 6, due: date(1, "fri", "07:00"), took: 70, outcome: "no change", note: "GET /leaderboard p95 0.31 s, every endpoint under 400 ms" },
+    { run: 7, due: date(2, "fri", "07:00"), took: merges[123].live, outcome: "done", issue: 123, cost: 0.62, note: "GET /leaderboard p95 0.74 s, up from 0.31 s since #118" },
   ],
   "cost-review": [
     { run: 3, due: date(2, "thu", "08:00"), took: 11 * HOUR, outcome: "done", issue: 124, note: "€16.50 of the €60 cap, €0.99 per card" },
@@ -564,10 +567,10 @@ const sessions = {
     "s-1": {
       commit: "8c1e5a2",
       words: [
-        [30, "Reading the class page first: src/classes/ClassPage.tsx and its query in src/classes/queries.ts."],
-        [4 * MIN, "The class query already joins the schedule. I add the teacher's name and the room to it, so the page needs no second request."],
-        [9 * MIN, "The page names both under the title: \"with Lena · Room 2\". Next, the tests."],
-        [17 * MIN, "npm test: the 3 new tests of the class page pass, 214 in all. Pushing the branch and opening the pull request."],
+        [30, "Reading the ship select first: src/ships/ShipSelect.tsx and its query in src/ships/queries.ts."],
+        [4 * MIN, "The ships query already loads each ship's model. I add its speed and its shield to it, so the screen needs no second request."],
+        [9 * MIN, "The screen shows both under each ship's name: \"Speed 7 · Shield 4\". Next, the tests."],
+        [17 * MIN, "npm test: the 3 new tests of the ship select pass, 214 in all. Pushing the branch and opening the pull request."],
       ],
     },
   },
@@ -575,10 +578,10 @@ const sessions = {
     "s-1": {
       commit: "a71c3d0",
       words: [
-        [30, "The alert's stack trace points at src/payments/webhook.ts:57: confirmBooking reads paymentIntent.charges.data[0]."],
+        [30, "The alert's stack trace points at src/payments/webhook.ts:57: confirmPurchase reads paymentIntent.charges.data[0]."],
         [3 * MIN, "API version 2022-11-15 sends no charges list on a PaymentIntent, only latest_charge, so charges is undefined and " +
-          "every confirmation answers 500. confirmBooking now reads latest_charge."],
-        [9 * MIN, "A test replays a payment_intent.succeeded event of API version 2022-11-15: the booking is confirmed, 2xx."],
+          "every confirmation answers 500. confirmPurchase now reads latest_charge."],
+        [9 * MIN, "A test replays a payment_intent.succeeded event of API version 2022-11-15: the purchase is confirmed, 2xx."],
         [14 * MIN, "npm test: 211 passing. Pushing and opening the pull request."],
       ],
     },
@@ -591,18 +594,18 @@ const sessions = {
     "s-1": {
       commit: "9d2b6c4",
       words: [
-        [40, "Reading the Stripe webhook in src/payments/webhook.ts and the confirmation mail in src/mail/confirmation.ts."],
-        [6 * MIN, "The confirmation now goes out from the payment_intent.succeeded handler, once the payment settles."],
+        [40, "Reading the Stripe webhook in src/payments/webhook.ts and the receipt in src/mail/receipt.ts."],
+        [6 * MIN, "The receipt now goes out from the payment_intent.succeeded handler, once the payment settles."],
         [15 * MIN, "npm test passes. Pushing and opening the pull request."],
       ],
     },
     "s-2": {
       commit: "3e7f915",
       words: [
-        [30, "The acceptance job failed on \"a webhook delivered twice sends one mail\": Stripe sent the event again, and two mails went out."],
-        [4 * MIN, "The handler mails before it records the mail. I record the confirmation keyed on the PaymentIntent's id, " +
-          "in the transaction that marks the booking paid, and mail only when that insert took."],
-        [12 * MIN, "npm test passes, and the acceptance test delivers the event twice: one mail. Pushing to the pull request."],
+        [30, "The acceptance job failed on \"a webhook delivered twice sends one receipt\": Stripe sent the event again, and two receipts went out."],
+        [4 * MIN, "The handler mails before it records the receipt. I record the receipt keyed on the PaymentIntent's id, " +
+          "in the transaction that marks the purchase paid, and mail only when that insert took."],
+        [12 * MIN, "npm test passes, and the acceptance test delivers the event twice: one receipt. Pushing to the pull request."],
       ],
     },
   },
@@ -610,40 +613,40 @@ const sessions = {
     "s-1": {
       commit: "2d7f0b9",
       words: [
-        [40, "Reading src/bookings/cancel.ts and offerSeat, the waitlist's hand-over from #101."],
-        [5 * MIN, "Cancel shows until 12 hours before the class; the check reads the class's start in the studio's time zone."],
-        [14 * MIN, "A cancel frees the seat, then offerSeat mails the first member in line. The tests of the window and the hand-over pass."],
-        [26 * MIN, "npm test: 9 new tests pass. Pushing and opening the pull request."],
+        [40, "Reading server/lobby/leave.go and offerSeat, the queue's hand-over from #101."],
+        [5 * MIN, "Leave without penalty shows for the first 60 seconds. The check reads the match's start from the server's clock, not the client's."],
+        [14 * MIN, "A leave frees the seat, then offerSeat offers it to the first player in the queue. The tests of the window and the hand-over pass."],
+        [26 * MIN, "go test ./server/lobby/...: 9 new tests pass. Pushing and opening the pull request."],
       ],
     },
     "s-2": {
       commit: "e5a3c18",
       words: [
-        [30, "The review found a race in cancel.ts: the seat is freed and offered in two transactions, and a claim between them books it twice."],
-        [4 * MIN, "cancelBooking now locks the class row with SELECT … FOR UPDATE, and frees and offers the seat in that one transaction."],
-        [11 * MIN, "A new test runs a cancel and a waitlist claim at the same moment, 50 times: one booking for the seat every time."],
-        [15 * MIN, "npm test: 10 new tests pass. Pushing to the pull request."],
+        [30, "The review found a race in leave.go: the seat is freed and offered in two steps, and two leaves at once offer both seats to the same player."],
+        [4 * MIN, "Leave now holds the lobby's lock while it frees the seat and offers it, so the two steps are one."],
+        [11 * MIN, "A new test runs two leaves at the same moment, 50 times under -race: two different players get the two seats every time."],
+        [15 * MIN, "go test -race ./server/lobby/...: 10 new tests pass. Pushing to the pull request."],
       ],
     },
   },
   117: {
     "s-1": {
       words: [
-        [30, "Reading src/mail/reminder.ts and the job that sends it, src/jobs/reminders.ts."],
-        [3 * MIN, "The reminder goes out at the class's start minus 24 hours. Running npm test -- reminder."],
-        [6 * MIN, "npm test -- reminder fails: the class on Sunday 25 October at 18:00 wants its reminder at 18:00 on Saturday, " +
-          "and reminder.ts sends it at 19:00. I move the arithmetic from UTC to the studio's time zone."],
-        [10 * MIN, "npm test -- reminder fails the same way: 19:00, not 18:00. Back to UTC in reminder.ts, with the time zone applied after."],
-        [13 * MIN, "npm test -- reminder fails the same way again: 19:00, not 18:00."],
+        [30, "Reading src/notify/challenge.ts and the job that sends it, src/jobs/challenges.ts."],
+        [3 * MIN, "The job sends each notice 24 hours after the last opening. Running npm test -- challenge."],
+        [6 * MIN, "npm test -- challenge fails: the challenge of Sunday 25 October opens at 18:00 and wants its notice then, " +
+          "and challenge.ts sends it at 17:00. I move the arithmetic from UTC to Berlin time."],
+        [10 * MIN, "npm test -- challenge fails the same way: 17:00, not 18:00. Back to UTC in challenge.ts, with the time zone applied after."],
+        [13 * MIN, "npm test -- challenge fails the same way again: 17:00, not 18:00."],
       ],
     },
     "s-2": {
       commit: "7a4c2e9",
       words: [
-        [30, "Starting from the supervisor's note: both versions subtracted 24 hours, and the test's class falls on the night the clocks go back. " +
-          "I subtract one calendar day in Europe/Berlin."],
-        [5 * MIN, "npm test -- reminder: 6 passing. The class on 25 October gets its reminder at 18:00 on Saturday."],
-        [8 * MIN, "npm test: 221 passing. Pushing and opening the pull request."],
+        [30, "Starting from the supervisor's note: both versions added 24 hours, and the test's day falls on the night the clocks go back. " +
+          "I add one calendar day in Europe/Berlin."],
+        [5 * MIN, "npm test -- challenge: 6 passing. The challenge of 25 October gets its notice at 18:00 on Sunday."],
+        [8 * MIN, "npm test: 221 passing, and the notice carries its link from gameLink in src/links/game.ts. Pushing and opening the pull request."],
       ],
     },
   },
@@ -654,14 +657,14 @@ const sessions = {
   113: {
     "s-1": {
       words: [
-        [40, "Reading src/calendar: the events model of #109 and the month view of #111, which draws its own table."],
-        [100, "The week grid needs a calendar library or a hand-built grid. Every calendar card after this one lives with that choice, so I ask."],
+        [40, "Reading src/levels/belt: the physics model of #109 and the mining drone of #111, which spawns from a hand-written list."],
+        [100, "The belt's map needs a map editor or a hand-written layout. Every level 4 card after this one lives with that choice, so I ask."],
       ],
     },
     "s-2": {
       words: [
-        [30, "The answer is TOAST UI Calendar: its week view takes the studio's hours, and its drag serves #112 later. Adding it to package.json."],
-        [6 * MIN, "The grid shows the studio's hours for seven days; previous and next move a week. Next, the tests."],
+        [30, "The answer is Tiled: Phaser loads its maps as they are, and its object layers carry the wave markers #114 needs later. Adding the map to assets/maps."],
+        [6 * MIN, "The map scrolls from the start gate to the arena, and the camera keeps the crew in view. Next, the tests."],
       ],
     },
   },
@@ -670,13 +673,13 @@ const sessions = {
     "s-1": {
       commit: "d4c8a21",
       words: [
-        [40, "Reading the class cancel in src/classes/cancel.ts and the Stripe client in src/payments/stripe.ts."],
-        [6 * MIN, "A studio cancel marks every booking of the class cancelled. I add refundBooking in src/payments/refund.ts for the paid ones."],
-        [11 * MIN, "refundBooking creates one Stripe refund per paid booking. Next, the charge.refunded webhook."],
+        [40, "Reading the rollback in src/store/rollback.ts and the Stripe client in src/payments/stripe.ts."],
+        [6 * MIN, "A rollback marks the purchase reversed and takes the item back. I add refundPurchase in src/payments/refund.ts for the paid ones."],
+        [11 * MIN, "refundPurchase creates one Stripe refund per paid purchase. Next, the charge.refunded webhook."],
         // the answer to the steer of steers.refund, which reaches the session 13 minutes in
-        [13.2 * MIN, "Taking your message: refundBooking passes the booking's id to Stripe as the idempotency key, " +
-          "and a test sends the cancel twice and finds one refund."],
-        [21 * MIN, "npm test: 12 new tests pass, among them a cancel sent twice and a declined refund. Pushing and opening the pull request."],
+        [13.2 * MIN, "Taking your message: refundPurchase passes the purchase's id to Stripe as the idempotency key, " +
+          "and a test sends the rollback twice and finds one refund."],
+        [21 * MIN, "npm test: 12 new tests pass, among them a rollback sent twice and a declined refund. Pushing and opening the pull request."],
       ],
     },
   },
@@ -684,10 +687,10 @@ const sessions = {
     "s-1": {
       commit: "4f8b2d3",
       words: [
-        [30, "Reading the issue's repro and src/booking/cancel.ts: allowed(secondsBefore) returns secondsBefore > 12 * 3600."],
-        [2 * MIN, "The repro at main exits 1: allowed(12 * 3600) is false. The rule says up to 12 hours, so the boundary belongs to the member: >= 12 * 3600."],
-        [5 * MIN, "A test cancels at exactly 12 hours before the class and a second after it: the first goes through, the second is refused."],
-        [8 * MIN, "npm test: 224 passing, and the issue's repro exits 0. Pushing and opening the pull request."],
+        [30, "Reading the issue's repro and server/boss/phase.go: Resume restores the phase timer only when b.phase == 1."],
+        [2 * MIN, "The repro at main exits 1: in phase two the timer stays stopped after Resume, so the boss never moves again. Every phase has a timer, so Resume restores it in each."],
+        [5 * MIN, "A test pauses and resumes the boss in each of its three phases: it fights on in all three."],
+        [8 * MIN, "go test ./...: 224 passing, and the issue's repro exits 0. Pushing and opening the pull request."],
       ],
     },
   },
@@ -744,7 +747,7 @@ const filed = {
   115: date(2, "mon", "06:00"), 116: date(2, "tue", "08:00"), 117: date(2, "wed", "02:15"), 118: date(2, "thu", "16:00"),
   119: new Date(date(2, "thu", "17:19").getTime() + 30 * 1000), 120: date(2, "wed", "02:08"), 121: date(2, "wed", "02:18"),
   123: date(2, "fri", "07:00"),
-  // the calendar: the plan #105 waits from Wednesday until Sebastian accepts it on Thursday evening, which files its four
+  // level 4: the plan #105 waits from Wednesday until Sebastian accepts it on Thursday evening, which files its four
   // cards; on Friday morning he splits #110, stopped by its budget overnight, from the chat
   105: date(1, "wed", "10:00"), 109: date(1, "thu", "20:00"), 110: date(1, "thu", "20:00"), 111: date(1, "thu", "20:00"),
   112: date(1, "thu", "20:00"), 113: date(1, "fri", "08:40"), 114: date(1, "fri", "08:40"),
@@ -771,32 +774,32 @@ function board(cards) {
 
 // reviews are the review gate's verdicts on a card's pull request, round by round.
 const reviews = {
-  101: [{ verdict: "approve", summary: "A full class takes waitlist sign-ups in order, and a cancellation mails the first in line a seat held for 2 hours." }],
-  102: [{ verdict: "approve", summary: "Caches the week's schedule for a minute; the load test measures GET /schedule at 0.31 s at the p95." }],
-  103: [{ verdict: "approve", summary: "Adds the teacher and the room to the class query and names them under the title, with tests for the page." }],
-  104: [{ verdict: "approve", summary: "confirmBooking reads latest_charge of API version 2022-11-15; a replayed event of that version confirms the booking." }],
+  101: [{ verdict: "approve", summary: "A full lobby queues players in order, and a player leaving offers the first in line a seat held for 30 seconds." }],
+  102: [{ verdict: "approve", summary: "Keeps the open lobbies in memory, indexed by region. The load test measures GET /match at 0.31 s at the p95." }],
+  103: [{ verdict: "approve", summary: "Adds the speed and the shield to the ships query and shows them under each ship, with tests for the screen." }],
+  104: [{ verdict: "approve", summary: "confirmPurchase reads latest_charge of API version 2022-11-15, and a replayed event of that version confirms the purchase." }],
   108: [{ verdict: "approve", summary: "express 4.20.0 pins path-to-regexp 0.1.10; npm audit reports no high finding, and the route tests pass." }],
   115: [{ verdict: "approve", summary: "12 packages move to the newest release of their line, none a major release; the test suite passes." }],
-  118: [{ verdict: "approve", summary: "The schedule takes a teacher filter from the URL; the tests cover a chosen teacher and a reload." }],
-  119: [{ verdict: "approve", summary: "parseTeacherFilter answers no filter when ?teacher is absent; a test covers the link without one." }],
-  107: [{ verdict: "approve", summary: "Mails the confirmation once per booking from the webhook, keyed on the PaymentIntent; the tests deliver the event twice." }],
+  118: [{ verdict: "approve", summary: "The leaderboard takes a ship filter from the URL, and the tests cover a chosen ship and a reload." }],
+  119: [{ verdict: "approve", summary: "parseShipFilter answers no filter when ?ship is absent, and a test covers the link without one." }],
+  107: [{ verdict: "approve", summary: "Mails the receipt once per purchase from the webhook, keyed on the PaymentIntent. The tests deliver the event twice." }],
   116: [
     {
       verdict: "concerns",
-      summary: "The cancel window and the hand-over to the waitlist work, but a cancel and a waitlist claim at the same moment can both take the seat.",
+      summary: "The leave window and the hand-over to the queue work, but two players leaving at the same moment can give both seats to the same player.",
       findings: [
-        "src/bookings/cancel.ts:48: cancelBooking frees the seat, and offerSeat reads the waitlist in a second transaction; a claim between " +
-          "the two books the seat twice. Free and offer the seat in one transaction that locks the class row (SELECT … FOR UPDATE).",
+        "server/lobby/leave.go:48: Leave frees the seat, then offerSeat reads the queue in a second step without the lobby's lock. Two leaves " +
+          "at once read the same head of the queue and offer both seats to the first in line. Free the seat and offer it under one hold of the lobby's mutex.",
       ],
     },
-    { verdict: "approve", summary: "Frees and offers the seat in one transaction under a lock on the class row; the concurrency test finds one booking per seat." },
+    { verdict: "approve", summary: "Frees the seat and offers it under one hold of the lobby's lock. The race test finds two players for two seats every time." },
   ],
-  120: [{ verdict: "approve", summary: "A pass of 10 classes bought by card; each booking takes one, and the account page shows what is left." }],
-  121: [{ verdict: "approve", summary: "Lists a member's bookings of the last 12 months, newest first, scoped to the member." }],
-  123: [{ verdict: "approve", summary: "The schedule loads a week's teachers in one query, not one per class; the load test measures GET /schedule at 0.29 s at the p95." }],
-  122: [{ verdict: "approve", summary: "Refunds each paid booking of a cancelled class once, keyed on the booking's id; the tests cover a cancel sent twice and a declined refund." }],
-  125: [{ verdict: "approve", summary: "The class page serves the reminder's calendar file; the tests read the studio's address and the room in its location." }],
-  126: [{ verdict: "approve", summary: "allowed() takes the boundary into the window; the tests cover a cancel at exactly 12 hours and one a second after, and the issue's repro passes at the head." }],
+  120: [{ verdict: "approve", summary: "A season pass of 10 tiers bought by card. Each tier unlocks at its points, and the profile shows what is unlocked." }],
+  121: [{ verdict: "approve", summary: "Lists a player's runs of the last 12 months, newest first, scoped to the player." }],
+  123: [{ verdict: "approve", summary: "The leaderboard loads the runs' ships in one query, not one per run. The load test measures GET /leaderboard at 0.29 s at the p95." }],
+  122: [{ verdict: "approve", summary: "Refunds each rolled-back purchase once, keyed on the purchase's id. The tests cover a rollback sent twice and a declined refund." }],
+  125: [{ verdict: "approve", summary: "The replay screen builds its link with the challenge notice's gameLink, and the tests read the replay's path and seed from it." }],
+  126: [{ verdict: "approve", summary: "Resume restores the phase timer in every phase. The tests pause the boss in each of its three phases, and the issue's repro passes at the head." }],
 };
 
 // mergeSpec is the spec of approval a's merge request as factoryd writes it: the risk class, the review's verdict, the
@@ -816,8 +819,8 @@ function review(issue, n, from, at, sid) {
 
 // checksFailed are the findings of a card's failed checks, sent on to its next session.
 const checksFailed = {
-  107: "acceptance: a webhook delivered twice sends one mail: 2 mails sent, want 1",
-  110: "acceptance: a member books from a block: the week view draws no block for a weekly class's later weeks",
+  107: "acceptance: a webhook delivered twice sends one receipt: 2 receipts sent, want 1",
+  110: "acceptance: each enemy wave enters at its marker on the map: the waves after the third never spawn",
 };
 
 // merge is the steps of issue's merge, in seconds after its creation: its turn in the merge queue it entered at
@@ -853,17 +856,12 @@ function mergeEvents(now, issue, age, m) {
 
 // sources are files of the repository at main, as the chat's file tool reads them.
 const sources = {
-  "src/mail/ics.ts": [
-    "// The class as a calendar file: the reminder of #117 attaches it.",
-    "export function classEvent(c: BookedClass): string {",
-    "  return [",
-    '    "BEGIN:VEVENT",',
-    "    `UID:${c.occurrenceId}@nord-booking.example`,",
-    "    `DTSTART;TZID=Europe/Berlin:${local(c.startsAt)}`,",
-    "    `SUMMARY:${c.name} with ${c.teacher}`,",
-    "    `LOCATION:${STUDIO_ADDRESS}\\\\, ${c.room}`,",
-    '    "END:VEVENT",',
-    '  ].join("\\r\\n");',
+  "src/links/game.ts": [
+    "// A link that opens the game at its target: the challenge notice of #117 carries one.",
+    "export function gameLink(t: LinkTarget): string {",
+    "  const url = new URL(`/play/${t.kind}/${t.id}`, \"https://nebula-run.example\");",
+    '  if (t.seed !== undefined) url.searchParams.set("seed", String(t.seed));',
+    "  return url.toString();",
     "}",
     "",
   ].join("\n"),
@@ -874,10 +872,10 @@ const sources = {
 const supervisor = {
   issue: 117,
   detector: "flip_flop",
-  trip: "after src/mail/reminder.ts returned to a content it had before, `npm test -- reminder` failed again, unchanged",
+  trip: "after src/notify/challenge.ts returned to a content it had before, `npm test -- challenge` failed again, unchanged",
   decision: "redirect",
-  reason: "Both versions of reminder.ts subtract 24 hours from the class's start, and the test's class is on 25 October, the night " +
-    "the clocks go back: 24 hours before 18:00 is 19:00 on Saturday. Subtract one calendar day in Europe/Berlin instead.",
+  reason: "Both versions of challenge.ts add 24 hours to the last opening, and the test's day is 25 October, the night " +
+    "the clocks go back: 24 hours after Saturday's 18:00 is 17:00 on Sunday. Add one calendar day in Europe/Berlin instead.",
 };
 
 // answeredAt are the morning's answers to the overnight asks on week 2's Wednesday: #120 and #121 at once, #117 two
@@ -923,7 +921,7 @@ const A = (answeredAt[117] - filed[117]) / 1000;
 
 // lives are the cards whose life more than one scene shows, offsets in seconds after each card's creation.
 const lives = {
-  // the reminder takes its slot with the morning's answer: its first session circles on the same failing test, the
+  // the daily challenge takes its slot with the morning's answer: its first session circles on the same failing test, the
   // flip-flop detector trips, and the supervisor redirects it to a second session
   117: {
     admitted: A,
@@ -944,10 +942,10 @@ const lives = {
       state.checks(A + 25.5 * MIN, A + 32 * MIN),
     ],
   },
-  // the class pass and the account page build side by side from the morning's answer
+  // the season pass and the profile build side by side from the morning's answer
   120: built(120, { start: 1.5, push: 33, reviewed: 47, merged: 58, spent: [0.05, 0.71, 0.83, 0.86] }),
   121: built(121, { start: 1, push: 19, reviewed: 31, merged: 40, spent: [0.04, 0.36, 0.44, 0.46] }),
-  // the waitlist waits in the merge queue on Monday afternoon, merges, and is live two hours after its filing
+  // the lobby queue waits in the merge queue on Monday afternoon, merges, and is live two hours after its filing
   101: {
     phases: [{ from: 92 * MIN, status: "in-review", gate: "merge-queue", model: "small", spent: 0.71, pr: true }, ...merging(merges[101], 1.12)],
     steps: [
@@ -958,7 +956,7 @@ const lives = {
       ...merge(101, merges[101]),
     ],
   },
-  // the schedule builds a second time after a failed test
+  // matchmaking builds a second time after a failed test
   102: {
     phases: [
       { from: 39 * MIN, status: "running", gate: "session", model: "small", spent: 0.22 },
@@ -978,7 +976,7 @@ const lives = {
       review(102, 1, 114 * MIN, 120 * MIN, "s-2"),
     ],
   },
-  // the class page, filed on the form
+  // the ship select, filed on the form
   103: {
     phases: [
       { from: 0, status: "queued" },
@@ -996,7 +994,7 @@ const lives = {
       review(103, 1, 30 * MIN, 45 * MIN, "s-1"),
     ],
   },
-  // the confirmation mail: the first attempt on small fails the acceptance job, its finding goes to the stronger
+  // the receipt: the first attempt on small fails the acceptance job, its finding goes to the stronger
   // class, the second attempt on big passes, and the card merges
   107: {
     phases: [
@@ -1079,8 +1077,8 @@ const lives = {
     ],
     card: { author: "factory-agent", source: "routine" },
   },
-  // the week view takes its slot when the events model #109 is live; two sessions on big fail the acceptance on the
-  // class blocks, and the third session's start finds €0.40 of its €5.00 left: the budget stops it overnight. The split
+  // the belt's map takes its slot when the physics model #109 is live; two sessions on big fail the acceptance on the
+  // enemy waves, and the third session's start finds €0.40 of its €5.00 left: the budget stops it overnight. The split
   // closes it in the morning.
   110: {
     admitted: 160 * MIN,
@@ -1104,7 +1102,7 @@ const lives = {
     ],
     card: { attempts: 2 },
   },
-  // the week grid, filed by the split: its first session asks which calendar library, and the answer in the chat 25
+  // the map and its camera, filed by the split: its first session asks which map editor, and the answer in the chat 25
   // minutes later starts its second
   113: {
     phases: [
@@ -1120,9 +1118,9 @@ const lives = {
       state.sessionStart(28.5 * MIN, { session: "s-2", model: "small", attempt: 2 }),
     ],
   },
-  // drag to move waits on the views: on #110 until the split points it at #114
+  // the boss waits on the map and the drone: on #110 until the split points it at #114
   112: { phases: [{ from: 0, status: "waiting-deps" }] },
-  // the class blocks wait in the backlog until the grid is in
+  // the enemy waves wait in the backlog until the map is in
   114: { phases: [{ from: 0, status: "backlog" }], card: { lane: "backlog" } },
   // the refund: its session takes scene 11's steer 13 minutes in; its high risk stops it at the merge gate until
   // Sebastian approves, 64 minutes after its filing
@@ -1150,15 +1148,15 @@ const lives = {
   },
 };
 
-// calendarFile is #125's life at two autonomy levels. At manual its ask waits five minutes for Sebastian's answer and
+// shareLink is #125's life at two autonomy levels. At manual its ask waits five minutes for Sebastian's answer and
 // its pull request for his approval at the merge gate. At full auto the agent's wake turn answers the ask at once, and
 // factory-merge merges on the merge rule auto, without an approval.
-const calendarFile = {
+const shareLink = {
   manual: {
     phases: [
       { from: 0, status: "queued" },
       { from: MIN, status: "running", gate: "session", model: "small", spent: 0.03 },
-      { from: 4 * MIN, status: "waiting-human", gate: undefined, spent: 0.07, ask: asks.calendarFile },
+      { from: 4 * MIN, status: "waiting-human", gate: undefined, spent: 0.07, ask: asks.shareLink },
       { from: 9.5 * MIN, status: "running", gate: "session" },
       { from: 25.5 * MIN, status: "in-review", gate: "checks", spent: 0.36, pr: true },
       { from: 32 * MIN, gate: "review" },
@@ -1172,14 +1170,14 @@ const calendarFile = {
       state.checks(25.5 * MIN, 32 * MIN),
       review(125, 1, 32 * MIN, 37 * MIN, "s-2"),
       state.policyGate(37 * MIN, 37.5 * MIN, { pr: cards[125].pr, risk: "normal", outcome: "auto", changed: 3, lines: 86 }),
-      state.approvalRequested(37.5 * MIN, { approval: approvals.calendarFile.id, pr: cards[125].pr, commit: sessions[125]["s-2"].commit, risk: "normal" }),
+      state.approvalRequested(37.5 * MIN, { approval: approvals.shareLink.id, pr: cards[125].pr, commit: sessions[125]["s-2"].commit, risk: "normal" }),
     ],
   },
   auto: {
     phases: [
       { from: 0, status: "queued" },
       { from: MIN, status: "running", gate: "session", model: "small", spent: 0.03 },
-      { from: 4 * MIN, status: "waiting-human", gate: undefined, spent: 0.07, ask: asks.calendarFile },
+      { from: 4 * MIN, status: "waiting-human", gate: undefined, spent: 0.07, ask: asks.shareLink },
       { from: 5 * MIN, status: "running", gate: "session", spent: 0.09 },
       { from: 20.5 * MIN, status: "in-review", gate: "checks", spent: 0.36, pr: true },
       { from: 27 * MIN, gate: "review" },
@@ -1195,7 +1193,7 @@ const calendarFile = {
       review(125, 1, 27 * MIN, 32 * MIN, "s-2"),
       state.policyGate(32 * MIN, 32.5 * MIN, { pr: cards[125].pr, risk: "normal", outcome: "auto", mergeRule: "auto", changed: 3, lines: 86 }),
       state.autoMerge(32.5 * MIN, {
-        pr: cards[125].pr, commit: sessions[125]["s-2"].commit, risk: "normal", reproduction: "npm test -- calendar-file", review: reviews[125][0].summary,
+        pr: cards[125].pr, commit: sessions[125]["s-2"].commit, risk: "normal", reproduction: "npm test -- share-link", review: reviews[125][0].summary,
       }),
       ...merge(125, merges[125]),
     ],
@@ -1205,15 +1203,15 @@ const calendarFile = {
 // files are the changed files of a pull request, as Forgejo lists them.
 const files = {
   203: [
-    { filename: "src/classes/queries.ts", status: "modified", additions: 6, deletions: 2 },
-    { filename: "src/classes/ClassPage.tsx", status: "modified", additions: 12, deletions: 1 },
-    { filename: "src/classes/ClassPage.test.tsx", status: "modified", additions: 41, deletions: 0 },
+    { filename: "src/ships/queries.ts", status: "modified", additions: 6, deletions: 2 },
+    { filename: "src/ships/ShipSelect.tsx", status: "modified", additions: 12, deletions: 1 },
+    { filename: "src/ships/ShipSelect.test.tsx", status: "modified", additions: 41, deletions: 0 },
   ],
   220: [
     { filename: "src/payments/refund.ts", status: "added", additions: 64, deletions: 0 },
-    { filename: "src/classes/cancel.ts", status: "modified", additions: 9, deletions: 2 },
+    { filename: "src/store/rollback.ts", status: "modified", additions: 9, deletions: 2 },
     { filename: "src/payments/webhook.ts", status: "modified", additions: 18, deletions: 1 },
-    { filename: "src/classes/ClassAdminPage.tsx", status: "modified", additions: 11, deletions: 0 },
+    { filename: "src/store/PurchasePage.tsx", status: "modified", additions: 11, deletions: 0 },
     { filename: "src/payments/refund.test.ts", status: "added", additions: 92, deletions: 0 },
   ],
 };
@@ -1223,9 +1221,9 @@ const files = {
 const steers = {
   refund: {
     issue: 122, at: 14.25 * MIN - 5,
-    request: "Tell #122 to use the booking's id as the Stripe idempotency key, so a cancel sent twice refunds once.",
-    reply: "I pass it to the running session of #122; it reads it at its next step:",
-    text: "Use the booking's id as the Stripe idempotency key, so a cancel sent twice refunds once.",
+    request: "Tell #122 to use the purchase's id as the Stripe idempotency key, so a rollback sent twice refunds once.",
+    reply: "I pass it to the running session of #122. It reads it at its next step:",
+    text: "Use the purchase's id as the Stripe idempotency key, so a rollback sent twice refunds once.",
   },
 };
 
@@ -1265,7 +1263,7 @@ const ledger = {
   122: { ...live(122), spent: 0.61, diff: [5, 194, 3], acts: 3 },
   123: { ...live(123), spent: 0.62, diff: [2, 38, 21], acts: 1 },
   // at full auto the agent's wake turn answers the ask
-  125: { ...live(125), spent: 0.41, asks: [{ at: 4 * MIN, answered: calendarFile.auto.answered, by: "ai" }], diff: [3, 79, 7], acts: 1 },
+  125: { ...live(125), spent: 0.41, asks: [{ at: 4 * MIN, answered: shareLink.auto.answered, by: "ai" }], diff: [3, 79, 7], acts: 1 },
 };
 
 // chats are the project agent's spend in the chat, cumulative, at the times the scenes' chats reach it.
@@ -1451,7 +1449,7 @@ function costs(now, at, days = 14) {
 
 module.exports = {
   date, cards, title, description, body, card: boardCard, filing, requests, asks, escalation, asking, answered, answerRows, replies, wakeAsk, alerts, alertsAt, approvals,
-  mergeSpec, plans, planCards, routines, runsAt, cronOf, filedAge, anchoredAt, routineCard, routinesAt, scanned, sessions, words, life, lives, calendarFile,
+  mergeSpec, plans, planCards, routines, runsAt, cronOf, filedAge, anchoredAt, routineCard, routinesAt, scanned, sessions, words, life, lives, shareLink,
   merges, merge, merging, mergeEvents, done, filed, answeredAt, ageAt, doneAt, board, session, reviews, review, files, sources, checksFailed, supervisor,
   steers, at, ledger, spentAt, spending, weekEnd, report, metricsWeek, costs,
 };

@@ -12,7 +12,7 @@ const T = story.filed[113];
 // and he answers the budget stop in the chat by splitting the card. Ages are seconds since each card's filing, picked
 // so each card stands in the phase its column shows.
 const refund = story.approvals.refund;
-const classPass = story.lives[120].phases.find((p) => p.ask).ask;
+const seasonPass = story.lives[120].phases.find((p) => p.ask).ask;
 
 function busy(now) {
   const b = story.board([
@@ -34,7 +34,7 @@ function busy(now) {
     story.card(now, 118, { status: "backlog", lane: "backlog", age: 26 * HOUR }),
   ];
   const budget = story.asking(now, story.asks.budget, 17 * MIN, INBOX);
-  const pass = story.asking(now, classPass, 39 * MIN, INBOX);
+  const pass = story.asking(now, seasonPass, 39 * MIN, INBOX);
   const chat = [
     state.livePoke(now, { issue: 109, title: story.cards[109].title, spent: 1.84, age: 25 * MIN, conversation: INBOX }),
     budget.inbox,

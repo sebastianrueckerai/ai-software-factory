@@ -9,18 +9,18 @@ test("id is t- and the first 12 hex digits of sha256 of 'lab <issue>'", () => {
   assert.equal(s.id(12), "t-4e4c15ef3f52");
 });
 test("card ages from now", () => {
-  const c = s.card(now, { issue: 12, status: "running", lane: "ready", age: 3600, title: "Waitlist", body: "." });
+  const c = s.card(now, { issue: 12, status: "running", lane: "ready", age: 3600, title: "Lobby queue", body: "." });
   assert.equal(c.CreatedAt, "2026-10-20T11:00:00.000Z");
-  assert.equal(c.Repository, "nord/booking");
+  assert.equal(c.Repository, "orbit/nebula-run");
   assert.equal(c.Kind, "agent");
 });
 test("card is flat and takes its defaults", () => {
   const c = s.card(now, {
-    issue: 12, status: "waiting-human", lane: "ready", age: 7200, title: "Waitlist", body: "Members ask.",
+    issue: 12, status: "waiting-human", lane: "ready", age: 7200, title: "Lobby queue", body: "Players ask.",
     gate: "human", gateSince: 600, escalation: s.AGENT_ASKS + "Which?", choices: ["a", "b"], escalatedAt: 300, attempts: 2, spent: 1.5,
   });
   assert.equal(c.ID, s.id(12));
-  assert.equal(c.Objective, "Waitlist\n\nMembers ask.");
+  assert.equal(c.Objective, "Lobby queue\n\nPlayers ask.");
   assert.equal(c.Size, "small");
   assert.equal(c.BudgetEUR, 3);
   assert.equal(c.Process, "spec");
@@ -39,7 +39,7 @@ test("a finished card carries FinishedAt", () => {
 test("scene fills every timeline", () => {
   const sc = s.scene(now, { tasks: [s.card(now, { issue: 12, status: "backlog", lane: "backlog", age: 60, title: "x", body: "y" })] });
   assert.ok(`sessions/${s.id(12)}/timeline.jsonl` in sc.Objects);
-  assert.equal(sc.Project.Repository, "nord/booking");
+  assert.equal(sc.Project.Repository, "orbit/nebula-run");
 });
 test("scene keeps a given timeline", () => {
   const id = s.id(12);
@@ -87,7 +87,7 @@ test("status event", () => {
 test("approval refuses an empty brief or detail", () => {
   assert.throws(() => s.approval(now, { id: 1, kind: "merge", task: 12, reason: "r", age: 1, brief: "", detail: "d" }), /brief/);
   const a = s.approval(now, { id: 1, kind: "merge", task: 12, pr: 7, reason: "r", age: 60, brief: "b", detail: "d" });
-  assert.equal(a.Project, "nord/booking");
+  assert.equal(a.Project, "orbit/nebula-run");
   assert.equal(a.Status, "pending");
   assert.equal(a.PRNumber, 7);
 });
@@ -104,11 +104,11 @@ test("two asks of one text at two ages have two call ids", () => {
   assert.equal(b.tool_calls[0].id, "ask-e387d31e");
 });
 test("cardFiling describes the filing as the console does", () => {
-  const args = { title: "Waitlist", body: "Members join.", lane: "ready", size: "medium", acceptance: ["a", "b"] };
+  const args = { title: "Lobby queue", body: "Players join.", lane: "ready", size: "medium", acceptance: ["a", "b"] };
   const p = s.cardFiling(now, args);
   assert.equal(p.Tool, "new_card");
   assert.deepEqual(p.Args, args);
-  assert.equal(p.Description, "File a card, title Waitlist, body Members join., lane ready, size medium, acceptance a; b");
+  assert.equal(p.Description, "File a card, title Lobby queue, body Players join., lane ready, size medium, acceptance a; b");
 });
 test("cardFiling cuts a field at 120 bytes on a character boundary", () => {
   const p = s.cardFiling(now, { title: "t", body: "x".repeat(119) + "äy", lane: "plan" });
@@ -116,10 +116,10 @@ test("cardFiling cuts a field at 120 bytes on a character boundary", () => {
 });
 test("pressed is the do- row of the proposal's call", () => {
   const p = { Token: "labABCDEFGHIJKLMN", Tool: "new_card", Args: { title: "t" } };
-  assert.deepEqual(s.pressed(now, p, { age: 5, result: "Filed nord/booking#101 in lane ready. It cannot be undone." }), {
+  assert.deepEqual(s.pressed(now, p, { age: 5, result: "Filed orbit/nebula-run#101 in lane ready. It cannot be undone." }), {
     role: "assistant", content: "", at: "2026-10-20T11:59:55.000Z",
     tool_calls: [{ id: "do-labABCDEFGHI", name: "new_card", arguments: '{"title":"t"}', read_at: "2026-10-20T11:59:55.000Z",
-      result: "Filed nord/booking#101 in lane ready. It cannot be undone." }],
+      result: "Filed orbit/nebula-run#101 in lane ready. It cannot be undone." }],
   });
 });
 test("filedThread is the member's line, the proposing reply and the Do it's row", () => {
@@ -137,7 +137,7 @@ test("filedThread is the member's line, the proposing reply and the Do it's row"
     {
       role: "assistant", content: "", at: "2026-10-20T11:59:53.000Z",
       tool_calls: [{ id: "do-lab9f848efee", name: "new_card", arguments: '{"title":"t","lane":"ready"}', read_at: "2026-10-20T11:59:53.000Z",
-        result: "Filed nord/booking#101 in lane ready. It cannot be undone." }],
+        result: "Filed orbit/nebula-run#101 in lane ready. It cannot be undone." }],
     },
   ]);
 });
@@ -182,12 +182,12 @@ test("a card admitted after its creation carries AdmittedAt", () => {
 test("timeline stamps a gate step's from as started and leaves out a step after now", () => {
   const rows = s.timeline(now, 600, {
     steps: [
-      s.modelReview(300, 420, { pr: 214, commit: "2d7f0b9", verdict: "concerns", summary: "race", findings: ["cancel.ts:48"] }),
+      s.modelReview(300, 420, { pr: 214, commit: "2d7f0b9", verdict: "concerns", summary: "race", findings: ["leave.go:48"] }),
       s.sessionStart(700, { session: "s-2", model: "big", attempt: 2 }),
     ],
   }).trim().split("\n").map(JSON.parse);
   assert.deepEqual(rows, [{
-    step: "model_review", pr: 214, commit: "2d7f0b9", model: "big", verdict: "concerns", summary: "race", findings: ["cancel.ts:48"], round: 1,
+    step: "model_review", pr: 214, commit: "2d7f0b9", model: "big", verdict: "concerns", summary: "race", findings: ["leave.go:48"], round: 1,
     time: "2026-10-20T11:57:00Z", started: "2026-10-20T11:55:00Z",
   }]);
 });
@@ -222,13 +222,13 @@ test("transcript leaves out a row not said yet", () => {
   assert.deepEqual(rows, [{ time: "2026-10-20T11:55:00Z", kind: "model_call", detail: { text: "said", cost: 0.02 } }]);
 });
 test("steering describes the steer as the console does", () => {
-  const p = s.steering(now, { issue: 122, title: "Payments: refund", text: "Use the id" });
+  const p = s.steering(now, { issue: 122, title: "Store: refund", text: "Use the id" });
   assert.equal(p.Tool, "steer");
   assert.deepEqual(p.Args, { task_id: "t-47db29d200e1", text: "Use the id" });
-  assert.equal(p.Description, 'Message a running card, #122 t-47db29d200e1 "Payments: refund", text Use the id');
+  assert.equal(p.Description, 'Message a running card, #122 t-47db29d200e1 "Store: refund", text Use the id');
 });
 test("steeredThread ends in the Do it's row with the steer's result", () => {
-  const f = s.steeredThread(now, { said: "tell it", reply: "r", issue: 122, title: "Payments: refund", text: "Use the id", age: 10 });
+  const f = s.steeredThread(now, { said: "tell it", reply: "r", issue: 122, title: "Store: refund", text: "Use the id", age: 10 });
   assert.deepEqual(f.rows.map((m) => [m.role, m.content, m.at]), [
     ["user", "tell it", "2026-10-20T11:59:50.000Z"], ["assistant", "r", "2026-10-20T11:59:51.000Z"], ["assistant", "", "2026-10-20T11:59:53.000Z"],
   ]);
@@ -237,7 +237,7 @@ test("steeredThread ends in the Do it's row with the steer's result", () => {
 });
 test("scene keys a pull request's files by their Forgejo path", () => {
   const sc = s.scene(now, { prFiles: { 203: [{ filename: "a.ts", status: "modified", additions: 1, deletions: 0 }] } });
-  assert.deepEqual(sc.PRFiles, { "/api/v1/repos/nord/booking/pulls/203/files": '[{"filename":"a.ts","status":"modified","additions":1,"deletions":0}]' });
+  assert.deepEqual(sc.PRFiles, { "/api/v1/repos/orbit/nebula-run/pulls/203/files": '[{"filename":"a.ts","status":"modified","additions":1,"deletions":0}]' });
 });
 test("scene carries its costs ledger, and leaves it out without one", () => {
   const costs = { from: "2026-10-20", to: "2026-10-20", days: [{ day: "2026-10-20", by_kind: { model: 1.5 }, total: 1.5 }], tasks: [] };
@@ -250,10 +250,10 @@ test("a figure has a value and a previous one unless its cohort is empty", () =>
   assert.deepEqual(s.figure(420000, undefined, weeks), { value: 420000, prev: 0, has: true, prev_has: false, weeks });
   assert.deepEqual(s.figure(undefined, 0.5, weeks), { value: 0, prev: 0.5, has: false, prev_has: true, weeks });
 });
-test("metrics report is nord/booking's window of days to now's UTC day", () => {
+test("metrics report is orbit/nebula-run's window of days to now's UTC day", () => {
   const deploys = s.figure(10, 9, [0, 0, 0, 1, 0, 9, 10]);
   const m = s.metrics(now, 7, { deploys });
-  assert.deepEqual(m, { repository: "nord/booking", from: "2026-10-14T00:00:00.000Z", to: "2026-10-20T00:00:00.000Z", deploys });
+  assert.deepEqual(m, { repository: "orbit/nebula-run", from: "2026-10-14T00:00:00.000Z", to: "2026-10-20T00:00:00.000Z", deploys });
   assert.equal(s.metrics(now, 28, {}).from, "2026-09-23T00:00:00.000Z");
 });
 test("a card filed by someone else is no writer's, and carries its alert and its chain", () => {
@@ -272,7 +272,7 @@ test("a merge is the queue's turn, factory-merge's merge, its event and the card
   ];
   const rows = s.timeline(now, 3600, { steps }).trim().split("\n").map(JSON.parse);
   assert.deepEqual(rows, [
-    { step: "queue_turn", project: "nord/booking", time: "2026-10-20T11:20:00Z", started: "2026-10-20T11:10:00Z" },
+    { step: "queue_turn", project: "orbit/nebula-run", time: "2026-10-20T11:20:00Z", started: "2026-10-20T11:10:00Z" },
     { step: "merged", pr: 201, commit: "4be1c07", approver: "sebastian", merged_by: "factory-merge", time: "2026-10-20T11:21:00Z", started: "2026-10-20T11:20:00Z" },
     { step: "event", event: "pull_request_merged", pr: 201, by: "factory-merge", time: "2026-10-20T11:21:00Z" },
     { step: "final", state: "merged", reason: "pull request merged", time: "2026-10-20T11:21:00Z" },
@@ -302,7 +302,7 @@ test("prevCron is the last time strictly before before", () => {
 test("routineRun is a run as the routines' store keeps it; an open one has no end", () => {
   const due = new Date("2026-09-24T02:00:00Z");
   assert.deepEqual(s.routineRun("security-scan", { run: 55, due, ended: new Date("2026-09-24T02:51:00Z"), outcome: "done", issue: 108, cost: 0.29, note: "n" }), {
-    Project: "nord-booking", Routine: "security-scan", Run: 55, Due: "2026-09-24T02:00:00.000Z", Started: "2026-09-24T02:00:00.000Z",
+    Project: "nebula-run", Routine: "security-scan", Run: 55, Due: "2026-09-24T02:00:00.000Z", Started: "2026-09-24T02:00:00.000Z",
     Ended: "2026-09-24T02:51:00.000Z", Trigger: "cron", TaskID: s.id(108), Issue: 108, Outcome: "done", Note: "n", CostEUR: 0.29,
   });
   assert.equal("Ended" in s.routineRun("security-scan", { run: 55, due, outcome: "filed", issue: 108 }), false);

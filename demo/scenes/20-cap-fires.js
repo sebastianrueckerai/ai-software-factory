@@ -1,3 +1,4 @@
+const project = require("../lib/project");
 const state = require("../lib/state");
 const story = require("../lib/story");
 const ui = require("../lib/ui");
@@ -22,7 +23,7 @@ const repointing = state.reply(
   state.call("close", { task_id: state.id(110), note }),
 );
 
-// the week's earlier cards are done: issue, done after, spend; the plan's events model and month view, each live after
+// the week's earlier cards are done: issue, done after, spend; the plan's physics model and mining drone, each live after
 // and spent, went live in the night before #110's stop
 const finished = [[101, 2 * HOUR, 1.12], [102, 2.9 * HOUR, 0.64], [103, 1.4 * HOUR, 0.31], [104, HOUR, 0.48], [107, 64 * MIN, 1.18]];
 const planned = [[109, 155 * MIN, 1.84], [111, 270 * MIN, 0.92]];
@@ -66,7 +67,7 @@ function friday(now, s, o = {}) {
 function split(now, s) {
   const first = state.pressedThread(now, filings.map((f) => state.cardFiling(now, f)), {
     line: story.requests.split, reply: story.replies.split, age: s + 3,
-    results: ["Filed nord/booking#113 in lane ready.", "Filed nord/booking#114 in lane backlog."],
+    results: [`Filed ${project.repository}#113 in lane ready.`, `Filed ${project.repository}#114 in lane backlog.`],
   });
   const repoints = [
     state.depending(now, named(112), named(114)), state.depending(now, named(112), named(110), true),
@@ -99,9 +100,9 @@ const applied = (n) => `#chat-log .applied >> nth=${n}`;
 
 module.exports = {
   title: "The cap fires",
-  story: "The calendar's week view stops overnight at its budget, and the factory asks whether to fund one more session. Sebastian " +
-    "splits it in the chat instead: the agent files the week grid and the class blocks as two small cards, points the drag card " +
-    "at the blocks and closes the week view.",
+  story: "Level 4's map card stops overnight at its budget, and the factory asks whether to fund one more session. Sebastian " +
+    "splits it in the chat instead: the agent files the map and the enemy waves as two small cards, points the boss card " +
+    "at the waves and closes the map card.",
   group: "gates",
   theme: "dark",
   viewport: "desk",
@@ -122,7 +123,7 @@ module.exports = {
     },
     { state: () => null, actions: [{ click: ui.doIt }, { waitFor: applied(2) }, { wait: 600 }, { hover: ui.doIt }], hold: 600 },
     { state: () => null, actions: [{ click: ui.doIt }, { waitFor: applied(3) }, { wait: 600 }, { hover: ui.doIt }], hold: 1200 },
-    // the lab's Forgejo fake closes no issue of nord/booking, so the close is the seed's; the open chat keeps its live
+    // the lab's Forgejo fake closes no issue of the repository, so the close is the seed's; the open chat keeps its live
     // thread, and the reload reads the one the seed stores
     { state: (now) => afterSplit(now, 40), actions: [{ goto: "/" }, { hover: ui.park }], hold: 3500 },
   ],

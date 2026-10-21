@@ -1,6 +1,6 @@
 # Demo scenes
 
-A bank of scripted recordings of the real console, served by the console lab over the data of a fake project (Studio Nord, `nord/booking`). Design: [the demo scenes design](../docs/superpowers/specs/2026-10-20-demo-scenes-design.md).
+A bank of scripted recordings of the real console, served by the console lab over the data of a fake project (Nebula Run, a co-op browser space shooter by Orbit Games, `orbit/nebula-run`). Design: [the demo scenes design](../docs/superpowers/specs/2026-10-20-demo-scenes-design.md).
 
 `demo/run.sh [scene...]` starts the lab from `$CODE_REPO` (default `~/repos/ai-software-factory-code`), records the named scenes or all of `demo/scenes/`, converts each to mp4 and stops the lab. The lab ends itself after 30 minutes. `CONSOLE_LAB_DIR` and `CONSOLE_LAB_ADDR` default to `/tmp/claude-1000/console-lab-demo` and `127.0.0.1:8147`.
 

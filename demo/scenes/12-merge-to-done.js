@@ -6,7 +6,7 @@ const MIN = 60;
 const merge = story.merges[101];
 const live = `${ui.step("final")}:has(code:has-text("live: covered"))`;
 
-// monday is Monday afternoon's board a minutes after #103's filing, as scene 6 has it: the waitlist #101 merges
+// monday is Monday afternoon's board a minutes after #103's filing, as scene 6 has it: the lobby queue #101 merges
 // out of the merge queue and goes live, the week's first deploy. The metrics page opens on its default 28 days.
 function monday(now, a) {
   const t = new Date(story.filed[103].getTime() + a * MIN * 1000);
@@ -21,7 +21,7 @@ const deploys = ui.figure("deploys / week");
 
 module.exports = {
   title: "Merge to done",
-  story: "The waitlist merges out of the merge queue, the drawer shows the merge and its chain going live, the settings show " +
+  story: "The lobby queue merges out of the merge queue, the drawer shows the merge and its chain going live, the settings show " +
     "both environments ready, and the week's deploys count one more.",
   group: "ship",
   theme: "dark",
