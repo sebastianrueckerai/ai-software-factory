@@ -57,7 +57,7 @@ Three nodes are not on the card's life and are reached by cuts: `day`, `numbers`
 
 ## 2. The beats
 
-Every point of [tier 1](concept.md#2-tier-1-the-value) as a beat. Seconds are the beat's length in the film; a rewind takes a quarter second off the beat it enters. The words on screen are the titles (decision 1). The source names the bank's scene and step span; the sidecars' `steps[].atMs` give the span's start in the video.
+Every point of [tier 1](concept.md#2-tier-1-the-value) as a beat, each with its proof linked in [the evidence](../docs/evidence.md). Seconds are the beat's length in the film; a rewind takes a quarter second off the beat it enters. The words on screen are the titles (decision 1). The source names the bank's scene and step span; the sidecars' `steps[].atMs` give the span's start in the video.
 
 | Id | Points | Entry | Action | Exit | s | On screen | Words on screen | Source |
 |---|---|---|---|---|---|---|---|---|
