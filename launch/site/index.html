@@ -552,7 +552,7 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 
 <section id="compare" aria-labelledby="compare-h">
 <h2 id="compare-h">How it compares</h2>
-<p class="lede">A table of guarantees, not of features. The market sweep of 29 September 2026 scored 148 tools. Every cell is rechecked against the vendor's own page before this goes public, and cells we have not verified say so.</p>
+<p class="lede">A table of guarantees, not of features. Every cell was checked against the vendor's own documentation on 22 October 2026.</p>
 <details>
 <summary>Eight guarantees against six tools</summary>
 <div class="body">
@@ -564,88 +564,88 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 <tbody>
 <tr>
 <th scope="row">The control plane runs on your servers, source published</th>
-<td>Yes. Self-hosted on rented commodity servers, source published. No commercial product we surveyed rebuilds the control plane from Git.</td>
-<td>No.</td>
-<td>No, workers only.</td>
-<td>No, sandbox only.</td>
-<td>Partial. Self-hosts with its own models, paid licence.</td>
-<td>Yes, open core.</td>
-<td>No.</td>
+<td>Yes. Self-hosted on rented commodity servers, source published.</td>
+<td>No. Runners can be yours, the control plane stays in GitHub's cloud. Closed source.</td>
+<td>No. Workers can be yours, the control plane stays in Cursor's cloud. Closed source.</td>
+<td>No. Outposts workers can be yours, the control plane stays in Cognition's cloud.</td>
+<td>Partial. The whole stack self-hosts under a paid, source-available licence.</td>
+<td>Yes. MIT core. The enterprise tier is source-available and paid.</td>
+<td>Partial. Factory Private is in preview, by quote, closed source.</td>
 </tr>
 <tr>
-<th scope="row">Your own model behind the same gateway, with a recorded run</th>
-<td>Yes. Hosted APIs and self-hosted models sit behind one gateway. The evidence page links a run on a self-hosted model.</td>
-<td>No, hosted model list.</td>
+<th scope="row">Your own model behind the same gateway, run end to end</th>
+<td>Yes. Hosted APIs and self-hosted models sit behind one gateway. The factory has completed tasks on a self-hosted model.</td>
+<td>No. The cloud agent offers a hosted model list.</td>
 <td>No, hosted models.</td>
 <td>No, its own models.</td>
-<td>Partial, its own model list on self-hosted.</td>
-<td>Any API key, no published run.</td>
-<td>Not verified.</td>
+<td>Yes. vLLM or any OpenAI-compatible endpoint, documented.</td>
+<td>Yes. vLLM, Ollama and LM Studio, documented.</td>
+<td>Partial. Any OpenAI-compatible endpoint in the CLI, no published run.</td>
 </tr>
 <tr>
 <th scope="row">The agent never holds a push token</th>
 <td>Yes. A fresh identity per task, minted after the agent is dead, used once, revoked.</td>
-<td>No, repository secrets.</td>
-<td>Not verified.</td>
-<td>Not verified.</td>
-<td>No, composite identity, token up to about 3 days.</td>
-<td>No, shared pool key.</td>
-<td>Not verified.</td>
+<td>Partial. It cannot run git push. The platform pushes for it, to one branch.</td>
+<td>Not documented. The agent pushes its own branch.</td>
+<td>No. Devin pushes itself, with the GitHub App's permissions.</td>
+<td>No. The agent runs with the user's token, a composite identity.</td>
+<td>No. The token sits in the agent's shell, and it runs git push.</td>
+<td>No. The agent runs with the user's own git credentials.</td>
 </tr>
 <tr>
 <th scope="row">The money is held before each call, and at the cap it asks</th>
 <td>Yes. The hold is taken under a database lock. At a cap: fund or end.</td>
-<td>No, org budgets.</td>
-<td>No, the cap is not instant.</td>
-<td>No, session and cycle limits.</td>
-<td>No, credits ledger.</td>
-<td>Not verified.</td>
-<td>Not verified.</td>
+<td>No, organisation and user budgets.</td>
+<td>No. The cap lags, and usage stops without a question.</td>
+<td>No. Limits per session, user and organisation block work at the cap.</td>
+<td>Partial. Caps per user, group and subscription pause use. No hold before a call.</td>
+<td>No. Budgets and a per-run cap stop the run with an error.</td>
+<td>No. Rolling rate limits, long tasks pause at the limit.</td>
 </tr>
 <tr>
 <th scope="row">A fix must fail at base and pass at head</th>
 <td>Yes. An issue or an alert files the fix card. The gate runs the repro command at base and at head.</td>
-<td>Not surveyed.</td>
-<td>Partial, Automations fire on Sentry and PagerDuty.</td>
-<td>Not surveyed.</td>
-<td>Not surveyed.</td>
-<td>Not surveyed.</td>
-<td>Not verified.</td>
+<td>No gate. Issues, schedules and code scanning alerts start tasks.</td>
+<td>No gate. Sentry, PagerDuty, Linear and labels start runs.</td>
+<td>No gate. PagerDuty, Linear and GitHub issues start sessions.</td>
+<td>No gate. Failed pipelines, merge requests and scans start flows.</td>
+<td>No gate. Issue labels and webhooks start tasks.</td>
+<td>No gate. Sentry, PagerDuty, Slack and GitHub events start runs.</td>
 </tr>
 <tr>
 <th scope="row">The gates run the tests the criteria name, and a file cannot lower the floor</th>
-<td>Yes. Nine stage kinds, a floor of four no process file can remove. Among the 148 tools surveyed, none runs the named tests and requires them green.</td>
-<td>Not surveyed.</td>
-<td>Not surveyed.</td>
-<td>Not surveyed.</td>
-<td>Not surveyed.</td>
-<td>Not surveyed.</td>
-<td>Not verified.</td>
+<td>Yes. The criteria gate runs each named test and requires it green. Four stages stay in every process.</td>
+<td>Partial. Rulesets require checks. No criteria name tests.</td>
+<td>No. Bugbot's review advises. No named-test gate.</td>
+<td>No. Devin Review comments. Merge gating is your branch protection.</td>
+<td>Partial. Policy pipelines a project cannot remove, on Ultimate. No criteria name tests.</td>
+<td>No. Hooks and a critic are optional. No named-test gate.</td>
+<td>Partial. Organisation policy a project cannot weaken. No named-test gate.</td>
 </tr>
 <tr>
 <th scope="row">The process is a set of YAML files</th>
-<td>Yes. Lanes, stages, merge rule. Ours is spec-driven; bring your own.</td>
-<td>Not surveyed.</td>
-<td>Not surveyed.</td>
-<td>Not surveyed.</td>
-<td>Not surveyed.</td>
-<td>Not surveyed.</td>
-<td>Not verified.</td>
+<td>Yes. Lanes, stages, merge rule. Ours is spec-driven, bring your own.</td>
+<td>Partial. Agents and workflows in YAML, the merge rule in settings.</td>
+<td>Partial. Files set the environment, hooks and review, not the stages.</td>
+<td>No. Files hold the environment, rules and skills, not stages or a merge rule.</td>
+<td>Partial. Flows, agents and CI are YAML. Triggers are set in the UI.</td>
+<td>Partial. Automations sync to YAML in Git. No stages or merge rule.</td>
+<td>Partial. Settings, hooks and skills in the repository. No stage process.</td>
 </tr>
 <tr>
 <th scope="row">Delete everything and rebuild from Git and a bucket</th>
-<td>Yes. Rehearsed on 13 October.</td>
-<td>No.</td>
-<td>No.</td>
-<td>No.</td>
-<td>Not verified.</td>
-<td>Not surveyed.</td>
-<td>Not verified.</td>
+<td>Yes. Rebuilt from the repositories and a backup bucket, rehearsed on 13 October.</td>
+<td>No, SaaS.</td>
+<td>No, SaaS.</td>
+<td>No, SaaS. Only Outposts workers rebuild from Helm and Terraform.</td>
+<td>Yes, self-managed. Helm charts, and backup and restore through a bucket.</td>
+<td>Partial. Helm charts and Terraform. The backup is database dumps only.</td>
+<td>No, SaaS. The Private preview is undocumented.</td>
 </tr>
 </tbody>
 </table>
 </div>
-<p class="cap">Chat intake and model independence stay out of the table: every hyperscaler sells a gateway and 78 of 148 tools score high on chat.</p>
+<p class="cap">The source of every cell: <a href="../../docs/comparison.md">the comparison file</a>. Chat intake stays out of the table, because 78 of the 148 tools in our market sweep score high on chat.</p>
 </div>
 </details>
 <div class="limits" style="margin-top:28px">

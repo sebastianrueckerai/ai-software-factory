@@ -27,7 +27,7 @@ The hero frame is `34-busy-board-3.png`, from scene 34 of the bank, written for 
 
 Assets in `launch/site/assets/`: the hero frame and seven more console frames from `demo/out/`, named by scene and step ( `11-steer-4`, `03-too-large-split-6`, `07-review-rejects-2`, `33-issue-to-fix-6`, `20-cap-fires-1`, `25-autonomy-2`, `08-supervisor-2`). Each frame was picked from its scene script's step list, not by eye. The hero frame is checked by pixel count: its board columns hold 4 to 13 % non-background pixels and the Needs you column is lit amber, where the old hero's board held 0.2 %. The sidecars stay in `demo/out/`. The two procedural clips left the page and the assets folder; the diagrams are hand-written SVG inside the HTML, generated once by a throwaway script and spliced in.
 
-Other files: `launch/revision/concept.md` is the copy's source (section 2 copy, section 4 table rows, section 5 tradeoffs, section 6 what the page never claims). The page now departs from its section order; the copy of each kept sentence is verbatim. `launch/concept.md` is the older twelve-block concept. Which file becomes the source of truth is undecided. Docs the page links and that exist: `docs/architecture.md`, `docs/threat-model.md`, `docs/evidence.md`, `docs/spec-driven.md`, `docs/layers.md`. The film handover is `launch/handover.md`.
+Other files: `launch/revision/concept.md` is the copy's source (section 2 copy, section 4 table rows, section 5 tradeoffs, section 6 what the page never claims). The page now departs from its section order; the copy of each kept sentence is verbatim. `launch/concept.md` is the older twelve-block concept. Which file becomes the source of truth is undecided. Docs the page links and that exist: `docs/architecture.md`, `docs/threat-model.md`, `docs/evidence.md`, `docs/spec-driven.md`, `docs/layers.md`, `docs/comparison.md`. The film handover is `launch/handover.md`.
 
 ## Calls made on 21 October without Sebastian, open to reversal
 
@@ -40,7 +40,7 @@ Other files: `launch/revision/concept.md` is the copy's source (section 2 copy, 
 
 ## Known gaps, by design
 
-- Comparison cells that say "not surveyed" or "not verified" wait for Sebastian to check them against the vendors' own pages before anything goes public.
+- The comparison was checked against each vendor's own documentation on 22 October 2026 by six parallel researchers, one per vendor. Every cell and its source sit in `docs/comparison.md`, which the table's caption links. Vendors ship fast: recheck the cells on the day the page goes public and change the date in the lede and in that file.
 - Docs links are relative (`../../docs/...`) and work in-repo; they break when the page moves to GitHub Pages and must be reworked then.
 - The eyebrow says "Source available" while the licence file does not exist yet. Stop-ship rule: nothing public before the BSL 1.1 file is committed with its parameters.
 - No session so far could view rendered images. The frames, the diagrams and the layout are verified by a DOM probe (no horizontal overflow at 1440 and 500 px, every SVG label inside its box, folds closed) and not by eye.
@@ -55,6 +55,7 @@ From revision section 6 and section 11:
 - No install time and no server price until an outside engineer has installed it and the numbers exist.
 - No count older than the day the page goes public; the counts get recounted that day.
 - Links only to paths that exist. No numbers from the demo project on the page.
+- Sebastian's ruling of 22 October: the page may say the factory has completed tasks on a self-hosted model, with no run link and no date. He ran it end to end, and the test projects are cleared. This replaces the concept's rule that the claim waits for a run on the evidence page.
 - The word is roadmap, never "roadmap YAML": the intake is linked Markdown, the YAML is the process, and the two must not be conflated.
 - Every generated image or clip keeps its sidecar JSON. No spend past the $20 fal cap without asking.
 - A section says its point once and stops. Depth goes behind a `<details>` fold or a link, never into a denser paragraph.
