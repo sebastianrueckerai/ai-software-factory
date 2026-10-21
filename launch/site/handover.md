@@ -8,17 +8,18 @@ One static page, `launch/site/index.html`, no build step, dark design, no JavaSc
 
 ## What exists, as of the commit after 83e3714 on 21 October
 
-The page is built for progressive disclosure. Nine stops, each one point:
+The page is built for progressive disclosure. Eight stops, each one point:
 
 1. **Hero.** The eyebrow names the product ("AI software factory · Self-hosted · Source available"). The line takes the sandbox route: "The worst an agent can do is wreck its own sandbox." A three-sentence subhead, two buttons (`How it works` to the loop, `Source and setup` to the repository), then the annotated console frame and the one-line positioning band. The frame carries the kanban and chat points, so the line no longer has to.
-2. **The loop.** An inline SVG: nine stops from roadmap to telemetry and back to cards. Amber marks where the human appears (confirm the spec, fund or end at a cap, approve or let the merge rule merge). A dashed wall around the sandbox. Under it three panels: you, the agent, the checks.
+2. **The loop.** Title "One card's life. The amber steps are yours." and one line: "Everything else runs on its own." An inline SVG: nine stops from roadmap to telemetry and back to cards. Amber marks where the human appears: confirm the spec, fund or end at a cap, and "manual: you approve · full auto: it merges" under Merge. A dashed wall around the sandbox. The three panels that repeated the diagram are gone.
 3. **What you get.** Six cards, each a console frame, a bold line, one or two sentences and a link to the evidence page or the spec-driven doc: the chat, the spec with named proofs, the review that rejects, issues that file their own fix, the money held, the autonomy dial.
 4. **What the agent can reach.** An inline SVG: the pod in the middle, four blocked targets on the left with crossed wires, three reachable hosts on the right, the push after the agent at the bottom. Four fact lines and an amber box for the risk that stays.
 5. **Run it.** Three sentences, the three layers as an inline SVG, the button.
 6. **Under the hood.** One lede sentence, then six `<details>` folds, closed by default: the sandbox, the gates, the money, recovery (with the supervisor frame), the numbers, three more facts.
 7. **How it compares.** One lede, the table behind a fold, the tradeoffs box visible.
-8. **Proof and limits.** The four links, the counts.
-9. **Footer.**
+8. **Proof and limits.** The four links and the open limits in one line. The counts are gone: the page links the repository instead.
+
+There is no footer and no contact block. The page will sit inside a larger site that carries the imprint and the contact.
 
 Visible words per section stay between 33 and 201. The old eight-paragraph reach section, the module cards, the numbers section and the table are the folds and the diagrams now.
 
@@ -57,11 +58,12 @@ From revision section 6 and section 11:
 - The word is roadmap, never "roadmap YAML": the intake is linked Markdown, the YAML is the process, and the two must not be conflated.
 - Every generated image or clip keeps its sidecar JSON. No spend past the $20 fal cap without asking.
 - A section says its point once and stops. Depth goes behind a `<details>` fold or a link, never into a denser paragraph.
+- No working notes in the copy. A reminder such as "only when they are real" belongs in this handover, never on the page.
 
 ## How to work in this repo
 
 - Terminal output of repo files is mangled by a renderer. Copy a file to `/tmp` and read it there, or view exact lines with `awk 'NR>=X && NR<=Y {printf "L%d|%.250s\n", NR, $0}'`. IDE spelling diagnostics are noise.
-- The SVG diagrams are long single lines inside the HTML. To change one, regenerate it rather than hand-edit: the panel helper draws a rect, four corner marks, a number, a title and sub lines, and the wires are paths with a marker tip. The CSS classes are in the page's stylesheet under `.diagram`.
+- The SVG diagrams live inside the HTML and no generator is committed. Change a label by its unique text, then run the DOM probe: every text must stay inside its panel and the viewBox. Each panel is a rect, four corner marks, a number, a title and sub lines. Wires are paths with a marker tip. The CSS classes are in the page's stylesheet under `.diagram` and `.hero-annot`.
 - Verify every change: `python3` html.parser parse, anchor and asset path check, the DOM probe (copy the page to `/tmp`, append a script that writes `scrollWidth`, each SVG text's `getBBox()` against its panel rect and the open folds into a `<pre>`, then `google-chrome --headless=new --no-sandbox --dump-dom`), and `google-chrome --headless=new --no-sandbox --screenshot=... --window-size=1440,9000` for a render. You cannot view images (image reads upload to a CDN), so say plainly what is unverified by eye.
 - Git: work in a worktree (`git -C ~/repos/ai-software-factory worktree add -b <branch> /tmp/claude-1000/wt-<name> master`), commit with the trailer `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`, then `git fetch forgejo` first, because the factory's own document writer pushes to forgejo master and master can move under you, ff-merge to master, push both `origin` (GitHub) and `forgejo`, remove the worktree, delete the branch.
 - Never commit `terraform.tfstate`. `launch/revision/` is Sebastian's untracked input; leave it unless he says commit it.

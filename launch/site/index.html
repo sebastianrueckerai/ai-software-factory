@@ -20,8 +20,9 @@ html { scroll-behavior: smooth; scroll-padding-top: 64px; }
 body { margin: 0; background: var(--bg); color: var(--text); font: 400 17px/1.55 var(--font-ui); -webkit-font-smoothing: antialiased; }
 a { color: var(--accent); }
 p { margin: 0 0 12px; }
-.cap, .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-variant-ligatures: none; }
+.cap { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-variant-ligatures: none; }
 .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+main.wrap { padding-bottom: 72px; }
 .skip { position: absolute; left: -999px; top: 8px; background: var(--bg-raised); padding: 8px 12px; z-index: 10; }
 .skip:focus { left: 8px; }
 nav { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 94%, transparent); border-bottom: 1px solid var(--line); }
@@ -86,13 +87,6 @@ h3 { font-size: 18px; font-weight: 600; line-height: 1.3; margin: 0 0 8px; }
 .hero-list { margin: 14px 0 0; padding-left: 22px; color: var(--text-muted); }
 .hero-list b { color: var(--text); }
 
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.three { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-.block { background: var(--bg-panel); border: 1px solid var(--line); padding: 18px 20px; display: flex; flex-direction: column; }
-.block p { color: var(--text-muted); }
-.block .cap { margin-top: auto; padding-top: 12px; }
-.block.you { border-left: 3px solid var(--need); }
-.block.agent, .block.checks { border-left: 3px solid var(--accent); }
 figure { margin: 0; }
 figcaption { margin-top: 8px; text-align: center; }
 
@@ -133,14 +127,11 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 .limits ul { margin: 0; padding-left: 20px; color: var(--text-muted); }
 .limits p { color: var(--text-muted); margin: 0; }
 
-table.counts { width: auto; font-family: var(--font-mono); }
-table.counts td:last-child { text-align: right; }
-footer { padding: 48px 0 64px; }
 @media (max-width: 900px) {
-  .cards, .three { grid-template-columns: 1fr 1fr; }
+  .cards { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 640px) {
-  .grid, .cards, .three { grid-template-columns: 1fr; }
+  .cards { grid-template-columns: 1fr; }
   .hero-annot { display: none; }
   .hero-plain, .hero-list { display: block; }
   body { font-size: 16px; }
@@ -161,7 +152,6 @@ footer { padding: 48px 0 64px; }
 <li><a href="#hood">Under the hood</a></li>
 <li><a href="#compare">Compare</a></li>
 <li><a href="#proof">Proof</a></li>
-<li><a href="#contact">Contact</a></li>
 </ul>
 </nav>
 <main class="wrap">
@@ -189,9 +179,9 @@ footer { padding: 48px 0 64px; }
 </section>
 
 <section id="loop" aria-labelledby="loop-h">
-<h2 id="loop-h">One card's life. You appear twice.</h2>
-<p class="lede">You confirm the spec and you hold the money. The machine does the rest. Three things make that work.</p>
-<div class="scroll"><svg class="diagram" viewBox="0 0 1140 520" role="img" aria-labelledby="loop-t loop-d"><title id="loop-t">One card runs the loop</title><desc id="loop-d">Roadmap, spec, cards, sandbox, pull request, gates, merge, live, telemetry, and back to cards. The human appears at the spec, at a budget cap and at the merge rule. The agent is walled into the sandbox.</desc>
+<h2 id="loop-h">One card's life. The amber steps are yours.</h2>
+<p class="lede">Everything else runs on its own.</p>
+<div class="scroll"><svg class="diagram" viewBox="0 0 1140 520" role="img" aria-labelledby="loop-t loop-d"><title id="loop-t">One card runs the loop</title><desc id="loop-d">Roadmap, spec, cards, sandbox, pull request, gates, merge, live, telemetry, and back to cards. The human appears at the spec, at a budget cap, and at the merge when the autonomy level is manual. At full auto the factory merges on its own. The agent is walled into the sandbox.</desc>
 <defs><marker id="tip" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="tip" d="M0 0 L10 5 L0 10 z"/></marker></defs>
 <path class="wire" d="M216 112.0 H246" marker-end="url(#tip)"/>
 <path class="wire" d="M442 112.0 H472" marker-end="url(#tip)"/>
@@ -276,7 +266,7 @@ footer { padding: 48px 0 64px; }
 <path class="corner" d="M894 427 V434 H887"/>
 <text class="n" x="712" y="354">07</text>
 <text class="t " x="712" y="378">Merge</text>
-<text class="s" x="712" y="400">by your merge rule</text>
+<text class="s" x="712" y="400">once the gates pass</text>
 </g>
 <g class="panel ">
 <rect x="472" y="330" width="196" height="104"/>
@@ -300,22 +290,8 @@ footer { padding: 48px 0 64px; }
 </g>
 <rect class="hm" x="260" y="182" width="8" height="8"/><text class="h" x="275" y="190">you confirm the spec</text>
 <rect class="hm" x="712" y="182" width="8" height="8"/><text class="h" x="727" y="190">at a cap: fund it or end it</text>
-<rect class="hm" x="712" y="452" width="8" height="8"/><text class="h" x="727" y="460">you approve, or it merges on its own</text>
+<rect class="hm" x="712" y="452" width="8" height="8"/><text class="h" x="727" y="460">manual: you approve · full auto: it merges</text>
 </svg></div>
-<div class="three">
-<article class="block you">
-<h3>You, at two points</h3>
-<p>You confirm the spec before any code exists. At a budget cap the factory stops and asks: fund it or end it. The merge waits for you only if your merge rule says so.</p>
-</article>
-<article class="block agent">
-<h3>The agent, walled in</h3>
-<p>It works in a throwaway sandbox with no credentials and no internet. The worst it can do is wreck that sandbox.</p>
-</article>
-<article class="block checks">
-<h3>The checks, before every merge</h3>
-<p>Tests, policy, a reproduction and a stronger model's review. No project file can switch them off.</p>
-</article>
-</div>
 </section>
 
 <section id="get" aria-labelledby="get-h">
@@ -686,42 +662,15 @@ footer { padding: 48px 0 64px; }
 
 <section id="proof" aria-labelledby="proof-h">
 <h2 id="proof-h">Proof and limits</h2>
-<div class="grid">
-<article class="block">
-<h3>The links, only when they are real</h3>
-<ul>
+<ul class="facts">
 <li><a href="https://github.com/sebastianrueckerai/ai-software-factory">The source</a>: three repositories, factory, code and infrastructure.</li>
 <li><a href="../../docs/architecture.md">The architecture</a>: the five planes and the three layers.</li>
 <li><a href="../../docs/threat-model.md">The threat model</a>: what the sandbox stops, what it does not stop, the known holes.</li>
 <li><a href="../../docs/evidence.md">The evidence page</a>: the file and the test per guarantee, a run where one exists, "not yet" where none does.</li>
 </ul>
 <p class="cap">The open limits live in the threat model: the hosted model APIs see diffs and briefs, the Go module proxy is a covert channel of a few hundred bytes per request, gVisor is not a microVM, and the model can write code that passes the checks.</p>
-</article>
-<article class="block">
-<h3>The counts, 21 October 2026, three repositories</h3>
-<table class="counts">
-<tbody>
-<tr><td>Lines of Go</td><td>233,425</td></tr>
-<tr><td>Outside tests</td><td>94,277</td></tr>
-<tr><td>Files</td><td>487</td></tr>
-<tr><td>Test files</td><td>279</td></tr>
-<tr><td>Test functions</td><td>2,940</td></tr>
-<tr><td>Commits since 24 September</td><td>3,467</td></tr>
-</tbody>
-</table>
-<p class="cap">Recounted on the day the page goes public.</p>
-</article>
-</div>
 </section>
 
 </main>
-<footer id="contact" class="wrap">
-<h2>Contact</h2>
-<p><strong>Sebastian Rücker</strong></p>
-<p><a href="mailto:mail@sebastianruecker.com">mail@sebastianruecker.com</a></p>
-<p class="cap">Hamburg</p>
-<p class="cap">Licence: Business Source License 1.1. Documentation: the architecture, the threat model, the evidence page, the spec-driven process.</p>
-<p class="cap">Built for teams that cannot sign off a hosted coding agent: regulated industries, and companies where security and compliance decide the tool choice.</p>
-</footer>
 </body>
 </html>
