@@ -4,24 +4,42 @@ Paste this as the first message of a new session. It carries everything; you nee
 
 ## What you work on
 
-One static page, `launch/site/index.html`, no build step, dark design already built. It sells the factory to two readers: an engineer who might run it (what does it do, can I run it) and a CTO or hiring reader (the sandbox, the gates, the proof). Sebastian is looking at the page right now to judge whether it crams too much in or needs better progressive disclosure. Your first job is to take his rulings and reshape the page: cut sections, collapse them behind folds, move them to the docs, reorder. He decides, you build.
+One static page, `launch/site/index.html`, no build step, dark design, no JavaScript. It sells the factory to two readers: an engineer who might run it (what does it do, can I run it) and a CTO or hiring reader (the sandbox, the gates, the proof). Sebastian's ruling of 21 October: the page must make its points in text and images early, with no walls of text and no dense summaries. Depth goes behind a fold or a link. The film is a later concern.
 
-## What exists, as of commit 72973ec on 21 October
+## What exists, as of the commit after 83e3714 on 21 October
 
-- The page follows `launch/revision/concept.md` section 2 exactly, copy verbatim: hero, what the agent can reach (eight paragraphs), who it is for (one band), run it yourself, the loop with the film slot, under the hood (four module cards), three layers, the numbers, how it compares (eight guarantee rows, six competitor columns), tradeoffs, proof and limits, footer.
-- Assets in `launch/site/assets/`: `hero.png` (copied from `demo/out/01-chat-to-card-4.png`, a guess at the proposal beat, unverified by eye), `loop.mp4` and `layers.mp4` (the rendered procedural clips from `demo/out/`).
-- The demo bank: `demo/out/`, 34 console scenes, each with numbered png frames, webm, mp4 and a json sidecar holding the story and step timings. `demo/run.sh` regenerates the bank in 13 minutes.
-- The revision concept: `launch/revision/concept.md`, third version, written with other AIs and Sebastian's evening review. Section 2 is the page copy, section 4 the comparison rows, section 5 the tradeoffs, section 6 what the page never claims, section 11 the phases and stop-ship rules, section 12 the open decisions.
-- The older `launch/concept.md` disagrees with it (the twelve-block page). The page follows the REVISION. Which file becomes the source of truth is undecided; do not merge them without Sebastian's word.
-- Docs the page links: `docs/architecture.md`, `docs/threat-model.md`, `docs/evidence.md` exist. `docs/deployment.md` does not exist yet.
-- The film handover for the 90-second film lives in `launch/handover.md`. The film is the next stage after the page settles; its slot in the loop section plays `loop.mp4` until then.
+The page is built for progressive disclosure. Nine stops, each one point:
+
+1. **Hero.** The line, the four-sentence subhead, two buttons (`How it works` to the loop, `Source and setup` to the repository), the console frame, the one-line positioning band.
+2. **The loop.** An inline SVG: nine stops from roadmap to telemetry and back to cards. Amber marks where the human appears (confirm the spec, fund or end at a cap, approve or let the merge rule merge). A dashed wall around the sandbox. Under it three panels: you, the agent, the checks.
+3. **What you get.** Six cards, each a console frame, a bold line, one or two sentences and a link to the evidence page or the spec-driven doc: the chat, the spec with named proofs, the review that rejects, issues that file their own fix, the money held, the autonomy dial.
+4. **The sandbox.** An inline SVG: the pod in the middle, four blocked targets on the left with crossed wires, three reachable hosts on the right, the push after the agent at the bottom. Four fact lines and an amber box for the risk that stays.
+5. **Run it.** Three sentences, the three layers as an inline SVG, the button.
+6. **Under the hood.** One lede sentence, then six `<details>` folds, closed by default: the sandbox, the gates, the money, recovery (with the supervisor frame), the numbers, three more facts.
+7. **How it compares.** One lede, the table behind a fold, the tradeoffs box visible.
+8. **Proof and limits.** The four links, the counts.
+9. **Footer.**
+
+Visible words per section stay between 33 and 201. The old eight-paragraph reach section, the module cards, the numbers section and the table are the folds and the diagrams now.
+
+Assets in `launch/site/assets/`: eight console frames from `demo/out/`, named by scene and step (`01-chat-to-card-4.png` is the hero, then `11-steer-4`, `03-too-large-split-6`, `07-review-rejects-2`, `33-issue-to-fix-6`, `20-cap-fires-1`, `25-autonomy-2`, `08-supervisor-2`). Each frame was picked from its scene script's step list, not by eye. The sidecars stay in `demo/out/`. The two procedural clips left the page and the assets folder; the diagrams are hand-written SVG inside the HTML, generated once by a throwaway script and spliced in.
+
+Other files: `launch/revision/concept.md` is the copy's source (section 2 copy, section 4 table rows, section 5 tradeoffs, section 6 what the page never claims). The page now departs from its section order; the copy of each kept sentence is verbatim. `launch/concept.md` is the older twelve-block concept. Which file becomes the source of truth is undecided. Docs the page links and that exist: `docs/architecture.md`, `docs/threat-model.md`, `docs/evidence.md`, `docs/spec-driven.md`, `docs/layers.md`. The film handover is `launch/handover.md`.
+
+## Calls made on 21 October without Sebastian, open to reversal
+
+- The film button and the loop clip left the hero and the loop section. The film returns to the loop section when it is cut.
+- The loop diagram says one thing: the human appears at the spec, at a cap and at the merge rule, the agent is walled in, the checks stand before the merge. It replaces the five-plane clip, which showed stages without a point.
+- The comparison table sits behind a fold. Revision section 12 point 5 left open whether it goes to the docs.
+- The three layers sit under "Run it", not as their own section.
 
 ## Known gaps, by design
 
 - Comparison cells that say "not surveyed" or "not verified" wait for Sebastian to check them against the vendors' own pages before anything goes public.
 - Docs links are relative (`../../docs/...`) and work in-repo; they break when the page moves to GitHub Pages and must be reworked then.
 - The eyebrow says "Source available" while the licence file does not exist yet. Stop-ship rule: nothing public before the BSL 1.1 file is committed with its parameters.
-- The hero frame and the overall layout are unverified by eye; no session so far could view rendered images.
+- No session so far could view rendered images. The frames, the diagrams and the layout are verified by a DOM probe (no horizontal overflow at 1440 and 500 px, every SVG label inside its box, folds closed) and not by eye.
+- On narrow screens the three diagrams scroll sideways (`min-width: 860px`). A phone layout for them is not designed.
 
 ## The rules that bind the page
 
@@ -34,19 +52,20 @@ From revision section 6 and section 11:
 - Links only to paths that exist. No numbers from the demo project on the page.
 - The word is roadmap, never "roadmap YAML": the intake is linked Markdown, the YAML is the process, and the two must not be conflated.
 - Every generated image or clip keeps its sidecar JSON. No spend past the $20 fal cap without asking.
+- A section says its point once and stops. Depth goes behind a `<details>` fold or a link, never into a denser paragraph.
 
 ## How to work in this repo
 
-- Terminal output of repo files is mangled by a renderer. Edit with unique substrings, or view exact lines with `awk 'NR>=X && NR<=Y {printf "L%d|%.250s\n", NR, $0}'`, or copy a file to `/tmp` and read it there. IDE spelling diagnostics are noise.
-- In `launch/site/index.html` a heading and its body sit on single long lines with HTML between; edit small unique substrings, never assume newlines.
-- Verify every change: `python3` html.parser parse, anchor and asset path check, and `google-chrome --headless=new --no-sandbox --screenshot=... --window-size=1440,960` for a render. You cannot view images (image reads upload to a CDN), so say plainly what is unverified by eye.
-- Git: work in a worktree (`git -C ~/repos/ai-software-factory worktree add -b <branch> /tmp/claude-1000/wt-<name> master`), commit with the trailer `Co-Authored-By: Claude Code <noreply@anthropic.com>`, then `git fetch forgejo` first, because the factory's own document writer pushes to forgejo master and master can move under you, ff-merge to master, push both `origin` (GitHub) and `forgejo`, remove the worktree, delete the branch. Removing the worktree you stand in prints a getcwd error; it is harmless.
+- Terminal output of repo files is mangled by a renderer. Copy a file to `/tmp` and read it there, or view exact lines with `awk 'NR>=X && NR<=Y {printf "L%d|%.250s\n", NR, $0}'`. IDE spelling diagnostics are noise.
+- The SVG diagrams are long single lines inside the HTML. To change one, regenerate it rather than hand-edit: the panel helper draws a rect, four corner marks, a number, a title and sub lines, and the wires are paths with a marker tip. The CSS classes are in the page's stylesheet under `.diagram`.
+- Verify every change: `python3` html.parser parse, anchor and asset path check, the DOM probe (copy the page to `/tmp`, append a script that writes `scrollWidth`, each SVG text's `getBBox()` against its panel rect and the open folds into a `<pre>`, then `google-chrome --headless=new --no-sandbox --dump-dom`), and `google-chrome --headless=new --no-sandbox --screenshot=... --window-size=1440,9000` for a render. You cannot view images (image reads upload to a CDN), so say plainly what is unverified by eye.
+- Git: work in a worktree (`git -C ~/repos/ai-software-factory worktree add -b <branch> /tmp/claude-1000/wt-<name> master`), commit with the trailer `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`, then `git fetch forgejo` first, because the factory's own document writer pushes to forgejo master and master can move under you, ff-merge to master, push both `origin` (GitHub) and `forgejo`, remove the worktree, delete the branch.
 - Never commit `terraform.tfstate`. `launch/revision/` is Sebastian's untracked input; leave it unless he says commit it.
 - Provider keys live in the gitignored `.env.tools`; never print one.
 
 ## Open, for Sebastian (ask with context, then act)
 
-1. **Density.** He looks at the page and rules. Twelve stops stand today; the reach section with its eight paragraphs and the comparison table are the heaviest. Ask which sections go, which collapse behind a fold, which move to the docs.
-2. **The hero frame.** Right beat? If not, he names the scene and step from `demo/out/`; copy the new frame into `launch/site/assets/`.
-3. **The comparison table.** Revision section 12 point 5 leaves open whether it stays low on the page or moves to the docs.
-4. **The source of truth.** `launch/concept.md` or `launch/revision/concept.md`. Until ruled, the revision wins for the page.
+1. **The four calls above.** Keep or reverse each.
+2. **The frames.** Eight frames picked by step, unverified by eye. If a frame shows the wrong beat, he names the scene and step from `demo/out/`.
+3. **The source of truth.** `launch/concept.md` or `launch/revision/concept.md`. Until ruled, the revision wins for the copy.
+4. **The film.** Where it sits once cut: the loop section's diagram stays and the film goes beside it, or the film replaces the diagram.
