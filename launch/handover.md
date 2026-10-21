@@ -11,7 +11,20 @@ Read first, in this order: launch/handover.md, launch/concept.md, launch/script.
 
 My answer on the spine of script.md section 4 (approve, or name the beats to change):
 
-My answers to the eight decisions of concept.md section 10, where I want a default changed:
+The spine runs one card's life in 90 seconds: the calendar card born in the chat, its four planned children, the sandbox, the pull request, the rejected review, a steer while the agent runs, the green gates, the stall handling, the cost stop, merge and deploy, the alert and issue cards nobody typed, the reproduction gate red then green, full auto's three asks, the three layers, the week before and after, three title cards, the GitHub link. Three points await a word:
+- The hero line over the opening beat B0 is draft 1: "One board shows everything. One chat steers it. Agents do the rest in sandboxes on your own servers." Drafts 2 and 3 sit in concept section 5. Pick one or write one.
+- Beats B2 and B12 claim less than the concept's bangs: the criteria's kinds and the two terminals are not on screen. Both can become procedural overlays, half a day each. Say if either must.
+- The film's card is the calendar, #105, with the week view, #110, as its child. Another card changes the nodes after `landed`, not the beats.
+
+My answers to the eight decisions of concept.md section 10. All eight stand at the defaults the last session took; name any to change, a blank keeps it:
+1. Narration: titles on screen, so the film works muted where GitHub and LinkedIn autoplay without sound. A voice track joins later without a recut. The other choices are a generated voice or Sebastian's own.
+2. The fal cap: $10 for the generated clips. Group H spent about $2.88 of it.
+3. The film's three closing cards, seconds 80 to 87: the three layers. Your servers: rebuilt from Git, every euro held before it is spent. Your process: a YAML file, proofs named first. Your prompts: files you change.
+4. The hero line: draft 1 (the spine above). This decision names no default, so say the word if another line goes there.
+5. The perimeter claim in docs/pitch.md: the pitch sells code that never leaves the perimeter, and today every session sends diffs to hosted model APIs. Default: reword to "the model is your choice behind the gateway" and file the card that puts one self-hosted model behind the gateway, so the claim becomes true. The other way: keep the pitch and accept that a compliance reader catches it.
+6. The comparison table's names: GitHub Copilot cloud agent, Cursor cloud agents, Devin, GitLab Duo, OpenHands, Factory sixth. Default: yes.
+7. A known limits block on the page: five lines of concessions under the comparison table. A hiring reader reads it as judgement, an investor may read it as weakness. Default: yes.
+8. Prompts as data: the writing guide and the other guides are compiled into the binaries, so "bring your own prompts" is worded precisely today. Default: keep the wording and file the card that moves the guides into the config tree beside the process files.
 
 Then do, in this order, each as its own round with a result I can look at:
 1. The spine scene and the two branch scenes of script.md section 6, recorded with demo/run.sh and on the results page.
