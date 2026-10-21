@@ -1387,9 +1387,47 @@ function report(now, at, days) {
   });
 }
 
+// metricsWeek is the metrics page's 7 days on Sunday evening of week, and the board's spend then.
+const metricsWeek = (now, week) => ({ metrics: report(now, weekEnd(week), 7), ...spending(weekEnd(week)) });
+
+// costs is the costs page's ledger of the days to the story's time at, each story day dated on the recording's day as
+// far back from now. A day holds what the cards and the chat spent in it, 2 % of it on tools and the rest on models; a
+// day without spend has no row, as factoryd's ledger keeps none. Each card that spent in the days lists its spend on
+// its class and on its review, the costliest card first.
+function costs(now, at, days = 14) {
+  const DAY_MS = DAY * 1000;
+  const iso = (ms) => new Date(ms).toISOString().slice(0, 10);
+  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const from = Date.UTC(at.getUTCFullYear(), at.getUTCMonth(), at.getUTCDate()) - (days - 1) * DAY_MS;
+  const spentBy = (ms) => {
+    const t = new Date(Math.min(ms, at));
+    return sum(Object.keys(ledger).map((issue) => spentAt(issue, t))) + chatAt(t);
+  };
+  const base = spentBy(from);
+  const spend = (ms) => cents(spentBy(ms) - base);
+  const tools = (ms) => cents(spend(ms) * TOOLS);
+  const rows = [];
+  for (let i = 0; i < days; i++) {
+    const [lo, hi] = [from + i * DAY_MS, from + (i + 1) * DAY_MS];
+    const total = cents(spend(hi) - spend(lo));
+    const tool = cents(tools(hi) - tools(lo));
+    if (total) rows.push({ day: iso(today - (days - 1 - i) * DAY_MS), by_kind: tool ? { model: cents(total - tool), tool } : { model: total }, total });
+  }
+  const tasks = Object.entries(ledger).map(([issue, c]) => {
+    const eur = cents(spentAt(issue, at) - spentAt(issue, new Date(from)));
+    const review = cents(eur * REVIEW);
+    const lines = [{ kind: "model", ref: c.model ?? "small", eur: cents(eur - review) }, { kind: "model", ref: "review/big", eur: review }];
+    return { task_id: state.id(Number(issue)), eur, lines: lines.sort((x, y) => (x.ref < y.ref ? -1 : 1)) };
+  });
+  return {
+    from: iso(today - (days - 1) * DAY_MS), to: iso(today), days: rows,
+    tasks: tasks.filter((t) => t.eur > 0).sort((x, y) => y.eur - x.eur || (x.task_id < y.task_id ? -1 : 1)),
+  };
+}
+
 module.exports = {
   date, cards, title, description, body, card: boardCard, filing, requests, asks, escalation, asking, answered, answerRows, replies, wakeAsk, alerts, alertsAt, approvals,
   mergeSpec, plans, planCards, routines, runsAt, cronOf, filedAge, anchoredAt, routineCard, routinesAt, scanned, sessions, words, life, lives, calendarFile,
   merges, merge, merging, mergeEvents, done, filed, answeredAt, ageAt, doneAt, board, session, reviews, review, files, sources, checksFailed, supervisor,
-  steers, at, ledger, spentAt, spending, weekEnd, report,
+  steers, at, ledger, spentAt, spending, weekEnd, report, metricsWeek, costs,
 };

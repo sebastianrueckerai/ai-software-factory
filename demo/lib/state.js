@@ -454,6 +454,7 @@ function scene(now, o = {}) {
     Runs: o.runs,
     RoutinesAt: o.routinesAt?.toISOString(),
     Metrics: o.metrics,
+    Costs: o.costs,
     Replies: o.replies,
   });
 }

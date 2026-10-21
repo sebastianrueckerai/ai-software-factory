@@ -229,3 +229,27 @@ test("the cost review reads September from the ledger", () => {
   // 15.84 of the cards over the sixteen done by then
   assert.equal(story.routines["cost-review"][0].note, "€16.50 of the €60 cap, €0.99 per card");
 });
+test("the costs page's days are the two weeks' spend by day, dated back from now", () => {
+  const c = story.costs(now, story.weekEnd(2));
+  assert.deepEqual([c.from, c.to], ["2026-10-07", "2026-10-20"]);
+  // Monday: #101 1.12, #102 0.64, #103 0.31, the chat 0.18. Tuesday: #104 0.48, the chat 0.03. Wednesday: #105 0.46,
+  // #107 1.18, the chat 0.17. Thursday: #108 0.29, #109 1.84, #110's 79 of its 195 minutes into 4.60 (1.8636), #111's
+  // 85 of 115 into 0.92 (0.68), the chat 0.02: 9.2636 in all, 9.26 by the cent. Friday: the rest to 12.82.
+  // The weekends spend nothing and keep no row.
+  assert.deepEqual(c.days.map((d) => [d.day, d.total]), [
+    ["2026-10-07", 2.25], ["2026-10-08", 0.51], ["2026-10-09", 1.81], ["2026-10-10", 4.69], ["2026-10-11", 3.56],
+    ["2026-10-14", 0.38], ["2026-10-15", 1.1], ["2026-10-16", 1.82], ["2026-10-17", 1.52], ["2026-10-18", 1.13],
+  ]);
+  // tools are 2 % of the spend so far, by the cent: 0.05 of Monday's 2.25, 0.26 of week 1's 12.82, 0.38 of 18.77
+  assert.deepEqual(c.days[0].by_kind, { model: 2.2, tool: 0.05 });
+  assert.deepEqual(c.days[5].by_kind, { model: 0.38 });
+  const week = (from, to, kind) => pct(c.days.filter((d) => d.day >= from && d.day <= to).reduce((s, d) => s + (kind ? d.by_kind[kind] ?? 0 : d.total), 0));
+  assert.deepEqual([week("2026-10-07", "2026-10-13"), week("2026-10-14", "2026-10-20")], [12.82, 5.95]);
+  assert.deepEqual([week("2026-10-07", "2026-10-13", "tool"), week("2026-10-14", "2026-10-20", "tool")], [0.26, 0.12]);
+  // the 21 cards that spent, #110 the costliest, a small card's review line first by its ref; the chat's 1.02 is in
+  // the days only
+  assert.equal(c.tasks.length, 21);
+  assert.deepEqual(c.tasks[0], { task_id: s.id(110), eur: 4.6, lines: [{ kind: "model", ref: "big", eur: 4.05 }, { kind: "model", ref: "review/big", eur: 0.55 }] });
+  assert.deepEqual(c.tasks[1], { task_id: s.id(109), eur: 1.84, lines: [{ kind: "model", ref: "review/big", eur: 0.22 }, { kind: "model", ref: "small", eur: 1.62 }] });
+  assert.equal(pct(c.tasks.reduce((sum, t) => sum + t.eur, 0)), 17.75);
+});

@@ -239,6 +239,11 @@ test("scene keys a pull request's files by their Forgejo path", () => {
   const sc = s.scene(now, { prFiles: { 203: [{ filename: "a.ts", status: "modified", additions: 1, deletions: 0 }] } });
   assert.deepEqual(sc.PRFiles, { "/api/v1/repos/nord/booking/pulls/203/files": '[{"filename":"a.ts","status":"modified","additions":1,"deletions":0}]' });
 });
+test("scene carries its costs ledger, and leaves it out without one", () => {
+  const costs = { from: "2026-10-20", to: "2026-10-20", days: [{ day: "2026-10-20", by_kind: { model: 1.5 }, total: 1.5 }], tasks: [] };
+  assert.equal(s.scene(now, { costs }).Costs, costs);
+  assert.equal("Costs" in s.scene(now), false);
+});
 test("a figure has a value and a previous one unless its cohort is empty", () => {
   const weeks = [0, 0, 0, 0, 1, 0, 9];
   assert.deepEqual(s.figure(9, 0, weeks), { value: 9, prev: 0, has: true, prev_has: true, weeks });
