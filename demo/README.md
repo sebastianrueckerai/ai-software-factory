@@ -4,7 +4,9 @@ A bank of scripted recordings of the real console, served by the console lab ove
 
 `demo/run.sh [scene...]` starts the lab from `$CODE_REPO` (default `~/repos/ai-software-factory-code`), records the named scenes or all of `demo/scenes/`, converts each to mp4 and stops the lab. The lab ends itself after 30 minutes. `CONSOLE_LAB_DIR` and `CONSOLE_LAB_ADDR` default to `/tmp/claude-1000/console-lab-demo` and `127.0.0.1:8147`.
 
-Output, ignored by git: `demo/out/<scene>.webm`, `.mp4`, `.json` (the sidecar) and `<scene>-<step>.png`. A scene that fails (a rejected seed, a page error, a 4xx or 5xx from the console) leaves no output, is named on stderr, and makes the run exit 1.
+A fresh session needs Node 22; Playwright's Node modules at `NODE_PATH` (default `/tmp/claude-1000/pw/node_modules`, a path a reboot can wipe; install with `npm i playwright` in that directory) and Chromium under `PLAYWRIGHT_BROWSERS_PATH` (default `~/.cache/ms-playwright`; `npx playwright install chromium`); ffmpeg with ffprobe; Go for the lab; and the code repository at `CODE_REPO` (default `/home/womb/repos/ai-software-factory-code`).
+
+Output, ignored by git: `demo/out/<scene>.webm`, `.mp4`, `.json` (the sidecar) and `<scene>-<step>.png`. A scene that fails (a rejected seed, a page error, a 4xx or 5xx from the console, a chat turn with no scripted reply) leaves no output, is named on stderr, and makes the run exit 1.
 
 A scene module. `state(now)` returns the lab's scene JSON, or null for no seed. An action has one key: `goto`, `click`, `type: [selector, text]`, `press`, `hover`, `wait`, `waitFor`, `scroll` (the element to the top of its scroll box), `seed` (a `state(now)` the lab takes in the middle of a step, after a real press).
 

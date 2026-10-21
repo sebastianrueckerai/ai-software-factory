@@ -103,7 +103,12 @@ async function record(browser, name, commits) {
   page.on("response", (r) => {
     if (r.status() >= 400 && r.url().startsWith(BASE)) problem ??= `${r.request().method()} ${r.url()} answered ${r.status()}`;
   });
-  const check = () => { if (problem) throw new Error(problem); };
+  // a failed chat turn (a lab gateway with no reply left) comes as a 200 stream carrying an error row
+  const check = async () => {
+    const row = page.locator("#chat-log .chat-error").first();
+    if (!problem && await row.count()) problem = `unscripted chat turn: ${(await row.innerText()).trim()}`;
+    if (problem) throw new Error(problem);
+  };
   const marks = [];
   const pngs = [];
   const mouse = { x: 0, y: 0 };
@@ -115,13 +120,13 @@ async function record(browser, name, commits) {
       n = i + 1;
       marks.push({ index: n, atMs: Date.now() - t0 });
       if (!scene.page) await seed(page, step, new Date());
-      check();
+      await check();
       for (const action of step.actions) {
         await run(page, action, mouse);
-        check();
+        await check();
       }
       await sleep(step.hold);
-      check();
+      await check();
       const png = path.join(OUT, `${name}-${n}.png`);
       pngs.push(png);
       await page.screenshot({ path: png });
