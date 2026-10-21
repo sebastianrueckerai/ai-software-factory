@@ -13,6 +13,8 @@ A scene module. `state(now)` returns the lab's scene JSON, or null for no seed. 
       steps: [{ state: (now) => state.scene(now, { tasks: [...] }), actions: [{ goto: "/" }], hold: 1500 }],
     };
 
+A diagram scene sets `page: "diagrams/loop.html"`: the recorder opens that file under `demo/` instead of the lab, posts no state and draws no cursor, and each step's `{ press: "ArrowRight" }` reveals the page's next part (`ui.reveal(n)`). The four pages in `demo/diagrams/` share `diagram.css`, the console's dark tokens, and `diagram.js`, the reveal: a `[data-step]` part shows once the page's step reaches it and hides again from its `data-until`.
+
 Sidecar clock: `atMs` and `durationMs` count from the creation of the recording context, which is the video's time zero (measured: the board is on screen within about half a second of it). `durationMs` is the script's span; The mp4 is cut to `durationMs`; the webm keeps its static tail (`context.close()` takes a variable time), and `videoMs` is its measured length.
 
 Tests: `node --test demo/test/*.test.js`.

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Five planes in a loop</title>
+<link rel="stylesheet" href="diagram.css">
+<style>
+  .plane { top: 240px; width: 256px; height: 270px; padding: 18px; }
+  .plane ul { font-size: 18px; }
+  .pods { position: absolute; left: 18px; bottom: 20px; display: flex; gap: 10px; }
+  .pods i { display: grid; place-items: center; width: 46px; height: 34px; border: 1px dashed var(--line-strong); }
+  .telemetry { left: 640px; top: 640px; width: 320px; text-align: center; background: var(--bg); }
+  .telemetry h2 { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<h1>Five planes in a loop</h1>
+
+<svg class="wires" viewBox="0 0 1600 900" aria-hidden="true">
+  <defs><marker id="tip" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+    <path class="wire-tip" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+  <path data-step="2" class="wire" d="M322 375 H360" marker-end="url(#tip)"/>
+  <path data-step="3" class="wire" d="M628 375 H666" marker-end="url(#tip)"/>
+  <path data-step="4" class="wire" d="M934 375 H972" marker-end="url(#tip)"/>
+  <path data-step="5" class="wire" d="M1240 375 H1278" marker-end="url(#tip)"/>
+  <path data-step="6" class="wire" d="M1412 518 V690 H188 V520" marker-end="url(#tip)"/>
+</svg>
+
+<section class="panel plane" data-step="1" style="left:60px">
+  <span class="n">01</span>
+  <h2>Signals</h2>
+  <ul><li>issues</li><li>alerts</li><li>telemetry</li></ul>
+</section>
+
+<section class="panel plane" data-step="2" style="left:366px">
+  <span class="n">02</span>
+  <h2>Control plane</h2>
+  <ul><li>task state</li><li>scheduler</li><li>policy</li><li>approvals</li><li>model choice</li><li>cost and audit</li></ul>
+</section>
+
+<section class="panel plane" data-step="3" style="left:672px">
+  <span class="n">03</span>
+  <h2>Agent workers in sandboxes</h2>
+  <ul><li>ephemeral workspace</li><li>constrained network</li><li>temporary credentials</li></ul>
+  <div class="pods"><i><b class="live"></b></i><i><b class="live"></b></i><i><b class="live"></b></i></div>
+</section>
+
+<section class="panel plane" data-step="4" style="left:978px">
+  <span class="n">04</span>
+  <h2>Verification</h2>
+  <ul><li>tests</li><li>security</li><li>stronger-model review</li><li>policy evaluation</li></ul>
+</section>
+
+<section class="panel plane" data-step="5" style="left:1284px">
+  <span class="n">05</span>
+  <h2>Merge and deploy</h2>
+  <ul><li>pull requests</li><li>GitOps</li></ul>
+</section>
+
+<section class="panel telemetry" data-step="6">
+  <h2>Telemetry</h2>
+  <p class="muted">feeds back into signals</p>
+</section>
+
+<script src="diagram.js"></script>
+</body>
+</html>

@@ -49,4 +49,6 @@ module.exports = {
   park: "#needs-you .cards",
   // idle is the same spot in In progress, on a board where nothing runs
   idle: '#board .column[aria-labelledby="col-2"] .cards',
+  // reveal is a diagram page's steps: one ArrowRight per part, the last holding on the full diagram
+  reveal: (parts) => Array.from({ length: parts }, (_, i) => ({ actions: [{ press: "ArrowRight" }], hold: i === parts - 1 ? 2500 : 1800 })),
 };

@@ -1,6 +1,7 @@
 const { execFileSync } = require("node:child_process");
 const fs = require("node:fs");
 const path = require("node:path");
+const { pathToFileURL } = require("node:url");
 const { chromium } = require("playwright");
 
 const BASE = process.env.BASE;
@@ -13,8 +14,15 @@ const VIEWPORTS = {
 const REDRAW_MS = 1200;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const [cookieName, cookieValue] = fs.readFileSync(path.join(LAB_DIR, "cookie.txt"), "utf8").trim().split(/=(.*)/s);
-const cookie = `${cookieName}=${cookieValue}`;
+// lab is the console lab's login cookie, read once a scene of the console needs it: a diagram scene runs without the lab
+let labCookie;
+function lab() {
+  if (!labCookie) {
+    const [name, value] = fs.readFileSync(path.join(LAB_DIR, "cookie.txt"), "utf8").trim().split(/=(.*)/s);
+    labCookie = { name, value };
+  }
+  return labCookie;
+}
 
 const ring = () => {
   const el = document.createElement("div");
@@ -35,7 +43,7 @@ async function seed(page, step, now) {
   const body = step.state(now);
   if (body === null) return;
   const res = await fetch(BASE + "/lab/scene", {
-    method: "POST", headers: { cookie, "content-type": "application/json" }, body: JSON.stringify(body),
+    method: "POST", headers: { cookie: `${lab().name}=${lab().value}`, "content-type": "application/json" }, body: JSON.stringify(body),
   });
   if (res.status !== 204) throw new Error(`seed answered ${res.status}: ${(await res.text()).trim()}`);
   if (page.url() !== "about:blank") await sleep(REDRAW_MS);
@@ -82,11 +90,13 @@ async function record(browser, name, commits) {
     viewport, deviceScaleFactor: scale, recordVideo: { dir: tmp, size: viewport }, colorScheme: scene.theme,
   });
   const t0 = Date.now(); // the video clock starts with the context
-  await context.addCookies([{
-    name: cookieName, value: cookieValue, domain: new URL(BASE).hostname, path: "/", secure: true, httpOnly: true, sameSite: "Lax",
-  }]);
-  await context.addInitScript((theme) => localStorage.setItem("theme", theme), scene.theme);
-  await context.addInitScript(ring);
+  if (!scene.page) {
+    await context.addCookies([{
+      name: lab().name, value: lab().value, domain: new URL(BASE).hostname, path: "/", secure: true, httpOnly: true, sameSite: "Lax",
+    }]);
+    await context.addInitScript((theme) => localStorage.setItem("theme", theme), scene.theme);
+    await context.addInitScript(ring);
+  }
   const page = await context.newPage();
   let problem = null;
   page.on("pageerror", (e) => { problem ??= `page error: ${e.message}`; });
@@ -100,10 +110,11 @@ async function record(browser, name, commits) {
   let n = 0;
   let failure = null;
   try {
+    if (scene.page) await page.goto(pathToFileURL(path.join(__dirname, scene.page)).href, { waitUntil: "load" });
     for (const [i, step] of scene.steps.entries()) {
       n = i + 1;
       marks.push({ index: n, atMs: Date.now() - t0 });
-      await seed(page, step, new Date());
+      if (!scene.page) await seed(page, step, new Date());
       check();
       for (const action of step.actions) {
         await run(page, action, mouse);

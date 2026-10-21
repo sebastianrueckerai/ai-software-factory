@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The escalation ladder</title>
+<link rel="stylesheet" href="diagram.css">
+<style>
+  .rail { position: absolute; top: 170px; width: 4px; height: 710px; background: var(--line-strong); }
+  .rung { left: 74px; width: 1452px; height: 104px; padding: 0 28px; display: grid; grid-template-columns: 56px 330px 1fr; align-items: center; }
+  .rung .n { font-size: 16px; }
+  .rung h2 { margin: 0; }
+  .rung .gates { margin-top: 4px; }
+</style>
+</head>
+<body>
+<h1>The escalation ladder</h1>
+
+<div class="rail" style="left:70px"></div>
+<div class="rail" style="left:1526px"></div>
+
+<svg class="wires" viewBox="0 0 1600 900" aria-hidden="true">
+  <defs><marker id="tip" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+    <path class="wire-tip" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+  <path data-step="2" class="wire" d="M130 744 V718" marker-end="url(#tip)"/>
+  <path data-step="3" class="wire" d="M130 610 V584" marker-end="url(#tip)"/>
+  <path data-step="4" class="wire" d="M130 476 V450" marker-end="url(#tip)"/>
+  <path data-step="5" class="wire" d="M130 342 V316" marker-end="url(#tip)"/>
+</svg>
+
+<section class="panel rung" data-step="1" style="top:746px">
+  <span class="n">1</span>
+  <h2>Self-correction</h2>
+  <p class="muted">The agent runs the tests, reads the failure and corrects its own work, inside its session.</p>
+</section>
+
+<section class="panel rung" data-step="2" style="top:612px">
+  <span class="n">2</span>
+  <h2>The stronger model</h2>
+  <div>
+    <p class="muted">Code moves the card to the strong rung: at the cheap cap, when a session is stuck, or after returns from the gates.</p>
+    <p class="gates">cheap → strong</p>
+  </div>
+</section>
+
+<section class="panel rung" data-step="3" style="top:478px">
+  <span class="n">3</span>
+  <h2>The check-in</h2>
+  <div>
+    <p class="muted">A detector trips, a session ends without a push, or a gate returns findings: a strong model with read tools looks.</p>
+    <p class="gates">continue · message · handover · human</p>
+  </div>
+</section>
+
+<section class="panel rung" data-step="4" style="top:344px">
+  <span class="n">4</span>
+  <h2>A fresh session</h2>
+  <div>
+    <p class="muted">Starts from the check-in's handover note. The earlier transcripts lie in its workspace to search.</p>
+    <p class="gates">handover</p>
+  </div>
+</section>
+
+<section class="panel rung need" data-step="5" style="top:210px">
+  <span class="n">5</span>
+  <h2>The human</h2>
+  <div>
+    <p class="muted">Gets a prepared question: what happened, what was tried, what the check-in found, the options.</p>
+    <p class="gates acts">answer · fund · grant · close</p>
+  </div>
+</section>
+
+<script src="diagram.js"></script>
+</body>
+</html>
