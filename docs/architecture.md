@@ -2420,6 +2420,30 @@ at its boundary. It drops invalid choices and keeps the question. The card
 renders one button per choice above the text box, posting the same answer
 endpoint, and every question records a `question_asked` event.
 
+**Every human card asks** (Sebastian, 2026-10-20). A human card is filed
+from its five-part question by one of two filers, `EscalateToHuman` and
+`fileHumanTask`, and no other: alerts on a project without agents or with
+the capacity label, a refused roll, a lost runner, a rejected config
+commit, the month cap, a routine that files to a person, an issue filed
+into the human lane, and a queued card moved there because its project
+runs no agents each have a template in `question.go`. The ask is the
+card's title, one line of at most 200 bytes, its tail kept whole when
+the variable part is cut. The intake row and the `question_asked` row
+carry all five parts, so the board's face shows every human card's ask
+once, as its headline, with its buttons, the drawer the why, the info and
+the recommendation with its named source, and the inbox row the ask with
+its why. "End the card" closes an agent card from the board, the inbox
+and the chat alike, without a note: a posted note would answer the
+question if the close failed. One route
+answers a human card from the board, the inbox and the chat's `answer`
+tool. A chat or agent choice carries the value `say:` plus its label, so
+no label can fire a factory control value such as park, close or
+dismiss. "Have the factory do it" is a choice on a person's issue and on
+a routine's card where the project runs agents. The chat's `escalate`
+tool requires all five parts and refuses an ask over 200 bytes, a line
+break, a missing recommendation, fewer than 2 or more than 5 choices,
+and a repeated choice.
+
 **Where the project agent runs** (Ruling 252). Two shapes were weighed:
 
 | | Shape | Cost | Fit |
@@ -2882,7 +2906,6 @@ caused: events `via: chat` wake nobody.
 | An ask is filed | `question_asked`, from any source but the chat itself | autonomous and full auto |
 | A watched card moves | a state change of a card a thread watches | assisted and above |
 | A timer comes due | the thread's one-shot wake row | assisted and above |
-| The heartbeat | an hour while work sits open, a day while the board is idle | assisted and above |
 
 The caps limit wake turns and drop nothing. Every event still lands in
 the log and pokes the inbox, whatever the caps do, and the Waker moves
@@ -2941,12 +2964,13 @@ interval fits, and a turn whose reason ended writes none, so a chain
 ends on its own and a forgotten timer cannot run forever. A watch and a
 bound timer die with their card, however the card ended. A project holds
 at most 16 watches and timers together, and the tool that crosses the
-cap names the count back. The heartbeat is the failsafe: a wake turn
-that never ran leaves the open work for it to see. It reads the same
-snapshot the agent reads (Console.PulseState beside the pulse's own
-view), work open when a card works or waits on the provider, and it
-skips a board that waits on a human, since the needs-you card already
-has the member's eye.
+cap names the count back. No wake fires on the clock: an idle board
+wakes nobody, and work starts from an ask, a watched card, a timer or a
+person (Sebastian, 2026-10-20). The hourly and daily heartbeat of the
+main-agent concept is gone with the prompt line that told the agent to
+escalate when nothing on the roadmap was ready; together they filed a
+needs-you card on every idle day, #1184 among them, that asked a person
+what to do.
 
 With the new tools the chat has 29 reads and 38 writes. The inbox volume
 filter is a contingency, unbuilt. Messengers stay outbox only. The agent
@@ -4663,7 +4687,13 @@ app's did, and an alert in `platform` or `forgejo` files an issue in the
 human lane on the infra repository, which has `agents: none`. The issue
 title names the service. A human-lane alert's verdict follows the close: a
 writer's close is `real`, and the label `noise` on the issue at the close
-makes it `noise`. Proven live in the Stage 9 exit test: three deletions of
+makes it `noise`. A cleared alert closes its human card when nobody
+touched it (Sebastian, 2026-10-20): no comment by a person, no answer or
+park, no `noise` label. The minute pass beside the SigNoz sweep turns the
+row `unjudged` by factoryd, ends the card `closed`, and comments and
+closes the issue. An alert that fired again after it cleared, or a card a
+person acted on, keeps waiting for its verdict. The agent's `alerts`
+tool names such a row "cleared at …, verdict pending". Proven live in the Stage 9 exit test: three deletions of
 the factoryd pod filed #193 and started an agent task, a platform Job past
 its deadline filed infra issue #5 in the human lane, and the gateway's 5xx
 rate filed #210 while blocked keys made it answer 502. The demo app's own rules are a 5xx rate above 5 % over
