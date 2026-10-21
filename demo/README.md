@@ -22,3 +22,5 @@ Sidecar clock: `atMs` and `durationMs` count from the creation of the recording 
 The results page, rebuilt at the end of every run: [index.html](index.html) (`node demo/build-index.js`).
 
 Tests: `node --test demo/test/*.test.js`.
+
+The handover for a follow-up session, with the requirements, the rulings, the open items and the research, is in [handover/README.md](handover/README.md).
