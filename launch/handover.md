@@ -1,70 +1,61 @@
 # Launch: handover for the next session
 
-Written 21 October 2026 at the end of the session that wrote the concept. Read this, then [concept.md](concept.md), then [the demo handover](../demo/handover/README.md). The three sweeps under [research/](research/) are the evidence behind the concept. Read them when a claim needs its source.
+Written 21 October 2026 at the end of the second launch session, the one that wrote the script, the issue scene, the page skeleton, the two procedural clips and group H. Read this, then [concept.md](concept.md), then [script.md](script.md), then [the demo handover](../demo/handover/README.md). The three sweeps under [research/](research/) are the evidence behind the concept.
 
 ## The prompt to paste
 
 ```
 Continue the launch work for the AI software factory: one 90-second film and a landing page, for hiring readers and investors.
 
-Read first, in this order: launch/handover.md, launch/concept.md, demo/handover/README.md. Read the sweeps under launch/research/ when you need a claim's source.
+Read first, in this order: launch/handover.md, launch/concept.md, launch/script.md, demo/handover/README.md.
 
-My answers to the eight decisions of concept.md section 10. Where I left one blank, take the default the concept names and say so in your report.
-1. Narration:
-2. The fal cap:
-3. The three cards of the film's tail:
-4. The hero line:
-5. The perimeter claim:
-6. The comparison table's names:
-7. The "known limits" block:
-8. Prompts as data:
+My answer on the spine of script.md section 4 (approve, or name the beats to change):
 
-Then do, in this order, each as its own round with a result I can look at (a page, frames, a video), not a narration of how you worked:
-1. The script, launch/script.md, by the method of concept section 8: the story graph with named nodes, every beat with its entry and exit nodes, the fold pass, the spine with timings and transitions. One card creation on screen. Stop and show me the spine before recording anything.
-2. The issue beat scene in demo/scenes/: an issue with a repro block filed on the scene's repository, the card within a minute, the reproduction gate red at base and green at head, the merge. Record it with demo/run.sh and add it to the results page.
-3. The page skeleton, launch/site/index.html: static, no build step, the sections of concept section 6, an empty film slot.
-4. The procedural trial: HyperFrames on demo/diagrams/loop.html, 30 seconds, rendered locally with a sidecar, judged against filmed scene 29. If it wins, the three layers diagram next.
-5. Group H by demo/generated/PLAN.md, only once the cap is set.
+My answers to the eight decisions of concept.md section 10, where I want a default changed:
+
+Then do, in this order, each as its own round with a result I can look at:
+1. The spine scene and the two branch scenes of script.md section 6, recorded with demo/run.sh and on the results page.
+2. The cut list launch/cut.json and the film launch/film.mp4 from one command, with the titles of the script as procedural overlays. Show me the film.
+3. The page's film slot filled, the twelve clip slots cut from the spine, the diagram slots from the procedural clips' frames.
+4. The public steps of concept section 9 phase 5: the secret scan of the three histories, the README, the pitch's four lines, the counts recounted.
 
 Rules: work in a git worktree, commit to master, push to origin and forgejo, and fetch forgejo first because the factory's own document writer pushes there. Every generated image or clip gets its sidecar JSON. No spend past a cap without asking. Never print a key. terraform.tfstate never enters a commit.
 ```
 
 ## What exists
 
-- [concept.md](concept.md): the two readers, tier 1 (twelve points with their bang, proof and material), tier 2 by layer with the market verdicts, what we do not claim, the hero drafts, the surfaces, the three video routes, the script method with the folded spine, the process, the eight decisions, the next steps.
-- [research/docs-sweep.md](research/docs-sweep.md): 25 candidate points from the design documents, what is not built, five quotable sentences, where the docs say we are weak.
-- [research/code-sweep.md](research/code-sweep.md): 30 built features with paths, the 64 chat tools, the nine stage kinds and the floor, the ladder and the autonomy levels as the code has them, identity and sandbox facts, the counts of 21 October, fourteen claims the code does not back, the re-seed sequence.
-- [research/market-sweep.md](research/market-sweep.md): twelve differentiators with verdicts and counts from the 148-tool matrix, what to concede, the competitors' positioning lines, the five names for the comparison table with their cells, the steal lists, wording hazards.
-- The scene bank: 33 scenes, the lab, the recorder, the results page. All in [the demo handover](../demo/handover/README.md), with its pitfalls and prerequisites.
+- [concept.md](concept.md): the readers, the two tiers, what we do not claim, the hero drafts, the surfaces with their state, the three routes with their state, the script method, the process, the eight decisions.
+- [script.md](script.md): the story graph with 19 named nodes, 18 beats with entry and exit nodes, the fold pass, the 90-second spine with timings and transitions, the six 20-second clips as sub-paths, what the recording needs. The film's card is the calendar, #105, and its child the week view, #110.
+- [site/index.html](site/index.html): the landing page skeleton, one static file, every section of concept section 6, the film slot empty, the clip and diagram slots captioned with their sources. The comparison table has the five names plus Factory, and the known limits block sits under it.
+- Scene 33, [demo/scenes/33-issue-to-fix.js](../demo/scenes/33-issue-to-fix.js), recorded: a developer's issue with a repro block becomes card #126 within a minute, the agent reproduces and fixes the fault, the reproduction gate passes with `base_exit` 1 and `exit` 0, the fix merges. The story gained card #126 and `state.reproduction`.
+- Two procedural clips under [demo/video/](../demo/video/): the loop (30 s) and the three layers (24 s), rendered by `node demo/video/render.js <name>` with HyperFrames, each proven identical over two renders. The critic picked the loop over filmed scene 29: [demo/video/loop/judge/notes.md](../demo/video/loop/judge/notes.md).
+- Group H under [demo/generated/](../demo/generated/): 21 stills, four contact sheets, four critiques, six takes, every output with its sidecar. [notes.md](../demo/generated/notes.md) has the picks and the cost, about $2.88 of the $10 cap.
+- The results page, [demo/index.html](../demo/index.html), now with group P (procedural) and group H (generated) beside the bank.
 
-## What Sebastian said this session
+## The decisions, as taken
 
-In order. His decisions are marked.
+Sebastian left all eight blank, so the session took the concept's defaults: titles on screen, the $10 cap, the three layers as the tail's cards, the perimeter claim reworded, the five names plus Factory, the known limits block, prompts worded precisely. Decision 4 names no default, so draft 1 of concept section 5 is the hero line on the page and in beat B0. Any of them can still change; the page and the script carry them.
 
-- The video is for a landing page with text and images, as a portfolio for hiring and a pitch for investors. People watch one video, so plan one main film. The landing page may later move to GitHub or stand alone.
-- The bank's scenes show features one by one from the start. The film needs a script: the best moments condensed, one after the other, cuts only where needed, the coolest and most foundational first.
-- His first list of points: three layers, process in configurable YAML (bring your own process and prompts), every task on the board but one chat, the AI escalates only when stuck or out of money, no stalling sessions, the sandbox instead of guardrail snake oil, at full auto the human still holds spending and the roadmap.
-- Value first, then difference: show why the factory is good, then how it beats the competition. **Decision.**
-- Try both video routes, model-generated and procedural from code. **Decision.**
-- Build a landing page in tandem with the concept. **Decision.**
-- "Did you just copy my ideas?" He wanted the docs, the code and the market research mined for the strongest points, not his list organised. The three sweeps followed.
-- His most important point was missing: total transparency through the board, the chat as the only tool to steer, no writing of individual cards. It is now tier 1 point 1. **Decision.**
-- Point 5 must show an issue landing on Forgejo and the process starting: agents fix clear, reproducible errors on their own. **Decision.**
-- The three layers are a point of their own and the frame of the difference: the factory (sandboxes, workflows), the process (all YAML, bring your own), the prompts (the writing guide, changeable), and the harness swaps on top. **Decision.** The code narrows two words: the factory's guides are compiled in, and the harness is one adapter. Both in concept section 4.
-- "I like the direction." Then: fold the film's segments so one process is shown once and the film keeps going along the flow, rewinds to branch, no dead time, no repetition. The script method in concept section 8 is the answer. **Decision: the film follows one card's life.**
+Two cards the defaults call for, for Sebastian to file (intake is closed to agents):
+
+- **A self-hosted model option behind the gateway.** Decision 5: the pitch sells code that stays inside the perimeter, and today every session sends diffs to hosted model APIs. One self-hosted model configured as a gateway route makes "the model is your choice" true. Acceptance: a project can name a self-hosted route for its small class, and a session runs on it end to end.
+- **The factory's guides move into the configuration tree.** Decision 8: the writing guide and the other guides are compiled into the binaries, so "bring your own prompts" needs a footnote. Acceptance: the guides live beside the process files, a project may override each, and the binaries read them from there.
 
 ## Open
 
-- The eight decisions of concept section 10. None answered yet.
-- The three factory cards in [factory-bugs.md](../demo/handover/factory-bugs.md), plus a card for a self-hosted model option (decision 5) and a card that moves the factory's guides into the config tree (decision 8). Sebastian files them. Intake is closed to agents.
-- The pitch, [docs/pitch.md](../docs/pitch.md), carries four lines to change before anyone reads it again: the perimeter claim, "the only way", the stale counts, Conductor. Concept section 4 has the replacements. Sebastian's text, so he changes it or says go.
-- No secret scan of the three repositories' histories yet.
+- The spine. Nothing of it records before Sebastian approves [script.md](script.md) section 4. Two beats claim less than the concept's bangs, said under the beats table: the criteria's kinds (B2) and the two terminals (B12) are procedural overlays if he wants them.
+- The pitch, [docs/pitch.md](../docs/pitch.md), still carries the four lines concept section 4 names. The page applies the replacements; the pitch is Sebastian's text.
+- The secret scan of the three repositories' histories has not run.
+- The three factory cards of [factory-bugs.md](../demo/handover/factory-bugs.md) are not filed.
 
 ## Pitfalls of this repository and this work
 
-- The remotes here are `origin` (GitHub) and `forgejo`. The sibling repositories name them the other way round. A push to a remote named `github` fails here.
-- The factory's own document writer commits to Forgejo's master as `factory-docs` (a one-line roadmap change landed during this session). Fetch forgejo before pushing. A merge commit keeps both remotes fast-forward.
-- Claude Code's worktree hook refuses compound shell commands that mention git inside a worktree. Run git with `-C <path>` from the main checkout, or split the commands. Use the Write tool for long files.
-- The IDE's spell checker flags every proper noun in a written file. Ignore it.
-- The lab, the recorder, Node, Playwright and ffmpeg: see the demo handover's pitfalls. A reboot wipes Playwright under `/tmp`.
+- The remotes here are `origin` (GitHub) and `forgejo`. The sibling repositories name them the other way round.
+- The factory's own document writer commits to Forgejo's master as `factory-docs`. Fetch forgejo before pushing.
+- Claude Code's worktree hook refuses shell variables, heredocs, loops and compound commands inside a worktree, and writes outside it. Plain commands with literal paths chained with `&&` pass. Use the Write tool for files.
+- A recording fails while a HyperFrames render runs beside it: the render's four Chrome workers starve the recorder, and Playwright reports an element "not stable" or "not attached". Record alone.
+- A click on the drawer's open tab reloads the drawer, and the next action lands on a replaced element. A queued or done card opens on Overview, a running card on Session: click a tab only to change it.
+- fal's `flux-3` has `aspect_ratio`, `resolution` and `output_format` and no field for the number of images or a seed. `recraft` flash has `image_size` only. One call makes one image. `tools/img.py gen` now uploads the still and uses fal's queue for the video models.
+- HyperFrames pins its version in `render.js`. Its lint warns about Studio's editing model and tween boundaries; neither matters for a render.
+- The IDE's spell checker flags every proper noun. Ignore it.
 - `terraform.tfstate` sits untracked in this repository's root. Never add it.
