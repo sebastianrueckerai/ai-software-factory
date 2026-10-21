@@ -74,6 +74,18 @@ h3 { font-size: 18px; font-weight: 600; line-height: 1.3; margin: 0 0 8px; }
 .diagram .ft { font: 13.5px var(--font-mono); fill: var(--text); }
 .diagram .fs { font: 11.5px var(--font-mono); fill: var(--text-faint); }
 
+.hero-annot { display: block; width: 100%; height: auto; font-family: var(--font-ui); }
+.hero-annot .frame { fill: none; stroke: var(--line-strong); }
+.hero-annot .ct { font-size: 30px; font-weight: 600; fill: var(--text); }
+.hero-annot .cs { font-size: 22px; fill: var(--text-muted); }
+.hero-annot .br { fill: none; stroke-width: 3; }
+.hero-annot .cyan .br { stroke: var(--accent); }
+.hero-annot .amber .br { stroke: var(--need); }
+.hero-annot .hit { fill: none; stroke: var(--accent); stroke-width: 3; }
+.hero-plain, .hero-list { display: none; }
+.hero-list { margin: 14px 0 0; padding-left: 22px; color: var(--text-muted); }
+.hero-list b { color: var(--text); }
+
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .three { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
 .block { background: var(--bg-panel); border: 1px solid var(--line); padding: 18px 20px; display: flex; flex-direction: column; }
@@ -129,6 +141,8 @@ footer { padding: 48px 0 64px; }
 }
 @media (max-width: 640px) {
   .grid, .cards, .three { grid-template-columns: 1fr; }
+  .hero-annot { display: none; }
+  .hero-plain, .hero-list { display: block; }
   body { font-size: 16px; }
   section { padding-top: 44px; }
   .wrap, nav ul { padding-left: 16px; padding-right: 16px; }
@@ -153,24 +167,30 @@ footer { padding: 48px 0 64px; }
 <main class="wrap">
 
 <section id="hero" aria-labelledby="hero-h">
-<p class="eyebrow">Source available · Self-hosted · Sandboxed agents</p>
-<h1 id="hero-h">See everything on the kanban. Feed it a roadmap. Change anything from the chat.</h1>
-<p class="lede">Write a roadmap. The factory turns it into cards and builds them. Each card runs in its own sandbox on your own servers. Nothing merges until the checks pass.</p>
-<p class="cap">Run it on your servers. Use hosted models or your own.</p>
+<p class="eyebrow">AI software factory · Self-hosted · Source available</p>
+<h1 id="hero-h">The worst an agent can do is wreck its own sandbox.</h1>
+<p class="lede">Write a roadmap. Agents build it card by card, each in its own sandbox on your servers. Nothing merges until the checks pass.</p>
+<p class="cap">Use hosted models or your own.</p>
 <div class="links">
 <a class="btn primary" href="#loop">How it works</a>
 <a class="btn" href="https://github.com/sebastianrueckerai/ai-software-factory">Source and setup</a>
 </div>
 <figure>
-<div class="media"><img src="assets/01-chat-to-card-4.png" alt="The console: the chat with a typed sentence and the card proposal, the board behind it." width="1600" height="900"></div>
+<svg class="hero-annot" viewBox="0 0 1600 1032" role="img" aria-labelledby="hero-shot-t hero-shot-d"><title id="hero-shot-t">The console on a busy afternoon</title><desc id="hero-shot-d">The chat on the left, the board on the right. Callouts: change anything from one chat, where the agent proposes and you press Do it. See what is stuck and what waits on you, in the amber Needs you column with a question, a budget stop and a merge approval. Decide what runs next, in the Queued column with priorities and a backlog. Five cards build in In progress, seven are done.</desc><image href="assets/34-busy-board-3.png" x="0" y="132" width="1600" height="900"/><rect class="frame" x="0.5" y="132.5" width="1599" height="899"/><g class="call cyan"><text class="ct" x="16" y="44">Change anything from one chat</text><text class="cs" x="16" y="78">The agent proposes. You press Do it.</text><path class="br" d="M12 122 V108 H635 V122"/></g><g class="call amber"><text class="ct" x="649" y="44">See what is stuck</text><text class="cs" x="649" y="78">and what waits on you</text><path class="br" d="M645 122 V108 H950 V122"/></g><g class="call cyan"><text class="ct" x="960" y="44">Decide what runs next</text><text class="cs" x="960" y="78">Priorities and a backlog</text><path class="br" d="M956 122 V108 H1159 V122"/></g><rect class="hit" x="108" y="506" width="67" height="38" rx="3"/><rect class="hit" x="108" y="752" width="67" height="38" rx="3"/></svg>
+<div class="media hero-plain"><img src="assets/34-busy-board-3.png" alt="The console on a busy afternoon: the chat with two card proposals on the left, the board on the right with every column full." width="1600" height="900"></div>
+<ol class="hero-list" aria-hidden="true">
+<li><b>Change anything from one chat.</b> The agent proposes. You press Do it.</li>
+<li><b>See what is stuck</b> and what waits on you, in the amber column.</li>
+<li><b>Decide what runs next:</b> priorities and a backlog.</li>
+</ol>
 <figcaption class="cap">Recorded on the real console. The project is a demo seeded for the film.</figcaption>
 </figure>
-<div class="band"><p>Built for teams that cannot sign off a hosted coding agent: regulated industries, and companies where security and compliance decide the purchase.</p></div>
+<div class="band"><p>Built for teams that cannot sign off a hosted coding agent: regulated industries, and companies where security and compliance decide the tool choice.</p></div>
 </section>
 
 <section id="loop" aria-labelledby="loop-h">
 <h2 id="loop-h">One card's life. You appear twice.</h2>
-<p class="lede">You confirm the spec and you hold the money. The machine does the rest. Three things make that safe to say.</p>
+<p class="lede">You confirm the spec and you hold the money. The machine does the rest. Three things make that work.</p>
 <div class="scroll"><svg class="diagram" viewBox="0 0 1140 520" role="img" aria-labelledby="loop-t loop-d"><title id="loop-t">One card runs the loop</title><desc id="loop-d">Roadmap, spec, cards, sandbox, pull request, gates, merge, live, telemetry, and back to cards. The human appears at the spec, at a budget cap and at the merge rule. The agent is walled into the sandbox.</desc>
 <defs><marker id="tip" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="tip" d="M0 0 L10 5 L0 10 z"/></marker></defs>
 <path class="wire" d="M216 112.0 H246" marker-end="url(#tip)"/>
@@ -304,8 +324,8 @@ footer { padding: 48px 0 64px; }
 <div class="cards">
 <article class="card">
 <div class="media"><img src="assets/11-steer-4.png" alt="A line typed into the chat reaches a running card: the session transcript shows the message arrive." width="1600" height="900" loading="lazy"></div>
-<h3>One chat for everything</h3>
-<p>Say what you want. The agent proposes the card, you press Do it. The same chat reaches a running agent.</p>
+<h3>Talk to an agent while it works</h3>
+<p>A line typed into the chat reaches the running session. The agent's next turn takes it, and the gates still judge the result.</p>
 <p class="more"><a href="../../docs/evidence.md#1-the-kanban-fills-itself-the-chat-drives-it">The evidence</a></p>
 </article>
 <article class="card">
@@ -342,8 +362,8 @@ footer { padding: 48px 0 64px; }
 </section>
 
 <section id="sandbox" aria-labelledby="sandbox-h">
-<h2 id="sandbox-h">The worst an agent can do is wreck its own sandbox.</h2>
-<p class="lede">That holds while it works. What it writes still has to pass the gates.</p>
+<h2 id="sandbox-h">What the agent can reach</h2>
+<p class="lede">Its own sandbox and a few named hosts, nothing else. What it writes still has to pass the gates.</p>
 <div class="scroll"><svg class="diagram" viewBox="0 0 1140 440" role="img" aria-labelledby="sb-t sb-d"><title id="sb-t">What the agent can reach</title><desc id="sb-d">The agent runs in a throwaway pod. The internet, the host, the cloud metadata address and a push token are blocked. The model gateway, the repository for reading and a few named hosts are reached only through the factory's tools. When the card is done, the pod is deleted, then the factory mints a write token, pushes once and revokes it.</desc>
 <defs><marker id="tip" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="tip" d="M0 0 L10 5 L0 10 z"/></marker></defs>
 <rect class="wall" x="420" y="30" width="300" height="256"/>
@@ -701,7 +721,7 @@ footer { padding: 48px 0 64px; }
 <p><a href="mailto:mail@sebastianruecker.com">mail@sebastianruecker.com</a></p>
 <p class="cap">Hamburg</p>
 <p class="cap">Licence: Business Source License 1.1. Documentation: the architecture, the threat model, the evidence page, the spec-driven process.</p>
-<p class="cap">Built for teams that cannot sign off a hosted coding agent: regulated industries, and companies where security and compliance decide the purchase.</p>
+<p class="cap">Built for teams that cannot sign off a hosted coding agent: regulated industries, and companies where security and compliance decide the tool choice.</p>
 </footer>
 </body>
 </html>

@@ -21,7 +21,7 @@ The factory becomes a portfolio project and an accelerator pitch. The thing to s
 
 ### The recorded bank
 
-34 scenes in `demo/out/` of the main checkout (`/home/womb/repos/ai-software-factory/demo/out`): per scene an mp4 cut to the script's span, the raw webm, a sidecar JSON (`name, title, story, group, theme, viewport, consoleCommit, designCommit, recordedAt, durationMs, videoMs, steps[].atMs`) and one PNG per step. 33 were recorded on 21 October 2026 on the console at commit aeefb58bea, 11.5 minutes in all, no scene failed. A second recording of scene 06 matched the first frame for frame; only the clock text differed. Scene 33, the issue beat, was recorded later the same day at console commit e90d1252 (37 seconds, 8 steps).
+35 scenes in `demo/out/` of the main checkout (`/home/womb/repos/ai-software-factory/demo/out`): per scene an mp4 cut to the script's span, the raw webm, a sidecar JSON (`name, title, story, group, theme, viewport, consoleCommit, designCommit, recordedAt, durationMs, videoMs, steps[].atMs`) and one PNG per step. 33 were recorded on 21 October 2026 on the console at commit aeefb58bea, 11.5 minutes in all, no scene failed. A second recording of scene 06 matched the first frame for frame; only the clock text differed. Scene 33, the issue beat, was recorded later the same day at console commit e90d1252 (37 seconds, 8 steps).
 
 Beside the bank, two procedural clips rendered from HTML under `demo/video/` (`p-loop`, `p-layers`, each with a sidecar and frames in `demo/out/`) and the generated clips of group H under `demo/generated/` (committed, with their sidecars). The results page shows all three.
 
@@ -31,7 +31,7 @@ Catalogue groups and files in [demo/scenes/](../scenes/):
 
 | Group | Scenes | What they show |
 |---|---|---|
-| A Intake | 01 chat to card, 02 a vague request measured, 03 too large so split, 04 a card from the board form, 05 chat to card on the phone | The chat's ask, choice buttons, the `new_card` proposal, Do it pressed for real, the card on the board |
+| A Intake | 01 chat to card, 02 a vague request measured, 03 too large so split, 04 a card from the board form, 05 chat to card on the phone, 34 a busy board (the landing page's hero, recorded 21 October at console commit 61b14e63ce) | The chat's ask, choice buttons, the `new_card` proposal, Do it pressed for real, the card on the board |
 | B Build | 06 card to PR, 07 the review rejects, 08 the supervisor steps in, 09 two in parallel, 10 the stronger model, 11 a steer | The drawer's gates table, session transcripts, review verdicts, the `small` to `big` class change, a steer pressed for real |
 | C Ship | 12 merge to done, 13 a bad merge | Merge and live in the Activity steps, the metrics deploys count moving, an alert minutes after a merge |
 | D Operate | 14 alert to fix, 15 a member's report, 16 the security routine, 17 the performance routine, 18 the settled inbox, 19 routines on the board, 33 an issue to a fix | The alert's stack trace on the card, routine runs on their cron, the inbox's night, a developer's issue with a repro block and the reproduction gate's base and head exits |
