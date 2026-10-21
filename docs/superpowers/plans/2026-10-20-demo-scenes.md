@@ -466,7 +466,7 @@ Each step's `state(now)` returns the full state. A scene with chat typing script
 ### Task 13: the whole bank and the push
 
 - [ ] Run: `demo/run.sh 2>&1 | tail -40`. Expected: every scene in `demo/scenes/` has an mp4 and a sidecar, exit 0.
-- [ ] Run it a second time into another directory (`OUT=/tmp/claude-1000/demo-out-2 demo/run.sh`) and compare one scene's step PNGs with the first run's by eye: the same states in the same order.
+- [ ] Copy one scene's step PNGs aside, run `demo/run.sh <that scene>` again and compare the two sets by eye: the same states in the same order.
 - [ ] Grep the sidecars and the scene sources for the factory's names: `grep -rn -i -E "sf/code|ai-software-factory|demo-app|linkshort" demo/scenes demo/lib demo/out/*.json`. Expected: no match.
 - [ ] Commit and push: `git push origin master && git push github master`.
 
