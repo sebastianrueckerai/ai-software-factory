@@ -62,15 +62,14 @@
 <section class="panel gate row2" data-step="6" style="left:445px">
   <span class="n">06</span>
   <h2>Merge</h2>
-  <p class="muted">The merge queue syncs the branch with main. factory-merge merges.</p>
-  <p class="human">a human approves</p>
+  <p class="muted">The project's merge rule: a human approves, or it merges on its own once the gates pass. factory-merge merges.</p>
   <p class="gates">approval · merge-queue · merge</p>
 </section>
 
 <section class="panel gate row2" data-step="7" style="left:830px">
   <span class="n">07</span>
   <h2>Deploy</h2>
-  <p class="muted">The chain runs the change live: staging first, production only if no alert fires.</p>
+  <p class="muted">The merge rolls staging. Promotion to production is its own step. Done means live.</p>
 </section>
 
 <section class="panel gate row2" data-step="8" style="left:1215px">

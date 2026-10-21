@@ -9,8 +9,9 @@
   .plane ul { font-size: 18px; }
   .pods { position: absolute; left: 18px; bottom: 20px; display: flex; gap: 10px; }
   .pods i { display: grid; place-items: center; width: 46px; height: 34px; border: 1px dashed var(--line-strong); }
-  .telemetry { left: 640px; top: 640px; width: 320px; text-align: center; background: var(--bg); }
-  .telemetry h2 { margin-bottom: 4px; }
+  .telemetry { position: absolute; left: 0; width: 1600px; top: 675px; margin: 0; font-size: 20px; text-align: center; }
+  .telemetry span { padding: 0 18px; background: var(--bg); color: var(--text-muted); }
+  .telemetry b { font-weight: 600; color: var(--text); }
 </style>
 </head>
 <body>
@@ -57,10 +58,7 @@
   <ul><li>pull requests</li><li>GitOps</li></ul>
 </section>
 
-<section class="panel telemetry" data-step="6">
-  <h2>Telemetry</h2>
-  <p class="muted">feeds back into signals</p>
-</section>
+<p class="telemetry" data-step="6"><span><b>telemetry</b> feeds back into signals</span></p>
 
 <script src="diagram.js"></script>
 </body>
