@@ -103,7 +103,7 @@ footer { padding: 48px 0 64px; }
 <main class="wrap">
 
 <section id="hero" aria-labelledby="hero-h">
-<h1 id="hero-h">You control everything via chat.</h1>
+<h1 id="hero-h">You run the factory from one chat. The kanban shows everything.</h1>
 <p class="lede">An open source AI software factory, built and run by one person. Say what you need in a chat; agents plan, build, test, review, ship and operate it in sandboxes on servers you control.</p>
 <div id="film" class="media" role="img" aria-label="The film slot">the film: 90 seconds, coming</div>
 <div class="links">
@@ -115,9 +115,9 @@ footer { padding: 48px 0 64px; }
 <section id="what-you-get" aria-labelledby="wyg-h">
 <h2 id="wyg-h">What you get</h2>
 <div class="grid">
-<article class="block"><span class="num">01</span><h3>You control everything via chat</h3><p>Every card, gate, session and euro is on the board. The chat is the only tool you need, and you never write a card: you say what you want, the factory proposes the card, you press Do it. The same chat talks to a running agent.</p><div class="media">clip: scenes 01, 04, 05, 11, 23</div></article>
+<article class="block"><span class="num">01</span><h3>You run the factory from one chat</h3><p>The kanban gives you the picture: every card, gate, session and euro. To change anything you chat: you say what you want, the factory proposes the card, you press Do it. You never write a card, and the same chat talks to a running agent.</p><div class="media">clip: scenes 01, 04, 05, 11, 23</div></article>
 <article class="block"><span class="num">02</span><h3>Say it, it ships</h3><p>The card becomes a sandbox, a pull request, a merge and a live deploy. No human in between.</p><div class="media">clip: scenes 06, 12</div></article>
-<article class="block"><span class="num">03</span><h3>It plans before it builds</h3><p>A vague request is measured. A big one is split into a plan whose criteria name their proofs before any code exists.</p><div class="media">clip: scenes 02, 03, 21, 30</div></article>
+<article class="block"><span class="num">03</span><h3>It plans before it builds</h3><p>A vague request is measured. A big one is split into a plan whose criteria name their proofs before any code exists. The builders never see the hold-out tests: no brief carries them, no sandbox holds them. One blind run, then the gate opens them, and a red one goes to an audit that names the defective side: the test, the code or the spec.</p><div class="media">clip: scenes 02, 03, 21, 30</div></article>
 <article class="block"><span class="num">04</span><h3>Nothing merges unproven</h3><p>Checks, policy, reproduction, review, audit and the criteria gate stand before every merge. Silence never passes a gate.</p><div class="media">clip: scenes 07, 10, 30</div></article>
 <article class="block"><span class="num">05</span><h3>An issue lands, the fix ships</h3><p>An issue filed on Forgejo with a way to reproduce becomes a card within a minute. The gate proves the fault at the base commit and the fix at the head. A clear, reproducible error gets fixed with no human.</p><div class="media">clip: a new beat scene, scenes 15, 30</div></article>
 <article class="block"><span class="num">06</span><h3>Live software feeds back</h3><p>An alert minutes after a merge files a fix card. Routines sweep security and performance on a clock.</p><div class="media">clip: scenes 13, 14, 16, 17, 19</div></article>
@@ -125,7 +125,7 @@ footer { padding: 48px 0 64px; }
 <article class="block"><span class="num">08</span><h3>No model call runs without its cost covered</h3><p>The gateway reserves the worst case of a model call before the call runs and refuses at the task, day, month and project caps. At a cap the factory stops and asks: fund or end.</p><div class="media">clip: scenes 20, 28</div></article>
 <article class="block"><span class="num">09</span><h3>You hold the roadmap and the money</h3><p>One dial, four positions. At full auto the factory merges on evidence and asks only for decisions and money. Forbidden paths and migrations stay human at every level.</p><div class="media">clip: scenes 22, 23, 24, 25</div></article>
 <article class="block"><span class="num">10</span><h3>The sandbox is the guardrail</h3><p>Each task runs in its own throwaway pod with its own identity. The network is closed except for named hosts. The agent never holds a push token. No prompt rule stands in for a wall.</p><div class="media">clip: scene 32, generated clip 34</div></article>
-<article class="block"><span class="num">11</span><h3>Three layers: the factory, your process, your prompts</h3><p>The base layer is the factory: sandboxes, workflows, gates. It works out of the box and runs on rented commodity servers. Built like Kubernetes on purpose: what you configure is a file, not a vendor's console. The process is such a file: lanes, stages, merge rule. Ours ships, bring your own. The prompts sit in your project's AGENTS.md: ours seeds it, you change it. The harness in the sandbox is an adapter behind one interface.</p><div class="media">clip: a new procedural diagram</div></article>
+<article class="block"><span class="num">11</span><h3>Three layers: the factory, your process, your prompts</h3><p>The base layer is the factory: sandboxes, workflows, gates. It works out of the box and runs on rented commodity servers. Everything you configure is a file. The development process is one: lanes, stages, merge rule. Ours is spec-driven; if you don't like it, bring your own, with a floor of checks and gates every process keeps. The prompts sit in your project's AGENTS.md: ours seeds it, you change it. The harness in the sandbox is an adapter behind one interface.</p><div class="media">clip: a new procedural diagram</div></article>
 <article class="block"><span class="num">12</span><h3>The numbers</h3><p>Cost per card, card cycle, lead time, spend. The week before against the week after.</p><div class="media">clip: scenes 26, 27, 28</div></article>
 </div>
 </section>
@@ -186,13 +186,12 @@ footer { padding: 48px 0 64px; }
 </table>
 </div>
 <div class="limits">
-<h3>Known limits</h3>
+<h3>Tradeoffs we made</h3>
 <ul>
-<li>No diff view with inline comments to the agent.</li>
-<li>Intake from Forgejo and SigNoz only.</li>
-<li>gVisor rather than a microVM.</li>
-<li>A responsive console, but no native app.</li>
-<li>One operator's daily use is the proof of scale.</li>
+<li>gVisor, not a microVM, so cheap commodity servers are enough.</li>
+<li>Roadmap intake as linked Markdown, not Jira: we think Markdown is better, and a Jira adapter would be easy.</li>
+<li>Models are commodity APIs behind the gateway, like servers from Hetzner. Self-hosted LLMs fit behind the same gateway.</li>
+<li>Signals arrive from Forgejo and SigNoz: Forgejo speaks GitHub's protocol, SigNoz is the open telemetry stack we picked.</li>
 </ul>
 </div>
 </section>

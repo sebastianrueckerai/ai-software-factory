@@ -2,7 +2,7 @@
 
 Written 21 October 2026 by the method of [concept section 8](concept.md#8-the-script-one-cards-life-told-once). Three parts: the story graph with its nodes named, the beats with their entry and exit nodes, and the spine with timings and transitions. The fold pass between them says how the beats became the spine.
 
-Decisions this script rests on, answered by Sebastian on 21 October: a generated voice over the titles (decision 1), so the film works muted and the sound track swaps without a recut; the three layers as the tail's three cards in his framing (decision 3); his hero line (decision 4): "You control everything via chat."
+Decisions this script rests on, answered by Sebastian on 21 October: a generated voice over the titles (decision 1), so the film works muted and the sound track swaps without a recut; the three layers as the tail's three cards in his framing (decision 3); his hero line (decision 4): "You run the factory from one chat. The kanban shows everything."
 
 The film's card is the calendar. Sebastian asks for a calendar rewrite in the chat, the factory files #105, the planner splits it into four cards, and the week view, #110, is the child the film follows through its build. The branches off its running session, the stall and the cap, are states the story already gives this card: #110 is the card that stopped at its budget. The signals of the second half are the two cards nobody typed, #119 from an alert and #126 from an issue.
 
@@ -61,9 +61,9 @@ Every point of [tier 1](concept.md#2-tier-1-the-value) as a beat. Seconds are th
 
 | Id | Points | Entry | Action | Exit | s | On screen | Words on screen | Source |
 |---|---|---|---|---|---|---|---|---|
-| B0 | title | cut | | cut | 4 | The five planes ring on the dark field, the hero line over it | You control everything via chat. Agents build in sandboxes on your own servers. The board shows everything | Procedural loop (round 4), else generated clip 33 |
+| B0 | title | cut | | cut | 4 | The five planes ring on the dark field, the hero line over it | You run the factory from one chat. The kanban shows everything. Agents build in sandboxes on your own servers | Procedural loop (round 4), else generated clip 33 |
 | B1 | 1, 2 | `idle` | "Rewrite the calendar." typed, Enter, the proposal, Do it | `landed` | 8 | The console at rest, the sentence, the agent's answer and its proposal panel, Do it pressed, the applied line, #105 in Queued | Say what you need. The factory writes the card. You press Do it | Scene 03 steps 1 to 3 (0.0 to 9.8 s) |
-| B2 | 3 | `landed` | The planner's verdict, the plan's cards, Accept | `accepted` | 6 | #105 running on big, then the plan in Needs you with its question, the drawer's four cards in dependency order with their roles and sizes, Accept plan, the four children in Queued | Too large. It plans before it builds | Scene 03 steps 4 to 6 (9.8 to 24.9 s); the exit state is new |
+| B2 | 3 | `landed` | The planner's verdict, the plan's cards, Accept | `accepted` | 6 | #105 running on big, then the plan in Needs you with its question, the drawer's four cards in dependency order with their roles and sizes, Accept plan, the four children in Queued | Too large. It plans before it builds. Some tests stay hidden until the end | Scene 03 steps 4 to 6 (9.8 to 24.9 s); the exit state is new |
 | B3 | 10 | cut | The sandbox's life | cut | 5 | A cell appears, a token and a key slide in, work glows, everything dissolves | Each card runs in its own throwaway sandbox. The agent never holds a push token | Generated clip 34, else scene 32 steps 1 to 4 |
 | B4 | 2, 4 | `running` | The session pushes, the checks run | `pr` | 5 | The drawer on #110: the agent's words on Session, then the header's PR #208 and the gates table with checks success and its four jobs | Agents build. A pull request, checks, then the review | Scene 06 steps 2 and 4 (2.8 to 8.9 s, 13.8 to 19.1 s) |
 | B5 | 4 | `pr` | The review verdict | `rejected` | 4 | The gates table: review 1, 6 min, concerns. Session 2 open under it | Nothing merges unproven. The review rejects, with a reason | Scene 07 step 2 (4.7 to 11.0 s) |
@@ -75,9 +75,9 @@ Every point of [tier 1](concept.md#2-tier-1-the-value) as a beat. Seconds are th
 | B11 | 5, 6 | `live` | An alert fires, an issue lands | `signal` | 4 | The board: #119 and #126 in Queued, nobody typed them. #119's objective with the stack trace, #126's with the repro block | Live software talks back. An alert files a card. An issue files a card | Scene 13 step 3 (17.0 to 23.5 s), scene 33 steps 2 and 3 |
 | B12 | 5 | `signal` | The fix's session, the reproduction gate, the merge | `reproduced` | 6 | #126's gates table: reproduction passed; the step's detail: base_exit 1, exit 0; then merged and live | Red at the base commit. Green at the fix. Merged | Scene 33 steps 5 and 6 |
 | B13 | 9 | cut | The dial, three answers | `day` | 6 | The level menu, full auto picked; the phone with three asks in Needs you, each answered with one press | You hold the roadmap and the money. Full auto asks only for decisions and euros | Scene 25 step 2 (4.2 to 8.7 s), scene 24 steps 2 to 4 (4.2 to 23.3 s, cut to the three presses) |
-| B14 | 11 | cut | The three bands, the file, the swap | cut | 6 | Three bands: the factory, your process, your prompts. The process file's stage list slides in beside the middle band. The harness box in the bottom band swaps | Built like Kubernetes: everything is a YAML file | A new procedural diagram (round 4, after the loop) |
+| B14 | 11 | cut | The three bands, the file, the swap | cut | 6 | Three bands: the factory, your process, your prompts. The process file's stage list slides in beside the middle band. The harness box in the bottom band swaps | Our dev process is spec-driven. The process is a YAML file: bring your own | A new procedural diagram (round 4, after the loop) |
 | B15 | 12 | cut | | `numbers` | 4 | The metrics page: deploys, lead time, cost per card, week 2 beside week 1 | The week before, the week after | Scene 27 steps 4 to 6 (15.3 to 22.2 s) |
-| B16 | tail | cut | | cut | 7 | Three title cards, one after the other | The factory: sandboxes, workflows, gates. Works out of the box, on rented servers. Your process: a YAML file. Ours ships, bring your own. Your prompts and harness: plug in yours | Procedural titles (round 4) |
+| B16 | tail | cut | | cut | 7 | Three title cards, one after the other | The factory: sandboxes, workflows, gates. Works out of the box, on rented servers. Your process: a YAML file. Ours is spec-driven, bring your own. Your prompts and harness: plug in yours | Procedural titles (round 4) |
 | B17 | link | cut | | cut | 3 | The repository and the page over the title loop | github.com/sebastianrueckerai/ai-software-factory | Generated clip 36 |
 
 Two notes on what the console shows, so no title claims more than the frame:
@@ -99,9 +99,9 @@ The folds the concept foresaw hold. Points 1 and 2 are one shot (B1). The steer 
 
 | From s | To s | Beat | Transition in | On screen | Words on screen | Source |
 |---|---|---|---|---|---|---|
-| 0 | 4 | B0 | cut | The loop under the hero line | You control everything via chat. Agents build in sandboxes on your own servers. The board shows everything | Procedural loop, else clip 33 |
+| 0 | 4 | B0 | cut | The loop under the hero line | You run the factory from one chat. The kanban shows everything. Agents build in sandboxes on your own servers | Procedural loop, else clip 33 |
 | 4 | 12 | B1 | cut | The console at rest. "Rewrite the calendar." The proposal. Do it. #105 lands | Say what you need. The factory writes the card. You press Do it | Scene 03 steps 1 to 3 |
-| 12 | 18 | B2 | continue | Too large: the plan's four cards in order, Accept, the children in Queued | Too large. It plans before it builds | Scene 03 steps 4 to 6, a new exit state |
+| 12 | 18 | B2 | continue | Too large: the plan's four cards in order, Accept, the children in Queued | Too large. It plans before it builds. Some tests stay hidden until the end | Scene 03 steps 4 to 6, a new exit state |
 | 18 | 23 | B3 | cut, interlude | The cell, the token, the key, the work, the dissolve | Each card runs in its own throwaway sandbox. The agent never holds a push token | Clip 34, else scene 32 |
 | 23 | 28 | B4 | cut to `running` | The drawer on the week view: the agent's words, PR #208, checks green | Agents build. A pull request, checks, then the review | Scene 06 steps 2 and 4 |
 | 28 | 32 | B5 | continue | The review's row: concerns | Nothing merges unproven. The review rejects, with a reason | Scene 07 step 2 |
@@ -113,9 +113,9 @@ The folds the concept foresaw hold. Points 1 and 2 are one shot (B1). The steer 
 | 54 | 58 | B11 | continue | Two cards nobody typed: the alert's stack trace, the issue's repro block | Live software talks back. An alert files a card. An issue files a card | Scene 13 step 3, scene 33 steps 2 and 3 |
 | 58 | 64 | B12 | continue | The reproduction gate: base_exit 1, exit 0. Merged | Red at the base commit. Green at the fix. Merged | Scene 33 steps 5 and 6 |
 | 64 | 70 | B13 | cut | Full auto picked. Three asks on the phone, three presses | You hold the roadmap and the money. Full auto asks only for decisions and euros | Scenes 25 step 2, 24 steps 2 to 4 |
-| 70 | 76 | B14 | cut, interlude | Three bands, the process file slides in, the harness swaps | Built like Kubernetes: everything is a YAML file | The three layers diagram, procedural |
+| 70 | 76 | B14 | cut, interlude | Three bands, the process file slides in, the harness swaps | Our dev process is spec-driven. The process is a YAML file: bring your own | The three layers diagram, procedural |
 | 76 | 80 | B15 | cut | Week 2 beside week 1 | The week before, the week after | Scene 27 steps 4 to 6 |
-| 80 | 87 | B16 | cut | Three title cards | The factory: sandboxes, workflows, gates. Works out of the box, on rented servers. Your process: a YAML file. Ours ships, bring your own. Your prompts and harness: plug in yours | Procedural titles |
+| 80 | 87 | B16 | cut | Three title cards | The factory: sandboxes, workflows, gates. Works out of the box, on rented servers. Your process: a YAML file. Ours is spec-driven, bring your own. Your prompts and harness: plug in yours | Procedural titles |
 | 87 | 90 | B17 | cut | The link over the title loop | github.com/sebastianrueckerai/ai-software-factory | Clip 36 |
 
 Ninety seconds. Three rewinds, four interludes or cuts to a state of the world, the rest one card. A rewind plays the entering beat's last second backwards at four times speed, then holds a quarter second on the fork node's frame before the branch starts.
@@ -145,6 +145,7 @@ Nothing records before Sebastian approves the spine. Then, in the material phase
 
 ## 7. For Sebastian
 
-- The hero line is his: "You control everything via chat." B0 adds two plain sentences for what draft 1 carried. Say the word to change either.
+- The hero line carries his combo in the active voice: "You run the factory from one chat. The kanban shows everything." B0 adds one sentence for the sandboxes and his servers. Say the word to change either.
+- B2 now names the hidden hold-outs: "Some tests stay hidden until the end." If that sentence must go, the beat keeps "Too large. It plans before it builds."
 - B2 and B12 claim less than the concept's bangs, for the reasons under the beats table. Say if the criteria's kinds or the two terminals must be on screen; both are procedural overlays, half a day each.
 - The film's card is the calendar. If another card should carry it, every node after `landed` changes, the beats do not.

@@ -10,13 +10,13 @@ Continue the launch work for the AI software factory: one 90-second film and a l
 Read first, in this order: launch/handover.md, launch/concept.md, launch/script.md, demo/handover/README.md.
 
 My answers, given 21 October and already carried by the page and the script:
-- The spine: approved in shape. The hero line is mine: "You control everything via chat." The closing cards carry my three-layers framing: the factory works out of the box and runs anywhere, everything is a YAML file, ours ships and yours plugs in. Two points stay open, both fine as the script has them: the criteria's kinds (B2) and the two terminals (B12) off screen, and the calendar as the film's card.
+- The spine: approved in shape. The hero line is mine, the combo in the active voice: "You run the factory from one chat. The kanban shows everything." The interlude over the layers diagram says the dev process is a YAML file, ours is spec-driven, bring your own; no phrase stands alone. The closing cards carry the three-layers framing: the factory works out of the box and runs anywhere, ours ships and yours plugs in. B2 adds "Some tests stay hidden until the end." Two points stay open, both fine as the script has them: the criteria's kinds (B2) and the two terminals (B12) off screen, and the calendar as the film's card.
 - Narration: a generated voice. Draft the spoken lines from the spine's titles, generate the track under the cap, keep the titles on screen so the film still works muted. If I dislike the voice, I record my own and the track swaps without a recut.
 - The fal cap: $20.
-- The perimeter: claim only that the factory is easy to self-host, that nothing runs on someone else's computer unless I want it to, that model APIs and self-hosted LLMs sit behind the gateway, and that we do not push this as SaaS.
+- The perimeter: model APIs are an expected commodity, like Hetzner holding your data when you run on Hetzner. Claim that the factory pulls you into no SaaS scheme and is as open as we could make it.
 - The comparison table's six names stand; I verify the cells.
-- The known limits block stays, its five lines.
-- Prompts as data is dropped as a point. The page claims the project's AGENTS.md as the prompts you change.
+- The limits block is now "Tradeoffs we made": every line a choice with its reason, nothing else.
+- Prompts as data is dropped; it is no killer feature. Advertise the spec-driven hold-out instead: the builders never see the hold-out tests, one blind run, then the gate opens them and the audit names the defective side.
 
 Then do, in this order, each as its own round with a result I can look at:
 1. The spine scene and the two branch scenes of script.md section 6, recorded with demo/run.sh and on the results page.
@@ -31,7 +31,7 @@ Rules: work in a git worktree, commit to master, push to origin and forgejo, and
 
 - [concept.md](concept.md): the readers, the two tiers, what we do not claim, the hero drafts, the surfaces with their state, the three routes with their state, the script method, the process, the eight decisions.
 - [script.md](script.md): the story graph with 19 named nodes, 18 beats with entry and exit nodes, the fold pass, the 90-second spine with timings and transitions, the six 20-second clips as sub-paths, what the recording needs. The film's card is the calendar, #105, and its child the week view, #110.
-- [site/index.html](site/index.html): the landing page skeleton, one static file, every section of concept section 6, the film slot empty, the clip and diagram slots captioned with their sources. The comparison table has the five names plus Factory, and the known limits block sits under it.
+- [site/index.html](site/index.html): the landing page skeleton, one static file, every section of concept section 6, the film slot empty, the clip and diagram slots captioned with their sources. The comparison table has the five names plus Factory, and the tradeoffs block sits under it.
 - Scene 33, [demo/scenes/33-issue-to-fix.js](../demo/scenes/33-issue-to-fix.js), recorded: a developer's issue with a repro block becomes card #126 within a minute, the agent reproduces and fixes the fault, the reproduction gate passes with `base_exit` 1 and `exit` 0, the fix merges. The story gained card #126 and `state.reproduction`.
 - Two procedural clips under [demo/video/](../demo/video/): the loop (30 s) and the three layers (24 s), rendered by `node demo/video/render.js <name>` with HyperFrames, each proven identical over two renders. The critic picked the loop over filmed scene 29: [demo/video/loop/judge/notes.md](../demo/video/loop/judge/notes.md).
 - Group H under [demo/generated/](../demo/generated/): 21 stills, four contact sheets, four critiques, six takes, every output with its sidecar. [notes.md](../demo/generated/notes.md) has the picks and the cost, about $2.88 of the $10 cap.
@@ -39,12 +39,12 @@ Rules: work in a git worktree, commit to master, push to origin and forgejo, and
 
 ## The decisions, as answered
 
-Sebastian answered the eight on 21 October. A generated voice over the titles, so the film works muted and his own voice can replace the track without a recut. The fal cap is $20. The closing cards carry his three-layers framing: the factory is the base layer, it works out of the box and runs anywhere, everything is a YAML file, ours ships and yours plugs in; "every euro held before it is spent" is gone, he could not read it. The hero line is his: "You control everything via chat." The perimeter claim is replaced by the self-hosting claim: easy to self-host, nothing on someone else's computer unless he wants it, model APIs and self-hosted LLMs behind the gateway, not SaaS. The six table names stand, he verifies the cells. The known limits block stays. Prompts as data is dropped as a point: the page claims the project's AGENTS.md as the prompts you change.
+Sebastian answered the eight on 21 October and sharpened them the same evening. A generated voice over the titles, so the film works muted and his own voice can replace the track without a recut. The fal cap is $20. The hero line carries his combo in the active voice: "You run the factory from one chat. The kanban shows everything." The interlude over the layers diagram says the dev process is a YAML file, ours is spec-driven, bring your own; he hates phrases standing alone. "Every euro held before it is spent" is gone, he could not read it. Model APIs are commodities to him, like Hetzner: the perimeter claim is that the factory pulls you into no SaaS scheme and is as open as we could make it. The six table names stand, he verifies the cells. The limits block became "Tradeoffs we made": every line a choice with its reason, nothing else. Prompts as data is dropped, no killer feature; the freed emphasis goes to the spec-driven hold-out, one blind run then the gate opens the tests and the audit names the defective side.
 
-Two cards for Sebastian to file (intake is closed to agents):
+Two cards for Sebastian to file (intake is closed to agents), both optional:
 
-- **A self-hosted model option behind the gateway.** The new claim says self-hosted LLMs work behind the gateway, and today every session routes to hosted model APIs. An operator can add a LiteLLM route by hand, but no self-hosted route is configured or tested. The card makes the claim factory-tested. Acceptance: a project can name a self-hosted route for its small class, and a session runs on it end to end.
-- **The factory's guides move into the configuration tree.** Optional now that the prompts point is dropped. The writing guide and the other guides are compiled into the binaries; the card would let a project override each. File it only if that control matters to him.
+- **A self-hosted model option behind the gateway.** The claim stands on the gateway's design; this card would make one self-hosted route configured and tested, which helps the compliance reader. Acceptance: a project can name a self-hosted route for its small class, and a session runs on it end to end.
+- **The factory's guides move into the configuration tree.** The writing guide and the other guides are compiled into the binaries; the card would let a project override each. File it only if that control matters to him.
 
 ## Open
 
