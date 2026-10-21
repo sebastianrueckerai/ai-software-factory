@@ -1064,6 +1064,27 @@ console exists.
 workflow. Closing the issue finishes it `done`. Agent escalations land in
 the same state (6.6).
 
+**The factory's own close.** factoryd closes a card's issue itself in eleven
+places: an issue not reproduced in 14 days, a closed task's open issue, a
+failed card retried as a new one, a stall or a red chain that no longer
+stands, a healed configuration rejection, a re-run card, a failed roll's
+retry, a failed template card filed again, a template update it closes, a
+cleared alert, and a pull request's human card. All eleven use one
+function. It first writes the `factory_closed` intake row with the comment
+it will post. Then it posts the comment, closes the issue and sets the
+row's `confirmed_at`. The row tells the issue-closed webhook that the bot's
+close is factoryd's own. If Forgejo fails at a step, the row stays
+unconfirmed. If Forgejo refuses the comment, factoryd logs the refusal and
+closes the issue all the same. The heal pass finishes every row left
+unconfirmed for over two minutes, at most 50 a pass. It posts the row's
+comment where the issue does not carry it, closes the issue and confirms
+the row. If the issue is closed already, the heal confirms the row and
+posts nothing. If Forgejo refuses the close, the heal confirms the row and
+logs the refusal, because no retry changes a refusal. A confirmed close is
+final: if a person reopens the issue after it, the issue stays open. The
+rows written before the migration `20261021090000_factory_close_confirmed`
+count as confirmed.
+
 **The workflow.** factoryd runs the Temporal worker itself, on task queue
 `factory-tasks`, one workflow `task-<id>` per agent task. It links the issue,
 runs up to `limits.sessions` sessions (3 by default, 5.3), opens the pull request, waits for the checks
@@ -4690,8 +4711,8 @@ writer's close is `real`, and the label `noise` on the issue at the close
 makes it `noise`. A cleared alert closes its human card when nobody
 touched it (Sebastian, 2026-10-20): no comment by a person, no answer or
 park, no `noise` label. The minute pass beside the SigNoz sweep turns the
-row `unjudged` by factoryd, ends the card `closed`, and comments and
-closes the issue. An alert that fired again after it cleared, or a card a
+row `unjudged` by factoryd and ends the card `closed` in one transaction.
+Then it comments and closes the issue as the factory's own close. An alert that fired again after it cleared, or a card a
 person acted on, keeps waiting for its verdict. The agent's `alerts`
 tool names such a row "cleared at …, verdict pending". Proven live in the Stage 9 exit test: three deletions of
 the factoryd pod filed #193 and started an agent task, a platform Job past
@@ -4716,7 +4737,7 @@ bounds and detectors can be tuned from data:
 | `supervisor_trip` | a session detector trips | `continue` is noise, any other action real, resolved by `supervisor` |
 | `escalation` | an agent or a supervisor escalates | one click by an approver on the console answer, "real problem" or "noise". Since Stage 9 `unjudged`, set by factoryd, when the task ends without a click |
 | `info_request` | an agent asks the poster (7), Task 66 | `unjudged`, set by factoryd when the task ends without a verdict (Stage 9) |
-| `alert` | a SigNoz alert files an issue, Task 70 | real when the task's pull request merges, noise when a human closes the issue without a merge. On a human-lane issue, a writer's close is real and the label `noise` makes it noise (Stage 9) |
+| `alert` | a SigNoz alert files an issue, Task 70 | real when the task's pull request merges, noise when a human closes the issue without a merge. On a human-lane issue, a writer's close is real and the label `noise` makes it noise (Stage 9). Since 2026-10-21 `unjudged`, set by factoryd, when the agent task ends any other way, for example failed |
 | `config_rejected` | a configuration commit is refused, or ten reads in a row fail (5.3), Stage 9 | real, set when a valid commit loads |
 | `screening` | the screening stage answers suspect (7), Stage 9 | a human's answer is noise, a close real |
 
