@@ -1,0 +1,6 @@
+{
+  "id": "loop",
+  "name": "Five planes in a loop",
+  "title": "The five-plane loop, procedural",
+  "story": "The five planes appear in turn, the wires draw themselves and close the ring, then a card runs the loop twice: a signal in, work in the sandboxes, verification, a merge, the telemetry back. Rendered from HTML and a GSAP timeline, frame by frame."
+}

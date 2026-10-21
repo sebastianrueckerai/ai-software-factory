@@ -4,14 +4,11 @@ const path = require("node:path");
 
 const GROUPS = [
   ["intake", "A", "Intake"], ["build", "B", "Build"], ["ship", "C", "Ship"], ["operate", "D", "Operate"],
-  ["gates", "E", "The human at the gates"], ["metrics", "F", "Metrics"], ["diagrams", "G", "Diagrams"], ["smoke", "", "Smoke"],
+  ["gates", "E", "The human at the gates"], ["metrics", "F", "Metrics"], ["diagrams", "G", "Diagrams"], ["procedural", "P", "Procedural clips"],
+  ["smoke", "", "Smoke"],
 ];
-const CLIPS = [
-  [33, "The opening: the loop", "10 s", "minimax/h3-max/image-to-video", "0.40"],
-  [34, "The sandbox life cycle", "10 s", "minimax/h3-max/image-to-video", "0.40"],
-  [35, "The wipe and re-seed", "10 s", "minimax/h3-max/image-to-video", "0.40"],
-  [36, "Title and transitions", "3 loops of 5 s", "pixelcut/looping-video", "1.30"],
-];
+// the generated clips of group H by their directory under demo/generated, in the plan's order
+const CLIPS = { "33-loop": "The opening: the loop", "34-sandbox": "The sandbox life cycle", "35-reseed": "The wipe and re-seed", "36-titles": "Title and transitions" };
 
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const secs = (ms) => `${(ms / 1000).toFixed(1)} s`;
@@ -29,6 +26,53 @@ function load(scenesDir, outDir) {
   });
 }
 
+// loadProcedural lists the compositions under demo/video, each rendered by demo/video/render.js to out/p-<name>.*
+function loadProcedural(videoDir, outDir) {
+  const files = fs.readdirSync(outDir);
+  return fs.readdirSync(videoDir).filter((d) => fs.existsSync(path.join(videoDir, d, "meta.json"))).sort().map((d) => {
+    const name = `p-${d}`;
+    const m = JSON.parse(fs.readFileSync(path.join(videoDir, d, "meta.json"), "utf8"));
+    const meta = { title: m.title, story: m.story, group: "procedural", theme: "dark", viewport: "desk" };
+    const side = path.join(outDir, `${name}.json`);
+    const sidecar = fs.existsSync(side) ? JSON.parse(fs.readFileSync(side, "utf8")) : null;
+    const frames = files.map((p) => p.match(new RegExp(`^${name}-(\\d+)\\.png$`))).filter(Boolean).map((x) => +x[1]).sort((a, b) => a - b);
+    return { name, meta, sidecar, frames };
+  });
+}
+
+// loadGenerated reads each clip's directory under demo/generated: the sidecars tools/img.py wrote (model, prompt, outputs,
+// est_cost_usd), the contact sheet and the critic's answer
+function loadGenerated(genDir) {
+  if (!fs.existsSync(genDir)) return [];
+  return Object.keys(CLIPS).filter((d) => fs.existsSync(path.join(genDir, d))).map((dir) => {
+    const files = fs.readdirSync(path.join(genDir, dir)).sort();
+    const sidecars = files.filter((f) => f.endsWith(".json")).map((f) => ({ file: f, ...JSON.parse(fs.readFileSync(path.join(genDir, dir, f), "utf8")) }))
+      .filter((m) => m.model && m.outputs);
+    const critique = path.join(genDir, dir, "critique", "gemini.json");
+    return {
+      dir, title: CLIPS[dir], sidecars,
+      stills: sidecars.filter((m) => !m.outputs[0].endsWith(".mp4")),
+      clips: sidecars.filter((m) => m.outputs[0].endsWith(".mp4")),
+      sheet: files.includes("contact-sheet.jpg"),
+      critique: fs.existsSync(critique) ? JSON.parse(fs.readFileSync(critique, "utf8")).answer : null,
+      cost: sidecars.reduce((a, m) => a + (m.est_cost_usd || 0), 0) + (fs.existsSync(critique) ? 0.03 : 0),
+    };
+  });
+}
+
+function generatedCard(g) {
+  const base = `generated/${g.dir}`;
+  const clips = g.clips.map((m) => `<video controls preload="metadata" class="desk" src="${base}/${esc(m.outputs[0])}"></video>` +
+    `<p class="facts mono">${esc(m.label || m.outputs[0])}: ${esc(m.model)}, ~$${m.est_cost_usd.toFixed(2)}</p>`).join("");
+  const stills = g.stills.flatMap((m) => m.outputs.map((o) =>
+    `<a href="${base}/${esc(o)}"><img src="${base}/${esc(o)}" alt="${esc(m.label || o)}"><span class="mono">${esc(o.replace(/\.png$/, ""))}</span></a>`)).join("");
+  const sheet = g.sheet ? `<p><a href="${base}/contact-sheet.jpg">the contact sheet</a> the critic judged</p>` : "";
+  const critique = g.critique ? `<details><summary>the critic's answer (Gemini 2.5 Pro)</summary><pre>${esc(g.critique)}</pre></details>` : "";
+  const facts = `${g.stills.length} stills, ${g.clips.length} ${g.clips.length === 1 ? "take" : "takes"}, ~$${g.cost.toFixed(2)}`;
+  return `<article class="card" id="${g.dir}"><h3><span class="n mono">${g.dir.slice(0, 2)}</span>${esc(g.title)}</h3><p class="facts mono">${facts}</p>` +
+    `<div class="media">${clips}<div class="frames">${stills}</div>${sheet}${critique}</div></article>`;
+}
+
 function card(s) {
   const { name, meta, sidecar } = s;
   const lead = name.match(/^\d+/);
@@ -36,7 +80,10 @@ function card(s) {
   const head = `<h3>${num}${esc(meta.title)}</h3><p class="story">${esc(meta.story)}</p>`;
   if (!sidecar) return `<article class="card" id="${name}">${head}<p class="mono missing">not recorded</p></article>`;
   const phone = meta.viewport === "phone";
-  const facts = `${esc(meta.viewport)} viewport, ${secs(sidecar.durationMs)}, ${sidecar.steps.length} steps`;
+  const facts = sidecar.route === "procedural"
+    ? `${secs(sidecar.durationMs)} at ${esc(sidecar.fps)} fps, ${sidecar.steps.length} frames shown, rendered with ${esc(sidecar.tool)} in ${sidecar.renderSeconds} s, ` +
+      `${sidecar.deterministic ? "two renders frame for frame identical" : "the two renders differed"}, source ${esc(sidecar.source)}`
+    : `${esc(meta.viewport)} viewport, ${secs(sidecar.durationMs)}, ${sidecar.steps.length} steps`;
   const video = `<video controls preload="metadata" class="${phone ? "phone" : "desk"}" poster="out/${name}-1.png" src="out/${name}.mp4"></video>`;
   const frames = s.frames.map((n) =>
     `<a href="out/${name}-${n}.png"><img src="out/${name}-${n}.png" alt="${esc(meta.title)}, step ${n}"><span class="mono">${n}</span></a>`).join("");
@@ -92,8 +139,8 @@ function prerequisites(file) {
   return esc(para).replace(/`([^`]+)`/g, "<code>$1</code>");
 }
 
-function render(scenes, prereq) {
-  const rec = scenes.filter((s) => s.sidecar);
+function render(scenes, prereq, generated = []) {
+  const rec = scenes.filter((s) => s.sidecar && s.meta.group !== "procedural");
   const ms = rec.reduce((a, s) => a + s.sidecar.durationMs, 0);
   const first = rec[0] && rec[0].sidecar;
   const days = rec.map((s) => s.sidecar.recordedAt.slice(0, 10)).sort();
@@ -105,8 +152,12 @@ function render(scenes, prereq) {
     if (!cards.length) return "";
     return `<section id="${id}"><h2>${letter ? `<span class="g">${letter}</span>` : ""}${esc(name)}</h2>${cards.map(card).join("\n")}</section>`;
   }).join("\n");
-  const clips = CLIPS.map(([n, t, len, model, cost]) =>
-    `<tr><td class="mono">${n}</td><td>${t}</td><td>${len}</td><td class="mono">${model}</td><td class="mono">${cost}</td></tr>`).join("");
+  const spent = generated.reduce((a, g) => a + g.cost, 0);
+  const clips = generated.length
+    ? `<p>Made with the fal models of the plan by <code>tools/img.py</code>: the stills went wide, Gemini judged the contact sheet, the director picked ` +
+      `provisionally, one take per clip. Every output has its sidecar JSON beside it. About $${spent.toFixed(2)} of the $10 cap. ` +
+      `The plan: <a href="generated/PLAN.md">demo/generated/PLAN.md</a>.</p>${generated.map(generatedCard).join("\n")}`
+    : `<p>Nothing has run yet. Each clip waits for the spending cap Sebastian sets. The plan: <a href="generated/PLAN.md">demo/generated/PLAN.md</a>.</p>`;
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Demo scene bank</title><style>${CSS}</style></head>
@@ -118,9 +169,8 @@ function render(scenes, prereq) {
 <p class="legend">Click a frame to open it full size. The video plays in place.</p>
 </header>
 ${sections}
-<section id="planned"><h2><span class="g">H</span>Planned: generated clips (group H)</h2>
-<p>Nothing has run yet. Each clip waits for the spending cap Sebastian sets. The plan: <a href="generated/PLAN.md">demo/generated/PLAN.md</a>.</p>
-<table><thead><tr><th>#</th><th>Clip</th><th>Length</th><th>Video model</th><th>Cost est. $</th></tr></thead><tbody>${clips}</tbody></table></section>
+<section id="generated"><h2><span class="g">H</span>Generated clips</h2>
+${clips}</section>
 <section id="regenerate"><h2>How to regenerate</h2>
 <pre>demo/run.sh                      # the whole bank
 demo/run.sh 01-chat-to-card      # one scene
@@ -131,8 +181,9 @@ node --test demo/test/*.test.js  # the tests</pre>
 `;
 }
 
-function build(scenesDir, outDir, readmeFile) {
-  return render(load(scenesDir, outDir), prerequisites(readmeFile));
+function build(scenesDir, outDir, readmeFile, videoDir = path.join(scenesDir, "..", "video"), genDir = path.join(scenesDir, "..", "generated")) {
+  const procedural = fs.existsSync(videoDir) ? loadProcedural(videoDir, outDir) : [];
+  return render([...load(scenesDir, outDir), ...procedural], prerequisites(readmeFile), loadGenerated(genDir));
 }
 
 module.exports = { build };
