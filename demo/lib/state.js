@@ -38,6 +38,7 @@ function card(now, o) {
     ModelAlias: o.model,
     Size: o.size ?? "small",
     PRNumber: o.pr,
+    ReproCommand: o.repro,
     Parent: o.parent === undefined ? undefined : id(o.parent),
     PlanKey: o.planKey,
     Gate: o.gate,
@@ -94,6 +95,11 @@ const queueTurn = (from, at) => ({ at, from, step: "queue_turn", project: projec
 // policyGate ends the policy gate on the pull request: its risk class, the class's outcome and the merge rule in force.
 const policyGate = (from, at, { pr, risk, outcome, mergeRule = "human", changed, lines }) =>
   ({ at, from, step: "gate_policy", pr, class: risk, outcome, changed, lines, merge_rule: mergeRule });
+
+// reproduction ends the reproduction gate: the issue's command ran at the task's base commit and at the pull request's
+// head; the fault shows at the base (baseExit) and the fix at the head (exit).
+const reproduction = (from, at, { pr, commit, command, base, baseExit, exit, output = "" }) =>
+  ({ at, from, step: "gate_reproduction", pr, commit, command, exit, output, base, base_exit: baseExit, by_agent: false });
 
 // approvalRequested is the merge's approval request opening: the pull request waits on a person.
 const approvalRequested = (at, { approval: n, pr, commit, risk }) => ({ at, step: "approval_requested", approval: n, pr, commit, class: risk });
@@ -460,7 +466,7 @@ function scene(now, o = {}) {
 }
 
 module.exports = {
-  AGENT_ASKS, id, card, intake, sessionStart, session, checks, modelReview, findings, queueTurn, policyGate, approvalRequested, autoMerge, merged, recorded,
+  AGENT_ASKS, id, card, intake, sessionStart, session, checks, modelReview, findings, queueTurn, policyGate, reproduction, approvalRequested, autoMerge, merged, recorded,
   final, supervisor, timeline, said, transcript, event, status, alert, poke, mergedPoke, livePoke, asked, mergeAsked, wake, approval, message, ask,
   proposal, proposedCall, cardFiling, steering, closing, depending, pressed, pressedThread, filedThread, steeredThread, seen,
   plan, say, call, reply, figure, metrics, nextCron, prevCron, routineRun, routineView, scene,
