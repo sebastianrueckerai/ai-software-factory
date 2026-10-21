@@ -38,4 +38,5 @@ for s in "${scenes[@]}"; do
     ffmpeg -y -loglevel error -i "$here/out/$s.webm" -t "$secs" -c:v libx264 -pix_fmt yuv420p -movflags +faststart "$here/out/$s.mp4"
   fi
 done
+node "$here/build-index.js"
 exit $status

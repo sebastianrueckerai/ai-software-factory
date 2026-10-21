@@ -19,4 +19,6 @@ A diagram scene sets `page: "diagrams/loop.html"`: the recorder opens that file 
 
 Sidecar clock: `atMs` and `durationMs` count from the creation of the recording context, which is the video's time zero (measured: the board is on screen within about half a second of it). `durationMs` is the script's span; The mp4 is cut to `durationMs`; the webm keeps its static tail (`context.close()` takes a variable time), and `videoMs` is its measured length.
 
+The results page, rebuilt at the end of every run: [index.html](index.html) (`node demo/build-index.js`).
+
 Tests: `node --test demo/test/*.test.js`.
