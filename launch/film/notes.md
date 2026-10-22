@@ -70,6 +70,14 @@ Started 22 October 2026. The working file for the film and its small clips: what
 - **The chat posters.** Four variations: A `poster-chat-hub`, B `poster-chat-context`, C `poster-chat-both`, D `poster-chat`. The project agent reads the board, sessions and the document repository, where the roadmap lives, through its tools, so B says "sees the whole project", not that it holds it all in its context. The critic ranks D, A, C, B: D tells the card's text step by step, A shows one chat to many cards at a glance, C is crowded at card size, B shows no action. Sebastian picks.
 - **The routines diagram** is gone, since the routines card took the crop.
 
+## What Sebastian asked, 23 October, after the chat variations
+
+- The variation with the board and the roadmap, with the steering of the running cards added, not crammed.
+
+## The chat poster
+
+- `demo/video/poster-chat` is that variation with one arrow from the project agent over the board into the In progress column, whose running cards are lit, labelled "steers". The critic found the first version's steering the weakest idea, an arrow at the board in general, and the poster crowded, so the arrow ends on the running cards, its label is one large word, and "writes no code" left the poster, since the card's text says it. The other three variations are gone.
+
 ## What Sebastian asked, 22 October, after round 8 (round 9)
 
 - A second of the drained board before "New work files itself", so the first new card stands out.
