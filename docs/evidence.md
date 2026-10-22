@@ -1,6 +1,6 @@
 # The evidence: every claim with its file, its test and its run
 
-The proof column of the [value table](../launch/concept.md#2-tier-1-the-value) turned into links, one row per guarantee. Written 21 October 2026.
+One row per guarantee the landing page makes. Written 21 October 2026.
 
 The columns: Enforced by names the code that holds the guarantee. Tested by names the test that exercises it. Proven by names a real run and where its record lives. Until a run exists, the column says not yet.
 
@@ -135,4 +135,4 @@ The pages read the same ledger the board reads.
 | The metrics and costs pages read the same ledger as the board | `internal/console/metrics.go`, `internal/factoryd/metrics.go` | `internal/console/metrics_test.go`, `internal/factoryd/metrics_test.go` | Scenes 26 to 28: the pages beside the board |
 | Costs are booked per card and per call, with a dated window | `internal/factoryd/meters.go`, `internal/factoryd/settle.go` | `internal/factoryd/meters_test.go`, `acceptance/costs_date_window_test.go` | Stage 18: cost per card 0.019 to 1.24 EUR |
 
-Rows that say not yet: hold-outs, the stale-plan refusal, cheat detection, the no-verdict finding, outsider screening, routines, the missing-cap stop, the model attempt on an ask and template seeding. Nine of thirty-nine guarantees wait for their run.
+Rows that say not yet: hold-outs, the stale-plan refusal, cheat detection, the no-verdict finding, outsider screening, routines, the missing-cap stop, the model attempt on an ask and template seeding. Nine of forty-three guarantees wait for their run.

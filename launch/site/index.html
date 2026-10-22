@@ -5,169 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI software factory</title>
 <meta name="description" content="An AI software factory you run on your own servers: a kanban that fills itself, one chat to change anything, every card in its own sandbox, nothing merges until the checks pass.">
-<style>
-:root {
-  color-scheme: dark;
-  --bg: #070b12; --bg-panel: #0b111a; --bg-raised: #0f1723; --bg-card: #111b28;
-  --line: #1a2636; --line-strong: #263649; --mark: #5a8aa3;
-  --text: #dfe7f1; --text-muted: #93a1b5; --text-faint: #7c8ba0;
-  --accent: #4fcbe2; --need: #f4b13e; --need-text: #f6bd5a;
-  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", "Noto Sans", system-ui, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", "Noto Sans Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
-}
-*, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 64px; }
-body { margin: 0; background: var(--bg); color: var(--text); font: 400 17px/1.55 var(--font-ui); -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); }
-p { margin: 0 0 12px; }
-.cap { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-variant-ligatures: none; }
-.wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
-main.wrap { padding-bottom: 72px; }
-.skip { position: absolute; left: -999px; top: 8px; background: var(--bg-raised); padding: 8px 12px; z-index: 10; }
-.skip:focus { left: 8px; }
-nav { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 94%, transparent); border-bottom: 1px solid var(--line); }
-nav ul { list-style: none; margin: 0 auto; padding: 10px 24px; max-width: 1100px; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 14px; }
-nav a { text-decoration: none; color: var(--text-muted); }
-nav a:hover, nav a:focus-visible { color: var(--accent); }
-section { padding: 64px 0 8px; }
-h1 { font-size: clamp(30px, 5vw, 52px); line-height: 1.12; font-weight: 600; margin: 0 0 18px; text-wrap: balance; }
-h2 { font-size: 28px; font-weight: 600; line-height: 1.2; margin: 0 0 12px; text-wrap: balance; }
-h3 { font-size: 18px; font-weight: 600; line-height: 1.3; margin: 0 0 8px; }
-.lede { font-size: 20px; color: var(--text-muted); max-width: 760px; margin-bottom: 28px; }
-.cap { font-size: 13px; color: var(--text-faint); }
-.links { display: flex; gap: 16px; flex-wrap: wrap; margin: 20px 0 28px; }
-.more { font-size: 14px; }
-
-.media { position: relative; background: var(--bg-panel); border: 1px solid var(--line-strong); }
-.media::after { content: ""; position: absolute; inset: -1px; border: 1px solid var(--mark); pointer-events: none; --s: 7px;
-  -webkit-mask: conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0 / calc(100% - var(--s)) calc(100% - var(--s));
-          mask: conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0 / calc(100% - var(--s)) calc(100% - var(--s)); }
-.media img { display: block; width: 100%; height: auto; }
-.media video.loop { display: block; width: 100%; height: auto; cursor: pointer; }
-
-.eyebrow { font: 600 12px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-faint); margin: 0 0 16px; }
-.btn { display: inline-block; padding: 10px 18px; border: 1px solid var(--line-strong); color: var(--text); text-decoration: none; font: 14px var(--font-mono); }
-.btn:hover, .btn:focus-visible { border-color: var(--accent); color: var(--accent); }
-.btn.primary { border-color: var(--accent); color: var(--accent); }
-.stack { max-width: 780px; }
-.band { border: 1px solid var(--line-strong); border-left: 3px solid var(--accent); background: var(--bg-panel); padding: 14px 22px; color: var(--text-muted); max-width: 880px; margin-top: 32px; }
-.band p { margin: 0; }
-
-.scroll { overflow-x: auto; margin: 8px 0 20px; }
-.diagram { display: block; width: 100%; height: auto; min-width: 860px; font-family: var(--font-ui); }
-.diagram .panel rect { fill: var(--bg-panel); stroke: var(--line-strong); }
-.diagram .panel.off rect { stroke: var(--line); }
-.diagram .corner { fill: none; stroke: var(--mark); stroke-width: 1; }
-.diagram .n { font: 12px var(--font-mono); fill: var(--text-faint); }
-.diagram .t { font-size: 17px; font-weight: 600; fill: var(--text); }
-.diagram .t.off { fill: var(--text-faint); font-weight: 500; }
-.diagram .s { font-size: 13px; fill: var(--text-muted); }
-.diagram .wire { fill: none; stroke: var(--accent); stroke-width: 2; }
-.diagram .wire.off { stroke: var(--line-strong); stroke-dasharray: 4 4; }
-.diagram .tip { fill: var(--accent); }
-.diagram .x { fill: none; stroke: var(--text-faint); stroke-width: 2; }
-.diagram .wall { fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 6 5; }
-.diagram .wl { font: 12px var(--font-mono); fill: var(--accent); }
-.diagram .hm { fill: var(--need); }
-.diagram .h { font: 12.5px var(--font-mono); fill: var(--need-text); }
-.diagram .w { font: 12.5px var(--font-mono); fill: var(--accent); }
-.diagram .w.off { fill: var(--text-faint); }
-.diagram .file rect { fill: var(--bg-card); stroke: var(--line-strong); }
-.diagram .ft { font: 13.5px var(--font-mono); fill: var(--text); }
-.diagram .fs { font: 11.5px var(--font-mono); fill: var(--text-faint); }
-.diagram .panel.ours rect { stroke: var(--accent); }
-.diagram .panel.slot rect { fill: none; stroke-dasharray: 5 4; }
-.diagram .link { fill: none; stroke: var(--mark); stroke-width: 1.5; }
-.diagram .tipn { fill: var(--mark); }
-
-.hero-stage { position: relative; }
-.hero-annot { position: relative; z-index: 1; display: block; width: 100%; height: auto; font-family: var(--font-ui); pointer-events: none; transition: opacity .6s; }
-.hero-annot.gone { opacity: 0; }
-@media (prefers-reduced-motion: reduce) { .hero-annot { transition: none; } }
-.hero-annot .ct { font-size: 30px; font-weight: 600; fill: var(--text); }
-.hero-annot .cs { font-size: 22px; fill: var(--text-muted); }
-.hero-annot .br { fill: none; stroke-width: 3; }
-.hero-annot .cyan .br { stroke: var(--accent); }
-.hero-annot .amber .br { stroke: var(--need); }
-.hero-annot .hit { fill: none; stroke: var(--accent); stroke-width: 3; }
-.hero-list { display: none; }
-#hero figure { position: relative; }
-.play { position: absolute; z-index: 2; right: 18px; bottom: 18px; padding: 12px 20px; border: 1px solid var(--accent); background: color-mix(in srgb, var(--bg) 88%, transparent);
-  color: var(--accent); font: 600 16px var(--font-mono); cursor: pointer; box-shadow: 0 4px 18px rgba(0,0,0,.5); }
-.play:hover, .play:focus-visible { background: var(--accent); color: var(--bg); }
-.play span { margin-right: 6px; }
-video.film { position: absolute; left: 0; bottom: 0; display: block; width: 100%; height: auto; border: 1px solid var(--line-strong); background: #000; }
-.hero-list { margin: 14px 0 0; padding-left: 22px; color: var(--text-muted); }
-.hero-list b { color: var(--text); }
-
-figure { margin: 0; }
-figcaption { margin-top: 8px; text-align: center; }
-
-.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px 24px; }
-@media (max-width: 960px) { .cards { grid-template-columns: 1fr 1fr; } }
-.cards .card.big { grid-column: 1 / -1; }
-.cards .card.big p { max-width: 760px; }
-.cards .media::before { content: "▶ Play"; position: absolute; right: 12px; bottom: 12px; z-index: 1; padding: 6px 12px; border: 1px solid var(--accent);
-  background: color-mix(in srgb, var(--bg) 88%, transparent); color: var(--accent); font: 600 13px var(--font-mono); pointer-events: none; }
-.cards .media:hover::before { background: var(--accent); color: var(--bg); }
-.cards .card.big .media::before { display: none; }
-.cards video.loop:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.shrink { position: absolute; top: 10px; right: 10px; z-index: 2; padding: 6px 12px; border: 1px solid var(--line-strong); cursor: pointer;
-  background: color-mix(in srgb, var(--bg) 88%, transparent); color: var(--text); font: 13px var(--font-mono); }
-.shrink:hover, .shrink:focus-visible { border-color: var(--accent); color: var(--accent); }
-::view-transition-group(*) { animation-duration: .35s; }
-.card h3 { margin: 14px 0 6px; }
-.card p { color: var(--text-muted); margin-bottom: 6px; }
-
-.facts { margin: 0 0 20px; padding: 0; list-style: none; max-width: 820px; }
-.facts li { padding: 10px 0 10px 22px; border-top: 1px solid var(--line); position: relative; }
-.facts li:last-child { border-bottom: 1px solid var(--line); }
-.facts li::before { content: ""; position: absolute; left: 0; top: 19px; width: 8px; height: 8px; background: var(--accent); }
-.facts b { color: var(--text); }
-.facts li { color: var(--text-muted); }
-
-details { border: 1px solid var(--line); background: var(--bg-panel); margin: 0 0 10px; }
-details[open] { border-color: var(--line-strong); }
-summary { cursor: pointer; padding: 14px 20px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
-summary::-webkit-details-marker { display: none; }
-summary::after { content: "+"; font-family: var(--font-mono); color: var(--text-faint); }
-details[open] summary::after { content: "−"; }
-summary:hover, summary:focus-visible { color: var(--accent); }
-details .body { padding: 0 20px 16px; color: var(--text-muted); }
-details .body p:last-child { margin-bottom: 0; }
-details .body figure { margin: 8px 0 14px; max-width: 640px; }
-
-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th, td { text-align: left; vertical-align: top; padding: 9px 12px; border: 1px solid var(--line); }
-thead th { background: var(--bg-raised); font-weight: 600; }
-.tscroll { overflow-x: auto; }
-table.cmp { min-width: 1000px; }
-table.cmp tbody th[scope=row] { font-weight: 600; min-width: 120px; }
-table.cmp td { color: var(--text-muted); min-width: 90px; }
-table.cmp td:nth-child(2) { color: var(--text); min-width: 140px; }
-table.cmp .v { color: var(--text); }
-table.cmp .v::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 7px; border: 1.5px solid var(--text-faint); }
-table.cmp .v.yes::before { background: var(--accent); border-color: var(--accent); }
-table.cmp .v.part::before { background: linear-gradient(90deg, var(--accent) 50%, transparent 0); border-color: var(--accent); }
-table.cmp .v.nd::before { border-style: dashed; }
-
-.limits { border: 1px solid var(--line-strong); border-left: 3px solid var(--need); background: var(--bg-panel); padding: 18px 22px; max-width: 880px; }
-.limits h3 { margin-bottom: 10px; }
-.limits h3::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 10px; background: var(--need); vertical-align: 1px; }
-.limits ul { margin: 0; padding-left: 20px; color: var(--text-muted); }
-.limits p { color: var(--text-muted); margin: 0; }
-
-@media (max-width: 640px) {
-  .cards { grid-template-columns: 1fr; }
-  .hero-annot { display: none; }
-  .hero-list { display: block; }
-  video.film { position: static; }
-  .play { position: static; margin-top: 14px; }
-  body { font-size: 16px; }
-  section { padding-top: 44px; }
-  .wrap, nav ul { padding-left: 16px; padding-right: 16px; }
-}
-</style>
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
 <a class="skip" href="#hero">Skip to the content</a>
@@ -182,6 +20,7 @@ table.cmp .v.nd::before { border-style: dashed; }
 <li><a href="#hood">Under the hood</a></li>
 <li><a href="#compare">Compare</a></li>
 <li><a href="#proof">Proof</a></li>
+<li><a href="evidence.html">Evidence</a></li>
 </ul>
 </nav>
 <main class="wrap">
@@ -331,41 +170,41 @@ table.cmp .v.nd::before { border-style: dashed; }
 <h2 id="get-h">What you get</h2>
 <p class="lede">Six things the console shows. Each one links to the file, the test and the run behind it.</p>
 <div class="cards">
-<article class="card">
+<article class="card" id="clip-steer">
 <div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/poster-chat.png" aria-label="A request that names no card: the project agent reads the board, finds the refund card and sends its running session the line." width="1600" height="900"><source src="assets/clips/clip-steer.mp4" type="video/mp4"></video></div>
 <h3>The chat orchestrates development</h3>
 <p>Name the work, not the card. The project agent writes no code: it reads the board, finds who builds it and passes your line to the running session. The gates still judge the result.</p>
-<p class="more"><a href="../../docs/evidence.md#1-the-kanban-fills-itself-the-chat-drives-it">The evidence</a></p>
+<p class="more"><a href="evidence.html#1-the-kanban-fills-itself-the-chat-drives-it">the file · the test · the run</a></p>
 </article>
-<article class="card">
+<article class="card" id="clip-plan">
 <div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/diagram-plan.png" aria-label="How a plan becomes cards, then the console: the plan card waits in Needs you, opens like any card, and on accept its four cards land." width="1600" height="900"><source src="assets/clips/clip-plan.mp4" type="video/mp4"></video></div>
 <h3>A plan is a card you accept</h3>
 <p>A big request becomes a plan card. The planner lists its cards in build order and asks what it cannot decide. Once you accept it, the cards land, each criterion naming its test before the code exists.</p>
-<p class="more"><a href="../../docs/spec-driven.md">How the spec-driven process works</a></p>
+<p class="more"><a href="evidence.html#3-it-plans-before-it-builds">the file · the test · the run</a> · <a href="https://github.com/sebastianrueckerai/ai-software-factory/blob/master/docs/spec-driven.md">how the spec-driven process works</a></p>
 </article>
-<article class="card">
+<article class="card" id="clip-ladder">
 <div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/diagram-ladder.png" aria-label="The ladder from the cheap model to a human, then a card whose second session runs on the stronger model." width="1600" height="900"><source src="assets/clips/clip-ladder.mp4" type="video/mp4"></video></div>
 <h3>Stuck sessions get help in steps</h3>
 <p>A stuck session gets a nudge, then a check-in by the stronger model, then the stronger model itself. Caps on sessions, agent time and budget end the climb in front of a human.</p>
-<p class="more"><a href="../../docs/evidence.md#7-it-does-not-stall">The evidence</a></p>
+<p class="more"><a href="evidence.html#7-it-does-not-stall">the file · the test · the run</a></p>
 </article>
-<article class="card">
+<article class="card" id="clip-pool">
 <div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/diagram-pool.png" aria-label="How a small raise comes out of the project's monthly pool, then a card at €0.40 funded by the project agent so it goes on." width="1600" height="900"><source src="assets/clips/clip-pool.mp4" type="video/mp4"></video></div>
 <h3>Control spending intelligently</h3>
 <p>Caps per task, per day, per month and per project, and the factory stops at each. At autonomous and full auto the project agent settles small raises from a monthly pool you set. Anything bigger still asks you.</p>
-<p class="more"><a href="../../docs/evidence.md#8-no-model-call-runs-without-its-cost-covered">The evidence</a></p>
+<p class="more"><a href="evidence.html#8-no-model-call-runs-without-its-cost-covered">the file · the test · the run</a></p>
 </article>
-<article class="card">
+<article class="card" id="clip-routine">
 <div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/poster-routine.png" aria-label="One sentence in the chat sets up a weekly image bump: a dashed card waits in Queued, comes due on its day, files a card that runs, and waits for the next week." width="1600" height="900"><source src="assets/clips/clip-routine.mp4" type="video/mp4"></video></div>
 <h3>Routines run themselves</h3>
 <p>Ask the chat for a weekly job, and it writes the schedule into the project's file. Each run files a card, and the card passes the same gates as any other.</p>
-<p class="more"><a href="../../docs/evidence.md#6-live-software-feeds-back">The evidence</a></p>
+<p class="more"><a href="evidence.html#6-live-software-feeds-back">the file · the test · the run</a></p>
 </article>
-<article class="card">
+<article class="card" id="clip-dial">
 <div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/diagram-dial.png" aria-label="Who decides at each autonomy level, then a merge approved by hand, the level menu where only the current level's lamp is lit, and on full auto a card that merges on its own." width="1600" height="900"><source src="assets/clips/clip-dial.mp4" type="video/mp4"></video></div>
 <h3>Going full auto</h3>
 <p>From manual to full auto. Direction and money beyond the project's pool stay with you at every level.</p>
-<p class="more"><a href="../../docs/evidence.md#9-you-hold-the-roadmap-and-the-money">The evidence</a></p>
+<p class="more"><a href="evidence.html#9-you-hold-the-roadmap-and-the-money">the file · the test · the run</a></p>
 </article>
 </div>
 </section>
@@ -478,7 +317,7 @@ table.cmp .v.nd::before { border-style: dashed; }
 </ul>
 <div class="limits">
 <h3>The risk that stays</h3>
-<p>The model can write code that is wrong on purpose, and that code can pass the checks. The review, the hold-out tests and the audit make that hard, not impossible. <a href="../../docs/threat-model.md">The threat model</a> names every hole we know.</p>
+<p>The model can write code that is wrong on purpose, and that code can pass the checks. The review, the hold-out tests and the audit make that hard, not impossible. <a href="https://github.com/sebastianrueckerai/ai-software-factory/blob/master/docs/threat-model.md">The threat model</a> names every hole we know.</p>
 </div>
 </section>
 
@@ -527,7 +366,7 @@ table.cmp .v.nd::before { border-style: dashed; }
 <g class="file"><rect x="770" y="224" width="160" height="50"/><text class="ft" x="782" y="244">model gateway</text><text class="fs" x="782" y="262">every call held</text></g>
 <g class="file"><rect x="940" y="224" width="160" height="50"/><text class="ft" x="952" y="244">sandbox</text><text class="fs" x="952" y="262">one per card</text></g>
 </svg></div>
-<p class="cap">A project may only tighten: four stages stay in every process, and no file can remove them. <a href="../../docs/layers.md">The three layers in full</a>.</p>
+<p class="cap">A project may only tighten: four stages stay in every process, and no file can remove them. <a href="https://github.com/sebastianrueckerai/ai-software-factory/blob/master/docs/layers.md">The three layers in full</a>.</p>
 <div class="links"><a class="btn" href="https://github.com/sebastianrueckerai/ai-software-factory">Source and setup</a></div>
 </section>
 
@@ -767,7 +606,7 @@ table.cmp .v.nd::before { border-style: dashed; }
 <summary>The sandbox</summary>
 <div class="body">
 <p>gVisor, non-root, read-only root, no service account token, the metadata address blocked, default-deny egress, an egress probe before the agent starts, the write token minted after the agent is dead and used once.</p>
-<p class="cap"><a href="../../docs/evidence.md#10-the-sandbox-is-the-guardrail">the file · the test · the run</a></p>
+<p class="cap"><a href="evidence.html#10-the-sandbox-is-the-guardrail">the file · the test · the run</a></p>
 </div>
 </details>
 <details>
@@ -775,30 +614,30 @@ table.cmp .v.nd::before { border-style: dashed; }
 <div class="body">
 <p>Nine kinds of stage. Four of them stay in every process, and a process file cannot remove them. A deleted or weakened test is a finding. A review that gives no verdict is a finding on the reviewer's card.</p>
 <p>A separate session writes hold-out tests that no sandbox can see. When a hold-out fails, an audit names the defective side: the test, the code or the spec.</p>
-<p class="cap"><a href="../../docs/evidence.md#4-nothing-merges-unproven">the file · the test · the run</a></p>
+<p class="cap"><a href="evidence.html#4-nothing-merges-unproven">the file · the test · the run</a></p>
 </div>
 </details>
 <details>
 <summary>The money</summary>
 <div class="body">
 <p>The hold is taken under a database lock. The model's output is clamped to the amount held. The real cost is booked after the call. A missing cap reads as zero, which stops all spend.</p>
-<p class="cap"><a href="../../docs/evidence.md#8-no-model-call-runs-without-its-cost-covered">the file · the test · the run</a></p>
+<p class="cap"><a href="evidence.html#8-no-model-call-runs-without-its-cost-covered">the file · the test · the run</a></p>
 </div>
 </details>
-<details>
+<details id="clip-stall">
 <summary>Recovery from stalls</summary>
 <div class="body">
 <figure><div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/diagram-stall.png" aria-label="The checks the factory runs on every session, then a session going in circles until a check trips and the supervisor redirects it." width="1600" height="900"><source src="assets/clips/clip-stall.mp4" type="video/mp4"></video></div></figure>
 <p>One durable workflow per task. Twelve detectors watch each session for no write, repetition, the same failure, the same call, flip-flop, churn, wall clock and spend with no push.</p>
 <p>A stalled session gets a nudge, then a supervisor, then a fresh session on the stronger model. A human sees it only after the session cap.</p>
-<p class="cap"><a href="../../docs/evidence.md#7-it-does-not-stall">the file · the test · the run</a></p>
+<p class="cap"><a href="evidence.html#7-it-does-not-stall">the file · the test · the run</a></p>
 </div>
 </details>
 <details>
 <summary>The numbers it keeps</summary>
 <div class="body">
 <p>The metrics page keeps the <a href="https://dora.dev/guides/dora-metrics-four-keys/">four DevOps delivery metrics</a>: deployment frequency, lead time for changes, change failure rate and time to restore. It also keeps cost per card, per project and per week. All of them read from the same ledger as the board.</p>
-<p class="cap"><a href="../../docs/evidence.md#12-the-numbers">the file · the test · the run</a></p>
+<p class="cap"><a href="evidence.html#12-the-numbers">the file · the test · the run</a></p>
 </div>
 </details>
 <details>
@@ -807,7 +646,7 @@ table.cmp .v.nd::before { border-style: dashed; }
 <p>The factory builds itself. Every commit carries the task, the session, who asked and who approved.</p>
 <p>An outsider's issue is screened for injection before any session runs.</p>
 <p>The console was designed by image models and an independent critic. Every image has its sidecar.</p>
-<p class="cap"><a href="../../docs/architecture.md">The architecture</a>: the five planes and the three layers.</p>
+<p class="cap"><a href="https://github.com/sebastianrueckerai/ai-software-factory/blob/master/docs/architecture.md">The architecture</a>: the five planes and the three layers.</p>
 </div>
 </details>
 </section>
@@ -907,7 +746,7 @@ table.cmp .v.nd::before { border-style: dashed; }
 </tbody>
 </table>
 </div>
-<p class="cap">The source of every cell: <a href="../../docs/comparison.md">the comparison file</a>. Chat intake stays out of the table, because 78 of the 148 tools in our market sweep score high on chat.</p>
+<p class="cap">The source of every cell: <a href="https://github.com/sebastianrueckerai/ai-software-factory/blob/master/docs/comparison.md">the comparison file</a>. Chat intake stays out of the table, because 78 of the 148 tools in our market sweep score high on chat.</p>
 </div>
 </details>
 <div class="limits" style="margin-top:28px">
@@ -926,9 +765,9 @@ table.cmp .v.nd::before { border-style: dashed; }
 <h2 id="proof-h">Proof and limits</h2>
 <ul class="facts">
 <li><a href="https://github.com/sebastianrueckerai/ai-software-factory">The source</a>: three repositories, factory, code and infrastructure.</li>
-<li><a href="../../docs/architecture.md">The architecture</a>: the five planes and the three layers.</li>
-<li><a href="../../docs/threat-model.md">The threat model</a>: what the sandbox stops, what it does not stop, the known holes.</li>
-<li><a href="../../docs/evidence.md">The evidence page</a>: the file and the test per guarantee, a run where one exists, "not yet" where none does.</li>
+<li><a href="https://github.com/sebastianrueckerai/ai-software-factory/blob/master/docs/architecture.md">The architecture</a>: the five planes and the three layers.</li>
+<li><a href="https://github.com/sebastianrueckerai/ai-software-factory/blob/master/docs/threat-model.md">The threat model</a>: what the sandbox stops, what it does not stop, the known holes.</li>
+<li><a href="evidence.html">The evidence page</a>: the file and the test per guarantee, a run where one exists, "not yet" where none does.</li>
 </ul>
 <p class="cap">The open limits live in the threat model: the hosted model APIs see diffs and briefs, the Go module proxy is a covert channel of a few hundred bytes per request, gVisor is not a microVM, and the model can write code that passes the checks.</p>
 </section>
@@ -988,6 +827,12 @@ table.cmp .v.nd::before { border-style: dashed; }
   document.querySelectorAll("video.loop").forEach((v) => {
     if (!grid.contains(v)) v.addEventListener("click", () => { if (!v.controls) { v.controls = true; v.play().catch(() => {}); } });
   });
+})();
+// a link into a fold, as the claims page's to the stall clip, opens it
+(() => {
+  const unfold = () => document.getElementById(decodeURIComponent(location.hash.slice(1)))?.closest("details")?.setAttribute("open", "");
+  addEventListener("hashchange", unfold);
+  unfold();
 })();
 </script>
 </body>
