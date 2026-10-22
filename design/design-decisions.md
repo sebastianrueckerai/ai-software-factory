@@ -268,3 +268,15 @@ Sebastian, on round 5 of the film: "Showing the manual to auto setting, multiple
 Each row keeps its lamp, but only the current level's lamp is lit; the other rows show an unlit socket with the strong line colour as its border. This returns to C32's single lit lamp and keeps C33's values: manual at 28 percent of the accent over the ground still reads as lit, and full auto keeps its glow, so the lamp of the current level gets brighter as the level rises.
 
 The build is c9dd1fe4 on main of the code repository.
+
+## C35. A message sent during a turn joins it and shows when the agent read it; a thinking mark; tool calls fold (2026-10-22, Sebastian)
+
+Sebastian, on the chat: "I want my messages to go into the chat to be read by the AI at the next opportunity", "I want a pulsing *thinking* indicator", "can we collapse the old ones and only show the current one?", and on queued messages, it is "difficult to know when he actually read my latest message". Before this, a message sent while a turn ran waited in a queue under the input with an ×. It went out as its own turn only after the turn ended. A blinking block cursor stood for a turn in flight.
+
+A message sent while the agent's turn runs now goes into the log at once, below the turn, with the line "not read yet: the agent reads it after its current step". The server hands it to the running turn. After the tool call in flight, the turn moves the message after its own rows and reads it at its next model call. The line then turns to "✓ read by the agent" in the done green, and the turn answers in a new message below it. A turn that takes no messages, such as `/compact` or a Do it, leaves the message queued for its own turn, as before. The editable queue under the input is gone.
+
+A message whose turn is in flight ends with a cyan dot and the word "thinking" in mono, which breathes at 1.6 s. Under reduced motion it stands still.
+
+A run of two or more tool calls in a row shows its newest call. The earlier calls fold behind one line, "n earlier calls", which opens on a click. Text, a proposal or an applied line ends a run.
+
+The build is f57d0312 on main of the code repository.

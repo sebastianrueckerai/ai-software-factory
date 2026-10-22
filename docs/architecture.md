@@ -2341,17 +2341,22 @@ sandbox becomes a card.
   project agent's conversation: streaming replies, tool calls as collapsed
   blocks with their arguments and duration, proposals as a list of changes
   with a Do-it button when a tool needs an OK, "applied" lines with undo
-  where an undo exists, and a message queue that stays editable until a
-  message lands. The conversation persists per project and per member. On a
+  where an undo exists. The conversation persists per project and per member. On a
   narrow screen the chat and the board become two tabs. Built at 36 percent
   of the width from 1200 px, two tabs below. A tool block shows the
   result's first line, a proposal has Do it and Skip, and `#n` in a reply
   opens the card's drawer. Since Stage 16 "New conversation" starts
   afresh, and the old conversations stay readable but not writable. Until
-  Stage 17 the input waited while a turn streamed. Since then the
-  member's next messages wait in a queue under the input, each editable in
-  place and removable, and go out in order as their own turns when the
-  turn ends. Live, two messages typed during a turn went out in order.
+  Stage 17 the input waited while a turn streamed. Stage 17 held the
+  member's next messages in an editable queue under the input. Since
+  2026-10-22 a message sent while a turn runs goes into the chat at once,
+  marked "not read yet". The turn reads it at its next model call, after
+  the tool call in flight, and the mark turns to "✓ read by the agent".
+  The turn answers below it. A turn that takes no messages, such as
+  `/compact`, leaves the message queued for its own turn. A pulsing
+  "thinking" mark ends a message whose turn is in flight, and a run of
+  tool calls shows its newest call, the earlier ones folded behind one
+  line (C35).
   Since 2026-10-18 a wake turn is one row with an expand, its fold the
   wake's first line, the whole turn behind the fold (below).
 - **Card drawer**: everything about one piece of work. It opens beside the
