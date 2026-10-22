@@ -49,13 +49,13 @@ Verified in the code on 2026-10-13:
 - The reproduction command comes from the issue's repro block, and the gate proves the fault at the base and the fix at the head.
 - Every factory-side prompt is a Go constant. AGENTS.md ships from the template. There is no skills mechanism, no per-project prompt key, no CLAUDE.md.
 - The harness interface exists (prepare, run, message) with one implementation, opencode, chosen in code. A per-class harness choice is roadmap 28.
-- Nothing schedules cards periodically. Cards come from webhooks, plans, the roller and humans. A checkpoint card has no clock to come from yet.
+- Nothing scheduled cards periodically on 2026-10-13. Since 2026-10-15 routines file cards by cron, after a count of merges or on an event ([routines.md](routines.md)).
 
 ## 5. Open points
 
 - Skills as data: carried by the project's repository, installed by the worker from a factory default pack, or both. The adapter contract must say how a pack maps onto a harness's own skill mechanism, so a harness swap (roadmap 28) keeps the pack working.
 - The sourcing of product rules: a directive card ("here are rules, give them tests") or the planner extracting candidates while planning. Either lands as tests in the repository. The agent must understand that a check never calls a model per execution.
-- Periodic cards: the missing primitive for checkpoints. An audit at a checkpoint is a card that runs a skill, and the clock is process config.
+- Periodic cards: closed by the routines of 2026-10-15 ([routines.md](routines.md)). An audit at a checkpoint is a routine that files a card to run a skill.
 - The drift view: closed cards grouped by changed path, weighted by revert marks. A query, not a stage. It rides roadmap 198's recording, needs the changed-path list on the task (the plan records counts only), and feeds roadmap 37's runbooks.
 - Risk classes per project: global only today. Possibly right, possibly a tightening a project should be allowed. Not discussed.
 
