@@ -80,21 +80,23 @@ h3 { font-size: 18px; font-weight: 600; line-height: 1.3; margin: 0 0 8px; }
 .diagram .link { fill: none; stroke: var(--mark); stroke-width: 1.5; }
 .diagram .tipn { fill: var(--mark); }
 
-.hero-annot { display: block; width: 100%; height: auto; font-family: var(--font-ui); }
-.hero-annot .frame { fill: none; stroke: var(--line-strong); }
+.hero-stage { position: relative; }
+.hero-annot { position: relative; z-index: 1; display: block; width: 100%; height: auto; font-family: var(--font-ui); pointer-events: none; transition: opacity .6s; }
+.hero-annot.gone { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .hero-annot { transition: none; } }
 .hero-annot .ct { font-size: 30px; font-weight: 600; fill: var(--text); }
 .hero-annot .cs { font-size: 22px; fill: var(--text-muted); }
 .hero-annot .br { fill: none; stroke-width: 3; }
 .hero-annot .cyan .br { stroke: var(--accent); }
 .hero-annot .amber .br { stroke: var(--need); }
 .hero-annot .hit { fill: none; stroke: var(--accent); stroke-width: 3; }
-.hero-plain, .hero-list { display: none; }
+.hero-list { display: none; }
 #hero figure { position: relative; }
-.play { position: absolute; right: 18px; bottom: 54px; padding: 12px 20px; border: 1px solid var(--accent); background: color-mix(in srgb, var(--bg) 88%, transparent);
+.play { position: absolute; z-index: 2; right: 18px; bottom: 18px; padding: 12px 20px; border: 1px solid var(--accent); background: color-mix(in srgb, var(--bg) 88%, transparent);
   color: var(--accent); font: 600 16px var(--font-mono); cursor: pointer; box-shadow: 0 4px 18px rgba(0,0,0,.5); }
 .play:hover, .play:focus-visible { background: var(--accent); color: var(--bg); }
 .play span { margin-right: 6px; }
-video.film { display: block; width: 100%; height: auto; border: 1px solid var(--line-strong); background: #000; }
+video.film { position: absolute; left: 0; bottom: 0; display: block; width: 100%; height: auto; border: 1px solid var(--line-strong); background: #000; }
 .hero-list { margin: 14px 0 0; padding-left: 22px; color: var(--text-muted); }
 .hero-list b { color: var(--text); }
 
@@ -127,10 +129,10 @@ table { width: 100%; border-collapse: collapse; font-size: 14px; }
 th, td { text-align: left; vertical-align: top; padding: 9px 12px; border: 1px solid var(--line); }
 thead th { background: var(--bg-raised); font-weight: 600; }
 .tscroll { overflow-x: auto; }
-table.cmp { min-width: 1040px; }
-table.cmp tbody th[scope=row] { font-weight: 600; min-width: 170px; }
+table.cmp { min-width: 1000px; }
+table.cmp tbody th[scope=row] { font-weight: 600; min-width: 120px; }
 table.cmp td { color: var(--text-muted); min-width: 90px; }
-table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
+table.cmp td:nth-child(2) { color: var(--text); min-width: 140px; }
 
 .limits { border: 1px solid var(--line-strong); border-left: 3px solid var(--need); background: var(--bg-panel); padding: 18px 22px; max-width: 880px; }
 .limits h3 { margin-bottom: 10px; }
@@ -141,7 +143,8 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 @media (max-width: 640px) {
   .cards { grid-template-columns: 1fr; }
   .hero-annot { display: none; }
-  .hero-plain, .hero-list { display: block; }
+  .hero-list { display: block; }
+  video.film { position: static; }
   .play { position: static; margin-top: 14px; }
   body { font-size: 16px; }
   section { padding-top: 44px; }
@@ -176,15 +179,16 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 <a class="btn" href="https://github.com/sebastianrueckerai/ai-software-factory">Source and setup</a>
 </div>
 <figure>
-<svg class="hero-annot" viewBox="0 0 1600 1032" role="img" aria-labelledby="hero-shot-t hero-shot-d"><title id="hero-shot-t">The console on a busy afternoon</title><desc id="hero-shot-d">The chat on the left, the board on the right. Callouts: change anything from one chat, where the agent proposes and you press Do it. See what is stuck and what waits on you, in the amber Needs you column with a question, a budget stop and a merge approval. Decide what runs next, in the Queued column with priorities and a backlog. Five cards build in In progress, seven are done.</desc><image href="assets/34-busy-board-3.png" x="0" y="132" width="1600" height="900"/><rect class="frame" x="0.5" y="132.5" width="1599" height="899"/><g class="call cyan"><text class="ct" x="16" y="44">Change anything from one chat</text><text class="cs" x="16" y="78">The agent proposes. You press Do it.</text><path class="br" d="M12 122 V108 H635 V122"/></g><g class="call amber"><text class="ct" x="649" y="44">See what is stuck</text><text class="cs" x="649" y="78">and what waits on you</text><path class="br" d="M645 122 V108 H950 V122"/></g><g class="call cyan"><text class="ct" x="960" y="44">Decide what runs next</text><text class="cs" x="960" y="78">Priorities and a backlog</text><path class="br" d="M956 122 V108 H1159 V122"/></g><rect class="hit" x="108" y="782" width="67" height="38" rx="3"/></svg>
-<div class="media hero-plain"><img src="assets/34-busy-board-3.png" alt="The console on a busy afternoon: the chat with two card proposals on the left, the board on the right with every column full." width="1600" height="900"></div>
+<div class="hero-stage">
+<svg class="hero-annot" viewBox="0 0 1600 1032" role="img" aria-labelledby="hero-shot-t hero-shot-d"><title id="hero-shot-t">The console on a busy afternoon</title><desc id="hero-shot-d">The chat on the left, the board on the right. Callouts: change anything from one chat, where the agent proposes and you press Do it. See what is stuck and what waits on you, in the amber Needs you column with a question, a budget stop and a merge approval. Decide what runs next, in the Queued column with priorities and a backlog. Five cards build in In progress, seven are done.</desc><g class="call cyan"><text class="ct" x="16" y="44">Change anything from one chat</text><text class="cs" x="16" y="78">The agent proposes. You press Do it.</text><path class="br" d="M12 122 V108 H635 V122"/></g><g class="call amber"><text class="ct" x="649" y="44">See what is stuck</text><text class="cs" x="649" y="78">and what waits on you</text><path class="br" d="M645 122 V108 H950 V122"/></g><g class="call cyan"><text class="ct" x="960" y="44">Decide what runs next</text><text class="cs" x="960" y="78">Priorities and a backlog</text><path class="br" d="M956 122 V108 H1159 V122"/></g><rect class="hit" x="108" y="782" width="67" height="38" rx="3"/></svg>
+<video id="film" class="film" controls playsinline preload="none" poster="assets/34-busy-board-3.png" width="1600" height="900" aria-label="The film, recorded on the real console. It opens on a busy afternoon: the chat with two card proposals on the left, the board on the right with every column full."><source src="assets/film.mp4" type="video/mp4"></video>
+<button type="button" class="play" id="play-film" aria-label="Play the film, three and a half minutes, captions, no sound"><span aria-hidden="true">▶</span> Watch the film · 3½ min</button>
+</div>
 <ol class="hero-list" aria-hidden="true">
 <li><b>Change anything from one chat.</b> The agent proposes. You press Do it.</li>
 <li><b>See what is stuck</b> and what waits on you, in the amber column.</li>
 <li><b>Decide what runs next:</b> priorities and a backlog.</li>
 </ol>
-<button type="button" class="play" id="play-film" aria-label="Play the film, three and a half minutes, captions, no sound"><span aria-hidden="true">▶</span> Watch the film · 3½ min</button>
-<video id="film" class="film" controls playsinline preload="none" poster="assets/34-busy-board-3.png" hidden><source src="assets/film.mp4" type="video/mp4"></video>
 <figcaption class="cap">Recorded on the real console. The project is a demo game, seeded for the film.</figcaption>
 </figure>
 <div class="band"><p>Built for teams that cannot sign off a hosted coding agent: regulated industries, and companies where security and compliance decide the tool choice.</p></div>
@@ -805,7 +809,7 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 <tbody>
 <tr>
 <th scope="row">The control plane runs on your servers, source published</th>
-<td>Yes. Self-hosted on rented commodity servers, source published.</td>
+<td><b>Yes</b>. Self-hosted on rented commodity servers, source published.</td>
 <td>No. Runners can be yours, the control plane stays in GitHub's cloud. Closed source.</td>
 <td>No. Workers can be yours, the control plane stays in Cursor's cloud. Closed source.</td>
 <td>No. Outposts workers can be yours, the control plane stays in Cognition's cloud.</td>
@@ -815,7 +819,7 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 </tr>
 <tr>
 <th scope="row">Your own model behind the same gateway, run end to end</th>
-<td>Yes. Hosted APIs and self-hosted models sit behind one gateway. The factory has completed tasks on a self-hosted model.</td>
+<td><b>Yes</b>. Hosted APIs and self-hosted models sit behind one gateway.</td>
 <td>No. The cloud agent offers a hosted model list.</td>
 <td>No, hosted models.</td>
 <td>No, its own models.</td>
@@ -825,7 +829,7 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 </tr>
 <tr>
 <th scope="row">The agent never holds a push token</th>
-<td>Yes. A fresh identity per task, minted after the agent is dead, used once, revoked.</td>
+<td><b>Yes</b>. A fresh identity per task, minted after the agent is dead, used once, revoked.</td>
 <td>Partial. It cannot run git push. The platform pushes for it, to one branch.</td>
 <td>Not documented. The agent pushes its own branch.</td>
 <td>No. Devin pushes itself, with the GitHub App's permissions.</td>
@@ -835,7 +839,7 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 </tr>
 <tr>
 <th scope="row">The money is held before each call, and at the cap it asks</th>
-<td>Yes. The hold is taken under a database lock. At a cap: fund or end.</td>
+<td><b>Yes</b>. The hold is taken under a database lock. At a cap: fund or end.</td>
 <td>No, organisation and user budgets.</td>
 <td>No. The cap lags, and usage stops without a question.</td>
 <td>No. Limits per session, user and organisation block work at the cap.</td>
@@ -845,7 +849,7 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 </tr>
 <tr>
 <th scope="row">A fix must fail at base and pass at head</th>
-<td>Yes. An issue or an alert files the fix card. The gate runs the repro command at base and at head.</td>
+<td><b>Yes</b>. An issue or an alert files the fix card. The gate runs the repro command at base and at head.</td>
 <td>No gate. Issues, schedules and code scanning alerts start tasks.</td>
 <td>No gate. Sentry, PagerDuty, Linear and labels start runs.</td>
 <td>No gate. PagerDuty, Linear and GitHub issues start sessions.</td>
@@ -855,7 +859,7 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 </tr>
 <tr>
 <th scope="row">The gates run the tests the criteria name, and a file cannot lower the floor</th>
-<td>Yes. The criteria gate runs each named test and requires it green. Four stages stay in every process.</td>
+<td><b>Yes</b>. The criteria gate runs each named test and requires it green. Four stages stay in every process.</td>
 <td>Partial. Rulesets require checks. No criteria name tests.</td>
 <td>No. Bugbot's review advises. No named-test gate.</td>
 <td>No. Devin Review comments. Merge gating is your branch protection.</td>
@@ -865,7 +869,7 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 </tr>
 <tr>
 <th scope="row">The process is a set of YAML files</th>
-<td>Yes. Lanes, stages, merge rule. Ours is spec-driven, bring your own.</td>
+<td><b>Yes</b>. Lanes, stages, merge rule. Ours is spec-driven, bring your own.</td>
 <td>Partial. Agents and workflows in YAML, the merge rule in settings.</td>
 <td>Partial. Files set the environment, hooks and review, not the stages.</td>
 <td>No. Files hold the environment, rules and skills, not stages or a merge rule.</td>
@@ -875,7 +879,7 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 </tr>
 <tr>
 <th scope="row">Delete everything and rebuild from Git and a bucket</th>
-<td>Yes. Rebuilt from the repositories and a backup bucket, rehearsed on 13 October.</td>
+<td><b>Yes</b>. Rebuilt from the repositories and a backup bucket, rehearsed on 13 October.</td>
 <td>No, SaaS.</td>
 <td>No, SaaS.</td>
 <td>No, SaaS. Only Outposts workers rebuild from Helm and Terraform.</td>
@@ -916,12 +920,18 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 <script>
 // The clips loop muted while they are on screen. A click pauses or plays one. A reader who asks for reduced motion
 // gets the still frames, and a clip plays only on a click.
-// The hero's play button swaps the annotated frame for the film, which opens on that same frame.
+// The film rests on its first frame under the hero's callouts. A second after it starts, the callouts fade.
+// When it ends, the callouts and the play button return.
 (() => {
   const button = document.querySelector("#play-film"), film = document.querySelector("#film");
-  button.addEventListener("click", () => {
-    document.querySelectorAll("#hero .hero-annot, #hero .hero-plain, #hero .hero-list").forEach((e) => { e.style.display = "none"; });
-    button.hidden = true; film.hidden = false; film.play().catch(() => {});
+  const annot = document.querySelector("#hero .hero-annot");
+  let fade;
+  film.controls = false;
+  button.addEventListener("click", () => { button.hidden = true; film.controls = true; film.play().catch(() => {}); });
+  film.addEventListener("playing", () => { fade ??= setTimeout(() => annot.classList.add("gone"), 1000); });
+  film.addEventListener("ended", () => {
+    clearTimeout(fade); fade = undefined;
+    film.controls = false; film.load(); annot.classList.remove("gone"); button.hidden = false;
   });
 })();
 (() => {
