@@ -557,7 +557,7 @@ const routines = {
     { run: 7, due: date(2, "fri", "07:00"), took: merges[123].live, outcome: "done", issue: 123, cost: 0.62, note: "GET /leaderboard p95 0.74 s, up from 0.31 s since #118" },
   ],
   "cost-review": [
-    { run: 3, due: date(2, "thu", "08:00"), took: 11 * HOUR, outcome: "done", issue: 124, note: "€16.50 of the €60 cap, €0.99 per card" },
+    { run: 3, due: date(2, "thu", "08:00"), took: 11 * HOUR, outcome: "done", issue: 124, note: "€24.42 of the €60 cap, €0.15 per card" },
   ],
 };
 
@@ -1342,6 +1342,28 @@ const ledger = {
   // at full auto the agent's wake turn answers the ask
   125: { ...live(125), spent: 0.41, asks: [{ at: 4 * MIN, answered: shareLink.auto.answered, by: "ai" }], diff: [3, 79, 7], acts: 1 },
 };
+
+// quiet is the work no scene shows: every weekday of the two weeks the routines and the intake file small changes,
+// one each half hour from 08:00, that run on the cheap model, pass review and go live after the one merge click manual
+// asks for. The figures read them as factoryd reads every card, so the metrics see the factory's week, not only the
+// cards the scenes need, of which many wait on a person by design.
+const QUIET = [
+  "Bump a pinned dependency to its newest patch", "Fix a flaky lobby test", "Update the German strings", "Compress the asteroid sprites",
+  "Fix a lint warning in the store", "Tidy the matchmaking log lines", "Raise the replay test's timeout", "Pin the CI image's digest",
+  "Fix a typo on the season pass page",
+];
+for (const w of [1, 2]) {
+  for (let k = 0; k < 90; k++) {
+    const issue = 1000 + (w - 1) * 90 + k;
+    const title = QUIET[k % QUIET.length];
+    cards[issue] = { title, size: "small", pr: 400 + issue - 1000, body: title, acceptance: ["the change's own test passes"] };
+    filed[issue] = new Date(date(w, "mon", "08:00").getTime() + (Math.floor(k / 18) * DAY + (k % 18) * 30 * MIN) * 1000);
+    ledger[issue] = {
+      end: (18 + ((k * 7) % 20)) * MIN, spent: (3 + ((k * 13) % 6)) / 100, lead: (6 + (k % 3)) * MIN,
+      diff: [1 + (k % 2), 4 + ((k * 11) % 30), (k * 5) % 7], acts: 1,
+    };
+  }
+}
 
 // chats are the project agent's spend in the chat, cumulative, at the times the scenes' chats reach it.
 const chats = [

@@ -2,5 +2,5 @@
  "id": "clip-dial",
  "name": "Manual control or full auto, and anything in between",
  "title": "Manual control or full auto, and anything in between",
- "story": "The theory first: which decisions stay with you at each autonomy level. Then the console: on manual a payments merge waits and is approved by hand. The dial stands on manual, its menu shows a lamp per level, brighter with each, and full auto is picked. After the switch the chip's lamp burns brightest, the agent answers the next card's question from the code, and the card merges and goes live without anyone."
+ "story": "The theory first: which decisions stay with you at each autonomy level. Then the console: on manual a payments merge waits and is approved by hand. The dial stands on manual with only its dim lamp lit, its menu opens, and full auto is picked. After the switch the chip reads full auto, the menu shows only the full auto lamp lit, the agent answers the next card's question from the code, and the card merges and goes live without anyone."
 }

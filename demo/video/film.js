@@ -33,6 +33,10 @@ const media = [];
 let t = 0;
 // slates: a title segment holds the frame black with its words, between the scenes before and after it
 const slates = [];
+// span writes a media element's start and length from its rounded start and rounded end, so one element ends exactly
+// where the next begins: rounding the two apart leaves a frame between them that shows no picture
+const ms = (x) => Number(x.toFixed(3));
+const span = (start, dur) => `data-start="${ms(start).toFixed(3)}" data-duration="${(ms(start + dur) - ms(start)).toFixed(3)}"`;
 for (const [i, s] of film.segments.entries()) {
   if (s.title) {
     seg[s.id] = { start: t, dur: s.dur, title: s.title };
@@ -45,15 +49,15 @@ for (const [i, s] of film.segments.entries()) {
     fs.copyFileSync(path.join(bank, s.clip), path.join(clips, s.clip));
     const rate = s.rate || 1, dur = s.dur / rate;
     seg[s.id] = { start: t, dur, clip: s.clip, mediaStart: 0, rate };
-    media.push(`<video class="clip media" id="m-${s.id}" src="clips/${s.clip}" muted playsinline data-start="${t.toFixed(3)}" ` +
-      `data-duration="${dur.toFixed(3)}" data-media-start="0"${rate === 1 ? "" : ` data-playback-rate="${rate}"`}></video>`);
+    media.push(`<video class="clip media" id="m-${s.id}" src="clips/${s.clip}" muted playsinline ${span(t, dur)} ` +
+      `data-media-start="0"${rate === 1 ? "" : ` data-playback-rate="${rate}"`}></video>`);
     t += dur;
     continue;
   }
   if (s.still) {
     fs.copyFileSync(path.join(bank, s.still), path.join(clips, s.still));
     seg[s.id] = { start: t, dur: s.dur, still: s.still };
-    media.push(`<img class="clip media" id="m-${s.id}" src="clips/${s.still}" alt="" data-start="${t.toFixed(3)}" data-duration="${s.dur.toFixed(3)}">`);
+    media.push(`<img class="clip media" id="m-${s.id}" src="clips/${s.still}" alt="" ${span(t, s.dur)}>`);
     t += s.dur;
     continue;
   }
@@ -90,8 +94,8 @@ for (const [i, s] of film.segments.entries()) {
     const m0 = marks[i], m1 = marks[i + 1], r = held(m0, m1) && i + 2 < marks.length ? s.holdRate : rate, d = (m1 - m0) / r;
     if (d < 0.02) continue;
     pieces.push({ m0, m1, t0: out, rate: r });
-    media.push(`<video class="clip media" id="m-${s.id}-${pieces.length}" src="clips/${s.scene}.mp4" muted playsinline data-start="${out.toFixed(3)}" ` +
-      `data-duration="${d.toFixed(3)}" data-media-start="${m0.toFixed(3)}"${r === 1 ? "" : ` data-playback-rate="${r}"`}></video>`);
+    media.push(`<video class="clip media" id="m-${s.id}-${pieces.length}" src="clips/${s.scene}.mp4" muted playsinline ${span(out, d)} ` +
+      `data-media-start="${m0.toFixed(3)}"${r === 1 ? "" : ` data-playback-rate="${r}"`}></video>`);
     out += d;
   }
   const dur = out - t;

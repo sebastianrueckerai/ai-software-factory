@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The film, version 5</title>
+<title>The film, version 6</title>
 <style>
 :root { color-scheme: dark; --bg: #070b12; --line: #263649; --text: #dfe7f1; --muted: #93a1b5; --accent: #4fcbe2; --need: #f4b13e; }
 body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 system-ui, sans-serif; }
@@ -22,11 +22,11 @@ code { font-size: .92em; }
 </head>
 <body>
 <main>
-<h1>The film, version 5</h1>
-<p>What changed since version 4, from your notes. Each section title now stands alone on black: the board fades out, the title shows, the board fades back in, and only then does anything move. Inside a card comes right after the plan, and Metrics comes last. The plan, the merged card and the full-auto board have no zoom. The highlight on the approval leaves with the card. The question's highlight reaches down to its three choices. Metrics shows the whole page first, runs slower, and ends on tuning the process, the harness and the prompts on data. Every clip plays inside the black bars, and the labels sit in a bigger box with a shadow. The level menu has a lamp on every row, brighter with each level. Routines are now one console scene with no diagram. "Player" became "user" in the captions and in the demo project's cards.</p>
+<h1>The film, version 6</h1>
+<p>What changed since version 5, from your notes. The level menu lights only the current level's lamp: manual's dim lamp at first, and after the switch only the brighter full auto lamp, which the menu now shows again. The flicker and shake in the dial clip came from two highlight moves at the same moment and are fixed in the template for every video. Unchanging views are shorter: the manual review, the Forgejo page (now without a highlight), the stall and the question, and the board drains faster, still card by card. Full auto ends before the drawer opens. The metrics week reads 100 cards with 4 % escalated, since the ledger now holds the factory's quiet work too. The pool clip ends on "You are not alerted for peanuts."</p>
 <p>The videos and sheets load from <code>demo/out/</code> of the main checkout. Open this page from there. Scores come from the independent critic, Gemini 2.5 Pro, reading one frame every two seconds. It cannot see motion.</p>
 <h2>The rough cut</h2>
-<p id="film-len">Spotlight style with captions, no voice, the whole of sandbox A inside, and black bars at the top and bottom. It runs 222 s.</p>
+<p id="film-len">Spotlight style with captions, no voice, the whole of sandbox A inside, and black bars at the top and bottom. It runs 204 s.</p>
 <div class="pair"><div><video src="../../demo/out/p-film-a.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-film-a-sheet.png" alt="Contact sheet of the rough cut."><p class="cap"><span class="score" id="s-film-a"></span></p></div></div>
 <h2>The landing page clips</h2>
 <p>Silent loops with a short label for each moment at the top left, each ending on its moral.</p>
@@ -43,7 +43,7 @@ code { font-size: .92em; }
 <p>The diagram of a small monthly pool you set for overruns, then a card at €0.40 that the project agent funds from it at full auto.</p>
 <div class="pair"><div><video src="../../demo/out/p-clip-pool.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-pool-sheet.png" alt="Contact sheet of the pool clip."><p class="cap"><span class="score" id="s-clip-pool"></span></p></div></div>
 <h3>Manual control or full auto, and anything in between</h3>
-<p>The diagram of who decides at each level, then a merge approved by hand, the level menu with a lamp per level, the full auto lamp on, and a card that merges on its own.</p>
+<p>The diagram of who decides at each level, then a merge approved by hand, the level menu with only manual's lamp lit, the switch, the menu again with only the full auto lamp lit, and a card that merges on its own.</p>
 <div class="pair"><div><video src="../../demo/out/p-clip-dial.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-dial-sheet.png" alt="Contact sheet of the dial clip."><p class="cap"><span class="score" id="s-clip-dial"></span></p></div></div>
 <h3>Recovery from stalls</h3>
 <p>The diagram of the twelve checks and the staircase of measures up to a human, then a session going in circles until a check trips.</p>

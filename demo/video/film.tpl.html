@@ -110,7 +110,14 @@ const after = (t) => { for (let k = 0; k < 3; k++) { const w = within(held, t) |
 
 // the camera: each cam moves the frame so its box fills a share of the screen, a cam with no box returns home; a cut may
 // cap how far any zoom goes and how fast the camera moves (maxZoom and camDur in film.json)
-const moves = (F.cams || []).map((c) => ({ ...c, t: after(time(c.at)), dur: c.dur ?? F.camDur ?? 0.9 }));
+// A move ends before the next one starts and before the next reset under black: a seek that lands inside two moves of one
+// property shows whichever the seeks before it rendered last, and the renderer's workers each seek a different series.
+const resets = [...(F.slates || []).map((id) => time([id]) + 0.05), ...(F.reveals || []).map((r) => time(r.from || r))];
+const moves = (F.cams || []).map((c) => ({ ...c, t: after(time(c.at)), dur: c.dur ?? F.camDur ?? 0.9 })).sort((a, b) => a.t - b.t);
+moves.forEach((c, i) => {
+  const ends = [moves[i + 1]?.t, ...resets].filter((e) => e > c.t);
+  c.dur = Math.min(c.dur, ...ends.map((e) => e - c.t));
+});
 moves.forEach((c) => {
   const r = box(c.box);
   if (r) fx.camera(tl, stage, r, c.t, { fill: c.fill ?? 0.8, cx: c.cx, cy: c.cy, dur: c.dur, max: F.maxZoom });
@@ -122,17 +129,21 @@ moves.forEach((c) => {
 // In time order, since a hidden highlight appears in place and a shown one travels.
 const spots = [];
 (F.spots || []).forEach((s) => {
-  let t = after(time(s.at));
+  // taking the highlight away is never late: only a highlight waits for a title or a lift
+  let t = s.box ? after(time(s.at)) : time(s.at);
   const m = moves.find((c) => c.dur > 0.1 && t >= c.t - 0.3 && t < c.t + c.dur);
   if (m) { spots.push({ t: Math.min(t, m.t), box: null, dur: 0.3 }); t = m.t + m.dur; }
   spots.push({ ...s, t });
 });
 // the highlight is gone before the title rises
 held.forEach((h) => spots.push({ t: h.t - 0.4, box: null, dur: 0.3 }));
-spots.sort((a, b) => a.t - b.t).forEach((s) => {
+// each move of the highlight ends where the next begins, and of two at one moment only the later counts
+spots.sort((a, b) => a.t - b.t).forEach((s, i, all) => {
+  const next = all[i + 1]?.t ?? Infinity;
+  if (next - s.t < 0.02) return;
   const r = box(s.box);
-  if (r) fx.spotlight(tl, stage, r, s.t, { color: s.amber ? "#f4b13e" : "#4fcbe2", dur: s.dur ?? 0.45 });
-  else fx.unspot(tl, stage, s.t, s.dur ?? 0.5);
+  if (r) fx.spotlight(tl, stage, r, s.t, { color: s.amber ? "#f4b13e" : "#4fcbe2", dur: Math.min(s.dur ?? 0.45, next - s.t) });
+  else fx.unspot(tl, stage, s.t, Math.min(s.dur ?? 0.5, next - s.t));
 });
 
 // the words: each caption lasts until the next one, its own end or the next title, and must be up long enough to read. A caption with
@@ -199,9 +210,26 @@ held.forEach(({ t, s }) => {
 // quiet segments carry their own words: the caption band steps aside
 (F.quiet || []).forEach((id) => {
   tl.to(caps, { opacity: 0, duration: 0.2 }, time([id]));
-  tl.to(caps, { opacity: 1, duration: 0.2 }, time([id, "end"]));
+  // a title right after brings the band back itself, once it has left
+  const end = time([id, "end"]);
+  if (!held.some((h) => h.t > end - 0.5 && h.t < end + 0.6)) tl.to(caps, { opacity: 1, duration: 0.2 }, end);
 });
 
+// no two tweens may change one property of one element at the same moment: the frame would depend on the seeks before it
+const spans = new Map(), CONTROL = new Set(["attr", "duration", "ease", "immediateRender", "parent", "delay", "overwrite", "lazy", "runBackwards", "startAt", "data", "id", "stagger", "paused"]);
+tl.getChildren(true, true, false).forEach((tw) => {
+  const keys = [...Object.keys(tw.vars.attr || {}).map((k) => "attr:" + k), ...Object.keys(tw.vars).filter((k) => !CONTROL.has(k))];
+  tw.targets().forEach((el) => keys.forEach((k) => {
+    if (!spans.has(el)) spans.set(el, {});
+    (spans.get(el)[k] ??= []).push([tw.startTime(), tw.endTime()]);
+  }));
+});
+spans.forEach((props, el) => Object.entries(props).forEach(([k, xs]) => {
+  xs.sort((a, b) => a[0] - b[0]).forEach((x, i) => {
+    const y = xs[i + 1];
+    if (y && y[0] < x[1] - 1e-6) throw new Error(`${el.id || el.getAttribute("class") || el.tagName} ${k}: tweens overlap at ${y[0].toFixed(2)} s`);
+  });
+}));
 window.__timelines = window.__timelines || {};
 window.__timelines["main"] = tl;
 </script>

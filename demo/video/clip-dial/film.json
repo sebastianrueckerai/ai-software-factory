@@ -166,8 +166,19 @@
    "at": [
     "c",
     3,
-    "act1",
-    2.4
+    "act4"
+   ],
+   "box": [
+    "25-autonomy",
+    2,
+    "menu"
+   ]
+  },
+  {
+   "at": [
+    "c",
+    3,
+    "act7"
    ],
    "box": [
     "25-autonomy",
@@ -272,7 +283,7 @@
     "act0",
     0.3
    ],
-   "text": "Each level's lamp is brighter than the last",
+   "text": "Only the current level's lamp is lit",
    "cls": "label"
   },
   {
@@ -296,8 +307,16 @@
    "at": [
     "c",
     3,
-    "act1",
-    2.4
+    "act4"
+   ],
+   "text": "Only the full auto lamp is lit",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "c",
+    3,
+    "act7"
    ],
    "text": "The agent takes the next card's question",
    "cls": "label"

@@ -37,7 +37,7 @@
     "stillMs"
    ],
    "tail": 0.3,
-   "rate": 5.5
+   "rate": 9
   },
   {
    "id": "intake",
@@ -79,7 +79,7 @@
     34,
     "stillMs"
    ],
-   "tail": 1.6,
+   "tail": 0.8,
    "rate": 1.1
   },
   {
@@ -112,7 +112,7 @@
    ],
    "tail": 0,
    "rate": 1.0,
-   "holdRate": 1.0
+   "holdRate": 2.0
   },
   {
    "id": "merged",
@@ -150,7 +150,7 @@
     4,
     "stillMs"
    ],
-   "tail": 2.6,
+   "tail": 0,
    "rate": 1.3,
    "holdRate": 1.6
   },
@@ -171,8 +171,8 @@
     "stillMs"
    ],
    "tail": 0.3,
-   "rate": 1.1,
-   "holdRate": 1.6
+   "rate": 1.4,
+   "holdRate": 2.4
   },
   {
    "id": "t-needs",
@@ -192,8 +192,8 @@
     "stillMs"
    ],
    "tail": 0.3,
-   "rate": 0.8,
-   "holdRate": 1.6
+   "rate": 1.0,
+   "holdRate": 2.2
   },
   {
    "id": "t-metrics",
@@ -556,22 +556,6 @@
   {
    "at": [
     "approval",
-    4,
-    "act4",
-    0.6
-   ],
-   "box": {
-    "rect": [
-     24,
-     150,
-     1552,
-     150
-    ]
-   }
-  },
-  {
-   "at": [
-    "approval",
     5,
     "act0"
    ],
@@ -602,31 +586,6 @@
     "22-approval",
     6,
     "merged"
-   ]
-  },
-  {
-   "at": [
-    "auto2",
-    3,
-    "act0"
-   ],
-   "box": [
-    "25-autonomy",
-    3,
-    "level"
-   ]
-  },
-  {
-   "at": [
-    "auto2",
-    3,
-    "act1",
-    1.8
-   ],
-   "box": [
-    "25-autonomy",
-    3,
-    "wake"
    ]
   },
   {
@@ -699,21 +658,36 @@
   },
   {
    "at": [
-    "approval",
-    5,
-    "atMs",
-    -0.35
-   ],
-   "box": null
-  },
-  {
-   "at": [
     "auto2",
     null,
     null,
     -0.3
    ],
    "box": null
+  },
+  {
+   "at": [
+    "auto2",
+    3,
+    "act4"
+   ],
+   "box": [
+    "25-autonomy",
+    2,
+    "menu"
+   ]
+  },
+  {
+   "at": [
+    "auto2",
+    3,
+    "act7"
+   ],
+   "box": [
+    "25-autonomy",
+    3,
+    "wake"
+   ]
   }
  ],
  "caps": [
@@ -943,7 +917,7 @@
    "at": [
     "auto2",
     3,
-    "act0"
+    "act7"
    ],
    "text": "<b>On full auto, the agent takes the open question,</b>"
   },

@@ -28,7 +28,8 @@
    "to": [
     4,
     "stillMs"
-   ]
+   ],
+   "holdRate": 1.8
   },
   {
    "id": "end",

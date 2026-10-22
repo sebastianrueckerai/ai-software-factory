@@ -260,3 +260,11 @@ Every row now shows its level's lamp at that level's strength, so the menu reads
 
 The build is 549cbaee on main of the code repository.
 
+
+## C34. Only the current level's lamp is lit (2026-10-22, Sebastian)
+
+Sebastian, on round 5 of the film: "Showing the manual to auto setting, multiple lights seem to be on. In the beginning only the manual light should be on, then when switching to auto only the brighter full auto light." C33 lit every row of the level menu at its level's strength, so the menu showed four lit lamps at once.
+
+Each row keeps its lamp, but only the current level's lamp is lit; the other rows show an unlit socket with the strong line colour as its border. This returns to C32's single lit lamp and keeps C33's values: manual at 28 percent of the accent over the ground still reads as lit, and full auto keeps its glow, so the lamp of the current level gets brighter as the level rises.
+
+The build is c9dd1fe4 on main of the code repository.

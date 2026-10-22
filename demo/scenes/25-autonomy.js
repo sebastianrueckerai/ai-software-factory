@@ -96,7 +96,15 @@ module.exports = {
     { state: () => null, actions: [{ click: ui.level }, { waitFor: ui.levelPick("full auto") }, { hover: ui.levelPick("full auto") }], hold: 3500, boxes: { level: ui.level, menu: "#level-pop" } },
     // a pick sets the level at once, through a commit of the project's file; the lab's Forgejo fake holds no such file,
     // so the full auto level is the seed's
-    { state: full, actions: [{ goto: "/" }, { waitFor: wake }, { hover: ui.park }], hold: 3500, boxes: { wake, level: ui.level } },
+    {
+      state: full,
+      actions: [
+        { goto: "/" }, { waitFor: wake }, { wait: 1800 }, { click: ui.level }, { waitFor: ui.levelPick("full auto") },
+        { hover: ui.levelPick("full auto") }, { wait: 2200 }, { press: "Escape" }, { hover: ui.park },
+      ],
+      hold: 3000,
+      boxes: { wake, level: ui.level },
+    },
     {
       state: () => null,
       actions: [{ click: `${wake} [data-fold]` }, { hover: `${wake} .av` }],

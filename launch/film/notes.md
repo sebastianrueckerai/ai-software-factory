@@ -47,6 +47,22 @@ Started 22 October 2026. The working file for the film and its small clips: what
 - Show routines (the dashed card, the weekly bump) in a clip of their own.
 - The budget clip mostly shows a split: replace it with the discretionary pool, so the factory does not ask about five-cent overruns.
 
+## What Sebastian asked, 22 October, after round 5 (round 6)
+
+- The level menu shows several lamps lit. At first only manual's lamp may be on, after the switch only the brighter full auto lamp. Check it wherever the menu shows.
+- Unchanging views can be shorter: the stall, the manual review, the Forgejo page and other places. Nobody reads the screen's text; the screen only has to look real. Keep enough time for the captions, judged from the last camera move. The cards can leave the board faster, still one by one.
+- No highlight on the Forgejo page. In full auto, do not open the drawer at "the card merges once the gates pass".
+- The metrics page should look better: 40 % of cards needing a human looks bad, about 4 % is right.
+- The pool clip's moral names no amount: "You are not alerted for peanuts".
+- The dial clip flickers and shakes from 34 s, and at 41 s a highlight outlasts what it marks.
+
+## Round 6 decisions
+
+- **The lamp.** C34: each row keeps its lamp, only the current level's is lit, at C33's values, in console build c9dd1fe4. Scene 25 opens the menu again after the switch, where only the full auto lamp is lit, before the wake turn.
+- **The flicker.** The dial clip's last unspot before each cut fell inside the lift's 0.05 s tolerance, so it moved to the lift's end, the same moment as the next highlight. Two tweens on one attribute that start together render by seek history, and HyperFrames renders every fourth frame in its own worker, so one worker in four showed the frame without its highlight. Now taking a highlight away is never delayed, each highlight move and camera move ends before the next begins, and the page refuses to load when two tweens still change one property of one element at once. Single blank frames came from how film.js wrote each media element's start and length, both rounded to the millisecond apart: piece 4 of the stall ended at 157.766 and piece 5 began at 157.767, so frame 4733 showed no video. film.js now writes each length as the rounded end minus the rounded start, so one element ends exactly where the next begins.
+- **The quiet work.** The ledger adds 90 small cards a week that no scene shows, filed by routines and the intake each half hour of every weekday, 3 to 8 cents each, live after the merge click manual asks for. A week now reads 100 cards; week 2 escalates 4 of them, 4 %. Board spend, the costs page and the cost review's note follow from the same ledger.
+- **Pacing.** The drain runs at 9 times speed, the manual review and the Forgejo page at twice the hold speed, the stall at 1.4 with holds at 2.4, the question at 1.0 with holds at 2.2. The caption guard keeps every caption long enough to read.
+
 ## What Sebastian asked, 22 October, after round 4 (round 5)
 
 - Rough cut: "you press Do it" becomes "you approve". "Player" becomes "user" everywhere.
@@ -155,13 +171,14 @@ Started 22 October 2026. The working file for the film and its small clips: what
 
 - Version 2, the film's sections at 3, 2 and 3 of 5 before the last fixes. The approval's empty highlight, the zoom out on the plan, the split's highlight on a card that had left, the highlight before the Do it button existed, and the full-auto story were fixed. Full auto now shows the agent's own answer and the merge and release lines, not the gate's raw log. The wake line itself said "1 asks wait": factoryd's wake text now says "1 ask waits" (code 2d6b6156).
 - Version 5: the film's parts at 2, 2 and 3 of 5, the clips at 3 of 5 except the ladder at 2. Its listed defects were checked frame by frame: it reads the black slates, the dips at page changes and the dimmed moral frames as empty, the spotlight's dimming as a zoom, and a highlight around a card with its button as a highlight on the button. Fixed from my own frame checks instead: the Forgejo highlight that stayed over the board, the approval highlight that outlined the empty slot, up to 2 s of black at page reloads, the black last frame, and the routine clip's typed line that scrolled away unread.
+- Version 6: the film's parts at 2 of 5 each, the dial clip 2, the pool and stall clips 4; the other clips kept their version 5 content and scores. The dial's two asks, zooms onto the chip and readable console text, run against the direction to zoom less, so they stay undone.
 
 ## Open, for Sebastian
 
 - The budget stop in the opening follows option 2 since round 4: the split, with its reason ("a card failed twice") on screen. Option 1 (Fund on screen) and option 3 (a different chat example) stay open.
 - The pool shows nowhere in the console: no page states its size or what it funded. The pool clip shows it through the diagram and the wake turn's trace.
 - The case that lands with the human uses scene 21, a decision only a human makes. A scene where an agent tried twice and explains why it cannot fix the problem does not exist yet.
-- The rough cut runs about 222 s since round 5: slower pacing, black slates, the Forgejo visit and the whole sandbox A (56 s) inside it. Cutting to 90 means dropping sections or moving the sandbox out of the film; the clips already carry each mechanism on their own.
+- The rough cut runs 204 s since round 6: black slates, the Forgejo visit and the whole sandbox A (56 s) inside it. Cutting to 90 means dropping sections or moving the sandbox out of the film; the clips already carry each mechanism on their own.
 - The voice track: lines are not written. They come from the captions once the cut is approved, generated under the fal cap.
 - DORA: the film says "the four DevOps delivery metrics", as the page does.
 
@@ -173,4 +190,5 @@ Started 22 October 2026. The working file for the film and its small clips: what
 - [x] Version 2: the rough cut, sandbox A, C and D, seven clips. Probed clean, rendered, each identical over two renders.
 - [x] The landing page plays the clips in its cards, with the stills as posters, and the film behind the hero's play button. Its video files stay out of git until a cut is approved.
 - [x] Round 5: black slates, Inside a card after the plan, Metrics last, no zoom on the plan, the merged card or the full-auto board, the level menu's lamps (C33), routines as scene 38, all 38 scenes recorded again with "user" for "player".
+- [x] Round 6: one lit lamp (C34), the flicker fixed in the template, shorter static views, the quiet work in the ledger, the pool's moral without an amount.
 - [ ] Sebastian approves the cut; then the cut to length, the voice, the videos into git.
