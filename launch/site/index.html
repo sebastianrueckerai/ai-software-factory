@@ -75,6 +75,10 @@ h3 { font-size: 18px; font-weight: 600; line-height: 1.3; margin: 0 0 8px; }
 .diagram .file rect { fill: var(--bg-card); stroke: var(--line-strong); }
 .diagram .ft { font: 13.5px var(--font-mono); fill: var(--text); }
 .diagram .fs { font: 11.5px var(--font-mono); fill: var(--text-faint); }
+.diagram .panel.ours rect { stroke: var(--accent); }
+.diagram .panel.slot rect { fill: none; stroke-dasharray: 5 4; }
+.diagram .link { fill: none; stroke: var(--mark); stroke-width: 1.5; }
+.diagram .tipn { fill: var(--mark); }
 
 .hero-annot { display: block; width: 100%; height: auto; font-family: var(--font-ui); }
 .hero-annot .frame { fill: none; stroke: var(--line-strong); }
@@ -154,6 +158,7 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 <li><a href="#get">What you get</a></li>
 <li><a href="#sandbox">The sandbox</a></li>
 <li><a href="#run">Run it</a></li>
+<li><a href="#parts">The parts</a></li>
 <li><a href="#hood">Under the hood</a></li>
 <li><a href="#compare">Compare</a></li>
 <li><a href="#proof">Proof</a></li>
@@ -503,6 +508,235 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 </svg></div>
 <p class="cap">A project may only tighten: four stages stay in every process, and no file can remove them. <a href="../../docs/layers.md">The three layers in full</a>.</p>
 <div class="links"><a class="btn" href="https://github.com/sebastianrueckerai/ai-software-factory">Source and setup</a></div>
+</section>
+
+<section id="parts" aria-labelledby="parts-h">
+<h2 id="parts-h">Open source parts. Our code only where none fit.</h2>
+<p class="lede">We wrote four parts in Go: the control plane, the console, the sandbox worker and the gateway in front of LiteLLM. Every other part is an open source project, set up by configuration.</p>
+<div class="scroll"><svg class="diagram" viewBox="0 0 1140 740" role="img" aria-labelledby="pt-t pt-d"><title id="pt-t">What the factory is built from</title><desc id="pt-d">Open source parts, set up by configuration: Forgejo, SigNoz, OpenBao, Temporal, PostgreSQL, LiteLLM, opencode, gVisor, Kubernetes, Talos Linux, Cilium, Flux, OpenTofu and cert-manager. Written for the factory in Go: the console, factoryd, agent-worker and factory-gateway. Your files: the process, the policy, the project file and AGENTS.md. The harness sits behind one interface. opencode is the default, and another harness is one more adapter.</desc>
+<defs><marker id="tipn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="tipn" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<g class="panel "><rect x="20" y="8" width="28" height="18"/></g><text class="s" x="58" y="22">open source, set up by configuration</text>
+<g class="panel ours"><rect x="330" y="8" width="28" height="18"/></g><text class="s" x="368" y="22">written for the factory</text>
+<g class="file"><rect x="560" y="8" width="28" height="18"/></g><text class="s" x="598" y="22">your files</text>
+<g class="panel ">
+<rect x="20" y="80" width="300" height="80"/>
+<path class="corner" d="M20 87 V80 H27"/>
+<path class="corner" d="M320 87 V80 H313"/>
+<path class="corner" d="M20 153 V160 H27"/>
+<path class="corner" d="M320 153 V160 H313"/>
+<text class="t " x="34" y="106">Forgejo</text>
+<text class="s" x="34" y="126">Git, issues, pull requests, CI, registry</text>
+<text class="fs" x="34" y="144">GPL 3.0</text>
+</g>
+<g class="panel ours">
+<rect x="20" y="176" width="300" height="64"/>
+<path class="corner" d="M20 183 V176 H27"/>
+<path class="corner" d="M320 183 V176 H313"/>
+<path class="corner" d="M20 233 V240 H27"/>
+<path class="corner" d="M320 233 V240 H313"/>
+<text class="t " x="34" y="202">Console and chat</text>
+<text class="w" x="308" y="202" text-anchor="end">Go</text>
+<text class="s" x="34" y="222">one screen per project</text>
+</g>
+<g class="panel ">
+<rect x="20" y="256" width="300" height="80"/>
+<path class="corner" d="M20 263 V256 H27"/>
+<path class="corner" d="M320 263 V256 H313"/>
+<path class="corner" d="M20 329 V336 H27"/>
+<path class="corner" d="M320 329 V336 H313"/>
+<text class="t " x="34" y="282">SigNoz</text>
+<text class="s" x="34" y="302">traces, logs and alerts on OpenTelemetry</text>
+<text class="fs" x="34" y="320">MIT, open core</text>
+</g>
+<g class="panel ">
+<rect x="20" y="364" width="300" height="80"/>
+<path class="corner" d="M20 371 V364 H27"/>
+<path class="corner" d="M320 371 V364 H313"/>
+<path class="corner" d="M20 437 V444 H27"/>
+<path class="corner" d="M320 437 V444 H313"/>
+<text class="t " x="34" y="390">OpenBao</text>
+<text class="s" x="34" y="410">short-lived SSH certificates</text>
+<text class="fs" x="34" y="428">MPL 2.0</text>
+</g>
+<g class="panel ours">
+<rect x="400" y="80" width="310" height="264"/>
+<path class="corner" d="M400 87 V80 H407"/>
+<path class="corner" d="M710 87 V80 H703"/>
+<path class="corner" d="M400 337 V344 H407"/>
+<path class="corner" d="M710 337 V344 H703"/>
+<text class="t " x="414" y="106">factoryd</text>
+<text class="w" x="698" y="106" text-anchor="end">Go</text>
+<text class="s" x="414" y="126">the control plane: intake, gates,</text>
+<text class="s" x="414" y="144">caps, routines, the money ledger</text>
+</g>
+<g class="file"><rect x="414" y="166" width="282" height="42"/><text class="ft" x="426" y="184">processes/spec.yaml</text><text class="fs" x="426" y="200">lanes, stages, merge queue</text></g>
+<g class="file"><rect x="414" y="222" width="282" height="42"/><text class="ft" x="426" y="240">policy.yaml</text><text class="fs" x="426" y="256">caps, models per class, risk rules</text></g>
+<g class="file"><rect x="414" y="278" width="282" height="42"/><text class="ft" x="426" y="296">projects/&lt;name&gt;.yaml</text><text class="fs" x="426" y="312">autonomy, merge rule, routines</text></g>
+<g class="panel ">
+<rect x="400" y="364" width="150" height="80"/>
+<path class="corner" d="M400 371 V364 H407"/>
+<path class="corner" d="M550 371 V364 H543"/>
+<path class="corner" d="M400 437 V444 H407"/>
+<path class="corner" d="M550 437 V444 H543"/>
+<text class="t " x="414" y="390">Temporal</text>
+<text class="s" x="414" y="410">a workflow per card</text>
+<text class="fs" x="414" y="428">MIT</text>
+</g>
+<g class="panel ">
+<rect x="560" y="364" width="150" height="80"/>
+<path class="corner" d="M560 371 V364 H567"/>
+<path class="corner" d="M710 371 V364 H703"/>
+<path class="corner" d="M560 437 V444 H567"/>
+<path class="corner" d="M710 437 V444 H703"/>
+<text class="t " x="574" y="390">PostgreSQL</text>
+<text class="s" x="574" y="410">task state, ledger</text>
+<text class="fs" x="574" y="428">PostgreSQL licence</text>
+</g>
+<rect class="wall" x="800" y="80" width="320" height="364"/>
+<text class="wl" x="800" y="72">one throwaway pod per card</text>
+<g class="panel ours">
+<rect x="815" y="94" width="290" height="70"/>
+<path class="corner" d="M815 101 V94 H822"/>
+<path class="corner" d="M1105 101 V94 H1098"/>
+<path class="corner" d="M815 157 V164 H822"/>
+<path class="corner" d="M1105 157 V164 H1098"/>
+<text class="t " x="829" y="120">agent-worker</text>
+<text class="w" x="1093" y="120" text-anchor="end">Go</text>
+<text class="s" x="829" y="140">clones, runs the harness, pushes</text>
+</g>
+<text class="fs" x="815" y="188">harness interface: prepare, run, message</text>
+<g class="panel ">
+<rect x="815" y="198" width="140" height="80"/>
+<path class="corner" d="M815 205 V198 H822"/>
+<path class="corner" d="M955 205 V198 H948"/>
+<path class="corner" d="M815 271 V278 H822"/>
+<path class="corner" d="M955 271 V278 H948"/>
+<text class="t " x="829" y="224">opencode</text>
+<text class="s" x="829" y="244">the default</text>
+<text class="fs" x="829" y="262">MIT</text>
+</g>
+<g class="panel slot">
+<rect x="965" y="198" width="140" height="80"/>
+<text class="t " x="979" y="224">your harness</text>
+<text class="s" x="979" y="244">one more adapter</text>
+</g>
+<g class="file"><rect x="815" y="292" width="290" height="42"/><text class="ft" x="827" y="310">AGENTS.md</text><text class="fs" x="827" y="326">your prompts, in your repository</text></g>
+<g class="panel ">
+<rect x="815" y="348" width="290" height="80"/>
+<path class="corner" d="M815 355 V348 H822"/>
+<path class="corner" d="M1105 355 V348 H1098"/>
+<path class="corner" d="M815 421 V428 H822"/>
+<path class="corner" d="M1105 421 V428 H1098"/>
+<text class="t " x="829" y="374">gVisor</text>
+<text class="s" x="829" y="394">a user-space kernel for each pod</text>
+<text class="fs" x="829" y="412">Apache 2.0</text>
+</g>
+<g class="panel ours">
+<rect x="800" y="480" width="320" height="64"/>
+<path class="corner" d="M800 487 V480 H807"/>
+<path class="corner" d="M1120 487 V480 H1113"/>
+<path class="corner" d="M800 537 V544 H807"/>
+<path class="corner" d="M1120 537 V544 H1113"/>
+<text class="t " x="814" y="506">factory-gateway</text>
+<text class="w" x="1108" y="506" text-anchor="end">Go</text>
+<text class="s" x="814" y="526">pod identity, money held per call, tools</text>
+</g>
+<g class="panel ">
+<rect x="400" y="480" width="310" height="80"/>
+<path class="corner" d="M400 487 V480 H407"/>
+<path class="corner" d="M710 487 V480 H703"/>
+<path class="corner" d="M400 553 V560 H407"/>
+<path class="corner" d="M710 553 V560 H703"/>
+<text class="t " x="414" y="506">LiteLLM</text>
+<text class="s" x="414" y="526">routes each model class, fails over</text>
+<text class="fs" x="414" y="544">MIT, open core</text>
+</g>
+<g class="panel off">
+<rect x="20" y="480" width="300" height="64"/>
+<path class="corner" d="M20 487 V480 H27"/>
+<path class="corner" d="M320 487 V480 H313"/>
+<path class="corner" d="M20 537 V544 H27"/>
+<path class="corner" d="M320 537 V544 H313"/>
+<text class="t off" x="34" y="506">Model providers</text>
+<text class="s" x="34" y="526">a hosted API or your own model</text>
+</g>
+<g class="panel ">
+<rect x="20" y="592" width="175" height="80"/>
+<path class="corner" d="M20 599 V592 H27"/>
+<path class="corner" d="M195 599 V592 H188"/>
+<path class="corner" d="M20 665 V672 H27"/>
+<path class="corner" d="M195 665 V672 H188"/>
+<text class="t " x="34" y="618">Kubernetes</text>
+<text class="s" x="34" y="638">runs every part</text>
+<text class="fs" x="34" y="656">Apache 2.0</text>
+</g>
+<g class="panel ">
+<rect x="205" y="592" width="175" height="80"/>
+<path class="corner" d="M205 599 V592 H212"/>
+<path class="corner" d="M380 599 V592 H373"/>
+<path class="corner" d="M205 665 V672 H212"/>
+<path class="corner" d="M380 665 V672 H373"/>
+<text class="t " x="219" y="618">Talos Linux</text>
+<text class="s" x="219" y="638">the node OS</text>
+<text class="fs" x="219" y="656">MPL 2.0</text>
+</g>
+<g class="panel ">
+<rect x="390" y="592" width="175" height="80"/>
+<path class="corner" d="M390 599 V592 H397"/>
+<path class="corner" d="M565 599 V592 H558"/>
+<path class="corner" d="M390 665 V672 H397"/>
+<path class="corner" d="M565 665 V672 H558"/>
+<text class="t " x="404" y="618">Cilium</text>
+<text class="s" x="404" y="638">network, egress rules</text>
+<text class="fs" x="404" y="656">Apache 2.0</text>
+</g>
+<g class="panel ">
+<rect x="575" y="592" width="175" height="80"/>
+<path class="corner" d="M575 599 V592 H582"/>
+<path class="corner" d="M750 599 V592 H743"/>
+<path class="corner" d="M575 665 V672 H582"/>
+<path class="corner" d="M750 665 V672 H743"/>
+<text class="t " x="589" y="618">Flux</text>
+<text class="s" x="589" y="638">deploys from Git</text>
+<text class="fs" x="589" y="656">Apache 2.0</text>
+</g>
+<g class="panel ">
+<rect x="760" y="592" width="175" height="80"/>
+<path class="corner" d="M760 599 V592 H767"/>
+<path class="corner" d="M935 599 V592 H928"/>
+<path class="corner" d="M760 665 V672 H767"/>
+<path class="corner" d="M935 665 V672 H928"/>
+<text class="t " x="774" y="618">OpenTofu</text>
+<text class="s" x="774" y="638">rents the servers</text>
+<text class="fs" x="774" y="656">MPL 2.0</text>
+</g>
+<g class="panel ">
+<rect x="945" y="592" width="175" height="80"/>
+<path class="corner" d="M945 599 V592 H952"/>
+<path class="corner" d="M1120 599 V592 H1113"/>
+<path class="corner" d="M945 665 V672 H952"/>
+<path class="corner" d="M1120 665 V672 H1113"/>
+<text class="t " x="959" y="618">cert-manager</text>
+<text class="s" x="959" y="638">TLS certificates</text>
+<text class="fs" x="959" y="656">Apache 2.0</text>
+</g>
+<g class="panel off"><rect x="20" y="684" width="1100" height="40"/><text class="s" x="570" y="709" text-anchor="middle">on rented commodity servers and S3 storage</text></g>
+<path class="link" d="M320 120 H398" marker-end="url(#tipn)"/>
+<text class="fs" x="360" y="112" text-anchor="middle">webhooks</text>
+<path class="link" d="M320 208 H398" marker-end="url(#tipn)"/>
+<text class="fs" x="360" y="200" text-anchor="middle">chat</text>
+<path class="link" d="M320 296 H398" marker-end="url(#tipn)"/>
+<text class="fs" x="360" y="288" text-anchor="middle">alerts</text>
+<path class="link" d="M710 129 H813" marker-end="url(#tipn)"/>
+<text class="fs" x="755" y="121" text-anchor="middle">starts</text>
+<path class="link" d="M1065 94 V48 H170 V78" marker-end="url(#tipn)"/>
+<text class="fs" x="600" y="40" text-anchor="middle">the worker pushes the branch after the agent exits</text>
+<path class="link" d="M960 444 V478" marker-end="url(#tipn)"/>
+<text class="fs" x="952" y="466" text-anchor="end">every model and tool call</text>
+<path class="link" d="M800 512 H712" marker-end="url(#tipn)"/>
+<path class="link" d="M400 512 H322" marker-end="url(#tipn)"/>
+</svg></div>
+<p class="cap">The harness is an adapter. opencode ships as the default, and another harness is one more adapter behind the same interface. Each licence is the one its project publishes. SigNoz and LiteLLM keep their enterprise features under a separate licence.</p>
 </section>
 
 <section id="hood" aria-labelledby="hood-h">

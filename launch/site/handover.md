@@ -8,16 +8,17 @@ One static page, `launch/site/index.html`, no build step, dark design, no JavaSc
 
 ## What exists, as of the commit after 83e3714 on 21 October
 
-The page is built for progressive disclosure. Eight stops, each one point:
+The page is built for progressive disclosure. Nine stops, each one point:
 
 1. **Hero.** The eyebrow names the product ("AI software factory · Self-hosted · Source available"). The line takes the sandbox route: "The worst an agent can do is wreck its own sandbox." A three-sentence subhead, two buttons (`How it works` to the loop, `Source and setup` to the repository), then the annotated console frame and the one-line positioning band. The frame carries the kanban and chat points, so the line no longer has to.
 2. **The loop.** Title "One card's life. The amber steps are yours." and one line: "Everything else runs on its own." An inline SVG: nine stops from roadmap to telemetry and back to cards. Amber marks where the human appears: confirm the spec, fund or end at a cap, and "manual: you approve · full auto: it merges" under Merge. A dashed wall around the sandbox. The three panels that repeated the diagram are gone.
 3. **What you get.** Six cards, each a console frame, a bold line, one or two sentences and a link to the evidence page or the spec-driven doc: the chat, the spec with named proofs, the review that rejects, issues that file their own fix, the money held, the autonomy dial.
 4. **What the agent can reach.** An inline SVG: the pod in the middle, four blocked targets on the left with crossed wires, three reachable hosts on the right, the push after the agent at the bottom. Four fact lines and an amber box for the risk that stays.
 5. **Run it.** Three sentences, the three layers as an inline SVG, the button.
-6. **Under the hood.** One lede sentence, then six `<details>` folds, closed by default: the sandbox, the gates, the money, recovery (with the supervisor frame), the numbers, three more facts.
-7. **How it compares.** One lede, the table behind a fold, the tradeoffs box visible.
-8. **Proof and limits.** The four links and the open limits in one line. The counts are gone: the page links the repository instead.
+6. **The parts.** Added 22 October. Title "Open source parts. Our code only where none fit." A two-sentence lede, then an inline SVG system diagram. The four parts written in Go have a cyan outline and a `Go` tag: the console, factoryd, agent-worker and factory-gateway. Fourteen open source parts carry their licence: Forgejo, SigNoz, OpenBao, Temporal, PostgreSQL, LiteLLM, opencode, gVisor, Kubernetes, Talos Linux, Cilium, Flux, OpenTofu and cert-manager. The config files are `.file` boxes. The harness slot shows opencode as the default and a dashed "your harness, one more adapter". The facts come from the code and infra repositories as of 22 October. Licences come from each project's own LICENSE file. If a part is added or swapped, change the diagram.
+7. **Under the hood.** One lede sentence, then six `<details>` folds, closed by default: the sandbox, the gates, the money, recovery (with the supervisor frame), the numbers, three more facts.
+8. **How it compares.** One lede, the table behind a fold, the tradeoffs box visible.
+9. **Proof and limits.** The four links and the open limits in one line. The counts are gone: the page links the repository instead.
 
 There is no footer and no contact block. The page will sit inside a larger site that carries the imprint and the contact.
 
@@ -66,7 +67,7 @@ From revision section 6 and section 11:
 ## How to work in this repo
 
 - Terminal output of repo files is mangled by a renderer. Copy a file to `/tmp` and read it there, or view exact lines with `awk 'NR>=X && NR<=Y {printf "L%d|%.250s\n", NR, $0}'`. IDE spelling diagnostics are noise.
-- The SVG diagrams live inside the HTML and no generator is committed. Change a label by its unique text, then run the DOM probe: every text must stay inside its panel and the viewBox. Each panel is a rect, four corner marks, a number, a title and sub lines. Wires are paths with a marker tip. The CSS classes are in the page's stylesheet under `.diagram` and `.hero-annot`.
+- The SVG diagrams live inside the HTML and no generator is committed. Change a label by its unique text, then run the DOM probe: every text must stay inside its panel and the viewBox. Each panel is a rect, four corner marks, a number, a title and sub lines. Wires are paths with a marker tip. The CSS classes are in the page's stylesheet under `.diagram` and `.hero-annot`. The parts diagram adds `.panel.ours` (cyan outline), `.panel.slot` (dashed, no fill) and `.link` wires with the `#tipn` marker in the mark colour.
 - Verify every change: `python3` html.parser parse, anchor and asset path check, the DOM probe (copy the page to `/tmp`, append a script that writes `scrollWidth`, each SVG text's `getBBox()` against its panel rect and the open folds into a `<pre>`, then `google-chrome --headless=new --no-sandbox --dump-dom`), and `google-chrome --headless=new --no-sandbox --screenshot=... --window-size=1440,9000` for a render. You cannot view images (image reads upload to a CDN), so say plainly what is unverified by eye.
 - Git: work in a worktree (`git -C ~/repos/ai-software-factory worktree add -b <branch> /tmp/claude-1000/wt-<name> master`), commit with the trailer `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`, then `git fetch forgejo` first, because the factory's own document writer pushes to forgejo master and master can move under you, ff-merge to master, push both `origin` (GitHub) and `forgejo`, remove the worktree, delete the branch.
 - Never commit `terraform.tfstate`. `launch/revision/` is Sebastian's untracked input; leave it unless he says commit it.
