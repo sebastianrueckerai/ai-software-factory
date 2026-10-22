@@ -18,7 +18,7 @@
   .fx-cap b { color: var(--accent); font-weight: 600; }
   .fx-cap.amber b { color: var(--need-text); }
   .fx-cap.close { top: -330px; font-size: 64px; }
-  .fx-cap.label { top: 30px; left: 40px; right: auto; max-width: 1100px; text-align: left; font-size: 44px; line-height: 1.2; padding: 12px 22px;
+  .fx-cap.label { top: 22px; left: 40px; right: auto; max-width: 1100px; text-align: left; font-size: 44px; line-height: 1.2; padding: 12px 22px;
     background: color-mix(in srgb, var(--bg) 90%, transparent); border-left: 6px solid var(--accent); box-shadow: 0 6px 24px rgba(0,0,0,.5); }
   .fx-cap.label.amber { border-left-color: var(--need); }
   .fx-cap.close small { display: block; margin-top: 18px; font: 34px var(--font-mono); color: var(--text-muted); }
@@ -27,6 +27,7 @@
   .title span { position: absolute; left: 0; right: 0; top: 380px; text-align: center; font: 600 88px var(--font-ui); color: var(--text); }
   .title b { position: absolute; left: 700px; top: 500px; width: 200px; height: 4px; background: var(--accent); }
   #shade { position: absolute; inset: 0; background: color-mix(in srgb, var(--bg) 70%, transparent); opacity: 0; }
+  #dip { position: absolute; inset: 0; background: var(--bg); opacity: 0; }
 </style>
 </head>
 <body>
@@ -35,6 +36,7 @@
 <!--MEDIA-->
 </div>
 <div id="shade"></div>
+<div id="dip"></div>
 <div id="caps"></div>
 <div id="titles"></div>
 </div>
@@ -46,8 +48,9 @@
 const tl = gsap.timeline({ paused: true });
 const F = window.FILM;
 const stage = document.querySelector("#stage"), caps = document.querySelector("#caps"), titles = document.querySelector("#titles");
-// a plain cut has labels, not captions: no band darkens the bottom of its frame
-if (F.plain) caps.style.background = "none";
+// a plain cut has labels, not captions: no band darkens its frame, and the labels sit over the console's top bar, clear
+// of the chat's input at the bottom
+if (F.plain) Object.assign(caps.style, { background: "none", top: "0px" });
 // time: a number, ["seg"] for a segment's start, ["seg", "end"], or ["seg", step, field, offset], where field is atMs,
 // stillMs, or actN for the moment the step's Nth action ended
 const time = (a) => {
@@ -83,8 +86,9 @@ const box = (spec) => {
 const inSegment = (t) => Object.entries(F.seg).find(([, s]) => t >= s.start - 0.001 && t < s.start + s.dur)?.[0];
 
 // the one highlight: each spot moves it, or a spot with no box takes it away
-(F.spots || []).forEach((s) => {
-  const t = time(s.at), r = box(s.box);
+// in time order, since a hidden highlight appears in place and a shown one travels
+(F.spots || []).map((s) => ({ ...s, t: time(s.at) })).sort((a, b) => a.t - b.t).forEach((s) => {
+  const t = s.t, r = box(s.box);
   if (r) fx.spotlight(tl, stage, r, t, { color: s.amber ? "#f4b13e" : "#4fcbe2", dur: s.dur ?? 0.45 });
   else fx.unspot(tl, stage, t);
 });
@@ -92,8 +96,10 @@ const inSegment = (t) => Object.entries(F.seg).find(([, s]) => t >= s.start - 0.
 // the camera: each cam moves the frame so its box fills a share of the screen, a cam with no box returns home
 (F.cams || []).forEach((c) => {
   const t = time(c.at), r = box(c.box);
-  if (r) fx.camera(tl, stage, r, t, { fill: c.fill ?? 0.8, cx: c.cx, cy: c.cy, dur: c.dur ?? 0.9 });
-  else fx.home(tl, stage, t, c.dur ?? 0.9);
+  // a cut may cap how far any zoom goes and how fast the camera moves: maxZoom and camDur in film.json
+  const dur = c.dur ?? F.camDur ?? 0.9;
+  if (r) fx.camera(tl, stage, r, t, { fill: c.fill ?? 0.8, cx: c.cx, cy: c.cy, dur, max: F.maxZoom });
+  else fx.home(tl, stage, t, dur);
 });
 
 // the words: each caption lasts until the next one or its own end, and must be up long enough to read
@@ -119,6 +125,13 @@ cs.forEach((c, i) => {
   tl.from(el.querySelector("span"), { y: 36, opacity: 0, duration: 0.45, ease: "power3.out" }, t);
   tl.from(el.querySelector("b"), { scaleX: 0, duration: 0.45, ease: "power3.out" }, t + 0.1);
   tl.to(el, { opacity: 0, duration: 0.3 }, t + d);
+});
+
+// a reveal brings the frame up from the background colour, where a diagram that faded out hands over to the console
+(F.reveals || []).forEach((r) => {
+  const t = time(r);
+  tl.set("#dip", { opacity: 1 }, t);
+  tl.to("#dip", { opacity: 0, duration: 0.7, ease: "power1.out" }, t);
 });
 
 // quiet segments carry their own words: the caption band steps aside

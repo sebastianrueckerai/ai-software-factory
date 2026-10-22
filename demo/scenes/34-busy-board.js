@@ -17,35 +17,40 @@ const moon = story.approvals.moonPlan;
 const filings = [story.filing(113, "ready"), story.filing(114, "backlog")];
 const seasonPass = story.lives[120].phases.find((p) => p.ask).ask;
 
-function busy(now) {
+// LIVES are the ages of the busy board's working cards; hero draws the busy board's cards less those that moved,
+// each moved card drawn by face at its new status
+const LIVES = { 120: 40 * MIN, 110: 380 * MIN, 122: 45 * MIN, 112: 9 * HOUR, 102: 50 * MIN, 103: 25 * MIN, 107: 49 * MIN, 121: 530 * MIN, 123: 12 * MIN };
+const DONE = [[101, 2 * HOUR, 1.12], [104, HOUR, 0.48], [108, 50 * MIN, 0.22], [109, 155 * MIN, 1.84], [111, 270 * MIN, 0.92], [115, 52 * MIN, 0.31]];
+function hero(now, moved = {}) {
+  const still = (i) => !(i in moved);
   const b = story.board([
-    story.life(now, 120, 40 * MIN, story.lives[120]),
-    story.life(now, 110, 380 * MIN, story.lives[110]),
-    story.life(now, 122, 45 * MIN, story.lives[122]),
-    story.life(now, 112, 9 * HOUR, { ...story.lives[112], card: { waitingOn: "#110" } }),
-    story.life(now, 102, 50 * MIN, story.lives[102]),
-    story.life(now, 103, 25 * MIN, story.lives[103]),
-    story.life(now, 107, 49 * MIN, story.lives[107]),
-    story.life(now, 121, 530 * MIN, story.lives[121]),
-    story.life(now, 123, 12 * MIN, story.lives[123]),
-    ...[[101, 2 * HOUR, 1.12], [104, HOUR, 0.48], [108, 50 * MIN, 0.22], [109, 155 * MIN, 1.84], [111, 270 * MIN, 0.92], [115, 52 * MIN, 0.31]]
-      .map(([issue, after, spent]) => story.done(now, issue, after + 3 * HOUR, after, spent)),
+    ...Object.keys(LIVES).map(Number).filter(still)
+      .map((i) => story.life(now, i, LIVES[i], i === 112 ? { ...story.lives[112], card: { waitingOn: "#110" } } : story.lives[i])),
+    ...DONE.map(([issue, after, spent]) => story.done(now, issue, after + 3 * HOUR, after, spent)),
   ]);
   const queued = [
     story.card(now, 105, { status: "done", lane: "plan", age: 26 * HOUR, finished: 9 * HOUR, spent: 0.46, model: "big" }),
-    story.card(now, 125, { status: "queued", lane: "ready", age: 4 * MIN }),
-    story.card(now, 118, { status: "backlog", lane: "backlog", age: 26 * HOUR }),
+    ...(still(125) ? [story.card(now, 125, { status: "queued", lane: "ready", age: 4 * MIN })] : []),
+    ...(still(118) ? [story.card(now, 118, { status: "backlog", lane: "backlog", age: 26 * HOUR })] : []),
   ];
+  const moves = Object.entries(moved).map(([i, st]) => face(now, Number(i), st));
+  const asks = [still(110) && story.asking(now, story.asks.budget, 17 * MIN, INBOX), still(120) && story.asking(now, seasonPass, 39 * MIN, INBOX)].filter(Boolean);
+  return {
+    tasks: [...b.tasks, ...queued, ...moves], objects: b.objects, deps: still(110) && still(112) ? { 112: [110] } : {},
+    events: asks.flatMap((a) => a.events), alerts: asks.flatMap((a) => a.alerts),
+    approvals: still(122) ? [state.approval(now, { ...refund, spec: story.mergeSpec(refund), age: 6 * MIN })] : [],
+  };
+}
+
+function busy(now) {
+  const h = hero(now);
   const budget = story.asking(now, story.asks.budget, 17 * MIN, INBOX);
-  const pass = story.asking(now, seasonPass, 39 * MIN, INBOX);
   const chat = [
     state.livePoke(now, { issue: 109, title: story.cards[109].title, spent: 1.84, age: 25 * MIN, conversation: INBOX }),
     budget.inbox,
   ];
   return state.scene(now, {
-    tasks: [...b.tasks, ...queued], objects: b.objects, deps: { 112: [110] },
-    events: [...budget.events, ...pass.events], alerts: [...budget.alerts, ...pass.alerts],
-    approvals: [state.approval(now, { ...refund, spec: story.mergeSpec(refund), age: 6 * MIN })],
+    tasks: h.tasks, objects: h.objects, deps: h.deps, events: h.events, alerts: h.alerts, approvals: h.approvals,
     chat, seen: { [INBOX]: chat.length }, inbox: INBOX, open: INBOX, ...story.spending(T),
     replies: [state.reply(state.say(story.replies.split), ...[story.filing(113, "ready"), story.filing(114, "backlog")].map((f) => state.call("new_card", f)))],
   });
@@ -80,29 +85,27 @@ function face(now, issue, status, o = {}) {
   });
 }
 
-// drained is the board one wave at a time after the split, statuses by issue: what waits on Sebastian is answered,
-// queued work starts, running work goes to review, reviewed work merges and ends done
-const WEEK = [101, 104, 108, 109, 111, 115];
-const waves = [
-  { 120: "running", 110: "closed", 122: "merged", 112: "waiting-deps", 102: "running", 103: "in-review", 107: "in-review", 121: "running", 123: "running", 125: "queued", 118: "backlog", 126: "queued", 127: "backlog" },
-  { 120: "running", 110: "closed", 122: "done", 112: "waiting-deps", 102: "in-review", 103: "merged", 107: "merged", 121: "done", 123: "done", 125: "running", 118: "queued", 126: "running", 127: "queued" },
-  { 120: "in-review", 110: "closed", 122: "done", 112: "running", 102: "done", 103: "done", 107: "done", 121: "done", 123: "done", 125: "in-review", 118: "running", 126: "in-review", 127: "running" },
-  { 120: "done", 110: "closed", 122: "done", 112: "in-review", 102: "done", 103: "done", 107: "done", 121: "done", 123: "done", 125: "done", 118: "in-review", 126: "done", 127: "in-review" },
-  { 120: "done", 110: "closed", 122: "done", 112: "done", 102: "done", 103: "done", 107: "done", 121: "done", 123: "done", 125: "done", 118: "done", 126: "done", 127: "done" },
+// drained is the board after the split, one card moving at a time: what waits on Sebastian is answered, queued work
+// starts, running work ends done. Step k applies the first k moves to the board right after the presses, where the
+// question, the budget stop and the merge still wait with their buttons.
+const moves = [
+  [110, "closed"], [122, "merged"], [103, "done"], [107, "done"], [120, "running"], [121, "done"], [123, "done"], [122, "done"],
+  [125, "running"], [102, "done"], [126, "running"], [120, "done"], [125, "done"], [118, "running"], [126, "done"], [112, "running"],
+  [127, "running"], [118, "done"], [127, "done"], [112, "done"],
 ];
-function drained(now, w, o = {}) {
-  const statuses = waves[w];
-  const tasks = [
-    face(now, 105, "done", { age: 26 * HOUR, finished: 9 * HOUR, spent: 0.46 }),
-    ...WEEK.map((i) => face(now, i, "done", { age: 8 * HOUR, finished: 3 * HOUR })),
-    ...Object.entries(statuses).map(([i, s]) => face(now, Number(i), s)),
-    ...(o.tasks ?? []),
-  ];
-  const s = split(now, 30 * MIN + w * HOUR);
+const DRAINED = moves.length;
+function drained(now, k, o = {}) {
+  const moved = Object.fromEntries(moves.slice(0, k));
+  const filed = { 126: "queued", 127: "backlog" };
+  const h = hero(now, Object.fromEntries(Object.entries(moved).filter(([i]) => !(i in filed))));
+  // the split's cards keep the age the lab gave them at the presses, so the queue keeps its order
+  const tasks = [...h.tasks, ...Object.entries(filed).map(([i, st]) => face(now, Number(i), moved[i] ?? st, { age: 40 })), ...(o.tasks ?? [])];
+  const s = split(now, 30 * MIN + k * 12 * MIN);
   const chat = [...s.chat, ...(o.rows ?? [])];
   return state.scene(now, {
-    tasks, chat, seen: { [INBOX]: chat.length }, inbox: INBOX, open: INBOX, usedProposals: [...s.usedProposals, ...(o.used ?? [])],
-    replies: o.replies, plans: o.plans, questions: o.questions, approvals: o.approvals, ...story.spending(T),
+    tasks, objects: h.objects, deps: h.deps, events: h.events, alerts: h.alerts, approvals: [...h.approvals, ...(o.approvals ?? [])],
+    chat, seen: { [INBOX]: chat.length }, inbox: INBOX, open: INBOX, usedProposals: [...s.usedProposals, ...(o.used ?? [])],
+    replies: o.replies, plans: o.plans, questions: o.questions, ...story.spending(T),
   });
 }
 
@@ -119,7 +122,7 @@ function moonThread(now, age) {
   return { rows: f.rows.map((r) => ({ ...r, conversation: INBOX })), used: [f.proposal] };
 }
 function intake(now, n, o = {}) {
-  return drained(now, 4, { ...o, tasks: [...arrivals(now).slice(0, n), ...(o.tasks ?? [])] });
+  return drained(now, DRAINED, { ...o, tasks: [...arrivals(now).slice(0, n), ...(o.tasks ?? [])] });
 }
 function planning(now) {
   const t = moonThread(now, 40);
@@ -148,7 +151,7 @@ const columns = { needs: "#needs-you", queued: '#board .column[aria-labelledby="
 module.exports = {
   title: "A busy board, drained and filled again",
   story: "One afternoon in one frame: three cards need Sebastian, one waits on another, five build and six are done. He splits " +
-    "the card at its budget in the chat and presses Do it twice. The board drains as the work resolves and ends done. Then new " +
+    "the card at its budget in the chat and presses Do it twice. The board drains one card at a time as the work resolves. Then new " +
     "work comes in on its own, a nightly scan, an alert and a player's issue, and one sentence in the chat becomes the plan for " +
     "level 5, whose four cards land on the board once he accepts it.",
   group: "intake",
@@ -170,7 +173,7 @@ module.exports = {
     { state: () => null, actions: [{ click: ui.doIt }, { waitFor: ui.face(126) }, { wait: 600 }], hold: 1200, boxes: { first: ui.face(126) } },
     { state: () => null, actions: [{ click: ui.doIt }, { waitFor: ui.face(127) }], hold: 2200, boxes: { first: ui.face(126), second: ui.face(127) } },
     // the drain, one wave per step
-    ...waves.map((_, w) => ({ state: (now) => drained(now, w), actions: [], hold: 1400 })),
+    ...Array.from({ length: DRAINED + 1 }, (_, k) => ({ state: (now) => drained(now, k), actions: [], hold: 900 })),
     // the intake: three cards file themselves, then a sentence
     { state: (now) => intake(now, 1), actions: [], hold: 1400, boxes: { scan: ui.face(135) } },
     { state: (now) => intake(now, 2), actions: [], hold: 1400, boxes: { alert: ui.face(134) } },

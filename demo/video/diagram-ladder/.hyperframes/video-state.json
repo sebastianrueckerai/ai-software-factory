@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "historyId": "e7a01416-c315-43e8-8132-577c4a3aeb7e",
+  "currentRevision": "e599bcac-d892-4cbb-8df9-c8a720908830",
+  "pendingChanges": false,
+  "files": {
+    "diagram.css": {
+      "hash": "0cceb3bbd66fd486cd3afc0506f05d77f2165294235c772cd64bb35dcbf1cd40",
+      "content": "/home/womb/.cache/hyperframes/history/e7a01416-c315-43e8-8132-577c4a3aeb7e/blobs/0c/0cceb3bbd66fd486cd3afc0506f05d77f2165294235c772cd64bb35dcbf1cd40"
+    },
+    "gsap.min.js": {
+      "hash": "c174bfce53a729418d57a8ad8625e7247c793a22fef8e2851e3cfa3de9cd8280",
+      "content": "/home/womb/.cache/hyperframes/history/e7a01416-c315-43e8-8132-577c4a3aeb7e/blobs/c1/c174bfce53a729418d57a8ad8625e7247c793a22fef8e2851e3cfa3de9cd8280"
+    },
+    "index.html": {
+      "hash": "de5dfa244b5db4d5376938f320badc95a8d12ee8b4d6f66ff9b5dda27a2fb178",
+      "content": "/home/womb/.cache/hyperframes/history/e7a01416-c315-43e8-8132-577c4a3aeb7e/blobs/de/de5dfa244b5db4d5376938f320badc95a8d12ee8b4d6f66ff9b5dda27a2fb178"
+    },
+    "meta.json": {
+      "hash": "c3922e2c26760689d16cd0864d2026d83a9edfc064b048b2ba1a7ca2accd43a6",
+      "content": "/home/womb/.cache/hyperframes/history/e7a01416-c315-43e8-8132-577c4a3aeb7e/blobs/c3/c3922e2c26760689d16cd0864d2026d83a9edfc064b048b2ba1a7ca2accd43a6"
+    }
+  },
+  "revisions": {
+    "6fb109db-2f2e-432b-af1a-3de6005b7849": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792658794979,
+      "endedAt": 1792658794979,
+      "files": {
+        "index.html": {
+          "before": "/home/womb/.cache/hyperframes/history/e7a01416-c315-43e8-8132-577c4a3aeb7e/blobs/ae/ae69a4a604333f4734fbaee56a82af1347f7259f20cd9ba92426f80c2e04eb50",
+          "after": "/home/womb/.cache/hyperframes/history/e7a01416-c315-43e8-8132-577c4a3aeb7e/blobs/8f/8f2918a0fd9579fcf983bf513d2e9276d68f3f62e8ed5f30fb34361605a22f5c"
+        }
+      }
+    },
+    "e599bcac-d892-4cbb-8df9-c8a720908830": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792659178877,
+      "endedAt": 1792659178878,
+      "files": {
+        "index.html": {
+          "before": "/home/womb/.cache/hyperframes/history/e7a01416-c315-43e8-8132-577c4a3aeb7e/blobs/8f/8f2918a0fd9579fcf983bf513d2e9276d68f3f62e8ed5f30fb34361605a22f5c",
+          "after": "/home/womb/.cache/hyperframes/history/e7a01416-c315-43e8-8132-577c4a3aeb7e/blobs/de/de5dfa244b5db4d5376938f320badc95a8d12ee8b4d6f66ff9b5dda27a2fb178"
+        }
+      }
+    }
+  },
+  "checks": {
+    "latest": null,
+    "revisions": {},
+    "unversioned": []
+  },
+  "snapshots": {
+    "latest": null,
+    "revisions": {},
+    "unversioned": []
+  },
+  "renders": {
+    "latest": {
+      "id": "fb991540-bdee-4136-84af-3ea2a666bac9",
+      "completedAt": 1792659206980,
+      "output": "/tmp/hf-diagram-ladder-75h7Iv/b.mp4",
+      "status": "completed",
+      "revision": "e599bcac-d892-4cbb-8df9-c8a720908830"
+    },
+    "retainedRevisions": [
+      "e599bcac-d892-4cbb-8df9-c8a720908830",
+      "6fb109db-2f2e-432b-af1a-3de6005b7849"
+    ]
+  },
+  "pendingArtifactCleanup": []
+}

@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "historyId": "7192542c-f7dc-4479-b5a3-109ec3f8faad",
+  "currentRevision": "027a031b-cca2-4d5f-90f6-fde1597fef3e",
+  "pendingChanges": false,
+  "files": {
+    "diagram.css": {
+      "hash": "0cceb3bbd66fd486cd3afc0506f05d77f2165294235c772cd64bb35dcbf1cd40",
+      "content": "/home/womb/.cache/hyperframes/history/7192542c-f7dc-4479-b5a3-109ec3f8faad/blobs/0c/0cceb3bbd66fd486cd3afc0506f05d77f2165294235c772cd64bb35dcbf1cd40"
+    },
+    "gsap.min.js": {
+      "hash": "c174bfce53a729418d57a8ad8625e7247c793a22fef8e2851e3cfa3de9cd8280",
+      "content": "/home/womb/.cache/hyperframes/history/7192542c-f7dc-4479-b5a3-109ec3f8faad/blobs/c1/c174bfce53a729418d57a8ad8625e7247c793a22fef8e2851e3cfa3de9cd8280"
+    },
+    "index.html": {
+      "hash": "c635689f519acbe293dee1b0e2560c8b0e03905278333e85004b1c267903d8b3",
+      "content": "/home/womb/.cache/hyperframes/history/7192542c-f7dc-4479-b5a3-109ec3f8faad/blobs/c6/c635689f519acbe293dee1b0e2560c8b0e03905278333e85004b1c267903d8b3"
+    },
+    "meta.json": {
+      "hash": "4bae99a0fc44ca2f1152872ca8b72b2022174315abe5d733e7443b49c65aaf2f",
+      "content": "/home/womb/.cache/hyperframes/history/7192542c-f7dc-4479-b5a3-109ec3f8faad/blobs/4b/4bae99a0fc44ca2f1152872ca8b72b2022174315abe5d733e7443b49c65aaf2f"
+    }
+  },
+  "revisions": {
+    "aa4d7bf2-c620-4b7e-9c1f-5f1c1a1d62b6": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792658900473,
+      "endedAt": 1792658900473,
+      "files": {
+        "index.html": {
+          "before": "/home/womb/.cache/hyperframes/history/7192542c-f7dc-4479-b5a3-109ec3f8faad/blobs/df/df45b89be6a97c7d89acbaedad57b977adddadda5b01d4ed00d5f4b71373bf3b",
+          "after": "/home/womb/.cache/hyperframes/history/7192542c-f7dc-4479-b5a3-109ec3f8faad/blobs/2d/2d67110c1b7e1c12e50195add5fcca35ad19ed857e7e5ca6621e4220ab0bfe7a"
+        }
+      }
+    },
+    "027a031b-cca2-4d5f-90f6-fde1597fef3e": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792659108072,
+      "endedAt": 1792659108073,
+      "files": {
+        "index.html": {
+          "before": "/home/womb/.cache/hyperframes/history/7192542c-f7dc-4479-b5a3-109ec3f8faad/blobs/2d/2d67110c1b7e1c12e50195add5fcca35ad19ed857e7e5ca6621e4220ab0bfe7a",
+          "after": "/home/womb/.cache/hyperframes/history/7192542c-f7dc-4479-b5a3-109ec3f8faad/blobs/c6/c635689f519acbe293dee1b0e2560c8b0e03905278333e85004b1c267903d8b3"
+        }
+      }
+    }
+  },
+  "checks": {
+    "latest": null,
+    "revisions": {},
+    "unversioned": []
+  },
+  "snapshots": {
+    "latest": null,
+    "revisions": {},
+    "unversioned": []
+  },
+  "renders": {
+    "latest": {
+      "id": "87502968-1b3a-4fb9-a683-726f1bbef869",
+      "completedAt": 1792659135746,
+      "output": "/tmp/hf-diagram-dial-FWeS6S/b.mp4",
+      "status": "completed",
+      "revision": "027a031b-cca2-4d5f-90f6-fde1597fef3e"
+    },
+    "retainedRevisions": [
+      "027a031b-cca2-4d5f-90f6-fde1597fef3e",
+      "aa4d7bf2-c620-4b7e-9c1f-5f1c1a1d62b6"
+    ]
+  },
+  "pendingArtifactCleanup": []
+}

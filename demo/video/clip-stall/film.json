@@ -5,93 +5,69 @@
   "../loop/diagram.css",
   "../vendor/gsap.min.js"
  ],
- "tail": 0.2,
+ "plain": true,
+ "maxZoom": 1.5,
+ "camDur": 1.4,
  "segments": [
+  {
+   "id": "d",
+   "clip": "p-diagram-stall.mp4",
+   "dur": 29.6
+  },
   {
    "id": "s",
    "scene": "08-supervisor",
    "from": [
     1,
-    "stillMs"
+    "act0"
    ],
-   "lead": 2.0,
    "to": [
-    3,
+    4,
     "stillMs"
-   ],
-   "tail": 0.4,
-   "rate": 1.4,
-   "holdRate": 4
-  }
- ],
- "cams": [
-  {
-   "at": [
-    "s"
-   ],
-   "box": [
-    "08-supervisor",
-    1,
-    "drawer",
-    600
-   ],
-   "fill": 0.95,
-   "dur": 0.05
+   ]
   },
   {
-   "at": [
-    "s",
-    2,
-    "act1"
-   ],
-   "box": {
-    "rect": [
-     870,
-     380,
-     720,
-     450
-    ]
-   },
-   "fill": 0.95,
-   "dur": 0.9
-  },
-  {
-   "at": [
-    "s",
-    3,
-    "act1"
-   ],
-   "box": [
-    "08-supervisor",
-    3,
-    "drawer",
-    600
-   ],
-   "fill": 0.95,
-   "dur": 0.9
+   "id": "end",
+   "still": "08-supervisor-4.png",
+   "dur": 1.8
   }
  ],
  "spots": [
   {
    "at": [
-    "s"
+    "s",
+    null,
+    null,
+    1.0
    ],
    "box": [
     "08-supervisor",
     1,
-    "drawer",
-    600
+    "card"
    ]
   },
   {
    "at": [
     "s",
     2,
-    "act1"
+    "act0",
+    0.3
    ],
    "box": [
     "08-supervisor",
     2,
+    "drawer"
+   ]
+  },
+  {
+   "at": [
+    "s",
+    3,
+    "act1"
+   ],
+   "box": [
+    "08-supervisor",
+    3,
     "row"
    ],
    "amber": true
@@ -99,15 +75,53 @@
   {
    "at": [
     "s",
+    4,
+    "act1"
+   ],
+   "box": [
+    "08-supervisor",
+    4,
+    "drawer"
+   ]
+  },
+  {
+   "at": [
+    "end",
+    "end",
+    null,
+    -0.9
+   ],
+   "box": null
+  }
+ ],
+ "cams": [
+  {
+   "at": [
+    "s",
     3,
     "act1"
    ],
    "box": [
     "08-supervisor",
     3,
-    "drawer",
-    600
-   ]
+    "row"
+   ],
+   "fill": 0.9
+  },
+  {
+   "at": [
+    "s",
+    4,
+    "act0"
+   ],
+   "box": null
+  },
+  {
+   "at": [
+    "end"
+   ],
+   "box": null,
+   "dur": 1.2
   }
  ],
  "caps": [
@@ -116,19 +130,29 @@
     "s",
     null,
     null,
-    0.2
+    1.0
    ],
-   "text": "A session goes in circles",
+   "text": "One card's agent is stuck",
    "cls": "label"
   },
   {
    "at": [
     "s",
     2,
-    "act1"
+    "act0",
+    0.3
    ],
-   "amber": true,
-   "text": "A detector trips, the supervisor steps in",
+   "text": "It fixes the same date bug, again and again",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "s",
+    2,
+    "act3",
+    3.0
+   ],
+   "text": "A file flips back, the fixed test fails again",
    "cls": "label"
   },
   {
@@ -137,9 +161,23 @@
     3,
     "act1"
    ],
+   "text": "The check trips: the supervisor redirects",
+   "cls": "label",
+   "amber": true
+  },
+  {
+   "at": [
+    "s",
+    4,
+    "act1"
+   ],
    "text": "The next session starts from what it learned",
    "cls": "label"
   }
  ],
- "plain": true
+ "reveals": [
+  [
+   "s"
+  ]
+ ]
 }

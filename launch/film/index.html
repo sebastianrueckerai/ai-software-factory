@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The film, version 2</title>
+<title>The film, version 3</title>
 <style>
 :root { color-scheme: dark; --bg: #070b12; --line: #263649; --text: #dfe7f1; --muted: #93a1b5; --accent: #4fcbe2; --need: #f4b13e; }
 body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 system-ui, sans-serif; }
@@ -22,44 +22,40 @@ code { font-size: .92em; }
 </head>
 <body>
 <main>
-<h1>The film, version 2</h1>
-<p>What changed since version 1, from your notes: the red ring is now an arrow pointer with a soft ripple on clicks. There is one highlight at a time, timed to the real clicks. The clock is gone: the board drains as the work resolves and moves to Done, then new work files itself (a nightly scan, an alert, a player's issue) and one sentence becomes a plan. Captions no longer say what the game builds. Gentle zooms help legibility, and the waits between clicks run faster. Full auto now shows the agent's own answer, then the merge and the release. The cell animation is gone, and the sandbox has three variants now.</p>
-<p>The videos and sheets load from <code>demo/out/</code> of the main checkout. Open this page from there. Scores come from the independent critic, Gemini 2.5 Pro. It reads one frame a second for the clips and one every two seconds for the film's three sections, so it cannot see motion: it calls every camera move a jump and every pause for reading a dead frame.</p>
-
+<h1>The film, version 3</h1>
+<p>What changed since version 2, from your notes. Everything runs slower, every console part starts on the full board, zooms stop at one and a half times, and a highlight frames a card, a column or a panel, never a button. The pointer's click shows the press. No clip ends on a dark frame. Four clips open with an animated diagram of the theory, built like sandbox D, and then show the example. The board drains one card at a time, the intake names each source, and the split's caption says a click files the parts.</p>
+<p>The videos and sheets load from <code>demo/out/</code> of the main checkout. Open this page from there. Scores come from the independent critic, Gemini 2.5 Pro, reading one frame every two seconds. It cannot see motion.</p>
 <h2>The rough cut</h2>
-<p>Spotlight style, with the sandbox's schematic variant A. Captions only, no voice.</p>
-<div class="pair">
-<div><video src="../../demo/out/p-film-a.mp4" controls preload="metadata"></video><p class="cap">p-film-a.mp4</p></div>
-<div><img src="../../demo/out/p-film-a-sheet.png" alt="Contact sheet of the rough cut, one frame every six seconds."><p class="cap">one frame every 6 s · <span class="score" id="s-film-a"></span></p></div>
-</div>
-
+<p>Spotlight style with captions, no voice, the whole of sandbox A inside. It runs 180 s, double the 90 s target.</p>
+<div class="pair"><div><video src="../../demo/out/p-film-a.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-film-a-sheet.png" alt="Contact sheet of the rough cut, one frame every six seconds."><p class="cap">one frame every 6 s · <span class="score" id="s-film-a"></span></p></div></div>
+<h2>The landing page clips</h2>
+<p>Silent loops with a short label for each moment at the top left. The review and issue clips are gone, and the escalation ladder takes their place.</p>
+<h3>The chat finds the right card</h3>
+<p>A line that names no card: the project agent reads the board, finds who builds the refund, and a click sends the line into the running session.</p>
+<div class="pair"><div><video src="../../demo/out/p-clip-steer.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-steer-sheet.png" alt="Contact sheet of the chat finds the right card."><p class="cap"><span class="score" id="s-clip-steer"></span></p></div></div>
+<h3>A plan is a card you accept</h3>
+<p>The diagram, then the plan card in Needs you, opened like any card, its question answered, accepted, its four cards landing.</p>
+<div class="pair"><div><video src="../../demo/out/p-clip-plan.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-plan-sheet.png" alt="Contact sheet of a plan is a card you accept."><p class="cap"><span class="score" id="s-clip-plan"></span></p></div></div>
+<h3>The escalation ladder</h3>
+<p>The diagram of the rungs up to a person, then a card whose second session runs on the stronger model.</p>
+<div class="pair"><div><video src="../../demo/out/p-clip-ladder.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-ladder-sheet.png" alt="Contact sheet of the escalation ladder."><p class="cap"><span class="score" id="s-clip-ladder"></span></p></div></div>
+<h3>The money is held before each call</h3>
+<p>A card whose budget cannot fund another session. One sentence splits it, and a click files the smaller card.</p>
+<div class="pair"><div><video src="../../demo/out/p-clip-money.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-money-sheet.png" alt="Contact sheet of the money is held before each call."><p class="cap"><span class="score" id="s-clip-money"></span></p></div></div>
+<h3>One dial for how much it asks</h3>
+<p>The diagram of who decides at each level, then a merge approved by hand, the dial, and a card that merges on its own on full auto.</p>
+<div class="pair"><div><video src="../../demo/out/p-clip-dial.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-dial-sheet.png" alt="Contact sheet of one dial for how much it asks."><p class="cap"><span class="score" id="s-clip-dial"></span></p></div></div>
+<h3>Recovery from stalls</h3>
+<p>The diagram of the twelve checks and the staircase of measures, then a session going in circles until a check trips.</p>
+<div class="pair"><div><video src="../../demo/out/p-clip-stall.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-stall-sheet.png" alt="Contact sheet of recovery from stalls."><p class="cap"><span class="score" id="s-clip-stall"></span></p></div></div>
 <h2>The sandbox, three variants</h2>
-<h3>A: the schematic, improved</h3>
-<p>The pod with its chips, the probe's crosses, the gateway that holds the keys and a meter that holds first and books after, a person who funds or ends, and the factory's five closing steps.</p>
+<p>Slower, with one bright element at a time and the same label style as the clips. D, the sequence diagram, stays in reserve for explaining a workflow.</p>
+<h3>A: the schematic</h3>
 <div class="pair"><div><video src="../../demo/out/p-sandbox-a.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-sandbox-a-sheet.png" alt="Contact sheet of sandbox A."><p class="cap"><span class="score" id="s-sandbox-a"></span></p></div></div>
 <h3>C: concentric walls</h3>
-<p>The pod, gVisor and the network policy as nested walls. Each attempt stops at the wall that blocks it, and the gateway sits in the one gate.</p>
 <div class="pair"><div><video src="../../demo/out/p-sandbox-c.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-sandbox-c-sheet.png" alt="Contact sheet of sandbox C."><p class="cap"><span class="score" id="s-sandbox-c"></span></p></div></div>
 <h3>D: a sequence diagram</h3>
-<p>Lanes for a person, the factory, the pod, the gateway, the model API and the repository. The messages draw in order, from starting the pod to deleting it.</p>
 <div class="pair"><div><video src="../../demo/out/p-sandbox-d.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-sandbox-d-sheet.png" alt="Contact sheet of sandbox D."><p class="cap"><span class="score" id="s-sandbox-d"></span></p></div></div>
-
-<h2>The small clips, one per card on the landing page</h2>
-<p>Silent loops of 7 to 11 seconds that zoom into the moment that matters, with a short label for each moment at the bottom left. The landing page plays them in its cards, with the old frames as posters.</p>
-<h3>Talk to an agent while it works</h3>
-<div class="pair"><div><video src="../../demo/out/p-clip-chat.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-chat-sheet.png" alt="Contact sheet of the chat clip."><p class="cap"><span class="score" id="s-clip-chat"></span></p></div></div>
-<h3>The plan before the code</h3>
-<div class="pair"><div><video src="../../demo/out/p-clip-plan.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-plan-sheet.png" alt="Contact sheet of the plan clip."><p class="cap"><span class="score" id="s-clip-plan"></span></p></div></div>
-<h3>The review rejects with a reason</h3>
-<div class="pair"><div><video src="../../demo/out/p-clip-review.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-review-sheet.png" alt="Contact sheet of the review clip."><p class="cap"><span class="score" id="s-clip-review"></span></p></div></div>
-<h3>An issue files its own fix</h3>
-<div class="pair"><div><video src="../../demo/out/p-clip-issue.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-issue-sheet.png" alt="Contact sheet of the issue clip."><p class="cap"><span class="score" id="s-clip-issue"></span></p></div></div>
-<h3>The money is held before each call</h3>
-<div class="pair"><div><video src="../../demo/out/p-clip-money.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-money-sheet.png" alt="Contact sheet of the money clip."><p class="cap"><span class="score" id="s-clip-money"></span></p></div></div>
-<h3>One dial for how much it asks</h3>
-<div class="pair"><div><video src="../../demo/out/p-clip-dial.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-dial-sheet.png" alt="Contact sheet of the dial clip."><p class="cap"><span class="score" id="s-clip-dial"></span></p></div></div>
-<h3>Recovery from stalls</h3>
-<div class="pair"><div><video src="../../demo/out/p-clip-stall.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-stall-sheet.png" alt="Contact sheet of the stall clip."><p class="cap"><span class="score" id="s-clip-stall"></span></p></div></div>
 </main>
 <script src="scores.js"></script>
 </body>

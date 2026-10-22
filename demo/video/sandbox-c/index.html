@@ -8,158 +8,171 @@
 <script src="gsap.min.js"></script>
 <style>
   #root { position: relative; width: 1600px; height: 900px; overflow: hidden; background: var(--bg); }
+
+  /* a unit is lit by --hi: 1 is the one element the caption talks about, 0 is the settled, muted state */
+  .u { --hi: 0; --lc: var(--accent); --c: color-mix(in srgb, var(--lc) calc(var(--hi) * 100%), #93a1b5); --b: color-mix(in srgb, var(--lc) calc(var(--hi) * 100%), #263649); --k: color-mix(in srgb, var(--lc) calc(var(--hi) * 100%), #2c4056); color: var(--c); }
+  .u.amb { --lc: var(--need); }
+  .panel.u { border-color: var(--b); background: var(--bg-panel); }
+  .panel.u::after { border-color: var(--k); }
+  .panel.u h2 { color: var(--c); }
   .panel h2 { font-size: 34px; margin: 0 0 6px; }
-  .panel p { font-size: 28px; line-height: 1.3; color: var(--text-muted); }
+  .panel p { font-size: 28px; line-height: 1.3; color: var(--c); }
+  path.u, rect.u { stroke: var(--k); }
+
   .legend { position: absolute; padding: 0 10px; background: var(--bg); font: 26px var(--font-mono); white-space: nowrap; opacity: 0; }
   .legend b { font-weight: 600; }
-  .lg1 { left: 404px; top: 174px; color: var(--accent); }
-  .lg2 { left: 340px; top: 110px; color: #8fc3d6; }
-  .lg3 { left: 432px; top: 46px; color: var(--text); }
+  .lg1 { left: 404px; top: 174px; }
+  .lg2 { left: 340px; top: 110px; }
+  .lg3 { left: 432px; top: 46px; }
   .agent { left: 408px; top: 214px; width: 444px; height: 258px; padding: 16px 22px; opacity: 0; }
-  .agent h2 { display: inline-block; }
-  .pill { position: absolute; right: 18px; top: 22px; padding: 2px 10px; border: 1px solid var(--line-strong); font: 24px var(--font-mono); color: var(--text-muted); white-space: nowrap; }
-  .chip { display: inline-block; margin-top: 4px; padding: 1px 12px; border: 1px solid var(--line-strong); font-size: 25px; color: var(--text); }
-  .work { margin-top: 10px; font: 26px var(--font-mono); letter-spacing: -0.02em; color: var(--text-muted); white-space: nowrap; }
-  .work b { color: var(--accent); font-weight: 400; }
+  .chip { display: inline-block; margin-top: 4px; padding: 1px 12px; border: 1px solid var(--b); font-size: 25px; color: var(--c); }
+  .holds { margin-top: 18px; }
   .holds p { font-size: 26px; margin-top: 2px; opacity: 0; white-space: nowrap; }
-  .holds .ok { color: var(--accent); }
-  .holds .no { color: var(--text-muted); }
   .ki { width: 28px; height: 28px; margin: 0 8px -5px 0; fill: none; stroke: currentColor; stroke-width: 2.4; }
-  .factory p { color: var(--text); }
-  .tgt { position: absolute; left: 0; width: 236px; text-align: right; font-size: 28px; line-height: 1.15; color: var(--text); opacity: 0; }
-  .tgt small { display: block; font: 24px var(--font-mono); color: var(--text-muted); }
-  .note { position: absolute; font-size: 26px; color: var(--text); white-space: nowrap; opacity: 0; }
-  .gatelbl { position: absolute; left: 1040px; top: 310px; font-size: 28px; color: var(--accent); white-space: nowrap; opacity: 0; }
+  .tgt { position: absolute; left: 0; width: 236px; text-align: right; font-size: 28px; line-height: 1.15; opacity: 0; }
+  .tgt small { display: block; font: 24px var(--font-mono); }
+  .note { position: absolute; font-size: 26px; white-space: nowrap; opacity: 0; }
+  .gatelbl { position: absolute; left: 1040px; top: 310px; font-size: 28px; white-space: nowrap; opacity: 0; }
   .gw { left: 960px; top: 230px; width: 430px; height: 292px; padding: 16px 22px; opacity: 0; }
-  .key { display: inline-block; margin: 2px 0 12px; padding: 2px 12px; border: 1px solid var(--accent); font-size: 28px; color: var(--text); white-space: nowrap; }
-  .lbl { display: flex; justify-content: space-between; font: 26px var(--font-mono); color: var(--text-muted); margin-bottom: 6px; }
-  .lbl b { color: var(--text); font-weight: 400; }
-  .bar { position: relative; height: 36px; border: 1px solid var(--line-strong); background: var(--bg); }
-  .seg { position: absolute; top: 0; bottom: 0; left: 0; width: 0; }
-  .seg.booked { background: color-mix(in srgb, var(--accent) 80%, transparent); }
+  .key { display: inline-block; margin: 2px 0 12px; padding: 2px 12px; border: 1px solid var(--b); font-size: 28px; color: var(--c); white-space: nowrap; }
+  .lbl { display: flex; justify-content: space-between; font: 26px var(--font-mono); margin-bottom: 6px; color: color-mix(in srgb, var(--need) calc(var(--hi) * 100%), #93a1b5); }
+  .bar { position: relative; height: 36px; border: 1px solid var(--b); background: var(--bg); }
+  .seg { position: absolute; top: 0; bottom: 0; left: 0; width: 0; opacity: calc(.4 + .6 * var(--hi)); }
+  .seg.booked { background: var(--accent); }
   .seg.held { background: repeating-linear-gradient(135deg, var(--need) 0 8px, color-mix(in srgb, var(--need) 55%, transparent) 8px 16px); }
   .lgd { position: relative; height: 68px; margin-top: 6px; }
   .lgd p { position: absolute; left: 0; font-size: 27px; white-space: nowrap; opacity: 0; }
-  .lgd .h { top: 0; color: var(--need-text); }
-  .lgd .b { top: 34px; color: var(--accent); }
   .api { left: 1420px; top: 322px; width: 160px; height: 110px; padding: 10px 14px; text-align: center; opacity: 0; }
   .api h2 { font-size: 32px; line-height: 1.2; margin: 0; }
-  .api p { font-size: 24px; }
-  .ask { left: 1060px; top: 40px; width: 510px; height: 166px; padding: 16px 22px; background: var(--need-tint); border-color: color-mix(in srgb, var(--need) 72%, transparent); box-shadow: inset 3px 0 0 var(--need); opacity: 0; }
-  .ask::after { border-color: var(--need); }
-  .ask h2 { color: var(--need-text); }
-  .ask p { color: var(--text); }
+  .ask { left: 1060px; top: 40px; width: 510px; height: 166px; padding: 16px 22px; background: var(--need-tint); opacity: 0; }
   .ask .btns { position: absolute; right: 22px; bottom: 18px; display: flex; gap: 12px; }
-  .ask .btns span { padding: 3px 14px; border: 1px solid var(--need); color: var(--need-text); font: 25px var(--font-mono); }
+  .ask .btns span { padding: 3px 14px; border: 1px solid var(--b); font: 25px var(--font-mono); }
   .factory { left: 1060px; top: 530px; width: 510px; height: 198px; padding: 14px 22px; }
   .factory h2 { font-size: 32px; margin: 0 0 2px; }
-  .factory ol { position: absolute; left: 22px; top: 54px; margin: 0; padding: 0; list-style: none; font-size: 24px; line-height: 26px; color: var(--text-faint); opacity: 0; }
+  .factory ol { position: absolute; left: 22px; top: 54px; margin: 0; padding: 0; list-style: none; font-size: 24px; line-height: 26px; }
+  .factory li { opacity: 0; white-space: nowrap; }
   .factory li::before { content: none; }
-  .factory ol i { display: inline-block; width: 28px; font-style: normal; color: var(--accent); opacity: 0; }
+  .factory ol i { display: inline-block; width: 28px; font-style: normal; }
   .repo { left: 260px; top: 646px; width: 380px; height: 82px; padding: 12px 20px; opacity: 0; }
   .repo h2 { display: inline-block; font-size: 30px; margin: 0 14px 0 0; }
-  .repo p { display: inline-block; font-size: 26px; color: var(--text); }
-  .card { position: absolute; left: 0; top: 0; padding: 6px 14px; background: var(--bg-card); border: 1px solid var(--mark); font: 26px var(--font-mono); color: var(--text); white-space: nowrap; }
-  .token { position: absolute; left: 0; top: 0; padding: 3px 12px; background: var(--bg-raised); border: 1px solid var(--accent); font: 25px var(--font-mono); color: var(--accent); white-space: nowrap; opacity: 0; }
+  .repo p { display: inline-block; font-size: 26px; }
+  .card { position: absolute; left: 0; top: 0; padding: 6px 14px; background: var(--bg-card); border: 1px solid var(--b); font: 26px var(--font-mono); white-space: nowrap; }
+  .token { position: absolute; left: 0; top: 0; padding: 3px 12px; background: var(--bg-raised); border: 1px solid var(--b); font: 25px var(--font-mono); white-space: nowrap; opacity: 0; }
   .dot { position: absolute; left: 0; top: 0; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 14px 3px color-mix(in srgb, var(--accent) 55%, transparent); opacity: 0; }
-  .gone { position: absolute; left: 400px; top: 318px; width: 460px; text-align: center; font: 36px var(--font-mono); color: var(--text); opacity: 0; }
-  .caption { position: absolute; left: 0; right: 0; top: 744px; height: 156px; text-align: center; font-size: 48px; line-height: 1.25; color: var(--text); background: var(--bg); border-top: 1px solid var(--line); }
-  .caption span { position: absolute; left: 80px; right: 80px; top: 18px; opacity: 0; }
-  .w1 { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-dasharray: 10 7; }
-  .w2 { fill: none; stroke: #8fc3d6; stroke-width: 2.5; }
-  .w3 { fill: none; stroke: var(--text); stroke-width: 4; }
-  .wire { stroke-width: 2.5; }
-  .wire.off { stroke: var(--text-faint); stroke-dasharray: 6 6; }
-  .x { stroke: var(--text); stroke-width: 4; fill: none; opacity: 0; }
-  .tick { stroke: var(--accent); stroke-width: 4; fill: none; opacity: 0; }
+  .gone { position: absolute; left: 400px; top: 318px; width: 460px; text-align: center; font: 36px var(--font-mono); opacity: 0; }
+
+  .caption { position: absolute; left: 40px; top: 774px; width: 1100px; height: 120px; }
+  .caption span { position: absolute; left: 0; top: 0; width: max-content; max-width: 1100px; padding: 12px 22px; font: 500 44px/1.2 var(--font-ui); color: #c3cfdf; text-align: left; background: color-mix(in srgb, var(--bg) 90%, transparent); border-left: 6px solid var(--accent); box-shadow: 0 6px 24px rgba(0,0,0,.5); opacity: 0; }
+  .caption span.m { border-left-color: var(--need); }
+  .caption span.two { font-size: 40px; }
+  .caption b { font-weight: 700; color: var(--accent); }
+  .caption b.m { color: var(--need-text); }
+
+  .w1 { fill: none; stroke-width: 2.5; stroke-dasharray: 10 7; }
+  .w2 { fill: none; stroke-width: 2.5; }
+  .w3 { fill: none; stroke-width: 4; }
+  .wire { stroke-width: 2.5; fill: none; }
+  .wire.off { stroke-dasharray: 6 6; }
+  .x { stroke-width: 4; fill: none; opacity: 0; }
+  .tick { stroke-width: 4; fill: none; opacity: 0; }
 </style>
 </head>
 <body>
-<div id="root" data-composition-id="main" data-start="0" data-duration="23" data-width="1600" data-height="900">
-<div id="scene" class="clip" data-start="0" data-duration="23" style="position:absolute;inset:0">
+<div id="root" data-composition-id="main" data-start="0" data-duration="56.6" data-width="1600" data-height="900">
+<div id="scene" class="clip" data-start="0" data-duration="56.6" style="position:absolute;inset:0">
 
 <svg class="wires" viewBox="0 0 1600 900" aria-hidden="true">
   <g id="walls">
-    <path id="w3" class="w3" d="M1000 290 V64 H260 V620 H1000 V370"/>
-    <rect id="w2" class="w2" x="324" y="128" width="612" height="428"/>
-    <rect id="w1" class="w1" x="388" y="192" width="484" height="300"/>
+    <path id="w3" class="w3 u" d="M1000 290 V64 H260 V620 H1000 V370"/>
+    <rect id="w2" class="w2 u" x="324" y="128" width="612" height="428"/>
+    <rect id="w1" class="w1 u" x="388" y="192" width="484" height="300"/>
   </g>
-  <path class="wire off" data-off="0" d="M408 270 H262"/>
-  <path class="wire off" data-off="1" d="M408 342 H262"/>
-  <path class="wire off" data-off="2" d="M408 432 H262"/>
-  <path class="wire off" id="off-root" d="M420 472 V492"/>
-  <path class="wire off" id="off-kern" d="M420 492 V556"/>
-  <path class="wire" id="w-ctl" d="M1060 600 H840 V474"/>
-  <path class="x" data-x="0" d="M246 256 l28 28 M274 256 l-28 28"/>
-  <path class="x" data-x="1" d="M246 328 l28 28 M274 328 l-28 28"/>
-  <path class="x" data-x="2" d="M246 418 l28 28 M274 418 l-28 28"/>
-  <path class="x" id="x-root" d="M408 480 l24 24 M432 480 l-24 24"/>
-  <path class="x" id="x-kern" d="M408 544 l24 24 M432 544 l-24 24"/>
-  <path class="wire" id="w-gate" d="M852 330 H1010"/>
-  <path class="tick" id="tick" d="M1004 300 l8 10 l16 -20"/>
-  <path class="wire" id="w-api" d="M1390 377 H1420"/>
-  <path class="wire" id="w-push" d="M1060 688 H640"/>
+  <path class="wire off u" data-off="0" d="M408 270 H262"/>
+  <path class="wire off u" data-off="1" d="M408 342 H262"/>
+  <path class="wire off u" data-off="2" d="M408 432 H262"/>
+  <path class="wire off u" id="off-root" d="M420 472 V492"/>
+  <path class="wire off u" id="off-kern" d="M420 492 V556"/>
+  <path class="wire u" id="w-ctl" d="M1060 600 H840 V474"/>
+  <path class="x u" data-x="0" d="M246 256 l28 28 M274 256 l-28 28"/>
+  <path class="x u" data-x="1" d="M246 328 l28 28 M274 328 l-28 28"/>
+  <path class="x u" data-x="2" d="M246 418 l28 28 M274 418 l-28 28"/>
+  <path class="x u" id="x-root" d="M408 480 l24 24 M432 480 l-24 24"/>
+  <path class="x u" id="x-kern" d="M408 544 l24 24 M432 544 l-24 24"/>
+  <path class="wire u" id="w-gate" d="M852 330 H1010"/>
+  <path class="tick u" id="tick" d="M1004 300 l8 10 l16 -20"/>
+  <path class="wire u" id="w-api" d="M1390 377 H1420"/>
+  <path class="wire u" id="w-push" d="M1060 688 H640"/>
 </svg>
 
-<p class="legend lg3" id="lg3"><b>network policy</b> · named hosts only</p>
-<p class="legend lg2" id="lg2"><b>gVisor</b> · its own kernel</p>
-<p class="legend lg1" id="lg1"><b>pod</b> · non-root · read-only root</p>
+<p class="legend u lg3" id="lg3"><b>network policy</b> · named hosts only</p>
+<p class="legend u lg2" id="lg2"><b>gVisor</b> · its own kernel</p>
+<p class="legend u lg1" id="lg1"><b>pod</b> · non-root · read-only root</p>
 
-<section class="panel agent" id="agent">
+<section class="panel agent u" id="agent">
   <h2>The agent</h2>
-  <div><span class="chip" data-ov>no service account token</span></div>
-  <div class="work" id="work" data-ov>… waits for the probe</div>
+  <div><span class="chip">no service account token</span></div>
   <div class="holds">
-    <p class="ok" id="h-id">✓ 1-hour gateway identity</p>
-    <p class="no" id="h-no"><svg class="ki" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="12" r="4.5"/><path d="M11.5 12 H22 M18 12 v4 M21.5 12 v3 M2 22 L22 2"/></svg>no push token, no model key</p>
+    <p class="u" id="h-id">✓ 1-hour gateway identity</p>
+    <p class="u" id="h-no"><svg class="ki" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="12" r="4.5"/><path d="M11.5 12 H22 M18 12 v4 M21.5 12 v3 M2 22 L22 2"/></svg>no push token, no model key</p>
   </div>
 </section>
 
-<p class="note" id="n-root" style="left:446px;top:500px">write to the root filesystem</p>
-<p class="note" id="n-kern" style="left:446px;top:568px">a call into the host's kernel</p>
+<p class="note u" id="n-root" style="left:446px;top:500px">write to the root filesystem</p>
+<p class="note u" id="n-kern" style="left:446px;top:568px">a call into the host's kernel</p>
 
-<p class="tgt" data-t="0" style="top:252px">the internet</p>
-<p class="tgt" data-t="1" style="top:324px">the host machine</p>
-<p class="tgt" data-t="2" style="top:398px">cloud metadata<small>169.254.169.254</small></p>
-<p class="gatelbl" id="gatelbl">named hosts only</p>
+<p class="tgt u" data-t="0" style="top:252px">the internet</p>
+<p class="tgt u" data-t="1" style="top:324px">the host machine</p>
+<p class="tgt u" data-t="2" style="top:398px">cloud metadata<small>169.254.169.254</small></p>
+<p class="gatelbl u" id="gatelbl">named hosts only</p>
 
-<section class="panel gw" id="gw">
+<section class="panel gw u" id="gw">
   <h2>Model gateway</h2>
   <span class="key" id="key"><svg class="ki" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="12" r="4.5"/><path d="M11.5 12 H22 M18 12 v4 M21.5 12 v3"/></svg>holds the model keys</span>
-  <div class="lbl"><span id="cap-l">card budget</span><b id="cap">cap €2.00</b></div>
-  <div class="bar"><i class="seg booked" id="booked"></i><i class="seg held" id="held"></i></div>
-  <div class="lgd"><p class="h" id="lg-held">▮ held first: €0.30, worst case</p><p class="b" id="lg-booked">▮ booked after: €0.04, real</p></div>
+  <div class="lbl u amb"><span id="cap-l">card budget</span><b id="cap" style="font-weight:400">cap €2.00</b></div>
+  <div class="bar u amb"><i class="seg booked u" id="booked"></i><i class="seg held u amb" id="held"></i></div>
+  <div class="lgd"><p class="u amb" id="lg-held" style="top:0">▮ held first: €0.30, worst case</p><p class="u" id="lg-booked" style="top:34px">▮ booked after: €0.04, real</p></div>
 </section>
-<section class="panel api" id="api"><h2>Model<br>API</h2></section>
+<section class="panel api u" id="api"><h2>Model<br>API</h2></section>
 
-<section class="panel ask" id="ask"><h2>A person decides</h2><p>the card's budget cap is reached</p><div class="btns"><span id="fund">Fund it</span><span>End it</span></div></section>
+<section class="panel ask u amb" id="ask"><h2>A person decides</h2><p>the card's budget cap is reached</p><div class="btns"><span>Fund it</span><span>End it</span></div></section>
 
-<section class="panel factory" id="factory">
+<section class="panel factory u" id="factory">
   <h2>The factory</h2>
   <p id="f-sub">starts one pod per card</p>
   <ol id="f-steps">
-    <li data-ov><i>✓</i>kills the agent's processes</li>
-    <li data-ov><i>✓</i>mints a fresh write token</li>
-    <li data-ov><i>✓</i>pushes once</li>
-    <li data-ov><i>✓</i>revokes the token</li>
-    <li data-ov><i>✓</i>deletes the pod</li>
+    <li class="u" data-ov><i>✓</i>kills the agent's processes</li>
+    <li class="u" data-ov><i>✓</i>mints a fresh write token</li>
+    <li class="u" data-ov><i>✓</i>pushes once</li>
+    <li class="u" data-ov><i>✓</i>revokes the token</li>
+    <li class="u" data-ov><i>✓</i>deletes the pod</li>
   </ol>
 </section>
-<section class="panel repo" id="repo"><h2>Repository</h2><p id="repo-sub">&nbsp;</p></section>
+<section class="panel repo u" id="repo"><h2>Repository</h2><p id="repo-sub">&nbsp;</p></section>
 
-<div class="card" id="card">card · belt-boss</div>
+<div class="card u" id="card">card · belt-boss</div>
 <i class="dot" id="dot"></i>
-<span class="token" id="token">write token</span>
-<p class="note" id="pushlbl" style="left:760px;top:694px">push once</p>
-<p class="gone" id="gone">pod deleted</p>
+<span class="token u" id="token">write token</span>
+<p class="note u" id="pushlbl" style="left:760px;top:694px">push once</p>
+<p class="gone u" id="gone">pod deleted</p>
 
 <div class="caption">
-  <span data-c="0">The factory starts one throwaway pod for each card, wrapped in gVisor and a closed network.</span>
-  <span data-c="1">Before the agent starts, a probe proves the pod cannot reach the internet, the host or the cloud metadata.</span>
-  <span data-c="2">Every model call goes through the gateway. It reserves the worst case first, then books the real cost.</span>
-  <span data-c="3">The agent never holds a push token or a model key.</span>
-  <span data-c="4">At the card's budget cap, the factory stops and asks a person: fund it or end it.</span>
-  <span data-c="5">When the agent is done, the factory kills it, pushes once with a fresh token, revokes it and deletes the pod.</span>
+  <span>The factory starts <b>one throwaway pod</b> for each card.</span>
+  <span>A write to the root filesystem stops at <b>the pod wall</b>.</span>
+  <span>A call into the host's kernel stops at <b>gVisor</b>.</span>
+  <span>The probe's try at <b>the internet</b> stops at the network policy.</span>
+  <span>Its try at <b>the host machine</b> stops there too.</span>
+  <span>And its try at <b>cloud metadata</b> stops there too.</span>
+  <span>Only <b>named hosts</b> pass the gate.</span>
+  <span>The gateway sits in that gate with <b>the model keys</b> and <b class="m">the card budget</b>.</span>
+  <span>It <b class="m">reserves the worst case</b> first: €0.30 is held.</span>
+  <span>The call goes out; then it books <b class="m">the real cost</b>: €0.04.</span>
+  <span>The agent holds <b>a one-hour gateway identity</b>, never a push token or a model key.</span>
+  <span>More calls fill <b class="m">the budget</b> to its cap.</span>
+  <span>The factory stops and asks <b class="m">a person</b>: fund it or end it.</span>
+  <span>When the agent is done, the factory <b>kills it</b>.</span>
+  <span>It <b>mints a fresh write token</b> and <b>pushes once</b>.</span>
+  <span>It <b>revokes</b> the token.</span>
+  <span>It <b>deletes the pod</b>, and the walls fold away.</span>
 </div>
 
 </div>
@@ -169,8 +182,7 @@
 // One paused timeline drives the clip: the renderer seeks it frame by frame, so nothing here reads the clock.
 const tl = gsap.timeline({ paused: true });
 const qa = (s) => [...document.querySelectorAll(s)];
-const caps = qa("[data-c]"), tgts = qa("[data-t]"), offs = qa("[data-off]"), xs = qa("[data-x]");
-const steps = qa("#f-steps li"), ticks = qa("#f-steps i");
+const tgts = qa("[data-t]"), offs = qa("[data-off]"), xs = qa("[data-x]"), caps = qa(".caption span"), steps = qa("#f-steps li");
 const Y = [270, 342, 432];
 offs.forEach((w, i) => gsap.set(w, { attr: { d: `M408 ${Y[i]} H408` } }));
 gsap.set(["#w-gate", "#w-api", "#w-push", "#w-ctl"], { strokeDasharray: 1000, strokeDashoffset: 1000 });
@@ -178,136 +190,158 @@ gsap.set(["#off-root", "#off-kern"], { opacity: 0 });
 gsap.set(["#w1", "#w2", "#w3"], { opacity: 0, scale: 0.9, transformOrigin: "630px 342px" });
 gsap.set(["#card", "#token"], { xPercent: -50, yPercent: -50 });
 gsap.set("#card", { x: 1315, y: 660 });
+gsap.set(".u", { "--hi": 0 });
 
-const caption = (i, at, until) => {
-  tl.to(caps[i], { opacity: 1, duration: 0.25 }, at);
-  tl.to(caps[i], { opacity: 0, duration: 0.15 }, until - 0.15);
+let T = 0, ci = 0, cur = [];
+const lit = (units, at) => {
+  const old = cur.filter((x) => !units.includes(x));
+  if (old.length) tl.to(old, { "--hi": 0, duration: 0.4 }, at);
+  tl.to(units, { "--hi": 1, duration: 0.3 }, at);
+  cur = units;
 };
+const beat = (dur, fn) => {
+  const i = ci++;
+  tl.to(caps[i], { opacity: 1, duration: 0.25 }, T);
+  tl.to(caps[i], { opacity: 0, duration: 0.15 }, T + dur - 0.15);
+  fn(T);
+  T += dur;
+};
+const show = (sel, at, d = 0.3) => tl.to(sel, { opacity: 1, duration: d }, at);
 const go = (from, to, at, dur) => {
   tl.set("#dot", { x: from[0], y: from[1], opacity: 1 }, at);
   tl.to("#dot", { x: to[0], y: to[1], duration: dur, ease: "power1.inOut" }, at);
   tl.set("#dot", { opacity: 0 }, at + dur + 0.02);
 };
 const say = (sel, text, at) => tl.set(sel, { textContent: text }, at);
-const wall = (w, lg, at) => {
-  tl.to(w, { opacity: 1, scale: 1, duration: 0.45, ease: "power2.out" }, at);
-  tl.to(lg, { opacity: 1, duration: 0.3 }, at + 0.25);
-};
+const wall = (w, at) => tl.to(w, { opacity: 1, scale: 1, duration: 0.45, ease: "power2.out" }, at);
 
-// 0 to 3.8: the factory sends the card in, and the walls close around it: the pod, gVisor, the network policy
-tl.to("#w-ctl", { strokeDashoffset: 0, duration: 0.3, ease: "none" }, 0.05);
-tl.to("#card", { keyframes: [{ x: 840, y: 600, duration: 0.25 }, { x: 840, y: 480, duration: 0.2 }], ease: "none" }, 0.1);
-tl.to("#card", { opacity: 0, scale: 1.5, duration: 0.2 }, 0.55);
-wall("#w1", "#lg1", 0.5);
-tl.to("#agent", { opacity: 1, duration: 0.35 }, 0.55);
-tl.to("#off-root", { opacity: 1, duration: 0.2 }, 1.1);
-go([420, 466], [420, 490], 1.1, 0.2);
-tl.to(["#x-root", "#n-root"], { opacity: 1, duration: 0.2 }, 1.3);
-wall("#w2", "#lg2", 1.6);
-tl.to("#off-kern", { opacity: 1, duration: 0.2 }, 2.1);
-go([420, 494], [420, 554], 2.1, 0.3);
-tl.to(["#x-kern", "#n-kern"], { opacity: 1, duration: 0.2 }, 2.4);
-wall("#w3", "#lg3", 2.5);
-caption(0, 0, 3.8);
-
-// 3.8 to 7.8: the probe, before the agent starts
-say("#f-sub", "probes the network first", 3.9);
-Y.forEach((y, i) => {
-  const at = 4.0 + i * 0.5;
-  tl.to(offs[i], { attr: { d: `M408 ${y} H262` }, duration: 0.3, ease: "none" }, at);
-  go([408, y], [266, y], at, 0.3);
-  tl.to([xs[i], tgts[i]], { opacity: 1, duration: 0.2 }, at + 0.32);
+// the pod: the factory sends the card in
+beat(3.0, (t) => {
+  const u = ["#w-ctl", "#card", "#w1", "#lg1", "#agent"];
+  gsap.set(u, { "--hi": 1 });
+  cur = u;
+  tl.to("#w-ctl", { strokeDashoffset: 0, duration: 0.3, ease: "none" }, 0.05);
+  tl.to("#card", { keyframes: [{ x: 840, y: 600, duration: 0.25 }, { x: 840, y: 480, duration: 0.2 }], ease: "none" }, 0.1);
+  tl.to("#card", { opacity: 0, scale: 1.5, duration: 0.2 }, 0.55);
+  wall("#w1", 0.5);
+  show("#lg1", 0.75);
+  show("#agent", 0.55, 0.35);
 });
-tl.to("#w-gate", { strokeDashoffset: 0, duration: 0.4, ease: "none" }, 5.6);
-go([852, 330], [1010, 330], 5.6, 0.4);
-tl.to(["#tick", "#gatelbl"], { opacity: 1, duration: 0.2 }, 6.0);
-tl.set("#work", { innerHTML: "<b>$</b> go test ./...", color: "#dfe7f1" }, 6.4);
-caption(1, 3.8, 7.8);
+// each attempt stops at the wall that blocks it
+beat(3.3, (t) => {
+  lit(["#w1", "#lg1", "#off-root", "#x-root", "#n-root"], t);
+  show("#off-root", t, 0.2);
+  go([420, 466], [420, 490], t, 0.2);
+  show(["#x-root", "#n-root"], t + 0.25, 0.2);
+});
+beat(3.0, (t) => {
+  lit(["#w2", "#lg2", "#off-kern", "#x-kern", "#n-kern"], t);
+  wall("#w2", t);
+  show("#lg2", t + 0.2);
+  show("#off-kern", t + 0.5, 0.2);
+  go([420, 494], [420, 554], t + 0.5, 0.3);
+  show(["#x-kern", "#n-kern"], t + 0.8, 0.2);
+});
+Y.forEach((y, i) => {
+  beat(i === 0 ? 3.4 : 2.8, (t) => {
+    const u = [tgts[i], offs[i], xs[i]];
+    if (i === 0) { u.push("#w3", "#lg3"); wall("#w3", t); show("#lg3", t + 0.2); }
+    lit(u, t);
+    const at = t + (i === 0 ? 0.6 : 0);
+    tl.to(offs[i], { attr: { d: `M408 ${y} H262` }, duration: 0.3, ease: "none" }, at);
+    go([408, y], [266, y], at, 0.3);
+    show([xs[i], tgts[i]], at + 0.32, 0.2);
+  });
+});
+beat(2.7, (t) => {
+  lit(["#w-gate", "#tick", "#gatelbl"], t);
+  tl.to("#w-gate", { strokeDashoffset: 0, duration: 0.4, ease: "none" }, t);
+  go([852, 330], [1010, 330], t, 0.4);
+  show(["#tick", "#gatelbl"], t + 0.4, 0.2);
+});
 
-// 7.8 to 11.8: the gateway is the gate; one call held at its worst case, sent with the gateway's key, booked at its real cost
-say("#f-sub", "waits for the agent", 7.8);
-tl.to(["#gatelbl", "#tick"], { opacity: 0, duration: 0.15 }, 7.65);
-tl.to("#gw", { opacity: 1, duration: 0.3 }, 7.85);
-tl.to("#api", { opacity: 1, duration: 0.3 }, 7.95);
-tl.to("#w-api", { strokeDashoffset: 0, duration: 0.3, ease: "none" }, 8.0);
-tl.to("#h-id", { opacity: 1, duration: 0.3 }, 8.0);
-go([852, 330], [958, 330], 8.25, 0.3);
-tl.to("#gw", { borderColor: "#f4b13e", duration: 0.15 }, 8.55);
-tl.to("#held", { width: 58, duration: 0.25 }, 8.55);
-tl.to("#lg-held", { opacity: 1, duration: 0.2 }, 8.6);
-go([1390, 377], [1420, 377], 9.3, 0.2);
-go([1420, 377], [1390, 377], 9.7, 0.2);
-tl.to("#gw", { borderColor: "#263649", duration: 0.2 }, 10.1);
-tl.to("#held", { width: 0, duration: 0.2 }, 10.1);
-tl.set("#booked", { width: 8 }, 10.1);
-tl.to("#lg-held", { opacity: 0.5, duration: 0.2 }, 10.1);
-tl.to("#lg-booked", { opacity: 1, duration: 0.2 }, 10.15);
-go([958, 330], [852, 330], 10.35, 0.3);
-caption(2, 7.8, 11.8);
+// the gateway sits in the gate
+beat(4.2, (t) => {
+  lit(["#gw", "#api", "#w-api", ".lbl", ".bar"], t);
+  tl.to(["#gatelbl", "#tick"], { opacity: 0, duration: 0.2 }, t);
+  show("#gw", t + 0.1, 0.4);
+  show("#api", t + 0.1, 0.4);
+  tl.to("#w-api", { strokeDashoffset: 0, duration: 0.3, ease: "none" }, t + 0.3);
+});
+beat(3.0, (t) => {
+  lit(["#held", "#lg-held"], t);
+  go([852, 330], [958, 330], t, 0.3);
+  tl.to("#held", { width: 58, duration: 0.25 }, t + 0.35);
+  show("#lg-held", t + 0.4, 0.2);
+});
+beat(3.0, (t) => {
+  lit(["#booked", "#lg-booked"], t);
+  go([1390, 377], [1420, 377], t, 0.2);
+  go([1420, 377], [1390, 377], t + 0.4, 0.2);
+  tl.to("#held", { width: 0, duration: 0.2 }, t + 1.0);
+  tl.set("#booked", { width: 8 }, t + 1.0);
+  show("#lg-booked", t + 1.05, 0.2);
+  go([958, 330], [852, 330], t + 1.4, 0.3);
+});
 
-// 11.8 to 14: no push token and no model key inside the walls; the keys stay in the gateway
-tl.to("#h-no", { opacity: 1, duration: 0.3 }, 11.9);
-tl.to("#h-no", { color: "#dfe7f1", duration: 0.3 }, 12.2);
-tl.to("#key", { backgroundColor: "rgba(79,203,226,.22)", duration: 0.3 }, 12.2);
-tl.to("#key", { backgroundColor: "rgba(79,203,226,0)", duration: 0.3 }, 13.6);
-caption(3, 11.8, 14.0);
+// what the agent holds
+beat(4.6, (t) => { lit(["#h-id", "#h-no"], t); show(["#h-id", "#h-no"], t, 0.3); });
 
-// 14 to 17.8: calls fill the budget to its cap; the gateway refuses, the factory asks a person, who funds it, and the agent runs on
-tl.to(["#lg-held", "#lg-booked"], { opacity: 0, duration: 0.15 }, 14.0);
-for (let k = 0; k < 4; k++) {
-  const at = 14.0 + k * 0.15;
-  go([852, 330], [958, 330], at, 0.12);
-  tl.set("#booked", { width: Math.min(384, 9 + (k + 1) * 94) }, at + 0.13);
-}
-say("#cap", "€2.00 of €2.00", 14.6);
-say("#cap-l", "at cap", 14.6);
-tl.to("#booked", { backgroundColor: "#f4b13e", duration: 0.15 }, 14.6);
-tl.to("#gw", { borderColor: "#f4b13e", duration: 0.15 }, 14.6);
-tl.set("#work", { textContent: "■ stopped at the cap", color: "#f6bd5a" }, 14.6);
-say("#f-sub", "stops the card and asks a person", 14.6);
-tl.to("#ask", { opacity: 1, duration: 0.2 }, 14.62);
-tl.to("#fund", { backgroundColor: "#f4b13e", color: "#070b12", duration: 0.15 }, 15.8);
-say("#cap-l", "funded", 16.1);
-say("#cap", "€2.00 of €2.60", 16.1);
-tl.to("#booked", { width: 295, backgroundColor: "rgba(79,203,226,.8)", duration: 0.3 }, 16.1);
-tl.to("#gw", { borderColor: "#263649", duration: 0.2 }, 16.1);
-say("#f-sub", "funded: the agent runs on", 16.2);
-tl.set("#work", { innerHTML: "<b>$</b> go test ./... · funded", color: "#dfe7f1" }, 16.3);
-caption(4, 14.0, 17.8);
+// the cap, then the person
+beat(2.7, (t) => {
+  lit([".lbl", ".bar", "#booked"], t);
+  tl.to(["#lg-held", "#lg-booked"], { opacity: 0, duration: 0.2 }, t);
+  for (let k = 0; k < 4; k++) {
+    const at = t + 0.2 + k * 0.25;
+    go([852, 330], [958, 330], at, 0.18);
+    tl.set("#booked", { width: Math.min(384, 9 + (k + 1) * 94) }, at + 0.2);
+  }
+  say("#cap", "€2.00 of €2.00", t + 1.4);
+  say("#cap-l", "at cap", t + 1.4);
+  tl.to("#booked", { backgroundColor: "#f4b13e", duration: 0.2 }, t + 1.4);
+});
+beat(3.7, (t) => { lit(["#ask"], t); show("#ask", t, 0.3); });
 
-// 17.8 to 23: the agent is done; kill, mint, push once, revoke, delete
-tl.to("#ask", { opacity: 0, duration: 0.3 }, 17.8);
-tl.set("#f-sub", { opacity: 0 }, 17.8);
-tl.to("#f-steps", { opacity: 1, duration: 0.3 }, 17.85);
-tl.to("#repo", { opacity: 1, duration: 0.3 }, 17.9);
-const step = (i, at) => {
-  tl.to(steps[i], { color: "#dfe7f1", duration: 0.2 }, at);
-  tl.to(ticks[i], { opacity: 1, duration: 0.2 }, at);
-};
-go([1060, 600], [840, 600], 17.9, 0.15);
-go([840, 600], [840, 476], 18.07, 0.15);
-step(0, 18.25);
-tl.set("#work", { textContent: "✕ processes killed", color: "#dfe7f1" }, 18.25);
-tl.to(["#h-id", "#h-no", ".chip"], { opacity: 0.3, duration: 0.3 }, 18.25);
-step(1, 18.6);
-tl.set("#token", { x: 950, y: 650, opacity: 1 }, 18.6);
-tl.to("#w-push", { strokeDashoffset: 0, duration: 0.4, ease: "none" }, 19.8);
-tl.to("#pushlbl", { opacity: 1, duration: 0.2 }, 19.9);
-tl.to("#token", { x: 790, duration: 0.6, ease: "power1.inOut" }, 20.0);
-step(2, 20.6);
-say("#repo-sub", "pushed once", 20.6);
-step(3, 21.6);
-say("#token", "token revoked", 21.6);
-tl.to("#token", { borderColor: "#263649", color: "#7c8ba0", duration: 0.2 }, 21.6);
-tl.set("#token", { textDecoration: "line-through" }, 21.6);
-go([1060, 600], [840, 600], 21.75, 0.15);
-go([840, 600], [840, 476], 21.92, 0.15);
-step(4, 22.1);
-tl.to(["#agent", ".legend", ".note", ".tgt", ".x", ".wire.off", "#w-ctl"], { opacity: 0, duration: 0.25 }, 22.1);
-tl.to(["#w1", "#w2", "#w3"], { scale: 0.85, opacity: 0.25, duration: 0.4, ease: "power2.in" }, 22.1);
-tl.to("#gone", { opacity: 1, duration: 0.25 }, 22.4);
-caption(5, 17.8, 23.4);
+// the closing steps
+beat(2.8, (t) => {
+  lit([steps[0], "#w-ctl"], t);
+  tl.to("#ask", { opacity: 0, duration: 0.3 }, t);
+  tl.to("#f-sub", { opacity: 0, duration: 0.2 }, t);
+  show(steps[0], t + 0.2, 0.3);
+  go([1060, 600], [840, 600], t + 0.2, 0.2);
+  go([840, 600], [840, 476], t + 0.42, 0.15);
+});
+beat(4.0, (t) => {
+  lit([steps[1], steps[2], "#token", "#w-push", "#repo", "#pushlbl"], t);
+  show(steps[1], t, 0.3);
+  tl.set("#token", { x: 950, y: 650 }, t);
+  show("#token", t, 0.3);
+  show([steps[2], "#repo", "#pushlbl"], t + 1.8, 0.3);
+  tl.to("#w-push", { strokeDashoffset: 0, duration: 0.4, ease: "none" }, t + 1.9);
+  tl.to("#token", { x: 790, duration: 0.7, ease: "power1.inOut" }, t + 2.1);
+  say("#repo-sub", "pushed once", t + 3.0);
+});
+beat(2.6, (t) => {
+  lit([steps[3], "#token"], t);
+  show(steps[3], t, 0.3);
+  say("#token", "token revoked", t);
+  tl.set("#token", { textDecoration: "line-through" }, t);
+});
+beat(4.4, (t) => {
+  lit([steps[4], "#gone", "#w-ctl"], t);
+  show(steps[4], t, 0.3);
+  go([1060, 600], [840, 600], t, 0.2);
+  go([840, 600], [840, 476], t + 0.22, 0.15);
+  tl.to(["#agent", ".legend", "#n-root", "#n-kern", ".tgt", ".x", ".wire.off"], { opacity: 0, duration: 0.3 }, t + 0.4);
+  tl.to(["#w1", "#w2", "#w3"], { scale: 0.85, opacity: 0.25, duration: 0.5, ease: "power2.in" }, t + 0.4);
+  show("#gone", t + 0.8, 0.3);
+});
 
+tl.to("#scene", { opacity: 0, duration: 0.6, ease: "none" }, T);
+T += 0.6;
+tl.set({}, {}, T);
+if (Math.abs(T - 56.6) > 0.01) throw new Error("duration " + T);
+document.querySelectorAll(".caption span").forEach((s) => { if (s.querySelector("b.m")) s.classList.add("m"); if (s.getBoundingClientRect().height > 90) s.classList.add("two"); });
 window.__timelines = window.__timelines || {};
 window.__timelines["main"] = tl;
 </script>

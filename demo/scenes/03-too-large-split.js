@@ -10,6 +10,7 @@ const card = ui.face(105);
 const plan = story.plans[105];
 const approval = story.approvals.beltPlan;
 const accept = `#board article.approval.plan[data-card="${state.id(105)}"] button[aria-label^="Accept revision"]`;
+const choice = `#board article.approval.plan[data-card="${state.id(105)}"] button:has-text("${plan.question.choices[0]}")`;
 
 const filing = state.reply(state.say(story.replies.belt), state.call("new_card", args));
 
@@ -80,11 +81,16 @@ module.exports = {
     {
       state: () => null,
       actions: [{ click: `#board article.approval.plan[data-card="${state.id(105)}"] a.open` }, { click: '#drawer [data-sec="plan"] > summary' }],
-      hold: 3500,
-      boxes: { plan: '#drawer [data-sec="plan"]' },
+      hold: 4500,
+      boxes: { plan: '#drawer [data-sec="plan"]', drawer: "#drawer" },
     },
+    // the plan read, the drawer closes, the plan's question is answered, which frees its accept, and the accept is pressed;
+    // the accepted board follows without a reload
+    { state: () => null, actions: [{ click: "#drawer-close" }, { wait: 400 }, { hover: choice }], hold: 1200, boxes: { card } },
+    { state: () => null, actions: [{ click: choice }, { waitFor: `${accept}:not([disabled])` }, { wait: 500 }, { hover: accept }], hold: 800, boxes: { card } },
+    { state: () => null, actions: [{ click: accept }], hold: 500, boxes: { card } },
     {
-      state: (now) => scene(now, PLANNED + 90, { ...thread(now), ...accepted(now) }), actions: [{ goto: "/" }, { waitFor: ui.face(112) }], hold: 3000,
+      state: (now) => scene(now, PLANNED + 90, { ...thread(now), ...accepted(now) }), actions: [{ waitFor: ui.face(112) }, { hover: ui.park }], hold: 3500,
       boxes: { first: ui.face(109), last: ui.face(112) },
     },
   ],

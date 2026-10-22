@@ -25,10 +25,14 @@ module.exports = {
   viewport: "desk",
   steps: [
     {
-      state: (now) => morning(now, 14.5),
-      actions: [{ goto: "/" }, { click: ui.open(sup.issue) }, { waitFor: ui.tab("chat") }, { click: ui.tab("chat") }, { waitFor: "#session-log .msg" }],
-      hold: 5000,
-      boxes: { drawer: "#drawer" },
+      // the board first, so a viewer finds the card before its session opens
+      state: (now) => morning(now, 14.5), actions: [{ goto: "/" }, { hover: ui.idle }], hold: 2500, boxes: { card: ui.face(sup.issue) },
+    },
+    {
+      state: () => null,
+      actions: [{ click: ui.open(sup.issue) }, { waitFor: ui.tab("chat") }, { click: ui.tab("chat") }, { waitFor: "#session-log .msg" }],
+      hold: 6000,
+      boxes: { drawer: "#drawer", log: "#session-log" },
     },
     { state: (now) => morning(now, 16.5), actions: [{ click: ui.tab("activity") }, { waitFor: ui.step("supervisor") }, { hover: ui.step("supervisor") }], hold: 5500, boxes: { drawer: "#drawer", row: ui.step("supervisor") } },
     { state: (now) => morning(now, 24.5), actions: [{ click: ui.tab("chat") }, { waitFor: "#session-log .msg" }], hold: 4500, boxes: { drawer: "#drawer" } },

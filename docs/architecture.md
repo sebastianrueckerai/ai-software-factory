@@ -789,29 +789,24 @@ The seed bundle holds keys for DeepSeek, Alibaba (Qwen via DashScope), z.ai
 (GLM), Replicate, Firecrawl and fal.ai. These split into two groups at the
 gateway.
 
-Chat models reach LiteLLM as upstreams: deepseek, qwen, glm. The first alias
-table: `coding-cheap` maps to the DeepSeek and Qwen tier, `coding-frontier` to
-the GLM frontier tier, `review-frontier` to the strongest of the three,
-measured in Phase 2. Anthropic and OpenAI stay out at the start, deliberately:
+Chat models reach LiteLLM as upstreams. The first alias table named three
+providers and four role aliases. Anthropic and OpenAI stay out at the start, deliberately:
 the factory should run on the providers its owner actually uses daily.
 
-Since Stage 9 (Rulings 181, 189, 192, Task 77) LiteLLM holds three tiers,
-each with deployments from several providers, and the four role aliases map
-onto tiers. Tier membership is a quality bar, and latency orders only
-inside a tier. tier-high holds each provider's strongest general coding
-model, `zai/glm-5.3`, `dashscope/qwen3.8-max` and
-`deepseek/deepseek-v4-pro`, at equal weight, and serves `supervisor`,
-`review-frontier` and `coding-frontier`, so the stronger-model retry and
-the review stay a real step up from `coding-cheap`. tier-low serves
-`coding-cheap` with deepseek-flash, qwen3.8-flash and glm-5.3-flash,
-weighted by measured latency and cost. tier-mid is configured, measured
-and priced, and no alias uses it. A tier fails over among its own
-deployments with a 60-second cooldown and never falls to another tier: a
+Since 2026-10-20 LiteLLM holds two model classes, `small` and `big`, one
+alias each. `big` is the z.ai model `glm-5.3` and `small` is `glm-5.3-flash`.
+Each class has an Alibaba twin, `qwen3.8-max` for `big` and `qwen3.8-flash`
+for `small`. `small` is the start rung and serves the coder, the pulse and
+the cheap calls. `big` serves the stronger rung, the review, the supervisor,
+the audit, the check-in and the operator, so the stronger-model retry and
+the review stay a real step up from `small`. A call's purpose sits on its
+audit row and in its ledger ref, not in its alias. A class fails over to
+its Alibaba twin and never falls to the other class: a
 review that can merge on `auto` must not move to a weaker model without a
-trace (Ruling 189). A tier with none left fails the call, which the task's
+trace (Ruling 189). A class with none left fails the call, which the task's
 existing paths handle.
 
-The ranking came from a fixed coding and review sample, 117 calls for 0.25
+At Stage 9 the ranking of the three tiers came from a fixed coding and review sample, 117 calls for 0.25
 USD. All 13 candidates passed all 9 samples, so the samples could not rank
 quality: membership is a judgement, and the weights shift only when the
 analytics (8) give a reason. Groq's models ranked fastest, but Groq refuses
@@ -821,24 +816,28 @@ against 40 % of the weight. It left both lower tiers, its key stays seeded,
 and the measurement's samples must include a multi-turn exchange. The
 gateway's audit row records the deployment that answered, from LiteLLM's
 `x-litellm-model-name` header. The price book prices an alias at the
-dearest deployment of its tier, so a hold covers whichever answers, and a
+dearest deployment of that alias, so a hold covers whichever answers, and a
 deployment with a price field the book does not know makes its alias
 unpriced, which the gateway refuses. A provider switch is one infra file.
 
-Since Stage 10 (Ruling 204, Task 91) one provider, Alibaba, serves all
+At Stage 10 (Ruling 204, Task 91) one provider, Alibaba, served all
 three tiers, one deployment each: tier-high `dashscope/qwen3.8-max`,
 tier-mid `qwen3.7-plus`, tier-low `qwen3.8-flash`, with thinking off.
-Sebastian wanted one account to top up; the tiers and the aliases stay,
-so a second provider is again one infra file. With one deployment per
-tier a cooldown would lock the whole tier, so the router retries twice
-with backoff and runs no cooldown. The measurement gave 9 of 9 on each
+Sebastian wanted one account to top up. With one deployment per tier a
+cooldown would have locked the whole tier, so the router retried twice
+with backoff and ran no cooldown. The measurement gave 9 of 9 on each
 tier (p50 4.2, 5.2 and 4.3 s). DeepSeek, z.ai and Groq left the release,
 and their key secrets left the cluster. Until the switch at 00:56Z on
 2026-09-30, the Stage 10 run spent on all three providers. LiteLLM also
-holds a proxy-wide budget of 55 USD a month (`litellm_settings.max_budget`,
-reset on the 1st at 00:00 UTC), the backstop behind the factory's month cap
-(5.4); its refusal names no entity, and the gateway reads it as the month
+holds a proxy-wide budget of 680 USD a month (`litellm_settings.max_budget`,
+reset on the 1st at 00:00 UTC), 1.25 times `budget.month_eur` and the
+backstop behind the factory's month cap (5.4); its refusal names no entity, and the gateway reads it as the month
 cap.
+
+Since 2026-10-20 the router retries a failed call twice with backoff on the
+same deployment. Then the class's Alibaba twin answers (`fallbacks`). A z.ai
+model that fails 3 calls within a minute rests 60 seconds, and the twin
+serves its class meanwhile.
 
 Replicate, Firecrawl and fal.ai are not chat models for our loop: they are paid
 capabilities. They enter as connectors on the capability gateway with per-task
@@ -1093,10 +1092,12 @@ request (7) and then waits for a person: a merge finishes the task
 `done`, a pull request closed without merge finishes it `failed`, a closed
 issue finishes it `closed` (since the fix round after Stage 16, 7), a trusted
 change request runs another session with the request as findings.
-Attempts start on `coding-cheap`; red checks or a repetition trip
-move the next attempt to `coding-frontier` (Ruling 86), and since Stage 12
-so does the stuck rule (6.6).
-Since Stage 17 these climbs are the only way to `coding-frontier`: the
+Attempts start on `small`. Two things switch the running session to `big`
+in place: the 8-minute cap on a first attempt that has pushed nothing, and
+the stuck rule's `retry_stronger` (6.6). Returns of one stage past
+`limits.stronger_after` start the next session on `big`. The limit is 3 in
+policy and 1 for a medium or large card.
+Since Stage 17 these climbs are the only way to `big`: the
 gateway refuses an agent's call on any alias other than its task's (5.3). The wall-clock cap
 counts the agent's working time across attempts, not time since intake,
 because a PR image build alone takes longer than a session (Ruling 93);
@@ -1763,7 +1764,7 @@ allowed alias. It admits function tools and text parts only. Each minted key
 carries the class's model list, so LiteLLM refuses other models as well. Since
 Stage 17 the gateway refuses with 403 an agent's call on an alias other
 than its task's `model_alias` and names both aliases (Ruling 279). Before,
-an agent could call any alias its class lists, `coding-frontier` included.
+an agent could call any alias its class lists, `big` included.
 factoryd's own identities keep the aliases of their purposes.
 Since Stage 10 one admission check serves the tool list and the call (Task
 89): `tools/list` shows a session only the tools its classes may call, the
@@ -2926,7 +2927,7 @@ caused: events `via: chat` wake nobody.
 |---|---|---|
 | An ask is filed | `question_asked`, from any source but the chat itself | autonomous and full auto |
 | A watched card moves | a state change of a card a thread watches | assisted and above |
-| A timer comes due | the thread's one-shot wake row | assisted and above |
+| A timer comes due | the thread's one-shot wake row | every level |
 
 The caps limit wake turns and drop nothing. Every event still lands in
 the log and pokes the inbox, whatever the caps do, and the Waker moves
@@ -3668,7 +3669,8 @@ message resumes from the pushed head with the dead session's findings. An escala
 `waiting-human`, comments the reason on the issue and waits without a timer.
 The answer is a comment from a trusted human (owner, admin or write on the
 repository), newer than the escalation comment, written in Forgejo or in the
-console. It may grant a bounded slice of agent time, ten minutes by default
+console. It may grant a bounded slice of agent time, a quarter of the agent-time cap by default,
+never under the 5 minutes a session needs (30 minutes at the 2-hour cap),
 and never more than the full cap per answer. A human may raise a cap this
 way; the check-in never can.
 
@@ -4159,7 +4161,7 @@ closed as real.
   the value. Since Stage 17 it finds GitHub tokens with
   `redact.GitHubToken`, which the chat's scrub shares, so `github_pat_` and
   a token glued to a word no longer pass. Then one call on the task class's `audit_model`
-  (coding-frontier on the stronger rung; the gateway admits factoryd only
+  (`big`; the gateway admits factoryd only
   the aliases the task's own class names, Ruling 200) reads the diff
   against a fixed checklist of six items: secrets, network egress, RBAC
   and service accounts, policy and workflow files, migrations that drop or
@@ -4864,7 +4866,7 @@ since Stage 6, but neither has run under load.
 | Untrusted text | One sanitiser: into the brief for outsiders' text only, hidden comments stripped outside code blocks; out to Forgejo, hidden comments stripped, mentions and closing keywords neutralised, off-list links defanged; agent commits squashed under a sanitised subject | Built (Task 89, Ruling 214) |
 | Answer chain for questions | `questions: [self, model:<tier>, human]` per stage (queue item B), on top of the message call | Not built, waits for Sebastian's scoping |
 | Rolls | The code repository rolls through a roll task: a digest pull request from factoryd, a card, the bot's merge, a row per image. Infra changes stay human commits. The merge waits for a session gap, and new sessions wait while it does | Built (Rulings 178, 269) |
-| Model routing | Three LiteLLM tiers, membership by quality, latency order inside a tier, no fallback across tiers, the answering deployment in the audit row; one provider, Alibaba, one deployment per tier, retries without cooldown | Built (Rulings 181, 189, 192, 204) |
+| Model routing | Two LiteLLM classes, `small` and `big`, each a z.ai model with an Alibaba twin as its fallback, a 60-second cooldown after 3 failures, no fallback across classes, the answering deployment in the audit row | Built (Rulings 181, 189, 192, 204) |
 | Capability classes | `coder`, `analyzer` with a report session mode for the improvement presort and the screening stage, and `planner` with a plan session mode. The release is the roll task, no class | Built (Rulings 182, 185, 191, 208) |
 | Task analytics | Four task metrics, a revert mark and four panels, no report task | Built (Ruling 185) |
 | SPIRE and OPA | No need appeared in Stage 9 | Deferred |

@@ -1289,6 +1289,13 @@ const steers = {
     reply: "I pass it to the running session of #122. It reads it at its next step:",
     text: "Use the purchase's id as the Stripe idempotency key, so a rollback sent twice refunds once.",
   },
+  // the same steer asked without the card: the project agent reads the board to find who builds the refund
+  find: {
+    issue: 122,
+    request: "Find out who is building the refund and tell them to use the purchase's id as the Stripe idempotency key, so a rollback sent twice refunds once.",
+    reply: "#122, Store: refund a purchase the server rolls back, builds it and runs its session now. I pass your line to that session; it reads it at its next step:",
+    text: "Use the purchase's id as the Stripe idempotency key, so a rollback sent twice refunds once.",
+  },
 };
 
 // ledger is every card of the two weeks that spent, and #100 before them, as the factory's figures read it; offsets are

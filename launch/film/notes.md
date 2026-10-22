@@ -21,6 +21,20 @@ Started 22 October 2026. The working file for the film and its small clips: what
 - The animation inside the pod is bad: back to the drawing board. The schematic sandbox A looks better: improve it and make one or two other variants.
 - Clean up, use the critic, then make the small clips too. He likes the spotlight style.
 
+## What Sebastian asked, 22 October, after version 2 (round 3)
+
+- The sandbox videos are all good. Keep D, the sequence diagram, in reserve: it explains a workflow, who decides what, better than the real UI can. For the sandbox itself A and C work better. All three move a bit too fast at points, and many stacked shapes are stark white like the captions, so the eye does not know where to look.
+- Talk to an agent while it works: confusing, it moves fast in a zoomed view. Start on the whole board with the card in question, click the card and show its session. Then the main chat's real strength: a request that names no card ("find out who is implementing X and tell them ..."); the main chat searches, finds the card and passes the message on, live. The old title is not accurate.
+- The plan before the code: too fast. The plan is itself a card, and that must come across.
+- Where it helps, a short clip opens with the theory as an animated sequence diagram, like sandbox D, then shows the example. Every clip starts on the full board so people can orient. No fast camera moves or cuts. Zooms are gentle; we need not zoom all the way. After a zoom, stay there long enough that the in and out does not make people motion sick.
+- The review rejects, an issue files its fix: simple and expected; maybe not shown at all. If anything, show the escalation ladder.
+- Many clips end on a black frame: the recording goes dark but the highlight box stays.
+- The money is held: highlights work for columns and cards; on buttons they get chaotic. Keep the card or column around the button highlighted and let the pointer and its click show the press.
+- One dial: show how the workflow changes, the combined flow asked for at the start (accept by hand, raise the dial, the next card goes through on its own), not just the selection.
+- Recovery from stalls: too fast. Stay on the stall longer. Harnesses stall in many ways, so the factory checks many things (no message, no commit, and the rest) again and again and takes ever stronger measures. No agent stays stalled, no task just waits.
+- The rough cut: "Do it files the parts" does not say Do it is a button; say it shorter, a click files the parts. The work resolving moves to Done one card at a time. "New work files itself": the note breaks off here; the arrivals now come one at a time, each with its source named.
+- Overall: slower, gentle zooms, the full board first, no zoom onto buttons or small elements; inside a highlighted region the click animation shows the press. Use the animated sequence diagram more.
+
 ## Decisions
 
 - **Videos with contact sheets.** Motion is what Sebastian judges. Each variant also gets a sheet of stills so he compares at a glance.
@@ -30,6 +44,14 @@ Started 22 October 2026. The working file for the film and its small clips: what
 - **Tooling.** The console footage comes from the demo bank (`demo/run.sh`). The recorder writes each step's element boxes and the end of each action (`acts`) into the sidecar, so spotlights and zooms follow the UI, land on the clicks and regenerate with the bank. The film is a HyperFrames composition: the bank's videos as clips, GSAP overlays on top. Captions only: the voice track costs money and waits until the lines are approved.
 - **Version 2.** The cursor is an arrow with a soft ripple on each click. One highlight at a time, moved by a track of spots timed to the clicks. The waits between clicks play faster (`holdRate`), the actions at their pace. Gentle zooms, never below the console's own size. Scene 34 runs on past the hero still: the split, the drain in five waves, intake (a nightly scan, an alert, a player's issue), one sentence that becomes a plan, the accept. The sandbox has three variants: A the schematic, C nested walls, D a sequence diagram.
 - **The small clips.** One per landing page card, 7 to 11 s, silent, a short label at the bottom left per moment instead of captions (`"plain": true` and the `label` caption class). The waits play four times faster.
+
+## Round 3 decisions
+
+- **The clips.** Five cards on the landing page, plus the stall clip in its fold: the chat finds the right card (new scene 36: a line that names no card; the project agent has no search tool, so it reads the board with its `board` tool, then proposes the `steer`), a plan is a card (diagram, then scene 03, which now answers the plan's question and presses Accept for real), the escalation ladder (diagram, then scene 10), the money (scene 20), the dial (diagram, then scenes 22 and 25), recovery from stalls (diagram, then scene 08). The review and issue clips left the page.
+- **The facts behind the diagrams** come from a read of the code, not the docs: twelve session detectors in `factoryd/supervise.go` (no events 5 min, no file written 15 min, 60 tool calls with no change, the same call 4 times, the same failure 3 times, flip-flop, 15 changes with no new pass, 60 % spent with nothing pushed, a check-in every 45 min, 8 min on the cheap model with nothing pushed, 2 h of agent time, 3 nudges with no new content), the measures in order (nudge, check-in by the big model, the big model in place, a new session from a handover, caps of 3 sessions, 2 h, 12 check-in calls and the budget floor, then a person), and the decisions per autonomy level from `policy.ConfirmFor`.
+- **Rules built into the cuts.** `maxZoom` and `camDur` in film.json cap a zoom and set the camera's pace. A clip's labels sit at the top left, over the console's top bar, clear of the chat input. A tail stops where the next step reloads the page or the video ends. A closing still covers the clock's rounding, so no cut ends on dark. `reveals` bring the console up from the background where a diagram faded out.
+- **Scene 34** drains one card at a time: twenty moves from the board right after the presses, the waiting cards keeping their buttons until they move. Scene 08 and scene 10 open on the board before the drawer.
+- **Open for Sebastian.** The page and `docs/evidence.md` said database migrations stay human at every level. The code lets the project agent approve a pending merge at full auto with no risk-class check (`console/actions.go` doApprove, `factoryd/gates.go` on the merge rule auto). The page no longer makes the claim. Whether the product or the doc changes is his call.
 
 ## The game's cards
 
@@ -95,7 +117,7 @@ Started 22 October 2026. The working file for the film and its small clips: what
 
 - Which sandbox: A the schematic (in the cut), C nested walls or D the sequence diagram.
 - The case that lands with the human uses scene 21, a decision only a person makes. A scene where an agent tried twice and explains why it cannot fix the problem does not exist yet.
-- The rough cut runs 115 s. Cutting to 90 means shorter middle sections or dropping one.
+- The rough cut runs 180 s since round 3: slower pacing and the whole sandbox A (56 s) inside it. Cutting to 90 means dropping sections or moving the sandbox out of the film; the clips already carry each mechanism on their own.
 - The voice track: lines are not written. They come from the captions once the cut is approved, generated under the fal cap.
 - DORA: the film says "the four DevOps delivery metrics", as the page does.
 

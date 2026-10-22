@@ -26,13 +26,17 @@
     }
     const b = pad(box, opts.pad ?? 10), d = opts.dur ?? 0.6;
     const hole = svg.querySelector(".fx-hole"), edge = svg.querySelector(".fx-edge"), dim = svg.querySelector(".fx-dim");
-    tl.to([hole, edge], { attr: { x: b.x, y: b.y, width: b.width, height: b.height }, duration: d, ease: "power2.inOut" }, at);
+    // a shown highlight travels to its next box; a hidden one appears in place, so it never sweeps across the frame
+    if (svg.dataset.off !== "0") tl.set([hole, edge], { attr: { x: b.x, y: b.y, width: b.width, height: b.height } }, at);
+    else tl.to([hole, edge], { attr: { x: b.x, y: b.y, width: b.width, height: b.height }, duration: d, ease: "power2.inOut" }, at);
+    svg.dataset.off = "0";
     tl.to(dim, { attr: { opacity: opts.dim ?? 0.74 }, duration: d }, at);
     tl.to(edge, { attr: { stroke: opts.color || "#4fcbe2" }, opacity: 1, duration: d }, at);
   }
   function unspot(tl, stage, at, dur = 0.5) {
     const svg = stage.querySelector("svg.fx-spot");
     if (!svg) return;
+    svg.dataset.off = "1";
     tl.to(svg.querySelector(".fx-dim"), { attr: { opacity: 0 }, duration: dur }, at);
     tl.to(svg.querySelector(".fx-edge"), { opacity: 0, duration: dur }, at);
   }
@@ -41,7 +45,7 @@
   function camera(tl, stage, box, at, opts = {}) {
     const fill = opts.fill ?? 0.62, cx = opts.cx ?? 800, cy = opts.cy ?? 450;
     // never below 1: a zoom out would show the black past the console
-    const s = opts.scale ?? Math.max(1, Math.min(4, 1600 * fill / box.width, 900 * fill / box.height));
+    const s = opts.scale ?? Math.max(1, Math.min(opts.max ?? 4, 1600 * fill / box.width, 900 * fill / box.height));
     // the stage always covers the frame: the move stops at the console's edges rather than showing past them
     const x = Math.min(0, Math.max(1600 - 1600 * s, cx - (box.x + box.width / 2) * s));
     const y = Math.min(0, Math.max(900 - 900 * s, cy - (box.y + box.height / 2) * s));

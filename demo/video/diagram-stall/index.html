@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1600, height=900">
+<title>A session can stall in many ways</title>
+<link rel="stylesheet" href="diagram.css">
+<script src="gsap.min.js"></script>
+<style>
+  #root { position: relative; width: 1600px; height: 900px; overflow: hidden; background: var(--bg); }
+  .u { --hi: 0; --lc: var(--accent); }
+  .u.amb { --lc: var(--need); }
+  .bd { border: 1px solid color-mix(in srgb, var(--lc) calc(var(--hi) * 100%), #263649); background: color-mix(in srgb, var(--lc) calc(var(--hi) * 8%), var(--bg-panel)); }
+  .lab { color: color-mix(in srgb, #dfe7f1 calc(var(--hi) * 100%), #93a1b5); }
+  .acc { color: color-mix(in srgb, var(--lc) calc(var(--hi) * 100%), #93a1b5); }
+
+  .abs { position: absolute; opacity: 0; }
+  #session { left: 30px; top: 20px; width: 500px; height: 290px; padding: 14px 20px; }
+  #session h2 { margin: 0; font-size: 38px; line-height: 46px; font-weight: 600; }
+  #feed { position: absolute; left: 20px; right: 20px; top: 66px; height: 126px; overflow: hidden; font: 32px/42px var(--font-mono); color: #5c6c80;
+    -webkit-mask-image: linear-gradient(transparent, #000 20%, #000 80%, transparent); mask-image: linear-gradient(transparent, #000 20%, #000 80%, transparent); }
+  #feed div { white-space: nowrap; }
+  #tag { position: absolute; left: 20px; right: 20px; bottom: 12px; font-size: 32px; line-height: 40px; opacity: 0; }
+  #sweep { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); opacity: 0; }
+
+  .grp { padding: 14px; width: 510px; top: 340px; }
+  .grp h3 { margin: 0 0 10px; font: 600 32px/40px var(--font-ui); letter-spacing: .06em; text-transform: uppercase; }
+  .chip { padding: 6px 14px; margin-bottom: 12px; font-size: 36px; line-height: 44px; opacity: .4; }
+  .chip:last-child { margin-bottom: 0; }
+  .chip b { font-weight: 700; white-space: nowrap; }
+
+  #stairs { left: 550px; top: 20px; width: 1020px; height: 190px; }
+  .step { position: absolute; bottom: 0; width: 200px; white-space: nowrap; padding: 6px 8px; font-size: 32px; line-height: 38px; opacity: .4; }
+  .note { width: 495px; top: 218px; padding: 8px 16px; font-size: 36px; line-height: 44px; }
+
+  .cap { position: absolute; left: 40px; top: 774px; max-width: 1100px; padding: 12px 22px; font: 500 44px/1.2 var(--font-ui); color: #dfe7f1; text-align: left; text-wrap: balance;
+    background: color-mix(in srgb, var(--bg) 90%, transparent); border-left: 6px solid var(--accent); box-shadow: 0 6px 24px rgba(0,0,0,.5); opacity: 0; z-index: 3; }
+  .cap.two { font-size: 40px; }
+  .cap.need { border-left-color: var(--need); }
+  .cap b { font-weight: 700; color: var(--accent); }
+  .cap b.m { color: var(--need-text); }
+  #fade { position: absolute; inset: 0; background: var(--bg); opacity: 0; z-index: 9; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="29.6" data-width="1600" data-height="900">
+<div id="scene" class="clip" style="position:absolute;inset:0">
+
+<section id="session" class="abs u bd">
+  <h2 class="lab">Agent session</h2>
+  <div id="feed" aria-hidden="true"></div>
+  <div id="tag" class="u acc">checked every few seconds</div>
+  <div id="sweep"></div>
+</section>
+
+<div id="g1" class="abs grp bd" style="left:30px"><h3 class="acc">No output</h3>
+  <div class="chip bd"><span class="lab">no events · </span><b class="acc">5 min</b></div>
+  <div class="chip bd"><span class="lab">no file written · </span><b class="acc">15 min</b></div>
+  <div class="chip bd"><span class="lab">no file changed · </span><b class="acc">60 calls</b></div>
+</div>
+<div id="g2" class="abs grp bd" style="left:545px"><h3 class="acc">Going in circles</h3>
+  <div class="chip bd"><span class="lab">same call · </span><b class="acc">4 times</b></div>
+  <div class="chip bd"><span class="lab">same failure · </span><b class="acc">3 times</b></div>
+  <div class="chip bd"><span class="lab">file flips back; fixed check fails again</span></div>
+  <div class="chip bd"><span class="lab">15 changes · </span><b class="acc">no pass</b></div>
+</div>
+<div id="g3" class="abs grp bd" style="left:1060px"><h3 class="acc">Money and time</h3>
+  <div class="chip bd"><span class="lab">60 % spent · </span><b class="acc">nothing pushed</b></div>
+  <div class="chip bd"><span class="lab">check-in · </span><b class="acc">every 45 min</b></div>
+  <div class="chip bd"><span class="lab">session ends · </span><b class="acc">2 hours</b></div>
+</div>
+
+<div id="stairs" class="abs"></div>
+<div id="n1" class="abs note u bd" style="left:550px"><span class="lab">2 hours of agent time end any session</span></div>
+<div id="n2" class="abs note u amb bd" style="left:1075px"><span class="lab">Every stop lands in Needs you, with a question</span></div>
+
+<div id="fade"></div>
+</div>
+</div>
+
+<script>
+gsap.config({ force3D: false });
+const tl = gsap.timeline({ paused: true });
+const $ = (s) => document.querySelector(s);
+const root = $("#scene");
+
+const feedLines = ["read   src/route.go", "edit   src/route.go", "run    go test ./...", "read   src/score.go", "edit   src/score.go", "run    go vet ./...", "read   src/board.go", "edit   src/board.go", "run    go test ./...", "read   src/ship.go", "edit   src/ship.go", "run    go build ./..."];
+const feed = $("#feed");
+const inner = document.createElement("div");
+feedLines.forEach((t) => { const d = document.createElement("div"); d.textContent = t; inner.appendChild(d); });
+feed.appendChild(inner);
+
+const steps = [["nudge", 56], ["check-in", 78], ["big model", 100], ["new session", 122], ["a person", 144]];
+const stepEls = steps.map(([t, h], i) => {
+  const d = document.createElement("div");
+  d.className = "step u bd" + (i === 4 ? " amb" : "");
+  d.style.left = i * 205 + "px"; d.style.height = h + "px";
+  d.innerHTML = '<span class="lab">' + t + "</span>";
+  $("#stairs").appendChild(d);
+  return d;
+});
+
+const caps = [];
+const mkCap = (html, need) => {
+  const c = document.createElement("div");
+  const plain = html.replace(/<[^>]+>/g, "");
+  c.className = "cap" + (plain.length > 44 ? " two" : "") + (need ? " need" : "");
+  c.innerHTML = html; root.appendChild(c); return c;
+};
+
+gsap.set(".u", { "--hi": 0 });
+gsap.set(".abs", { opacity: 0 });
+gsap.set(".chip", { opacity: 0.4 });
+gsap.set(".step", { opacity: 0.4 });
+
+let T = 0, cur = [];
+const focus = (els, at) => {
+  if (cur.length) tl.to(cur, { "--hi": 0, duration: 0.4 }, at);
+  if (els.length) tl.to(els, { "--hi": 1, duration: 0.3 }, at);
+  cur = els;
+};
+const show = (el, at) => tl.to(el, { opacity: 1, duration: 0.35 }, at);
+const beat = (dur, html, body, need) => {
+  const c = mkCap(html, need);
+  tl.to(c, { opacity: 1, duration: 0.25 }, T);
+  tl.to(c, { opacity: 0, duration: 0.15 }, T + dur - 0.15);
+  body(T);
+  T += dur;
+};
+const words = (h) => h.replace(/<[^>]+>/g, "").trim().split(/\s+/).length;
+const BEATS = [];
+const add = (dur, html, body, need) => { if (dur < Math.max(2.2, 0.3 * words(html)) - 1e-6) throw new Error("caption too short: " + html); BEATS.push([dur, html, body, need]); };
+
+add(2.6, 'A session can <b>stall in many ways</b>.', (t) => {
+  show("#session", t + 0.2); focus([$("#session")], t + 0.2);
+});
+add(2.6, 'The factory checks it <b>every few seconds</b>.', (t) => {
+  const tag = $("#tag");
+  show(tag, t + 0.1); focus([tag], t + 0.1);
+  for (let k = 0; k < 8; k++) {
+    const s = t + 0.3 + k * 3.4;
+    if (k > 0 && s > 100) break;
+    tl.set("#sweep", { opacity: 0.55, x: 0 }, s);
+    tl.to("#sweep", { x: 456, duration: 1.4, ease: "none" }, s);
+    tl.set("#sweep", { opacity: 0 }, s + 1.4);
+  }
+});
+const group = (id, dur, html, dt) => add(dur, html, (t) => {
+  const g = $(id), ch = [...g.querySelectorAll(".chip")];
+  show(g, t + 0.1);
+  focus([g.querySelector("h3")], t + 0.1);
+  const span = dur - 1.0 - 0.9;
+  ch.forEach((c, i) => {
+    const at = t + 0.95 + (i * span) / (ch.length - 1);
+    if (cur.length) tl.to(cur, { "--hi": 0, duration: 0.3 }, at);
+    tl.to(c, { "--hi": 1, opacity: 1, duration: 0.3 }, at);
+    cur = [c];
+  });
+});
+group("#g1", 3.7, 'Three for <b>no output</b>: no events, no file written, no file changed.');
+group("#g2", 4.3, 'Four for <b>going in circles</b>: same call, same failure, a revert, no new pass.');
+group("#g3", 3.6, 'Three for <b>money and time</b>: budget, check-ins, the 2-hour end.');
+add(5.0, 'A tripped check makes the factory <b>act</b>: each step stronger, up to <b class="m">a person</b>.', (t) => {
+  show("#stairs", t + 0.1);
+  if (cur.length) tl.to(cur, { "--hi": 0, duration: 0.4 }, t + 0.1);
+  cur = [];
+  stepEls.forEach((s, i) => {
+    const at = t + 0.8 + i * 0.85;
+    if (i > 0) tl.to(stepEls[i - 1], { "--hi": 0, duration: 0.3 }, at);
+    tl.to(s, { "--hi": 1, opacity: 1, duration: 0.3 }, at);
+  });
+  cur = [stepEls[4]];
+}, false);
+add(3.0, 'No agent stays stalled: <b>2 hours</b> end any session.', (t) => {
+  show("#n1", t + 0.1); focus([$("#n1")], t + 0.1);
+});
+add(3.2, 'No card waits unseen: every stop lands in <b class="m">Needs you</b>.', (t) => {
+  show("#n2", t + 0.1); focus([$("#n2")], t + 0.1);
+}, true);
+BEATS.forEach((b) => beat(...b));
+
+const HOLD = 1.0, FADE = 0.6;
+tl.to("#fade", { opacity: 1, duration: FADE, ease: "none" }, T + HOLD);
+const TOTAL = Math.round((T + HOLD + FADE) * 100) / 100;
+tl.to(inner, { y: -(feedLines.length - 3) * 42, duration: TOTAL, ease: "none" }, 0);
+tl.set({}, {}, TOTAL);
+if (TOTAL !== 29.6 || TOTAL > 30) throw new Error("duration " + TOTAL);
+$("#root").setAttribute("data-duration", TOTAL);
+window.__timelines = window.__timelines || {};
+window.__timelines["main"] = tl;
+</script>
+</body>
+</html>

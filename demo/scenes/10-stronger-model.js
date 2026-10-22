@@ -28,14 +28,19 @@ module.exports = {
   theme: "dark",
   viewport: "desk",
   steps: [
-    { state: (now) => wednesday(now, 25.5), actions: [{ goto: "/" }, { click: ui.open(107) }, { waitFor: agent }], hold: 3000 },
-    { state: () => null, actions: [{ click: ui.tab("activity") }, { waitFor: ui.row("failure") }, { hover: `${ui.row("failure")} meter` }], hold: 3500 },
+    // the board first, so a viewer finds the card before its drawer opens
+    { state: (now) => wednesday(now, 25.5), actions: [{ goto: "/" }, { hover: ui.idle }], hold: 2500, boxes: { card: ui.face(107) } },
+    { state: () => null, actions: [{ click: ui.open(107) }, { waitFor: agent }], hold: 3500, boxes: { drawer: "#drawer", agent: "#drawer .top-block" } },
+    {
+      state: () => null, actions: [{ click: ui.tab("activity") }, { waitFor: ui.row("failure") }, { hover: `${ui.row("failure")} meter` }], hold: 4000,
+      boxes: { drawer: "#drawer", failure: ui.row("failure") },
+    },
     {
       state: (now) => wednesday(now, 31),
       actions: [{ click: ui.tab("activity") }, { waitFor: bigStart }, { hover: `${bigStart} td:first-child` }],
-      hold: 4000,
+      hold: 4500, boxes: { drawer: "#drawer", big: bigStart },
     },
-    { state: () => null, actions: [{ click: ui.tab("chat") }, { waitFor: "#session-log .msg" }], hold: 4000 },
-    { state: (now) => wednesday(now, 53.5), actions: [{ click: ui.tab("overview") }, { waitFor: agent }], hold: 3500 },
+    { state: () => null, actions: [{ click: ui.tab("chat") }, { waitFor: "#session-log .msg" }], hold: 4500, boxes: { drawer: "#drawer", log: "#session-log" } },
+    { state: (now) => wednesday(now, 53.5), actions: [{ click: ui.tab("overview") }, { waitFor: agent }], hold: 4000, boxes: { drawer: "#drawer", agent: "#drawer .top-block" } },
   ],
 };

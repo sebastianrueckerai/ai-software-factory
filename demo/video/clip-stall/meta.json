@@ -2,5 +2,5 @@
  "id": "clip-stall",
  "name": "Recovery from stalls",
  "title": "Recovery from stalls",
- "story": "A session goes in circles, the flip-flop detector trips, the supervisor steps in, and the next session starts from what it learned."
+ "story": "The theory first: the many checks the factory runs on every session and the measures that follow. Then the console: a session goes in circles on a date bug, a detector trips, the supervisor redirects, and the next session starts from what it learned."
 }

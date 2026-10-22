@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1600, height=900">
+<title>The escalation ladder</title>
+<link rel="stylesheet" href="diagram.css">
+<script src="gsap.min.js"></script>
+<style>
+  #root { position: relative; width: 1600px; height: 900px; overflow: hidden; background: var(--bg); }
+  .u { --hi: 0; --lc: var(--accent); }
+  .u.amb { --lc: var(--need); }
+  .bd { border: 1px solid color-mix(in srgb, var(--lc) calc(var(--hi) * 100%), #263649); background: color-mix(in srgb, var(--lc) calc(var(--hi) * 8%), var(--bg-panel)); }
+  .lab { color: color-mix(in srgb, #dfe7f1 calc(var(--hi) * 100%), #93a1b5); }
+  .acc { color: color-mix(in srgb, var(--lc) calc(var(--hi) * 100%), #93a1b5); }
+  .sub { color: color-mix(in srgb, #c3cfdf calc(var(--hi) * 100%), #7c8ba0); }
+
+  .row { position: absolute; left: 100px; width: 1470px; opacity: 0; display: flex; align-items: center; padding: 0 24px; }
+  .row .t { width: 400px; flex: none; }
+  .row .t h2 { margin: 0; font-size: 38px; line-height: 46px; font-weight: 600; white-space: nowrap; }
+  .row .d { flex: 1; font-size: 32px; line-height: 38px; }
+  .row .d q { quotes: none; font-style: italic; }
+  .opts { display: flex; flex-wrap: wrap; gap: 8px 12px; margin-top: 6px; }
+  .opt { padding: 2px 14px; font-size: 36px; line-height: 44px; opacity: .4; }
+  .node { position: absolute; left: 26px; width: 48px; height: 48px; border-radius: 50%; text-align: center; font: 700 32px/46px var(--font-mono); opacity: 0; }
+  .link { position: absolute; left: 49px; width: 3px; opacity: 0; }
+  .link.u { background: color-mix(in srgb, var(--lc) calc(var(--hi) * 100%), #263649); }
+
+  .cap { position: absolute; left: 40px; top: 774px; max-width: 1100px; padding: 12px 22px; font: 500 44px/1.2 var(--font-ui); color: #dfe7f1; text-align: left; text-wrap: balance;
+    background: color-mix(in srgb, var(--bg) 90%, transparent); border-left: 6px solid var(--accent); box-shadow: 0 6px 24px rgba(0,0,0,.5); opacity: 0; z-index: 3; }
+  .cap.two { font-size: 40px; }
+  .cap.need { border-left-color: var(--need); }
+  .cap b { font-weight: 700; color: var(--accent); }
+  .cap b.m { color: var(--need-text); }
+  #fade { position: absolute; inset: 0; background: var(--bg); opacity: 0; z-index: 9; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="27.4" data-width="1600" data-height="900">
+<div id="scene" class="clip" style="position:absolute;inset:0"><div id="fade"></div></div>
+</div>
+
+<script>
+gsap.config({ force3D: false });
+const tl = gsap.timeline({ paused: true });
+const root = document.getElementById("scene");
+const fade = document.getElementById("fade");
+
+// rungs bottom-up: title, sub, detail html, height, option chips (lit one by one as the caption names them)
+const RUNGS = [
+  { h: 64, t: "A session", d: "on the cheap model, small" },
+  { h: 90, t: "A nudge", d: '<q>You repeated the same call three times. Change approach, then continue.</q>' },
+  { h: 100, t: "A check-in", d: "every 45 min; the stronger model answers:", opts: ["go on", "guidance", "handover, ends it"] },
+  { h: 90, t: "Stronger model", d: "same session · 8 min on the cheap model, nothing pushed, or a trip after guidance" },
+  { h: 64, t: "A new session", d: "from the pushed work and a handover note" },
+  { h: 128, t: "Caps", d: "", opts: ["3 sessions per card", "2 hours of agent time", "12 check-in calls", "budget floor"] },
+  { h: 140, t: "A person", d: "The card's session cap is reached. Grant it one more session?", opts: ["Grant one session", "Leave it waiting", "End the card"], amb: true },
+];
+const GAP = 6, TOPY = 24;
+const total = RUNGS.reduce((a, r) => a + r.h, 0) + GAP * (RUNGS.length - 1);
+let y = TOPY;
+const tops = new Array(RUNGS.length);
+for (let i = RUNGS.length - 1; i >= 0; i--) { tops[i] = y; y += RUNGS[i].h + GAP; }
+
+const rows = RUNGS.map((r, i) => {
+  const e = document.createElement("section");
+  e.className = "row u bd" + (r.amb ? " amb" : "");
+  e.style.top = tops[i] + "px"; e.style.height = r.h + "px";
+  e.innerHTML = '<div class="t"><h2 class="acc">' + r.t + '</h2></div>' +
+    '<div class="d lab">' + r.d + (r.opts ? '<div class="opts">' + r.opts.map((o) => '<span class="opt u bd' + (r.amb ? " amb" : "") + '"><span class="lab">' + o + "</span></span>").join("") + "</div>" : "") + "</div>";
+  root.insertBefore(e, fade);
+  const mid = tops[i] + r.h / 2;
+  const n = document.createElement("div");
+  n.className = "node u bd" + (r.amb ? " amb" : "");
+  n.style.top = mid - 24 + "px"; n.innerHTML = '<span class="acc">' + (i + 1) + "</span>";
+  root.insertBefore(n, fade);
+  let link = null;
+  if (i > 0) {
+    link = document.createElement("div");
+    link.className = "link u" + (r.amb ? " amb" : "");
+    const below = tops[i - 1] + RUNGS[i - 1].h / 2;
+    link.style.top = mid + 24 + "px"; link.style.height = below - mid - 48 + "px";
+    root.insertBefore(link, fade);
+  }
+  return { e, n, link, opts: [...e.querySelectorAll(".opt")] };
+});
+
+const caps = [];
+const words = (h) => h.replace(/<[^>]+>/g, "").trim().split(/\s+/).length;
+gsap.set(".u", { "--hi": 0 });
+
+const BEATS = [
+  [2.8, 'A session starts on the <b>cheap model</b>, small.', 0],
+  [3.6, 'A check trips: the factory sends <b>a nudge</b> into the live session.', 1],
+  [4.2, 'At a check-in the stronger model answers: <b>go on</b>, <b>guidance</b>, or <b>a handover</b>.', 2],
+  [4.4, 'The big model takes over: 8 minutes, nothing pushed, or a trip after guidance.', 3],
+  [3.2, 'A handover starts a <b>new session</b> from the pushed work.', 4],
+  [3.6, 'Four <b>caps</b> bound the climb: sessions, time, check-ins, a budget floor.', 5],
+  [4.0, 'At the cap, <b class="m">a person</b> decides in Needs you.', 6],
+];
+let T = 0, cur = [], curOpts = [];
+BEATS.forEach(([dur, html, i]) => {
+  if (dur < Math.max(2.2, 0.3 * words(html)) - 1e-6) throw new Error("caption too short: " + html);
+  const c = document.createElement("div");
+  c.className = "cap" + (words(html) > 0 && html.replace(/<[^>]+>/g, "").length > 44 ? " two" : "") + (i === 6 ? " need" : "");
+  c.innerHTML = html; root.insertBefore(c, fade);
+  tl.to(c, { opacity: 1, duration: 0.25 }, T);
+  tl.to(c, { opacity: 0, duration: 0.15 }, T + dur - 0.15);
+  const R = rows[i], r = RUNGS[i];
+  const els = [R.e, R.n, R.link].filter(Boolean);
+  if (cur.length) tl.to(cur.concat(curOpts), { "--hi": 0, duration: 0.4 }, T + 0.1);
+  curOpts = r.opts && !r.amb ? R.opts : [];
+  tl.to(els, { opacity: 1, "--hi": 1, duration: 0.35 }, T + 0.1);
+  cur = els;
+  if (r.opts && !r.amb) {
+    const n = R.opts.length, span = dur - 1.0 - 0.9;
+    R.opts.forEach((o, k) => {
+      const at = T + 1.0 + (k * span) / (n - 1);
+      if (k > 0) tl.to(R.opts[k - 1], { "--hi": 0, duration: 0.3 }, at);
+      tl.to(o, { "--hi": 1, opacity: 1, duration: 0.3 }, at);
+    });
+  }
+  if (r.amb) tl.to(R.opts, { opacity: 1, duration: 0.4 }, T + 0.1);
+  T += dur;
+});
+const HOLD = 1.0, FADE = 0.6;
+tl.to(fade, { opacity: 1, duration: FADE, ease: "none" }, T + HOLD);
+const TOTAL = Math.round((T + HOLD + FADE) * 100) / 100;
+tl.set({}, {}, TOTAL);
+if (TOTAL !== 27.4) throw new Error("duration " + TOTAL);
+document.getElementById("root").setAttribute("data-duration", TOTAL);
+window.__timelines = window.__timelines || {};
+window.__timelines["main"] = tl;
+</script>
+</body>
+</html>

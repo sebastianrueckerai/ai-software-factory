@@ -55,7 +55,11 @@ for (const s of film.segments) {
     if (v === undefined) throw new Error(`${s.id}: ${s.scene} step ${n} has no ${field}`);
     return v / 1000;
   };
-  const from = Math.max(0, at(s.from) - (s.lead || 0)), to = at(s.to) + (s.tail || 0), rate = s.rate || 1;
+  const from = Math.max(0, at(s.from) - (s.lead || 0)), rate = s.rate || 1;
+  // a tail stops where the next step reloads the page, since a reload shows a dark frame, and before the video ends
+  const next = require(path.join(__dirname, "..", "scenes", `${s.scene}.js`)).steps[s.to[0]];
+  const reload = next && (next.actions || [])[0]?.goto !== undefined ? steps[s.to[0]].atMs / 1000 : Infinity;
+  const to = Math.min(at(s.to) + (s.tail || 0), reload, (scenes[s.scene].videoMs ?? Infinity) / 1000 - 0.05);
   // copied on every build like the stills: a scene recorded again must not play its old video against its new marks
   fs.copyFileSync(path.join(bank, `${s.scene}.mp4`), path.join(clips, `${s.scene}.mp4`));
   // pieces: with a holdRate, the waits between a step's last action and the next step's start play faster than the
@@ -91,7 +95,11 @@ for (const s of film.stills || []) {
   fs.copyFileSync(path.join(bank, s), path.join(clips, s));
 }
 const duration = Math.ceil((t + (film.tail || 0)) * 10) / 10;
-fs.writeFileSync(path.join(dir, "data.js"), `window.FILM = ${JSON.stringify({ duration, seg, scenes, spots: film.spots, cams: film.cams, caps: film.caps, titles: film.titles, quiet: film.quiet, plain: film.plain })};\n`);
+// the clock rounds up past the last segment; a closing still covers the gap, which would otherwise end the cut on dark
+if (!film.tail && media.length && media.at(-1).startsWith("<img")) {
+  media[media.length - 1] = media.at(-1).replace(/data-start="([\d.]+)" data-duration="[\d.]+"/, (m, st) => `data-start="${st}" data-duration="${(duration - Number(st)).toFixed(3)}"`);
+}
+fs.writeFileSync(path.join(dir, "data.js"), `window.FILM = ${JSON.stringify({ duration, seg, scenes, spots: film.spots, cams: film.cams, caps: film.caps, titles: film.titles, quiet: film.quiet, plain: film.plain, maxZoom: film.maxZoom, camDur: film.camDur, reveals: film.reveals })};\n`);
 if (film.template) {
   const tpl = fs.readFileSync(path.join(dir, film.template), "utf8");
   fs.writeFileSync(path.join(dir, "index.html"), tpl.replaceAll("{{DURATION}}", String(duration)).replace("<!--MEDIA-->", media.join("\n")));

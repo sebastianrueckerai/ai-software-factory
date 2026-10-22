@@ -303,42 +303,36 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 
 <section id="get" aria-labelledby="get-h">
 <h2 id="get-h">What you get</h2>
-<p class="lede">Six things the console shows. Each one links to the file, the test and the run behind it.</p>
+<p class="lede">Five things the console shows. Each one links to the file, the test and the run behind it.</p>
 <div class="cards">
 <article class="card">
-<div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/11-steer-4.png" aria-label="A line typed into the chat reaches a running card: the session transcript shows the message arrive." width="1600" height="900"><source src="assets/clips/clip-chat.mp4" type="video/mp4"></video></div>
-<h3>Talk to an agent while it works</h3>
-<p>A line typed into the chat reaches the running session. The agent's next turn takes it, and the gates still judge the result.</p>
+<div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/36-find-and-tell-4.png" aria-label="A request that names no card: the project agent reads the board, finds the refund card and sends its running session the line." width="1600" height="900"><source src="assets/clips/clip-steer.mp4" type="video/mp4"></video></div>
+<h3>The chat finds the right card</h3>
+<p>Name the work, not the card. The project agent reads the board, finds who builds it and passes your line to the running session. The gates still judge the result.</p>
 <p class="more"><a href="../../docs/evidence.md#1-the-kanban-fills-itself-the-chat-drives-it">The evidence</a></p>
 </article>
 <article class="card">
-<div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/03-too-large-split-6.png" aria-label="The drawer's plan section: level 4 of the game split into four cards, waiting for the accept." width="1600" height="900"><source src="assets/clips/clip-plan.mp4" type="video/mp4"></video></div>
-<h3>The proof is named before the code exists</h3>
-<p>A big request becomes a spec with criteria. Each criterion names its test, and one gate runs them all on the assembled feature.</p>
+<div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/03-too-large-split-5.png" aria-label="How a plan becomes cards, then the console: the plan card waits in Needs you, opens like any card, and on accept its four cards land." width="1600" height="900"><source src="assets/clips/clip-plan.mp4" type="video/mp4"></video></div>
+<h3>A plan is a card you accept</h3>
+<p>A big request becomes a plan card. The planner lists its cards in build order and asks what it cannot decide. On your accept the cards land, each criterion naming its test before the code exists.</p>
 <p class="more"><a href="../../docs/spec-driven.md">How the spec-driven process works</a></p>
 </article>
 <article class="card">
-<div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/07-review-rejects-2.png" aria-label="The card's activity: the review's concerns row with its finding." width="1600" height="900"><source src="assets/clips/clip-review.mp4" type="video/mp4"></video></div>
-<h3>The review rejects with a reason</h3>
-<p>A stronger model reads every diff. Its finding goes back to the agent. A review with no verdict is itself a finding.</p>
-<p class="more"><a href="../../docs/evidence.md#4-nothing-merges-unproven">The evidence</a></p>
+<div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/diagram-ladder.png" aria-label="The ladder from the cheap model to a person, then a card whose second session runs on the stronger model." width="1600" height="900"><source src="assets/clips/clip-ladder.mp4" type="video/mp4"></video></div>
+<h3>The escalation ladder</h3>
+<p>A stuck session gets a nudge, then a check-in by the stronger model, then the stronger model itself. Caps on sessions, agent time and budget end the climb in front of a person.</p>
+<p class="more"><a href="../../docs/evidence.md#7-it-does-not-stall">The evidence</a></p>
 </article>
 <article class="card">
-<div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/33-issue-to-fix-6.png" aria-label="The reproduction gate: the issue's command exits 1 at the base commit and 0 at the head." width="1600" height="900"><source src="assets/clips/clip-issue.mp4" type="video/mp4"></video></div>
-<h3>Live software files its own fixes</h3>
-<p>An issue or an alert becomes a card within a minute. The fix must fail at the base commit and pass at the head.</p>
-<p class="more"><a href="../../docs/evidence.md#5-an-issue-lands-the-fix-ships">The evidence</a></p>
-</article>
-<article class="card">
-<div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/20-cap-fires-1.png" aria-label="The chat's budget question: a card stopped at its cap, fund it or end it." width="1600" height="900"><source src="assets/clips/clip-money.mp4" type="video/mp4"></video></div>
+<div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/20-cap-fires-1.png" aria-label="A card whose budget cannot fund another session: one sentence splits it, and a click files the smaller card." width="1600" height="900"><source src="assets/clips/clip-money.mp4" type="video/mp4"></video></div>
 <h3>The money is held before each call</h3>
 <p>Caps per task, per day, per month and per project. At a cap the factory stops and asks: fund it or end it.</p>
 <p class="more"><a href="../../docs/evidence.md#8-no-model-call-runs-without-its-cost-covered">The evidence</a></p>
 </article>
 <article class="card">
-<div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/25-autonomy-2.png" aria-label="The autonomy picker open on the board, full auto under the pointer." width="1600" height="900"><source src="assets/clips/clip-dial.mp4" type="video/mp4"></video></div>
+<div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/diagram-dial.png" aria-label="Who decides at each autonomy level, then a merge approved by hand and, on full auto, a card that merges on its own." width="1600" height="900"><source src="assets/clips/clip-dial.mp4" type="video/mp4"></video></div>
 <h3>One dial for how much it asks</h3>
-<p>From manual to full auto. Forbidden paths and database migrations stay human at every level.</p>
+<p>From manual to full auto. Direction and money beyond the project's pool stay with you at every level.</p>
 <p class="more"><a href="../../docs/evidence.md#9-you-hold-the-roadmap-and-the-money">The evidence</a></p>
 </article>
 </div>
@@ -533,8 +527,8 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 <details>
 <summary>Recovery from stalls</summary>
 <div class="body">
-<figure><div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/08-supervisor-2.png" aria-label="The card's activity: the supervisor's step after the flip-flop detector tripped." width="1600" height="900"><source src="assets/clips/clip-stall.mp4" type="video/mp4"></video></div></figure>
-<p>One durable workflow per task. Thirteen detectors watch each session for no write, repetition, the same failure, the same call, flip-flop, churn, wall clock and spend with no push.</p>
+<figure><div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/diagram-stall.png" aria-label="The checks the factory runs on every session, then a session going in circles until a check trips and the supervisor redirects it." width="1600" height="900"><source src="assets/clips/clip-stall.mp4" type="video/mp4"></video></div></figure>
+<p>One durable workflow per task. Twelve detectors watch each session for no write, repetition, the same failure, the same call, flip-flop, churn, wall clock and spend with no push.</p>
 <p>A stalled session gets a nudge, then a supervisor, then a fresh session on the stronger model. A human sees it only after the session cap.</p>
 <p class="cap"><a href="../../docs/evidence.md#7-it-does-not-stall">the file · the test · the run</a></p>
 </div>

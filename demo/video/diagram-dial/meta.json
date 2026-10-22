@@ -1,0 +1,6 @@
+{
+  "id": "diagram-dial",
+  "name": "One dial: who decides what",
+  "title": "One dial: who decides what",
+  "story": "A matrix of six decisions against the four autonomy levels. A dial moves from manual to full auto one level at a time, and the cells that change flip from you to agent one row at a time: assisted lets the agent start and file ready cards, autonomous lets it answer its questions and steer, split or close cards, full auto lets a card merge once its gates pass. Two rows stay with the person at every level."
+}

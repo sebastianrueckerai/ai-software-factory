@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1600, height=900">
+<title>A plan is a card</title>
+<link rel="stylesheet" href="diagram.css">
+<script src="gsap.min.js"></script>
+<style>
+  #root { position: relative; width: 1600px; height: 900px; overflow: hidden; background: var(--bg); }
+  .u { --hi: 0; --lc: var(--accent); --c: color-mix(in srgb, var(--lc) calc(var(--hi) * 100%), #93a1b5); --b: color-mix(in srgb, var(--lc) calc(var(--hi) * 100%), #263649); --k: color-mix(in srgb, var(--lc) calc(var(--hi) * 100%), #2c4056); --d: color-mix(in srgb, var(--lc) calc(var(--hi) * 100%), #6b7a8f); color: var(--c); }
+  .u.amb { --lc: var(--need); }
+  .h { opacity: 0; }
+  #board { position: absolute; inset: 0; opacity: 0; }
+  .col { position: absolute; top: 20px; height: 720px; border: 1px solid #263649; background: var(--bg-panel); }
+  .colh { position: absolute; top: 34px; text-align: center; font-size: 34px; line-height: 40px; font-weight: 600; letter-spacing: .02em; }
+  .card, .node { position: absolute; background: var(--bg-raised); border: 1.5px solid var(--b); text-align: center; display: flex; flex-direction: column; justify-content: center; }
+  .card { width: 226px; height: 104px; }
+  .node { height: 104px; }
+  .nm { font: 600 36px/44px var(--font-ui); }
+  .sub { font-size: 32px; line-height: 38px; color: var(--d); }
+  #chat { position: absolute; left: 250px; top: 350px; width: 1100px; height: 180px; padding: 20px 28px; background: var(--bg-panel); border: 1px solid #263649; opacity: 0; }
+  .row { display: flex; align-items: baseline; height: 70px; opacity: 0; font-size: 38px; line-height: 70px; white-space: nowrap; }
+  .row i { font-style: normal; width: 140px; font-size: 32px; color: #6b7a8f; }
+  #panel { position: absolute; left: 290px; top: 20px; width: 1290px; height: 720px; background: var(--bg-panel); border: 1px solid var(--b); }
+  .ptitle { position: absolute; left: 314px; top: 36px; font-size: 32px; line-height: 40px; white-space: nowrap; }
+  .q { position: absolute; left: 314px; top: 650px; font-size: 34px; line-height: 44px; white-space: nowrap; }
+  .q i { font-style: normal; font-size: 32px; color: var(--d); margin-right: 14px; }
+  svg { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; overflow: visible; }
+  .ln { fill: none; stroke: var(--k); stroke-width: 2.5; }
+  .tp { fill: var(--k); }
+  .cap { position: absolute; left: 40px; top: 774px; max-width: 1100px; padding: 12px 22px; font: 500 44px/1.2 var(--font-ui); color: #c3cfdf; background: color-mix(in srgb, var(--bg) 90%, transparent); border-left: 6px solid var(--accent); box-shadow: 0 6px 24px rgba(0,0,0,.5); opacity: 0; z-index: 5; }
+  .cap.two { font-size: 40px; top: 760px; }
+  .cap.m { border-left-color: var(--need); }
+  .cap b { font-weight: 700; color: var(--accent); }
+  .cap.m b { color: var(--need-text); }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="25.9" data-width="1600" data-height="900">
+<div id="scene" class="clip" style="position:absolute;inset:0" data-start="0" data-duration="25.9"></div>
+</div>
+<script>
+gsap.config({ force3D: false });
+const tl = gsap.timeline({ paused: true });
+const NS = "http://www.w3.org/2000/svg";
+const scene = document.getElementById("scene");
+const mk = (tag, cls, html, css, parent = scene) => { const d = document.createElement(tag); d.className = cls; if (html) d.innerHTML = html; Object.assign(d.style, css); parent.appendChild(d); return d; };
+
+// board
+const board = mk("div", "", "", {}); board.id = "board";
+const COLS = [["Plan", 20, 250], ["Needs you", 278, 260, 1], ["Queued", 546, 600], ["In progress", 1154, 220], ["Done", 1382, 198]];
+const hdr = {};
+for (const [n, x, w, amb] of COLS) {
+  mk("div", "col", "", { left: x + "px", width: w + "px" }, board);
+  hdr[n] = mk("div", "colh u" + (amb ? " amb" : ""), n, { left: x + "px", width: w + "px" }, board);
+}
+
+// chat
+const chat = mk("div", "", "", {}); chat.id = "chat"; scene.appendChild(chat);
+const r1 = mk("div", "row u amb", "<i>you</i>Build level 4, the asteroid belt.", {}, chat);
+const r2 = mk("div", "row u", "<i>agent</i>This is several cards. I file one plan card.", {}, chat);
+
+// plan card
+const card = mk("div", "card u h", '<div class="nm">level 4</div><div class="sub">plan card</div>', { left: "32px", top: "110px" });
+
+// graph geometry: [name, kind, centre x offset, top]
+const NODES = [["rock-physics", "foundation", 0, 110], ["belt-map", "feature", -1, 300], ["mining-drone", "feature", 1, 300], ["belt-boss", "integration", 0, 490]];
+const EDGES = [[0, 1], [0, 2], [1, 3], [2, 3]];
+const svg = document.createElementNS(NS, "svg"); scene.appendChild(svg);
+function graph(cx, dx, w) {
+  const H = 104;
+  const nodes = NODES.map(([n, k, o, y]) => { const x = cx + o * dx; return { x, y, el: mk("div", "node u h", `<div class="nm">${n}</div><div class="sub">${k}</div>`, { left: x - w / 2 + "px", top: y + "px", width: w + "px" }) }; });
+  const edges = EDGES.map(([a, b]) => {
+    const A = nodes[a], B = nodes[b], x1 = A.x, y1 = A.y + H, x2 = B.x, y2 = B.y;
+    const L = Math.hypot(x2 - x1, y2 - y1), ux = (x2 - x1) / L, uy = (y2 - y1) / L;
+    const g = document.createElementNS(NS, "g"); g.setAttribute("class", "u h");
+    const ln = document.createElementNS(NS, "path"); ln.setAttribute("class", "ln"); ln.setAttribute("d", `M${x1} ${y1} L${x2 - ux * 12} ${y2 - uy * 12}`);
+    const tp = document.createElementNS(NS, "path"); tp.setAttribute("class", "tp");
+    tp.setAttribute("d", `M${x2} ${y2} l${-ux * 16 - uy * 8} ${-uy * 16 + ux * 8} l${uy * 16} ${-ux * 16} z`);
+    g.append(ln, tp); svg.appendChild(g); return { g, a, b };
+  });
+  return { nodes, edges };
+}
+const panel = mk("div", "u h", "", {}); panel.id = "panel";
+const ptitle = mk("div", "ptitle u h", "the plan, written by the planner, a model run on this card", {});
+const pg = graph(935, 330, 340);
+const question = mk("div", "q u amb h", "<i>question</i>Does the boss's health grow with the size of the crew?", {});
+const qg = graph(846, 146, 280);
+
+// timeline
+let T = 0, cur = [];
+const lit = (units, at) => { if (cur.length) tl.to(cur, { "--hi": 0, duration: 0.4 }, at); tl.to(units, { "--hi": 1, duration: 0.3 }, at); cur = units; };
+const show = (els, at, d = 0.3) => tl.to(els, { opacity: 1, duration: d }, at);
+function beat(dur, cap, amber, fn) {
+  const t0 = T, c = mk("div", "cap" + (amber ? " m" : ""), cap);
+  if (c.offsetHeight > 90) c.classList.add("two");
+  tl.to(c, { opacity: 1, duration: 0.25 }, t0);
+  if (!fn.last) tl.to(c, { opacity: 0, duration: 0.15 }, t0 + dur - 0.15);
+  fn(t0); T += dur;
+}
+const ids = (arr) => arr;
+
+beat(2.6, "One sentence goes into the <b>chat</b>.", true, (t) => { show(chat, t + 0.1); show(r1, t + 0.1); lit([r1], t + 0.1); });
+beat(2.6, "It answers: this is <b>several cards</b>.", false, (t) => { show(r2, t + 0.15); lit([r2], t + 0.15); });
+beat(3.2, "It files <b>one plan card</b> in the board's plan lane.", false, (t) => {
+  tl.to(chat, { opacity: 0, duration: 0.4 }, t + 0.05);
+  show(board, t + 0.45, 0.4); show(card, t + 0.6); lit([card], t + 0.6);
+});
+beat(3.0, "The <b>planner</b> writes the plan: four cards.", false, (t) => {
+  show([panel, ptitle], t + 0.1); lit([panel, ptitle], t + 0.1);
+  pg.nodes.forEach((n, i) => show(n.el, t + 0.5 + i * 0.25, 0.25));
+  pg.edges.forEach((e, i) => show(e.g, t + 1.5 + i * 0.1, 0.25));
+});
+beat(3.3, "<b>rock-physics</b> first, <b>belt-map</b> and <b>mining-drone</b> next, <b>belt-boss</b> last.", false, (t) => {
+  const n = pg.nodes, e = pg.edges;
+  lit([n[0].el], t);
+  tl.to(cur, { "--hi": 0, duration: 0.4 }, t + 1.1); tl.to([n[1].el, n[2].el, e[0].g, e[1].g], { "--hi": 1, duration: 0.3 }, t + 1.1);
+  tl.to([n[1].el, n[2].el, e[0].g, e[1].g], { "--hi": 0, duration: 0.4 }, t + 2.2); tl.to([n[3].el, e[2].g, e[3].g], { "--hi": 1, duration: 0.3 }, t + 2.2);
+  cur = [n[3].el, e[2].g, e[3].g];
+});
+beat(2.7, "The plan can ask <b>the person</b> a question.", true, (t) => { show(question, t + 0.1); lit([question], t + 0.1); });
+beat(3.0, "It moves to <b>Needs you</b> to wait for an accept.", true, (t) => {
+  tl.to([panel, ptitle, question, ...pg.nodes.map((n) => n.el), ...pg.edges.map((e) => e.g)], { opacity: 0, duration: 0.4 }, t + 0.1);
+  tl.set(card, { "--lc": "#f4b13e" }, t);
+  tl.to(card, { x: 263, duration: 0.8, ease: "power1.inOut" }, t + 0.5);
+  lit([card, hdr["Needs you"]], t + 0.5);
+});
+const last = (t) => {
+  tl.to(card, { opacity: 0, duration: 0.3 }, t + 0.1);
+  qg.nodes.forEach((n, i) => show(n.el, t + 0.5 + i * 0.3));
+  qg.edges.forEach((e, i) => show(e.g, t + 1.5 + i * 0.1));
+  lit([hdr["Queued"], ...qg.nodes.map((n) => n.el), ...qg.edges.map((e) => e.g)], t + 0.5);
+};
+last.last = true;
+beat(3.9, "On accept, the four cards land in <b>Queued</b>; each waits for its dependencies.", false, last);
+T += 1.0;
+tl.to(scene, { opacity: 0, duration: 0.6 }, T); T += 0.6;
+tl.set({}, {}, T);
+if (Math.abs(T - 25.9) > 0.01) throw new Error("duration " + T);
+window.__timelines = window.__timelines || {};
+window.__timelines["main"] = tl;
+</script>
+</body>
+</html>

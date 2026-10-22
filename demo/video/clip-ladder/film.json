@@ -1,0 +1,206 @@
+{
+ "template": "../film.tpl.html",
+ "shared": [
+  "../film-fx.js",
+  "../loop/diagram.css",
+  "../vendor/gsap.min.js"
+ ],
+ "plain": true,
+ "maxZoom": 1.5,
+ "camDur": 1.4,
+ "segments": [
+  {
+   "id": "d",
+   "clip": "p-diagram-ladder.mp4",
+   "dur": 27.4
+  },
+  {
+   "id": "s",
+   "scene": "10-stronger-model",
+   "from": [
+    1,
+    "act0"
+   ],
+   "to": [
+    6,
+    "stillMs"
+   ],
+   "holdRate": 1.4
+  },
+  {
+   "id": "end",
+   "still": "10-stronger-model-6.png",
+   "dur": 1.8
+  }
+ ],
+ "spots": [
+  {
+   "at": [
+    "s",
+    null,
+    null,
+    1.0
+   ],
+   "box": [
+    "10-stronger-model",
+    1,
+    "card"
+   ]
+  },
+  {
+   "at": [
+    "s",
+    2,
+    "act1"
+   ],
+   "box": [
+    "10-stronger-model",
+    2,
+    "agent"
+   ]
+  },
+  {
+   "at": [
+    "s",
+    3,
+    "act1"
+   ],
+   "box": [
+    "10-stronger-model",
+    3,
+    "failure"
+   ],
+   "amber": true
+  },
+  {
+   "at": [
+    "s",
+    4,
+    "act1"
+   ],
+   "box": [
+    "10-stronger-model",
+    4,
+    "big"
+   ]
+  },
+  {
+   "at": [
+    "s",
+    5,
+    "act1"
+   ],
+   "box": [
+    "10-stronger-model",
+    5,
+    "log"
+   ]
+  },
+  {
+   "at": [
+    "s",
+    6,
+    "act1"
+   ],
+   "box": [
+    "10-stronger-model",
+    6,
+    "agent"
+   ]
+  },
+  {
+   "at": [
+    "end",
+    "end",
+    null,
+    -0.9
+   ],
+   "box": null
+  }
+ ],
+ "cams": [
+  {
+   "at": [
+    "s",
+    2,
+    "act0"
+   ],
+   "box": [
+    "10-stronger-model",
+    2,
+    "drawer"
+   ],
+   "fill": 0.95
+  },
+  {
+   "at": [
+    "end"
+   ],
+   "box": null,
+   "dur": 1.2
+  }
+ ],
+ "caps": [
+  {
+   "at": [
+    "s",
+    null,
+    null,
+    1.0
+   ],
+   "text": "The receipt card",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "s",
+    2,
+    "act1"
+   ],
+   "text": "Its first session runs on the cheap model",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "s",
+    3,
+    "act1"
+   ],
+   "text": "The acceptance check fails",
+   "cls": "label",
+   "amber": true
+  },
+  {
+   "at": [
+    "s",
+    4,
+    "act1"
+   ],
+   "text": "The next session runs on the stronger model",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "s",
+    5,
+    "act1"
+   ],
+   "text": "Its second session works on the stronger model",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "s",
+    6,
+    "act1"
+   ],
+   "text": "The card shows the model and the spend",
+   "cls": "label"
+  }
+ ],
+ "reveals": [
+  [
+   "s"
+  ]
+ ]
+}

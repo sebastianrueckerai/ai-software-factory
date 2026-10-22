@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1600, height=900">
+<title>One dial: who decides what</title>
+<link rel="stylesheet" href="diagram.css">
+<script src="gsap.min.js"></script>
+<style>
+  #root { position: relative; width: 1600px; height: 900px; overflow: hidden; background: var(--bg); }
+  .u { --hi: 0; --lc: var(--accent); --c: color-mix(in srgb, var(--lc) calc(var(--hi) * 100%), #93a1b5); --b: color-mix(in srgb, var(--lc) calc(var(--hi) * 100%), #263649); --k: color-mix(in srgb, var(--lc) calc(var(--hi) * 100%), #2c4056); color: var(--c); }
+  .u.amb { --lc: var(--need); }
+  .h { opacity: 0; }
+  .abs { position: absolute; }
+  .lbl { position: absolute; left: 30px; width: 610px; height: 92px; display: flex; align-items: center; font-size: 36px; line-height: 40px; border-top: 1px solid #1a2636; padding-top: 0; }
+  .hd { position: absolute; top: 90px; width: 220px; height: 64px; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 600; background: var(--bg-panel); border: 1px solid var(--b); }
+  .cell { position: absolute; width: 220px; height: 86px; display: flex; align-items: center; justify-content: center; font-size: 42px; font-weight: 600; background: var(--bg-raised); border: 2px solid var(--b); opacity: 0; }
+  .cell.agent { transform: scaleY(0); }
+  #track { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; }
+  #ptr { position: absolute; left: 742px; top: 34px; width: 36px; height: 36px; border-radius: 50%; border: 4px solid var(--b); background: var(--bg); }
+  .cap { position: absolute; left: 40px; top: 774px; max-width: 1100px; padding: 12px 22px; font: 500 44px/1.2 var(--font-ui); color: #c3cfdf; background: color-mix(in srgb, var(--bg) 90%, transparent); border-left: 6px solid var(--accent); box-shadow: 0 6px 24px rgba(0,0,0,.5); opacity: 0; z-index: 5; }
+  .cap.two { font-size: 40px; top: 760px; }
+  .cap.m { border-left-color: var(--need); }
+  .cap b { font-weight: 700; color: var(--accent); }
+  .cap.m b { color: var(--need-text); }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="25.9" data-width="1600" data-height="900">
+<div id="scene" class="clip" style="position:absolute;inset:0" data-start="0" data-duration="25.9"></div>
+</div>
+<script>
+gsap.config({ force3D: false });
+const tl = gsap.timeline({ paused: true });
+const scene = document.getElementById("scene");
+const mk = (cls, html, css) => { const d = document.createElement("div"); d.className = cls; if (html) d.innerHTML = html; Object.assign(d.style, css); scene.appendChild(d); return d; };
+
+const LEVELS = ["manual", "assisted", "autonomous", "full auto"];
+const CX = [760, 992, 1224, 1456];
+const ROWS = [
+  ["Answer an agent's question", "yyaa"],
+  ["Start and file ready cards", "yaaa"],
+  ["Steer, split or close a card", "yyaa"],
+  ["Approve a merge", "yyya"],
+  ["Set the level, invite people, change routines", "yyyy"],
+  ["Direction, and money beyond the project's pool", "yyyy"],
+];
+const RY = (r) => 170 + r * 97;
+
+const dialLbl = mk("abs u h", "autonomy level", { left: "30px", top: "32px", fontSize: "34px", lineHeight: "40px" });
+const track = mk("abs u h", '<svg id="track" viewBox="0 0 1600 900"><line x1="760" y1="52" x2="1456" y2="52" stroke="#263649" stroke-width="3"/>' + CX.map((x) => `<circle cx="${x}" cy="52" r="8" fill="#070b12" stroke="#2c4056" stroke-width="2"/>`).join("") + "</svg>", { inset: 0 });
+const ptr = mk("u h", "", {}); ptr.id = "ptr";
+const heads = LEVELS.map((n, i) => mk("hd u h", n, { left: CX[i] - 110 + "px" }));
+const labels = ROWS.map(([n], r) => mk("lbl u h" + (r >= 4 ? " amb" : ""), n, { top: RY(r) - 3 + "px" }));
+const cells = ROWS.map(([, v], r) => v.split("").map((o, l) => ({
+  y: mk("cell u amb you", "you", { left: CX[l] - 110 + "px", top: RY(r) + "px" }),
+  a: mk("cell u agent", "agent", { left: CX[l] - 110 + "px", top: RY(r) + "px" }),
+})));
+
+let T = 0, cur = [];
+const lit = (units, at) => { if (cur.length) tl.to(cur, { "--hi": 0, duration: 0.4 }, at); tl.to(units, { "--hi": 1, duration: 0.3 }, at); cur = units; };
+const show = (els, at, d = 0.3) => tl.to(els, { opacity: 1, duration: d }, at);
+function beat(dur, cap, amber, fn, keep) {
+  const t0 = T, c = mk("cap" + (amber ? " m" : ""), cap);
+  if (c.offsetHeight > 90) c.classList.add("two");
+  tl.to(c, { opacity: 1, duration: 0.25 }, t0);
+  if (!keep) tl.to(c, { opacity: 0, duration: 0.15 }, t0 + dur - 0.15);
+  fn(t0); T += dur;
+}
+// the level column appears carrying the previous owners, muted; flip(r, at) turns a row to agent and lights it
+const column = (l, at) => ROWS.forEach(([, v], r) => { const prev = l ? v[l - 1] : "y"; show(prev === "y" ? cells[r][l].y : cells[r][l].a, at, 0.3); if (prev === "a") tl.set(cells[r][l].a, { scaleY: 1 }, at); });
+const flip = (r, l, at) => {
+  const c = cells[r][l];
+  if (cur.length) tl.to(cur, { "--hi": 0, duration: 0.4 }, at);
+  tl.to(c.y, { scaleY: 0, duration: 0.2, ease: "power1.in" }, at + 0.3);
+  tl.set(c.a, { opacity: 1 }, at + 0.5);
+  tl.to(c.a, { scaleY: 1, duration: 0.2, ease: "power1.out" }, at + 0.5);
+  tl.to(c.a, { "--hi": 1, duration: 0.3 }, at + 0.3);
+  cur = [c.a];
+};
+const move = (l, at) => {
+  tl.to(ptr, { x: CX[l] - CX[0], duration: 0.7, ease: "power1.inOut" }, at);
+  lit([ptr, heads[l]], at);
+};
+
+beat(3.0, "One <b>dial</b> sets who decides what.", false, (t) => {
+  show([dialLbl, track, ptr, ...heads, ...labels], t + 0.1); lit([ptr, heads[0], dialLbl], t + 0.1);
+});
+beat(3.0, "At <b>manual</b>, every action of the agent asks <b>you</b>.", true, (t) => {
+  column(0, t + 0.1); lit(ROWS.map((_, r) => cells[r][0].y), t + 0.1);
+});
+beat(3.4, "<b>Assisted</b>: the agent starts and files ready cards.", false, (t) => {
+  move(1, t); column(1, t + 0.5); flip(1, 1, t + 0.5);
+});
+beat(3.4, "<b>Autonomous</b>: the agent answers its own questions.", false, (t) => {
+  move(2, t); column(2, t + 0.5); flip(0, 2, t + 0.5);
+});
+beat(2.9, "It <b>steers, splits and closes</b> cards too.", false, (t) => flip(2, 2, t + 0.2));
+beat(3.4, "<b>Full auto</b>: a card merges once its gates pass.", false, (t) => {
+  move(3, t); column(3, t + 0.5); flip(3, 3, t + 0.5);
+});
+beat(2.5, "<b>You</b> set the level, invite people, change routines.", true, (t) => {
+  lit([labels[4], ...cells[4].map((c) => c.y)], t + 0.1);
+});
+beat(2.7, "<b>You</b> decide direction, and money beyond the pool.", true, (t) => {
+  lit([labels[5], ...cells[5].map((c) => c.y)], t + 0.1);
+}, true);
+T += 1.0;
+tl.to(scene, { opacity: 0, duration: 0.6 }, T); T += 0.6;
+tl.set({}, {}, T);
+if (Math.abs(T - 25.9) > 0.01) throw new Error("duration " + T);
+window.__timelines = window.__timelines || {};
+window.__timelines["main"] = tl;
+</script>
+</body>
+</html>
