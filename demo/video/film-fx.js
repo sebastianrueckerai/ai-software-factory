@@ -37,22 +37,14 @@
     tl.to(svg.querySelector(".fx-edge"), { opacity: 0, duration: dur }, at);
   }
 
-  // ring draws a glowing frame around box for a moment: a button, a new card
-  function ring(tl, stage, box, at, until, color = "#4fcbe2") {
-    const b = pad(box, 6);
-    const r = el("div", {}, stage);
-    Object.assign(r.style, { position: "absolute", left: b.x + "px", top: b.y + "px", width: b.width + "px", height: b.height + "px",
-      border: `3px solid ${color}`, borderRadius: "6px", boxShadow: `0 0 22px 4px ${color}66`, opacity: 0, pointerEvents: "none" });
-    tl.to(r, { opacity: 1, duration: 0.25 }, at);
-    tl.to(r, { opacity: 0, duration: 0.25 }, until);
-    return r;
-  }
-
   // camera moves the stage so box fills a share of the frame, centred on (cx, cy) of the 1600 by 900 output
   function camera(tl, stage, box, at, opts = {}) {
     const fill = opts.fill ?? 0.62, cx = opts.cx ?? 800, cy = opts.cy ?? 450;
-    const s = opts.scale ?? Math.min(4, Math.min(1600 * fill / box.width, 900 * fill / box.height));
-    const x = cx - (box.x + box.width / 2) * s, y = cy - (box.y + box.height / 2) * s;
+    // never below 1: a zoom out would show the black past the console
+    const s = opts.scale ?? Math.max(1, Math.min(4, 1600 * fill / box.width, 900 * fill / box.height));
+    // the stage always covers the frame: the move stops at the console's edges rather than showing past them
+    const x = Math.min(0, Math.max(1600 - 1600 * s, cx - (box.x + box.width / 2) * s));
+    const y = Math.min(0, Math.max(900 - 900 * s, cy - (box.y + box.height / 2) * s));
     tl.to(stage, { scale: s, x, y, duration: opts.dur ?? 1.0, ease: opts.ease || "power2.inOut" }, at);
   }
   function home(tl, stage, at, dur = 0.9) {
@@ -69,34 +61,5 @@
     return s;
   }
 
-  // clock is the time-jump label: the old time slides away, the new one slides in
-  function clock(tl, layer, from, to, at, dur = 1.6) {
-    const box = el("div", { class: "fx-clock" }, layer);
-    const a = el("span", {}, box), b = el("span", {}, box);
-    a.textContent = from; b.textContent = to;
-    gsap.set(box, { opacity: 0 }); gsap.set(b, { yPercent: 100, opacity: 0 });
-    tl.to(box, { opacity: 1, duration: 0.25 }, at);
-    tl.to(a, { yPercent: -100, opacity: 0, duration: 0.45, ease: "power2.in" }, at + 0.4);
-    tl.to(b, { yPercent: 0, opacity: 1, duration: 0.45, ease: "power2.out" }, at + 0.9);
-    tl.to(box, { opacity: 0, duration: 0.3 }, at + dur);
-    return box;
-  }
-
-  // bracket draws a callout in a band above the frame: a label, a sub line, a bracket over the box's span
-  function bracket(tl, band, box, map, label, sub, at, until, color = "#4fcbe2") {
-    const x0 = map.x + box.x * map.s, x1 = map.x + (box.x + box.width) * map.s;
-    const g = el("div", { class: "fx-call" }, band);
-    Object.assign(g.style, { position: "absolute", left: x0 + "px", top: "0px", width: Math.max(360, x1 - x0) + "px" });
-    const h = el("div", { class: "fx-call-t" }, g); h.textContent = label;
-    const p = el("div", { class: "fx-call-s" }, g); p.textContent = sub;
-    const br = el("div", { class: "fx-br" }, band);
-    Object.assign(br.style, { position: "absolute", left: x0 + "px", width: (x1 - x0) + "px", borderColor: color });
-    gsap.set([g, br], { opacity: 0 }); gsap.set(br, { scaleX: 0, transformOrigin: "0 50%" });
-    tl.to(g, { opacity: 1, duration: 0.35 }, at);
-    tl.to(br, { opacity: 1, scaleX: 1, duration: 0.45, ease: "power2.out" }, at + 0.1);
-    if (until !== undefined) tl.to([g, br], { opacity: 0.28, duration: 0.3 }, until);
-    return { g, br };
-  }
-
-  window.fx = { spotlight, unspot, ring, camera, home, caption, clock, bracket };
+  window.fx = { spotlight, unspot, camera, home, caption };
 })();

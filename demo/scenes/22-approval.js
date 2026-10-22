@@ -59,7 +59,7 @@ module.exports = {
       boxes: { needs: "#needs-you" },
     },
     // the seed's redraw takes the press's banner away, so the banner and the settled counts show one step apart
-    { state: (now) => thursday(now, m.at + 30), actions: [{ goto: "/" }, { hover: ui.park }], hold: 4000 },
+    { state: (now) => thursday(now, m.at + 30), actions: [{ goto: "/" }, { hover: ui.park }], hold: 4000, boxes: { merged: ui.face(a.task), progress: '#board .column[aria-labelledby="col-2"]' } },
     {
       state: (now) => thursday(now, m.live + 60),
       actions: [

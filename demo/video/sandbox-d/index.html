@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1600, height=900">
+<title>The sandbox, in sequence</title>
+<link rel="stylesheet" href="diagram.css">
+<script src="gsap.min.js"></script>
+<style>
+  #root { position: relative; width: 1600px; height: 900px; overflow: hidden; background: var(--bg); }
+  .heads { position: absolute; left: 0; top: 0; width: 1600px; height: 164px; background: var(--bg); z-index: 2; }
+  .head { position: absolute; top: 78px; width: 236px; height: 80px; padding: 6px 6px; text-align: center; }
+  .head h2 { font-size: 28px; line-height: 36px; margin: 0; white-space: nowrap; }
+  .head p { font-size: 25px; line-height: 30px; color: var(--text); white-space: nowrap; }
+  .head.person { border-color: color-mix(in srgb, var(--need) 72%, transparent); background: var(--need-tint); }
+  .head.person::after { border-color: var(--need); }
+  .head.person h2 { color: var(--need-text); }
+  .head.pod { border-color: var(--accent); opacity: 0; }
+  #flow { position: absolute; left: 0; top: 0; width: 1600px; height: 2000px; z-index: 1; }
+  #flow svg { position: absolute; left: 0; top: 0; width: 1600px; height: 2000px; overflow: visible; }
+  .life { stroke: var(--line-strong); stroke-width: 2; stroke-dasharray: 8 7; }
+  .life.amber { stroke: color-mix(in srgb, var(--need) 45%, transparent); }
+  .life.pod { stroke: var(--accent); opacity: 0; }
+  .act { fill: color-mix(in srgb, var(--accent) 35%, var(--bg)); stroke: var(--accent); stroke-width: 1.5; }
+  .arr { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+  .arr.ret { stroke-dasharray: 8 6; }
+  .arr.amber { stroke: var(--need); }
+  .arr.lost { stroke: var(--text-faint); stroke-dasharray: 6 6; }
+  .tip { fill: var(--accent); opacity: 0; }
+  .tip.amber { fill: var(--need); }
+  .xm { stroke: var(--text); stroke-width: 4; fill: none; opacity: 0; }
+  .xm.big { stroke-width: 5; }
+  .ck { stroke: var(--accent); stroke-width: 4; fill: none; opacity: 0; }
+  .lbl { position: absolute; padding: 0 8px; background: var(--bg); font-size: 30px; line-height: 36px; color: var(--text); white-space: nowrap; transform: translateX(-50%); opacity: 0; }
+  .lbl.amber { color: var(--need-text); }
+  .lbl.lost { color: var(--text); }
+  .note { position: absolute; padding: 4px 14px; background: var(--bg-panel); border: 1px solid var(--line-strong); font-size: 28px; line-height: 36px; color: var(--text); white-space: nowrap; transform: translateX(-50%); text-align: center; opacity: 0; }
+  .note.amber { border-color: var(--need); color: var(--need-text); background: var(--need-tint); }
+  .note.cyan { border-color: var(--accent); }
+  .caption { position: absolute; left: 0; right: 0; top: 744px; height: 156px; text-align: center; font-size: 48px; line-height: 1.25; color: var(--text); background: var(--bg); border-top: 1px solid var(--line); z-index: 3; }
+  .caption span { position: absolute; left: 80px; right: 80px; top: 18px; opacity: 0; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="23" data-width="1600" data-height="900">
+<div id="scene" class="clip" data-start="0" data-duration="23" style="position:absolute;inset:0">
+
+<div id="flow"><svg id="fsvg" viewBox="0 0 1600 2000" aria-hidden="true"></svg></div>
+
+<div class="heads">
+  <section class="panel head person" style="left:12px"><h2>A person</h2><p>decides at the cap</p></section>
+  <section class="panel head" style="left:252px"><h2>The factory</h2><p>runs the card</p></section>
+  <section class="panel head pod" id="h-pod" style="left:522px"><h2>The pod</h2><p>the agent inside</p></section>
+  <section class="panel head" id="h-gw" style="left:802px"><h2>Model gateway</h2><p id="h-keys">holds the keys</p></section>
+  <section class="panel head" style="left:1062px"><h2>Model API</h2><p>hosted or yours</p></section>
+  <section class="panel head" style="left:1322px"><h2>Repository</h2><p>the card's code</p></section>
+</div>
+
+<div class="caption">
+  <span data-c="0">The factory starts one throwaway pod for each card.</span>
+  <span data-c="1">Before the agent starts, a probe proves the pod cannot reach the internet, the host or the cloud metadata.</span>
+  <span data-c="2">Every model call goes through the gateway. It reserves the worst case first, then books the real cost.</span>
+  <span data-c="3">The agent never holds a push token or a model key.</span>
+  <span data-c="4">At the card's budget cap, the factory stops and asks a person: fund it or end it.</span>
+  <span data-c="5">When the agent is done, the factory kills it, pushes once with a fresh token, revokes it and deletes the pod.</span>
+</div>
+
+</div>
+</div>
+
+<script>
+// One paused timeline drives the clip: the renderer seeks it frame by frame, so nothing here reads the clock.
+gsap.config({ force3D: false });
+const tl = gsap.timeline({ paused: true });
+const NS = "http://www.w3.org/2000/svg";
+const flow = document.getElementById("flow"), svg = document.getElementById("fsvg");
+const X = { person: 130, factory: 370, pod: 640, gw: 920, api: 1180, repo: 1440 };
+const el = (tag, attrs, parent = svg) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
+const div = (cls, html, x, y) => { const d = document.createElement("div"); d.className = cls; d.innerHTML = html; d.style.left = x + "px"; d.style.top = y + "px"; d.setAttribute("data-ov", ""); flow.appendChild(d); return d; };
+
+// each row of the sequence: a message (msg), a return (ret), a probe that stops (lost), or a note on a lane
+const R = [
+  { at: 0.6, k: "msg", a: "factory", b: "pod", t: "start one throwaway pod" },
+  { at: 1.6, k: "note", a: "pod", t: "gVisor · non-root · read-only root<br>no service account token" },
+  { at: 4.0, k: "lost", a: "pod", t: "the internet" },
+  { at: 4.6, k: "lost", a: "pod", t: "the host machine" },
+  { at: 5.2, k: "lost", a: "pod", t: "cloud metadata 169.254.169.254" },
+  { at: 5.9, k: "msg", a: "pod", b: "gw", t: "a named host: open", ok: true },
+  { at: 6.7, k: "note", a: "pod", c: "cyan", t: "probe passed: the agent starts", start: true },
+  { at: 8.4, k: "msg", a: "pod", b: "gw", t: "model call + 1-hour identity" },
+  { at: 9.1, k: "note", a: "gw", c: "amber", t: "hold €0.30, the worst case" },
+  { at: 9.8, k: "msg", a: "gw", b: "api", t: "call, with the model key" },
+  { at: 10.5, k: "ret", a: "api", b: "gw", t: "answer · cost €0.04" },
+  { at: 11.2, k: "note", a: "gw", c: "cyan", t: "book €0.04, free the rest" },
+  { at: 11.9, k: "ret", a: "gw", b: "pod", t: "answer" },
+  { at: 13.1, k: "note", a: "pod", t: "holds a 1-hour identity for the gateway<br>never a push token, never a model key" },
+  { at: 15.8, k: "msg", a: "pod", b: "gw", t: "more calls, each held, then booked" },
+  { at: 16.6, k: "note", a: "gw", c: "amber", t: "€2.00 of €2.00: the cap" },
+  { at: 17.2, k: "msg", a: "gw", b: "factory", c: "amber", t: "cap reached, call refused" },
+  { at: 17.8, k: "msg", a: "factory", b: "person", c: "amber", t: "fund it or end it?" },
+  { at: 18.5, k: "ret", a: "person", b: "factory", c: "amber", t: "fund it" },
+  { at: 19.3, k: "ret", a: "pod", b: "factory", t: "done", end: true },
+  { at: 19.7, k: "msg", a: "factory", b: "pod", t: "kill the agent's processes" },
+  { at: 20.1, k: "note", a: "factory", t: "mint a fresh write token" },
+  { at: 20.5, k: "msg", a: "factory", b: "repo", t: "push once" },
+  { at: 20.9, k: "msg", a: "factory", b: "repo", t: "revoke the token" },
+  { at: 21.3, k: "msg", a: "factory", b: "pod", t: "delete the pod", kill: true },
+];
+
+const TOP = 164, BOTTOM = 730;
+const lives = {};
+for (const [k, x] of Object.entries(X)) lives[k] = el("line", { class: "life" + (k === "person" ? " amber" : k === "pod" ? " pod" : ""), x1: x, x2: x, y1: TOP, y2: 2000 });
+const bar = el("rect", { class: "act", x: X.pod - 7, y: 0, width: 14, height: 0, opacity: 0 });
+
+let y = 196, scroll = 0, actFrom = 0;
+const shown = [];
+const scrollTo = (at, rowBottom) => {
+  if (rowBottom - scroll <= BOTTOM - 12) return;
+  scroll = rowBottom - (BOTTOM - 12);
+  tl.to(flow, { y: -scroll, duration: 0.35, ease: "power1.inOut", force3D: false }, at - 0.1);
+  for (const s of shown) if (!s.gone && s.top - scroll < TOP + 8) { s.gone = true; tl.to(s.els, { opacity: 0, duration: 0.2 }, at - 0.1); }
+};
+
+const BEATS = [3.8, 8.2, 13.3, 15.6, 19.2];
+let beat = 0;
+for (const r of R) {
+  while (beat < BEATS.length && r.at >= BEATS[beat]) {
+    for (const s of shown) if (!s.gone && !s.dim) { s.dim = true; tl.to(s.els, { opacity: 0.5, duration: 0.3 }, BEATS[beat]); }
+    beat++;
+  }
+  const lines = r.t.split("<br>").length;
+  const h = r.k === "note" ? 18 + lines * 36 : 60;
+  const rowTop = y, ay = r.k === "note" ? y + h / 2 : y + 46;
+  const els = [];
+  scrollTo(r.at, rowTop + h);
+  if (r.k === "note") {
+    const n = div("note" + (r.c ? " " + r.c : ""), r.t, X[r.a], rowTop + 4);
+    els.push(n);
+    tl.to(n, { opacity: 1, duration: 0.25 }, r.at);
+  } else {
+    const xa = X[r.a], dir = r.k === "lost" ? 1 : Math.sign(X[r.b] - xa);
+    const xb = r.k === "lost" ? xa + 170 : X[r.b] - dir * 8;
+    const cls = "arr" + (r.k === "ret" ? " ret" : "") + (r.k === "lost" ? " lost" : "") + (r.c === "amber" ? " amber" : "");
+    const line = el("path", { class: cls, d: `M${xa} ${ay} H${xb}` });
+    const len = Math.abs(xb - xa);
+    gsap.set(line, { attr: { d: `M${xa} ${ay} H${xa}` } });
+    tl.to(line, { attr: { d: `M${xa} ${ay} H${xb}` }, duration: Math.min(0.45, 0.15 + len / 2200), ease: "none" }, r.at);
+    els.push(line);
+    const lx = r.k === "lost" ? xa + 110 : (xa + xb) / 2;
+    const lab = div("lbl" + (r.c === "amber" ? " amber" : "") + (r.k === "lost" ? " lost" : ""), r.t, lx, ay - 42);
+    if (r.k === "lost") lab.style.left = (xa + 24) + "px", lab.style.transform = "none";
+    els.push(lab);
+    tl.to(lab, { opacity: 1, duration: 0.25 }, r.at + 0.05);
+    const done = r.at + Math.min(0.45, 0.15 + len / 2200);
+    if (r.k === "lost") {
+      const xm = el("path", { class: "xm", d: `M${xb - 12} ${ay - 12} l24 24 M${xb + 12} ${ay - 12} l-24 24` });
+      els.push(xm);
+      tl.to(xm, { opacity: 1, duration: 0.15 }, done);
+    } else {
+      const tip = el("path", { class: "tip" + (r.c === "amber" ? " amber" : ""), d: `M${xb} ${ay} l${-dir * 14} -7 v14 z` });
+      els.push(tip);
+      tl.to(tip, { opacity: 1, duration: 0.1 }, done);
+      if (r.ok) {
+        const ck = el("path", { class: "ck", d: `M${xb + 18} ${ay - 2} l8 10 l16 -20` });
+        els.push(ck);
+        tl.to(ck, { opacity: 1, duration: 0.15 }, done);
+      }
+    }
+  }
+  if (r.start) { actFrom = ay + h / 2; gsap.set(bar, { attr: { y: actFrom } }); tl.to(bar, { opacity: 1, duration: 0.2 }, r.at + 0.2); }
+  if (actFrom && !r.start) tl.to(bar, { attr: { height: ay - actFrom }, duration: 0.25 }, r.at);
+  if (r.end) actFrom = 0;
+  if (r.kill) {
+    const kx = X.pod, ky = ay;
+    const xm = el("path", { class: "xm big", d: `M${kx - 18} ${ky - 18} l36 36 M${kx + 18} ${ky - 18} l-36 36` });
+    tl.to(xm, { opacity: 1, duration: 0.15 }, r.at + 0.35);
+    tl.set(lives.pod, { attr: { y2: ky } }, r.at + 0.35);
+    els.push(xm);
+  }
+  shown.push({ top: rowTop, els });
+  y += h + 4;
+}
+
+tl.to("#h-pod", { opacity: 1, duration: 0.3 }, 0.85);
+tl.to(lives.pod, { opacity: 1, duration: 0.3 }, 0.85);
+tl.to("#h-keys", { color: "#4fcbe2", duration: 0.3 }, 13.4);
+tl.to("#h-gw", { borderColor: "#4fcbe2", duration: 0.3 }, 13.4);
+tl.to("#h-gw", { borderColor: "#263649", duration: 0.3 }, 15.4);
+
+const caps = [...document.querySelectorAll("[data-c]")];
+const caption = (i, at, until) => {
+  tl.to(caps[i], { opacity: 1, duration: 0.25 }, at);
+  tl.to(caps[i], { opacity: 0, duration: 0.15 }, until - 0.15);
+};
+caption(0, 0, 3.8);
+caption(1, 3.8, 8.2);
+caption(2, 8.2, 13.3);
+caption(3, 13.3, 15.6);
+caption(4, 15.6, 19.2);
+caption(5, 19.2, 23.4);
+tl.set({}, {}, 23);
+
+window.__timelines = window.__timelines || {};
+window.__timelines["main"] = tl;
+</script>
+</body>
+</html>

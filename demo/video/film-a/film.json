@@ -1,6 +1,5 @@
 {
  "template": "../film.tpl.html",
- "style": "spotlight",
  "shared": [
   "../film-fx.js",
   "../loop/diagram.css",
@@ -11,7 +10,7 @@
   {
    "id": "hero",
    "still": "34-busy-board-3.png",
-   "dur": 11.2
+   "dur": 11.6
   },
   {
    "id": "press",
@@ -24,50 +23,64 @@
     5,
     "stillMs"
    ],
-   "tail": 2.2
+   "tail": 0
   },
   {
-   "id": "rewind",
-   "scene": "35-rewind",
+   "id": "drain",
+   "scene": "34-busy-board",
    "from": [
-    1,
-    "stillMs"
-   ],
-   "to": [
     6,
-    "stillMs"
-   ],
-   "tail": 0.2,
-   "rate": 3.5
-  },
-  {
-   "id": "ingest1",
-   "scene": "03-too-large-split",
-   "from": [
-    2,
     "atMs"
    ],
    "to": [
-    3,
+    10,
     "stillMs"
    ],
-   "tail": 2.6,
-   "rate": 2
+   "tail": 0.3,
+   "rate": 2.2
   },
   {
-   "id": "ingest2",
-   "scene": "03-too-large-split",
+   "id": "intake",
+   "scene": "34-busy-board",
    "from": [
-    5,
-    "stillMs"
+    11,
+    "atMs"
    ],
-   "lead": 3.4,
    "to": [
-    7,
+    13,
     "stillMs"
    ],
-   "tail": 2.4,
+   "tail": 0.4,
+   "rate": 1.4
+  },
+  {
+   "id": "ask",
+   "scene": "34-busy-board",
+   "from": [
+    14,
+    "atMs"
+   ],
+   "to": [
+    15,
+    "stillMs"
+   ],
+   "tail": 0,
    "rate": 1.6
+  },
+  {
+   "id": "plan",
+   "scene": "34-busy-board",
+   "from": [
+    17,
+    "stillMs"
+   ],
+   "lead": 4.0,
+   "to": [
+    18,
+    "stillMs"
+   ],
+   "tail": 1.6,
+   "rate": 1.3
   },
   {
    "id": "approval",
@@ -81,8 +94,9 @@
     5,
     "stillMs"
    ],
-   "tail": 0.5,
-   "rate": 2.2
+   "tail": 0,
+   "rate": 1.5,
+   "holdRate": 2.2
   },
   {
    "id": "autonomy",
@@ -93,11 +107,12 @@
    ],
    "lead": 1.0,
    "to": [
-    5,
+    4,
     "stillMs"
    ],
-   "tail": 0.5,
-   "rate": 2.4
+   "tail": 2.6,
+   "rate": 1.6,
+   "holdRate": 2.2
   },
   {
    "id": "stall",
@@ -112,10 +127,11 @@
     "stillMs"
    ],
    "tail": 0.3,
-   "rate": 1.3
+   "rate": 1.4,
+   "holdRate": 2.2
   },
   {
-   "id": "ask",
+   "id": "question",
    "scene": "21-design-question",
    "from": [
     1,
@@ -127,7 +143,8 @@
     "stillMs"
    ],
    "tail": 0.3,
-   "rate": 1.4
+   "rate": 1.3,
+   "holdRate": 2.2
   },
   {
    "id": "metrics",
@@ -141,29 +158,29 @@
     "stillMs"
    ],
    "tail": 0.4,
-   "rate": 1.2
+   "rate": 1.2,
+   "holdRate": 2.2
   },
   {
    "id": "sandbox",
-   "clip": "p-sandbox-b.mp4",
-   "dur": 21,
+   "clip": "p-sandbox-a.mp4",
+   "dur": 23,
    "rate": 1.1
   },
   {
    "id": "close",
    "still": "34-busy-board-3.png",
-   "dur": 4.2
+   "dur": 4.4
   }
  ],
- "beats": [
+ "spots": [
   {
    "at": 2.0,
    "box": [
     "34-busy-board",
     3,
     "chat"
-   ],
-   "cap": "<b>Change anything from one chat.</b> The agent proposes, you press Do it."
+   ]
   },
   {
    "at": 5.2,
@@ -172,8 +189,7 @@
     3,
     "needs"
    ],
-   "amber": true,
-   "cap": "<b>See what is stuck</b> and what waits on you."
+   "amber": true
   },
   {
    "at": 8.4,
@@ -181,37 +197,305 @@
     "34-busy-board",
     3,
     "queued"
+   ]
+  },
+  {
+   "at": 10.8,
+   "box": [
+    "34-busy-board",
+    3,
+    "budget",
+    300
    ],
-   "cap": "<b>Decide what runs next:</b> priorities and a backlog."
+   "amber": true
   },
   {
    "at": [
     "press"
    ],
+   "box": [
+    "34-busy-board",
+    3,
+    "doit"
+   ]
+  },
+  {
+   "at": [
+    "press",
+    4,
+    "act0",
+    0.15
+   ],
+   "box": {
+    "rect": [
+     963,
+     177,
+     189,
+     72
+    ]
+   }
+  },
+  {
+   "at": [
+    "intake"
+   ],
+   "box": [
+    "34-busy-board",
+    13,
+    "queued",
+    330
+   ]
+  },
+  {
+   "at": [
+    "ask"
+   ],
+   "box": [
+    "34-busy-board",
+    14,
+    "chat"
+   ]
+  },
+  {
+   "at": [
+    "ask",
+    14,
+    "act3"
+   ],
+   "box": [
+    "34-busy-board",
+    14,
+    "doit"
+   ]
+  },
+  {
+   "at": [
+    "ask",
+    15,
+    "act0",
+    0.15
+   ],
+   "box": [
+    "34-busy-board",
+    15,
+    "plan"
+   ]
+  },
+  {
+   "at": [
+    "plan"
+   ],
    "box": {
     "union": [
      [
       "34-busy-board",
-      3,
-      "budget"
+      17,
+      "plan"
      ],
      [
       "34-busy-board",
-      3,
-      "queued",
-      320
+      17,
+      "accept"
      ]
     ]
    },
-   "amber": true,
-   "cap": "<b>Out of budget? Split it.</b> One sentence, then Do it."
+   "amber": true
+  },
+  {
+   "at": [
+    "plan",
+    18,
+    "atMs",
+    0.3
+   ],
+   "box": {
+    "union": [
+     [
+      "34-busy-board",
+      18,
+      "first"
+     ],
+     [
+      "34-busy-board",
+      18,
+      "last"
+     ]
+    ]
+   }
+  },
+  {
+   "at": [
+    "approval"
+   ],
+   "box": [
+    "22-approval",
+    1,
+    "approval"
+   ],
+   "amber": true
+  },
+  {
+   "at": [
+    "approval",
+    2,
+    "act0"
+   ],
+   "box": [
+    "22-approval",
+    2,
+    "drawer"
+   ]
+  },
+  {
+   "at": [
+    "approval",
+    4,
+    "act2"
+   ],
+   "box": [
+    "22-approval",
+    1,
+    "approval"
+   ]
+  },
+  {
+   "at": [
+    "autonomy"
+   ],
+   "box": [
+    "25-autonomy",
+    1,
+    "level"
+   ]
+  },
+  {
+   "at": [
+    "autonomy",
+    2,
+    "act0"
+   ],
+   "box": [
+    "25-autonomy",
+    2,
+    "menu"
+   ]
+  },
+  {
+   "at": [
+    "stall"
+   ],
+   "box": [
+    "08-supervisor",
+    1,
+    "drawer"
+   ]
+  },
+  {
+   "at": [
+    "stall",
+    2,
+    "act1"
+   ],
+   "box": [
+    "08-supervisor",
+    2,
+    "row"
+   ],
+   "amber": true
+  },
+  {
+   "at": [
+    "stall",
+    3,
+    "act1"
+   ],
+   "box": [
+    "08-supervisor",
+    3,
+    "drawer"
+   ]
+  },
+  {
+   "at": [
+    "question"
+   ],
+   "box": [
+    "21-design-question",
+    1,
+    "ask"
+   ],
+   "amber": true
+  },
+  {
+   "at": [
+    "question",
+    2,
+    "act2"
+   ],
+   "box": [
+    "21-design-question",
+    2,
+    "chat"
+   ]
+  },
+  {
+   "at": [
+    "question",
+    3,
+    "act4"
+   ],
+   "box": [
+    "21-design-question",
+    3,
+    "drawer"
+   ]
+  },
+  {
+   "at": [
+    "metrics"
+   ],
+   "box": [
+    "27-before-and-after",
+    4,
+    "figure"
+   ]
+  },
+  {
+   "at": [
+    "metrics",
+    5,
+    "act1"
+   ],
+   "box": [
+    "27-before-and-after",
+    5,
+    "figure"
+   ]
+  },
+  {
+   "at": [
+    "metrics",
+    6,
+    "act0"
+   ],
+   "box": [
+    "27-before-and-after",
+    6,
+    "figure"
+   ]
+  },
+  {
+   "at": [
+    "sandbox"
+   ],
+   "box": null
   },
   {
    "at": [
     "press",
     5,
-    "stillMs",
-    -0.3
+    "act0",
+    0.15
    ],
    "box": {
     "union": [
@@ -226,411 +510,296 @@
       "second"
      ]
     ]
-   },
-   "cap": "<b>Two smaller cards</b> land in Queued."
-  },
-  {
-   "at": [
-    "rewind"
-   ],
-   "box": null,
-   "cap": "<b>Back to Monday.</b> How did the board fill up?"
-  },
-  {
-   "at": [
-    "ingest1",
-    null,
-    null,
-    0.4
-   ],
-   "box": [
-    "03-too-large-split",
-    2,
-    "doit"
-   ],
-   "cap": "<b>Monday starts with one sentence:</b> build level 4, the asteroid belt."
-  },
-  {
-   "at": [
-    "ingest1",
-    3,
-    "atMs",
-    0.2
-   ],
-   "box": [
-    "03-too-large-split",
-    3,
-    "card"
-   ],
-   "cap": "<b>Too big for one card,</b> so the planner writes a plan."
-  },
-  {
-   "at": [
-    "ingest2",
-    null,
-    null,
-    0.1
-   ],
-   "box": {
-    "union": [
-     [
-      "03-too-large-split",
-      5,
-      "card"
-     ],
-     [
-      "03-too-large-split",
-      5,
-      "accept"
-     ]
-    ]
-   },
-   "amber": true,
-   "cap": "<b>Twenty minutes later,</b> the plan waits for you."
-  },
-  {
-   "at": [
-    "ingest2",
-    6,
-    "atMs",
-    0.3
-   ],
-   "box": [
-    "03-too-large-split",
-    6,
-    "plan"
-   ],
-   "cap": "<b>Four cards, in the order</b> they build on each other."
-  },
-  {
-   "at": [
-    "ingest2",
-    7,
-    "atMs",
-    0.4
-   ],
-   "box": [
-    "03-too-large-split",
-    7,
-    "queued"
-   ],
-   "cap": "<b>You accept, and the four cards land.</b> Now the agents build."
-  },
-  {
-   "at": [
-    "approval",
-    null,
-    null,
-    0.1
-   ],
-   "box": [
-    "22-approval",
-    1,
-    "approval"
-   ],
-   "amber": true,
-   "cap": "<b>A payments change waits for you.</b> On manual, every merge does."
-  },
-  {
-   "at": [
-    "approval",
-    2,
-    "stillMs",
-    -1.0
-   ],
-   "box": [
-    "22-approval",
-    2,
-    "drawer"
-   ],
-   "cap": "<b>You read the review and the files,</b>"
+   }
   },
   {
    "at": [
     "approval",
     4,
-    "atMs"
-   ],
-   "box": [
-    "22-approval",
-    4,
-    "needs"
-   ],
-   "cap": "<b>then approve.</b> It merges and goes live."
-  },
-  {
-   "at": [
-    "autonomy",
-    null,
-    null,
+    "act4",
     0.1
-   ],
-   "box": [
-    "25-autonomy",
-    2,
-    "menu"
-   ],
-   "cap": "<b>Turn the dial to full auto,</b>"
-  },
-  {
-   "at": [
-    "autonomy",
-    3,
-    "atMs"
-   ],
-   "box": [
-    "25-autonomy",
-    3,
-    "wake"
-   ],
-   "cap": "<b>and the agent answers the next card's question</b> from the code."
-  },
-  {
-   "at": [
-    "autonomy",
-    5,
-    "atMs"
-   ],
-   "box": [
-    "25-autonomy",
-    5,
-    "merge"
-   ],
-   "cap": "<b>It merges once the gates pass.</b> Nobody waits at the gate."
-  },
-  {
-   "at": [
-    "stall",
-    null,
-    null,
-    0.1
-   ],
-   "box": [
-    "08-supervisor",
-    1,
-    "drawer"
-   ],
-   "cap": "<b>A session goes in circles.</b>"
-  },
-  {
-   "at": [
-    "stall",
-    2,
-    "atMs",
-    1.0
-   ],
-   "box": [
-    "08-supervisor",
-    2,
-    "row"
-   ],
-   "amber": true,
-   "cap": "<b>A detector trips, and the supervisor steps in.</b>"
-  },
-  {
-   "at": [
-    "stall",
-    3,
-    "atMs"
-   ],
-   "box": [
-    "08-supervisor",
-    3,
-    "drawer"
-   ],
-   "cap": "<b>The next session starts from what it learned.</b>"
-  },
-  {
-   "at": [
-    "ask",
-    null,
-    null,
-    0.1
-   ],
-   "box": [
-    "21-design-question",
-    1,
-    "ask"
-   ],
-   "amber": true,
-   "cap": "<b>What it cannot decide, it asks you,</b> with the choices."
-  },
-  {
-   "at": [
-    "ask",
-    2,
-    "atMs",
-    0.8
-   ],
-   "box": [
-    "21-design-question",
-    2,
-    "chat"
-   ],
-   "cap": "<b>One click answers.</b>"
-  },
-  {
-   "at": [
-    "ask",
-    3,
-    "atMs"
-   ],
-   "box": [
-    "21-design-question",
-    3,
-    "drawer"
-   ],
-   "cap": "<b>The card goes on with your pick.</b>"
-  },
-  {
-   "at": [
-    "metrics",
-    null,
-    null,
-    0.1
-   ],
-   "box": [
-    "27-before-and-after",
-    4,
-    "figure"
-   ],
-   "cap": "<b>The four DevOps delivery metrics,</b> week by week:"
-  },
-  {
-   "at": [
-    "metrics",
-    5,
-    "atMs"
-   ],
-   "box": [
-    "27-before-and-after",
-    5,
-    "figure"
-   ],
-   "cap": "<b>what a card costs,</b>"
-  },
-  {
-   "at": [
-    "metrics",
-    6,
-    "atMs"
-   ],
-   "box": [
-    "27-before-and-after",
-    6,
-    "figure"
-   ],
-   "cap": "<b>how often it needs you.</b> Tune models and prompts against them."
-  },
-  {
-   "at": [
-    "sandbox"
    ],
    "box": null
   },
   {
    "at": [
-    "close"
+    "approval",
+    5,
+    "act1",
+    0.5
    ],
-   "box": null,
-   "shade": true,
-   "cls": "close",
-   "cap": "<b>The worst an agent can do is wreck its own sandbox.</b><small>github.com/sebastianrueckerai/ai-software-factory</small>"
-  }
- ],
- "rings": [
-  {
    "box": [
-    "34-busy-board",
-    3,
-    "doit"
-   ],
-   "from": [
-    "press",
-    null,
-    null,
-    0.2
-   ],
-   "to": [
-    "press",
-    4,
-    "atMs",
-    0.9
+    "22-approval",
+    5,
+    "merged"
    ]
   },
-  {
-   "box": [
-    "34-busy-board",
-    4,
-    "first"
-   ],
-   "from": [
-    "press",
-    4
-   ],
-   "to": [
-    "press",
-    "end"
-   ]
-  },
-  {
-   "box": [
-    "34-busy-board",
-    5,
-    "second"
-   ],
-   "from": [
-    "press",
-    5,
-    "stillMs",
-    -0.3
-   ],
-   "to": [
-    "press",
-    "end"
-   ]
-  },
-  {
-   "box": [
-    "03-too-large-split",
-    5,
-    "accept"
-   ],
-   "from": [
-    "ingest2",
-    null,
-    null,
-    0.2
-   ],
-   "to": [
-    "ingest2",
-    6,
-    "atMs"
-   ]
-  }
- ],
- "clocks": [
   {
    "at": [
-    "rewind",
-    null,
-    null,
+    "autonomy",
+    3,
+    "atMs"
+   ],
+   "box": null
+  },
+  {
+   "at": [
+    "autonomy",
+    3,
+    "act1"
+   ],
+   "box": [
+    "25-autonomy",
+    3,
+    "wake"
+   ]
+  },
+  {
+   "at": [
+    "autonomy",
+    4,
+    "act0",
     0.3
    ],
-   "from": "Fri 16:40",
-   "to": "Mon 09:00",
-   "dur": 2.6
+   "box": [
+    "25-autonomy",
+    4,
+    "answer"
+   ]
   },
   {
    "at": [
-    "ingest2",
-    null,
-    null,
-    0.1
+    "autonomy",
+    4,
+    "act1",
+    1.5
    ],
-   "from": "Mon 09:01",
-   "to": "Mon 09:21",
-   "dur": 1.6
+   "box": {
+    "union": [
+     [
+      "25-autonomy",
+      4,
+      "merged"
+     ],
+     [
+      "25-autonomy",
+      4,
+      "live"
+     ]
+    ]
+   }
+  },
+  {
+   "at": [
+    "press",
+    "end",
+    null,
+    -0.35
+   ],
+   "box": null
+  }
+ ],
+ "caps": [
+  {
+   "at": 2.0,
+   "text": "<b>Change anything from one chat.</b> The agent proposes, you press Do it."
+  },
+  {
+   "at": 5.2,
+   "amber": true,
+   "text": "<b>See what is stuck</b> and what waits on you."
+  },
+  {
+   "at": 8.4,
+   "text": "<b>Decide what runs next:</b> priorities and a backlog."
+  },
+  {
+   "at": 10.8,
+   "amber": true,
+   "text": "<b>A card ran out of budget.</b> One sentence splits it, Do it files the parts."
+  },
+  {
+   "at": [
+    "drain"
+   ],
+   "text": "<b>The work resolves</b> and moves to Done."
+  },
+  {
+   "at": [
+    "intake"
+   ],
+   "text": "<b>New work files itself:</b> a nightly scan, an alert, a player's issue."
+  },
+  {
+   "at": [
+    "ask"
+   ],
+   "text": "<b>Or you ask for it</b> in one sentence."
+  },
+  {
+   "at": [
+    "ask",
+    15,
+    "act0",
+    0.15
+   ],
+   "text": "<b>Too big for one card:</b> it needs a plan."
+  },
+  {
+   "at": [
+    "plan",
+    null,
+    null,
+    1.0
+   ],
+   "amber": true,
+   "text": "<b>The planner writes a plan</b> for your accept."
+  },
+  {
+   "at": [
+    "plan",
+    18,
+    "atMs",
+    0.3
+   ],
+   "text": "<b>You accept, and the four cards land.</b> The agents take it from here."
+  },
+  {
+   "at": [
+    "approval"
+   ],
+   "amber": true,
+   "text": "<b>A payments change waits for you.</b>"
+  },
+  {
+   "at": [
+    "approval",
+    2,
+    "act0"
+   ],
+   "text": "<b>On manual, you read the review and the files,</b>"
+  },
+  {
+   "at": [
+    "approval",
+    4,
+    "act2"
+   ],
+   "text": "<b>then approve.</b> It merges and goes live."
+  },
+  {
+   "at": [
+    "autonomy"
+   ],
+   "text": "<b>Turn the dial to full auto,</b>"
+  },
+  {
+   "at": [
+    "autonomy",
+    3,
+    "act1"
+   ],
+   "text": "<b>On full auto, the agent takes the open question,</b>"
+  },
+  {
+   "at": [
+    "autonomy",
+    4,
+    "act0",
+    0.3
+   ],
+   "text": "<b>answers it from the code,</b>"
+  },
+  {
+   "at": [
+    "autonomy",
+    4,
+    "act1",
+    1.5
+   ],
+   "text": "<b>and the card merges</b> once the gates pass."
+  },
+  {
+   "at": [
+    "stall"
+   ],
+   "text": "<b>A session goes in circles.</b>"
+  },
+  {
+   "at": [
+    "stall",
+    2,
+    "act1"
+   ],
+   "amber": true,
+   "text": "<b>A detector trips, and the supervisor steps in.</b>"
+  },
+  {
+   "at": [
+    "stall",
+    3,
+    "act1"
+   ],
+   "text": "<b>The next session starts from what it learned.</b>"
+  },
+  {
+   "at": [
+    "question"
+   ],
+   "amber": true,
+   "text": "<b>What it cannot decide, it asks you,</b> with the choices."
+  },
+  {
+   "at": [
+    "question",
+    2,
+    "act2"
+   ],
+   "text": "<b>One click answers.</b>"
+  },
+  {
+   "at": [
+    "question",
+    3,
+    "act4"
+   ],
+   "text": "<b>The card goes on with your pick.</b>"
+  },
+  {
+   "at": [
+    "metrics"
+   ],
+   "text": "<b>The four DevOps delivery metrics,</b> week by week:"
+  },
+  {
+   "at": [
+    "metrics",
+    5,
+    "act1"
+   ],
+   "text": "<b>what a card costs,</b>"
+  },
+  {
+   "at": [
+    "metrics",
+    6,
+    "act0"
+   ],
+   "text": "<b>how often it needs you.</b> Tune models and prompts against them."
+  },
+  {
+   "at": [
+    "sandbox"
+   ],
+   "text": ""
+  },
+  {
+   "at": [
+    "close"
+   ],
+   "cls": "close",
+   "shade": true,
+   "text": "<b>The worst an agent can do is wreck its own sandbox.</b><small>github.com/sebastianrueckerai/ai-software-factory</small>"
   }
  ],
  "titles": [
@@ -654,7 +823,7 @@
   },
   {
    "at": [
-    "ask"
+    "question"
    ],
    "text": "When it needs you"
   },
@@ -673,5 +842,323 @@
  ],
  "quiet": [
   "sandbox"
+ ],
+ "cams": [
+  {
+   "at": [
+    "press"
+   ],
+   "box": {
+    "rect": [
+     12,
+     440,
+     623,
+     448
+    ]
+   },
+   "fill": 0.85
+  },
+  {
+   "at": [
+    "press",
+    4,
+    "act0",
+    0.25
+   ],
+   "box": [
+    "34-busy-board",
+    5,
+    "queued",
+    340
+   ],
+   "fill": 0.9
+  },
+  {
+   "at": [
+    "drain"
+   ],
+   "box": null
+  },
+  {
+   "at": [
+    "intake"
+   ],
+   "box": [
+    "34-busy-board",
+    13,
+    "queued",
+    360
+   ],
+   "fill": 0.85
+  },
+  {
+   "at": [
+    "ask"
+   ],
+   "box": {
+    "rect": [
+     12,
+     440,
+     623,
+     448
+    ]
+   },
+   "fill": 0.85
+  },
+  {
+   "at": [
+    "ask",
+    15,
+    "act0",
+    0.25
+   ],
+   "box": [
+    "34-busy-board",
+    15,
+    "queued",
+    360
+   ],
+   "fill": 0.85
+  },
+  {
+   "at": [
+    "plan"
+   ],
+   "box": [
+    "34-busy-board",
+    17,
+    "plan",
+    500
+   ],
+   "fill": 0.85,
+   "cy": 380
+  },
+  {
+   "at": [
+    "plan",
+    18,
+    "atMs",
+    0.3
+   ],
+   "box": {
+    "union": [
+     [
+      "34-busy-board",
+      18,
+      "first"
+     ],
+     [
+      "34-busy-board",
+      18,
+      "last"
+     ]
+    ]
+   },
+   "fill": 0.75,
+   "cy": 390
+  },
+  {
+   "at": [
+    "approval"
+   ],
+   "box": [
+    "22-approval",
+    1,
+    "approval"
+   ],
+   "fill": 0.75
+  },
+  {
+   "at": [
+    "approval",
+    2,
+    "act0"
+   ],
+   "box": [
+    "22-approval",
+    2,
+    "drawer",
+    560
+   ],
+   "fill": 0.95
+  },
+  {
+   "at": [
+    "approval",
+    4,
+    "act0"
+   ],
+   "box": [
+    "22-approval",
+    1,
+    "approval"
+   ],
+   "fill": 0.75
+  },
+  {
+   "at": [
+    "approval",
+    4,
+    "act4",
+    0.3
+   ],
+   "box": [
+    "22-approval",
+    5,
+    "progress",
+    380
+   ],
+   "fill": 0.85
+  },
+  {
+   "at": [
+    "autonomy"
+   ],
+   "box": null
+  },
+  {
+   "at": [
+    "autonomy",
+    2,
+    "act0"
+   ],
+   "box": [
+    "25-autonomy",
+    2,
+    "menu"
+   ],
+   "fill": 0.55
+  },
+  {
+   "at": [
+    "stall"
+   ],
+   "box": [
+    "08-supervisor",
+    1,
+    "drawer",
+    560
+   ],
+   "fill": 0.95
+  },
+  {
+   "at": [
+    "stall",
+    2,
+    "act1"
+   ],
+   "box": [
+    "08-supervisor",
+    2,
+    "row"
+   ],
+   "fill": 0.8
+  },
+  {
+   "at": [
+    "stall",
+    3,
+    "act1"
+   ],
+   "box": [
+    "08-supervisor",
+    3,
+    "drawer",
+    560
+   ],
+   "fill": 0.95
+  },
+  {
+   "at": [
+    "question"
+   ],
+   "box": [
+    "21-design-question",
+    1,
+    "ask"
+   ],
+   "fill": 0.75
+  },
+  {
+   "at": [
+    "question",
+    3,
+    "act4"
+   ],
+   "box": [
+    "21-design-question",
+    3,
+    "drawer",
+    560
+   ],
+   "fill": 0.95
+  },
+  {
+   "at": [
+    "metrics"
+   ],
+   "box": [
+    "27-before-and-after",
+    4,
+    "figure"
+   ],
+   "fill": 0.85
+  },
+  {
+   "at": [
+    "metrics",
+    5,
+    "act1"
+   ],
+   "box": [
+    "27-before-and-after",
+    5,
+    "figure"
+   ],
+   "fill": 0.85
+  },
+  {
+   "at": [
+    "metrics",
+    6,
+    "act0"
+   ],
+   "box": [
+    "27-before-and-after",
+    6,
+    "figure"
+   ],
+   "fill": 0.85
+  },
+  {
+   "at": [
+    "sandbox"
+   ],
+   "box": null,
+   "dur": 0.05
+  },
+  {
+   "at": [
+    "autonomy",
+    3,
+    "act0"
+   ],
+   "box": {
+    "union": [
+     [
+      "25-autonomy",
+      4,
+      "wake"
+     ],
+     [
+      "25-autonomy",
+      4,
+      "live"
+     ]
+    ]
+   },
+   "fill": 0.75,
+   "cy": 400
+  }
  ]
 }

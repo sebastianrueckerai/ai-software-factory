@@ -24,19 +24,29 @@ function lab() {
   return labCookie;
 }
 
-const ring = () => {
+// cursor draws a pointer at the mouse, an arrow with a dark outline, and a soft ripple at each press; it stays hidden
+// until the mouse first moves, so a scene's stills before its first click carry no pointer
+const cursor = () => {
   const el = document.createElement("div");
-  el.style.cssText = "position:fixed;left:0;top:0;width:14px;height:14px;margin:-7px 0 0 -7px;border:2px solid #ff3b30;"
-    + "border-radius:50%;box-sizing:border-box;pointer-events:none;z-index:2147483647;transition:transform 80ms;visibility:hidden;";
+  el.style.cssText = "position:fixed;left:0;top:0;width:26px;height:30px;pointer-events:none;z-index:2147483647;visibility:hidden;"
+    + "filter:drop-shadow(0 2px 3px rgba(0,0,0,.55));";
+  el.innerHTML = '<svg width="26" height="30" viewBox="0 0 26 30"><path d="M2 2 L2 23 L7.5 17.8 L11.6 27 L15.4 25.3 L11.4 16.4 L19 16.4 Z" '
+    + 'fill="#f4f7fb" stroke="#0b111a" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  const ripple = document.createElement("div");
+  ripple.style.cssText = "position:fixed;left:0;top:0;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;pointer-events:none;"
+    + "z-index:2147483646;border:2px solid rgba(79,203,226,.9);background:rgba(79,203,226,.18);opacity:0;transform:scale(.3);";
   let x = 0;
   let y = 0;
-  let scale = 1;
-  const draw = () => { el.style.transform = `translate(${x}px,${y}px) scale(${scale})`; };
-  addEventListener("mousemove", (e) => { x = e.clientX; y = e.clientY; if (x || y) el.style.visibility = "visible"; draw(); }, true);
-  addEventListener("mousedown", () => { scale = 0.6; draw(); }, true);
-  addEventListener("mouseup", () => { scale = 1; draw(); }, true);
-  draw();
-  document.addEventListener("DOMContentLoaded", () => document.documentElement.appendChild(el));
+  addEventListener("mousemove", (e) => {
+    x = e.clientX; y = e.clientY;
+    if (x || y) el.style.visibility = "visible";
+    el.style.transform = `translate(${x - 2}px,${y - 2}px)`;
+  }, true);
+  addEventListener("mousedown", () => {
+    ripple.style.left = x + "px"; ripple.style.top = y + "px";
+    ripple.animate([{ opacity: 1, transform: "scale(.3)" }, { opacity: 0, transform: "scale(1.6)" }], { duration: 520, easing: "ease-out" });
+  }, true);
+  document.addEventListener("DOMContentLoaded", () => { document.documentElement.appendChild(ripple); document.documentElement.appendChild(el); });
 };
 
 async function seed(page, step, now) {
@@ -95,8 +105,7 @@ async function record(browser, name, commits) {
       name: lab().name, value: lab().value, domain: new URL(BASE).hostname, path: "/", secure: true, httpOnly: true, sameSite: "Lax",
     }]);
     await context.addInitScript((theme) => localStorage.setItem("theme", theme), scene.theme);
-    // a scene that becomes a still, the landing page's hero, records without the cursor's ring
-    if (scene.cursor !== false) await context.addInitScript(ring);
+    if (scene.cursor !== false) await context.addInitScript(cursor);
   }
   const page = await context.newPage();
   let problem = null;
@@ -122,9 +131,12 @@ async function record(browser, name, commits) {
       marks.push({ index: n, atMs: Date.now() - t0 });
       if (!scene.page) await seed(page, step, new Date());
       await check();
+      // acts are the moments each action ended, on the video's clock, so the cut can time an overlay to a click
+      marks[marks.length - 1].acts = [];
       for (const action of step.actions) {
         await run(page, action, mouse);
         await check();
+        marks[marks.length - 1].acts.push(Date.now() - t0);
       }
       await sleep(step.hold);
       await check();

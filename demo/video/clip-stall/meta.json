@@ -1,0 +1,6 @@
+{
+ "id": "clip-stall",
+ "name": "Recovery from stalls",
+ "title": "Recovery from stalls",
+ "story": "A session goes in circles, the flip-flop detector trips, the supervisor steps in, and the next session starts from what it learned."
+}

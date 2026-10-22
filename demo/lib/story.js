@@ -202,6 +202,49 @@ const cards = {
     repro: "go run ./server/cmd/sim -level 3 -pause-in-phase 2",
     acceptance: ["a boss paused and resumed in phase two fights on", "a boss paused and resumed in phase one or three fights on as before"],
   },
+  // the film's intake, Monday of week 3: a nightly scan, an alert and a player's issue file cards on their own, then a
+  // sentence in the chat becomes the plan for level 5 and its four cards
+  133: {
+    title: "Boss fight: pausing in phase two freezes the game", size: "small", reporter: "lena.h",
+    body: "Pausing in phase two of the level 3 boss freezes the game: after Resume the boss never moves again and the arena stays shut.",
+    acceptance: ["after Resume in phase two the boss moves again and the arena opens when it falls"],
+  },
+  134: {
+    title: "Leaderboard: 500 when no ship is chosen", size: "small",
+    body: "SigNoz alert LeaderboardErrors: GET /leaderboard answers 500 when a link carries no ?ship.",
+    acceptance: ["GET /leaderboard without ?ship answers 200 with every ship's rows"],
+  },
+  135: {
+    title: "Security: ws 8.17.1 for CVE-2024-37890", size: "small",
+    body: "The nightly scan found ws 8.16.0 in the client's dev server, open to CVE-2024-37890: a request with many headers crashes it. 8.17.1 fixes it.",
+    acceptance: ["the client builds and its tests pass on ws 8.17.1"],
+  },
+  136: {
+    title: "Level 5: the ice moon", size: "large",
+    body: "Level 5 lands the crew on an ice moon: ships slide on the ice, snow crawlers hunt in the caves and an avalanche boss waits at the end. " +
+      "The ice, the crawlers and the avalanche share one sliding model",
+    acceptance: ["the moon plays from the landing to the boss", "ships slide on the ice with their momentum", "the avalanche boss can be beaten by every crew size"],
+  },
+  137: {
+    title: "Ice moon: ships slide on the ice with their momentum", size: "medium", plan: 136, key: "ice-physics",
+    body: "Card ice-physics of plan #136, accepted by sebastian. On ice a ship keeps its momentum and turns slowly",
+    acceptance: ["a ship on ice keeps its momentum after the thrust stops", "levels 1 to 4 fly as before"],
+  },
+  138: {
+    title: "Ice moon: the frozen caves map and its waves", size: "medium", plan: 136, key: "cave-map",
+    body: "Card cave-map of plan #136, accepted by sebastian. The caves run from the landing site to the boss's glacier, the waves enter along them",
+    acceptance: ["the map scrolls from the landing site to the glacier", "each wave enters at its marker in the caves"],
+  },
+  139: {
+    title: "Ice moon: the snow crawler enemy", size: "small", plan: 136, key: "snow-crawler",
+    body: "Card snow-crawler of plan #136, accepted by sebastian. A crawler that slides on the ice toward the nearest ship",
+    acceptance: ["a crawler slides toward the nearest ship", "two shots destroy a crawler"],
+  },
+  140: {
+    title: "Ice moon: the avalanche boss", size: "medium", plan: 136, key: "avalanche-boss",
+    body: "Card avalanche-boss of plan #136, accepted by sebastian. A boss that sends down avalanches which slide on the ice model",
+    acceptance: ["each avalanche slides on the ice model", "the boss falls after three hits on its core"],
+  },
 };
 
 function card(issue) {
@@ -249,6 +292,7 @@ const requests = {
   leaderboardCheck: "Is the leaderboard all right since #118 went live?",
   leaderboard500: "Has the leaderboard alert settled?",
   split: "Split #110 into smaller cards instead of raising its budget.",
+  moon: "Build level 5, the ice moon.",
   repoint: "Let #112 wait on #114 instead of #110, then close #110.",
 };
 
@@ -330,6 +374,8 @@ const replies = {
   matchmakingRead: "I measure it first: the telemetry's alerts on matchmaking.",
   matchmaking: "The alerts agree with you: the rule on GET /match's **p95 above 1 s** fired three times this week " +
     "and settled each time without a fix. The card sets the bar at 400 ms:",
+  moon: "That is several cards: the ice, the caves, the crawlers and the boss. " +
+    "I file it in the plan lane, where the planner splits it into cards in their order, and the plan waits for your accept:",
   belt: "That is several cards: the map, the drones, the boss and the physics under them. " +
     "I file it in the plan lane, where the planner splits it into cards in their order, and the plan waits for your accept:",
   report: "maria.k paid, and her receipt never came, while a friend's did: the receipt goes out only when the payment " +
@@ -352,7 +398,7 @@ const replies = {
 
 // wakeAsk is the waker's text of a wake on the asks of a batch, as factoryd's askText words it: each ask with its card.
 function wakeAsk(list) {
-  return `Wake: ${list.length} asks wait for a human.` + list.map((a) => `\n#${a.issue}: ${a.question}`).join("") +
+  return (list.length === 1 ? "Wake: 1 ask waits for a human." : `Wake: ${list.length} asks wait for a human.`) + list.map((a) => `\n#${a.issue}: ${a.question}`).join("") +
     "\n\nRead each card. Settle what your permissions allow. For what stays the human's, record what you found with attach_analysis. " +
     "An ask already answered is done.";
 }
@@ -396,6 +442,13 @@ function alertsAt(now, at) {
 
 // approvals are the plans and merges that wait on a person.
 const approvals = {
+  moonPlan: {
+    id: 41, kind: "plan", task: 136,
+    brief: "The planner splits level 5 into four cards: the ice model, the caves and the snow crawler beside each other, then the avalanche boss.",
+    detail: "The ice model comes first, because the ships, the crawlers and the avalanches all slide on it. The caves with their waves " +
+      "and the snow crawler then build side by side. The avalanche boss comes last, as it needs both. One question is open: whether " +
+      "the avalanche resets the crew's shields.",
+  },
   beltPlan: {
     id: 21, kind: "plan", task: 105,
     brief: "The planner splits level 4 into four cards: the physics model, the map and the mining drone beside each other, then the boss.",
@@ -439,6 +492,17 @@ const plans = {
       { key: "belt-boss", role: "integration", issue: 112, dependsOn: ["belt-map", "mining-drone"] },
     ],
   },
+  136: {
+    summary: "Four cards: the ice model first, then the caves and the snow crawler side by side, then the avalanche boss.",
+    question: { issue: 136, question: "Does the avalanche reset the crew's shields?", choices: ["Keep the shields", "Reset the shields"] },
+    dirs: ["src/levels/moon", "server/levels/moon"],
+    cards: [
+      { key: "ice-physics", role: "foundation", issue: 137, dependsOn: [] },
+      { key: "cave-map", role: "feature", issue: 138, dependsOn: ["ice-physics"] },
+      { key: "snow-crawler", role: "feature", issue: 139, dependsOn: ["ice-physics"] },
+      { key: "avalanche-boss", role: "integration", issue: 140, dependsOn: ["cave-map", "snow-crawler"] },
+    ],
+  },
 };
 
 // planCards is the plan of issue as the planner writes its cards.
@@ -446,7 +510,7 @@ function planCards(issue) {
   return plans[issue].cards.map((p) => {
     const c = card(p.issue);
     return {
-      key: p.key, role: p.role, title: c.title, brief: c.body.replace(/^Card [^.]+\. /, ""), directories: ["src/levels/belt", "server/levels/belt"],
+      key: p.key, role: p.role, title: c.title, brief: c.body.replace(/^Card [^.]+\. /, ""), directories: plans[issue].dirs ?? ["src/levels/belt", "server/levels/belt"],
       depends_on: p.dependsOn, acceptance: c.acceptance.map((text) => ({ text })), size: c.size,
     };
   });

@@ -4,9 +4,9 @@
 // layer and the duration in as literal attributes, since HyperFrames reads clip timing before any script runs.
 // Then `node demo/video/render.js <name>` renders it.
 //
-// film.json: { "template": "../opening.tpl.html", "style": "spotlight", "segments": [ ... ] }, a segment either
-// { "id", "still": "<scene>-<n>.png", "dur": seconds } or { "id", "scene", "from": [step, "atMs"|"stillMs"],
-// "to": [step, field], "tail": seconds, "rate": playback rate }.
+// film.json: { "template": "../film.tpl.html", "segments": [ ... ], "spots": [ ... ], "caps": [ ... ], "titles": [ ... ] },
+// a segment either { "id", "still": "<scene>-<n>.png", "dur": seconds }, { "id", "clip": "p-<name>.mp4", "dur": seconds },
+// or { "id", "scene", "from": [step, "atMs"|"stillMs"|"actN"], "lead": seconds, "to": [step, field], "tail": seconds, "rate": rate }.
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -51,16 +51,38 @@ for (const s of film.segments) {
   scenes[s.scene] ??= sidecar(s.scene);
   const steps = scenes[s.scene].steps;
   const at = ([n, field]) => {
-    const v = steps[n - 1] && steps[n - 1][field];
+    const st = steps[n - 1], v = st && (field.startsWith("act") ? (st.acts || [])[Number(field.slice(3))] : st[field]);
     if (v === undefined) throw new Error(`${s.id}: ${s.scene} step ${n} has no ${field}`);
     return v / 1000;
   };
   const from = Math.max(0, at(s.from) - (s.lead || 0)), to = at(s.to) + (s.tail || 0), rate = s.rate || 1;
-  const dur = (to - from) / rate;
-  if (!fs.existsSync(path.join(clips, `${s.scene}.mp4`))) fs.copyFileSync(path.join(bank, `${s.scene}.mp4`), path.join(clips, `${s.scene}.mp4`));
-  seg[s.id] = { start: t, dur, scene: s.scene, mediaStart: from, rate };
-  media.push(`<video class="clip media" id="m-${s.id}" src="clips/${s.scene}.mp4" muted playsinline data-start="${t.toFixed(3)}" ` +
-    `data-duration="${dur.toFixed(3)}" data-media-start="${from.toFixed(3)}"${rate === 1 ? "" : ` data-playback-rate="${rate}"`}></video>`);
+  // copied on every build like the stills: a scene recorded again must not play its old video against its new marks
+  fs.copyFileSync(path.join(bank, `${s.scene}.mp4`), path.join(clips, `${s.scene}.mp4`));
+  // pieces: with a holdRate, the waits between a step's last action and the next step's start play faster than the
+  // actions, so a cut keeps the clicks at their pace and loses the dead time
+  const cuts = [from, to];
+  if (s.holdRate) for (const st of steps) {
+    const last = (st.acts || []).at(-1);
+    for (const v of [st.atMs, last]) if (v !== undefined && v / 1000 > from && v / 1000 < to) cuts.push(v / 1000);
+  }
+  const marks = [...new Set(cuts)].sort((a, b) => a - b);
+  const held = (m0, m1) => s.holdRate && steps.some((st) => {
+    const last = (st.acts || []).at(-1);
+    return last !== undefined && m0 >= last / 1000 - 0.001 && m1 <= (steps[st.index] ? steps[st.index].atMs : Infinity) / 1000 + 0.001;
+  });
+  const pieces = [];
+  let out = t;
+  for (let i = 0; i + 1 < marks.length; i++) {
+    // the last piece holds the section's outcome, so it keeps the normal rate
+    const m0 = marks[i], m1 = marks[i + 1], r = held(m0, m1) && i + 2 < marks.length ? s.holdRate : rate, d = (m1 - m0) / r;
+    if (d < 0.02) continue;
+    pieces.push({ m0, m1, t0: out, rate: r });
+    media.push(`<video class="clip media" id="m-${s.id}-${pieces.length}" src="clips/${s.scene}.mp4" muted playsinline data-start="${out.toFixed(3)}" ` +
+      `data-duration="${d.toFixed(3)}" data-media-start="${m0.toFixed(3)}"${r === 1 ? "" : ` data-playback-rate="${r}"`}></video>`);
+    out += d;
+  }
+  const dur = out - t;
+  seg[s.id] = { start: t, dur, scene: s.scene, mediaStart: from, rate, pieces };
   t += dur;
 }
 for (const s of film.stills || []) {
@@ -69,7 +91,7 @@ for (const s of film.stills || []) {
   fs.copyFileSync(path.join(bank, s), path.join(clips, s));
 }
 const duration = Math.ceil((t + (film.tail || 0)) * 10) / 10;
-fs.writeFileSync(path.join(dir, "data.js"), `window.FILM = ${JSON.stringify({ style: film.style, duration, seg, scenes, beats: film.beats, rings: film.rings, titles: film.titles, clocks: film.clocks, quiet: film.quiet })};\n`);
+fs.writeFileSync(path.join(dir, "data.js"), `window.FILM = ${JSON.stringify({ duration, seg, scenes, spots: film.spots, cams: film.cams, caps: film.caps, titles: film.titles, quiet: film.quiet, plain: film.plain })};\n`);
 if (film.template) {
   const tpl = fs.readFileSync(path.join(dir, film.template), "utf8");
   fs.writeFileSync(path.join(dir, "index.html"), tpl.replaceAll("{{DURATION}}", String(duration)).replace("<!--MEDIA-->", media.join("\n")));

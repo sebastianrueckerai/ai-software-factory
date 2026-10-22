@@ -1,0 +1,129 @@
+{
+ "template": "../film.tpl.html",
+ "shared": [
+  "../film-fx.js",
+  "../loop/diagram.css",
+  "../vendor/gsap.min.js"
+ ],
+ "tail": 0.2,
+ "segments": [
+  {
+   "id": "s",
+   "scene": "20-cap-fires",
+   "from": [
+    1,
+    "stillMs"
+   ],
+   "lead": 3.4,
+   "to": [
+    3,
+    "stillMs"
+   ],
+   "tail": 0.03,
+   "rate": 1.4,
+   "holdRate": 4
+  }
+ ],
+ "cams": [
+  {
+   "at": [
+    "s"
+   ],
+   "box": {
+    "rect": [
+     12,
+     300,
+     623,
+     588
+    ]
+   },
+   "fill": 0.9,
+   "dur": 0.05
+  },
+  {
+   "at": [
+    "s",
+    3,
+    "act0"
+   ],
+   "box": [
+    "20-cap-fires",
+    3,
+    "queued",
+    300
+   ],
+   "fill": 0.9,
+   "dur": 1.0
+  }
+ ],
+ "spots": [
+  {
+   "at": [
+    "s"
+   ],
+   "box": [
+    "20-cap-fires",
+    1,
+    "chat"
+   ],
+   "amber": true
+  },
+  {
+   "at": [
+    "s",
+    2,
+    "act4"
+   ],
+   "box": [
+    "20-cap-fires",
+    2,
+    "doit"
+   ]
+  },
+  {
+   "at": [
+    "s",
+    3,
+    "act1"
+   ],
+   "box": [
+    "20-cap-fires",
+    3,
+    "first"
+   ]
+  }
+ ],
+ "caps": [
+  {
+   "at": [
+    "s",
+    null,
+    null,
+    0.2
+   ],
+   "amber": true,
+   "text": "At its budget: fund or end?",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "s",
+    2,
+    "act0",
+    0.6
+   ],
+   "text": "Or split it in one sentence",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "s",
+    2,
+    "act4"
+   ],
+   "text": "Do it files the smaller card",
+   "cls": "label"
+  }
+ ],
+ "plain": true
+}

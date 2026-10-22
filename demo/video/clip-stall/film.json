@@ -1,0 +1,145 @@
+{
+ "template": "../film.tpl.html",
+ "shared": [
+  "../film-fx.js",
+  "../loop/diagram.css",
+  "../vendor/gsap.min.js"
+ ],
+ "tail": 0.2,
+ "segments": [
+  {
+   "id": "s",
+   "scene": "08-supervisor",
+   "from": [
+    1,
+    "stillMs"
+   ],
+   "lead": 2.0,
+   "to": [
+    3,
+    "stillMs"
+   ],
+   "tail": 0.4,
+   "rate": 1.4,
+   "holdRate": 4
+  }
+ ],
+ "cams": [
+  {
+   "at": [
+    "s"
+   ],
+   "box": [
+    "08-supervisor",
+    1,
+    "drawer",
+    600
+   ],
+   "fill": 0.95,
+   "dur": 0.05
+  },
+  {
+   "at": [
+    "s",
+    2,
+    "act1"
+   ],
+   "box": {
+    "rect": [
+     870,
+     380,
+     720,
+     450
+    ]
+   },
+   "fill": 0.95,
+   "dur": 0.9
+  },
+  {
+   "at": [
+    "s",
+    3,
+    "act1"
+   ],
+   "box": [
+    "08-supervisor",
+    3,
+    "drawer",
+    600
+   ],
+   "fill": 0.95,
+   "dur": 0.9
+  }
+ ],
+ "spots": [
+  {
+   "at": [
+    "s"
+   ],
+   "box": [
+    "08-supervisor",
+    1,
+    "drawer",
+    600
+   ]
+  },
+  {
+   "at": [
+    "s",
+    2,
+    "act1"
+   ],
+   "box": [
+    "08-supervisor",
+    2,
+    "row"
+   ],
+   "amber": true
+  },
+  {
+   "at": [
+    "s",
+    3,
+    "act1"
+   ],
+   "box": [
+    "08-supervisor",
+    3,
+    "drawer",
+    600
+   ]
+  }
+ ],
+ "caps": [
+  {
+   "at": [
+    "s",
+    null,
+    null,
+    0.2
+   ],
+   "text": "A session goes in circles",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "s",
+    2,
+    "act1"
+   ],
+   "amber": true,
+   "text": "A detector trips, the supervisor steps in",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "s",
+    3,
+    "act1"
+   ],
+   "text": "The next session starts from what it learned",
+   "cls": "label"
+  }
+ ],
+ "plain": true
+}

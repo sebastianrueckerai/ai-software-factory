@@ -1,0 +1,231 @@
+{
+ "template": "../film.tpl.html",
+ "shared": [
+  "../film-fx.js",
+  "../loop/diagram.css",
+  "../vendor/gsap.min.js"
+ ],
+ "tail": 0.2,
+ "segments": [
+  {
+   "id": "s",
+   "scene": "25-autonomy",
+   "from": [
+    1,
+    "stillMs"
+   ],
+   "lead": 3.5,
+   "to": [
+    4,
+    "stillMs"
+   ],
+   "tail": 3.0,
+   "rate": 1.6,
+   "holdRate": 3
+  }
+ ],
+ "cams": [
+  {
+   "at": [
+    "s"
+   ],
+   "box": {
+    "rect": [
+     12,
+     440,
+     623,
+     448
+    ]
+   },
+   "fill": 0.85,
+   "dur": 0.05
+  },
+  {
+   "at": [
+    "s",
+    3,
+    "act2",
+    0.4
+   ],
+   "box": {
+    "union": [
+     [
+      "25-autonomy",
+      4,
+      "wake"
+     ],
+     [
+      "25-autonomy",
+      4,
+      "live"
+     ]
+    ]
+   },
+   "fill": 0.75,
+   "cy": 430,
+   "dur": 1.0
+  },
+  {
+   "at": [
+    "s",
+    3,
+    "act0"
+   ],
+   "box": {
+    "rect": [
+     300,
+     720,
+     330,
+     170
+    ]
+   },
+   "fill": 0.75,
+   "dur": 0.6
+  }
+ ],
+ "spots": [
+  {
+   "at": [
+    "s"
+   ],
+   "box": [
+    "25-autonomy",
+    1,
+    "level"
+   ]
+  },
+  {
+   "at": [
+    "s",
+    2,
+    "act0"
+   ],
+   "box": [
+    "25-autonomy",
+    2,
+    "menu"
+   ]
+  },
+  {
+   "at": [
+    "s",
+    3,
+    "atMs"
+   ],
+   "box": null
+  },
+  {
+   "at": [
+    "s",
+    3,
+    "act1"
+   ],
+   "box": [
+    "25-autonomy",
+    1,
+    "level"
+   ]
+  },
+  {
+   "at": [
+    "s",
+    4,
+    "act0",
+    0.5
+   ],
+   "box": [
+    "25-autonomy",
+    4,
+    "answer"
+   ]
+  },
+  {
+   "at": [
+    "s",
+    4,
+    "act1",
+    1.65
+   ],
+   "box": {
+    "union": [
+     [
+      "25-autonomy",
+      4,
+      "merged"
+     ],
+     [
+      "25-autonomy",
+      4,
+      "live"
+     ]
+    ]
+   }
+  },
+  {
+   "at": [
+    "s",
+    3,
+    "act2",
+    0.4
+   ],
+   "box": [
+    "25-autonomy",
+    3,
+    "wake"
+   ]
+  }
+ ],
+ "caps": [
+  {
+   "at": [
+    "s",
+    null,
+    null,
+    0.2
+   ],
+   "amber": true,
+   "text": "Manual: every merge waits for you",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "s",
+    2,
+    "act2"
+   ],
+   "text": "Turn the dial to full auto",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "s",
+    3,
+    "act2",
+    0.4
+   ],
+   "text": "The agent takes the open question",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "s",
+    4,
+    "act0",
+    0.5
+   ],
+   "text": "It answers from the code",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "s",
+    4,
+    "act1",
+    1.65
+   ],
+   "text": "The card merges and goes live",
+   "cls": "label"
+  }
+ ],
+ "plain": true
+}

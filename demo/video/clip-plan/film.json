@@ -1,0 +1,179 @@
+{
+ "template": "../film.tpl.html",
+ "shared": [
+  "../film-fx.js",
+  "../loop/diagram.css",
+  "../vendor/gsap.min.js"
+ ],
+ "tail": 0.2,
+ "segments": [
+  {
+   "id": "s",
+   "scene": "03-too-large-split",
+   "from": [
+    5,
+    "stillMs"
+   ],
+   "lead": 2.5,
+   "to": [
+    7,
+    "stillMs"
+   ],
+   "tail": 1.2,
+   "rate": 1.3,
+   "holdRate": 4
+  }
+ ],
+ "cams": [
+  {
+   "at": [
+    "s"
+   ],
+   "box": [
+    "03-too-large-split",
+    5,
+    "card",
+    500
+   ],
+   "fill": 0.85,
+   "cy": 380,
+   "dur": 0.05
+  },
+  {
+   "at": [
+    "s",
+    6,
+    "act0"
+   ],
+   "box": [
+    "03-too-large-split",
+    6,
+    "plan"
+   ],
+   "fill": 0.9,
+   "dur": 0.9
+  },
+  {
+   "at": [
+    "s",
+    7,
+    "atMs"
+   ],
+   "box": {
+    "union": [
+     [
+      "03-too-large-split",
+      7,
+      "first"
+     ],
+     [
+      "03-too-large-split",
+      7,
+      "last"
+     ]
+    ]
+   },
+   "fill": 0.75,
+   "cy": 430,
+   "dur": 0.9
+  }
+ ],
+ "spots": [
+  {
+   "at": [
+    "s"
+   ],
+   "box": {
+    "union": [
+     [
+      "03-too-large-split",
+      5,
+      "card"
+     ],
+     [
+      "03-too-large-split",
+      5,
+      "accept"
+     ]
+    ]
+   },
+   "amber": true
+  },
+  {
+   "at": [
+    "s",
+    6,
+    "act1"
+   ],
+   "box": [
+    "03-too-large-split",
+    6,
+    "plan"
+   ]
+  },
+  {
+   "at": [
+    "s",
+    7,
+    "act1",
+    0.4
+   ],
+   "box": {
+    "union": [
+     [
+      "03-too-large-split",
+      7,
+      "first"
+     ],
+     [
+      "03-too-large-split",
+      7,
+      "last"
+     ]
+    ]
+   }
+  },
+  {
+   "at": [
+    "s",
+    7,
+    "atMs"
+   ],
+   "box": null
+  }
+ ],
+ "caps": [
+  {
+   "at": [
+    "s",
+    null,
+    null,
+    0.2
+   ],
+   "amber": true,
+   "text": "The plan waits for your accept",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "s",
+    6,
+    "act1",
+    0.2
+   ],
+   "text": "Four cards, in the order they build",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "s",
+    7,
+    "act1",
+    0.4
+   ],
+   "text": "Accepted: the four cards land",
+   "cls": "label"
+  }
+ ],
+ "plain": true
+}

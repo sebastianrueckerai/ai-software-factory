@@ -348,7 +348,7 @@ test("mergeAsked offers Approve on a merge request", () => {
   assert.equal(m.birth_kind, "approval_requested");
 });
 test("wake is the waker's user row with its birth kind", () => {
-  const w = s.wake(now, { kind: "wake_ask", text: "Wake: 1 asks wait for a human.", age: 10, conversation: 2 });
+  const w = s.wake(now, { kind: "wake_ask", text: "Wake: 1 ask waits for a human.", age: 10, conversation: 2 });
   assert.deepEqual([w.role, w.birth_kind, w.conversation, w.at], ["user", "wake_ask", 2, "2026-10-20T11:59:50.000Z"]);
 });
 test("the policy gate, the approval request and the auto merge as the timeline records them", () => {

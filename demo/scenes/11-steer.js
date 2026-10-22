@@ -45,13 +45,15 @@ module.exports = {
       state: (now) => thursday(now, 14, { replies: [steering] }),
       actions: [{ goto: "/" }, { click: ui.open(steer.issue) }, { waitFor: ui.tab("chat") }, { click: ui.tab("chat") }, { waitFor: "#session-log .msg" }],
       hold: 2500,
+      boxes: { drawer: "#drawer", chat: ".chat" },
     },
     {
       state: () => null,
       actions: [{ click: "#chat-input" }, { type: ["#chat-input", steer.request] }, { press: "Enter" }, { waitFor: ui.doIt }, { wait: 2500 }, { hover: ui.doIt }],
       hold: 600,
+      boxes: { chat: ".chat", doit: ui.doIt, drawer: "#drawer" },
     },
-    { state: () => null, actions: [{ click: ui.doIt }, { waitFor: "#chat-log .applied" }, { waitFor: "#session-log .msg.you" }], hold: 3000 },
-    { state: after, actions: [{ click: ui.tab("chat") }, { waitFor: "#session-log .msg.agent:has-text(\"Taking your message\")" }], hold: 3500 },
+    { state: () => null, actions: [{ click: ui.doIt }, { waitFor: "#chat-log .applied" }, { waitFor: "#session-log .msg.you" }], hold: 3000, boxes: { drawer: "#drawer", you: "#session-log .msg.you" } },
+    { state: after, actions: [{ click: ui.tab("chat") }, { waitFor: "#session-log .msg.agent:has-text(\"Taking your message\")" }], hold: 3500, boxes: { drawer: "#drawer", reply: "#session-log .msg.agent:has-text(\"Taking your message\")" } },
   ],
 };

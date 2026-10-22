@@ -43,6 +43,7 @@ h3 { font-size: 18px; font-weight: 600; line-height: 1.3; margin: 0 0 8px; }
   -webkit-mask: conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0 / calc(100% - var(--s)) calc(100% - var(--s));
           mask: conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0 / calc(100% - var(--s)) calc(100% - var(--s)); }
 .media img { display: block; width: 100%; height: auto; }
+.media video.loop { display: block; width: 100%; height: auto; cursor: pointer; }
 
 .eyebrow { font: 600 12px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-faint); margin: 0 0 16px; }
 .btn { display: inline-block; padding: 10px 18px; border: 1px solid var(--line-strong); color: var(--text); text-decoration: none; font: 14px var(--font-mono); }
@@ -84,13 +85,19 @@ h3 { font-size: 18px; font-weight: 600; line-height: 1.3; margin: 0 0 8px; }
 .hero-annot .amber .br { stroke: var(--need); }
 .hero-annot .hit { fill: none; stroke: var(--accent); stroke-width: 3; }
 .hero-plain, .hero-list { display: none; }
+#hero figure { position: relative; }
+.play { position: absolute; right: 18px; bottom: 54px; padding: 12px 20px; border: 1px solid var(--accent); background: color-mix(in srgb, var(--bg) 88%, transparent);
+  color: var(--accent); font: 600 16px var(--font-mono); cursor: pointer; box-shadow: 0 4px 18px rgba(0,0,0,.5); }
+.play:hover, .play:focus-visible { background: var(--accent); color: var(--bg); }
+.play span { margin-right: 6px; }
+video.film { display: block; width: 100%; height: auto; border: 1px solid var(--line-strong); background: #000; }
 .hero-list { margin: 14px 0 0; padding-left: 22px; color: var(--text-muted); }
 .hero-list b { color: var(--text); }
 
 figure { margin: 0; }
 figcaption { margin-top: 8px; text-align: center; }
 
-.cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px 24px; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 32px 28px; }
 .card h3 { margin: 14px 0 6px; }
 .card p { color: var(--text-muted); margin-bottom: 6px; }
 
@@ -127,13 +134,11 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 .limits ul { margin: 0; padding-left: 20px; color: var(--text-muted); }
 .limits p { color: var(--text-muted); margin: 0; }
 
-@media (max-width: 900px) {
-  .cards { grid-template-columns: 1fr 1fr; }
-}
 @media (max-width: 640px) {
   .cards { grid-template-columns: 1fr; }
   .hero-annot { display: none; }
   .hero-plain, .hero-list { display: block; }
+  .play { position: static; margin-top: 14px; }
   body { font-size: 16px; }
   section { padding-top: 44px; }
   .wrap, nav ul { padding-left: 16px; padding-right: 16px; }
@@ -173,7 +178,9 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 <li><b>See what is stuck</b> and what waits on you, in the amber column.</li>
 <li><b>Decide what runs next:</b> priorities and a backlog.</li>
 </ol>
-<figcaption class="cap">Recorded on the real console. The project is a demo seeded for the film.</figcaption>
+<button type="button" class="play" id="play-film" aria-label="Play the film, two minutes, captions, no sound"><span aria-hidden="true">▶</span> Watch the film · 2 min</button>
+<video id="film" class="film" controls playsinline preload="none" poster="assets/34-busy-board-3.png" hidden><source src="assets/film.mp4" type="video/mp4"></video>
+<figcaption class="cap">Recorded on the real console. The project is a demo game, seeded for the film.</figcaption>
 </figure>
 <div class="band"><p>Built for teams that cannot sign off a hosted coding agent: regulated industries, and companies where security and compliance decide the tool choice.</p></div>
 </section>
@@ -299,37 +306,37 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 <p class="lede">Six things the console shows. Each one links to the file, the test and the run behind it.</p>
 <div class="cards">
 <article class="card">
-<div class="media"><img src="assets/11-steer-4.png" alt="A line typed into the chat reaches a running card: the session transcript shows the message arrive." width="1600" height="900" loading="lazy"></div>
+<div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/11-steer-4.png" aria-label="A line typed into the chat reaches a running card: the session transcript shows the message arrive." width="1600" height="900"><source src="assets/clips/clip-chat.mp4" type="video/mp4"></video></div>
 <h3>Talk to an agent while it works</h3>
 <p>A line typed into the chat reaches the running session. The agent's next turn takes it, and the gates still judge the result.</p>
 <p class="more"><a href="../../docs/evidence.md#1-the-kanban-fills-itself-the-chat-drives-it">The evidence</a></p>
 </article>
 <article class="card">
-<div class="media"><img src="assets/03-too-large-split-6.png" alt="The drawer's plan section: level 4 of the game split into four cards, waiting for the accept." width="1600" height="900" loading="lazy"></div>
+<div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/03-too-large-split-6.png" aria-label="The drawer's plan section: level 4 of the game split into four cards, waiting for the accept." width="1600" height="900"><source src="assets/clips/clip-plan.mp4" type="video/mp4"></video></div>
 <h3>The proof is named before the code exists</h3>
 <p>A big request becomes a spec with criteria. Each criterion names its test, and one gate runs them all on the assembled feature.</p>
 <p class="more"><a href="../../docs/spec-driven.md">How the spec-driven process works</a></p>
 </article>
 <article class="card">
-<div class="media"><img src="assets/07-review-rejects-2.png" alt="The card's activity: the review's concerns row with its finding." width="1600" height="900" loading="lazy"></div>
+<div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/07-review-rejects-2.png" aria-label="The card's activity: the review's concerns row with its finding." width="1600" height="900"><source src="assets/clips/clip-review.mp4" type="video/mp4"></video></div>
 <h3>The review rejects with a reason</h3>
 <p>A stronger model reads every diff. Its finding goes back to the agent. A review with no verdict is itself a finding.</p>
 <p class="more"><a href="../../docs/evidence.md#4-nothing-merges-unproven">The evidence</a></p>
 </article>
 <article class="card">
-<div class="media"><img src="assets/33-issue-to-fix-6.png" alt="The reproduction gate: the issue's command exits 1 at the base commit and 0 at the head." width="1600" height="900" loading="lazy"></div>
+<div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/33-issue-to-fix-6.png" aria-label="The reproduction gate: the issue's command exits 1 at the base commit and 0 at the head." width="1600" height="900"><source src="assets/clips/clip-issue.mp4" type="video/mp4"></video></div>
 <h3>Live software files its own fixes</h3>
 <p>An issue or an alert becomes a card within a minute. The fix must fail at the base commit and pass at the head.</p>
 <p class="more"><a href="../../docs/evidence.md#5-an-issue-lands-the-fix-ships">The evidence</a></p>
 </article>
 <article class="card">
-<div class="media"><img src="assets/20-cap-fires-1.png" alt="The chat's budget question: a card stopped at its cap, fund it or end it." width="1600" height="900" loading="lazy"></div>
+<div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/20-cap-fires-1.png" aria-label="The chat's budget question: a card stopped at its cap, fund it or end it." width="1600" height="900"><source src="assets/clips/clip-money.mp4" type="video/mp4"></video></div>
 <h3>The money is held before each call</h3>
 <p>Caps per task, per day, per month and per project. At a cap the factory stops and asks: fund it or end it.</p>
 <p class="more"><a href="../../docs/evidence.md#8-no-model-call-runs-without-its-cost-covered">The evidence</a></p>
 </article>
 <article class="card">
-<div class="media"><img src="assets/25-autonomy-2.png" alt="The autonomy picker open on the board, full auto under the pointer." width="1600" height="900" loading="lazy"></div>
+<div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/25-autonomy-2.png" aria-label="The autonomy picker open on the board, full auto under the pointer." width="1600" height="900"><source src="assets/clips/clip-dial.mp4" type="video/mp4"></video></div>
 <h3>One dial for how much it asks</h3>
 <p>From manual to full auto. Forbidden paths and database migrations stay human at every level.</p>
 <p class="more"><a href="../../docs/evidence.md#9-you-hold-the-roadmap-and-the-money">The evidence</a></p>
@@ -526,7 +533,7 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 <details>
 <summary>Recovery from stalls</summary>
 <div class="body">
-<figure><div class="media"><img src="assets/08-supervisor-2.png" alt="The card's activity: the supervisor's step after the flip-flop detector tripped." width="1600" height="900" loading="lazy"></div></figure>
+<figure><div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/08-supervisor-2.png" aria-label="The card's activity: the supervisor's step after the flip-flop detector tripped." width="1600" height="900"><source src="assets/clips/clip-stall.mp4" type="video/mp4"></video></div></figure>
 <p>One durable workflow per task. Thirteen detectors watch each session for no write, repetition, the same failure, the same call, flip-flop, churn, wall clock and spend with no push.</p>
 <p>A stalled session gets a nudge, then a supervisor, then a fresh session on the stronger model. A human sees it only after the session cap.</p>
 <p class="cap"><a href="../../docs/evidence.md#7-it-does-not-stall">the file · the test · the run</a></p>
@@ -672,5 +679,31 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 220px; }
 </section>
 
 </main>
+<script>
+// The clips loop muted while they are on screen. A click pauses or plays one. A reader who asks for reduced motion
+// gets the still frames, and a clip plays only on a click.
+// The hero's play button swaps the annotated frame for the film, which opens on that same frame.
+(() => {
+  const button = document.querySelector("#play-film"), film = document.querySelector("#film");
+  button.addEventListener("click", () => {
+    document.querySelectorAll("#hero .hero-annot, #hero .hero-plain, #hero .hero-list").forEach((e) => { e.style.display = "none"; });
+    button.hidden = true; film.hidden = false; film.play().catch(() => {});
+  });
+})();
+(() => {
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const clips = [...document.querySelectorAll("video.loop")];
+  const seen = new IntersectionObserver((entries) => entries.forEach((e) => {
+    if (e.isIntersecting && !e.target.dataset.paused) e.target.play().catch(() => {});
+    else e.target.pause();
+  }), { threshold: 0.4 });
+  clips.forEach((v) => {
+    if (!still) seen.observe(v);
+    v.addEventListener("click", () => {
+      if (v.paused) { delete v.dataset.paused; v.play().catch(() => {}); } else { v.dataset.paused = "1"; v.pause(); }
+    });
+  });
+})();
+</script>
 </body>
 </html>

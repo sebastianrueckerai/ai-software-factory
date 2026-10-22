@@ -108,13 +108,14 @@ module.exports = {
   viewport: "desk",
   afterSplit,
   steps: [
-    { state: (now) => friday(now, -30, { unread: 1, replies: [splitting, repointing] }), actions: [{ goto: "/" }, { hover: ui.idle }], hold: 3500 },
+    { state: (now) => friday(now, -30, { unread: 1, replies: [splitting, repointing] }), actions: [{ goto: "/" }, { hover: ui.idle }], hold: 3500, boxes: { chat: ".chat", needs: "#needs-you" } },
     {
       state: () => null,
       actions: [{ click: "#chat-input" }, { type: ["#chat-input", story.requests.split] }, { press: "Enter" }, { waitFor: ui.doIt }, { wait: 2000 }, { hover: ui.doIt }],
       hold: 1500,
+      boxes: { chat: ".chat", doit: ui.doIt },
     },
-    { state: () => null, actions: [{ click: ui.doIt }, { waitFor: ui.face(113) }, { wait: 600 }, { hover: ui.doIt }], hold: 600 },
+    { state: () => null, actions: [{ click: ui.doIt }, { waitFor: ui.face(113) }, { wait: 600 }, { hover: ui.doIt }], hold: 600, boxes: { first: ui.face(113), queued: '#board .column[aria-labelledby="col-1"]' } },
     { state: () => null, actions: [{ click: ui.doIt }, { waitFor: applied(1) }], hold: 1500 },
     {
       state: () => null,

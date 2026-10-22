@@ -1,0 +1,6 @@
+{
+ "id": "clip-chat",
+ "name": "Talk to an agent while it works",
+ "title": "Talk to an agent while it works",
+ "story": "A line typed into the chat for a running card, Do it, and the session's transcript shows the line arrive and the agent take it."
+}

@@ -64,17 +64,18 @@ module.exports = {
   theme: "dark",
   viewport: "desk",
   steps: [
-    { state: (now) => friday(now, -30), actions: [{ goto: "/" }, { hover: ui.idle }], hold: 2000 },
-    { state: (now) => friday(now, 50), actions: [{ waitFor: ui.face(ISSUE) }, { hover: ui.open(ISSUE) }], hold: 2500 },
+    { state: (now) => friday(now, -30), actions: [{ goto: "/" }, { hover: ui.idle }], hold: 2000, boxes: { queued: '#board .column[aria-labelledby="col-1"]' } },
+    { state: (now) => friday(now, 50), actions: [{ waitFor: ui.face(ISSUE) }, { hover: ui.open(ISSUE) }], hold: 2500, boxes: { card: ui.face(ISSUE) } },
     // a queued card's drawer opens on Overview, so no tab click: a click on the open tab reloads the drawer under the next action
-    { state: () => null, actions: [{ click: ui.open(ISSUE) }, { waitFor: ui.objective }, { click: ui.objective }], hold: 4000 },
+    { state: () => null, actions: [{ click: ui.open(ISSUE) }, { waitFor: ui.objective }, { click: ui.objective }], hold: 4000, boxes: { drawer: "#drawer" } },
     { state: (now) => friday(now, 6 * MIN), actions: [{ click: ui.tab("chat") }, { waitFor: "#session-log .msg" }], hold: 4000 },
     {
       state: (now) => friday(now, 24 * MIN),
       actions: [{ click: ui.tab("activity") }, { waitFor: ui.row("reproduction") }, { hover: `${ui.row("reproduction")} meter` }],
       hold: 3000,
+      boxes: { drawer: "#drawer", row: ui.row("reproduction") },
     },
-    { state: () => null, actions: [{ scroll: repro }, { wait: 800 }, { hover: `${repro} code` }], hold: 4000 },
+    { state: () => null, actions: [{ scroll: repro }, { wait: 800 }, { hover: `${repro} code` }], hold: 4000, boxes: { drawer: "#drawer", repro } },
     {
       state: (now) => friday(now, 40 * MIN),
       actions: [{ click: "#drawer-close" }, { click: ui.open(ISSUE) }, { waitFor: ui.tab("activity") }, { click: ui.tab("activity") }, { waitFor: live }, { hover: live }],

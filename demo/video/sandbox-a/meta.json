@@ -2,5 +2,5 @@
   "id": "sandbox-a",
   "name": "The sandbox, schematic",
   "title": "The sandbox, schematic",
-  "story": "The pod and its wall appear, the agent at work inside. Probes toward the internet, the host, the cloud metadata address and a push token stop at a cross. One model call goes through the gateway, held against the card's budget, then booked. More calls fill the budget to the cap and the factory asks: fund it or end it. The agent ends, a fresh token pushes once and is revoked, the pod is deleted."
+  "story": "The factory sends a card into one throwaway pod: gVisor, non-root, read-only root, no service account token. A probe tries the internet, the host machine and the cloud metadata address, all crossed out, and only named hosts are open; then the agent runs. One model call goes through the gateway, which holds the keys, reserves the worst case against the card's budget and books the real cost. The pod holds a one-hour gateway identity, no push token and no model key. Calls fill the budget to its cap, the factory stops and a person decides: fund it or end it. At the end the factory ticks off its list: kill the agent's processes, mint a write token, push once, revoke it, delete the pod."
 }

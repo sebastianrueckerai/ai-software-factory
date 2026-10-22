@@ -97,7 +97,12 @@ module.exports = {
     // a pick sets the level at once, through a commit of the project's file; the lab's Forgejo fake holds no such file,
     // so the full auto level is the seed's
     { state: full, actions: [{ goto: "/" }, { waitFor: wake }, { hover: ui.park }], hold: 3500, boxes: { wake } },
-    { state: () => null, actions: [{ click: `${wake} [data-fold]` }, { hover: `${wake} .av` }], hold: 4500, boxes: { wake } },
+    {
+      state: () => null,
+      actions: [{ click: `${wake} [data-fold]` }, { hover: `${wake} .av` }],
+      hold: 4500,
+      boxes: { wake, answer: `${wake} .wake-b p:has-text("so I answered")`, merged: '#chat-log .msg:has-text("merged; the chain is running")', live: '#chat-log .msg:has-text("is done and live")' },
+    },
     {
       state: () => null,
       actions: [{ click: ui.open(ISSUE) }, { waitFor: ui.tab("activity") }, { click: ui.tab("activity") }, { waitFor: ui.step("auto_merge") }, { hover: `${ui.step("auto_merge")} td >> nth=2` }],

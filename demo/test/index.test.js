@@ -38,3 +38,14 @@ test("a scene without a sidecar renders as not recorded, with no video", () => {
   assert.match(html, /<b>1<\/b><span>scenes recorded/);
   assert.match(html, /<b>0\.1<\/b><span>minutes of video/);
 });
+
+test("a rendered composition counts neither as a recorded scene nor as one not recorded", () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "index-"));
+  for (const d of ["scenes", "out", "video/cut"]) fs.mkdirSync(path.join(root, d), { recursive: true });
+  fs.writeFileSync(path.join(root, "scenes", "02-beta.js"), scene("Beta", "build"));
+  fs.writeFileSync(path.join(root, "video", "cut", "meta.json"), JSON.stringify({ title: "Cut", story: "A cut." }));
+  fs.writeFileSync(path.join(root, "out", "p-cut.json"), JSON.stringify({ durationMs: 9000, steps: [] }));
+  const html = build(path.join(root, "scenes"), path.join(root, "out"), README);
+  assert.match(html, /<b>0<\/b><span>scenes recorded/);
+  assert.match(html, /<b>1<\/b><span>scenes not recorded/);
+});

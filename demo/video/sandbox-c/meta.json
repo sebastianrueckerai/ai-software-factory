@@ -1,0 +1,6 @@
+{
+  "id": "sandbox-c",
+  "name": "The sandbox, walls",
+  "title": "The sandbox, concentric walls",
+  "story": "The factory sends a card in and three walls close around the agent: the pod (non-root, read-only root, no service account token), gVisor and the network policy. A write to the root filesystem stops at the pod wall, a call into the host's kernel at gVisor, and the probe's tries at the internet, the host machine and the metadata address at the network policy; only named hosts pass the gate. The model gateway sits in that gate with the keys and the budget meter: a call is held at its worst case, sent and booked at its real cost. The agent holds a one-hour gateway identity, no push token and no model key. At the cap a person decides; at the end the factory kills the agent's processes, mints a write token, pushes once, revokes it and the walls fold away."
+}

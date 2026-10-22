@@ -1,0 +1,6 @@
+{
+ "id": "clip-issue",
+ "name": "An issue files its own fix",
+ "title": "An issue files its own fix",
+ "story": "A player's issue becomes a card within a minute, the agent fixes it, and the reproduction gate runs the issue's command red at the base and green at the head."
+}

@@ -1,0 +1,6 @@
+{
+ "id": "clip-review",
+ "name": "The review rejects with a reason",
+ "title": "The review rejects with a reason",
+ "story": "The stronger model's review finds a race, the finding goes back to the agent, the second session fixes it, and every gate turns green."
+}

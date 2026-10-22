@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "historyId": "78ceb152-e7a0-49f3-9102-4df3ec4782b4",
+  "currentRevision": "1691a99a-cab9-4626-956d-b7d341a9af68",
+  "pendingChanges": false,
+  "files": {
+    "diagram.css": {
+      "hash": "0cceb3bbd66fd486cd3afc0506f05d77f2165294235c772cd64bb35dcbf1cd40",
+      "content": "/home/womb/.cache/hyperframes/history/78ceb152-e7a0-49f3-9102-4df3ec4782b4/blobs/0c/0cceb3bbd66fd486cd3afc0506f05d77f2165294235c772cd64bb35dcbf1cd40"
+    },
+    "gsap.min.js": {
+      "hash": "c174bfce53a729418d57a8ad8625e7247c793a22fef8e2851e3cfa3de9cd8280",
+      "content": "/home/womb/.cache/hyperframes/history/78ceb152-e7a0-49f3-9102-4df3ec4782b4/blobs/c1/c174bfce53a729418d57a8ad8625e7247c793a22fef8e2851e3cfa3de9cd8280"
+    },
+    "index.html": {
+      "hash": "f79ac184cc0c3eac3152a3fa44a5ceb32cebf0def1cef5a9024af58b4732a652",
+      "content": "/home/womb/.cache/hyperframes/history/78ceb152-e7a0-49f3-9102-4df3ec4782b4/blobs/f7/f79ac184cc0c3eac3152a3fa44a5ceb32cebf0def1cef5a9024af58b4732a652"
+    },
+    "meta.json": {
+      "hash": "0006c795a07633bae003f5fda844650e3112888aee4607e2910d062b799aa79f",
+      "content": "/home/womb/.cache/hyperframes/history/78ceb152-e7a0-49f3-9102-4df3ec4782b4/blobs/00/0006c795a07633bae003f5fda844650e3112888aee4607e2910d062b799aa79f"
+    }
+  },
+  "revisions": {
+    "25c3937b-b4c1-4e1e-9544-e589012bd09f": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792627698166,
+      "endedAt": 1792627698166,
+      "files": {
+        "index.html": {
+          "before": "/home/womb/.cache/hyperframes/history/78ceb152-e7a0-49f3-9102-4df3ec4782b4/blobs/48/481956148946daa00fa9624a10c584423dbd6b994a1bb2004187c4e81d73f221",
+          "after": "/home/womb/.cache/hyperframes/history/78ceb152-e7a0-49f3-9102-4df3ec4782b4/blobs/c1/c100f8a78b807f073a897fb0296c7099ddf7d934d29b4f4b311405d604f6869a"
+        }
+      }
+    },
+    "1691a99a-cab9-4626-956d-b7d341a9af68": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792628155361,
+      "endedAt": 1792628155362,
+      "files": {
+        "index.html": {
+          "before": "/home/womb/.cache/hyperframes/history/78ceb152-e7a0-49f3-9102-4df3ec4782b4/blobs/c1/c100f8a78b807f073a897fb0296c7099ddf7d934d29b4f4b311405d604f6869a",
+          "after": "/home/womb/.cache/hyperframes/history/78ceb152-e7a0-49f3-9102-4df3ec4782b4/blobs/f7/f79ac184cc0c3eac3152a3fa44a5ceb32cebf0def1cef5a9024af58b4732a652"
+        }
+      }
+    }
+  },
+  "checks": {
+    "latest": null,
+    "revisions": {},
+    "unversioned": []
+  },
+  "snapshots": {
+    "latest": null,
+    "revisions": {},
+    "unversioned": []
+  },
+  "renders": {
+    "latest": {
+      "id": "9fb00b33-4bf8-441b-9f2e-bb1072d0c000",
+      "completedAt": 1792628178518,
+      "output": "/tmp/hf-sandbox-d-x9FKbe/b.mp4",
+      "status": "completed",
+      "revision": "1691a99a-cab9-4626-956d-b7d341a9af68"
+    },
+    "retainedRevisions": [
+      "1691a99a-cab9-4626-956d-b7d341a9af68",
+      "25c3937b-b4c1-4e1e-9544-e589012bd09f"
+    ]
+  },
+  "pendingArtifactCleanup": []
+}
