@@ -251,3 +251,12 @@ The wait. The control shows the pick at once and nothing of the write: no greyed
 The lamp. One blue, the accent, from all but unlit to white-hot (Sebastian, 2026-10-21: "make the gradation between the states bigger … full auto glow really bright, manual even darker; the last stage needs to be clearly distinguishable"). Manual is 15 percent of the accent over the ground and assisted 38, both without a glow. Autonomous is 70 with a small glow. Full auto is the accent mixed toward white in a three-layer halo. In the light theme the unlit manual lamp carries a grey edge, so it does not vanish into the ground, and full auto is a vivid cyan in its own halo. The menu's checked row carries the same lamp.
 
 The build is 41698315 on main of the code repository. [Before and after](rounds/02-multi-chat/ev/ev-level-montage.png): the menu at assisted, then at full auto after one click; [the lamp at the four levels in both themes, before and after the wider ramp of a74d4180](rounds/02-multi-chat/ev/ev-level-lamps.png). The lab's structural check picks full auto and asserts the menu closed, the control set at once and unlocked after the write, and the lamp's colour changed. The first build locked and greyed the control for the write's seconds, and Sebastian read that as the delay; 652c8b35 took the lock out, chained the writes, loads the policy after the merge and keeps the actor's own inbox quiet. The lab's check asserts the control is never greyed after a pick.
+
+## C33. Every row of the level menu carries its own lamp (2026-10-22, Sebastian)
+
+Sebastian, on the film's autonomy menu: "It should have lights that get brighter with each automation level!", and "manual is always not initially on". C32 lit only the checked row, so the menu showed one lamp and three empty squares, and manual's 15 percent read as off at any size below the full screen.
+
+Every row now shows its level's lamp at that level's strength, so the menu reads as a ramp from manual to full auto; the ✓ still marks the current level. This revises C32's two lowest values: manual is 28 percent of the accent over the ground and assisted 48, both still without a glow, so manual stays the subdued blue C32 asked for and still reads as lit. Autonomous and full auto keep C32's values, and the control under Send uses the same lamps.
+
+The build is 549cbaee on main of the code repository.
+

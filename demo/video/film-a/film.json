@@ -5,7 +5,6 @@
   "../loop/diagram.css",
   "../vendor/gsap.min.js"
  ],
- "tail": 0.3,
  "segments": [
   {
    "id": "hero",
@@ -84,6 +83,22 @@
    "rate": 1.1
   },
   {
+   "id": "t-card",
+   "title": "Inside a card",
+   "dur": 2.6
+  },
+  {
+   "id": "sandbox",
+   "clip": "p-sandbox-a.mp4",
+   "dur": 56.5,
+   "rate": 1.0
+  },
+  {
+   "id": "t-hand",
+   "title": "By hand",
+   "dur": 2.6
+  },
+  {
    "id": "approval",
    "scene": "22-approval",
    "from": [
@@ -92,12 +107,22 @@
    ],
    "lead": 3.5,
    "to": [
-    6,
-    "stillMs"
+    5,
+    "act4"
    ],
    "tail": 0,
    "rate": 1.0,
    "holdRate": 1.0
+  },
+  {
+   "id": "merged",
+   "still": "22-approval-6.png",
+   "dur": 2.6
+  },
+  {
+   "id": "t-auto",
+   "title": "Full auto",
+   "dur": 2.6
   },
   {
    "id": "autonomy",
@@ -108,12 +133,31 @@
    ],
    "lead": 1.0,
    "to": [
+    2,
+    "stillMs"
+   ],
+   "rate": 1.3,
+   "holdRate": 1.6
+  },
+  {
+   "id": "auto2",
+   "scene": "25-autonomy",
+   "from": [
+    3,
+    "act0"
+   ],
+   "to": [
     4,
     "stillMs"
    ],
    "tail": 2.6,
    "rate": 1.3,
    "holdRate": 1.6
+  },
+  {
+   "id": "t-stall",
+   "title": "When it stalls",
+   "dur": 2.6
   },
   {
    "id": "stall",
@@ -129,6 +173,11 @@
    "tail": 0.3,
    "rate": 1.1,
    "holdRate": 1.6
+  },
+  {
+   "id": "t-needs",
+   "title": "When it needs you",
+   "dur": 2.6
   },
   {
    "id": "question",
@@ -147,25 +196,32 @@
    "holdRate": 1.6
   },
   {
+   "id": "t-metrics",
+   "title": "Metrics",
+   "dur": 2.6
+  },
+  {
+   "id": "metrics-page",
+   "still": "27-before-and-after-4.png",
+   "dur": 4.6
+  },
+  {
    "id": "metrics",
    "scene": "27-before-and-after",
    "from": [
     4,
-    "atMs"
+    "stillMs"
    ],
    "to": [
     6,
     "stillMs"
    ],
-   "tail": 0.4,
-   "rate": 1.0,
-   "holdRate": 1.6
+   "rate": 0.8
   },
   {
-   "id": "sandbox",
-   "clip": "p-sandbox-a.mp4",
-   "dur": 56.5,
-   "rate": 1.0
+   "id": "metrics-end",
+   "still": "27-before-and-after-6.png",
+   "dur": 3.8
   },
   {
    "id": "close",
@@ -300,102 +356,7 @@
   },
   {
    "at": [
-    "question"
-   ],
-   "box": [
-    "21-design-question",
-    1,
-    "ask"
-   ],
-   "amber": true
-  },
-  {
-   "at": [
-    "question",
-    2,
-    "act2"
-   ],
-   "box": [
-    "21-design-question",
-    2,
-    "chat"
-   ]
-  },
-  {
-   "at": [
-    "question",
-    3,
-    "act4"
-   ],
-   "box": [
-    "21-design-question",
-    3,
-    "drawer"
-   ]
-  },
-  {
-   "at": [
-    "metrics"
-   ],
-   "box": [
-    "27-before-and-after",
-    4,
-    "figure"
-   ]
-  },
-  {
-   "at": [
-    "metrics",
-    5,
-    "act1"
-   ],
-   "box": [
-    "27-before-and-after",
-    5,
-    "figure"
-   ]
-  },
-  {
-   "at": [
-    "metrics",
-    6,
-    "act0"
-   ],
-   "box": [
-    "27-before-and-after",
-    6,
-    "figure"
-   ]
-  },
-  {
-   "at": [
-    "sandbox"
-   ],
-   "box": null
-  },
-  {
-   "at": [
-    "autonomy",
-    3,
-    "atMs"
-   ],
-   "box": null
-  },
-  {
-   "at": [
-    "autonomy",
-    3,
-    "act1"
-   ],
-   "box": [
-    "25-autonomy",
-    3,
-    "wake"
-   ]
-  },
-  {
-   "at": [
-    "autonomy",
+    "auto2",
     4,
     "act0",
     0.3
@@ -408,7 +369,7 @@
   },
   {
    "at": [
-    "autonomy",
+    "auto2",
     4,
     "act1",
     1.5
@@ -624,29 +585,141 @@
    "at": [
     "approval",
     5,
-    "act4",
-    0.1
+    "act3",
+    -0.2
    ],
-   "box": null
+   "box": null,
+   "dur": 0.3
   },
   {
    "at": [
-    "approval",
-    6,
-    "act1",
-    0.5
+    "merged",
+    null,
+    null,
+    0.2
    ],
    "box": [
     "22-approval",
     6,
     "merged"
    ]
+  },
+  {
+   "at": [
+    "auto2",
+    3,
+    "act0"
+   ],
+   "box": [
+    "25-autonomy",
+    3,
+    "level"
+   ]
+  },
+  {
+   "at": [
+    "auto2",
+    3,
+    "act1",
+    1.8
+   ],
+   "box": [
+    "25-autonomy",
+    3,
+    "wake"
+   ]
+  },
+  {
+   "at": [
+    "question"
+   ],
+   "box": {
+    "rect": [
+     52,
+     574,
+     576,
+     180
+    ]
+   },
+   "amber": true
+  },
+  {
+   "at": [
+    "question",
+    2,
+    "act2"
+   ],
+   "box": [
+    "21-design-question",
+    2,
+    "chat"
+   ]
+  },
+  {
+   "at": [
+    "question",
+    3,
+    "act4"
+   ],
+   "box": [
+    "21-design-question",
+    3,
+    "drawer"
+   ]
+  },
+  {
+   "at": [
+    "metrics",
+    5,
+    "act1"
+   ],
+   "box": [
+    "27-before-and-after",
+    5,
+    "figure"
+   ]
+  },
+  {
+   "at": [
+    "metrics",
+    6,
+    "act0"
+   ],
+   "box": [
+    "27-before-and-after",
+    6,
+    "figure"
+   ]
+  },
+  {
+   "at": [
+    "metrics-end"
+   ],
+   "box": null
+  },
+  {
+   "at": [
+    "approval",
+    5,
+    "atMs",
+    -0.35
+   ],
+   "box": null
+  },
+  {
+   "at": [
+    "auto2",
+    null,
+    null,
+    -0.3
+   ],
+   "box": null
   }
  ],
  "caps": [
   {
    "at": 2.0,
-   "text": "<b>Change anything from one chat.</b> The agent proposes, you press Do it."
+   "text": "<b>Change anything from one chat.</b> The agent proposes, you approve."
   },
   {
    "at": 5.2,
@@ -688,7 +761,7 @@
     "atMs",
     0.3
    ],
-   "text": "a player's issue."
+   "text": "a user's issue."
   },
   {
    "at": [
@@ -732,15 +805,7 @@
   },
   {
    "at": [
-    "autonomy",
-    3,
-    "act1"
-   ],
-   "text": "<b>On full auto, the agent takes the open question,</b>"
-  },
-  {
-   "at": [
-    "autonomy",
+    "auto2",
     4,
     "act0",
     0.3
@@ -749,7 +814,7 @@
   },
   {
    "at": [
-    "autonomy",
+    "auto2",
     4,
     "act1",
     1.5
@@ -801,34 +866,6 @@
     "act4"
    ],
    "text": "<b>The card goes on with your pick.</b>"
-  },
-  {
-   "at": [
-    "metrics"
-   ],
-   "text": "<b>The four DevOps delivery metrics,</b> week by week:"
-  },
-  {
-   "at": [
-    "metrics",
-    5,
-    "act1"
-   ],
-   "text": "<b>what a card costs,</b>"
-  },
-  {
-   "at": [
-    "metrics",
-    6,
-    "act0"
-   ],
-   "text": "<b>how often it needs you.</b> Tune models and prompts against them."
-  },
-  {
-   "at": [
-    "sandbox"
-   ],
-   "text": ""
   },
   {
    "at": [
@@ -895,44 +932,54 @@
     "act1"
    ],
    "text": "<b>Then approve.</b> It merges and goes live."
-  }
- ],
- "titles": [
-  {
-   "at": [
-    "approval"
-   ],
-   "text": "By hand"
-  },
-  {
-   "at": [
-    "autonomy"
-   ],
-   "text": "Full auto"
-  },
-  {
-   "at": [
-    "stall"
-   ],
-   "text": "When it stalls"
-  },
-  {
-   "at": [
-    "question"
-   ],
-   "text": "When it needs you"
-  },
-  {
-   "at": [
-    "metrics"
-   ],
-   "text": "Measured"
   },
   {
    "at": [
     "sandbox"
    ],
-   "text": "Inside a card"
+   "text": ""
+  },
+  {
+   "at": [
+    "auto2",
+    3,
+    "act0"
+   ],
+   "text": "<b>On full auto, the agent takes the open question,</b>"
+  },
+  {
+   "at": [
+    "metrics-page"
+   ],
+   "text": "<b>The four DevOps delivery metrics,</b> week by week:"
+  },
+  {
+   "at": [
+    "metrics",
+    5,
+    "act1"
+   ],
+   "text": "<b>what a card costs,</b>"
+  },
+  {
+   "at": [
+    "metrics",
+    6,
+    "act0"
+   ],
+   "text": "<b>how often it needs you.</b>"
+  },
+  {
+   "at": [
+    "metrics-end"
+   ],
+   "text": "<b>Tune your process, harness and prompts</b> on data, not hunches.",
+   "until": [
+    "close",
+    null,
+    null,
+    -0.35
+   ]
   }
  ],
  "quiet": [
@@ -942,49 +989,6 @@
   {
    "at": [
     "drain"
-   ],
-   "box": null
-  },
-  {
-   "at": [
-    "plan"
-   ],
-   "box": [
-    "34-busy-board",
-    33,
-    "plan",
-    500
-   ],
-   "fill": 0.85,
-   "cy": 380
-  },
-  {
-   "at": [
-    "plan",
-    34,
-    "atMs",
-    0.3
-   ],
-   "box": {
-    "union": [
-     [
-      "34-busy-board",
-      34,
-      "first"
-     ],
-     [
-      "34-busy-board",
-      34,
-      "last"
-     ]
-    ]
-   },
-   "fill": 0.75,
-   "cy": 390
-  },
-  {
-   "at": [
-    "autonomy"
    ],
    "box": null
   },
@@ -1042,17 +1046,6 @@
   },
   {
    "at": [
-    "question"
-   ],
-   "box": [
-    "21-design-question",
-    1,
-    "ask"
-   ],
-   "fill": 0.75
-  },
-  {
-   "at": [
     "question",
     3,
     "act4"
@@ -1064,73 +1057,6 @@
     560
    ],
    "fill": 0.95
-  },
-  {
-   "at": [
-    "metrics"
-   ],
-   "box": [
-    "27-before-and-after",
-    4,
-    "figure"
-   ],
-   "fill": 0.85
-  },
-  {
-   "at": [
-    "metrics",
-    5,
-    "act1"
-   ],
-   "box": [
-    "27-before-and-after",
-    5,
-    "figure"
-   ],
-   "fill": 0.85
-  },
-  {
-   "at": [
-    "metrics",
-    6,
-    "act0"
-   ],
-   "box": [
-    "27-before-and-after",
-    6,
-    "figure"
-   ],
-   "fill": 0.85
-  },
-  {
-   "at": [
-    "sandbox"
-   ],
-   "box": null,
-   "dur": 0.05
-  },
-  {
-   "at": [
-    "autonomy",
-    3,
-    "act0"
-   ],
-   "box": {
-    "union": [
-     [
-      "25-autonomy",
-      4,
-      "wake"
-     ],
-     [
-      "25-autonomy",
-      4,
-      "live"
-     ]
-    ]
-   },
-   "fill": 0.75,
-   "cy": 400
   },
   {
    "at": [
@@ -1167,17 +1093,17 @@
   },
   {
    "at": [
-    "approval",
-    6,
-    "act0"
+    "question"
    ],
-   "box": [
-    "22-approval",
-    6,
-    "progress",
-    380
-   ],
-   "fill": 0.85
+   "box": {
+    "rect": [
+     52,
+     574,
+     576,
+     180
+    ]
+   },
+   "fill": 0.75
   }
  ],
  "maxZoom": 1.35,
@@ -1205,6 +1131,30 @@
     "approval",
     5,
     "act0"
+   ]
+  },
+  {
+   "from": [
+    "merged"
+   ],
+   "to": [
+    "merged"
+   ]
+  },
+  {
+   "from": [
+    "close"
+   ],
+   "to": [
+    "close"
+   ]
+  },
+  {
+   "from": [
+    "auto2"
+   ],
+   "to": [
+    "auto2"
    ]
   }
  ],

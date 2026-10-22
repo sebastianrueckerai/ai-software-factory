@@ -36,7 +36,7 @@
 </style>
 </head>
 <body>
-<div id="root" data-composition-id="main" data-start="0" data-duration="29.9" data-width="1600" data-height="900">
+<div id="root" data-composition-id="main" data-start="0" data-duration="27.9" data-width="1600" data-height="900">
 <div id="scene" class="clip" style="position:absolute;inset:0">
 
 <svg class="wires" viewBox="0 0 1600 900">
@@ -81,16 +81,14 @@
   <div class="s big" style="top:54px">refused</div>
 </div>
 
-<section id="pool" class="box u h" style="left:1130px;top:30px;width:440px;height:600px">
+<section id="pool" class="box u h" style="left:1130px;top:30px;width:440px;height:270px">
   <h2>Monthly pool</h2>
   <div class="track" style="left:24px;top:84px;width:388px;height:36px">
     <div id="pfill" class="fill u h" style="left:0;width:24px"></div>
   </div>
   <div class="s big" style="top:130px;font-size:36px">€10 a month</div>
   <div id="pplus" class="s h" style="top:132px;left:auto;right:24px">+€0.60</div>
-  <div id="r1" class="row u" style="top:210px"><div class="big">Raise limit €1.00</div><div class="s">each raise at most</div></div>
-  <div id="r2" class="row u" style="top:330px"><div class="big">Card cap €15</div><div class="s">card never above it</div></div>
-  <div id="r3" class="row u" style="top:450px"><div class="big">Month's pool €10</div><div class="s">never overspent</div></div>
+  <div class="s" style="top:200px">for small overruns</div>
 </section>
 
 <div id="fade"></div>
@@ -104,7 +102,7 @@ const scene = document.getElementById("scene");
 const fade = document.getElementById("fade");
 const $ = (id) => document.getElementById(id);
 gsap.set(".u", { "--hi": 0 });
-gsap.set("#r1,#r2,#r3,#fund,#ext,#pfill", { opacity: 1 });
+gsap.set("#fund,#ext,#pfill", { opacity: 1 });
 gsap.set("#ext,#pfill", { opacity: 0 });
 
 let cur = [];
@@ -134,11 +132,10 @@ beat(2.9, "Manual and assisted: the ask goes to <b>you</b>.", true, (t) => {
 beat(2.9, "Autonomous and full auto: the <b>project agent</b> wakes first.", false, (t) => {
   show(["#agent", "#w-agent"], t + 0.1); lit([$("agent"), $("w-agent")], t + 0.1);
 });
-beat(5.4, "The agent may fund from the <b>monthly pool</b>, inside three limits set in the project's file.", false, (t) => {
+beat(3.4, "You set a small <b>monthly pool</b> for overruns.", false, (t) => {
   show(["#pool", "#w-pool"], t + 0.1); lit([$("pool"), $("w-pool")], t + 0.1);
-  lit([$("r1")], t + 1.9); lit([$("r2")], t + 3.0); lit([$("r3")], t + 4.1);
 });
-beat(5.6, "€0.60 fits: the agent <b>funds one more session</b>. The raise counts against the pool.", false, (t) => {
+beat(5.6, "€0.60 is small: the agent <b>funds one more session</b> from the pool.", false, (t) => {
   lit([$("card"), $("fund")], t + 0.1);
   tl.to("#mark", { left: 416, duration: 0.5, ease: "power1.inOut" }, t + 0.4);
   tl.to("#ext", { opacity: 1, "--hi": 1, duration: 0.4 }, t + 0.5);
@@ -149,14 +146,13 @@ beat(5.6, "€0.60 fits: the agent <b>funds one more session</b>. The raise coun
   tl.to("#pfill,#pplus", { opacity: 1, duration: 0.3 }, t + 3.0);
   cur = [$("pool"), $("pfill")];
 });
-beat(5.3, "Another card: a €4.00 raise is refused, and handed to <b class=\"m\">you</b> with the agent's analysis.", true, (t) => {
+beat(5.3, "A €4.00 raise is too big for the agent: it goes to <b class=\"m\">you</b>, with its analysis.", true, (t) => {
   tl.to("#pool,#pfill", { "--hi": 0, duration: 0.4 }, t + 0.1);
   tl.to("#mark", { left: 371, duration: 0.4 }, t);
   tl.to("#ext,#pfill,#pplus,#b56", { opacity: 0, duration: 0.4 }, t);
   tl.to("#b5", { opacity: 1, duration: 0.4 }, t);
-  tl.set("#r1", { "--lc": "#f4b13e" }, t);
   show("#chip4", t + 0.5);
-  lit([$("chip4"), $("r1")], t + 0.5);
+  lit([$("chip4")], t + 0.5);
   lit([$("person"), $("w-refuse"), $("w-person")], t + 2.7);
   show(["#note", "#w-refuse"], t + 2.7);
 });
@@ -165,7 +161,7 @@ tl.to(fade, { opacity: 1, duration: FADE, ease: "none" }, T + HOLD);
 const TOTAL = Math.round((T + HOLD + FADE) * 100) / 100;
 tl.set({}, {}, TOTAL);
 if (TOTAL < 20 || TOTAL > 30) throw new Error("duration " + TOTAL);
-$("root").setAttribute("data-duration", TOTAL);
+if (Number(document.getElementById("root").dataset.duration) !== TOTAL) throw new Error("the root's data-duration must be " + TOTAL);
 window.__timelines = window.__timelines || {};
 window.__timelines["main"] = tl;
 </script>

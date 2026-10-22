@@ -40,8 +40,8 @@ function filed(now, m) {
 }
 
 module.exports = {
-  title: "A player's report",
-  story: "A player reports a missing receipt as an issue. Sebastian has the agent file the fix card from it, the fix merges " +
+  title: "A user's report",
+  story: "A user reports a missing receipt as an issue. Sebastian has the agent file the fix card from it, the fix merges " +
     "and closes the report, and the fix card's drawer names the report it came from.",
   group: "operate",
   theme: "dark",

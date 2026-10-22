@@ -134,7 +134,7 @@
 </section>
 <section class="panel api u" id="api"><h2>Model<br>API</h2></section>
 
-<section class="panel ask u amb" id="ask"><h2>A person decides</h2><p>the card's budget cap is reached</p><div class="btns"><span>Fund it</span><span>End it</span></div></section>
+<section class="panel ask u amb" id="ask"><h2>A human decides</h2><p>the card's budget cap is reached</p><div class="btns"><span>Fund it</span><span>End it</span></div></section>
 
 <section class="panel factory u" id="factory">
   <h2>The factory</h2>
@@ -168,7 +168,7 @@
   <span>The call goes out; then it books <b class="m">the real cost</b>: €0.04.</span>
   <span>The agent holds <b>a one-hour gateway identity</b>, never a push token or a model key.</span>
   <span>More calls fill <b class="m">the budget</b> to its cap.</span>
-  <span>The factory stops and asks <b class="m">a person</b>: fund it or end it.</span>
+  <span>The factory stops and asks <b class="m">a human</b>: fund it or end it.</span>
   <span>When the agent is done, the factory <b>kills it</b>.</span>
   <span>It <b>mints a fresh write token</b> and <b>pushes once</b>.</span>
   <span>It <b>revokes</b> the token.</span>
@@ -287,7 +287,7 @@ beat(3.0, (t) => {
 // what the agent holds
 beat(4.6, (t) => { lit(["#h-id", "#h-no"], t); show(["#h-id", "#h-no"], t, 0.3); });
 
-// the cap, then the person
+// the cap, then the human
 beat(2.7, (t) => {
   lit([".lbl", ".bar", "#booked"], t);
   tl.to(["#lg-held", "#lg-booked"], { opacity: 0, duration: 0.2 }, t);

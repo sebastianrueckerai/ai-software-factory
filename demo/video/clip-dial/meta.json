@@ -1,6 +1,6 @@
 {
  "id": "clip-dial",
- "name": "One dial for how much it asks",
- "title": "One dial for how much it asks",
- "story": "The theory first: which decisions stay with the person at each autonomy level. Then the console: on manual a payments merge waits and is approved by hand; the dial goes to full auto; the next card's question is answered by the agent and the card merges and goes live without anyone."
+ "name": "Manual control or full auto, and anything in between",
+ "title": "Manual control or full auto, and anything in between",
+ "story": "The theory first: which decisions stay with you at each autonomy level. Then the console: on manual a payments merge waits and is approved by hand. The dial stands on manual, its menu shows a lamp per level, brighter with each, and full auto is picked. After the switch the chip's lamp burns brightest, the agent answers the next card's question from the code, and the card merges and goes live without anyone."
 }

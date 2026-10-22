@@ -8,18 +8,34 @@
  "plain": true,
  "maxZoom": 1.5,
  "camDur": 1.6,
+ "matte": {
+  "top": 54,
+  "bottom": 54
+ },
  "segments": [
   {
    "id": "d",
    "clip": "p-diagram-pool.mp4",
-   "dur": 29.9
+   "dur": 27.9
   },
   {
-   "id": "p",
+   "id": "p1",
    "scene": "37-pool",
    "from": [
     1,
     "act0"
+   ],
+   "to": [
+    1,
+    "stillMs"
+   ]
+  },
+  {
+   "id": "p2",
+   "scene": "37-pool",
+   "from": [
+    2,
+    "act1"
    ],
    "to": [
     3,
@@ -35,7 +51,7 @@
  "spots": [
   {
    "at": [
-    "p",
+    "p1",
     null,
     null,
     1.0
@@ -49,10 +65,16 @@
   },
   {
    "at": [
-    "p",
-    2,
-    "act0",
-    0.5
+    "p2",
+    null,
+    null,
+    -0.3
+   ],
+   "box": null
+  },
+  {
+   "at": [
+    "p2"
    ],
    "box": [
     "37-pool",
@@ -62,7 +84,7 @@
   },
   {
    "at": [
-    "p",
+    "p2",
     3,
     "act1"
    ],
@@ -83,7 +105,7 @@
   },
   {
    "at": [
-    "p",
+    "p2",
     3,
     "act1",
     3.4
@@ -98,7 +120,7 @@
  "cams": [
   {
    "at": [
-    "p",
+    "p2",
     3,
     "act0"
    ],
@@ -114,7 +136,7 @@
   },
   {
    "at": [
-    "p",
+    "p2",
     3,
     "act1",
     3.4
@@ -132,7 +154,7 @@
  "caps": [
   {
    "at": [
-    "p",
+    "p1",
     null,
     null,
     1.0
@@ -143,17 +165,14 @@
   },
   {
    "at": [
-    "p",
-    2,
-    "act0",
-    0.5
+    "p2"
    ],
    "text": "Full auto: the factory wakes the agent",
    "cls": "label"
   },
   {
    "at": [
-    "p",
+    "p2",
     3,
     "act1"
    ],
@@ -162,7 +181,7 @@
   },
   {
    "at": [
-    "p",
+    "p2",
     3,
     "act1",
     3.4
@@ -186,18 +205,14 @@
  ],
  "reveals": [
   [
-   "p"
+   "p1"
   ],
   {
    "from": [
-    "p",
-    2,
-    "atMs"
+    "p2"
    ],
    "to": [
-    "p",
-    2,
-    "act0"
+    "p2"
    ]
   }
  ]

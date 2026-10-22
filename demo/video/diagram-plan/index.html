@@ -119,7 +119,7 @@ beat(3.3, "<b>rock-physics</b> first, <b>belt-map</b> and <b>mining-drone</b> ne
   tl.to([n[1].el, n[2].el, e[0].g, e[1].g], { "--hi": 0, duration: 0.4 }, t + 2.2); tl.to([n[3].el, e[2].g, e[3].g], { "--hi": 1, duration: 0.3 }, t + 2.2);
   cur = [n[3].el, e[2].g, e[3].g];
 });
-beat(2.7, "The plan can ask <b>the person</b> a question.", true, (t) => { show(question, t + 0.1); lit([question], t + 0.1); });
+beat(2.7, "The plan can ask <b>you</b> a question.", true, (t) => { show(question, t + 0.1); lit([question], t + 0.1); });
 beat(3.0, "It moves to <b>Needs you</b> to wait for an accept.", true, (t) => {
   tl.to([panel, ptitle, question, ...pg.nodes.map((n) => n.el), ...pg.edges.map((e) => e.g)], { opacity: 0, duration: 0.4 }, t + 0.1);
   tl.set(card, { "--lc": "#f4b13e" }, t);

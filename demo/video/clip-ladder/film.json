@@ -8,6 +8,10 @@
  "plain": true,
  "maxZoom": 1.5,
  "camDur": 1.6,
+ "matte": {
+  "top": 54,
+  "bottom": 54
+ },
  "segments": [
   {
    "id": "d",
@@ -168,15 +172,6 @@
     "act1"
    ],
    "text": "The next session runs on the stronger model",
-   "cls": "label"
-  },
-  {
-   "at": [
-    "s",
-    5,
-    "act1"
-   ],
-   "text": "Its second session works on the stronger model",
    "cls": "label"
   },
   {

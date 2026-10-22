@@ -18,8 +18,9 @@
   .fx-cap b { color: var(--accent); font-weight: 600; }
   .fx-cap.amber b { color: var(--need-text); }
   .fx-cap.close { top: -330px; font-size: 64px; }
-  .fx-cap.label { top: 22px; left: 40px; right: auto; max-width: 1100px; text-align: left; font-size: 44px; line-height: 1.2; padding: 12px 22px;
-    background: color-mix(in srgb, var(--bg) 90%, transparent); border-left: 6px solid var(--accent); box-shadow: 0 6px 24px rgba(0,0,0,.5); }
+  .fx-cap.label { top: 22px; left: 40px; right: auto; max-width: 1100px; text-align: left; font-size: 46px; line-height: 1.2; padding: 18px 30px;
+    background: rgba(2, 4, 8, .95); border-left: 8px solid var(--accent);
+    box-shadow: 0 0 0 1px rgba(223, 231, 241, .12), 0 12px 40px 8px rgba(0, 0, 0, .85); }
   .fx-cap.label.amber { border-left-color: var(--need); }
   .fx-cap.close small { display: block; margin-top: 18px; font: 34px var(--font-mono); color: var(--text-muted); }
   .title { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; opacity: 0; }
@@ -32,7 +33,8 @@
   .title.moral b { top: 300px; }
   /* the matte: the picture sits inside bars, so the player's controls cover no caption (matte in film.json) */
   #frame { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; transform-origin: 0 0; overflow: hidden; }
-  #dip { position: absolute; inset: 0; background: var(--bg); opacity: 0; }
+  #dip { position: absolute; inset: 0; background: #000; opacity: 0; }
+  .title.slate i { display: none; }
 </style>
 </head>
 <body>
@@ -100,11 +102,15 @@ const inSegment = (t) => Object.entries(F.seg).find(([, s]) => t >= s.start - 0.
 // a section title or a moral holds the frame alone: the frame dims, the words rise in, and only after they leave do the
 // highlight and the caption of the next moment come
 const held = (F.titles || []).map((s) => { const t = time(s.at); return { t, end: t + (s.dur || 1.8) + 0.3, s }; });
-const after = (t) => { const w = held.find((h) => t >= h.t - 0.05 && t < h.end); return w ? w.end : t; };
+// a reveal lifts the frame from black after a slate or a page change; nothing moves or lights until it is up
+const lifts = (F.reveals || []).map((r) => (r.from ? time(r.to) : time(r))).map((t) => ({ t, end: t + 0.7 }));
+const quiet = (F.quiet || []).map((id) => ({ t: time([id]), end: time([id, "end"]) }));
+const within = (ws, t) => ws.find((w) => t >= w.t - 0.05 && t < w.end);
+const after = (t) => { for (let k = 0; k < 3; k++) { const w = within(held, t) || within(lifts, t); if (!w) break; t = w.end; } return t; };
 
 // the camera: each cam moves the frame so its box fills a share of the screen, a cam with no box returns home; a cut may
 // cap how far any zoom goes and how fast the camera moves (maxZoom and camDur in film.json)
-const moves = (F.cams || []).map((c) => ({ ...c, t: time(c.at), dur: c.dur ?? F.camDur ?? 0.9 }));
+const moves = (F.cams || []).map((c) => ({ ...c, t: after(time(c.at)), dur: c.dur ?? F.camDur ?? 0.9 }));
 moves.forEach((c) => {
   const r = box(c.box);
   if (r) fx.camera(tl, stage, r, c.t, { fill: c.fill ?? 0.8, cx: c.cx, cy: c.cy, dur: c.dur, max: F.maxZoom });
@@ -129,13 +135,15 @@ spots.sort((a, b) => a.t - b.t).forEach((s) => {
   else fx.unspot(tl, stage, s.t, s.dur ?? 0.5);
 });
 
-// the words: each caption lasts until the next one or its own end, and must be up long enough to read. A caption with
+// the words: each caption lasts until the next one, its own end or the next title, and must be up long enough to read. A caption with
 // parts builds its sentence: the whole sentence is laid out from the start, so nothing moves, and each part fades in at
 // its own moment; every part must stay up long enough to read before the next.
 const read = (html) => Math.max(1.4, html.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length * 0.22);
 const cs = (F.caps || []).map((c) => ({ ...c, t: after(time(c.at)) })).sort((a, b) => a.t - b.t);
 cs.forEach((c, i) => {
-  const end = c.until ? time(c.until) : (i + 1 < cs.length ? cs[i + 1].t : F.duration - 0.2);
+  let end = c.until ? time(c.until) : (i + 1 < cs.length ? cs[i + 1].t : F.duration - 0.2);
+  const next = held.find((h) => h.t > c.t + 0.05);
+  if (next) end = Math.min(end, next.t - 0.4);
   const parts = c.parts ? c.parts.map((p, k) => ({ t: k ? after(time(p.at)) : c.t, html: p.text })) : (c.text ? [{ t: c.t, html: c.text }] : []);
   if (!parts.length) return;
   parts.forEach((p, k) => {
@@ -161,21 +169,30 @@ held.forEach(({ t, s }) => {
   tl.from(el.querySelector("b"), { scaleX: 0, duration: 0.5, ease: "power3.out" }, t + 0.1);
   if (t + d < F.duration - 0.1) tl.to(el, { opacity: 0, duration: 0.3 }, t + d);
   tl.to(caps, { opacity: 0, duration: 0.3 }, t - 0.4);
-  if (t + d < F.duration - 0.1) tl.to(caps, { opacity: 1, duration: 0.2 }, t + d + 0.3);
+  if (t + d < F.duration - 0.1 && !within(quiet, t + d + 0.3)) tl.to(caps, { opacity: 1, duration: 0.2 }, t + d + 0.3);
 });
 
 // a reveal brings the frame up from the background colour, where a diagram that faded out hands over to the console
+// a slate: the frame fades to black over the scene's last half second, the camera goes home under the black
+(F.slates || []).forEach((id) => {
+  const t = time([id]);
+  tl.to("#dip", { opacity: 1, duration: 0.5 }, Math.max(0, t - 0.5));
+  tl.set(stage, { scale: 1, x: 0, y: 0 }, t + 0.05);
+});
+
 // a page change goes through the background colour too: { from, to } darkens just before from and lifts after to, so
-// the load between them never shows
+// the load between them never shows. Either way the new page comes up on the whole frame; a zoom on it is its own cam.
 (F.reveals || []).forEach((r) => {
   if (r.from) {
     const a = time(r.from), b = time(r.to);
     tl.to("#dip", { opacity: 1, duration: 0.3 }, a - 0.3);
+    tl.set(stage, { scale: 1, x: 0, y: 0 }, a);
     tl.to("#dip", { opacity: 0, duration: 0.6, ease: "power1.out" }, b);
     return;
   }
   const t = time(r);
   tl.set("#dip", { opacity: 1 }, t);
+  tl.set(stage, { scale: 1, x: 0, y: 0 }, t);
   tl.to("#dip", { opacity: 0, duration: 0.7, ease: "power1.out" }, t);
 });
 

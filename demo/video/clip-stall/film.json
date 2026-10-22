@@ -8,6 +8,10 @@
  "plain": true,
  "maxZoom": 1.5,
  "camDur": 1.6,
+ "matte": {
+  "top": 54,
+  "bottom": 54
+ },
  "segments": [
   {
    "id": "d",

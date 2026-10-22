@@ -37,7 +37,7 @@ function week2(now, a) {
 
 module.exports = {
   title: "The review rejects",
-  story: "The stronger model's review finds a race in the leave card's pull request: two players leaving at once. The finding goes " +
+  story: "The stronger model's review finds a race in the leave card's pull request: two users leaving at once. The finding goes " +
     "back to the agent, the second session frees the seat under a lock, and the review passes.",
   group: "build",
   theme: "dark",

@@ -8,6 +8,10 @@
  "plain": true,
  "maxZoom": 1.5,
  "camDur": 1.6,
+ "matte": {
+  "top": 54,
+  "bottom": 54
+ },
  "segments": [
   {
    "id": "s",
@@ -52,7 +56,7 @@
     "s",
     null,
     null,
-    1.2
+    1.0
    ],
    "box": [
     "36-find-and-tell",
@@ -138,9 +142,9 @@
     "s",
     null,
     null,
-    1.2
+    1.0
    ],
-   "text": "One card builds the refund right now",
+   "text": "You are looking for the card building a specific feature",
    "cls": "label"
   },
   {
@@ -200,7 +204,7 @@
     null,
     0.5
    ],
-   "text": "The chat writes no code. It finds the right worker and steers it.",
+   "text": "The chat writes no code, it orchestrates development for you.",
    "cls": "moral",
    "dur": 99
   }

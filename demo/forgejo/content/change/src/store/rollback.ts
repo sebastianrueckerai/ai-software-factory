@@ -10,7 +10,7 @@ export async function rollbackPurchase(purchaseId: string): Promise<Purchase> {
   if (purchase.status === "rolled_back") {
     return purchase;
   }
-  await db.inventory.revoke(purchase.playerId, purchase.itemId);
+  await db.inventory.revoke(purchase.userId, purchase.itemId);
   const updated: Purchase = { ...purchase, status: "rolled_back" };
   await db.purchases.put(updated);
   if (updated.chargeId) {

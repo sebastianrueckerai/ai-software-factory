@@ -90,7 +90,7 @@ const inner = document.createElement("div");
 feedLines.forEach((t) => { const d = document.createElement("div"); d.textContent = t; inner.appendChild(d); });
 feed.appendChild(inner);
 
-const steps = [["nudge", 56], ["check-in", 78], ["big model", 100], ["new session", 122], ["a person", 144]];
+const steps = [["nudge", 56], ["check-in", 78], ["big model", 100], ["new session", 122], ["a human", 144]];
 const stepEls = steps.map(([t, h], i) => {
   const d = document.createElement("div");
   d.className = "step u bd" + (i === 4 ? " amb" : "");
@@ -160,7 +160,7 @@ const group = (id, dur, html, dt) => add(dur, html, (t) => {
 group("#g1", 3.7, 'Three for <b>no output</b>: no events, no file written, no file changed.');
 group("#g2", 4.3, 'Four for <b>going in circles</b>: same call, same failure, a revert, no new pass.');
 group("#g3", 3.6, 'Three for <b>money and time</b>: budget, check-ins, the 2-hour end.');
-add(5.0, 'A tripped check makes the factory <b>act</b>: each step stronger, up to <b class="m">a person</b>.', (t) => {
+add(5.0, 'A tripped check makes the factory <b>act</b>: each step stronger, up to <b class="m">a human</b>.', (t) => {
   show("#stairs", t + 0.1);
   if (cur.length) tl.to(cur, { "--hi": 0, duration: 0.4 }, t + 0.1);
   cur = [];
@@ -185,7 +185,7 @@ const TOTAL = Math.round((T + HOLD + FADE) * 100) / 100;
 tl.to(inner, { y: -(feedLines.length - 3) * 42, duration: TOTAL, ease: "none" }, 0);
 tl.set({}, {}, TOTAL);
 if (TOTAL !== 29.6 || TOTAL > 30) throw new Error("duration " + TOTAL);
-$("#root").setAttribute("data-duration", TOTAL);
+if (Number(document.getElementById("root").dataset.duration) !== TOTAL) throw new Error("the root's data-duration must be " + TOTAL);
 window.__timelines = window.__timelines || {};
 window.__timelines["main"] = tl;
 </script>

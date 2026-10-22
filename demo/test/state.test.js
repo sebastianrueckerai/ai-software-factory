@@ -16,11 +16,11 @@ test("card ages from now", () => {
 });
 test("card is flat and takes its defaults", () => {
   const c = s.card(now, {
-    issue: 12, status: "waiting-human", lane: "ready", age: 7200, title: "Lobby queue", body: "Players ask.",
+    issue: 12, status: "waiting-human", lane: "ready", age: 7200, title: "Lobby queue", body: "Users ask.",
     gate: "human", gateSince: 600, escalation: s.AGENT_ASKS + "Which?", choices: ["a", "b"], escalatedAt: 300, attempts: 2, spent: 1.5,
   });
   assert.equal(c.ID, s.id(12));
-  assert.equal(c.Objective, "Lobby queue\n\nPlayers ask.");
+  assert.equal(c.Objective, "Lobby queue\n\nUsers ask.");
   assert.equal(c.Size, "small");
   assert.equal(c.BudgetEUR, 3);
   assert.equal(c.Process, "spec");
@@ -104,11 +104,11 @@ test("two asks of one text at two ages have two call ids", () => {
   assert.equal(b.tool_calls[0].id, "ask-e387d31e");
 });
 test("cardFiling describes the filing as the console does", () => {
-  const args = { title: "Lobby queue", body: "Players join.", lane: "ready", size: "medium", acceptance: ["a", "b"] };
+  const args = { title: "Lobby queue", body: "Users join.", lane: "ready", size: "medium", acceptance: ["a", "b"] };
   const p = s.cardFiling(now, args);
   assert.equal(p.Tool, "new_card");
   assert.deepEqual(p.Args, args);
-  assert.equal(p.Description, "File a card, title Lobby queue, body Players join., lane ready, size medium, acceptance a; b");
+  assert.equal(p.Description, "File a card, title Lobby queue, body Users join., lane ready, size medium, acceptance a; b");
 });
 test("cardFiling cuts a field at 120 bytes on a character boundary", () => {
   const p = s.cardFiling(now, { title: "t", body: "x".repeat(119) + "äy", lane: "plan" });

@@ -2,5 +2,5 @@
   "id": "diagram-plan",
   "name": "A plan is a card",
   "title": "A plan is a card",
-  "story": "The person types one sentence into the chat. The project agent answers that this is several cards and files one plan card in the board's plan lane. The planner, a model run on that card, writes a plan of four cards in build order: rock-physics first, belt-map and mining-drone side by side, belt-boss last, with the dependency arrows, and a question for the person. The plan card moves to Needs you and waits for the accept. On accept its four cards land in Queued, each waiting for the cards it depends on."
+  "story": "You type one sentence into the chat. The project agent answers that this is several cards and files one plan card in the board's plan lane. The planner, a model run on that card, writes a plan of four cards in build order: rock-physics first, belt-map and mining-drone side by side, belt-boss last, with the dependency arrows, and a question for you. The plan card moves to Needs you and waits for the accept. On accept its four cards land in Queued, each waiting for the cards it depends on."
 }

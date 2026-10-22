@@ -8,18 +8,41 @@
  "plain": true,
  "maxZoom": 1.5,
  "camDur": 1.6,
+ "matte": {
+  "top": 54,
+  "bottom": 54
+ },
  "segments": [
   {
-   "id": "d",
-   "clip": "p-diagram-routine.mp4",
-   "dur": 29.6
-  },
-  {
-   "id": "r",
-   "scene": "19-routines",
+   "id": "r1",
+   "scene": "38-image-bump",
    "from": [
     1,
     "act0"
+   ],
+   "to": [
+    2,
+    "stillMs"
+   ]
+  },
+  {
+   "id": "r3",
+   "scene": "38-image-bump",
+   "from": [
+    3,
+    "act1"
+   ],
+   "to": [
+    3,
+    "stillMs"
+   ]
+  },
+  {
+   "id": "r4",
+   "scene": "38-image-bump",
+   "from": [
+    4,
+    "act1"
    ],
    "to": [
     4,
@@ -27,80 +50,128 @@
    ]
   },
   {
+   "id": "r5",
+   "scene": "38-image-bump",
+   "from": [
+    5,
+    "act1"
+   ],
+   "to": [
+    5,
+    "stillMs"
+   ]
+  },
+  {
    "id": "end",
-   "still": "19-routines-4.png",
+   "still": "38-image-bump-5.png",
    "dur": 4.8
   }
  ],
  "spots": [
   {
    "at": [
-    "r",
+    "r1",
     null,
     null,
     0.6
    ],
-   "box": [
-    "19-routines",
-    1,
-    "queued"
-   ]
-  },
-  {
-   "at": [
-    "r",
-    null,
-    null,
-    2.4
-   ],
-   "box": [
-    "19-routines",
-    1,
-    "bump"
-   ]
-  },
-  {
-   "at": [
-    "r",
-    2,
-    "act0"
-   ],
-   "box": [
-    "19-routines",
-    1,
-    "read"
-   ]
-  },
-  {
-   "at": [
-    "r",
-    3,
-    "act0",
-    0.3
-   ],
-   "box": [
-    "19-routines",
-    3,
-    "drawer"
-   ]
-  },
-  {
-   "at": [
-    "r",
-    4,
-    "act1"
-   ],
    "box": {
     "rect": [
-     889,
-     250,
-     683,
-     90
+     12,
+     280,
+     623,
+     580
     ]
    }
+  },
+  {
+   "at": [
+    "r1",
+    2,
+    "act4"
+   ],
+   "box": [
+    "38-image-bump",
+    2,
+    "proposal"
+   ]
+  },
+  {
+   "at": [
+    "r3",
+    null,
+    null,
+    -0.3
+   ],
+   "box": null
+  },
+  {
+   "at": [
+    "r3"
+   ],
+   "box": [
+    "38-image-bump",
+    3,
+    "ghost"
+   ]
+  },
+  {
+   "at": [
+    "r4",
+    null,
+    null,
+    -0.3
+   ],
+   "box": null
+  },
+  {
+   "at": [
+    "r4"
+   ],
+   "box": [
+    "38-image-bump",
+    4,
+    "card"
+   ]
+  },
+  {
+   "at": [
+    "r5",
+    null,
+    null,
+    -0.3
+   ],
+   "box": null
+  },
+  {
+   "at": [
+    "r5"
+   ],
+   "box": [
+    "38-image-bump",
+    5,
+    "ghost"
+   ]
   }
  ],
  "cams": [
+  {
+   "at": [
+    "r1",
+    null,
+    null,
+    0.6
+   ],
+   "box": {
+    "rect": [
+     12,
+     280,
+     623,
+     580
+    ]
+   },
+   "fill": 0.95
+  },
   {
    "at": [
     "end"
@@ -112,50 +183,51 @@
  "caps": [
   {
    "at": [
-    "r",
+    "r1",
     null,
     null,
     0.6
    ],
-   "text": "Routines wait in Queued as dashed cards",
+   "text": "Ask the chat for a weekly job",
    "cls": "label"
   },
   {
    "at": [
-    "r",
-    null,
-    null,
-    2.4
-   ],
-   "text": "The weekly bump: every Monday 06:00",
-   "cls": "label"
-  },
-  {
-   "at": [
-    "r",
+    "r1",
     2,
-    "act0"
+    "act4"
    ],
-   "text": "Skip a run once, with one click",
+   "text": "It proposes a weekly routine",
    "cls": "label"
   },
   {
    "at": [
-    "r",
-    3,
-    "act0",
-    0.3
+    "r1",
+    2,
+    "act6"
    ],
-   "text": "Its drawer: the schedule and the next run",
+   "text": "You approve it",
    "cls": "label"
   },
   {
    "at": [
-    "r",
-    4,
-    "act1"
+    "r3"
    ],
-   "text": "Every run, and the card it filed",
+   "text": "A dashed card waits in Queued for its day",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "r4"
+   ],
+   "text": "On its day, it files a card, which runs",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "r5"
+   ],
+   "text": "Done, and queued again for next week",
    "cls": "label"
   }
  ],
@@ -174,7 +246,31 @@
  ],
  "reveals": [
   [
-   "r"
-  ]
+   "r1"
+  ],
+  {
+   "from": [
+    "r3"
+   ],
+   "to": [
+    "r3"
+   ]
+  },
+  {
+   "from": [
+    "r4"
+   ],
+   "to": [
+    "r4"
+   ]
+  },
+  {
+   "from": [
+    "r5"
+   ],
+   "to": [
+    "r5"
+   ]
+  }
  ]
 }

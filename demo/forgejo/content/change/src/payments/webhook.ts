@@ -24,7 +24,7 @@ export async function handleWebhook(
       const purchase = id ? await db.purchases.get(id) : undefined;
       if (purchase && purchase.status === "pending") {
         await db.purchases.put({ ...purchase, status: "paid", chargeId: charge.id });
-        await db.inventory.grant(purchase.playerId, purchase.itemId);
+        await db.inventory.grant(purchase.userId, purchase.itemId);
       }
       break;
     }

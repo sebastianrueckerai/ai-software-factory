@@ -109,7 +109,7 @@ function drained(now, k, o = {}) {
   });
 }
 
-// the intake: new cards that file themselves, a nightly scan's, an alert's and a player's issue, each as factoryd files it
+// the intake: new cards that file themselves, a nightly scan's, an alert's and a user's issue, each as factoryd files it
 const arrivals = (now) => [
   face(now, 135, "queued", { age: 50, author: "factory-agent", source: "routine" }),
   face(now, 134, "queued", { age: 40, author: "factory-agent", source: "alert" }),
@@ -152,7 +152,7 @@ module.exports = {
   title: "A busy board, drained and filled again",
   story: "One afternoon in one frame: three cards need Sebastian, one waits on another, five build and six are done. He splits " +
     "the card at its budget in the chat and presses Do it twice. The board drains one card at a time as the work resolves. Then new " +
-    "work comes in on its own, a nightly scan, an alert and a player's issue, and one sentence in the chat becomes the plan for " +
+    "work comes in on its own, a nightly scan, an alert and a user's issue, and one sentence in the chat becomes the plan for " +
     "level 5, whose four cards land on the board once he accepts it.",
   group: "intake",
   theme: "dark",

@@ -6,6 +6,7 @@
 //
 // film.json: { "template": "../film.tpl.html", "segments": [ ... ], "spots": [ ... ], "caps": [ ... ], "titles": [ ... ] },
 // a segment either { "id", "still": "<scene>-<n>.png", "dur": seconds }, { "id", "clip": "p-<name>.mp4", "dur": seconds },
+// { "id", "title": "words", "dur": seconds }, a black slate with its words,
 // or { "id", "scene", "from": [step, "atMs"|"stillMs"|"actN"], "lead": seconds, "to": [step, field], "tail": seconds, "rate": rate }.
 const fs = require("node:fs");
 const path = require("node:path");
@@ -30,7 +31,15 @@ const scenes = {};
 const seg = {};
 const media = [];
 let t = 0;
-for (const s of film.segments) {
+// slates: a title segment holds the frame black with its words, between the scenes before and after it
+const slates = [];
+for (const [i, s] of film.segments.entries()) {
+  if (s.title) {
+    seg[s.id] = { start: t, dur: s.dur, title: s.title };
+    slates.push({ id: s.id, text: s.title, dur: s.dur, next: film.segments[i + 1]?.id });
+    t += s.dur;
+    continue;
+  }
   if (s.clip) {
     // a rendered clip of the procedural route, played whole from its start
     fs.copyFileSync(path.join(bank, s.clip), path.join(clips, s.clip));
@@ -99,7 +108,9 @@ const duration = Math.ceil((t + (film.tail || 0)) * 10) / 10;
 if (!film.tail && media.length && media.at(-1).startsWith("<img")) {
   media[media.length - 1] = media.at(-1).replace(/data-start="([\d.]+)" data-duration="[\d.]+"/, (m, st) => `data-start="${st}" data-duration="${(duration - Number(st)).toFixed(3)}"`);
 }
-fs.writeFileSync(path.join(dir, "data.js"), `window.FILM = ${JSON.stringify({ duration, seg, scenes, spots: film.spots, cams: film.cams, caps: film.caps, titles: film.titles, quiet: film.quiet, plain: film.plain, maxZoom: film.maxZoom, camDur: film.camDur, reveals: film.reveals, matte: film.matte })};\n`);
+fs.writeFileSync(path.join(dir, "data.js"), `window.FILM = ${JSON.stringify({ duration, seg, scenes, spots: film.spots, cams: film.cams, caps: film.caps, quiet: film.quiet, plain: film.plain, maxZoom: film.maxZoom, camDur: film.camDur, matte: film.matte,
+  titles: [...(film.titles || []), ...slates.map((sl) => ({ at: [sl.id, null, null, 0.3], text: sl.text, dur: sl.dur - 0.9, cls: "slate" }))],
+  slates: slates.map((sl) => sl.id), reveals: [...(film.reveals || []), ...slates.filter((sl) => sl.next).map((sl) => [sl.next])] })};\n`);
 if (film.template) {
   const tpl = fs.readFileSync(path.join(dir, film.template), "utf8");
   fs.writeFileSync(path.join(dir, "index.html"), tpl.replaceAll("{{DURATION}}", String(duration)).replace("<!--MEDIA-->", media.join("\n")));

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "historyId": "34501a48-83d6-43ae-93d6-d45687746868",
-  "currentRevision": "5ee99964-91c7-42be-b227-aa84152239d0",
+  "currentRevision": null,
   "pendingChanges": false,
   "files": {
     "diagram.css": {
@@ -13,61 +13,15 @@
       "content": "/home/womb/.cache/hyperframes/history/34501a48-83d6-43ae-93d6-d45687746868/blobs/c1/c174bfce53a729418d57a8ad8625e7247c793a22fef8e2851e3cfa3de9cd8280"
     },
     "index.html": {
-      "hash": "1b0f0b5cb80e14d651233396ac4297efb93a09a1b5f69a5117b1ec7cec577ee8",
-      "content": "/home/womb/.cache/hyperframes/history/34501a48-83d6-43ae-93d6-d45687746868/blobs/1b/1b0f0b5cb80e14d651233396ac4297efb93a09a1b5f69a5117b1ec7cec577ee8"
+      "hash": "c0e557b136fdc1383ec412b7e47232c68fed486984b66efae5b6ccace224cfcb",
+      "content": "/home/womb/.cache/hyperframes/history/34501a48-83d6-43ae-93d6-d45687746868/blobs/c0/c0e557b136fdc1383ec412b7e47232c68fed486984b66efae5b6ccace224cfcb"
     },
     "meta.json": {
-      "hash": "c641177a5e4ffcca4c8aeee59d59816845ccc49ad4bd02c6cf70b83f45108f33",
-      "content": "/home/womb/.cache/hyperframes/history/34501a48-83d6-43ae-93d6-d45687746868/blobs/c6/c641177a5e4ffcca4c8aeee59d59816845ccc49ad4bd02c6cf70b83f45108f33"
+      "hash": "99c4428af4f2e0d54978837dad763e76271a1bd5f5211b3b2f6f1e91aeabf229",
+      "content": "/home/womb/.cache/hyperframes/history/34501a48-83d6-43ae-93d6-d45687746868/blobs/99/99c4428af4f2e0d54978837dad763e76271a1bd5f5211b3b2f6f1e91aeabf229"
     }
   },
-  "revisions": {
-    "f65cc33b-5415-47d3-8516-6e4f7ec464ee": {
-      "actor": {
-        "kind": "outside",
-        "name": "Outside"
-      },
-      "label": "Changed outside the app",
-      "startedAt": 1792657579248,
-      "endedAt": 1792657579249,
-      "files": {
-        "index.html": {
-          "before": "/home/womb/.cache/hyperframes/history/34501a48-83d6-43ae-93d6-d45687746868/blobs/30/30bcf438a4db32e22242081ec37a7c159b72121fb3a5766dd5def1b3188a047d",
-          "after": "/home/womb/.cache/hyperframes/history/34501a48-83d6-43ae-93d6-d45687746868/blobs/5d/5d8eedd2c149e4a3c50f84e46280582c28386791ca217f7c9160c57418056ba0"
-        }
-      }
-    },
-    "a204f6b9-1ce0-48d2-b653-bfa4add301a4": {
-      "actor": {
-        "kind": "outside",
-        "name": "Outside"
-      },
-      "label": "Changed outside the app",
-      "startedAt": 1792657927986,
-      "endedAt": 1792657927987,
-      "files": {
-        "index.html": {
-          "before": "/home/womb/.cache/hyperframes/history/34501a48-83d6-43ae-93d6-d45687746868/blobs/5d/5d8eedd2c149e4a3c50f84e46280582c28386791ca217f7c9160c57418056ba0",
-          "after": "/home/womb/.cache/hyperframes/history/34501a48-83d6-43ae-93d6-d45687746868/blobs/76/76dd1e6a4f77d7ab42c92a6416b5814b1be14126d8443df034255e4865001b95"
-        }
-      }
-    },
-    "5ee99964-91c7-42be-b227-aa84152239d0": {
-      "actor": {
-        "kind": "outside",
-        "name": "Outside"
-      },
-      "label": "Changed outside the app",
-      "startedAt": 1792658310529,
-      "endedAt": 1792658310529,
-      "files": {
-        "index.html": {
-          "before": "/home/womb/.cache/hyperframes/history/34501a48-83d6-43ae-93d6-d45687746868/blobs/76/76dd1e6a4f77d7ab42c92a6416b5814b1be14126d8443df034255e4865001b95",
-          "after": "/home/womb/.cache/hyperframes/history/34501a48-83d6-43ae-93d6-d45687746868/blobs/1b/1b0f0b5cb80e14d651233396ac4297efb93a09a1b5f69a5117b1ec7cec577ee8"
-        }
-      }
-    }
-  },
+  "revisions": {},
   "checks": {
     "latest": null,
     "revisions": {},
@@ -80,11 +34,11 @@
   },
   "renders": {
     "latest": {
-      "id": "abbbafc1-6705-486b-b65e-cf876e7de1ff",
-      "completedAt": 1792658360191,
-      "output": "/tmp/hf-sandbox-a-Cfukkt/b.mp4",
+      "id": "ad962b6b-d98a-41fd-bec2-15435e0c3bea",
+      "completedAt": 1792680416731,
+      "output": "/tmp/hf-sandbox-a-zEoxWy/b.mp4",
       "status": "completed",
-      "revision": "5ee99964-91c7-42be-b227-aa84152239d0"
+      "revision": null
     },
     "retainedRevisions": [
       "5ee99964-91c7-42be-b227-aa84152239d0",

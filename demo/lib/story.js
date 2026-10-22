@@ -26,15 +26,15 @@ function date(week, weekday, hm) {
 const cards = {
   100: {
     title: "Title screen: show the version and the server region", size: "small", pr: 200,
-    body: "The title screen names the game's version and the region of the server a player connects to",
+    body: "The title screen names the game's version and the region of the server a user connects to",
     acceptance: ["the title screen shows the version and the server region under the logo"],
   },
   101: {
-    title: "Co-op: a full lobby queues players for the next free seat", size: "medium", pr: 201,
-    body: "A full co-op lobby queues the players who try to join, in order. A player who leaves frees a seat for the first in line",
+    title: "Co-op: a full lobby queues users for the next free seat", size: "medium", pr: 201,
+    body: "A full co-op lobby queues the users who try to join, in order. A user who leaves frees a seat for the first in line",
     acceptance: [
       "a full lobby shows Join the queue in place of Join",
-      "a player leaving offers the seat to the first in line with a notice in the game that holds it for 30 seconds",
+      "a user leaving offers the seat to the first in line with a notice in the game that holds it for 30 seconds",
       "a seat unclaimed after 30 seconds passes to the next in line",
     ],
   },
@@ -48,7 +48,7 @@ const cards = {
   },
   103: {
     title: "Ship select: show each ship's speed and shield", size: "small", pr: 203,
-    body: "Players want to compare the ships before they launch a run",
+    body: "Users want to compare the ships before they launch a run",
     acceptance: ["the ship select screen shows each ship's speed and shield under its name"],
   },
   104: {
@@ -129,21 +129,21 @@ const cards = {
   },
   116: {
     title: "Lobby: leave a match without penalty in its first 60 seconds", size: "medium", pr: 214,
-    body: "A player may leave a match in its first 60 seconds without the quit penalty. The seat goes to the queue of #101",
+    body: "A user may leave a match in its first 60 seconds without the quit penalty. The seat goes to the queue of #101",
     acceptance: [
       "Leave without penalty shows for the first 60 seconds of a match and not after",
-      "a seat left goes to the first player in the queue",
-      "two players leaving at the same moment give their seats to two different players in the queue",
+      "a seat left goes to the first user in the queue",
+      "two users leaving at the same moment give their seats to two different users in the queue",
     ],
   },
   117: {
-    title: "Daily challenge: notify players when a new one opens", size: "small", pr: 215,
-    body: "Every player who opted in gets one notice when the day's challenge opens at 18:00 Berlin time",
-    acceptance: ["a player who opted in gets one notice when each new challenge opens", "a player who opted out gets none"],
+    title: "Daily challenge: notify users when a new one opens", size: "small", pr: 215,
+    body: "Every user who opted in gets one notice when the day's challenge opens at 18:00 Berlin time",
+    acceptance: ["a user who opted in gets one notice when each new challenge opens", "a user who opted out gets none"],
   },
   118: {
     title: "Leaderboard: filter by ship", size: "small", pr: 216,
-    body: "Players compare runs on the same ship. The leaderboard gets a ship filter, kept in the URL so a link shares it",
+    body: "Users compare runs on the same ship. The leaderboard gets a ship filter, kept in the URL so a link shares it",
     acceptance: ["the leaderboard shows only the runs on the chosen ship", "the filter survives a reload"],
   },
   119: {
@@ -157,23 +157,23 @@ const cards = {
   },
   120: {
     title: "Season pass: 10 tiers, valid for the season", size: "medium", pr: 218,
-    body: "A player buys a season pass of 10 reward tiers by card. Each tier unlocks at its season points, and the pass ends with the season",
+    body: "A user buys a season pass of 10 reward tiers by card. Each tier unlocks at its season points, and the pass ends with the season",
     acceptance: [
-      "a player with the pass unlocks each tier at its season points",
+      "a user with the pass unlocks each tier at its season points",
       "the profile shows the tiers unlocked and the season's end date",
       "a pass past its season unlocks nothing",
     ],
   },
   121: {
-    title: "Profile: a player's past runs", size: "small", pr: 219,
-    body: "The profile lists a player's runs of the last 12 months, newest first, with each run's date, ship and score",
-    acceptance: ["the profile lists the last 12 months of runs", "a player sees only their own"],
+    title: "Profile: a user's past runs", size: "small", pr: 219,
+    body: "The profile lists a user's runs of the last 12 months, newest first, with each run's date, ship and score",
+    acceptance: ["the profile lists the last 12 months of runs", "a user sees only their own"],
   },
   122: {
     title: "Store: refund a purchase the server rolls back", size: "medium", pr: 220,
-    body: "When the game server rolls back a purchase it could not grant, the player who paid for it by card gets a refund through Stripe, once",
+    body: "When the game server rolls back a purchase it could not grant, the user who paid for it by card gets a refund through Stripe, once",
     acceptance: [
-      "a purchase the server rolls back refunds the player's card",
+      "a purchase the server rolls back refunds the user's card",
       "a rollback sent twice refunds once",
       "a failed refund shows on the purchase's page for support",
     ],
@@ -202,7 +202,7 @@ const cards = {
     repro: "go run ./server/cmd/sim -level 3 -pause-in-phase 2",
     acceptance: ["a boss paused and resumed in phase two fights on", "a boss paused and resumed in phase one or three fights on as before"],
   },
-  // the film's intake, Monday of week 3: a nightly scan, an alert and a player's issue file cards on their own, then a
+  // the film's intake, Monday of week 3: a nightly scan, an alert and a user's issue file cards on their own, then a
   // sentence in the chat becomes the plan for level 5 and its four cards
   133: {
     title: "Boss fight: pausing in phase two freezes the game", size: "small", reporter: "lena.h",
@@ -245,6 +245,11 @@ const cards = {
     body: "Card avalanche-boss of plan #136, accepted by sebastian. A boss that sends down avalanches which slide on the ice model",
     acceptance: ["each avalanche slides on the ice model", "the boss falls after three hits on its core"],
   },
+  // the first run of the image-bump routine Sebastian adds in scene 38
+  141: {
+    title: "Weekly image bump", size: "small", pr: 231,
+    body: "Run the skill dependency-update.\n\nBump every pinned base image of the game server and the build to the newest release of its line, in one pull request.\n\nfiled by the factory · routine image-bump · run 1",
+  },
 };
 
 function card(issue) {
@@ -284,7 +289,7 @@ function filing(issue, lane) {
 
 // requests are what Sebastian types into the chat.
 const requests = {
-  queue: "Players ask for a queue when a co-op lobby is full.",
+  queue: "Users ask for a queue when a co-op lobby is full.",
   matchmaking: "Matchmaking feels slow.",
   belt: "Build level 4, the asteroid belt.",
   report: "File a fix card for maria.k's report #106.",
@@ -300,8 +305,8 @@ const requests = {
 const asks = {
   queue: {
     issue: 101,
-    question: "A queue fits the lobby: a full lobby takes players in order, and a player leaving offers the seat " +
-      "to the first in line. How does that player hear the seat is free?",
+    question: "A queue fits the lobby: a full lobby takes users in order, and a user leaving offers the seat " +
+      "to the first in line. How does that user hear the seat is free?",
     choices: ["In the game", "By push notification"],
     answer: "In the game",
   },
@@ -461,7 +466,7 @@ const approvals = {
   refund: {
     id: 31, kind: "merge", task: 122, pr: cards[122].pr, risk: "high",
     reason: "risk class high: the change touches src/payments",
-    brief: "Refunds a purchase the game server rolls back to the player's card, once per purchase.",
+    brief: "Refunds a purchase the game server rolls back to the user's card, once per purchase.",
     detail: "Adds refundPurchase in src/payments/refund.ts, called when the game server rolls back a purchase. It creates one Stripe " +
       "refund per paid purchase with an idempotency key, so a rollback sent twice refunds once. The charge.refunded webhook marks " +
       "the purchase refunded, and a failed refund shows on the purchase's page for support. Tests cover a double rollback and a " +
@@ -680,16 +685,16 @@ const sessions = {
       words: [
         [40, "Reading server/lobby/leave.go and offerSeat, the queue's hand-over from #101."],
         [5 * MIN, "Leave without penalty shows for the first 60 seconds. The check reads the match's start from the server's clock, not the client's."],
-        [14 * MIN, "A leave frees the seat, then offerSeat offers it to the first player in the queue. The tests of the window and the hand-over pass."],
+        [14 * MIN, "A leave frees the seat, then offerSeat offers it to the first user in the queue. The tests of the window and the hand-over pass."],
         [26 * MIN, "go test ./server/lobby/...: 9 new tests pass. Pushing and opening the pull request."],
       ],
     },
     "s-2": {
       commit: "e5a3c18",
       words: [
-        [30, "The review found a race in leave.go: the seat is freed and offered in two steps, and two leaves at once offer both seats to the same player."],
+        [30, "The review found a race in leave.go: the seat is freed and offered in two steps, and two leaves at once offer both seats to the same user."],
         [4 * MIN, "Leave now holds the lobby's lock while it frees the seat and offers it, so the two steps are one."],
-        [11 * MIN, "A new test runs two leaves at the same moment, 50 times under -race: two different players get the two seats every time."],
+        [11 * MIN, "A new test runs two leaves at the same moment, 50 times under -race: two different users get the two seats every time."],
         [15 * MIN, "go test -race ./server/lobby/...: 10 new tests pass. Pushing to the pull request."],
       ],
     },
@@ -839,7 +844,7 @@ function board(cards) {
 
 // reviews are the review gate's verdicts on a card's pull request, round by round.
 const reviews = {
-  101: [{ verdict: "approve", summary: "A full lobby queues players in order, and a player leaving offers the first in line a seat held for 30 seconds." }],
+  101: [{ verdict: "approve", summary: "A full lobby queues users in order, and a user leaving offers the first in line a seat held for 30 seconds." }],
   102: [{ verdict: "approve", summary: "Keeps the open lobbies in memory, indexed by region. The load test measures GET /match at 0.31 s at the p95." }],
   103: [{ verdict: "approve", summary: "Adds the speed and the shield to the ships query and shows them under each ship, with tests for the screen." }],
   104: [{ verdict: "approve", summary: "confirmPurchase reads latest_charge of API version 2022-11-15, and a replayed event of that version confirms the purchase." }],
@@ -851,16 +856,16 @@ const reviews = {
   116: [
     {
       verdict: "concerns",
-      summary: "The leave window and the hand-over to the queue work, but two players leaving at the same moment can give both seats to the same player.",
+      summary: "The leave window and the hand-over to the queue work, but two users leaving at the same moment can give both seats to the same user.",
       findings: [
         "server/lobby/leave.go:48: Leave frees the seat, then offerSeat reads the queue in a second step without the lobby's lock. Two leaves " +
           "at once read the same head of the queue and offer both seats to the first in line. Free the seat and offer it under one hold of the lobby's mutex.",
       ],
     },
-    { verdict: "approve", summary: "Frees the seat and offers it under one hold of the lobby's lock. The race test finds two players for two seats every time." },
+    { verdict: "approve", summary: "Frees the seat and offers it under one hold of the lobby's lock. The race test finds two users for two seats every time." },
   ],
   120: [{ verdict: "approve", summary: "A season pass of 10 tiers bought by card. Each tier unlocks at its points, and the profile shows what is unlocked." }],
-  121: [{ verdict: "approve", summary: "Lists a player's runs of the last 12 months, newest first, scoped to the player." }],
+  121: [{ verdict: "approve", summary: "Lists a user's runs of the last 12 months, newest first, scoped to the user." }],
   123: [{ verdict: "approve", summary: "The leaderboard loads the runs' ships in one query, not one per run. The load test measures GET /leaderboard at 0.29 s at the p95." }],
   122: [{ verdict: "approve", summary: "Refunds each rolled-back purchase once, keyed on the purchase's id. The tests cover a rollback sent twice and a declined refund." }],
   125: [{ verdict: "approve", summary: "The replay screen builds its link with the challenge notice's gameLink, and the tests read the replay's path and seed from it." }],

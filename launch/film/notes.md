@@ -47,6 +47,28 @@ Started 22 October 2026. The working file for the film and its small clips: what
 - Show routines (the dashed card, the weekly bump) in a clip of their own.
 - The budget clip mostly shows a split: replace it with the discretionary pool, so the factory does not ask about five-cent overruns.
 
+## What Sebastian asked, 22 October, after round 4 (round 5)
+
+- Rough cut: "you press Do it" becomes "you approve". "Player" becomes "user" everywhere.
+- No zoom on the plan card, only a mark. On "Then approve", the highlight must leave with the card, and the merged card needs no zoom and less time.
+- The board behind "Full auto" zooms erratically. Every section title: fade the board to black, show the title, fade back, and only then move.
+- The highlight on the question must reach its choices.
+- "Measured" becomes "Metrics", a little slower, the whole page first, and a line that the metrics let you tune the process, the harness and the prompts on data.
+- The caption over "Inside a card" looks dimmed. Should "Inside a card" come earlier, and should Metrics come last? Keep the black bars, in every video.
+- Clips: the chat clip's first label names no card content, its moral becomes "The chat writes no code, it orchestrates development for you", its page title "The chat orchestrates development". The labels get a bigger box and a shadow. The ladder loses its duplicate label. The pool box shows only a fund you set for small overruns. The dial's title becomes "Manual control or full auto, and anything in between", the level menu shows lamps brighter with each level, the full auto lamp is seen on, and the zoom jitter at 55 s goes. The stall clip says "human", not "person". Routines become one simple console scene, without a diagram. Sandbox A stays.
+
+## Round 5 decisions
+
+- **Order.** Inside a card follows the plan: the plan ends with "the agents take it from here", and the sandbox shows what one agent does inside its card. Every later section then reads as what happens around a card. Metrics comes last: it sums up the run and leads into tuning.
+- **Slates.** A section title is a segment of its own, `{"id", "title", "dur"}`: the scene before fades to black, the camera resets under the black, the title shows alone, and the next scene lifts from black before any highlight, caption or camera move starts.
+- **Zoom.** Only the stall, the question, the menu and the manual review keep a zoom, capped at 1.35. The merged card shows as a still with a highlight for 2.6 s.
+- **Template rules.** A caption ends before the next title, so no old caption returns over a slate. A page change through black lands on the whole frame; a zoom on the new page is its own cam. Where a scene reloads the page, the cut splits into two segments at the reload, so the load costs one 0.9 s dip instead of up to 2 s of black. The film's tail is gone, so it ends on the closing still, not on black.
+- **The level menu.** C33: every row of the menu carries its own lamp, brighter with each level, in console build 549cbaee. The lab cannot change the level, so the switch to full auto is seeded and shown after a reload, with the chip's lamp highlighted.
+- **Routines.** New scene 38: one sentence in the chat, the routine proposal, the dashed card in Queued, its card running on its day, done, and the dashed card waiting again. The approval press and the run are seeded, since the lab cannot commit the project file. The lab runs on the real clock, so the weekly slot is the last quarter hour at least ten minutes before the recording, and the chat thread sits a week earlier: the dashed card's next run, the card's age and its run then agree. The routine diagram is gone.
+- **The pool.** The pool box shows only "€10 a month, you set it, for small overruns". The raise limit, the card cap and the month's limit rows are gone.
+- **Users.** The demo project's cards, its Forgejo code and every caption say "user" where they said "player". All scenes were recorded again.
+- **Harness.** The metrics caption names the harness among the things to tune. The factory has one harness adapter today, so tuning it means its tools, skills and settings, not a switch to another harness.
+
 ## Round 4 decisions
 
 - **Template rules.** A section title or a moral holds the frame alone: the highlight leaves as it comes, captions and highlights of the next moment wait until it leaves. A highlight that meets a camera move leaves as the move starts and appears in place once it stops. A caption with `parts` lays out its whole sentence from the start and fades each part in, so nothing shifts. A `reveals` entry with `from` and `to` dissolves a page change through the background colour. `matte` in film.json scales the picture into black bars: 54 px top and bottom, which leaves pillar bars at the sides, since a 16:9 picture inside a 16:9 frame cannot shrink only in height without a crop. Removing the key reverses it; the review page shows both.
@@ -78,7 +100,7 @@ Started 22 October 2026. The working file for the film and its small clips: what
 | # | Was | Becomes |
 |---|---|---|
 | 100 | Footer: the studio's address and hours | Title screen: show the version and the server region |
-| 101 | Waitlist when a class is full | Co-op: a full lobby queues players for the next free seat |
+| 101 | Waitlist when a class is full | Co-op: a full lobby queues users for the next free seat |
 | 102 | Schedule page under 400 ms | Matchmaking: GET /match under 400 ms at the p95 |
 | 103 | Class page: teacher and room | Ship select: show each ship's speed and shield |
 | 104 | Checkout: 500 after the Stripe webhook change | Store: 500 after the Stripe webhook change |
@@ -94,11 +116,11 @@ Started 22 October 2026. The working file for the film and its small clips: what
 | 114 | Calendar: class blocks in the grid | Level 4: the enemy waves on the map |
 | 115 | Weekly dependency bump | unchanged |
 | 116 | Booking: cancel up to 12 hours before | Lobby: leave a match without penalty in its first 60 seconds |
-| 117 | Reminder mail 24 hours before class | Daily challenge: notify players when a new one opens |
+| 117 | Reminder mail 24 hours before class | Daily challenge: notify users when a new one opens |
 | 118 | Schedule: filter by teacher | Leaderboard: filter by ship |
 | 119 | Schedule: 500 when no teacher is chosen | Leaderboard: 500 when no ship is chosen |
 | 120 | Class pass: 10 classes, 6 months | Season pass: 10 tiers, valid for the season |
-| 121 | Account page: past bookings | Profile: a player's past runs |
+| 121 | Account page: past bookings | Profile: a user's past runs |
 | 122 | Payments: refund a class the studio cancels | Store: refund a purchase the server rolls back |
 | 123 | Schedule page p95 up since #118 | Leaderboard: p95 up from 0.31 s to 0.74 s since #118 |
 | 124 | Cost review | unchanged |
@@ -118,8 +140,8 @@ Started 22 October 2026. The working file for the film and its small clips: what
 
 ## How to build and render
 
-1. `demo/run.sh <scenes>` records the footage. The film uses 34, 22, 25, 08, 21 and 27, the clips 11, 03, 07, 33, 20, 25 and 08. Each names its overlay regions in `boxes`.
-2. `node demo/video/render.js sandbox-a` (and `sandbox-c`, `sandbox-d`): the procedural clips.
+1. `demo/run.sh <scenes>` records the footage. The film uses 34, 22, 25, 08, 21 and 27, the clips 36, 03, 10, 37, 22, 25, 08 and 38. Scene 22 needs `demo/forgejo/setup.sh` first. Each names its overlay regions in `boxes`.
+2. `node demo/video/render.js sandbox-a` (and `sandbox-c`, `sandbox-d`, and each `diagram-*`): the procedural clips.
 3. `node demo/video/film.js film-a` (and each `clip-*`) copies the clips, writes `data.js` and renders `index.html` from the template. Then `node demo/video/render.js <name>`.
 4. Before every render, run the geometry probe on the composition. The template refuses a caption shorter than its words need (1.4 s at least, 0.22 s a word), so a page error names the caption to retime.
 5. Contact sheets: `ffmpeg -i demo/out/p-<name>.mp4 -vf "fps=1/3,scale=533:-1,tile=3x4" -frames:v 1 demo/out/p-<name>-sheet.png`. The critic: `uv run tools/img.py critique --critic gemini ...` from the main checkout.
@@ -132,12 +154,14 @@ Started 22 October 2026. The working file for the film and its small clips: what
 - Openings A, B, C, first pass 2/5 each: the split's result not shown, the step from sentence to plan confusing, "the board fills" overstated four cards. Fixed: a held spotlight on the two landed cards, the planner's running step cut and replaced by a clock from 09:01 to 09:21, "the four cards land".
 
 - Version 2, the film's sections at 3, 2 and 3 of 5 before the last fixes. The approval's empty highlight, the zoom out on the plan, the split's highlight on a card that had left, the highlight before the Do it button existed, and the full-auto story were fixed. Full auto now shows the agent's own answer and the merge and release lines, not the gate's raw log. The wake line itself said "1 asks wait": factoryd's wake text now says "1 ask waits" (code 2d6b6156).
+- Version 5: the film's parts at 2, 2 and 3 of 5, the clips at 3 of 5 except the ladder at 2. Its listed defects were checked frame by frame: it reads the black slates, the dips at page changes and the dimmed moral frames as empty, the spotlight's dimming as a zoom, and a highlight around a card with its button as a highlight on the button. Fixed from my own frame checks instead: the Forgejo highlight that stayed over the board, the approval highlight that outlined the empty slot, up to 2 s of black at page reloads, the black last frame, and the routine clip's typed line that scrolled away unread.
 
 ## Open, for Sebastian
 
-- Which sandbox: A the schematic (in the cut), C nested walls or D the sequence diagram.
-- The case that lands with the human uses scene 21, a decision only a person makes. A scene where an agent tried twice and explains why it cannot fix the problem does not exist yet.
-- The rough cut runs about 200 s since round 4: slower pacing, the Forgejo visit and the whole sandbox A (56 s) inside it. Cutting to 90 means dropping sections or moving the sandbox out of the film; the clips already carry each mechanism on their own.
+- The budget stop in the opening follows option 2 since round 4: the split, with its reason ("a card failed twice") on screen. Option 1 (Fund on screen) and option 3 (a different chat example) stay open.
+- The pool shows nowhere in the console: no page states its size or what it funded. The pool clip shows it through the diagram and the wake turn's trace.
+- The case that lands with the human uses scene 21, a decision only a human makes. A scene where an agent tried twice and explains why it cannot fix the problem does not exist yet.
+- The rough cut runs about 222 s since round 5: slower pacing, black slates, the Forgejo visit and the whole sandbox A (56 s) inside it. Cutting to 90 means dropping sections or moving the sandbox out of the film; the clips already carry each mechanism on their own.
 - The voice track: lines are not written. They come from the captions once the cut is approved, generated under the fal cap.
 - DORA: the film says "the four DevOps delivery metrics", as the page does.
 
@@ -148,4 +172,5 @@ Started 22 October 2026. The working file for the film and its small clips: what
 - [x] Scene 34 runs from the hero still through the drain, intake and the ice moon's plan. Scene 35, the rewind, is gone. The demo project's backlog cap is 16.
 - [x] Version 2: the rough cut, sandbox A, C and D, seven clips. Probed clean, rendered, each identical over two renders.
 - [x] The landing page plays the clips in its cards, with the stills as posters, and the film behind the hero's play button. Its video files stay out of git until a cut is approved.
-- [ ] Sebastian picks; then the cut to length, the voice, the videos into git.
+- [x] Round 5: black slates, Inside a card after the plan, Metrics last, no zoom on the plan, the merged card or the full-auto board, the level menu's lamps (C33), routines as scene 38, all 38 scenes recorded again with "user" for "player".
+- [ ] Sebastian approves the cut; then the cut to length, the voice, the videos into git.

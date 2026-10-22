@@ -2,7 +2,7 @@ export type PurchaseStatus = "pending" | "paid" | "rolled_back" | "refunded";
 
 export interface Purchase {
   id: string;
-  playerId: string;
+  userId: string;
   itemId: string;
   amountCents: number;
   currency: string;

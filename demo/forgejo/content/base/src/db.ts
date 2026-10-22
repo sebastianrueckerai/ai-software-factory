@@ -16,11 +16,11 @@ export const db = {
     },
   },
   inventory: {
-    async grant(playerId: string, itemId: string): Promise<void> {
-      grants.add(`${playerId}:${itemId}`);
+    async grant(userId: string, itemId: string): Promise<void> {
+      grants.add(`${userId}:${itemId}`);
     },
-    async revoke(playerId: string, itemId: string): Promise<void> {
-      grants.delete(`${playerId}:${itemId}`);
+    async revoke(userId: string, itemId: string): Promise<void> {
+      grants.delete(`${userId}:${itemId}`);
     },
   },
 };

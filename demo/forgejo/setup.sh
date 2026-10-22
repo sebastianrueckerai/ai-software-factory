@@ -94,7 +94,7 @@ git -C "$W" commit -qm "Store: refund a purchase the server rolls back"
 git -C "$W" push -q "http://factory-agent:$A@127.0.0.1:3300/orbit/nebula-run.git" factory/t-47db29d200e1
 git -C "$W" diff --numstat main HEAD
 
-BODY=$(printf 'Closes #122.\n\nRefunds a purchase the game server rolls back to the player'"'"'s card, once per purchase.\n\nAdds refundPurchase in src/payments/refund.ts, called when the game server rolls back a purchase. It creates one Stripe refund per paid purchase with an idempotency key, so a rollback sent twice refunds once. The charge.refunded webhook marks the purchase refunded, and a failed refund shows on the purchase'"'"'s page for support. Tests cover a double rollback and a declined refund.')
+BODY=$(printf 'Closes #122.\n\nRefunds a purchase the game server rolls back to the user'"'"'s card, once per purchase.\n\nAdds refundPurchase in src/payments/refund.ts, called when the game server rolls back a purchase. It creates one Stripe refund per paid purchase with an idempotency key, so a rollback sent twice refunds once. The charge.refunded webhook marks the purchase refunded, and a failed refund shows on the purchase'"'"'s page for support. Tests cover a double rollback and a declined refund.')
 num=$(call $A POST /repos/orbit/nebula-run/pulls "$(jq -nc --arg b "$BODY" '{title:"Store: refund a purchase the server rolls back",head:"factory/t-47db29d200e1",base:"main",body:$b}')" | jq .number)
 [ "$num" = 220 ] || { echo "pull request got number $num"; exit 1; }
 call $G POST /repos/orbit/nebula-run/pulls/220/reviews "$(jq -nc '{event:"COMMENT",body:"Model review: approve. Refunds key on the purchase'"'"'s id, and the tests send a rollback twice and find one refund. Risk class high: a human approves the merge."}')" >/dev/null

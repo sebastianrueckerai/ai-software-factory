@@ -2,5 +2,5 @@
   "id": "diagram-pool",
   "name": "Small overruns, settled from a pool",
   "title": "Small overruns, settled from a pool",
-  "story": "A card has a budget of 5.00 euro with 4.60 spent. A session on the big model needs 0.60, so the card stops and asks: Fund one more session? At manual and assisted the ask goes to the person in Needs you. At autonomous and full auto the project agent wakes first. It may fund from the monthly pool (10 euro a month) inside three limits set in the project's file: a raise limit of 1.00, a card cap of 15, and a pool that is never overspent. 0.60 fits, so the agent funds one more session and the raise counts against the pool. A raise of 4.00 is beyond a limit: it is refused and the ask reaches the person with the agent's analysis."
+  "story": "A card has a budget of 5.00 euro with 4.60 spent. A session on the big model needs 0.60, so the card stops and asks: Fund one more session? At manual and assisted the ask goes to you in Needs you. At autonomous and full auto the project agent wakes first. You set a small monthly pool for overruns (10 euro a month). 0.60 is small, so the agent funds one more session from the pool. A raise of 4.00 is too big for the agent: it reaches you with the agent's analysis."
 }

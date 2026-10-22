@@ -32,7 +32,7 @@ vi.mock("./stripe", () => ({
 
 const paid: Purchase = {
   id: "pur_1001",
-  playerId: "player_7",
+  userId: "user_7",
   itemId: "skin-comet",
   amountCents: 499,
   currency: "usd",
@@ -45,7 +45,7 @@ beforeEach(async () => {
   calls = 0;
   decline = false;
   await db.purchases.put({ ...paid });
-  await db.inventory.grant(paid.playerId, paid.itemId);
+  await db.inventory.grant(paid.userId, paid.itemId);
 });
 
 describe("refund on rollback", () => {

@@ -8,6 +8,10 @@
  "plain": true,
  "maxZoom": 1.5,
  "camDur": 1.6,
+ "matte": {
+  "top": 54,
+  "bottom": 54
+ },
  "segments": [
   {
    "id": "d",
@@ -27,10 +31,14 @@
     "act0"
    ],
    "to": [
-    6,
-    "stillMs"
-   ],
-   "holdRate": 1.5
+    5,
+    "act4"
+   ]
+  },
+  {
+   "id": "am",
+   "still": "22-approval-6.png",
+   "dur": 2.6
   },
   {
    "id": "b",
@@ -42,8 +50,7 @@
    "to": [
     2,
     "stillMs"
-   ],
-   "holdRate": 1.5
+   ]
   },
   {
    "id": "c",
@@ -55,8 +62,7 @@
    "to": [
     4,
     "stillMs"
-   ],
-   "holdRate": 1.5
+   ]
   },
   {
    "id": "end",
@@ -83,16 +89,18 @@
    "at": [
     "a",
     5,
-    "act4"
+    "act3",
+    -0.2
    ],
-   "box": null
+   "box": null,
+   "dur": 0.3
   },
   {
    "at": [
-    "a",
-    6,
-    "act1",
-    0.6
+    "am",
+    null,
+    null,
+    0.2
    ],
    "box": [
     "22-approval",
@@ -102,9 +110,25 @@
   },
   {
    "at": [
-    "b"
+    "b",
+    null,
+    null,
+    -0.05
    ],
    "box": null
+  },
+  {
+   "at": [
+    "b",
+    null,
+    null,
+    0.4
+   ],
+   "box": [
+    "25-autonomy",
+    1,
+    "level"
+   ]
   },
   {
    "at": [
@@ -121,15 +145,29 @@
   },
   {
    "at": [
-    "c"
+    "c",
+    null,
+    null,
+    -0.05
    ],
    "box": null
   },
   {
    "at": [
+    "c"
+   ],
+   "box": [
+    "25-autonomy",
+    3,
+    "level"
+   ]
+  },
+  {
+   "at": [
     "c",
     3,
-    "act1"
+    "act1",
+    2.4
    ],
    "box": [
     "25-autonomy",
@@ -155,7 +193,7 @@
     "c",
     4,
     "act1",
-    1.6
+    1.9
    ],
    "box": {
     "union": [
@@ -176,26 +214,17 @@
  "cams": [
   {
    "at": [
-    "c",
-    3,
-    "act0"
+    "b",
+    2,
+    "act0",
+    0.3
    ],
-   "box": {
-    "union": [
-     [
-      "25-autonomy",
-      4,
-      "wake"
-     ],
-     [
-      "25-autonomy",
-      4,
-      "live"
-     ]
-    ]
-   },
-   "fill": 0.8,
-   "cy": 420
+   "box": [
+    "25-autonomy",
+    2,
+    "menu"
+   ],
+   "fill": 0.7
   },
   {
    "at": [
@@ -221,7 +250,7 @@
    "at": [
     "a",
     5,
-    "act3"
+    "act1"
    ],
    "text": "You approve it, and it merges",
    "cls": "label"
@@ -233,14 +262,42 @@
     null,
     0.4
    ],
-   "text": "Now turn the dial to full auto",
+   "text": "The dial stands on manual",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "b",
+    2,
+    "act0",
+    0.3
+   ],
+   "text": "Each level's lamp is brighter than the last",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "b",
+    2,
+    "act2",
+    1.8
+   ],
+   "text": "Pick full auto",
+   "cls": "label"
+  },
+  {
+   "at": [
+    "c"
+   ],
+   "text": "The dial now stands on full auto",
    "cls": "label"
   },
   {
    "at": [
     "c",
     3,
-    "act1"
+    "act1",
+    2.4
    ],
    "text": "The agent takes the next card's question",
    "cls": "label"
@@ -260,7 +317,7 @@
     "c",
     4,
     "act1",
-    1.6
+    1.9
    ],
    "text": "The card merges and goes live without you",
    "cls": "label"
@@ -283,6 +340,14 @@
   [
    "a0"
   ],
+  {
+   "from": [
+    "am"
+   ],
+   "to": [
+    "am"
+   ]
+  },
   [
    "b"
   ],
