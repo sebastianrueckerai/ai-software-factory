@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The film, version 7</title>
+<title>The film, version 8</title>
 <style>
 :root { color-scheme: dark; --bg: #070b12; --line: #263649; --text: #dfe7f1; --muted: #93a1b5; --accent: #4fcbe2; --need: #f4b13e; }
 body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 system-ui, sans-serif; }
@@ -22,15 +22,12 @@ code { font-size: .92em; }
 </head>
 <body>
 <main>
-<h1>The film, version 7</h1>
-<p>What changed since version 6, from your notes. The merge after "Then approve" now reaches the board live, with no fade to black. The dial switches to full auto in one continuous scene: the menu, one click, the chip with only the full auto lamp lit. The menu's zoom keeps it clear of the caption, with black past the console's edge. The level menu draws no lamp at all beside the levels not chosen. The metrics caption names no number, and the week reads 310 cards with 13 escalations, 4 % of them.</p>
+<h1>The film, version 8</h1>
+<p>What changed since version 7, from your notes. The split is gone from the opening: the hero's chat now holds the agent's proposal to steer a card, and the opening ends on a design choice answered on its card with one click, after which the board drains. "When it needs you" is gone too, since the opening shows that moment now. The film opens with the primer on the board alone, then goes column by column. It runs 184 s, down from 204.</p>
 <p>The videos and sheets load from <code>demo/out/</code> of the main checkout. Open this page from there. Scores come from the independent critic, Gemini 2.5 Pro, reading one frame every two seconds. It cannot see motion.</p>
 <h2>The rough cut</h2>
-<p id="film-len">Spotlight style with captions, no voice, the whole of sandbox A inside, and black bars at the top and bottom. It runs 204 s.</p>
+<p id="film-len">Spotlight style with captions, no voice, the whole of sandbox A inside, and black bars at the top and bottom. It runs 184 s.</p>
 <div class="pair"><div><video src="../../demo/out/p-film-a.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-film-a-sheet.png" alt="Contact sheet of the rough cut."><p class="cap"><span class="score" id="s-film-a"></span></p></div></div>
-<h2>The opening, with a primer</h2>
-<p>A test: the frame dims, lights the board, then the chat, and only then goes column by column. Compare it with the first 30 s of the rough cut above, which opens without it.</p>
-<div class="pair"><div><video src="../../demo/out/p-film-primer.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-film-primer-sheet.png" alt="Contact sheet of the opening with the primer."><p class="cap"><span class="score" id="s-film-primer"></span></p></div></div>
 <h2>The landing page clips</h2>
 <p>Silent loops with a short label for each moment at the top left, each ending on its moral.</p>
 <h3>The chat orchestrates development</h3>

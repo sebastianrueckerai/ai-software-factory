@@ -33,7 +33,7 @@ Catalogue groups and files in [demo/scenes/](../scenes/):
 
 | Group | Scenes | What they show |
 |---|---|---|
-| A Intake | 01 chat to card, 02 a vague request measured, 03 too large so split, 04 a card from the board form, 05 chat to card on the phone, 34 a busy board (the landing page's hero, and the film's opening: the split, the drain to Done, intake, one sentence to a plan) | The chat's ask, choice buttons, the `new_card` proposal, Do it pressed for real, the card on the board |
+| A Intake | 01 chat to card, 02 a vague request measured, 03 too large so split, 04 a card from the board form, 05 chat to card on the phone, 34 a busy board (the landing page's hero, and the film's opening: a design choice answered on its card in one click, the drain to Done, intake, one sentence to a plan) | The chat's ask, choice buttons, the `new_card` proposal, Do it pressed for real, the card on the board |
 | B Build | 06 card to PR, 07 the review rejects, 08 the supervisor steps in, 09 two in parallel, 10 the stronger model, 11 a steer, 36 find the card and tell it (a request that names no card) | The drawer's gates table, session transcripts, review verdicts, the `small` to `big` class change, a steer pressed for real |
 | C Ship | 12 merge to done, 13 a bad merge | Merge and live in the Activity steps, the metrics deploys count moving, an alert minutes after a merge |
 | D Operate | 14 alert to fix, 15 a member's report, 16 the security routine, 17 the performance routine, 18 the settled inbox, 19 routines on the board, 33 an issue to a fix, 38 a weekly image bump set up from the chat | The alert's stack trace on the card, routine runs on their cron, the inbox's night, a developer's issue with a repro block and the reproduction gate's base and head exits |

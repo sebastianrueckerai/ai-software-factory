@@ -1,7 +1,6 @@
 const state = require("../lib/state");
 const story = require("../lib/story");
 const ui = require("../lib/ui");
-const project = require("../lib/project");
 
 const MIN = 60;
 const HOUR = 3600;
@@ -10,12 +9,15 @@ const T = story.filed[113];
 
 // The landing page's hero: one busy afternoon in a single frame, every column of the board full. Three cards need
 // Sebastian (a question, a budget stop, a merge of a payments change), one waits on another, five build, six are done,
-// and he answers the budget stop in the chat by splitting the card. Ages are seconds since each card's filing, picked
-// so each card stands in the phase its column shows.
+// and the chat holds the agent's proposal to steer the refund's session. He answers the question on its card with one
+// click, and the board drains. Ages are seconds since each card's filing, picked so each card stands in the phase its
+// column shows.
 const refund = story.approvals.refund;
 const moon = story.approvals.moonPlan;
-const filings = [story.filing(113, "ready"), story.filing(114, "backlog")];
 const seasonPass = story.lives[120].phases.find((p) => p.ask).ask;
+const find = story.steers.find;
+// the steer's turn takes two model calls: the first reads the board, the second proposes the steer to the card it found
+const steerReplies = [state.reply(state.call("board", {})), state.reply(state.say(find.reply), state.call("steer", { task_id: state.id(find.issue), text: find.text }))];
 
 // LIVES are the ages of the busy board's working cards; hero draws the busy board's cards less those that moved,
 // each moved card drawn by face at its new status
@@ -51,61 +53,44 @@ function busy(now) {
   ];
   return state.scene(now, {
     tasks: h.tasks, objects: h.objects, deps: h.deps, events: h.events, alerts: h.alerts, approvals: h.approvals,
-    chat, seen: { [INBOX]: chat.length }, inbox: INBOX, open: INBOX, ...story.spending(T),
-    replies: [state.reply(state.say(story.replies.split), ...[story.filing(113, "ready"), story.filing(114, "backlog")].map((f) => state.call("new_card", f)))],
+    chat, seen: { [INBOX]: chat.length }, inbox: INBOX, open: INBOX, ...story.spending(T), replies: steerReplies,
   });
-}
-
-// split is the chat after the two presses of Do it, as the console stored them: the split's two cards filed as #126 and
-// #127, the next free numbers
-function split(now, age) {
-  const t = state.pressedThread(now, filings.map((f) => state.cardFiling(now, f)), {
-    line: story.requests.split, reply: story.replies.split, age,
-    results: [`Filed ${project.repository}#126 in lane ready.`, `Filed ${project.repository}#127 in lane backlog.`],
-  });
-  const chat = [
-    state.livePoke(now, { issue: 109, title: story.cards[109].title, spent: 1.84, age: age + 25 * MIN, conversation: INBOX }),
-    ...t.rows.map((r) => ({ ...r, conversation: INBOX })),
-  ];
-  return { chat, usedProposals: t.proposals };
 }
 
 // face is a card at a status, with the fields the board shows for it: the gate of running work, the pull request from
-// review on, the finish and the spend once done. The split's cards carry the numbers the lab gave them.
-const SPLIT = { 126: 113, 127: 114 };
+// review on, the finish and the spend once done. Work that builds or is in review is 20 minutes on the card, under the
+// board's 30 minutes without an event, so it reads as busy, not stale.
 function face(now, issue, status, o = {}) {
   const busy = status === "running" || status === "in-review";
   const ended = status === "done" || status === "closed";
-  const c = story.cards[SPLIT[issue] ?? issue];
-  return story.card(now, SPLIT[issue] ?? issue, {
-    issue, status, lane: issue === 105 || issue === 136 ? "plan" : "ready", age: o.age ?? 5 * HOUR,
+  const c = story.cards[issue];
+  return story.card(now, issue, {
+    issue, status, lane: issue === 105 || issue === 136 ? "plan" : "ready", age: o.age ?? (busy ? 20 * MIN : 5 * HOUR),
     gate: busy ? (status === "running" ? "session" : "review") : undefined, gateSince: busy ? 4 * MIN : undefined,
     finished: ended ? (o.finished ?? 20 * MIN) : undefined, spent: o.spent ?? 0.4, model: issue === 105 || issue === 136 ? "big" : "small",
     pr: ["in-review", "merged", "done"].includes(status) ? c.pr : undefined, ...o,
   });
 }
 
-// drained is the board after the split, one card moving at a time: what waits on Sebastian is answered, queued work
-// starts, running work ends done. Step k applies the first k moves to the board right after the presses, where the
-// question, the budget stop and the merge still wait with their buttons.
+// drained is the board after the answer, one card moving at a time: the question's card builds, what waits on Sebastian
+// is settled (the merge approved, the budget stop funded for one more session), queued work starts, running work ends
+// done. Step k applies the first k moves to the hero board; the first is the answer the scene clicks on its card.
 const moves = [
-  [110, "closed"], [122, "merged"], [103, "done"], [107, "done"], [120, "running"], [121, "done"], [123, "done"], [122, "done"],
-  [125, "running"], [102, "done"], [126, "running"], [120, "done"], [125, "done"], [118, "running"], [126, "done"], [112, "running"],
-  [127, "running"], [118, "done"], [127, "done"], [112, "done"],
+  [120, "running"], [122, "merged"], [103, "done"], [107, "done"], [110, "running"], [121, "done"], [123, "done"], [122, "done"],
+  [125, "running"], [102, "done"], [120, "done"], [125, "done"], [110, "done"], [118, "running"], [112, "running"], [118, "done"],
+  [112, "done"],
 ];
 const DRAINED = moves.length;
 function drained(now, k, o = {}) {
-  const moved = Object.fromEntries(moves.slice(0, k));
-  const filed = { 126: "queued", 127: "backlog" };
-  const h = hero(now, Object.fromEntries(Object.entries(moved).filter(([i]) => !(i in filed))));
-  // the split's cards keep the age the lab gave them at the presses, so the queue keeps its order
-  const tasks = [...h.tasks, ...Object.entries(filed).map(([i, st]) => face(now, Number(i), moved[i] ?? st, { age: 40 })), ...(o.tasks ?? [])];
-  const s = split(now, 30 * MIN + k * 12 * MIN);
-  const chat = [...s.chat, ...(o.rows ?? [])];
+  const h = hero(now, Object.fromEntries(moves.slice(0, k)));
+  const chat = [
+    state.livePoke(now, { issue: 109, title: story.cards[109].title, spent: 1.84, age: 25 * MIN + k * 12 * MIN, conversation: INBOX }),
+    ...(o.rows ?? []),
+  ];
   return state.scene(now, {
-    tasks, objects: h.objects, deps: h.deps, events: h.events, alerts: h.alerts, approvals: [...h.approvals, ...(o.approvals ?? [])],
-    chat, seen: { [INBOX]: chat.length }, inbox: INBOX, open: INBOX, usedProposals: [...s.usedProposals, ...(o.used ?? [])],
-    replies: o.replies, plans: o.plans, questions: o.questions, ...story.spending(T),
+    tasks: [...h.tasks, ...(o.tasks ?? [])], objects: h.objects, deps: h.deps, events: h.events, alerts: h.alerts,
+    approvals: [...h.approvals, ...(o.approvals ?? [])], chat, seen: { [INBOX]: chat.length }, inbox: INBOX, open: INBOX,
+    usedProposals: o.used, replies: o.replies, plans: o.plans, questions: o.questions, ...story.spending(T),
   });
 }
 
@@ -145,13 +130,15 @@ function accepted(now) {
     tasks: [face(now, 136, "done", { age: 22 * MIN, finished: 30, spent: 0.46 }), kid(137, "queued"), kid(138, "waiting-deps"), kid(139, "waiting-deps"), kid(140, "waiting-deps")],
   });
 }
+const moonDoIt = `${ui.doIt} >> nth=1`;
 const accept = `#board article.approval.plan[data-card="${state.id(136)}"] button[aria-label^="Accept revision"]`;
 const columns = { needs: "#needs-you", queued: '#board .column[aria-labelledby="col-1"]', progress: '#board .column[aria-labelledby="col-2"]', done: '#board .column[aria-labelledby="col-3"]' };
 
 module.exports = {
   title: "A busy board, drained and filled again",
-  story: "One afternoon in one frame: three cards need Sebastian, one waits on another, five build and six are done. He splits " +
-    "the card at its budget in the chat and presses Do it twice. The board drains one card at a time as the work resolves. Then new " +
+  story: "One afternoon in one frame: three cards need Sebastian, one waits on another, five build and six are done, and the chat " +
+    "holds the agent's proposal to steer the refund. He answers the season pass's question on its card with one click. The board " +
+    "drains one card at a time as the work resolves. Then new " +
     "work comes in on its own, a nightly scan, an alert and a user's issue, and one sentence in the chat becomes the plan for " +
     "level 5, whose four cards land on the board once he accepts it.",
   group: "intake",
@@ -160,30 +147,34 @@ module.exports = {
   // the regions the film's overlays name, on every step
   boxes: { chat: ".chat", ...columns },
   steps: [
-    { state: busy, actions: [{ goto: "/" }], hold: 1500, boxes: { running: ui.face(102), budget: ui.face(110) } },
+    { state: busy, actions: [{ goto: "/" }], hold: 1500, boxes: { running: ui.face(102), question: ui.face(120) } },
     // typed without a click, so the mouse has not moved and the hero still carries no pointer
     {
       state: () => null,
-      actions: [{ type: ["#chat-input", story.requests.split] }, { press: "Enter" }, { waitFor: ui.doIt }, { wait: 2000 }],
+      actions: [{ type: ["#chat-input", find.request] }, { press: "Enter" }, { waitFor: ui.doIt }, { wait: 2000 }],
       hold: 1500,
     },
-    // the landing page's hero still. No reload before the presses: Do it on a proposal read back from the store asks the
-    // model again, and the lab has no reply left for that
-    { state: () => null, actions: [{ waitFor: ui.doIt }], hold: 2500, boxes: { doit: ui.doIt, running: ui.face(102), budget: ui.face(110) } },
-    { state: () => null, actions: [{ click: ui.doIt }, { waitFor: ui.face(126) }, { wait: 600 }], hold: 1200, boxes: { first: ui.face(126) } },
-    { state: () => null, actions: [{ click: ui.doIt }, { waitFor: ui.face(127) }], hold: 2200, boxes: { first: ui.face(126), second: ui.face(127) } },
-    // the drain, one wave per step
-    ...Array.from({ length: DRAINED + 1 }, (_, k) => ({ state: (now) => drained(now, k), actions: [], hold: 900 })),
+    // the landing page's hero still, the steer's Do it waiting
+    { state: () => null, actions: [{ waitFor: ui.doIt }], hold: 2500, boxes: { doit: ui.doIt, running: ui.face(102), question: ui.face(120) } },
+    // one click answers the question on its card, which slides to In progress at once
+    {
+      state: () => null,
+      actions: [{ hover: ui.choice(120, seasonPass.answer) }, { wait: 700 }, { click: ui.choice(120, seasonPass.answer) }, { wait: 900 }, { hover: ui.park }],
+      hold: 600, boxes: { question: ui.face(120) },
+    },
+    // the drain, one wave per step, from the answer on
+    ...Array.from({ length: DRAINED }, (_, k) => ({ state: (now) => drained(now, k + 1), actions: [], hold: 900 })),
     // the intake: three cards file themselves, then a sentence
     { state: (now) => intake(now, 1), actions: [], hold: 1400, boxes: { scan: ui.face(135) } },
     { state: (now) => intake(now, 2), actions: [], hold: 1400, boxes: { alert: ui.face(134) } },
     { state: (now) => intake(now, 3, { replies: [moonReply] }), actions: [], hold: 1600, boxes: { issue: ui.face(133), arrived: '#board .column[aria-labelledby="col-1"] .cards' } },
+    // the hero's steer still waits above, so the plan's Do it is the second
     {
       state: () => null,
-      actions: [{ type: ["#chat-input", story.requests.moon] }, { press: "Enter" }, { waitFor: ui.doIt }, { wait: 2500 }, { hover: ui.doIt }],
-      hold: 600, boxes: { doit: ui.doIt },
+      actions: [{ type: ["#chat-input", story.requests.moon] }, { press: "Enter" }, { waitFor: moonDoIt }, { wait: 2500 }, { hover: moonDoIt }],
+      hold: 600, boxes: { doit: moonDoIt },
     },
-    { state: () => null, actions: [{ click: ui.doIt }, { waitFor: "#chat-log .applied >> nth=2" }, { waitFor: ui.face(136) }], hold: 2000, boxes: { plan: ui.face(136) } },
+    { state: () => null, actions: [{ click: moonDoIt }, { waitFor: "#chat-log .applied" }, { waitFor: ui.face(136) }], hold: 2000, boxes: { plan: ui.face(136) } },
     { state: planning, actions: [{ hover: ui.face(136) }], hold: 2200, boxes: { plan: ui.face(136) } },
     { state: waiting, actions: [{ hover: accept }], hold: 2600, boxes: { plan: ui.face(136), accept } },
     { state: accepted, actions: [{ hover: ui.park }], hold: 3000, boxes: { first: ui.face(137), last: ui.face(140) } },

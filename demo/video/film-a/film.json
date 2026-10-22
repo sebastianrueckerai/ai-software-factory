@@ -9,31 +9,29 @@
   {
    "id": "hero",
    "still": "34-busy-board-3.png",
-   "dur": 15.5
+   "dur": 14.5
   },
   {
-   "id": "press",
+   "id": "answer",
    "scene": "34-busy-board",
    "from": [
     4,
     "atMs"
    ],
    "to": [
-    5,
+    4,
     "stillMs"
-   ],
-   "tail": 1.2,
-   "rate": 0.85
+   ]
   },
   {
    "id": "drain",
    "scene": "34-busy-board",
    "from": [
-    6,
+    5,
     "atMs"
    ],
    "to": [
-    26,
+    21,
     "stillMs"
    ],
    "tail": 0.3,
@@ -43,11 +41,11 @@
    "id": "intake",
    "scene": "34-busy-board",
    "from": [
-    27,
+    22,
     "atMs"
    ],
    "to": [
-    29,
+    24,
     "stillMs"
    ],
    "tail": 0.4,
@@ -57,11 +55,11 @@
    "id": "ask",
    "scene": "34-busy-board",
    "from": [
-    30,
+    25,
     "atMs"
    ],
    "to": [
-    31,
+    26,
     "stillMs"
    ],
    "tail": 0,
@@ -71,12 +69,12 @@
    "id": "plan",
    "scene": "34-busy-board",
    "from": [
-    33,
+    28,
     "stillMs"
    ],
    "lead": 4.0,
    "to": [
-    34,
+    29,
     "stillMs"
    ],
    "tail": 0.8,
@@ -170,27 +168,6 @@
    "holdRate": 2.4
   },
   {
-   "id": "t-needs",
-   "title": "When it needs you",
-   "dur": 2.6
-  },
-  {
-   "id": "question",
-   "scene": "21-design-question",
-   "from": [
-    1,
-    "stillMs"
-   ],
-   "lead": 3.5,
-   "to": [
-    3,
-    "stillMs"
-   ],
-   "tail": 0.3,
-   "rate": 1.0,
-   "holdRate": 2.2
-  },
-  {
    "id": "t-metrics",
    "title": "Metrics",
    "dur": 2.6
@@ -226,7 +203,28 @@
  ],
  "spots": [
   {
-   "at": 0.5,
+   "at": [
+    "hero",
+    null,
+    null,
+    0.3
+   ],
+   "box": {
+    "rect": [
+     640,
+     104,
+     945,
+     784
+    ]
+   }
+  },
+  {
+   "at": [
+    "hero",
+    null,
+    null,
+    3.5
+   ],
    "box": [
     "34-busy-board",
     3,
@@ -234,7 +232,12 @@
    ]
   },
   {
-   "at": 3.7,
+   "at": [
+    "hero",
+    null,
+    null,
+    6.7
+   ],
    "box": [
     "34-busy-board",
     3,
@@ -243,7 +246,12 @@
    "amber": true
   },
   {
-   "at": 6.9,
+   "at": [
+    "hero",
+    null,
+    null,
+    9.9
+   ],
    "box": [
     "34-busy-board",
     3,
@@ -251,14 +259,28 @@
    ]
   },
   {
-   "at": 9.3,
+   "at": [
+    "hero",
+    null,
+    null,
+    12.3
+   ],
    "box": [
     "34-busy-board",
     3,
-    "budget",
-    300
+    "question"
    ],
    "amber": true
+  },
+  {
+   "at": [
+    "answer",
+    4,
+    "act2",
+    -0.2
+   ],
+   "box": null,
+   "dur": 0.3
   },
   {
    "at": [
@@ -268,12 +290,12 @@
     "union": [
      [
       "34-busy-board",
-      33,
+      28,
       "plan"
      ],
      [
       "34-busy-board",
-      33,
+      28,
       "accept"
      ]
     ]
@@ -283,7 +305,7 @@
   {
    "at": [
     "plan",
-    34,
+    29,
     "atMs",
     0.3
    ],
@@ -291,12 +313,12 @@
     "union": [
      [
       "34-busy-board",
-      34,
+      29,
       "first"
      ],
      [
       "34-busy-board",
-      34,
+      29,
       "last"
      ]
     ]
@@ -387,98 +409,41 @@
   {
    "at": [
     "intake",
-    27,
+    22,
     "atMs",
     0.3
    ],
    "box": [
     "34-busy-board",
-    27,
+    22,
     "scan"
    ]
   },
   {
    "at": [
     "intake",
-    28,
+    23,
     "atMs",
     0.3
    ],
    "box": [
     "34-busy-board",
-    28,
+    23,
     "alert"
    ]
   },
   {
    "at": [
     "intake",
-    29,
+    24,
     "atMs",
     0.3
    ],
    "box": [
     "34-busy-board",
-    29,
+    24,
     "issue"
    ]
-  },
-  {
-   "at": 13.5,
-   "box": [
-    "34-busy-board",
-    3,
-    "chat"
-   ],
-   "dur": 0.9
-  },
-  {
-   "at": [
-    "press",
-    4,
-    "act0",
-    0.4
-   ],
-   "box": {
-    "rect": [
-     963,
-     177,
-     189,
-     72
-    ]
-   },
-   "dur": 0.9
-  },
-  {
-   "at": [
-    "press",
-    5,
-    "act0",
-    0.3
-   ],
-   "box": {
-    "union": [
-     [
-      "34-busy-board",
-      5,
-      "first"
-     ],
-     [
-      "34-busy-board",
-      5,
-      "second"
-     ]
-    ]
-   }
-  },
-  {
-   "at": [
-    "press",
-    "end",
-    null,
-    -0.35
-   ],
-   "box": null
   },
   {
    "at": [
@@ -486,7 +451,7 @@
    ],
    "box": [
     "34-busy-board",
-    30,
+    25,
     "chat"
    ],
    "dur": 0.9
@@ -494,13 +459,13 @@
   {
    "at": [
     "ask",
-    31,
+    26,
     "act0",
     0.15
    ],
    "box": [
     "34-busy-board",
-    31,
+    26,
     "plan"
    ],
    "dur": 0.9
@@ -569,44 +534,6 @@
    ],
    "box": null,
    "dur": 0.3
-  },
-  {
-   "at": [
-    "question"
-   ],
-   "box": {
-    "rect": [
-     52,
-     574,
-     576,
-     180
-    ]
-   },
-   "amber": true
-  },
-  {
-   "at": [
-    "question",
-    2,
-    "act2"
-   ],
-   "box": [
-    "21-design-question",
-    2,
-    "chat"
-   ]
-  },
-  {
-   "at": [
-    "question",
-    3,
-    "act4"
-   ],
-   "box": [
-    "21-design-question",
-    3,
-    "drawer"
-   ]
   },
   {
    "at": [
@@ -686,17 +613,69 @@
  ],
  "caps": [
   {
-   "at": 0.5,
+   "at": [
+    "hero",
+    null,
+    null,
+    0.3
+   ],
+   "text": "<b>A kanban board:</b> where development stands, at a glance."
+  },
+  {
+   "at": [
+    "hero",
+    null,
+    null,
+    3.5
+   ],
    "text": "<b>Change anything from one chat.</b> The agent proposes, you approve."
   },
   {
-   "at": 3.7,
+   "at": [
+    "hero",
+    null,
+    null,
+    6.7
+   ],
    "amber": true,
    "text": "<b>See what is stuck</b> and what waits on you."
   },
   {
-   "at": 6.9,
+   "at": [
+    "hero",
+    null,
+    null,
+    9.9
+   ],
    "text": "<b>Decide what runs next:</b> priorities and a backlog."
+  },
+  {
+   "at": [
+    "hero",
+    null,
+    null,
+    12.3
+   ],
+   "amber": true,
+   "parts": [
+    {
+     "at": [
+      "hero",
+      null,
+      null,
+      12.3
+     ],
+     "text": "<b>A design choice waits for you:</b>"
+    },
+    {
+     "at": [
+      "answer",
+      4,
+      "act2"
+     ],
+     "text": "one click answers it."
+    }
+   ]
   },
   {
    "at": [
@@ -707,7 +686,7 @@
   {
    "at": [
     "intake",
-    27,
+    22,
     "atMs",
     0.3
    ],
@@ -716,7 +695,7 @@
   {
    "at": [
     "intake",
-    28,
+    23,
     "atMs",
     0.3
    ],
@@ -725,7 +704,7 @@
   {
    "at": [
     "intake",
-    29,
+    24,
     "atMs",
     0.3
    ],
@@ -740,7 +719,7 @@
   {
    "at": [
     "ask",
-    31,
+    26,
     "act0",
     0.15
    ],
@@ -759,7 +738,7 @@
   {
    "at": [
     "plan",
-    34,
+    29,
     "atMs",
     0.3
    ],
@@ -814,61 +793,11 @@
   },
   {
    "at": [
-    "question"
-   ],
-   "amber": true,
-   "text": "<b>What it cannot decide, it asks you,</b> with the choices."
-  },
-  {
-   "at": [
-    "question",
-    2,
-    "act2"
-   ],
-   "text": "<b>One click answers.</b>"
-  },
-  {
-   "at": [
-    "question",
-    3,
-    "act4"
-   ],
-   "text": "<b>The card goes on with your pick.</b>"
-  },
-  {
-   "at": [
     "close"
    ],
    "cls": "close",
    "shade": true,
    "text": "<b>The worst an agent can do is wreck its own sandbox.</b><small>github.com/sebastianrueckerai/ai-software-factory</small>"
-  },
-  {
-   "at": 9.3,
-   "amber": true,
-   "parts": [
-    {
-     "at": 9.3,
-     "text": "<b>A card failed twice</b>"
-    },
-    {
-     "at": 11.3,
-     "text": "and used up its budget."
-    },
-    {
-     "at": 13.5,
-     "text": "<br>One sentence splits it,"
-    },
-    {
-     "at": [
-      "press",
-      4,
-      "act0",
-      0.2
-     ],
-     "text": "a click files the parts."
-    }
-   ]
   },
   {
    "at": [
@@ -1015,20 +944,6 @@
   },
   {
    "at": [
-    "question",
-    3,
-    "act4"
-   ],
-   "box": [
-    "21-design-question",
-    3,
-    "drawer",
-    560
-   ],
-   "fill": 0.95
-  },
-  {
-   "at": [
     "approval"
    ],
    "box": [
@@ -1059,20 +974,6 @@
     "act0"
    ],
    "box": null
-  },
-  {
-   "at": [
-    "question"
-   ],
-   "box": {
-    "rect": [
-     52,
-     574,
-     576,
-     180
-    ]
-   },
-   "fill": 0.75
   }
  ],
  "maxZoom": 1.35,

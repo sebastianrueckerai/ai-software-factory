@@ -47,6 +47,19 @@ Started 22 October 2026. The working file for the film and its small clips: what
 - Show routines (the dashed card, the weekly bump) in a clip of their own.
 - The budget clip mostly shows a split: replace it with the discretionary pool, so the factory does not ask about five-cent overruns.
 
+## What Sebastian asked, 22 October, after round 7 (round 8)
+
+- Go on cutting the split: the opening's design question is answered in one click and the board drains.
+- The primer stays, for the board only: the chat is already explained by "Change anything from one chat".
+
+## Round 8 decisions
+
+- **The opening.** Scene 34 no longer splits #110. The hero's chat holds the agent's proposal to steer the refund (the steer of scene 36), so "The agent proposes, you approve" shows on screen. The hero's last beat is #120's design question; one click on "No refund" on its card slides it to In progress, and the drain follows. In the drain the merge is approved and #110 is funded for one more session, off screen, so #112 runs once #110 is done.
+- **The primer.** The rough cut opens on the board alone ("A kanban board: where development stands, at a glance."), then the chat, the columns and the design question. The test clip `film-primer` is gone.
+- **When it needs you.** Gone from the film: the opening shows that moment now. Scene 21 stays in the bank. The film runs 184 s.
+- **The budget stop.** Settled: the opening no longer answers a budget stop, so its three options are moot.
+- **Busy cards.** A card the drain moves to building or review is 20 minutes on the card, so the board shows no stale mark on it.
+
 ## What Sebastian asked, 22 October, after round 6 (round 7)
 
 - After 2:09 the cut goes light and dark: one fade to black is not needed.
@@ -199,10 +212,9 @@ Started 22 October 2026. The working file for the film and its small clips: what
 
 ## Open, for Sebastian
 
-- The budget stop in the opening follows option 2 since round 4: the split, with its reason ("a card failed twice") on screen. Option 1 (Fund on screen) and option 3 (a different chat example) stay open.
 - The pool shows nowhere in the console: no page states its size or what it funded. The pool clip shows it through the diagram and the wake turn's trace.
 - The case that lands with the human uses scene 21, a decision only a human makes. A scene where an agent tried twice and explains why it cannot fix the problem does not exist yet.
-- The rough cut runs 204 s since round 6: black slates, the Forgejo visit and the whole sandbox A (56 s) inside it. Cutting to 90 means dropping sections or moving the sandbox out of the film; the clips already carry each mechanism on their own.
+- The rough cut runs 184 s since round 8: black slates, the Forgejo visit and the whole sandbox A (56 s) inside it. Cutting to 90 means dropping sections or moving the sandbox out of the film; the clips already carry each mechanism on their own.
 - The voice track: lines are not written. They come from the captions once the cut is approved, generated under the fal cap.
 - DORA: the film says "the four DevOps delivery metrics", as the page does.
 
@@ -216,4 +228,5 @@ Started 22 October 2026. The working file for the film and its small clips: what
 - [x] Round 5: black slates, Inside a card after the plan, Metrics last, no zoom on the plan, the merged card or the full-auto board, the level menu's lamps (C33), routines as scene 38, all 38 scenes recorded again with "user" for "player".
 - [x] Round 6: one lit lamp (C34), the flicker fixed in the template, shorter static views, the quiet work in the ledger, the pool's moral without an amount.
 - [x] Round 7: the merge without a dip, the switch in one scene, the free camera, no lamp beside the levels not chosen (C36), 13 escalations at 4 %, the primer as a test.
+- [x] Round 8: the split cut from the opening, the design question answered in one click, When it needs you gone, the primer on the board alone, 184 s.
 - [ ] Sebastian approves the cut; then the cut to length, the voice, the videos into git.
