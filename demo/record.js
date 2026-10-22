@@ -7,9 +7,12 @@ const { chromium } = require("playwright");
 const BASE = process.env.BASE;
 const LAB_DIR = process.env.CONSOLE_LAB_DIR;
 const FORGEJO = process.env.FORGEJO_URL || "http://127.0.0.1:3300";
-const OUT = path.join(__dirname, "out");
+// POSTER=1 records into out/poster at three times the pixel density and without the pointer, for the crops a landing
+// page card shows as its poster
+const POSTER = process.env.POSTER === "1";
+const OUT = path.join(__dirname, "out", POSTER ? "poster" : "");
 const VIEWPORTS = {
-  desk: { viewport: { width: 1600, height: 900 }, scale: 1 },
+  desk: { viewport: { width: 1600, height: 900 }, scale: POSTER ? 3 : 1 },
   phone: { viewport: { width: 390, height: 844 }, scale: 2 },
 };
 const REDRAW_MS = 1200;
@@ -106,7 +109,7 @@ async function record(browser, name, commits) {
       name: lab().name, value: lab().value, domain: new URL(BASE).hostname, path: "/", secure: true, httpOnly: true, sameSite: "Lax",
     }]);
     await context.addInitScript((theme) => localStorage.setItem("theme", theme), scene.theme);
-    if (scene.cursor !== false) await context.addInitScript(cursor);
+    if (scene.cursor !== false && !POSTER) await context.addInitScript(cursor);
     // the console links pull requests to https://git.example; a scene that opens one is served by the local Forgejo of
     // demo/forgejo/setup.sh, redirects passed on unfollowed
     if (scene.forgejo) await context.route("https://git.example/**", async (route) => {

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1600, height=900">
+<title>The chat orchestrates development: one agent that reads the project and talks to the running sessions</title>
+<link rel="stylesheet" href="../loop/diagram.css">
+<link rel="stylesheet" href="../poster.css">
+<style>
+  .panel.row { padding: 16px 26px; }
+  .panel.row h2 { margin: 0; font-size: 44px; }
+  .panel.src h2 { margin: 0; font-size: 44px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<svg class="wires" viewBox="0 0 1600 900">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path class="wire-tip" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path class="tip-amb" d="M0 0 L10 5 L0 10 z"/></marker>
+    <marker id="q" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path class="tip-quiet" d="M0 0 L10 5 L0 10 z"/></marker>
+  </defs>
+  <path class="wire amb" d="M352 420 H448" marker-start="url(#m)" marker-end="url(#m)"/>
+  <path class="wire quiet" d="M685 160 V258" marker-end="url(#q)"/>
+  <path class="wire" d="M942 360 C1000 360 1000 325 1058 325" marker-start="url(#a)" marker-end="url(#a)"/>
+  <path class="wire" d="M942 440 H1058" marker-start="url(#a)" marker-end="url(#a)"/>
+  <path class="wire" d="M942 520 C1000 520 1000 555 1058 555" marker-start="url(#a)" marker-end="url(#a)"/>
+</svg>
+<p class="lbl" style="left:710px; top:186px">reads</p>
+<p class="lbl" style="left:1070px; top:208px">talks to</p>
+
+<div class="panel src" style="left:460px; top:40px; width:210px; height:110px"><h2>Board</h2></div>
+<div class="panel src" style="left:680px; top:40px; width:270px; height:110px"><h2>Roadmap</h2></div>
+
+<div class="panel need" style="left:40px; top:310px; width:300px; height:220px">
+  <h2>You</h2>
+  <p class="say">one chat</p>
+</div>
+
+<div class="panel" style="left:460px; top:270px; width:470px; height:300px">
+  <h2>Project agent</h2>
+  <p>writes no code</p>
+</div>
+
+<div class="panel row" style="left:1070px; top:270px; width:490px; height:110px"><h2><span class="live"></span>&nbsp; #110 belt-map</h2></div>
+<div class="panel row" style="left:1070px; top:385px; width:490px; height:110px"><h2><span class="live"></span>&nbsp; #122 refund</h2></div>
+<div class="panel row" style="left:1070px; top:500px; width:490px; height:110px"><h2><span class="live"></span>&nbsp; #123 leaderboard</h2></div>
+</body>
+</html>

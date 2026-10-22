@@ -1,6 +1,6 @@
 {
  "id": "clip-ladder",
- "name": "The escalation ladder",
- "title": "The escalation ladder",
+ "name": "Stuck sessions get help in steps",
+ "title": "Stuck sessions get help in steps",
  "story": "The theory first: the rungs a card climbs, from the cheap model through check-ins and the stronger model to a human at the caps. Then the console: the receipt card's first session on the cheap model fails its acceptance check, and the next session runs on the stronger model."
 }

@@ -1,0 +1,13 @@
+/* A poster is read at the size of a landing page card: the diagrams' stylesheet with larger type and thicker wires. */
+.panel { padding: 24px 30px; }
+.panel h2 { margin: 0 0 10px; font-size: 52px; }
+.panel p { font-size: 42px; line-height: 1.25; color: var(--text-muted); }
+.panel .say { color: var(--text); }
+.panel .tag { margin-top: 10px; font: 34px var(--font-mono); color: var(--text-faint); }
+.panel .gates { font-family: var(--font-ui); color: var(--accent); }
+.lbl { position: absolute; font: 34px var(--font-mono); color: var(--text-faint); }
+.wire { stroke-width: 6; }
+.wire.amb { stroke: var(--need); }
+.wire.quiet { stroke: var(--mark); }
+.tip-amb { fill: var(--need); }
+.tip-quiet { fill: var(--mark); }

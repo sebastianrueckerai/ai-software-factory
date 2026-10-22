@@ -54,10 +54,21 @@ Started 22 October 2026. The working file for the film and its small clips: what
 
 ## Poster candidates
 
-- **Diagrams.** `demo/video/poster-chat` and `demo/video/poster-routine` are static pages on the diagrams' stylesheet. `node demo/video/poster.js poster-chat poster-routine` writes `demo/out/poster-chat.png` and `demo/out/poster-routine.png`. Their bottom-right corner stays empty, under the card's Play button.
-- **Console crops.** Scenes 36 and 38 recorded in a worktree with the desk viewport's `scale` at 3 and the pointer off in `demo/record.js`, then cut with ffmpeg: `crop=1770:1200:135:645,scale=-1:900,pad=1600:900:(ow-iw)/2:0:color=0x070b12` on `36-find-and-tell-3.png`, `crop=1890:1062:2850:420,scale=1600:-1,pad=1600:900:0:(oh-ih)/2:color=0x070b12` on `38-image-bump-5.png`. The recorder change was not kept. The routine's slot follows the recording clock, so this crop reads Thursday 22:00 while the clip reads 19:30.
-- The critic (Gemini 2.5 Pro) on both grids, second pass after larger text and thicker wires: the diagrams tell each card better at card size and fit the other four; the crops read as dense illegible text. Its claim that the Play button covers the diagrams was checked on a magnified crop and is wrong.
-- The review page shows the grid with each set. Sebastian picks; the pick goes into `launch/site/assets/`.
+- **Diagrams.** Each poster is a static page in `demo/video/poster-*` on the diagrams' stylesheet and `demo/video/poster.css`. `node demo/video/poster.js <name>...` writes `demo/out/<name>.png`. A poster's bottom-right corner stays empty, under the card's Play button.
+- **Console crops.** `POSTER=1 demo/run.sh <scene>` records into `demo/out/poster/` at three times the pixel density, without the pointer, then ffmpeg cuts the crop.
+- The critic (Gemini 2.5 Pro) on the first two candidates, after larger text and thicker wires: the diagrams tell each card better at card size and fit the other four. Its claim that the Play button covers the diagrams was checked on a magnified crop and is wrong.
+
+## What Sebastian asked, 23 October, after the posters
+
+- The ladder card's title: "Stuck sessions get help in steps", picked from variations of "Stuck sessions climb a ladder".
+- The routines card shows the console crop.
+- For the chat card, a few diagram variations: the project agent talking to several running cards on one side and to you on the other, or the agent with the whole board and roadmap.
+
+## Decisions, 23 October
+
+- **The routines poster.** Scene 38's slot follows the recording clock, so the bank's recording and the poster recording run back to back and read the same slot, every Thursday 22:15: `demo/run.sh 38-image-bump`, then `POSTER=1 demo/run.sh 38-image-bump`, then `ffmpeg -i demo/out/poster/38-image-bump-5.png -vf "crop=1890:1062:2850:420,scale=1600:-1:flags=lanczos,pad=1600:900:0:(oh-ih)/2:color=0x070b12" launch/site/assets/poster-routine.png`. The routines clip was rendered again from the new recording, 31.8 s.
+- **The chat posters.** Four variations: A `poster-chat-hub`, B `poster-chat-context`, C `poster-chat-both`, D `poster-chat`. The project agent reads the board, sessions and the document repository, where the roadmap lives, through its tools, so B says "sees the whole project", not that it holds it all in its context. The critic ranks D, A, C, B: D tells the card's text step by step, A shows one chat to many cards at a glance, C is crowded at card size, B shows no action. Sebastian picks.
+- **The routines diagram** is gone, since the routines card took the crop.
 
 ## What Sebastian asked, 22 October, after round 8 (round 9)
 
