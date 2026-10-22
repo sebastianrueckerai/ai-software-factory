@@ -17,7 +17,7 @@ The page is built for progressive disclosure. Nine stops, each one point:
 5. **Run it.** Three sentences, the three layers as an inline SVG, the button.
 6. **The parts.** Added 22 October. Title "Open source parts. Our code only where none fit." A two-sentence lede, then an inline SVG system diagram. The four parts written in Go have a cyan outline and a `Go` tag: the console, factoryd, agent-worker and factory-gateway. Fourteen open source parts carry their licence: Forgejo, SigNoz, OpenBao, Temporal, PostgreSQL, LiteLLM, opencode, gVisor, Kubernetes, Talos Linux, Cilium, Flux, OpenTofu and cert-manager. The config files are `.file` boxes. The harness slot shows opencode as the default and a dashed "your harness, one more adapter". The facts come from the code and infra repositories as of 22 October. Licences come from each project's own LICENSE file. If a part is added or swapped, change the diagram.
 7. **Under the hood.** One lede sentence, then six `<details>` folds, closed by default: the sandbox, the gates, the money, recovery (with the supervisor frame), the numbers, three more facts.
-8. **How it compares.** One lede, the table behind a fold, the tradeoffs box visible.
+8. **How it compares.** One lede, the table behind a fold, the tradeoffs box visible. Each cell opens with its verdict in bold after a square mark: full cyan for Yes, half cyan for Partial, a grey outline for No and No gate, a dashed outline for Not documented (`<b class="v yes|part|no|nd">`).
 9. **Proof and limits.** The four links and the open limits in one line. The counts are gone: the page links the repository instead.
 
 There is no footer and no contact block. The page will sit inside a larger site that carries the imprint and the contact.

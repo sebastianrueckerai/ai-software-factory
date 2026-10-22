@@ -133,6 +133,11 @@ table.cmp { min-width: 1000px; }
 table.cmp tbody th[scope=row] { font-weight: 600; min-width: 120px; }
 table.cmp td { color: var(--text-muted); min-width: 90px; }
 table.cmp td:nth-child(2) { color: var(--text); min-width: 140px; }
+table.cmp .v { color: var(--text); }
+table.cmp .v::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 7px; border: 1.5px solid var(--text-faint); }
+table.cmp .v.yes::before { background: var(--accent); border-color: var(--accent); }
+table.cmp .v.part::before { background: linear-gradient(90deg, var(--accent) 50%, transparent 0); border-color: var(--accent); }
+table.cmp .v.nd::before { border-style: dashed; }
 
 .limits { border: 1px solid var(--line-strong); border-left: 3px solid var(--need); background: var(--bg-panel); padding: 18px 22px; max-width: 880px; }
 .limits h3 { margin-bottom: 10px; }
@@ -809,83 +814,83 @@ table.cmp td:nth-child(2) { color: var(--text); min-width: 140px; }
 <tbody>
 <tr>
 <th scope="row">The control plane runs on your servers, source published</th>
-<td><b>Yes</b>. Self-hosted on rented commodity servers, source published.</td>
-<td>No. Runners can be yours, the control plane stays in GitHub's cloud. Closed source.</td>
-<td>No. Workers can be yours, the control plane stays in Cursor's cloud. Closed source.</td>
-<td>No. Outposts workers can be yours, the control plane stays in Cognition's cloud.</td>
-<td>Partial. The whole stack self-hosts under a paid, source-available licence.</td>
-<td>Yes. MIT core. The enterprise tier is source-available and paid.</td>
-<td>Partial. Factory Private is in preview, by quote, closed source.</td>
+<td><b class="v yes">Yes</b>. Self-hosted on rented commodity servers, source published.</td>
+<td><b class="v no">No</b>. Runners can be yours, the control plane stays in GitHub's cloud. Closed source.</td>
+<td><b class="v no">No</b>. Workers can be yours, the control plane stays in Cursor's cloud. Closed source.</td>
+<td><b class="v no">No</b>. Outposts workers can be yours, the control plane stays in Cognition's cloud.</td>
+<td><b class="v part">Partial</b>. The whole stack self-hosts under a paid, source-available licence.</td>
+<td><b class="v yes">Yes</b>. MIT core. The enterprise tier is source-available and paid.</td>
+<td><b class="v part">Partial</b>. Factory Private is in preview, by quote, closed source.</td>
 </tr>
 <tr>
 <th scope="row">Your own model behind the same gateway, run end to end</th>
-<td><b>Yes</b>. Hosted APIs and self-hosted models sit behind one gateway.</td>
-<td>No. The cloud agent offers a hosted model list.</td>
-<td>No, hosted models.</td>
-<td>No, its own models.</td>
-<td>Yes. vLLM or any OpenAI-compatible endpoint, documented.</td>
-<td>Yes. vLLM, Ollama and LM Studio, documented.</td>
-<td>Partial. Any OpenAI-compatible endpoint in the CLI, no published run.</td>
+<td><b class="v yes">Yes</b>. Hosted APIs and self-hosted models sit behind one gateway.</td>
+<td><b class="v no">No</b>. The cloud agent offers a hosted model list.</td>
+<td><b class="v no">No</b>, hosted models.</td>
+<td><b class="v no">No</b>, its own models.</td>
+<td><b class="v yes">Yes</b>. vLLM or any OpenAI-compatible endpoint, documented.</td>
+<td><b class="v yes">Yes</b>. vLLM, Ollama and LM Studio, documented.</td>
+<td><b class="v part">Partial</b>. Any OpenAI-compatible endpoint in the CLI, no published run.</td>
 </tr>
 <tr>
 <th scope="row">The agent never holds a push token</th>
-<td><b>Yes</b>. A fresh identity per task, minted after the agent is dead, used once, revoked.</td>
-<td>Partial. It cannot run git push. The platform pushes for it, to one branch.</td>
-<td>Not documented. The agent pushes its own branch.</td>
-<td>No. Devin pushes itself, with the GitHub App's permissions.</td>
-<td>No. The agent runs with the user's token, a composite identity.</td>
-<td>No. The token sits in the agent's shell, and it runs git push.</td>
-<td>No. The agent runs with the user's own git credentials.</td>
+<td><b class="v yes">Yes</b>. A fresh identity per task, minted after the agent is dead, used once, revoked.</td>
+<td><b class="v part">Partial</b>. It cannot run git push. The platform pushes for it, to one branch.</td>
+<td><b class="v nd">Not documented</b>. The agent pushes its own branch.</td>
+<td><b class="v no">No</b>. Devin pushes itself, with the GitHub App's permissions.</td>
+<td><b class="v no">No</b>. The agent runs with the user's token, a composite identity.</td>
+<td><b class="v no">No</b>. The token sits in the agent's shell, and it runs git push.</td>
+<td><b class="v no">No</b>. The agent runs with the user's own git credentials.</td>
 </tr>
 <tr>
 <th scope="row">The money is held before each call, and at the cap it asks</th>
-<td><b>Yes</b>. The hold is taken under a database lock. At a cap: fund or end.</td>
-<td>No, organisation and user budgets.</td>
-<td>No. The cap lags, and usage stops without a question.</td>
-<td>No. Limits per session, user and organisation block work at the cap.</td>
-<td>Partial. Caps per user, group and subscription pause use. No hold before a call.</td>
-<td>No. Budgets and a per-run cap stop the run with an error.</td>
-<td>No. Rolling rate limits, long tasks pause at the limit.</td>
+<td><b class="v yes">Yes</b>. The hold is taken under a database lock. At a cap: fund or end.</td>
+<td><b class="v no">No</b>, organisation and user budgets.</td>
+<td><b class="v no">No</b>. The cap lags, and usage stops without a question.</td>
+<td><b class="v no">No</b>. Limits per session, user and organisation block work at the cap.</td>
+<td><b class="v part">Partial</b>. Caps per user, group and subscription pause use. No hold before a call.</td>
+<td><b class="v no">No</b>. Budgets and a per-run cap stop the run with an error.</td>
+<td><b class="v no">No</b>. Rolling rate limits, long tasks pause at the limit.</td>
 </tr>
 <tr>
 <th scope="row">A fix must fail at base and pass at head</th>
-<td><b>Yes</b>. An issue or an alert files the fix card. The gate runs the repro command at base and at head.</td>
-<td>No gate. Issues, schedules and code scanning alerts start tasks.</td>
-<td>No gate. Sentry, PagerDuty, Linear and labels start runs.</td>
-<td>No gate. PagerDuty, Linear and GitHub issues start sessions.</td>
-<td>No gate. Failed pipelines, merge requests and scans start flows.</td>
-<td>No gate. Issue labels and webhooks start tasks.</td>
-<td>No gate. Sentry, PagerDuty, Slack and GitHub events start runs.</td>
+<td><b class="v yes">Yes</b>. An issue or an alert files the fix card. The gate runs the repro command at base and at head.</td>
+<td><b class="v no">No gate</b>. Issues, schedules and code scanning alerts start tasks.</td>
+<td><b class="v no">No gate</b>. Sentry, PagerDuty, Linear and labels start runs.</td>
+<td><b class="v no">No gate</b>. PagerDuty, Linear and GitHub issues start sessions.</td>
+<td><b class="v no">No gate</b>. Failed pipelines, merge requests and scans start flows.</td>
+<td><b class="v no">No gate</b>. Issue labels and webhooks start tasks.</td>
+<td><b class="v no">No gate</b>. Sentry, PagerDuty, Slack and GitHub events start runs.</td>
 </tr>
 <tr>
 <th scope="row">The gates run the tests the criteria name, and a file cannot lower the floor</th>
-<td><b>Yes</b>. The criteria gate runs each named test and requires it green. Four stages stay in every process.</td>
-<td>Partial. Rulesets require checks. No criteria name tests.</td>
-<td>No. Bugbot's review advises. No named-test gate.</td>
-<td>No. Devin Review comments. Merge gating is your branch protection.</td>
-<td>Partial. Policy pipelines a project cannot remove, on Ultimate. No criteria name tests.</td>
-<td>No. Hooks and a critic are optional. No named-test gate.</td>
-<td>Partial. Organisation policy a project cannot weaken. No named-test gate.</td>
+<td><b class="v yes">Yes</b>. The criteria gate runs each named test and requires it green. Four stages stay in every process.</td>
+<td><b class="v part">Partial</b>. Rulesets require checks. No criteria name tests.</td>
+<td><b class="v no">No</b>. Bugbot's review advises. No named-test gate.</td>
+<td><b class="v no">No</b>. Devin Review comments. Merge gating is your branch protection.</td>
+<td><b class="v part">Partial</b>. Policy pipelines a project cannot remove, on Ultimate. No criteria name tests.</td>
+<td><b class="v no">No</b>. Hooks and a critic are optional. No named-test gate.</td>
+<td><b class="v part">Partial</b>. Organisation policy a project cannot weaken. No named-test gate.</td>
 </tr>
 <tr>
 <th scope="row">The process is a set of YAML files</th>
-<td><b>Yes</b>. Lanes, stages, merge rule. Ours is spec-driven, bring your own.</td>
-<td>Partial. Agents and workflows in YAML, the merge rule in settings.</td>
-<td>Partial. Files set the environment, hooks and review, not the stages.</td>
-<td>No. Files hold the environment, rules and skills, not stages or a merge rule.</td>
-<td>Partial. Flows, agents and CI are YAML. Triggers are set in the UI.</td>
-<td>Partial. Automations sync to YAML in Git. No stages or merge rule.</td>
-<td>Partial. Settings, hooks and skills in the repository. No stage process.</td>
+<td><b class="v yes">Yes</b>. Lanes, stages, merge rule. Ours is spec-driven, bring your own.</td>
+<td><b class="v part">Partial</b>. Agents and workflows in YAML, the merge rule in settings.</td>
+<td><b class="v part">Partial</b>. Files set the environment, hooks and review, not the stages.</td>
+<td><b class="v no">No</b>. Files hold the environment, rules and skills, not stages or a merge rule.</td>
+<td><b class="v part">Partial</b>. Flows, agents and CI are YAML. Triggers are set in the UI.</td>
+<td><b class="v part">Partial</b>. Automations sync to YAML in Git. No stages or merge rule.</td>
+<td><b class="v part">Partial</b>. Settings, hooks and skills in the repository. No stage process.</td>
 </tr>
 <tr>
 <th scope="row">Delete everything and rebuild from Git and a bucket</th>
-<td><b>Yes</b>. Rebuilt from the repositories and a backup bucket, rehearsed on 13 October.</td>
-<td>No, SaaS.</td>
-<td>No, SaaS.</td>
-<td>No, SaaS. Only Outposts workers rebuild from Helm and Terraform.</td>
-<td>Yes, self-managed. Helm charts, and backup and restore through a bucket.</td>
-<td>Partial. Helm charts and Terraform. The backup is database dumps only.</td>
-<td>No, SaaS. The Private preview is undocumented.</td>
+<td><b class="v yes">Yes</b>. Rebuilt from the repositories and a backup bucket, rehearsed on 13 October.</td>
+<td><b class="v no">No</b>, SaaS.</td>
+<td><b class="v no">No</b>, SaaS.</td>
+<td><b class="v no">No</b>, SaaS. Only Outposts workers rebuild from Helm and Terraform.</td>
+<td><b class="v yes">Yes</b>, self-managed. Helm charts, and backup and restore through a bucket.</td>
+<td><b class="v part">Partial</b>. Helm charts and Terraform. The backup is database dumps only.</td>
+<td><b class="v no">No</b>, SaaS. The Private preview is undocumented.</td>
 </tr>
 </tbody>
 </table>
