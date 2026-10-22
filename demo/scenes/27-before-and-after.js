@@ -12,8 +12,8 @@ const read = (w) => [
 
 module.exports = {
   title: "Before and after",
-  story: "The metrics page a week apart, each week a hundred cards, most of them the quiet work of routines and the intake: " +
-    "after level 4's split into small cards the week costs less, and the morning's questions raise the escalations to 4 % of the cards.",
+  story: "The metrics page a week apart, each week 310 cards, most of them the quiet work of routines and the intake: " +
+    "after level 4's split into small cards the week costs less, and the morning's questions raise the escalations to 13, 4 % of the cards.",
   group: "metrics",
   theme: "dark",
   viewport: "desk",

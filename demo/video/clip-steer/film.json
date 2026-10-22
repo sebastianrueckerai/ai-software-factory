@@ -56,7 +56,7 @@
     "s",
     null,
     null,
-    1.0
+    0.5
    ],
    "box": [
     "36-find-and-tell",
@@ -142,7 +142,7 @@
     "s",
     null,
     null,
-    1.0
+    0.5
    ],
    "text": "You are looking for the card building a specific feature",
    "cls": "label"

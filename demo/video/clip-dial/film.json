@@ -31,14 +31,10 @@
     "act0"
    ],
    "to": [
-    5,
-    "act4"
-   ]
-  },
-  {
-   "id": "am",
-   "still": "22-approval-6.png",
-   "dur": 2.6
+    6,
+    "stillMs"
+   ],
+   "holdRate": 1.5
   },
   {
    "id": "b",
@@ -48,7 +44,7 @@
     "act0"
    ],
    "to": [
-    2,
+    3,
     "stillMs"
    ]
   },
@@ -56,17 +52,18 @@
    "id": "c",
    "scene": "25-autonomy",
    "from": [
-    3,
+    4,
     "act0"
    ],
    "to": [
-    4,
+    5,
     "stillMs"
-   ]
+   ],
+   "holdRate": 1.5
   },
   {
    "id": "end",
-   "still": "25-autonomy-4.png",
+   "still": "25-autonomy-5.png",
    "dur": 4.8
   }
  ],
@@ -97,10 +94,9 @@
   },
   {
    "at": [
-    "am",
-    null,
-    null,
-    0.2
+    "a",
+    6,
+    "act0"
    ],
    "box": [
     "22-approval",
@@ -145,6 +141,18 @@
   },
   {
    "at": [
+    "b",
+    3,
+    "act0"
+   ],
+   "box": [
+    "25-autonomy",
+    3,
+    "level"
+   ]
+  },
+  {
+   "at": [
     "c",
     null,
     null,
@@ -158,51 +166,27 @@
    ],
    "box": [
     "25-autonomy",
-    3,
-    "level"
-   ]
-  },
-  {
-   "at": [
-    "c",
-    3,
-    "act4"
-   ],
-   "box": [
-    "25-autonomy",
-    2,
-    "menu"
-   ]
-  },
-  {
-   "at": [
-    "c",
-    3,
-    "act7"
-   ],
-   "box": [
-    "25-autonomy",
-    3,
+    4,
     "wake"
    ]
   },
   {
    "at": [
     "c",
-    4,
+    5,
     "act0",
     0.5
    ],
    "box": [
     "25-autonomy",
-    4,
+    5,
     "answer"
    ]
   },
   {
    "at": [
     "c",
-    4,
+    5,
     "act1",
     1.9
    ],
@@ -210,12 +194,12 @@
     "union": [
      [
       "25-autonomy",
-      4,
+      5,
       "merged"
      ],
      [
       "25-autonomy",
-      4,
+      5,
       "live"
      ]
     ]
@@ -235,7 +219,10 @@
     2,
     "menu"
    ],
-   "fill": 0.7
+   "fill": 0.7,
+   "free": true,
+   "cx": 620,
+   "cy": 420
   },
   {
    "at": [
@@ -289,34 +276,15 @@
   {
    "at": [
     "b",
-    2,
-    "act2",
-    1.8
+    3,
+    "act0"
    ],
-   "text": "Pick full auto",
+   "text": "One click: full auto, the brightest lamp",
    "cls": "label"
   },
   {
    "at": [
     "c"
-   ],
-   "text": "The dial now stands on full auto",
-   "cls": "label"
-  },
-  {
-   "at": [
-    "c",
-    3,
-    "act4"
-   ],
-   "text": "Only the full auto lamp is lit",
-   "cls": "label"
-  },
-  {
-   "at": [
-    "c",
-    3,
-    "act7"
    ],
    "text": "The agent takes the next card's question",
    "cls": "label"
@@ -324,7 +292,7 @@
   {
    "at": [
     "c",
-    4,
+    5,
     "act0",
     0.5
    ],
@@ -334,7 +302,7 @@
   {
    "at": [
     "c",
-    4,
+    5,
     "act1",
     1.9
    ],
@@ -359,14 +327,6 @@
   [
    "a0"
   ],
-  {
-   "from": [
-    "am"
-   ],
-   "to": [
-    "am"
-   ]
-  },
   [
    "b"
   ],

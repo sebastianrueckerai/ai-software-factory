@@ -46,9 +46,11 @@
     const fill = opts.fill ?? 0.62, cx = opts.cx ?? 800, cy = opts.cy ?? 450;
     // never below 1: a zoom out would show the black past the console
     const s = opts.scale ?? Math.max(1, Math.min(opts.max ?? 4, 1600 * fill / box.width, 900 * fill / box.height));
-    // the stage always covers the frame: the move stops at the console's edges rather than showing past them
-    const x = Math.min(0, Math.max(1600 - 1600 * s, cx - (box.x + box.width / 2) * s));
-    const y = Math.min(0, Math.max(900 - 900 * s, cy - (box.y + box.height / 2) * s));
+    // the stage covers the frame: the move stops at the console's edges rather than showing past them, unless the cam
+    // is free, which may show black past an edge to keep its box clear of the captions
+    const fx = cx - (box.x + box.width / 2) * s, fy = cy - (box.y + box.height / 2) * s;
+    const x = opts.free ? fx : Math.min(0, Math.max(1600 - 1600 * s, fx));
+    const y = opts.free ? fy : Math.min(0, Math.max(900 - 900 * s, fy));
     tl.to(stage, { scale: s, x, y, duration: opts.dur ?? 1.0, ease: opts.ease || "power2.inOut" }, at);
   }
   function home(tl, stage, at, dur = 0.9) {

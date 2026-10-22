@@ -64,8 +64,9 @@ module.exports = {
       boxes: { files: "#diff-file-boxes" },
     },
     { state: () => null, actions: [{ goto: "/" }, { hover: ui.approve(a.pr) }, { wait: 800 }, { click: ui.approve(a.pr) }, { wait: 400 }], hold: 300, boxes: { needs: "#needs-you" } },
-    // the seed's redraw takes the press's banner away, so the banner and the settled counts show one step apart
-    { state: (now) => thursday(now, m.at + 30), actions: [{ goto: "/" }, { hover: ui.park }], hold: 4000, boxes: { merged: ui.face(a.task), progress: '#board .column[aria-labelledby="col-2"]' } },
+    // the merge reaches the open board as the factory's event does, with no reload; the redraw takes the press's banner
+    // away, so the banner and the settled counts show one step apart
+    { state: (now) => thursday(now, m.at + 30), actions: [{ hover: ui.park }], hold: 4000, boxes: { merged: ui.face(a.task), progress: '#board .column[aria-labelledby="col-2"]' } },
     {
       state: (now) => thursday(now, m.live + 60),
       actions: [

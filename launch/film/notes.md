@@ -47,6 +47,29 @@ Started 22 October 2026. The working file for the film and its small clips: what
 - Show routines (the dashed card, the weekly bump) in a clip of their own.
 - The budget clip mostly shows a split: replace it with the discretionary pool, so the factory does not ask about five-cent overruns.
 
+## What Sebastian asked, 22 October, after round 6 (round 7)
+
+- After 2:09 the cut goes light and dark: one fade to black is not needed.
+- The text under "full auto" in the menu sits at the frame's edge under the caption's band. Zoom out a little, or pan past the console and show black there.
+- The switch to full auto shows the menu, then a cut, then the click and the new level. Make it one quick scene.
+- "The four DevOps delivery metrics": the page has more than four, so name no number.
+- "Escalations 4 · 4 %" looks made up: make it something like 13 and 4 %, and check the other figures for plausibility.
+- The lamps: each one, dim to bright, shows only when its level is chosen. Change it wherever the old way shows.
+- A clip built around a diagram shows the diagram as its poster.
+- The rough cut sat still for its first two seconds: the first highlight and caption start at 0.5 s.
+- Asked, not ordered: should the split go from the opening, replaced by a design question answered in one click that unblocks the board? And a test of a primer that lights the board, then the chat, before the column-by-column opening.
+
+## Round 7 decisions
+
+- **No dip after the approval.** Scene 22's merge reaches the open board as an event does, with no reload, so the cut runs from the click to the merged card without a fade.
+- **The switch in one scene.** The console lab now writes each scene's project file onto its infra fake, so a level pick commits as on the factory (code commit 9d3e1a21). Scene 25 opens the menu, clicks full auto, and the chip shows full auto at once; the agent's wake turn follows after one reload.
+- **Free camera.** A cam may set `free: true` and pan past the console's edge, which shows black, to keep its box clear of the caption band. The full-auto menu uses it.
+- **Lamps.** C36: the menu draws a lamp only beside the chosen level, in build 9d3e1a21.
+- **The figures.** The quiet work is 300 cards a week, 60 each weekday at one to three cents. Every 33rd asks one question, answered in nine minutes; every 25th's first review asks for changes; they book no human act, as on a merge rule. Week 2 reads 310 cards, 13 escalations, 4 % of the cards, 0.1 acts per card, 96 % review acceptance, 16 % human-blocked, €0.02 a card and 59 thousand tokens a card, at 1.6 million tokens a euro for the cheap model. Change failure stays 0 %: the factory counts reverts, and #118 was fixed forward.
+- **The primer.** A test clip, `film-primer`, opens on the dimmed frame, lights the board, then the chat, then plays the opening as it is.
+- **The first half second.** The opening's highlights and captions moved 1.5 s earlier, the first at 0.5 s, and the hero still runs 15.5 s; the chat clip's first label also starts at 0.5 s.
+- **Posters.** A clip with a diagram at its heart shows the diagram's last full frame as its poster, what a viewer sees while it does not play. The plan card switched from its console frame to `diagram-plan`; ladder, pool, dial and stall already did.
+
 ## What Sebastian asked, 22 October, after round 5 (round 6)
 
 - The level menu shows several lamps lit. At first only manual's lamp may be on, after the switch only the brighter full auto lamp. Check it wherever the menu shows.
@@ -172,6 +195,7 @@ Started 22 October 2026. The working file for the film and its small clips: what
 - Version 2, the film's sections at 3, 2 and 3 of 5 before the last fixes. The approval's empty highlight, the zoom out on the plan, the split's highlight on a card that had left, the highlight before the Do it button existed, and the full-auto story were fixed. Full auto now shows the agent's own answer and the merge and release lines, not the gate's raw log. The wake line itself said "1 asks wait": factoryd's wake text now says "1 ask waits" (code 2d6b6156).
 - Version 5: the film's parts at 2, 2 and 3 of 5, the clips at 3 of 5 except the ladder at 2. Its listed defects were checked frame by frame: it reads the black slates, the dips at page changes and the dimmed moral frames as empty, the spotlight's dimming as a zoom, and a highlight around a card with its button as a highlight on the button. Fixed from my own frame checks instead: the Forgejo highlight that stayed over the board, the approval highlight that outlined the empty slot, up to 2 s of black at page reloads, the black last frame, and the routine clip's typed line that scrolled away unread.
 - Version 6: the film's parts at 2 of 5 each, the dial clip 2, the pool and stall clips 4; the other clips kept their version 5 content and scores. The dial's two asks, zooms onto the chip and readable console text, run against the direction to zoom less, so they stay undone.
+- Version 7: the film's parts at 2, 3 and 2 of 5, the dial clip 4. The primer clip 2: the critic finds the dimmed primer slows the start, but its rules count every dimmed frame as a defect, so the verdict is the test you run with viewers, not this one.
 
 ## Open, for Sebastian
 
@@ -191,4 +215,5 @@ Started 22 October 2026. The working file for the film and its small clips: what
 - [x] The landing page plays the clips in its cards, with the stills as posters, and the film behind the hero's play button. Its video files stay out of git until a cut is approved.
 - [x] Round 5: black slates, Inside a card after the plan, Metrics last, no zoom on the plan, the merged card or the full-auto board, the level menu's lamps (C33), routines as scene 38, all 38 scenes recorded again with "user" for "player".
 - [x] Round 6: one lit lamp (C34), the flicker fixed in the template, shorter static views, the quiet work in the ledger, the pool's moral without an amount.
+- [x] Round 7: the merge without a dip, the switch in one scene, the free camera, no lamp beside the levels not chosen (C36), 13 escalations at 4 %, the primer as a test.
 - [ ] Sebastian approves the cut; then the cut to length, the voice, the videos into git.

@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "historyId": "b3f27b96-1e69-4b17-9d06-6c71b777a7ee",
+  "currentRevision": "b35abca3-0b29-46f6-80c8-39e4312f1f60",
+  "pendingChanges": false,
+  "files": {
+    "clips/34-busy-board-3.png": {
+      "hash": "9c78089a6e547bf6a4bde3097fe5669847294852079e33b1e448301d9198bf0d",
+      "content": "/home/womb/.cache/hyperframes/history/b3f27b96-1e69-4b17-9d06-6c71b777a7ee/blobs/9c/9c78089a6e547bf6a4bde3097fe5669847294852079e33b1e448301d9198bf0d"
+    },
+    "data.js": {
+      "hash": "b8579b9cea61c7f046db232092d91bb7ed76eda7ed6422b7421f2c54daff7b77",
+      "content": "/home/womb/.cache/hyperframes/history/b3f27b96-1e69-4b17-9d06-6c71b777a7ee/blobs/b8/b8579b9cea61c7f046db232092d91bb7ed76eda7ed6422b7421f2c54daff7b77"
+    },
+    "diagram.css": {
+      "hash": "0cceb3bbd66fd486cd3afc0506f05d77f2165294235c772cd64bb35dcbf1cd40",
+      "content": "/home/womb/.cache/hyperframes/history/b3f27b96-1e69-4b17-9d06-6c71b777a7ee/blobs/0c/0cceb3bbd66fd486cd3afc0506f05d77f2165294235c772cd64bb35dcbf1cd40"
+    },
+    "film-fx.js": {
+      "hash": "8c32e2839087a5e6b3adec1f82e4ed3499a340584e3de47b38e399eec69daa5b",
+      "content": "/home/womb/.cache/hyperframes/history/b3f27b96-1e69-4b17-9d06-6c71b777a7ee/blobs/8c/8c32e2839087a5e6b3adec1f82e4ed3499a340584e3de47b38e399eec69daa5b"
+    },
+    "film.json": {
+      "hash": "dd0a610ad0c14bd1139bbc0d4ab2d13d608d5975ec7f9e1646e8fc87ed06a26c",
+      "content": "/home/womb/.cache/hyperframes/history/b3f27b96-1e69-4b17-9d06-6c71b777a7ee/blobs/dd/dd0a610ad0c14bd1139bbc0d4ab2d13d608d5975ec7f9e1646e8fc87ed06a26c"
+    },
+    "gsap.min.js": {
+      "hash": "c174bfce53a729418d57a8ad8625e7247c793a22fef8e2851e3cfa3de9cd8280",
+      "content": "/home/womb/.cache/hyperframes/history/b3f27b96-1e69-4b17-9d06-6c71b777a7ee/blobs/c1/c174bfce53a729418d57a8ad8625e7247c793a22fef8e2851e3cfa3de9cd8280"
+    },
+    "index.html": {
+      "hash": "f7eba9c456d7c1c26515e005b4d651f54f68809e65b87738e39dd6ed1eeed276",
+      "content": "/home/womb/.cache/hyperframes/history/b3f27b96-1e69-4b17-9d06-6c71b777a7ee/blobs/f7/f7eba9c456d7c1c26515e005b4d651f54f68809e65b87738e39dd6ed1eeed276"
+    },
+    "meta.json": {
+      "hash": "fc90a65fa4b503ef177555c3ece0f7255c8e91c1962e05148d1dfd9e42b73da4",
+      "content": "/home/womb/.cache/hyperframes/history/b3f27b96-1e69-4b17-9d06-6c71b777a7ee/blobs/fc/fc90a65fa4b503ef177555c3ece0f7255c8e91c1962e05148d1dfd9e42b73da4"
+    },
+    "clips/34-busy-board.mp4": {
+      "hash": "68f4b25946fe8154d218b5d42b558768920307e88d11d3d802eeab376ac8a0d3",
+      "content": "/home/womb/.cache/hyperframes/history/b3f27b96-1e69-4b17-9d06-6c71b777a7ee/blobs/68/68f4b25946fe8154d218b5d42b558768920307e88d11d3d802eeab376ac8a0d3"
+    }
+  },
+  "revisions": {
+    "b35abca3-0b29-46f6-80c8-39e4312f1f60": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792699070825,
+      "endedAt": 1792699070842,
+      "files": {
+        "data.js": {
+          "before": "/home/womb/.cache/hyperframes/history/b3f27b96-1e69-4b17-9d06-6c71b777a7ee/blobs/d8/d829df382037d92d058e9b6f9df16c92dc0d3722090110157adf4e866fc6a42e",
+          "after": "/home/womb/.cache/hyperframes/history/b3f27b96-1e69-4b17-9d06-6c71b777a7ee/blobs/b8/b8579b9cea61c7f046db232092d91bb7ed76eda7ed6422b7421f2c54daff7b77"
+        },
+        "film.json": {
+          "before": "/home/womb/.cache/hyperframes/history/b3f27b96-1e69-4b17-9d06-6c71b777a7ee/blobs/18/18e569251710d837e0c461e173e081ba0644bbdf469ccba0532485afeae68623",
+          "after": "/home/womb/.cache/hyperframes/history/b3f27b96-1e69-4b17-9d06-6c71b777a7ee/blobs/dd/dd0a610ad0c14bd1139bbc0d4ab2d13d608d5975ec7f9e1646e8fc87ed06a26c"
+        },
+        "index.html": {
+          "before": "/home/womb/.cache/hyperframes/history/b3f27b96-1e69-4b17-9d06-6c71b777a7ee/blobs/f6/f670e26d06cec52aa6498825fa3d69914d3fece8ed69a063985f83ca66b821cc",
+          "after": "/home/womb/.cache/hyperframes/history/b3f27b96-1e69-4b17-9d06-6c71b777a7ee/blobs/f7/f7eba9c456d7c1c26515e005b4d651f54f68809e65b87738e39dd6ed1eeed276"
+        }
+      }
+    }
+  },
+  "checks": {
+    "latest": null,
+    "revisions": {},
+    "unversioned": []
+  },
+  "snapshots": {
+    "latest": null,
+    "revisions": {},
+    "unversioned": []
+  },
+  "renders": {
+    "latest": {
+      "id": "cf44f5ff-3ea1-4e14-a434-5a27d8183643",
+      "completedAt": 1792699106004,
+      "output": "/tmp/hf-film-primer-ivwDyz/b.mp4",
+      "status": "completed",
+      "revision": "b35abca3-0b29-46f6-80c8-39e4312f1f60"
+    },
+    "retainedRevisions": [
+      "b35abca3-0b29-46f6-80c8-39e4312f1f60"
+    ]
+  },
+  "pendingArtifactCleanup": []
+}

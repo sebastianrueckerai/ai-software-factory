@@ -557,7 +557,7 @@ const routines = {
     { run: 7, due: date(2, "fri", "07:00"), took: merges[123].live, outcome: "done", issue: 123, cost: 0.62, note: "GET /leaderboard p95 0.74 s, up from 0.31 s since #118" },
   ],
   "cost-review": [
-    { run: 3, due: date(2, "thu", "08:00"), took: 11 * HOUR, outcome: "done", issue: 124, note: "€24.42 of the €60 cap, €0.15 per card" },
+    { run: 3, due: date(2, "thu", "08:00"), took: 11 * HOUR, outcome: "done", issue: 124, note: "€26.10 of the €60 cap, €0.05 per card" },
   ],
 };
 
@@ -1343,24 +1343,28 @@ const ledger = {
   125: { ...live(125), spent: 0.41, asks: [{ at: 4 * MIN, answered: shareLink.auto.answered, by: "ai" }], diff: [3, 79, 7], acts: 1 },
 };
 
-// quiet is the work no scene shows: every weekday of the two weeks the routines and the intake file small changes,
-// one each half hour from 08:00, that run on the cheap model, pass review and go live after the one merge click manual
-// asks for. The figures read them as factoryd reads every card, so the metrics see the factory's week, not only the
-// cards the scenes need, of which many wait on a person by design.
+// quiet is the work no scene shows: every weekday of the two weeks the routines and the intake file small changes, one
+// each eight minutes from 08:00, sixty a day, that run on the cheap model for one to three cents and go live on their
+// own. Every 33rd asks its member one question, answered nine minutes later; every 25th's first review asks for changes.
+// They book no human act, as a project whose routine merges run on the merge rule; the scenes' own cards keep the
+// manual level's clicks. The figures read them as factoryd reads every card, so the metrics see the factory's week, not
+// only the cards the scenes need, of which many wait on a person by design.
 const QUIET = [
   "Bump a pinned dependency to its newest patch", "Fix a flaky lobby test", "Update the German strings", "Compress the asteroid sprites",
   "Fix a lint warning in the store", "Tidy the matchmaking log lines", "Raise the replay test's timeout", "Pin the CI image's digest",
   "Fix a typo on the season pass page",
 ];
 for (const w of [1, 2]) {
-  for (let k = 0; k < 90; k++) {
-    const issue = 1000 + (w - 1) * 90 + k;
+  for (let k = 0; k < 300; k++) {
+    const issue = 1000 + (w - 1) * 300 + k;
     const title = QUIET[k % QUIET.length];
     cards[issue] = { title, size: "small", pr: 400 + issue - 1000, body: title, acceptance: ["the change's own test passes"] };
-    filed[issue] = new Date(date(w, "mon", "08:00").getTime() + (Math.floor(k / 18) * DAY + (k % 18) * 30 * MIN) * 1000);
+    filed[issue] = new Date(date(w, "mon", "08:00").getTime() + (Math.floor(k / 60) * DAY + (k % 60) * 8 * MIN) * 1000);
     ledger[issue] = {
-      end: (18 + ((k * 7) % 20)) * MIN, spent: (3 + ((k * 13) % 6)) / 100, lead: (6 + (k % 3)) * MIN,
-      diff: [1 + (k % 2), 4 + ((k * 11) % 30), (k * 5) % 7], acts: 1,
+      end: (18 + ((k * 7) % 20)) * MIN, spent: (1 + (k % 3)) / 100, lead: (6 + (k % 3)) * MIN,
+      diff: [1 + (k % 2), 4 + ((k * 11) % 30), (k * 5) % 7], acts: 0,
+      ...(k % 33 === 5 && { asks: [{ at: 3 * MIN, answered: 12 * MIN, by: "human" }] }),
+      ...(k % 25 === 7 && { review: false }),
     };
   }
 }
@@ -1400,9 +1404,9 @@ const REVIEW = 0.12;
 const TOOLS = 0.02;
 const SERVED = { big: "zai/glm-5.3", small: "zai/glm-5.3-flash" };
 const TOOL_MIX = [{ alias: "web_search", share: 64 }, { alias: "web_scrape", share: 36 }];
-// TOKENS are the tokens a euro of the cards' calls moves, blended over the classes; the chat makes CALLS tool calls
-// and spends MINUTES minutes on them a euro of its spend.
-const TOKENS = 120000;
+// TOKENS are the tokens a euro of the cards' calls moves, blended over the classes, the cheap model's price among them;
+// the chat makes CALLS tool calls and spends MINUTES minutes on them a euro of its spend.
+const TOKENS = 1600000;
 const CALLS = 50;
 const MINUTES = 7;
 // SELF are the factory's own deploys a week, by the story's week: 0 is the week before week 1.

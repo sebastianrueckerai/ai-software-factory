@@ -120,7 +120,7 @@ moves.forEach((c, i) => {
 });
 moves.forEach((c) => {
   const r = box(c.box);
-  if (r) fx.camera(tl, stage, r, c.t, { fill: c.fill ?? 0.8, cx: c.cx, cy: c.cy, dur: c.dur, max: F.maxZoom });
+  if (r) fx.camera(tl, stage, r, c.t, { fill: c.fill ?? 0.8, cx: c.cx, cy: c.cy, dur: c.dur, max: F.maxZoom, free: c.free });
   else fx.home(tl, stage, c.t, c.dur);
 });
 

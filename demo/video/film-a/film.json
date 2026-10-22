@@ -9,7 +9,7 @@
   {
    "id": "hero",
    "still": "34-busy-board-3.png",
-   "dur": 17.0
+   "dur": 15.5
   },
   {
    "id": "press",
@@ -107,17 +107,12 @@
    ],
    "lead": 3.5,
    "to": [
-    5,
-    "act4"
+    6,
+    "stillMs"
    ],
    "tail": 0,
    "rate": 1.0,
    "holdRate": 2.0
-  },
-  {
-   "id": "merged",
-   "still": "22-approval-6.png",
-   "dur": 2.6
   },
   {
    "id": "t-auto",
@@ -133,7 +128,7 @@
    ],
    "lead": 1.0,
    "to": [
-    2,
+    3,
     "stillMs"
    ],
    "rate": 1.3,
@@ -143,11 +138,11 @@
    "id": "auto2",
    "scene": "25-autonomy",
    "from": [
-    3,
+    4,
     "act0"
    ],
    "to": [
-    4,
+    5,
     "stillMs"
    ],
    "tail": 0,
@@ -231,7 +226,7 @@
  ],
  "spots": [
   {
-   "at": 2.0,
+   "at": 0.5,
    "box": [
     "34-busy-board",
     3,
@@ -239,7 +234,7 @@
    ]
   },
   {
-   "at": 5.2,
+   "at": 3.7,
    "box": [
     "34-busy-board",
     3,
@@ -248,7 +243,7 @@
    "amber": true
   },
   {
-   "at": 8.4,
+   "at": 6.9,
    "box": [
     "34-busy-board",
     3,
@@ -256,7 +251,7 @@
    ]
   },
   {
-   "at": 10.8,
+   "at": 9.3,
    "box": [
     "34-busy-board",
     3,
@@ -357,20 +352,20 @@
   {
    "at": [
     "auto2",
-    4,
+    5,
     "act0",
     0.3
    ],
    "box": [
     "25-autonomy",
-    4,
+    5,
     "answer"
    ]
   },
   {
    "at": [
     "auto2",
-    4,
+    5,
     "act1",
     1.5
    ],
@@ -378,12 +373,12 @@
     "union": [
      [
       "25-autonomy",
-      4,
+      5,
       "merged"
      ],
      [
       "25-autonomy",
-      4,
+      5,
       "live"
      ]
     ]
@@ -429,7 +424,7 @@
    ]
   },
   {
-   "at": 15.0,
+   "at": 13.5,
    "box": [
     "34-busy-board",
     3,
@@ -577,19 +572,6 @@
   },
   {
    "at": [
-    "merged",
-    null,
-    null,
-    0.2
-   ],
-   "box": [
-    "22-approval",
-    6,
-    "merged"
-   ]
-  },
-  {
-   "at": [
     "question"
    ],
    "box": {
@@ -667,41 +649,53 @@
   },
   {
    "at": [
-    "auto2",
+    "approval",
+    6,
+    "act0"
+   ],
+   "box": [
+    "22-approval",
+    6,
+    "merged"
+   ]
+  },
+  {
+   "at": [
+    "autonomy",
     3,
-    "act4"
+    "act0"
    ],
    "box": [
     "25-autonomy",
-    2,
-    "menu"
+    3,
+    "level"
    ]
   },
   {
    "at": [
     "auto2",
-    3,
-    "act7"
+    4,
+    "act1"
    ],
    "box": [
     "25-autonomy",
-    3,
+    4,
     "wake"
    ]
   }
  ],
  "caps": [
   {
-   "at": 2.0,
+   "at": 0.5,
    "text": "<b>Change anything from one chat.</b> The agent proposes, you approve."
   },
   {
-   "at": 5.2,
+   "at": 3.7,
    "amber": true,
    "text": "<b>See what is stuck</b> and what waits on you."
   },
   {
-   "at": 8.4,
+   "at": 6.9,
    "text": "<b>Decide what runs next:</b> priorities and a backlog."
   },
   {
@@ -780,7 +774,7 @@
   {
    "at": [
     "auto2",
-    4,
+    5,
     "act0",
     0.3
    ],
@@ -789,7 +783,7 @@
   {
    "at": [
     "auto2",
-    4,
+    5,
     "act1",
     1.5
    ],
@@ -850,19 +844,19 @@
    "text": "<b>The worst an agent can do is wreck its own sandbox.</b><small>github.com/sebastianrueckerai/ai-software-factory</small>"
   },
   {
-   "at": 10.8,
+   "at": 9.3,
    "amber": true,
    "parts": [
     {
-     "at": 10.8,
+     "at": 9.3,
      "text": "<b>A card failed twice</b>"
     },
     {
-     "at": 12.8,
+     "at": 11.3,
      "text": "and used up its budget."
     },
     {
-     "at": 15.0,
+     "at": 13.5,
      "text": "<br>One sentence splits it,"
     },
     {
@@ -915,9 +909,7 @@
   },
   {
    "at": [
-    "auto2",
-    3,
-    "act7"
+    "auto2"
    ],
    "text": "<b>On full auto, the agent takes the open question,</b>"
   },
@@ -925,7 +917,7 @@
    "at": [
     "metrics-page"
    ],
-   "text": "<b>The four DevOps delivery metrics,</b> week by week:"
+   "text": "<b>The DevOps delivery metrics,</b> week by week:"
   },
   {
    "at": [
@@ -977,7 +969,10 @@
     2,
     "menu"
    ],
-   "fill": 0.55
+   "fill": 0.55,
+   "free": true,
+   "cx": 600,
+   "cy": 380
   },
   {
    "at": [
@@ -1105,14 +1100,6 @@
     "approval",
     5,
     "act0"
-   ]
-  },
-  {
-   "from": [
-    "merged"
-   ],
-   "to": [
-    "merged"
    ]
   },
   {

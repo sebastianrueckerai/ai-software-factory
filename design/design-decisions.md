@@ -280,3 +280,11 @@ A message whose turn is in flight ends with a cyan dot and the word "thinking" i
 A run of two or more tool calls in a row shows its newest call. The earlier calls fold behind one line, "n earlier calls", which opens on a click. Text, a proposal or an applied line ends a run.
 
 The build is f57d0312 on main of the code repository.
+
+## C36. A lamp shows only beside the chosen level (2026-10-22, Sebastian)
+
+Sebastian, on round 6: "Before they are always visible next to every setting. Now every light (from dim to bright) is only visible when its setting is chosen. So only one lamp is on at the same time." C34 still drew an unlit socket beside every other row.
+
+The level menu draws a lamp only beside the current level, at that level's strength from C33; the other rows keep the lamp's space, so the names stay aligned, but show nothing. The control under Send already shows only the current level's lamp.
+
+The build is 9d3e1a21 on main of the code repository.
