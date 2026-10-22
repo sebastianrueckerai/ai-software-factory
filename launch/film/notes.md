@@ -35,6 +35,26 @@ Started 22 October 2026. The working file for the film and its small clips: what
 - The rough cut: "Do it files the parts" does not say Do it is a button; say it shorter, a click files the parts. The work resolving moves to Done one card at a time. "New work files itself": the note breaks off here; the arrivals now come one at a time, each with its source named.
 - Overall: slower, gentle zooms, the full board first, no zoom onto buttons or small elements; inside a highlighted region the click animation shows the press. Use the animated sequence diagram more.
 
+## What Sebastian asked, 22 October, after round 3 (round 4)
+
+- The budget sentence in the rough cut comes too fast and is too long: build it ("A card failed twice" alone first, then longer), and slow the moves; a zoom in and then a quick move elsewhere disorients.
+- The drain can be a little faster, still one card after another.
+- "Too big for one card": the highlight left the screen because it moved faster than the zoom. Often show enough of the screen and skip the zoom; the highlight alone can point. "For your accept" becomes "for you to accept".
+- On manual, open the pull request in Forgejo, to show the code is a click away.
+- A section title must not show the earlier highlight behind it: title first, then the move, then the highlights.
+- The captions sit at the very bottom, where a player's controls cover them: try thin black bars top and bottom, reversibly.
+- The short clips end on their moral, for example that the control chat writes no code but orchestrates the workers.
+- Show routines (the dashed card, the weekly bump) in a clip of their own.
+- The budget clip mostly shows a split: replace it with the discretionary pool, so the factory does not ask about five-cent overruns.
+
+## Round 4 decisions
+
+- **Template rules.** A section title or a moral holds the frame alone: the highlight leaves as it comes, captions and highlights of the next moment wait until it leaves. A highlight that meets a camera move leaves as the move starts and appears in place once it stops. A caption with `parts` lays out its whole sentence from the start and fades each part in, so nothing shifts. A `reveals` entry with `from` and `to` dissolves a page change through the background colour. `matte` in film.json scales the picture into black bars: 54 px top and bottom, which leaves pillar bars at the sides, since a 16:9 picture inside a 16:9 frame cannot shrink only in height without a crop. Removing the key reverses it; the review page shows both.
+- **Forgejo.** `demo/forgejo/setup.sh` starts a local, throwaway Forgejo (codeberg.org/forgejo/forgejo:15.0.9) with orbit/nebula-run and pull request #220 of the refund card, five files whose line counts match the console's. The recorder serves https://git.example, where the lab's console links, from it (`forgejo: true` in a scene). Scene 22 needs it running.
+- **The pool.** The console shows the pool nowhere: no page states its size or what it funded. The clip shows the theory in a diagram and the console's real traces: the wake turn's `fund` call and its result, and the card's "question answered" line. The demo's wake text gained the pool sentence factoryd writes when the woken member is an approver. New scene 37.
+- **Routines.** Scene 19 records its boxes and a fourth step, the bump's Runs tab. The demo's bump files agent cards; the factory's own weekly bump files a card for a person.
+- **Morals.** Every clip ends on one sentence held over a dimmed last frame.
+
 ## Decisions
 
 - **Videos with contact sheets.** Motion is what Sebastian judges. Each variant also gets a sheet of stills so he compares at a glance.
@@ -117,7 +137,7 @@ Started 22 October 2026. The working file for the film and its small clips: what
 
 - Which sandbox: A the schematic (in the cut), C nested walls or D the sequence diagram.
 - The case that lands with the human uses scene 21, a decision only a person makes. A scene where an agent tried twice and explains why it cannot fix the problem does not exist yet.
-- The rough cut runs 180 s since round 3: slower pacing and the whole sandbox A (56 s) inside it. Cutting to 90 means dropping sections or moving the sandbox out of the film; the clips already carry each mechanism on their own.
+- The rough cut runs about 200 s since round 4: slower pacing, the Forgejo visit and the whole sandbox A (56 s) inside it. Cutting to 90 means dropping sections or moving the sandbox out of the film; the clips already carry each mechanism on their own.
 - The voice track: lines are not written. They come from the captions once the cut is approved, generated under the fal cap.
 - DORA: the film says "the four DevOps delivery metrics", as the page does.
 

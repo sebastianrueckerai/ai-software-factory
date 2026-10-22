@@ -27,11 +27,17 @@
   .title span { position: absolute; left: 0; right: 0; top: 380px; text-align: center; font: 600 88px var(--font-ui); color: var(--text); }
   .title b { position: absolute; left: 700px; top: 500px; width: 200px; height: 4px; background: var(--accent); }
   #shade { position: absolute; inset: 0; background: color-mix(in srgb, var(--bg) 70%, transparent); opacity: 0; }
+  .title.moral i { background: color-mix(in srgb, var(--bg) 88%, transparent); }
+  .title.moral span { left: 160px; right: 160px; top: 330px; font: 600 60px/1.3 var(--font-ui); }
+  .title.moral b { top: 300px; }
+  /* the matte: the picture sits inside bars, so the player's controls cover no caption (matte in film.json) */
+  #frame { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; transform-origin: 0 0; overflow: hidden; }
   #dip { position: absolute; inset: 0; background: var(--bg); opacity: 0; }
 </style>
 </head>
 <body>
 <div id="root" data-composition-id="main" data-start="0" data-duration="{{DURATION}}" data-width="1600" data-height="900">
+<div id="frame">
 <div id="stage">
 <!--MEDIA-->
 </div>
@@ -39,6 +45,7 @@
 <div id="dip"></div>
 <div id="caps"></div>
 <div id="titles"></div>
+</div>
 </div>
 
 <script>
@@ -51,6 +58,11 @@ const stage = document.querySelector("#stage"), caps = document.querySelector("#
 // a plain cut has labels, not captions: no band darkens its frame, and the labels sit over the console's top bar, clear
 // of the chat's input at the bottom
 if (F.plain) Object.assign(caps.style, { background: "none", top: "0px" });
+if (F.matte) {
+  const k = (900 - F.matte.top - F.matte.bottom) / 900;
+  Object.assign(document.querySelector("#frame").style, { transform: `translate(${(1600 - 1600 * k) / 2}px, ${F.matte.top}px) scale(${k})` });
+  document.querySelector("#root").style.background = "#000";
+}
 // time: a number, ["seg"] for a segment's start, ["seg", "end"], or ["seg", step, field, offset], where field is atMs,
 // stillMs, or actN for the moment the step's Nth action ended
 const time = (a) => {
@@ -85,50 +97,83 @@ const box = (spec) => {
 };
 const inSegment = (t) => Object.entries(F.seg).find(([, s]) => t >= s.start - 0.001 && t < s.start + s.dur)?.[0];
 
-// the one highlight: each spot moves it, or a spot with no box takes it away
-// in time order, since a hidden highlight appears in place and a shown one travels
-(F.spots || []).map((s) => ({ ...s, t: time(s.at) })).sort((a, b) => a.t - b.t).forEach((s) => {
-  const t = s.t, r = box(s.box);
-  if (r) fx.spotlight(tl, stage, r, t, { color: s.amber ? "#f4b13e" : "#4fcbe2", dur: s.dur ?? 0.45 });
-  else fx.unspot(tl, stage, t);
+// a section title or a moral holds the frame alone: the frame dims, the words rise in, and only after they leave do the
+// highlight and the caption of the next moment come
+const held = (F.titles || []).map((s) => { const t = time(s.at); return { t, end: t + (s.dur || 1.8) + 0.3, s }; });
+const after = (t) => { const w = held.find((h) => t >= h.t - 0.05 && t < h.end); return w ? w.end : t; };
+
+// the camera: each cam moves the frame so its box fills a share of the screen, a cam with no box returns home; a cut may
+// cap how far any zoom goes and how fast the camera moves (maxZoom and camDur in film.json)
+const moves = (F.cams || []).map((c) => ({ ...c, t: time(c.at), dur: c.dur ?? F.camDur ?? 0.9 }));
+moves.forEach((c) => {
+  const r = box(c.box);
+  if (r) fx.camera(tl, stage, r, c.t, { fill: c.fill ?? 0.8, cx: c.cx, cy: c.cy, dur: c.dur, max: F.maxZoom });
+  else fx.home(tl, stage, c.t, c.dur);
 });
 
-// the camera: each cam moves the frame so its box fills a share of the screen, a cam with no box returns home
-(F.cams || []).forEach((c) => {
-  const t = time(c.at), r = box(c.box);
-  // a cut may cap how far any zoom goes and how fast the camera moves: maxZoom and camDur in film.json
-  const dur = c.dur ?? F.camDur ?? 0.9;
-  if (r) fx.camera(tl, stage, r, t, { fill: c.fill ?? 0.8, cx: c.cx, cy: c.cy, dur, max: F.maxZoom });
-  else fx.home(tl, stage, t, dur);
+// the one highlight: each spot moves it, or a spot with no box takes it away. A spot that meets a camera move waits for
+// it: the highlight leaves as the camera starts and appears in place once it stops, so it never runs ahead of the frame.
+// In time order, since a hidden highlight appears in place and a shown one travels.
+const spots = [];
+(F.spots || []).forEach((s) => {
+  let t = after(time(s.at));
+  const m = moves.find((c) => c.dur > 0.1 && t >= c.t - 0.3 && t < c.t + c.dur);
+  if (m) { spots.push({ t: Math.min(t, m.t), box: null, dur: 0.3 }); t = m.t + m.dur; }
+  spots.push({ ...s, t });
+});
+// the highlight is gone before the title rises
+held.forEach((h) => spots.push({ t: h.t - 0.4, box: null, dur: 0.3 }));
+spots.sort((a, b) => a.t - b.t).forEach((s) => {
+  const r = box(s.box);
+  if (r) fx.spotlight(tl, stage, r, s.t, { color: s.amber ? "#f4b13e" : "#4fcbe2", dur: s.dur ?? 0.45 });
+  else fx.unspot(tl, stage, s.t, s.dur ?? 0.5);
 });
 
-// the words: each caption lasts until the next one or its own end, and must be up long enough to read
-const cs = (F.caps || []).map((c) => ({ ...c, t: time(c.at) }));
+// the words: each caption lasts until the next one or its own end, and must be up long enough to read. A caption with
+// parts builds its sentence: the whole sentence is laid out from the start, so nothing moves, and each part fades in at
+// its own moment; every part must stay up long enough to read before the next.
+const read = (html) => Math.max(1.4, html.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length * 0.22);
+const cs = (F.caps || []).map((c) => ({ ...c, t: after(time(c.at)) })).sort((a, b) => a.t - b.t);
 cs.forEach((c, i) => {
   const end = c.until ? time(c.until) : (i + 1 < cs.length ? cs[i + 1].t : F.duration - 0.2);
-  if (!c.text) return;
-  const words = c.text.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length;
-  if (end - c.t < Math.max(1.4, words * 0.22)) throw new Error(`caption ${i} (${c.text.slice(0, 32)}) has ${(end - c.t).toFixed(2)} s for ${words} words`);
+  const parts = c.parts ? c.parts.map((p, k) => ({ t: k ? after(time(p.at)) : c.t, html: p.text })) : (c.text ? [{ t: c.t, html: c.text }] : []);
+  if (!parts.length) return;
+  parts.forEach((p, k) => {
+    const until = k + 1 < parts.length ? parts[k + 1].t : end;
+    if (until - p.t < read(p.html)) throw new Error(`caption ${i} part ${k} (${p.html.slice(0, 32)}) has ${(until - p.t).toFixed(2)} s`);
+  });
   const el = fx.caption(tl, caps, "", c.t + 0.1, end, (c.amber ? "amber " : "") + (c.cls || ""));
-  el.innerHTML = c.text;
+  el.innerHTML = parts.map((p) => `<span class="part">${p.html}</span>`).join(" ");
+  const spans = el.querySelectorAll(".part");
+  parts.forEach((p, k) => { if (k) { gsap.set(spans[k], { opacity: 0 }); tl.to(spans[k], { opacity: 1, duration: 0.5 }, p.t); } });
   if (c.shade) tl.to("#shade", { opacity: 1, duration: 0.5 }, c.t);
 });
 
-// a section title: the frame dims, the name rises in with an accent rule, and both leave
-(F.titles || []).forEach((s) => {
-  const t = time(s.at), d = s.dur || 1.3;
+// the titles themselves: the frame dims, the words rise in with an accent rule, and both leave; a moral stays to the end
+held.forEach(({ t, s }) => {
+  const d = s.dur || 1.8;
   const el = document.createElement("div");
-  el.className = "title";
+  el.className = "title" + (s.cls ? " " + s.cls : "");
   el.innerHTML = `<i></i><span>${s.text}</span><b></b>`;
   titles.appendChild(el);
-  tl.to(el, { opacity: 1, duration: 0.25 }, t);
-  tl.from(el.querySelector("span"), { y: 36, opacity: 0, duration: 0.45, ease: "power3.out" }, t);
-  tl.from(el.querySelector("b"), { scaleX: 0, duration: 0.45, ease: "power3.out" }, t + 0.1);
-  tl.to(el, { opacity: 0, duration: 0.3 }, t + d);
+  tl.to(el, { opacity: 1, duration: 0.35 }, t);
+  tl.from(el.querySelector("span"), { y: 36, opacity: 0, duration: 0.5, ease: "power3.out" }, t);
+  tl.from(el.querySelector("b"), { scaleX: 0, duration: 0.5, ease: "power3.out" }, t + 0.1);
+  if (t + d < F.duration - 0.1) tl.to(el, { opacity: 0, duration: 0.3 }, t + d);
+  tl.to(caps, { opacity: 0, duration: 0.3 }, t - 0.4);
+  if (t + d < F.duration - 0.1) tl.to(caps, { opacity: 1, duration: 0.2 }, t + d + 0.3);
 });
 
 // a reveal brings the frame up from the background colour, where a diagram that faded out hands over to the console
+// a page change goes through the background colour too: { from, to } darkens just before from and lifts after to, so
+// the load between them never shows
 (F.reveals || []).forEach((r) => {
+  if (r.from) {
+    const a = time(r.from), b = time(r.to);
+    tl.to("#dip", { opacity: 1, duration: 0.3 }, a - 0.3);
+    tl.to("#dip", { opacity: 0, duration: 0.6, ease: "power1.out" }, b);
+    return;
+  }
   const t = time(r);
   tl.set("#dip", { opacity: 1 }, t);
   tl.to("#dip", { opacity: 0, duration: 0.7, ease: "power1.out" }, t);

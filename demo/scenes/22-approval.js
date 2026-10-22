@@ -1,6 +1,7 @@
 const state = require("../lib/state");
 const story = require("../lib/story");
 const ui = require("../lib/ui");
+const project = require("../lib/project");
 
 const MIN = 60;
 const HOUR = 3600;
@@ -40,24 +41,29 @@ function thursday(now, s) {
 }
 
 const details = `${ui.approval(a.pr)} a.details`;
+const prLink = `${ui.approval(a.pr)} a[href$="/pulls/${a.pr}"]`;
+const forgejo = `https://git.example/${project.repository}/pulls/${a.pr}/files`;
 
 module.exports = {
   title: "An approval",
   story: "The refund card touches payments, so its pull request waits for Sebastian at the merge gate. He reads the summary, the " +
-    "review and the changed files in the drawer, approves, and the card merges and goes live.",
+    "review and the changed files in the drawer, opens the pull request in Forgejo, approves, and the card merges and goes live.",
   group: "gates",
   theme: "dark",
+  forgejo: true,
   viewport: "desk",
   steps: [
     { state: (now) => thursday(now, m.queued - 30), actions: [{ goto: "/" }, { hover: ui.idle }], hold: 3500, boxes: { approval: ui.approval(a.pr) } },
     { state: () => null, actions: [{ click: details }, { waitFor: '#drawer [data-sec="reviews"][open]' }, { hover: ui.tab("files") }], hold: 4500, boxes: { drawer: "#drawer" } },
     { state: () => null, actions: [{ click: ui.tab("files") }, { waitFor: "#drawer table.files" }, { hover: "#drawer table.files caption" }], hold: 3500 },
+    // the pull request's link opens it in Forgejo, the code a click away; the film's link opens the same page in this tab
     {
       state: () => null,
-      actions: [{ click: "#drawer-close" }, { wait: 500 }, { hover: ui.approve(a.pr) }, { wait: 800 }, { click: ui.approve(a.pr) }, { wait: 400 }],
-      hold: 300,
-      boxes: { needs: "#needs-you" },
+      actions: [{ click: "#drawer-close" }, { wait: 500 }, { hover: prLink }, { wait: 1200 }, { goto: forgejo }, { waitFor: "#diff-file-boxes" }, { hover: "h1" }],
+      hold: 5000,
+      boxes: { files: "#diff-file-boxes" },
     },
+    { state: () => null, actions: [{ goto: "/" }, { hover: ui.approve(a.pr) }, { wait: 800 }, { click: ui.approve(a.pr) }, { wait: 400 }], hold: 300, boxes: { needs: "#needs-you" } },
     // the seed's redraw takes the press's banner away, so the banner and the settled counts show one step apart
     { state: (now) => thursday(now, m.at + 30), actions: [{ goto: "/" }, { hover: ui.park }], hold: 4000, boxes: { merged: ui.face(a.task), progress: '#board .column[aria-labelledby="col-2"]' } },
     {

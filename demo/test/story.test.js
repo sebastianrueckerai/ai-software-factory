@@ -110,7 +110,8 @@ test("answerRows are the member's choice and the factory's word on it", () => {
 test("wakeAsk is the waker's text of a batch of asks", () => {
   assert.equal(story.wakeAsk([{ issue: 125, question: "Where does the link open?" }]),
     "Wake: 1 ask waits for a human.\n#125: Where does the link open?\n\nRead each card. Settle what your permissions allow. " +
-    "For what stays the human's, record what you found with attach_analysis. An ask already answered is done.");
+    "A card waiting on its budget takes fund from your pool. For what stays the human's, record what you found with attach_analysis. " +
+    "An ask already answered is done.");
 });
 test("a planned card is named by its key, any other by its title", () => {
   assert.equal(story.title(110), "belt-map");

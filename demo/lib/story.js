@@ -375,9 +375,9 @@ const replies = {
   matchmaking: "The alerts agree with you: the rule on GET /match's **p95 above 1 s** fired three times this week " +
     "and settled each time without a fix. The card sets the bar at 400 ms:",
   moon: "That is several cards: the ice, the caves, the crawlers and the boss. " +
-    "I file it in the plan lane, where the planner splits it into cards in their order, and the plan waits for your accept:",
+    "I file it in the plan lane, where the planner splits it into cards in their order, and the plan waits for you to accept it:",
   belt: "That is several cards: the map, the drones, the boss and the physics under them. " +
-    "I file it in the plan lane, where the planner splits it into cards in their order, and the plan waits for your accept:",
+    "I file it in the plan lane, where the planner splits it into cards in their order, and the plan waits for you to accept it:",
   report: "maria.k paid, and her receipt never came, while a friend's did: the receipt goes out only when the payment " +
     "settles before the store page closes. The fix sends it from Stripe's webhook, once per purchase:",
   alertsRead: "I read the alerts.",
@@ -396,11 +396,12 @@ const replies = {
     "#125 builds the same kind of link, so I answered **In the game**. Nothing in it is direction or money.",
 };
 
-// wakeAsk is the waker's text of a wake on the asks of a batch, as factoryd's askText words it: each ask with its card.
+// wakeAsk is the waker's text of a wake on the asks of a batch, as factoryd's askText words it: each ask with its card,
+// and the pool's line, since the woken member, Sebastian, is an approver.
 function wakeAsk(list) {
   return (list.length === 1 ? "Wake: 1 ask waits for a human." : `Wake: ${list.length} asks wait for a human.`) + list.map((a) => `\n#${a.issue}: ${a.question}`).join("") +
-    "\n\nRead each card. Settle what your permissions allow. For what stays the human's, record what you found with attach_analysis. " +
-    "An ask already answered is done.";
+    "\n\nRead each card. Settle what your permissions allow. A card waiting on its budget takes fund from your pool. " +
+    "For what stays the human's, record what you found with attach_analysis. An ask already answered is done.";
 }
 
 // alerts are the alert rows of the two weeks; a scene passes now and the ages to state.alert. raised and resolved

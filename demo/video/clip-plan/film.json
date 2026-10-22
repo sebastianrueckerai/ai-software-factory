@@ -7,7 +7,7 @@
  ],
  "plain": true,
  "maxZoom": 1.5,
- "camDur": 1.4,
+ "camDur": 1.6,
  "segments": [
   {
    "id": "d",
@@ -30,7 +30,7 @@
   {
    "id": "end",
    "still": "03-too-large-split-10.png",
-   "dur": 1.8
+   "dur": 4.8
   }
  ],
  "spots": [
@@ -102,15 +102,6 @@
      ]
     ]
    }
-  },
-  {
-   "at": [
-    "end",
-    "end",
-    null,
-    -0.9
-   ],
-   "box": null
   }
  ],
  "cams": [
@@ -183,6 +174,19 @@
    ],
    "text": "Its four cards land, in build order",
    "cls": "label"
+  }
+ ],
+ "titles": [
+  {
+   "at": [
+    "end",
+    null,
+    null,
+    0.5
+   ],
+   "text": "A plan is a card: you read it and accept it before any code exists.",
+   "cls": "moral",
+   "dur": 99
   }
  ],
  "reveals": [

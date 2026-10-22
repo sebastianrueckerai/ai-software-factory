@@ -7,7 +7,7 @@
  ],
  "plain": true,
  "maxZoom": 1.5,
- "camDur": 1.4,
+ "camDur": 1.6,
  "segments": [
   {
    "id": "d",
@@ -15,14 +15,19 @@
    "dur": 25.9
   },
   {
+   "id": "a0",
+   "still": "22-approval-1.png",
+   "dur": 2.2
+  },
+  {
    "id": "a",
    "scene": "22-approval",
    "from": [
-    4,
+    5,
     "act0"
    ],
    "to": [
-    5,
+    6,
     "stillMs"
    ],
    "holdRate": 1.5
@@ -56,13 +61,13 @@
   {
    "id": "end",
    "still": "25-autonomy-4.png",
-   "dur": 1.8
+   "dur": 4.8
   }
  ],
  "spots": [
   {
    "at": [
-    "a",
+    "a0",
     null,
     null,
     0.6
@@ -77,7 +82,7 @@
   {
    "at": [
     "a",
-    4,
+    5,
     "act4"
    ],
    "box": null
@@ -85,13 +90,13 @@
   {
    "at": [
     "a",
-    5,
+    6,
     "act1",
     0.6
    ],
    "box": [
     "22-approval",
-    5,
+    6,
     "merged"
    ]
   },
@@ -166,15 +171,6 @@
      ]
     ]
    }
-  },
-  {
-   "at": [
-    "end",
-    "end",
-    null,
-    -0.9
-   ],
-   "box": null
   }
  ],
  "cams": [
@@ -212,7 +208,7 @@
  "caps": [
   {
    "at": [
-    "a",
+    "a0",
     null,
     null,
     0.6
@@ -224,8 +220,8 @@
   {
    "at": [
     "a",
-    4,
-    "act4"
+    5,
+    "act3"
    ],
    "text": "You approve it, and it merges",
    "cls": "label"
@@ -270,9 +266,22 @@
    "cls": "label"
   }
  ],
+ "titles": [
+  {
+   "at": [
+    "end",
+    null,
+    null,
+    0.5
+   ],
+   "text": "One dial sets what waits for you and what runs on its own.",
+   "cls": "moral",
+   "dur": 99
+  }
+ ],
  "reveals": [
   [
-   "a"
+   "a0"
   ],
   [
    "b"

@@ -99,7 +99,7 @@ const duration = Math.ceil((t + (film.tail || 0)) * 10) / 10;
 if (!film.tail && media.length && media.at(-1).startsWith("<img")) {
   media[media.length - 1] = media.at(-1).replace(/data-start="([\d.]+)" data-duration="[\d.]+"/, (m, st) => `data-start="${st}" data-duration="${(duration - Number(st)).toFixed(3)}"`);
 }
-fs.writeFileSync(path.join(dir, "data.js"), `window.FILM = ${JSON.stringify({ duration, seg, scenes, spots: film.spots, cams: film.cams, caps: film.caps, titles: film.titles, quiet: film.quiet, plain: film.plain, maxZoom: film.maxZoom, camDur: film.camDur, reveals: film.reveals })};\n`);
+fs.writeFileSync(path.join(dir, "data.js"), `window.FILM = ${JSON.stringify({ duration, seg, scenes, spots: film.spots, cams: film.cams, caps: film.caps, titles: film.titles, quiet: film.quiet, plain: film.plain, maxZoom: film.maxZoom, camDur: film.camDur, reveals: film.reveals, matte: film.matte })};\n`);
 if (film.template) {
   const tpl = fs.readFileSync(path.join(dir, film.template), "utf8");
   fs.writeFileSync(path.join(dir, "index.html"), tpl.replaceAll("{{DURATION}}", String(duration)).replace("<!--MEDIA-->", media.join("\n")));

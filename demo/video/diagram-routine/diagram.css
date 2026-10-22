@@ -1,0 +1,58 @@
+/* The console's dark theme (design/themes/06-mission-control, C15) on one 1600 by 900 diagram. */
+:root {
+  color-scheme: dark;
+  --bg: #070b12; --bg-panel: #0b111a; --bg-raised: #0f1723; --bg-card: #111b28;
+  --line: #1a2636; --line-strong: #263649; --mark: #5a8aa3;
+  --text: #dfe7f1; --text-muted: #93a1b5; --text-faint: #7c8ba0;
+  --accent: #4fcbe2; --need: #f4b13e; --need-text: #f6bd5a;
+  --need-tint: color-mix(in srgb, var(--need) 6%, var(--bg-panel));
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", "Noto Sans", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", "Noto Sans Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; width: 1600px; height: 900px; overflow: hidden; }
+body { position: relative; background: var(--bg); color: var(--text); font: 400 18px/1.45 var(--font-ui); -webkit-font-smoothing: antialiased; }
+h1 { position: absolute; left: 60px; top: 44px; margin: 0; font-size: 32px; font-weight: 600; }
+p { margin: 0; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-variant-ligatures: none; }
+.caps { font-variant-caps: all-small-caps; letter-spacing: .06em; }
+.muted { color: var(--text-muted); }
+.faint { color: var(--text-faint); }
+
+/* a panel: the console's thin border and its four 7 px corner marks */
+.panel { position: absolute; padding: 18px 22px; background: var(--bg-panel); border: 1px solid var(--line-strong); }
+.panel::after { content: ""; position: absolute; inset: -1px; border: 1px solid var(--mark); pointer-events: none; --s: 7px;
+  -webkit-mask: conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0 / calc(100% - var(--s)) calc(100% - var(--s));
+          mask: conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0 / calc(100% - var(--s)) calc(100% - var(--s)); }
+.panel .n { display: block; font: 14px var(--font-mono); color: var(--text-faint); }
+.panel h2 { margin: 2px 0 10px; font-size: 26px; font-weight: 600; line-height: 1.2; }
+.panel ul { margin: 0; padding: 0; list-style: none; color: var(--text-muted); }
+.panel li::before { content: "·"; margin-right: 8px; color: var(--mark); }
+.gates { margin-top: 12px; font: 14.5px/1.5 var(--font-mono); color: var(--accent); }
+.human { margin-top: 10px; color: var(--need-text); }
+.human::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 9px; background: var(--need); vertical-align: 2px; }
+.need { background: var(--need-tint); border-color: color-mix(in srgb, var(--need) 72%, transparent); box-shadow: inset 3px 0 0 var(--need); }
+.need::after { border-color: var(--need); }
+.need h2, .acts { color: var(--need-text); }
+
+/* the arrows, drawn on one page-sized SVG in page pixels */
+svg.wires { position: absolute; inset: 0; width: 1600px; height: 900px; overflow: visible; pointer-events: none; }
+.wire { fill: none; stroke: var(--accent); stroke-width: 2; }
+.wire.quiet { stroke: var(--line-strong); }
+.wire-tip { fill: var(--accent); }
+
+/* the dot of something running, breathing as the console's live dot does */
+.live { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); vertical-align: 1px;
+  animation: breathe 2.2s ease-out infinite; }
+@keyframes breathe {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent); }
+  70%, 100% { box-shadow: 0 0 0 7px transparent; }
+}
+
+/* the reveal: diagram.js turns each [data-step] part on once the page's step reaches it, off again from its data-until */
+[data-step] { opacity: 0; transition: opacity 280ms ease; }
+[data-step].on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  [data-step] { transition: none; }
+  .live { animation: none; }
+}

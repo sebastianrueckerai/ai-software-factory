@@ -6,6 +6,7 @@ const { chromium } = require("playwright");
 
 const BASE = process.env.BASE;
 const LAB_DIR = process.env.CONSOLE_LAB_DIR;
+const FORGEJO = process.env.FORGEJO_URL || "http://127.0.0.1:3300";
 const OUT = path.join(__dirname, "out");
 const VIEWPORTS = {
   desk: { viewport: { width: 1600, height: 900 }, scale: 1 },
@@ -76,7 +77,7 @@ async function run(page, action, mouse) {
     Object.assign(mouse, to);
     return loc;
   };
-  if (kind === "goto") await page.goto(BASE + arg, { waitUntil: "load" });
+  if (kind === "goto") await page.goto(/^https?:/.test(arg) ? arg : BASE + arg, { waitUntil: "load" });
   else if (kind === "click") await (await moveTo(arg)).click();
   else if (kind === "hover") await moveTo(arg);
   else if (kind === "type") await target(arg[0]).pressSequentially(arg[1], { delay: 45 });
@@ -106,6 +107,12 @@ async function record(browser, name, commits) {
     }]);
     await context.addInitScript((theme) => localStorage.setItem("theme", theme), scene.theme);
     if (scene.cursor !== false) await context.addInitScript(cursor);
+    // the console links pull requests to https://git.example; a scene that opens one is served by the local Forgejo of
+    // demo/forgejo/setup.sh, redirects passed on unfollowed
+    if (scene.forgejo) await context.route("https://git.example/**", async (route) => {
+      const u = new URL(route.request().url());
+      await route.fulfill({ response: await route.fetch({ url: `${FORGEJO}${u.pathname}${u.search}`, maxRedirects: 0 }) });
+    });
   }
   const page = await context.newPage();
   let problem = null;

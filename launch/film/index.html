@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The film, version 3</title>
+<title>The film, version 4</title>
 <style>
 :root { color-scheme: dark; --bg: #070b12; --line: #263649; --text: #dfe7f1; --muted: #93a1b5; --accent: #4fcbe2; --need: #f4b13e; }
 body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 system-ui, sans-serif; }
@@ -22,14 +22,14 @@ code { font-size: .92em; }
 </head>
 <body>
 <main>
-<h1>The film, version 3</h1>
-<p>What changed since version 2, from your notes. Everything runs slower, every console part starts on the full board, zooms stop at one and a half times, and a highlight frames a card, a column or a panel, never a button. The pointer's click shows the press. No clip ends on a dark frame. Four clips open with an animated diagram of the theory, built like sandbox D, and then show the example. The board drains one card at a time, the intake names each source, and the split's caption says a click files the parts.</p>
+<h1>The film, version 4</h1>
+<p>What changed since version 3, from your notes. The budget sentence builds up in four parts while the camera stays on the whole board. The drain runs faster, still one card at a time. A highlight never runs ahead of a zoom: it leaves when the camera moves and appears once the camera stops, and most zooms are gone. On manual, one click opens the pull request in Forgejo. Section titles show alone, with no highlight behind them. The film plays inside thin black bars, so a player's controls cover no caption. Every clip ends on its moral. The budget clip became the pool, and routines have a clip of their own.</p>
 <p>The videos and sheets load from <code>demo/out/</code> of the main checkout. Open this page from there. Scores come from the independent critic, Gemini 2.5 Pro, reading one frame every two seconds. It cannot see motion.</p>
 <h2>The rough cut</h2>
-<p>Spotlight style with captions, no voice, the whole of sandbox A inside. It runs 180 s, double the 90 s target.</p>
-<div class="pair"><div><video src="../../demo/out/p-film-a.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-film-a-sheet.png" alt="Contact sheet of the rough cut, one frame every six seconds."><p class="cap">one frame every 6 s · <span class="score" id="s-film-a"></span></p></div></div>
+<p>Spotlight style with captions, no voice, the whole of sandbox A inside. It runs about 200 s, more than double the 90 s target. Left with the black bars, right without them: play both with the controls showing.</p>
+<div class="pair"><div><video src="../../demo/out/p-film-a.mp4" controls preload="metadata"></video><p class="cap">with the bars · <span class="score" id="s-film-a"></span></p></div><div><video src="../../demo/out/p-film-a-nomatte.mp4" controls preload="metadata"></video><p class="cap">without the bars</p></div></div>
 <h2>The landing page clips</h2>
-<p>Silent loops with a short label for each moment at the top left. The review and issue clips are gone, and the escalation ladder takes their place.</p>
+<p>Silent loops with a short label for each moment at the top left, each ending on its moral.</p>
 <h3>The chat finds the right card</h3>
 <p>A line that names no card: the project agent reads the board, finds who builds the refund, and a click sends the line into the running session.</p>
 <div class="pair"><div><video src="../../demo/out/p-clip-steer.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-steer-sheet.png" alt="Contact sheet of the chat finds the right card."><p class="cap"><span class="score" id="s-clip-steer"></span></p></div></div>
@@ -39,15 +39,18 @@ code { font-size: .92em; }
 <h3>The escalation ladder</h3>
 <p>The diagram of the rungs up to a person, then a card whose second session runs on the stronger model.</p>
 <div class="pair"><div><video src="../../demo/out/p-clip-ladder.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-ladder-sheet.png" alt="Contact sheet of the escalation ladder."><p class="cap"><span class="score" id="s-clip-ladder"></span></p></div></div>
-<h3>The money is held before each call</h3>
-<p>A card whose budget cannot fund another session. One sentence splits it, and a click files the smaller card.</p>
-<div class="pair"><div><video src="../../demo/out/p-clip-money.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-money-sheet.png" alt="Contact sheet of the money is held before each call."><p class="cap"><span class="score" id="s-clip-money"></span></p></div></div>
+<h3>Small overruns come out of a pool</h3>
+<p>The diagram of the pool and its limits, then a card at €0.40 that the project agent funds from the pool at full auto.</p>
+<div class="pair"><div><video src="../../demo/out/p-clip-pool.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-pool-sheet.png" alt="Contact sheet of the pool clip."><p class="cap"><span class="score" id="s-clip-pool"></span></p></div></div>
 <h3>One dial for how much it asks</h3>
 <p>The diagram of who decides at each level, then a merge approved by hand, the dial, and a card that merges on its own on full auto.</p>
 <div class="pair"><div><video src="../../demo/out/p-clip-dial.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-dial-sheet.png" alt="Contact sheet of one dial for how much it asks."><p class="cap"><span class="score" id="s-clip-dial"></span></p></div></div>
 <h3>Recovery from stalls</h3>
 <p>The diagram of the twelve checks and the staircase of measures, then a session going in circles until a check trips.</p>
 <div class="pair"><div><video src="../../demo/out/p-clip-stall.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-stall-sheet.png" alt="Contact sheet of recovery from stalls."><p class="cap"><span class="score" id="s-clip-stall"></span></p></div></div>
+<h3>Routines run themselves</h3>
+<p>The diagram of a routine and its runs, then the dashed routine cards in Queued, a skipped run and the weekly bump's runs.</p>
+<div class="pair"><div><video src="../../demo/out/p-clip-routine.mp4" controls preload="metadata"></video></div><div><img src="../../demo/out/p-clip-routine-sheet.png" alt="Contact sheet of the routines clip."><p class="cap"><span class="score" id="s-clip-routine"></span></p></div></div>
 <h2>The sandbox, three variants</h2>
 <p>Slower, with one bright element at a time and the same label style as the clips. D, the sequence diagram, stays in reserve for explaining a workflow.</p>
 <h3>A: the schematic</h3>

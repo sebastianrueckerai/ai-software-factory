@@ -1,0 +1,6 @@
+{
+ "id": "clip-routine",
+ "name": "Routines run themselves",
+ "title": "Routines run themselves",
+ "story": "The theory first: a routine is a schedule in the project's file whose runs file cards, which run like any card. Then the console: the routines wait in Queued as dashed cards with their next runs, one run is skipped with a click, and the weekly bump's drawer lists its runs and the cards they filed."
+}

@@ -1,0 +1,6 @@
+{
+  "id": "diagram-routine",
+  "name": "Routines: recurring work, filed as cards",
+  "title": "Routines: recurring work, filed as cards",
+  "story": "A routine is a few lines in the project's file: a name, a schedule, what a run files and a brief. The factory keeps one schedule per routine (here every Monday 06:00) and starts a run when it comes due. If the routine's last card is still open, the run holds and says so; otherwise it files a card marked filed by the factory, routine, run N. That card runs like any other: a session, a pull request, the checks, the review and the merge. The run ends with its card: run 7 found no change; run 8 filed #115, done in 52 minutes for 0.38 euro. The routine then waits in Queued as a dashed card with its next run, Skip once, Run now and a switch for whether a run needs you."
+}

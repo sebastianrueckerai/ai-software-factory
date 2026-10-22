@@ -30,17 +30,21 @@ const skip = `${read} button[aria-label="Skip Performance read once"]`;
 
 module.exports = {
   title: "Routines on the board",
-  story: "The routines wait in Queued with their next runs; the weekly bump waits on Sebastian, and he skips the next performance read once.",
+  story: "The routines wait in Queued with their next runs; the weekly bump waits on Sebastian, and he skips the next performance read once. The bump's drawer lists its runs and the cards they filed.",
   group: "operate",
   theme: "dark",
   viewport: "desk",
+  boxes: { queued: '#board .column[aria-labelledby="col-1"]', done: '#board .column[aria-labelledby="col-3"]' },
   steps: [
-    { state: board, actions: [{ goto: BOARD }, { waitFor: bump }, { hover: `${bump} .ttl` }], hold: 3000 },
+    { state: board, actions: [{ goto: BOARD }, { waitFor: bump }, { hover: `${bump} .ttl` }], hold: 3500, boxes: { bump, read, scan: ui.ghost("security-scan") } },
     {
       state: () => null,
       actions: [{ hover: skip }, { wait: 600 }, { click: skip }, { waitFor: `${read} button[aria-label^="Undo the skip"]` }, { wait: 1200 }, { hover: `${read} .ttl` }],
       hold: 3000,
+      boxes: { read },
     },
-    { state: () => null, actions: [{ click: `${bump} button.open` }, { waitFor: "#drawer .top-block" }, { hover: ui.park }], hold: 3500 },
+    { state: () => null, actions: [{ click: `${bump} button.open` }, { waitFor: "#drawer .top-block" }, { hover: ui.park }], hold: 4000, boxes: { drawer: "#drawer", top: "#drawer .top-block" } },
+    // the runs: every run of the bump, the cards they filed and how each ended
+    { state: () => null, actions: [{ click: ui.tab("runs") }, { waitFor: "#drawer .life.runs" }, { hover: "#drawer .life.runs" }], hold: 4500, boxes: { drawer: "#drawer", runs: "#drawer .life.runs" } },
   ],
 };

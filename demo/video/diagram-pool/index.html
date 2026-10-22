@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1600, height=900">
+<title>Small overruns, settled from a pool</title>
+<link rel="stylesheet" href="diagram.css">
+<script src="gsap.min.js"></script>
+<style>
+  #root { position: relative; width: 1600px; height: 900px; overflow: hidden; background: var(--bg); }
+  .u { --hi: 0; --lc: var(--accent); --c: color-mix(in srgb, var(--lc) calc(var(--hi) * 100%), #93a1b5); --w: color-mix(in srgb, #dfe7f1 calc(var(--hi) * 100%), #8190a5); --b: color-mix(in srgb, var(--lc) calc(var(--hi) * 100%), #263649); color: var(--w); }
+  .u.amb { --lc: var(--need); }
+  .h { opacity: 0; }
+  .a { position: absolute; }
+  .box { position: absolute; background: color-mix(in srgb, var(--lc) calc(var(--hi) * 8%), var(--bg-panel)); border: 2px solid var(--b); }
+  .box h2 { position: absolute; left: 24px; top: 14px; margin: 0; font-size: 38px; line-height: 46px; font-weight: 600; color: var(--c); white-space: nowrap; }
+  .s { position: absolute; left: 24px; font-size: 32px; line-height: 40px; white-space: nowrap; }
+  .big { font-size: 36px; line-height: 44px; }
+  .chip { position: absolute; left: 24px; height: 48px; padding: 0 14px; font-size: 32px; line-height: 44px; white-space: nowrap; border: 2px solid var(--b); background: color-mix(in srgb, var(--lc) calc(var(--hi) * 10%), var(--bg-raised)); }
+  .track { position: absolute; background: var(--bg-raised); border: 2px solid #263649; }
+  .fill { position: absolute; top: 0; height: 100%; background: var(--c); }
+  .mark { position: absolute; width: 4px; background: var(--w); }
+  .row { position: absolute; left: 24px; width: 388px; height: 104px; border-left: 4px solid var(--b); padding-left: 16px; }
+  .row .big { position: absolute; left: 16px; top: 8px; font-weight: 600; color: var(--c); white-space: nowrap; }
+  .row .s { left: 16px; top: 52px; }
+  svg.wires { position: absolute; inset: 0; width: 1600px; height: 900px; }
+  .w path { fill: none; stroke: var(--b); stroke-width: 3; }
+  .w circle { fill: var(--b); }
+  .cap { position: absolute; left: 40px; top: 774px; max-width: 1100px; padding: 12px 22px; font: 500 44px/1.2 var(--font-ui); color: #dfe7f1; text-align: left; text-wrap: balance;
+    background: color-mix(in srgb, var(--bg) 90%, transparent); border-left: 6px solid var(--accent); box-shadow: 0 6px 24px rgba(0,0,0,.5); opacity: 0; z-index: 3; }
+  .cap.two { font-size: 40px; top: 760px; }
+  .cap.need { border-left-color: var(--need); }
+  .cap b { font-weight: 700; color: var(--accent); }
+  .cap.need b, .cap b.m { color: var(--need-text); }
+  #fade { position: absolute; inset: 0; background: var(--bg); opacity: 0; z-index: 9; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="29.9" data-width="1600" data-height="900">
+<div id="scene" class="clip" style="position:absolute;inset:0">
+
+<svg class="wires" viewBox="0 0 1600 900">
+  <g id="w-agent" class="w u h"><path d="M540 380 C600 380 590 160 640 160"/><circle cx="640" cy="160" r="7"/></g>
+  <g id="w-person" class="w u amb h"><path d="M540 430 C600 430 590 635 640 635"/><circle cx="640" cy="635" r="7"/></g>
+  <g id="w-pool" class="w u h"><path d="M1050 160 H1130"/><circle cx="1130" cy="160" r="7"/></g>
+  <g id="w-refuse" class="w u amb h"><path d="M845 230 V550"/><circle cx="845" cy="550" r="7"/></g>
+</svg>
+
+<section id="card" class="box u h" style="left:40px;top:30px;width:500px;height:210px">
+  <h2>Card budget</h2>
+  <div class="track" style="left:24px;top:84px;width:448px;height:36px">
+    <div class="fill" style="left:0;width:343px"></div>
+    <div id="ext" class="fill u h" style="left:373px;width:45px"></div>
+    <div id="mark" class="mark" style="left:371px;top:-8px;height:48px"></div>
+  </div>
+  <div class="s big" style="top:136px;font-size:32px">€4.60 spent</div>
+  <div id="b5" class="s" style="top:136px;left:auto;right:24px">budget €5.00</div>
+  <div id="b56" class="s h" style="top:136px;left:auto;right:24px">budget €5.60</div>
+</section>
+
+<section id="ask" class="box u h" style="left:40px;top:280px;width:500px;height:260px">
+  <h2>Fund one more session?</h2>
+  <div class="s big" style="top:62px">The session needs €0.60</div>
+  <div id="fund" class="chip u" style="top:120px">Fund one more session</div>
+  <div class="chip u" style="top:178px">End the card</div>
+</section>
+
+<section id="person" class="box u amb h" style="left:640px;top:540px;width:410px;height:190px">
+  <h2>Needs you</h2>
+  <div class="s" style="top:62px">manual, assisted</div>
+  <div id="note" class="s h" style="top:110px">agent's analysis</div>
+</section>
+
+<section id="agent" class="box u h" style="left:640px;top:90px;width:410px;height:140px">
+  <h2>Project agent</h2>
+  <div class="s" style="top:62px">autonomous, full auto</div>
+</section>
+
+<div id="chip4" class="box u amb h" style="left:870px;top:300px;width:240px;height:110px">
+  <div class="s big" style="top:8px;color:var(--c);font-weight:600">raise €4.00</div>
+  <div class="s big" style="top:54px">refused</div>
+</div>
+
+<section id="pool" class="box u h" style="left:1130px;top:30px;width:440px;height:600px">
+  <h2>Monthly pool</h2>
+  <div class="track" style="left:24px;top:84px;width:388px;height:36px">
+    <div id="pfill" class="fill u h" style="left:0;width:24px"></div>
+  </div>
+  <div class="s big" style="top:130px;font-size:36px">€10 a month</div>
+  <div id="pplus" class="s h" style="top:132px;left:auto;right:24px">+€0.60</div>
+  <div id="r1" class="row u" style="top:210px"><div class="big">Raise limit €1.00</div><div class="s">each raise at most</div></div>
+  <div id="r2" class="row u" style="top:330px"><div class="big">Card cap €15</div><div class="s">card never above it</div></div>
+  <div id="r3" class="row u" style="top:450px"><div class="big">Month's pool €10</div><div class="s">never overspent</div></div>
+</section>
+
+<div id="fade"></div>
+</div>
+</div>
+
+<script>
+gsap.config({ force3D: false });
+const tl = gsap.timeline({ paused: true });
+const scene = document.getElementById("scene");
+const fade = document.getElementById("fade");
+const $ = (id) => document.getElementById(id);
+gsap.set(".u", { "--hi": 0 });
+gsap.set("#r1,#r2,#r3,#fund,#ext,#pfill", { opacity: 1 });
+gsap.set("#ext,#pfill", { opacity: 0 });
+
+let cur = [];
+const lit = (units, at) => { if (cur.length) tl.to(cur, { "--hi": 0, duration: 0.4 }, at); tl.to(units, { "--hi": 1, duration: 0.3 }, at); cur = units; };
+const show = (els, at, d = 0.3) => tl.to(els, { opacity: 1, duration: d }, at);
+const words = (h) => h.replace(/<[^>]+>/g, "").trim().split(/\s+/).length;
+let T = 0;
+function beat(dur, html, amber, fn) {
+  if (dur < Math.max(2.2, 0.3 * words(html)) - 1e-6) throw new Error("caption too short: " + html);
+  const c = document.createElement("div");
+  c.className = "cap" + (html.replace(/<[^>]+>/g, "").length > 44 ? " two" : "") + (amber ? " need" : "");
+  c.innerHTML = html; scene.insertBefore(c, fade);
+  tl.to(c, { opacity: 1, duration: 0.25 }, T);
+  tl.to(c, { opacity: 0, duration: 0.15 }, T + dur - 0.15);
+  fn(T); T += dur;
+}
+
+beat(2.9, "A card has a <b>budget</b>: €5.00, €4.60 spent.", false, (t) => {
+  show("#card", t + 0.1); lit([$("card")], t + 0.1);
+});
+beat(3.3, "The next session needs <b>€0.60</b>, so the card stops and asks.", false, (t) => {
+  show("#ask", t + 0.1); lit([$("ask")], t + 0.1);
+});
+beat(2.9, "Manual and assisted: the ask goes to <b>you</b>.", true, (t) => {
+  show(["#person", "#w-person"], t + 0.1); lit([$("person"), $("w-person")], t + 0.1);
+});
+beat(2.9, "Autonomous and full auto: the <b>project agent</b> wakes first.", false, (t) => {
+  show(["#agent", "#w-agent"], t + 0.1); lit([$("agent"), $("w-agent")], t + 0.1);
+});
+beat(5.4, "The agent may fund from the <b>monthly pool</b>, inside three limits set in the project's file.", false, (t) => {
+  show(["#pool", "#w-pool"], t + 0.1); lit([$("pool"), $("w-pool")], t + 0.1);
+  lit([$("r1")], t + 1.9); lit([$("r2")], t + 3.0); lit([$("r3")], t + 4.1);
+});
+beat(5.6, "€0.60 fits: the agent <b>funds one more session</b>. The raise counts against the pool.", false, (t) => {
+  lit([$("card"), $("fund")], t + 0.1);
+  tl.to("#mark", { left: 416, duration: 0.5, ease: "power1.inOut" }, t + 0.4);
+  tl.to("#ext", { opacity: 1, "--hi": 1, duration: 0.4 }, t + 0.5);
+  tl.to("#b5", { opacity: 0, duration: 0.3 }, t + 0.5);
+  tl.to("#b56", { opacity: 1, duration: 0.3 }, t + 0.5);
+  tl.to("#pool,#pfill,#pplus", { "--hi": 1, duration: 0.3 }, t + 3.0);
+  tl.to("#card,#fund,#ext", { "--hi": 0, duration: 0.4 }, t + 3.0);
+  tl.to("#pfill,#pplus", { opacity: 1, duration: 0.3 }, t + 3.0);
+  cur = [$("pool"), $("pfill")];
+});
+beat(5.3, "Another card: a €4.00 raise is refused, and handed to <b class=\"m\">you</b> with the agent's analysis.", true, (t) => {
+  tl.to("#pool,#pfill", { "--hi": 0, duration: 0.4 }, t + 0.1);
+  tl.to("#mark", { left: 371, duration: 0.4 }, t);
+  tl.to("#ext,#pfill,#pplus,#b56", { opacity: 0, duration: 0.4 }, t);
+  tl.to("#b5", { opacity: 1, duration: 0.4 }, t);
+  tl.set("#r1", { "--lc": "#f4b13e" }, t);
+  show("#chip4", t + 0.5);
+  lit([$("chip4"), $("r1")], t + 0.5);
+  lit([$("person"), $("w-refuse"), $("w-person")], t + 2.7);
+  show(["#note", "#w-refuse"], t + 2.7);
+});
+const HOLD = 1.0, FADE = 0.6;
+tl.to(fade, { opacity: 1, duration: FADE, ease: "none" }, T + HOLD);
+const TOTAL = Math.round((T + HOLD + FADE) * 100) / 100;
+tl.set({}, {}, TOTAL);
+if (TOTAL < 20 || TOTAL > 30) throw new Error("duration " + TOTAL);
+$("root").setAttribute("data-duration", TOTAL);
+window.__timelines = window.__timelines || {};
+window.__timelines["main"] = tl;
+</script>
+</body>
+</html>

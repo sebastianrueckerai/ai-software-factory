@@ -10,7 +10,7 @@
   {
    "id": "hero",
    "still": "34-busy-board-3.png",
-   "dur": 11.6
+   "dur": 17.0
   },
   {
    "id": "press",
@@ -23,7 +23,8 @@
     5,
     "stillMs"
    ],
-   "tail": 0
+   "tail": 1.2,
+   "rate": 0.85
   },
   {
    "id": "drain",
@@ -37,7 +38,7 @@
     "stillMs"
    ],
    "tail": 0.3,
-   "rate": 4.5
+   "rate": 5.5
   },
   {
    "id": "intake",
@@ -89,14 +90,14 @@
     1,
     "stillMs"
    ],
-   "lead": 3.0,
+   "lead": 3.5,
    "to": [
-    5,
+    6,
     "stillMs"
    ],
    "tail": 0,
-   "rate": 1.2,
-   "holdRate": 1.6
+   "rate": 1.0,
+   "holdRate": 1.0
   },
   {
    "id": "autonomy",
@@ -136,13 +137,13 @@
     1,
     "stillMs"
    ],
-   "lead": 3.0,
+   "lead": 3.5,
    "to": [
     3,
     "stillMs"
    ],
    "tail": 0.3,
-   "rate": 1.1,
+   "rate": 0.8,
    "holdRate": 1.6
   },
   {
@@ -210,67 +211,6 @@
   },
   {
    "at": [
-    "press"
-   ],
-   "box": [
-    "34-busy-board",
-    3,
-    "chat"
-   ]
-  },
-  {
-   "at": [
-    "press",
-    4,
-    "act0",
-    0.15
-   ],
-   "box": {
-    "rect": [
-     963,
-     177,
-     189,
-     72
-    ]
-   }
-  },
-  {
-   "at": [
-    "ask"
-   ],
-   "box": [
-    "34-busy-board",
-    30,
-    "chat"
-   ]
-  },
-  {
-   "at": [
-    "ask",
-    30,
-    "act3"
-   ],
-   "box": [
-    "34-busy-board",
-    30,
-    "chat"
-   ]
-  },
-  {
-   "at": [
-    "ask",
-    31,
-    "act0",
-    0.15
-   ],
-   "box": [
-    "34-busy-board",
-    31,
-    "plan"
-   ]
-  },
-  {
-   "at": [
     "plan"
    ],
    "box": {
@@ -310,41 +250,6 @@
      ]
     ]
    }
-  },
-  {
-   "at": [
-    "approval"
-   ],
-   "box": [
-    "22-approval",
-    1,
-    "approval"
-   ],
-   "amber": true
-  },
-  {
-   "at": [
-    "approval",
-    2,
-    "act0"
-   ],
-   "box": [
-    "22-approval",
-    2,
-    "drawer"
-   ]
-  },
-  {
-   "at": [
-    "approval",
-    4,
-    "act2"
-   ],
-   "box": [
-    "22-approval",
-    1,
-    "approval"
-   ]
   },
   {
    "at": [
@@ -470,50 +375,6 @@
   },
   {
    "at": [
-    "press",
-    5,
-    "act0",
-    0.15
-   ],
-   "box": {
-    "union": [
-     [
-      "34-busy-board",
-      5,
-      "first"
-     ],
-     [
-      "34-busy-board",
-      5,
-      "second"
-     ]
-    ]
-   }
-  },
-  {
-   "at": [
-    "approval",
-    4,
-    "act4",
-    0.1
-   ],
-   "box": null
-  },
-  {
-   "at": [
-    "approval",
-    5,
-    "act1",
-    0.5
-   ],
-   "box": [
-    "22-approval",
-    5,
-    "merged"
-   ]
-  },
-  {
-   "at": [
     "autonomy",
     3,
     "atMs"
@@ -569,15 +430,6 @@
   },
   {
    "at": [
-    "press",
-    "end",
-    null,
-    -0.35
-   ],
-   "box": null
-  },
-  {
-   "at": [
     "intake",
     27,
     "atMs",
@@ -614,6 +466,181 @@
     29,
     "issue"
    ]
+  },
+  {
+   "at": 15.0,
+   "box": [
+    "34-busy-board",
+    3,
+    "chat"
+   ],
+   "dur": 0.9
+  },
+  {
+   "at": [
+    "press",
+    4,
+    "act0",
+    0.4
+   ],
+   "box": {
+    "rect": [
+     963,
+     177,
+     189,
+     72
+    ]
+   },
+   "dur": 0.9
+  },
+  {
+   "at": [
+    "press",
+    5,
+    "act0",
+    0.3
+   ],
+   "box": {
+    "union": [
+     [
+      "34-busy-board",
+      5,
+      "first"
+     ],
+     [
+      "34-busy-board",
+      5,
+      "second"
+     ]
+    ]
+   }
+  },
+  {
+   "at": [
+    "press",
+    "end",
+    null,
+    -0.35
+   ],
+   "box": null
+  },
+  {
+   "at": [
+    "ask"
+   ],
+   "box": [
+    "34-busy-board",
+    30,
+    "chat"
+   ],
+   "dur": 0.9
+  },
+  {
+   "at": [
+    "ask",
+    31,
+    "act0",
+    0.15
+   ],
+   "box": [
+    "34-busy-board",
+    31,
+    "plan"
+   ],
+   "dur": 0.9
+  },
+  {
+   "at": [
+    "approval"
+   ],
+   "box": [
+    "22-approval",
+    1,
+    "approval"
+   ],
+   "amber": true
+  },
+  {
+   "at": [
+    "approval",
+    2,
+    "act0"
+   ],
+   "box": [
+    "22-approval",
+    2,
+    "drawer"
+   ]
+  },
+  {
+   "at": [
+    "approval",
+    4,
+    "act0"
+   ],
+   "box": [
+    "22-approval",
+    1,
+    "approval"
+   ]
+  },
+  {
+   "at": [
+    "approval",
+    4,
+    "act3"
+   ],
+   "box": null
+  },
+  {
+   "at": [
+    "approval",
+    4,
+    "act4",
+    0.6
+   ],
+   "box": {
+    "rect": [
+     24,
+     150,
+     1552,
+     150
+    ]
+   }
+  },
+  {
+   "at": [
+    "approval",
+    5,
+    "act0"
+   ],
+   "box": [
+    "22-approval",
+    1,
+    "approval"
+   ]
+  },
+  {
+   "at": [
+    "approval",
+    5,
+    "act4",
+    0.1
+   ],
+   "box": null
+  },
+  {
+   "at": [
+    "approval",
+    6,
+    "act1",
+    0.5
+   ],
+   "box": [
+    "22-approval",
+    6,
+    "merged"
+   ]
   }
  ],
  "caps": [
@@ -629,11 +656,6 @@
   {
    "at": 8.4,
    "text": "<b>Decide what runs next:</b> priorities and a backlog."
-  },
-  {
-   "at": 10.8,
-   "amber": true,
-   "text": "<b>A card failed twice and used up its budget.</b> One sentence splits it, a click files the parts."
   },
   {
    "at": [
@@ -691,7 +713,7 @@
     1.0
    ],
    "amber": true,
-   "text": "<b>The planner writes a plan</b> for your accept."
+   "text": "<b>The planner writes a plan</b> for you to accept."
   },
   {
    "at": [
@@ -701,29 +723,6 @@
     0.3
    ],
    "text": "<b>You accept, and the four cards land.</b> The agents take it from here."
-  },
-  {
-   "at": [
-    "approval"
-   ],
-   "amber": true,
-   "text": "<b>A payments change waits for you.</b>"
-  },
-  {
-   "at": [
-    "approval",
-    2,
-    "act0"
-   ],
-   "text": "<b>On manual, you read the review and the files,</b>"
-  },
-  {
-   "at": [
-    "approval",
-    4,
-    "act2"
-   ],
-   "text": "<b>then approve.</b> It merges and goes live."
   },
   {
    "at": [
@@ -838,6 +837,64 @@
    "cls": "close",
    "shade": true,
    "text": "<b>The worst an agent can do is wreck its own sandbox.</b><small>github.com/sebastianrueckerai/ai-software-factory</small>"
+  },
+  {
+   "at": 10.8,
+   "amber": true,
+   "parts": [
+    {
+     "at": 10.8,
+     "text": "<b>A card failed twice</b>"
+    },
+    {
+     "at": 12.8,
+     "text": "and used up its budget."
+    },
+    {
+     "at": 15.0,
+     "text": "<br>One sentence splits it,"
+    },
+    {
+     "at": [
+      "press",
+      4,
+      "act0",
+      0.2
+     ],
+     "text": "a click files the parts."
+    }
+   ]
+  },
+  {
+   "at": [
+    "approval"
+   ],
+   "amber": true,
+   "text": "<b>A payments change waits for you.</b>"
+  },
+  {
+   "at": [
+    "approval",
+    2,
+    "act0"
+   ],
+   "text": "<b>On manual, you read the review and the files.</b>"
+  },
+  {
+   "at": [
+    "approval",
+    4,
+    "act2"
+   ],
+   "text": "<b>One click opens the code</b> in Forgejo."
+  },
+  {
+   "at": [
+    "approval",
+    5,
+    "act1"
+   ],
+   "text": "<b>Then approve.</b> It merges and goes live."
   }
  ],
  "titles": [
@@ -884,79 +941,9 @@
  "cams": [
   {
    "at": [
-    "press"
-   ],
-   "box": {
-    "rect": [
-     12,
-     440,
-     623,
-     448
-    ]
-   },
-   "fill": 0.85
-  },
-  {
-   "at": [
-    "press",
-    4,
-    "act0",
-    0.25
-   ],
-   "box": [
-    "34-busy-board",
-    5,
-    "queued",
-    340
-   ],
-   "fill": 0.9
-  },
-  {
-   "at": [
     "drain"
    ],
    "box": null
-  },
-  {
-   "at": [
-    "intake"
-   ],
-   "box": [
-    "34-busy-board",
-    29,
-    "queued",
-    360
-   ],
-   "fill": 0.85
-  },
-  {
-   "at": [
-    "ask"
-   ],
-   "box": {
-    "rect": [
-     12,
-     440,
-     623,
-     448
-    ]
-   },
-   "fill": 0.85
-  },
-  {
-   "at": [
-    "ask",
-    31,
-    "act0",
-    0.25
-   ],
-   "box": [
-    "34-busy-board",
-    31,
-    "queued",
-    360
-   ],
-   "fill": 0.85
   },
   {
    "at": [
@@ -994,59 +981,6 @@
    },
    "fill": 0.75,
    "cy": 390
-  },
-  {
-   "at": [
-    "approval"
-   ],
-   "box": [
-    "22-approval",
-    1,
-    "approval"
-   ],
-   "fill": 0.75
-  },
-  {
-   "at": [
-    "approval",
-    2,
-    "act0"
-   ],
-   "box": [
-    "22-approval",
-    2,
-    "drawer",
-    560
-   ],
-   "fill": 0.95
-  },
-  {
-   "at": [
-    "approval",
-    4,
-    "act0"
-   ],
-   "box": [
-    "22-approval",
-    1,
-    "approval"
-   ],
-   "fill": 0.75
-  },
-  {
-   "at": [
-    "approval",
-    4,
-    "act4",
-    0.3
-   ],
-   "box": [
-    "22-approval",
-    5,
-    "progress",
-    380
-   ],
-   "fill": 0.85
   },
   {
    "at": [
@@ -1197,8 +1131,85 @@
    },
    "fill": 0.75,
    "cy": 400
+  },
+  {
+   "at": [
+    "approval"
+   ],
+   "box": [
+    "22-approval",
+    1,
+    "approval"
+   ],
+   "fill": 0.75
+  },
+  {
+   "at": [
+    "approval",
+    2,
+    "act0"
+   ],
+   "box": [
+    "22-approval",
+    2,
+    "drawer",
+    560
+   ],
+   "fill": 0.95
+  },
+  {
+   "at": [
+    "approval",
+    4,
+    "act0"
+   ],
+   "box": null
+  },
+  {
+   "at": [
+    "approval",
+    6,
+    "act0"
+   ],
+   "box": [
+    "22-approval",
+    6,
+    "progress",
+    380
+   ],
+   "fill": 0.85
   }
  ],
- "maxZoom": 1.6,
- "camDur": 1.2
+ "maxZoom": 1.35,
+ "camDur": 1.6,
+ "reveals": [
+  {
+   "from": [
+    "approval",
+    4,
+    "act3"
+   ],
+   "to": [
+    "approval",
+    4,
+    "act4"
+   ]
+  },
+  {
+   "from": [
+    "approval",
+    5,
+    "atMs"
+   ],
+   "to": [
+    "approval",
+    5,
+    "act0"
+   ]
+  }
+ ],
+ "matte": {
+  "top": 54,
+  "bottom": 54
+ }
 }
