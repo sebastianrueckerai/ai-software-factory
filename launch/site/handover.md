@@ -53,8 +53,9 @@ Other files: `launch/revision/concept.md` is the copy's source (section 2 copy, 
 
 From revision section 6 and section 11:
 
-- Never "open source" about the factory. "Source available", and only once the licence file exists. The components (gVisor, Forgejo, SigNoz, opencode) may be called open source.
+- Never "open source" about the factory: it is "source available". The components (gVisor, Forgejo, SigNoz, opencode) may be called open source.
 - No "compliant", "certified", "safe", "secure", no named regulation.
+- Every public text reads as it will at release: no wording that waits for the licence, the hosting or the launch day. Sebastian decides when to release and picks the licence by then.
 - No install time and no server price until an outside engineer has installed it and the numbers exist.
 - No count older than the day the page goes public; the counts get recounted that day.
 - Links only to paths that exist. No numbers from the demo project on the page.

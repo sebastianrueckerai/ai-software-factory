@@ -57,4 +57,8 @@ Everything you configure is a file in your repository: the process, the prompts 
 
 The hosted model APIs see diffs and briefs. The Go module proxy is a covert channel of a few hundred bytes per request. gVisor is not a microVM. The model can write code that passes the checks, and the review, the hold-out tests and the audit make that hard, not impossible.
 
+## Licence
+
+Source available. The terms are in [LICENSE](LICENSE).
+
 Built by Sebastian Rücker.

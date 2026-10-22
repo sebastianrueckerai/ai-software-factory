@@ -34,6 +34,15 @@ The console's design runs as rounds by the process in [design/process.md](design
 - Provider keys live in the gitignored `.env.tools`. Never print a key.
 - Read [design/process.md](design/process.md) before any image generation or critique, [design/models.md](design/models.md) before calling a provider, and [design/design-decisions.md](design/design-decisions.md) before changing the look.
 
+## Launch surfaces
+
+The landing page, the claims page, the film and the README are public. Read the handover before changing one: `launch/site/handover.md` for the landing page, its wording rules and its assets; `launch/handover.md` and `launch/film/notes.md` for the film and the seven clips; `demo/handover/README.md` for the scene bank they are recorded from.
+
+- After editing `docs/evidence.md`, or once the code or infra repository's `github/main` moves, fetch both and run `node launch/site/evidence.js`. It fails on a path missing at that commit.
+- `README.md` repeats the guarantee count, the runs and the limits of `docs/evidence.md` and the landing page. Change them together.
+- After recording scene 38 again, record it with `POSTER=1` right after and cut `launch/site/assets/poster-routine.png` again, by the recipe in `launch/film/notes.md`.
+- After editing a page in `demo/video/poster-*`, run `node demo/video/poster.js <name>` and copy its PNG into `launch/site/assets/`.
+
 ## Constraints that shape every choice
 
 - Immutable and re-seedable end to end: deleting everything and re-seeding must work.
