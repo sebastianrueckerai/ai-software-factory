@@ -47,6 +47,16 @@ Started 22 October 2026. The working file for the film and its small clips: what
 - Show routines (the dashed card, the weekly bump) in a clip of their own.
 - The budget clip mostly shows a split: replace it with the discretionary pool, so the factory does not ask about five-cent overruns.
 
+## What Sebastian asked, 22 October, after round 8 (round 9)
+
+- A second of the drained board before "New work files itself", so the first new card stands out.
+- Snappier titles for two cards on the site: "Control spending intelligently" for the pool, "Going full auto" for the dial.
+
+## Round 9 decisions
+
+- **The pause.** The drain ends on the step that empties In progress, and the intake starts 1.1 s before the scan's card lands, from the same recording. The drained board holds about 1.2 s. The film runs 185 s.
+- **The titles.** The site's cards, the clips' metadata and this page carry the new titles. The clips themselves show no title, so nothing was rendered again for them.
+
 ## What Sebastian asked, 22 October, after round 7 (round 8)
 
 - Go on cutting the split: the opening's design question is answered in one click and the board drains.
@@ -214,7 +224,7 @@ Started 22 October 2026. The working file for the film and its small clips: what
 
 - The pool shows nowhere in the console: no page states its size or what it funded. The pool clip shows it through the diagram and the wake turn's trace.
 - The case that lands with the human uses scene 21, a decision only a human makes. A scene where an agent tried twice and explains why it cannot fix the problem does not exist yet.
-- The rough cut runs 184 s since round 8: black slates, the Forgejo visit and the whole sandbox A (56 s) inside it. Cutting to 90 means dropping sections or moving the sandbox out of the film; the clips already carry each mechanism on their own.
+- The rough cut runs 185 s since round 9: black slates, the Forgejo visit and the whole sandbox A (56 s) inside it. Cutting to 90 means dropping sections or moving the sandbox out of the film; the clips already carry each mechanism on their own.
 - The voice track: lines are not written. They come from the captions once the cut is approved, generated under the fal cap.
 - DORA: the film says "the four DevOps delivery metrics", as the page does.
 
@@ -229,4 +239,5 @@ Started 22 October 2026. The working file for the film and its small clips: what
 - [x] Round 6: one lit lamp (C34), the flicker fixed in the template, shorter static views, the quiet work in the ledger, the pool's moral without an amount.
 - [x] Round 7: the merge without a dip, the switch in one scene, the free camera, no lamp beside the levels not chosen (C36), 13 escalations at 4 %, the primer as a test.
 - [x] Round 8: the split cut from the opening, the design question answered in one click, When it needs you gone, the primer on the board alone, 184 s.
+- [x] Round 9: a 1.2 s pause on the drained board before the intake, the titles "Control spending intelligently" and "Going full auto", 185 s.
 - [ ] Sebastian approves the cut; then the cut to length, the voice, the videos into git.

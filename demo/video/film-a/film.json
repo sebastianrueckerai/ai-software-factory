@@ -32,9 +32,9 @@
    ],
    "to": [
     21,
-    "stillMs"
+    "atMs"
    ],
-   "tail": 0.3,
+   "tail": 1,
    "rate": 9
   },
   {
@@ -44,6 +44,7 @@
     22,
     "atMs"
    ],
+   "lead": 1.1,
    "to": [
     24,
     "stillMs"

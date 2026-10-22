@@ -1,6 +1,6 @@
 {
  "id": "clip-dial",
- "name": "Manual control or full auto, and anything in between",
- "title": "Manual control or full auto, and anything in between",
+ "name": "Going full auto",
+ "title": "Going full auto",
  "story": "The theory first: which decisions stay with you at each autonomy level. Then the console: on manual a payments merge waits and is approved by hand, and the card moves on merged. The dial stands on manual with only its dim lamp lit; its menu opens, one click picks full auto, and the chip shows only the full auto lamp, the brightest. The agent then answers the next card's question from the code, and the card merges and goes live without anyone."
 }
