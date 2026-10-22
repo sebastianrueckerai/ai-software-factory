@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1600, height=900">
+<title>The chat orchestrates development</title>
+<link rel="stylesheet" href="../loop/diagram.css">
+<style>
+  .panel { padding: 24px 30px; }
+  .panel h2 { margin: 0 0 10px; font-size: 52px; }
+  .panel p { font-size: 42px; line-height: 1.25; color: var(--text-muted); }
+  .panel .say { color: var(--text); }
+  .panel .tag { margin-top: 10px; font: 34px var(--font-mono); color: var(--text-faint); }
+  .card { margin-top: 14px; padding: 8px 18px; font-size: 40px; color: var(--text-muted); background: var(--bg-raised); border: 1px solid var(--line-strong); white-space: nowrap; }
+  .card.hit { color: var(--text); border-color: var(--accent); box-shadow: inset 6px 0 0 var(--accent); }
+  .panel .gates { font-family: var(--font-ui); color: var(--accent); }
+  .lbl { position: absolute; font: 34px var(--font-mono); color: var(--text-faint); }
+  .wire { stroke-width: 6; }
+  .wire.amb { stroke: var(--need); }
+  .tip-amb { fill: var(--need); }
+</style>
+</head>
+<body>
+<svg class="wires" viewBox="0 0 1600 900">
+  <path class="wire amb" d="M500 190 H562"/><path class="tip-amb" d="M590 190 l-28 -16 v32 z"/>
+  <path class="wire" d="M1030 190 H1092"/><path class="wire-tip" d="M1120 190 l-28 -16 v32 z"/>
+  <path class="wire" d="M1340 340 V560 H1058"/><path class="wire-tip" d="M1030 560 l28 -16 v32 z"/>
+  <path class="wire" d="M590 560 H528"/><path class="wire-tip" d="M500 560 l28 -16 v32 z"/>
+</svg>
+
+<div class="panel need" style="left:40px; top:40px; width:460px; height:300px">
+  <h2>You</h2>
+  <p class="say">Tell whoever builds the refund …</p>
+  <p class="tag">no card named</p>
+</div>
+
+<div class="panel" style="left:590px; top:40px; width:440px; height:300px">
+  <h2>Project agent</h2>
+  <p>reads the board</p>
+  <p>writes no code</p>
+</div>
+
+<div class="panel" style="left:1120px; top:40px; width:440px; height:300px">
+  <h2>In progress</h2>
+  <div class="card">#121 Profile</div>
+  <div class="card hit">#122 Refund</div>
+</div>
+<p class="lbl" style="left:1366px; top:420px">finds #122</p>
+
+<div class="panel" style="left:590px; top:440px; width:440px; height:240px">
+  <h2>Session #122</h2>
+  <p><span class="live"></span>&nbsp; gets your line</p>
+</div>
+
+<div class="panel" style="left:40px; top:440px; width:460px; height:240px">
+  <h2>The gates</h2>
+  <p class="gates">judge the result</p>
+</div>
+</body>
+</html>

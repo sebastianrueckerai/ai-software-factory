@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1600, height=900">
+<title>Routines run themselves</title>
+<link rel="stylesheet" href="../loop/diagram.css">
+<style>
+  .panel { padding: 24px 30px; }
+  .panel h2 { margin: 0 0 10px; font-size: 52px; white-space: nowrap; }
+  .panel p { font-size: 42px; line-height: 1.25; color: var(--text-muted); }
+  .panel .say { color: var(--text); }
+  .panel .cron { font: 36px var(--font-mono); color: var(--accent); white-space: nowrap; }
+  .ghost { border: 3px dashed var(--mark); }
+  .ghost::after { display: none; }
+  .panel h2.gh { white-space: normal; }
+  .panel .gates { font-family: var(--font-ui); color: var(--accent); }
+  .lbl { position: absolute; font: 34px var(--font-mono); color: var(--text-faint); }
+  .wire { stroke-width: 6; }
+  .wire.amb { stroke: var(--need); }
+  .wire.back { stroke: var(--mark); stroke-dasharray: 14 10; }
+  .tip-amb { fill: var(--need); }
+  .tip-back { fill: var(--mark); }
+</style>
+</head>
+<body>
+<svg class="wires" viewBox="0 0 1600 900">
+  <path class="wire amb" d="M460 170 H492"/><path class="tip-amb" d="M520 170 l-28 -16 v32 z"/>
+  <path class="wire" d="M1000 170 H1052"/><path class="wire-tip" d="M1080 170 l-28 -16 v32 z"/>
+  <path class="wire" d="M1230 300 V412"/><path class="wire-tip" d="M1230 440 l-16 -28 h32 z"/>
+  <path class="wire back" d="M1400 440 V328"/><path class="tip-back" d="M1400 300 l-16 28 h32 z"/>
+  <path class="wire" d="M1080 560 H1028"/><path class="wire-tip" d="M1000 560 l28 -16 v32 z"/>
+  <path class="wire" d="M520 560 H488"/><path class="wire-tip" d="M460 560 l28 -16 v32 z"/>
+</svg>
+
+<div class="panel need" style="left:40px; top:40px; width:420px; height:260px">
+  <h2>You</h2>
+  <p class="say">Bump our base images every Thursday.</p>
+</div>
+
+<div class="panel" style="left:520px; top:40px; width:480px; height:260px">
+  <h2>Project file</h2>
+  <p class="cron">cron: 30 19 * * 4</p>
+  <p>in your repository</p>
+</div>
+
+<div class="panel ghost" style="left:1080px; top:40px; width:480px; height:260px">
+  <h2 class="gh">↻ Weekly image bump</h2>
+  <p>waits in Queued</p>
+</div>
+
+<p class="lbl" style="right:388px; top:350px">Thursday</p>
+<p class="lbl" style="left:1418px; top:352px; font-size:30px">next week</p>
+
+<div class="panel" style="left:1080px; top:440px; width:480px; height:240px">
+  <h2>Card #141</h2>
+  <p><span class="live"></span>&nbsp; files itself and builds</p>
+</div>
+
+<div class="panel" style="left:520px; top:440px; width:480px; height:240px">
+  <h2>The gates</h2>
+  <p class="gates">as for any card</p>
+</div>
+
+<div class="panel" style="left:40px; top:440px; width:420px; height:240px">
+  <h2>Done</h2>
+  <p>✓ #141</p>
+</div>
+</body>
+</html>

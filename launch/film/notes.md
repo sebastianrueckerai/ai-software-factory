@@ -47,6 +47,18 @@ Started 22 October 2026. The working file for the film and its small clips: what
 - Show routines (the dashed card, the weekly bump) in a clip of their own.
 - The budget clip mostly shows a split: replace it with the discretionary pool, so the factory does not ask about five-cent overruns.
 
+## What Sebastian asked, 23 October, after round 9 (posters)
+
+- A suggestion for one form across the six card titles, in the chat.
+- A few posters for the chat card and the routines card, whose console frames do not read at card size.
+
+## Poster candidates
+
+- **Diagrams.** `demo/video/poster-chat` and `demo/video/poster-routine` are static pages on the diagrams' stylesheet. `node demo/video/poster.js poster-chat poster-routine` writes `demo/out/poster-chat.png` and `demo/out/poster-routine.png`. Their bottom-right corner stays empty, under the card's Play button.
+- **Console crops.** Scenes 36 and 38 recorded in a worktree with the desk viewport's `scale` at 3 and the pointer off in `demo/record.js`, then cut with ffmpeg: `crop=1770:1200:135:645,scale=-1:900,pad=1600:900:(ow-iw)/2:0:color=0x070b12` on `36-find-and-tell-3.png`, `crop=1890:1062:2850:420,scale=1600:-1,pad=1600:900:0:(oh-ih)/2:color=0x070b12` on `38-image-bump-5.png`. The recorder change was not kept. The routine's slot follows the recording clock, so this crop reads Thursday 22:00 while the clip reads 19:30.
+- The critic (Gemini 2.5 Pro) on both grids, second pass after larger text and thicker wires: the diagrams tell each card better at card size and fit the other four; the crops read as dense illegible text. Its claim that the Play button covers the diagrams was checked on a magnified crop and is wrong.
+- The review page shows the grid with each set. Sebastian picks; the pick goes into `launch/site/assets/`.
+
 ## What Sebastian asked, 22 October, after round 8 (round 9)
 
 - A second of the drained board before "New work files itself", so the first new card stands out.
