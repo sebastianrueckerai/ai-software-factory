@@ -468,6 +468,6 @@ function scene(now, o = {}) {
 module.exports = {
   AGENT_ASKS, id, card, intake, sessionStart, session, checks, modelReview, findings, queueTurn, policyGate, reproduction, approvalRequested, autoMerge, merged, recorded,
   final, supervisor, timeline, said, transcript, event, status, alert, poke, mergedPoke, livePoke, asked, mergeAsked, wake, approval, message, ask,
-  proposal, proposedCall, cardFiling, steering, closing, depending, pressed, pressedThread, filedThread, steeredThread, seen,
+  proposal, cardFiling, steering, closing, depending, pressed, pressedThread, filedThread, steeredThread, seen,
   plan, say, call, reply, figure, metrics, nextCron, prevCron, routineRun, routineView, scene,
 };

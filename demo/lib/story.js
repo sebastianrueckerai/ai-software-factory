@@ -1553,6 +1553,6 @@ function costs(now, at, days = 14) {
 module.exports = {
   date, cards, title, description, body, card: boardCard, filing, requests, asks, escalation, asking, answered, answerRows, replies, wakeAsk, alerts, alertsAt, approvals,
   mergeSpec, plans, planCards, routines, runsAt, cronOf, filedAge, anchoredAt, routineCard, routinesAt, scanned, sessions, words, life, lives, shareLink,
-  merges, merge, merging, mergeEvents, done, filed, answeredAt, ageAt, doneAt, board, session, reviews, review, files, sources, checksFailed, supervisor,
+  merges, merge, merging, mergeEvents, done, filed, answeredAt, ageAt, doneAt, board, session, reviews, review, files, sources, supervisor,
   steers, at, ledger, spentAt, spending, weekEnd, report, metricsWeek, costs,
 };

@@ -3,7 +3,6 @@ const assert = require("node:assert/strict");
 const s = require("../lib/state");
 const now = new Date("2026-10-20T12:00:00Z");
 
-test("id is stable", () => assert.equal(s.id(12), s.id(12)));
 test("id is t- and the first 12 hex digits of sha256 of 'lab <issue>'", () => {
   assert.equal(s.id(606), "t-9ba60dca9668");
   assert.equal(s.id(12), "t-4e4c15ef3f52");
@@ -167,13 +166,10 @@ test("scene keeps the plans by task, oldest first, and the questions by task and
   assert.equal("Plans" in s.scene(now, {}), false);
   assert.equal("Questions" in s.scene(now, {}), false);
 });
-test("proposal expires after its ttl and its call names the token", () => {
+test("a proposal expires after its ttl", () => {
   const p = s.proposal(now, { tool: "steer", args: { task_id: "t-1" }, description: "Message a card", ttl: 1800 });
   assert.equal(p.ExpiresAt, "2026-10-20T12:30:00.000Z");
   assert.equal(p.Kind, "proposal");
-  const c = s.proposedCall(now, p, { id: "call_1", age: 5 });
-  assert.equal(c.proposal, p.Token);
-  assert.equal(c.result, "Proposed to sebastian: Message a card. Nothing runs until they press Do it.");
 });
 test("a card admitted after its creation carries AdmittedAt", () => {
   const c = s.card(now, { issue: 117, status: "running", lane: "ready", age: 7200, title: "t", body: "b", admitted: 600 });
