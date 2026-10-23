@@ -1,5 +1,6 @@
 .env*
 terraform.tfstate*
+launch/revision/
 __pycache__/
 demo/out/
 demo/video/*/clips/
