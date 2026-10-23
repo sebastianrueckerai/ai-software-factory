@@ -61,4 +61,6 @@ The hosted model APIs see diffs and briefs. The Go module proxy is a covert chan
 
 Source available under the [PolyForm Noncommercial License 1.0.0](LICENSE). Non-commercial use is free as the licence defines it: personal use, research, education, charities and public bodies. Any commercial use, a company's evaluation included, needs a commercial licence: write to mail@sebastianruecker.com. Outside contributions are not accepted yet.
 
+Files copied from other projects keep their own licences: every `gsap.min.js` under `demo/video/` is GSAP's, under the [GSAP Standard License](https://gsap.com/standard-license).
+
 Built by Sebastian Rücker.
