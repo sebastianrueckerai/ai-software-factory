@@ -105,7 +105,7 @@ Four smaller moves follow from the same shape:
 
 - A wrong test the work can satisfy without a fight goes green and grades nothing. The dry run on main is the earlier catch, telemetry after merge is the backstop.
 - Whether the criteria cover the spec is a judgement no check makes. Hold-outs and the review's behaviour notes are the watch on it.
-- A proof the sandbox cannot run does not exist here: no browser, no external database, no model call inside check. Such a want becomes a human criterion that names the weakness, or waits as a note.
+- A proof the sandbox cannot run does not exist here: no browser in the default image (a card can run on a project image that has one, roadmap 281, but criteria stay in-process under `check`), no external database, no model call inside check. Such a want becomes a human criterion that names the weakness, or waits as a note.
 
 ## Reading further
 

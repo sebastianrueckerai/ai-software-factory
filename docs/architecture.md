@@ -1668,8 +1668,11 @@ Besides its `version`, `policy.yaml` holds eleven sections:
   (100000), the size at which opencode compacts the conversation, set in the
   generated config as `limit.input` with `compaction.reserved` 0. A session's
   brief states its budget left, agent time left and session number, and the
-  sandbox's tools, reachable names and missing browser, derived from the image
-  and `sandboxRegistries`. A plan card whose agent time is used up gets half
+  sandbox's tools, reachable names and missing browser. A project image's
+  facts come from the manifest its build publishes; the factory image keeps
+  its static facts, derived from the image and `sandboxRegistries`. A session
+  that lacks a tool calls `request_tool` and waits for the image that carries
+  it (roadmap 281). A plan card whose agent time is used up gets half
   the cap as one fresh planner session carrying the paths the first read
   (`planner-retry`). The stale sweep asks Temporal whether the card's
   workflow runs: a running workflow is left alone in any state and its

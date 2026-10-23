@@ -1,28 +1,34 @@
 # Sandbox images: how a project gets the tools it needs
 
-Written 2026-10-19, from the design discussion of the same day. This file
-turns the discussion into a design: the decided parts, the constraints, and
-what the builder settles. It covers roadmap 281 (tools per project) and the
-respawn half of 283. Status: design, approved by Sebastian in conversation.
-Nothing here is built.
+Written 2026-10-19, from the design conversation of the same day. It covers
+roadmap 281 (tools per project) and the respawn half of 283.
+
+Status: built and proven live. Sebastian decided on 2026-10-22 how the
+design meets the infrastructure as it stands, and the build followed
+those decisions. This file now describes what was built. The build plan
+([plans/2026-10-19-sandbox-images.md](plans/2026-10-19-sandbox-images.md))
+holds the decisions and rulings with their costs. On 2026-10-23 card #1234
+asked for chromium, tool card #1235 added it, the build took about 3
+minutes, the bot merged pin pull request infra #137, and the card restarted
+on the image about 90 seconds after the pin.
 
 ## Why
 
-Every agent session runs in the one sandbox image today: git, curl, ripgrep,
+Before this work, every agent session ran in the one sandbox image: git, curl, ripgrep,
 ssh, gcc and make, python3, PostgreSQL 17, Go 1.26, Node 24 with npm
 (Dockerfile.sandbox, the tool table test-pinned in
 internal/factoryd/sandbox.go). Go and Node are in the image because the
 factory's own projects are Go; for any other stack that default is wrong.
-The sandbox cannot install at runtime: no root, no capabilities, apt cannot
+The sandbox cannot install at runtime, and still cannot: no root, no capabilities, apt cannot
 run, and the DNS allowlist answers two registries only (the Go module proxy
 and npm). Card #854 spent calls trying to install a browser it could not
 reach. A project that needs another tool has no door.
 
 The design opens one door: the project declares its tools in a file of its
-own repository, the factory's CI builds a per-project image from that file,
-signs it, and pins its digest; a session runs on the image the project or
-the card names; a builder that misses a tool says so through a typed blocked
-reason, and the tool arrives by card, not by prompt.
+own repository, one trusted builder builds an image from that file, signs
+it, and factoryd pins its digest; a session runs on the image the project
+or the card names; a session that misses a tool asks for it with
+`request_tool`, and the tool arrives by card, not by prompt.
 
 ## Decided (Sebastian)
 
@@ -34,13 +40,12 @@ reason, and the tool arrives by card, not by prompt.
   merge rule, so a human-merge project gets human-approved tool changes and
   an auto-merge project gets AI-approved ones.
 - **The initial image is a choice made at creation.** The universal default
-  must not carry a stack. The project template carries the stack instead:
-  the template ships a tool file and the factory prebuilds its image, so a
-  project starts on its template's image with no build and no delay. The
-  console's creation flow may run a short AI pass over the repository or
-  spec to draft additions to the tool file; they build in the background
-  while the first session already runs, and the next session respawns onto
-  the richer image. A wrong guess costs one background build.
+  must not carry a stack. A project template ships `factory/images.yaml`
+  with its `default`, so a project starts on its template's image. The
+  factory's own project keeps its image (`opencode-worker`) as its default
+  and declares variants only. A project whose file declares no `default`
+  runs the factory image. A declared `default` that is not pinned yet also
+  runs the factory image. Only a named variant that is not pinned parks.
 - **Matching is per card.** A stage or lane property would fail the
   occasional case: one data-analysis task among twenty Go tasks. The image
   is an optional field on the card. The planner writes it; factoryd
@@ -83,168 +88,184 @@ have put a human gate in front of every genuinely new tool).
 
 The template ships the same file (infra repository,
 `factory/templates/ts-go/factory/images.yaml`), and project creation seeds
-it as the first commit's copy. One file, two uses.
+it as the first commit's copy. One file, two uses. The file allows at most
+4 names, and values must be safe to render into a Dockerfile.
 
 The declared facts are the source of truth for two artefacts: the image
-build, and the brief's sandbox facts line (piece 6). A tool the file does
-not name is not in the image, and the brief never claims it.
+build and the image's manifest, which feeds the brief's sandbox facts
+(piece 6). A tool the file does not name is not in the image, and the
+brief never claims it.
 
 ### 2. The images
 
-Three kinds, one pipeline:
+Three images:
 
-- **The base image** is today's Dockerfile.sandbox slimmed to what every
-  project needs regardless of stack: git, curl, ripgrep, ssh, gcc and
-  make, python3 as a scripting tool, and the PostgreSQL 17 server and
-  client the test harness uses (this split is my call: a test database is
-  test infrastructure, not a stack). Go and Node leave it. The base also
-  carries the agent harness today's Dockerfile.sandbox carries:
-  agent-worker, opencode and its plugin, since a session runs inside one
-  container. The base image itself runs no pod; it is the parent of every
-  other image.
-- **Template images** are the base plus a template's tool file, built by
-  the factory's own CI on template change and on the weekly bump. They
-  exist prebuilt so creation needs no build.
-- **Project images** are the base plus the project's tool file, built by
-  the project's own CI. A new project's first build reproduces its
-  template's image content; it diverges as the project amends its file.
+- **The factory image** (`Dockerfile.sandbox`, pushed as
+  `sf/opencode-worker`) carries the harness: agent-worker, opencode and
+  its bake. It is the default of the factory's own project and the image
+  every other project runs when its file declares no `default`. The
+  factory keeps its static sandbox facts and its registry allowlist
+  (`sandboxRegistries`).
+- **The sandbox base** (`sf/sandbox-base`, the `base` stage of the same
+  Dockerfile) holds what every project needs regardless of stack: the
+  Debian snapshot with apt sources kept, git, curl, ripgrep, ssh, gcc and
+  make, python3, PostgreSQL 17 (a test database is test infrastructure,
+  not a stack) and user 1000. It carries no harness, no Go and no Node. It
+  runs no pod. It is the parent of every project image.
+- **Project images** are the base plus the project's declaration, named
+  `git.aisoftwarefactory.world/sf/sandbox-<project>.<image>` and tagged by
+  a content key over the declaration and the base digest. The dot cannot
+  occur in either name, so the split is unambiguous. A template prebuilds
+  nothing: the template's `default` is an ordinary entry in the new
+  project's file, built by the same pipeline.
 
-Every image builds the way the factory's images build today: BuildKit on
-the build VMs, every input from the store (roadmap 203; apt rides the dated
-Debian snapshot, roadmap 242's documented exception), reproducible from the
-commit, amd64 only. Project images build rootless, as today's builds do, so
-a project-declared input executes contained; its blast radius is the image
-itself, which sessions run sandboxed.
+The harness rides an init container. Every sandbox pod runs an init
+container `harness` from the factory image (`WORKER_IMAGE`) that copies
+agent-worker, opencode and the opencode bake into an `emptyDir` at
+`/factory`. The main container runs `/factory/bin/agent-worker` from that
+volume, whatever image it runs, and agent-worker puts `/factory/bin` on
+`PATH`. A factoryd roll therefore never makes a project image stale. A
+project image rebuilds only when the base or its declaration changes.
 
-Caps, refused by `factoryd config check` and by the build: at most 4 image
-names per project, image size at most 4 GiB (both policy fields with these
-defaults).
+Every image builds from the store alone: apt through the dated Debian
+snapshot, every upstream file through the store's copy machinery (roadmap
+203). The builder unpacks upstream files as root in a stage of their own
+and the image takes only `/opt` and `/usr/local` from it by `COPY` after
+its apt step, with nothing run after. An upstream line that plants a
+symlink cannot carry another line's write elsewhere. A build is
+reproducible from the commit, amd64 only. A project-declared input
+executes during the build; its blast radius is the image, which sessions
+run sandboxed.
+
+Caps, refused by `factoryd config check` and at pin time: at most 4 image
+names per project (`policy.MaxImages`) and a compressed size of at most
+4 GiB (`policy.MaxImageBytes`).
 
 ### 3. Build, sign, pin
 
-A change to a tool file runs the owning repository's image job (the
-factory's ci.yml gains a template-image job; the project template's ci.yml
-gains the project-image job, guarded on the file's path). The job builds
-the image, then runs the project's own `check` on the candidate inside the
-job, before push: the gates' proof for a tool card is the candidate
-passing the project's tests, and factoryd never schedules an unpinned
-digest. On green the job pushes to the store under the project's own
-repository namespace (the project's Forgejo repository is its container
-package namespace), signs it, and writes the digest pin into the factory's
-policy tree: the project's file (`factory/projects/<name>.yaml`) gains an
-`images` block naming each image's digest. factoryd reads the policy tree
-already, the commit is the version, and the version is pinned per task, so
-a task's image is as reproducible as its process.
+One workflow in the code repository, on the trusted runner, builds every
+project's images from the project's declaration and signs them with a
+separate images key. No project holds a key and no project runs its own
+build. factoryd verifies project images with the images key and factory
+images with the factory key. Neither key verifies the other, and tests
+prove the refusal both ways.
 
-Signing keys are per project. Registration generates a keypair, seeds the
-private key into the project repository's secrets for signing only, and
-pins the public key in the project's policy file. factoryd verifies each
-image against its project's pinned key, and the factory's own images keep
-the factory key. One leaked project key can forge only that project's
-images, which the project's AI curates anyway; it cannot forge factory
-images (my call, from the standing constraint of fine-grained roles).
+The imager inside factoryd watches each project's `factory/images.yaml`,
+dispatches the build for the key the file asks for and reads the signed
+result from the store. It does not run a candidate check: a card's gates
+run on the card's own image, so the first card on a new image proves it.
+
+The pin lives in the infra repository. factoryd opens a pull request on
+`sf/ai-software-factory-infra` that changes only the `images` block of
+`factory/projects/<project>.yaml` (digest, key, tools, egress), and merges
+it itself once it has checked that the pull request touches the images
+block alone and that the tree passes factoryd's own config check. Every
+other infra change stays human. factoryd reads the policy tree already,
+the commit is the version, and a task pins the version at start, so a
+task's image is as reproducible as its process.
 
 The agent never builds, pushes or signs. It edits the declarative file
 through a card; the pipeline does the rest.
 
-### 4. Choosing the image for a pod
+### 4. Choosing the image
 
 The plan gains an optional image name per card. Resolution order: the
-card's image name, else the project's `default`. A name resolves only
-against a signed, pinned digest in the task's pinned policy version:
-declared but unpinned behaves exactly as undeclared, and a task asking for
-it parks with `missing_tool`, waiting for the pin. That parked wait is the
-respawn trigger. factoryd hands the resolved digest to every sandbox pod
-the card's work starts: the session pod, the repro pod, the criteria gate
-pod, the hold-out dry run. Gates run the project's tests on the project's
-image, or their verdicts prove nothing. The factory's own project's pods
-run the factory's image, which is its project image.
+card's image name, else the project's `default`, else the factory image.
+A name resolves only against a signed pin in the policy version in force
+when the session starts, and the task row records the digest it ran on.
+A named variant with no pin parks the card in `waiting-image` until the
+pin lands. factoryd hands the resolved digest to every sandbox pod the
+card's work starts: the session pod, the repro pod, the criteria gate pod
+and the hold-out dry run. Gates run the project's tests on the project's
+image, or their verdicts prove nothing. A reproduction, criteria or
+hold-out sandbox whose image has no pin is a start escalation at step
+`image pin`.
 
-Validation sits where the other impossibilities sit: ValidatePlan
-(internal/factoryd/plan.go) refuses an image name with no signed pin in
-the task's policy version, the same pass that refuses cycles and
-impossible compositions. The model chooses, from a closed list the tool
+Plan validation (ValidatePlan) refuses an image name the project's
+declaration does not list, the same pass that refuses cycles and
+impossible compositions. The model chooses from a closed list the tool
 file declares.
 
 ### 5. The ask flow: a missing tool becomes a card
 
-The typed blocked reason comes first in build order (roadmap 34, not built
-today): a builder that cannot go on reports `missing_tool` through
-`request_info`, naming the tool and what it needed it for. factoryd files a
-card against the tool file on the project's repository, titled with the
-tool and the asking card. The card is an ordinary change: it edits
-`factory/images.yaml`, the project's gates judge it, and it merges by the
-project's merge rule (AI-approved by default, per the decision above).
+A session that lacks a tool calls `request_tool` (`tool`, `need`). The
+call is free and ends the session with outcome `missing_tool`, the work
+kept on the branch. A report session cannot call it. factoryd parks the
+card in `waiting-image` (no work slot) and files a tool card on the
+project's repository: small, the cheap rung, a child the asking card
+depends on. Its body starts from the asking card's image entry, or from a
+ready-made fragment of the factory image's stack (Go, Node, env, egress)
+where the asking card ran on the factory image, so a cheap model does not
+reconstruct that stack. The tool card edits `factory/images.yaml`, the
+project's gates judge it, and it merges by the project's merge rule: a
+human-merge project gets human-approved tool changes, an auto-merge
+project gets AI-approved ones. One open tool card per image: a second ask
+joins it with a comment while no session has started it.
 
-When the merged file's image is built and pinned, factoryd respawns the
-parked task on the new image; the respawned session's brief states the
-image's facts from the new manifest. If the tool card is refused or closed
-without merging, the refusal is the parked task's answer through the
-answer chain. One asking card per tool per project, so twenty cards do not
-file twenty builds; a second ask rides the open card.
+When the merged file's image is built and pinned, the imager wakes the
+card (`image_ready`) and the next session runs on the new image, its
+findings naming the tool's arrival. A tool card closed unmerged, merged
+without declaring the image, or merged with an image whose builds left no
+signed image, reaches the next session as why the tool did not come. After
+24 hours without a wake the card asks a human.
 
-Egress follows the tool: a variant's `egress` names join the task
+Egress follows the tool: an image's declared `egress` names join the task
 namespace's DNS and Cilium allowlist (workerEgressSpec) when a pod runs on
-that image, the way the Go module proxy and npm joined. The gateway's
-resolved-address guard (roadmap 42) stands in front of every new name, and
-each name lands in the audit trail with the card that asked for it.
+that image. The gateway's resolved-address guard (roadmap 42) stands in
+front of every new name, and each name lands in the audit trail with the
+card that asked for it.
 
 ### 6. The brief's facts line
 
-SandboxFacts() today renders one global table. It becomes a render of the
-image's manifest: the build publishes, beside the digest in the store, a
-small manifest (the tool list, the egress names, the size, the base
-digest), generated by the build from the same file it built from. The
-brief of a session on an image states that image's tools and registries.
-The existing test that holds the tool table to Dockerfile.sandbox adapts
-to hold the base image's manifest to its Dockerfile.
+On a project image the brief's sandbox facts come from the image's
+manifest: the tool list, the egress names and the base digest, generated
+by the build from the file it built from. The factory image keeps the
+static facts, derived from the image and `sandboxRegistries`. The test
+that holds the factory's tool table to Dockerfile.sandbox still holds it
+to the factory image.
 
 ### 7. Updates
 
-The harness rides the base image, so a factoryd or opencode change must
-reach project sessions. A factoryd roll therefore rebuilds the base and
-the factory's own images in its existing gate, then triggers an
-asynchronous rebuild and repin of every template and project image from
-the new base, the way the roller watches today's three image jobs. A
-project keeps its previous pin until its own rebuild lands, so the skew
-window is the rebuild queue, minutes, not a week; a red rebuild keeps the
-old pin and files like any red build.
-
-Upstream tool versions move on the weekly bump, which exists (the roller's
-weekly bump card). It grows one leg: each template image and each project
-image rebuilds from a bumped tool file on the same weekly schedule, reruns
-the project's checks, and repins. The project policy file's routine
-machinery (`routines:`) carries it: the project's bump routine runs
-`files: ai` by default, per the decision above; the factory's own project
-keeps its human rule.
+A factoryd roll changes the factory image only. Project images rebuild
+when the sandbox base is bumped (the roller's weekly bump) or when their
+declaration changes, and the imager repins them through the same pull
+request. A project keeps its previous pin until its rebuild lands. A red
+rebuild keeps the old pin and raises an alert like any red build: after
+three builds of a key leave no signed image, one alert names the builder.
 
 ### 8. Cleanup
 
-Four rules, all by construction:
+1. **Store retention.** Once a pin changes in force, the store keeps of
+   that image the pinned build, the one pinned before it and the build of
+   the key the file asks for now. Every other version of
+   `sf/sandbox-<project>.<image>` goes, through Forgejo's package API. A
+   build pushed in the last 45 minutes or in flight stays.
+2. **Unpinned names.** A name that leaves the pins keeps its last build
+   for 30 days, so pinning it again undoes an unpin by mistake. Then every
+   version goes. The rule keys on the image name, not the digest, because
+   a weekly base bump repins every image.
+3. **Nodes.** The kubelet's image GC already runs at 75 percent (roadmap
+   252). No extra work.
+4. **Unused variants.** Once a day per image, an image other than
+   `default` that has been pinned for 30 days and that no card of the
+   project named or ran on in those 30 days gets a removal card (source
+   `image_removal`, small, the cheap rung) that deletes its entry from
+   `factory/images.yaml`. It merges by the project's merge rule. No second
+   card is filed while one is open or within 30 days of its end.
+5. **Projects.** `remove-project` deletes the project's
+   `sf/sandbox-<project>.*` packages and its image rows.
 
-1. **Store retention.** The store keeps the pinned digest and the one
-   before it per image name. A successful pin deletes older digests of
-   that name; a weekly sweep deletes unpinned digests. The store's
-   package API must delete single container digests; the plan verifies
-   this before relying on it.
-2. **Nodes.** The kubelet's image GC already runs at 75 percent (roadmap
-   252); per-session pulls fall under it. No extra work.
-3. **Variants.** A variant no card used for 30 days files a removal card,
-   approved like an addition. Removal unpins it; the next sweep drops the
-   digests.
-4. **Projects.** remove-project deletes the project's images with its
-   namespace.
-
-The caps bound the worst case per project: size cap times (4 names plus
-one) times two digests.
+The caps bound the worst case per project: size cap times 4 names times
+the pinned build plus the one before it.
 
 ## Constraints
 
 - Immutable and re-seedable end to end: every image rebuilds from a commit
-  of its tool file plus the store; the pin lives in the policy tree in
-  git; deleting everything and re-seeding rebuilds all of it.
-- Security: no direct credentials to agents, signed images, digest-only
-  references (never a tag), no runtime installs outside the declared
+  of its tool file plus the store; the pin lives in the infra repository
+  in git; deleting everything and re-seeding rebuilds all of it. A pin
+  whose build the store lacks, as after a re-seed, is built again.
+- Security: no direct credentials to agents, signed images (project images with the images key, factory images with
+  the factory key), digest-only references (never a tag), no runtime installs outside the declared
   registries, egress names audited, caps refused at config check.
 - The build's inputs stay store-only (roadmap 203); a new toolchain
   version enters through the store's existing copy machinery, never
@@ -262,32 +283,15 @@ one) times two digests.
 
 ## Migration
 
-One order, no fallback image: seed `factory/images.yaml` into both
-existing projects (the factory's code project declaring Go and Node, the
-demo app its template's stack), build and pin their images, then slim the
-base. In-flight tasks keep their already-resolved digest, since a task
-pins its policy version. A project with no pin of its own resolves its
-`default` to its template's pin; that is the creation flow's promise, not
-a legacy path, and it is also why a freshly created project runs its
-first session with no build and no delay.
-
-## Left to the builder
-
-- The exact schema of `factory/images.yaml`, the JSON Schema, and the
-  generated schema check.
-- The manifest's format and its store path beside the image.
-- The least-privilege mechanism the image job uses to write the pin into
-  the policy tree (a scoped token is the shape; the schema must reject a
-  pin factoryd cannot verify).
-- The store's delete API for single digests, verified against the running
-  Forgejo before the retention step lands.
-- The exact plan JSON field and the ValidatePlan change.
-- The respawn bookkeeping: where a parked `missing_tool` task waits and
-  what wakes it.
+One order, no fallback image: the factory's code project declares its
+variants in `factory/images.yaml` and keeps the factory image as its
+default. In-flight tasks keep their already-resolved digest, since a task
+pins its policy version. A project with no `default` runs the factory
+image; that is the rule of piece 2, not a legacy path.
 
 ## Sources
 
-Sebastian 2026-10-19 (the design conversation: the initial image as a
+Sebastian 2026-10-19 and his decisions of 2026-10-22 (the design conversation: the initial image as a
 creation choice, per-card matching, AI approval as the default under
 signing, cleanup by construction). Roadmap 281 and 283 (the concept),
 34 (typed blocked reasons), 42 (egress guard, built), 71 (per-project
