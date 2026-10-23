@@ -44,7 +44,7 @@ Other files: `launch/revision/concept.md` is the copy's source (section 2 copy, 
 ## Known gaps, by design
 
 - The comparison was checked against each vendor's own documentation on 22 October 2026 by six parallel researchers, one per vendor. Every cell and its source sit in `docs/comparison.md`, which the table's caption links. Vendors ship fast: recheck the cells on the day the page goes public and change the date in the lede and in that file.
-- The eyebrow says "Source available" while the licence file does not exist yet. Stop-ship rule: nothing public before the BSL 1.1 file is committed with its parameters.
+- The licence is the PolyForm Noncommercial License 1.0.0, in `LICENSE` of all three repositories since 23 October. Sebastian wants no date that turns the code open source, which rules out BSL 1.1. Commercial use, a company's evaluation included, needs a licence from him.
 - No session so far could view rendered images. The frames, the diagrams and the layout are verified by a DOM probe (no horizontal overflow at 1440 and 500 px, every SVG label inside its box, folds closed) and not by eye.
 - On narrow screens the three diagrams scroll sideways (`min-width: 860px`). A phone layout for them is not designed.
 
@@ -54,7 +54,7 @@ From revision section 6 and section 11:
 
 - Never "open source" about the factory: it is "source available". The components (gVisor, Forgejo, SigNoz, opencode) may be called open source.
 - No "compliant", "certified", "safe", "secure", no named regulation.
-- Every public text reads as it will at release: no wording that waits for the licence, the hosting or the launch day. Sebastian decides when to release and picks the licence by then.
+- Every public text reads as it will at release: no wording that waits for the licence, the hosting or the launch day. Sebastian decides when to release.
 - No install time and no server price until an outside engineer has installed it and the numbers exist.
 - No count older than the day the page goes public; the counts get recounted that day.
 - Links only to paths that exist. No numbers from the demo project on the page.

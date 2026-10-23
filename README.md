@@ -59,6 +59,6 @@ The hosted model APIs see diffs and briefs. The Go module proxy is a covert chan
 
 ## Licence
 
-Source available. The terms are in [LICENSE](LICENSE).
+Source available under the [PolyForm Noncommercial License 1.0.0](LICENSE). Non-commercial use is free as the licence defines it: personal use, research, education, charities and public bodies. Any commercial use, a company's evaluation included, needs a commercial licence: write to mail@sebastianruecker.com. Outside contributions are not accepted yet.
 
 Built by Sebastian Rücker.
