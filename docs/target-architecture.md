@@ -405,7 +405,7 @@ Which repositories carry the work, and in what order does it land?
 | `ai-software-factory-code` | The Go module with both binaries, the harness adapters, tests and deploy manifests | Changes often, the repository the factory's agents work on; its rolls are roll tasks |
 | `demo-app/demo-app` | The demo app, a Go link shortener with Postgres and its own CI/CD, the first project | Its own Forgejo organisation. Agents change it through the same gates, and its merge rule is `auto` |
 
-Forgejo is the primary remote and the one Flux reads. GitHub is the off-site copy: Forgejo push-mirrors both repositories to it on every commit, so a bot merge reaches it without a human push, and humans push to both remotes as well. While Forgejo is down, pushes reach GitHub only, so a restore is followed by a fast-forward push of every repository back to Forgejo.
+Forgejo is the primary remote and the one Flux reads. GitHub is the off-site and public copy: Forgejo push-mirrors the `main` branch of both repositories to it on every commit, so a bot merge reaches it without a human push, and humans push `main` to both remotes as well. Work branches stay in Forgejo. While Forgejo is down, pushes reach GitHub only, so a restore is followed by a fast-forward push of every repository back to Forgejo.
 
 Build order, seven phases:
 
@@ -477,7 +477,7 @@ The cluster is three servers at 69.49 EUR per month, about 210 EUR per month, pl
 | Protected files | Files that decide what installs, builds or instructs an agent; a change to them always waits for a human |
 | Stricter wins | A project's settings may only tighten the policy's defaults and caps, never loosen them |
 | Month cap | The limit on all variable spend of every project and the factory in one calendar month; a task that meets it waits for a human |
-| Push mirror | Forgejo's push of every commit to the GitHub copy of a repository |
+| Push mirror | Forgejo's push of every commit on `main` to the GitHub copy of a repository |
 | Pulse | One sentence under the status line, the most useful thing to know now, written by a cheap model from the board and the last events and refreshed on every event |
 | PV and PVC | Persistent volume, a disk the cluster offers, and persistent volume claim, a pod's request for one |
 | ServiceAccount | A Kubernetes identity for a pod, not for a person |

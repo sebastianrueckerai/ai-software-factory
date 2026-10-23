@@ -301,7 +301,9 @@ after the Forgejo restore every repository is fast-forward pushed to Forgejo
 before Flux's first sync; otherwise Flux converges to the dump's stale tree.
 Forgejo push-mirrors both repositories to GitHub on every commit and every
 8 hours, so a merge by the `factory-merge` bot (7) reaches the off-site copy
-without a human push (Ruling 126). The mirror's GitHub token is stored
+without a human push (Ruling 126). The mirrors push `main` only (Ruling
+326), so GitHub, the public copy, holds no task or work branch. The mirror's
+GitHub token is stored
 encrypted in Forgejo's database and comes back with the database restore, as
 long as it is still valid. Humans still push to both remotes.
 Nodes installed from the schematic image register with the control-plane
