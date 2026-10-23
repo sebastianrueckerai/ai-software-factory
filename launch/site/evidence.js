@@ -114,7 +114,6 @@ const html = `<!doctype html>
   a.path:hover code { text-decoration: underline; }
   .nyet { color: var(--need-text); }
   .toc { columns: 2; max-width: 760px; padding-left: 22px; }
-  footer { color: var(--text-faint); font-size: 14px; }
 </style>
 </head>
 <body>
@@ -127,7 +126,7 @@ ${intro.join("\n")}
 <ol class="toc">${toc.join("")}</ol>
 ${body.join("\n")}
 </section>
-<footer><p>Built from <a href="${design("docs/evidence.md")}">docs/evidence.md</a>. The file and test links point at commit ${pinned}.</p></footer>
+<footer><p>Built from <a href="${design("docs/evidence.md")}">docs/evidence.md</a>. The file and test links point at commit ${pinned}.</p><p><a href="legal.html#imprint">Imprint</a> · <a href="legal.html#privacy">Privacy</a></p></footer>
 </main>
 </body>
 </html>

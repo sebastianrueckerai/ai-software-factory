@@ -20,7 +20,7 @@ The page is built for progressive disclosure. Nine stops, each one point:
 8. **How it compares.** One lede, the table behind a fold, the tradeoffs box visible. Each cell opens with its verdict in bold after a square mark: full cyan for Yes, half cyan for Partial, a grey outline for No and No gate, a dashed outline for Not documented (`<b class="v yes|part|no|nd">`).
 9. **Proof and limits.** The four links and the open limits in one line. The counts are gone: the page links the repository instead.
 
-There is no footer and no contact block. The page will sit inside a larger site that carries the imprint and the contact.
+A footer links the imprint and the privacy notice, both in `legal.html`, on every page. Sebastian's ruling of 23 October: the imprint lists his name and e-mail only, no postal address and no phone. The privacy notice rests on the site setting no cookies and loading nothing from other servers. If the page ever loads a font, a script or a video from another host, or moves off GitHub Pages, change the notice.
 
 Visible words per section stay between 33 and 201. The old eight-paragraph reach section, the module cards, the numbers section and the table are the folds and the diagrams now.
 
@@ -44,7 +44,6 @@ Other files: `launch/revision/concept.md` is the copy's source (section 2 copy, 
 ## Known gaps, by design
 
 - The comparison was checked against each vendor's own documentation on 22 October 2026 by six parallel researchers, one per vendor. Every cell and its source sit in `docs/comparison.md`, which the table's caption links. Vendors ship fast: recheck the cells on the day the page goes public and change the date in the lede and in that file.
-- Docs links are relative (`../../docs/...`) and work in-repo; they break when the page moves to GitHub Pages and must be reworked then.
 - The eyebrow says "Source available" while the licence file does not exist yet. Stop-ship rule: nothing public before the BSL 1.1 file is committed with its parameters.
 - No session so far could view rendered images. The frames, the diagrams and the layout are verified by a DOM probe (no horizontal overflow at 1440 and 500 px, every SVG label inside its box, folds closed) and not by eye.
 - On narrow screens the three diagrams scroll sideways (`min-width: 860px`). A phone layout for them is not designed.
