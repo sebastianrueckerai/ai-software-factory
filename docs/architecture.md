@@ -3334,10 +3334,14 @@ Sandbox hardening:
 - Cilium network policy: default deny egress. Allowed: `factory-gateway` on
   its port, Forgejo git, and the Go module proxy and checksum database
   (`proxy.golang.org`, `sum.golang.org`) on 443. `storage.googleapis.com`
-  joined them while the proxy redirected module downloads there (Ruling
-  114) and left again on 2026-10-23, when the proxy began serving the
-  downloads itself; the proxy was accepted as the single trust boundary, so
-  no mirror was added. DNS answers only those names (`matchName`, not a
+  joined them while the proxy redirects some module downloads there
+  (Ruling 114). The entry left on 2026-10-23 on the belief the proxy
+  served every download itself, and returned the same day:
+  `github.com/segmentio/encoding@v0.5.4` answered 302 with a signed
+  `storage.googleapis.com` URL and every pull request's vet, test and
+  security checks failed on the blocked lookup. The host stays read-only
+  on 443; the proxy remains the single trust boundary, so no mirror was
+  added. DNS answers only those names (`matchName`, not a
   wildcard, which would open a DNS exfiltration channel). While a
   commissioned server's lease lives, its address on port 22 joins the list
   (5.5). The SigNoz collector on port 4318 is the one Stage 8 addition
@@ -4425,8 +4429,10 @@ checksum database, nothing else, no metadata endpoint). The rebuild
 drill's gate found the one entry this list once held beyond those: `go
 vet` fetched a new dependency, the proxy redirected the download to
 `storage.googleapis.com`, and every pull request's vet check failed
-(Ruling 114); the entry left the list again on 2026-10-23, when the proxy
-served the downloads itself. A build job's pod also reaches its build VM,
+(Ruling 114); the entry left the list on 2026-10-23 on the belief the
+proxy served every download itself, and returned within hours when the
+same redirect broke the vet, test and security checks of every pull
+request again. A build job's pod also reaches its build VM,
 `auth.docker.io` and the build cache (below). The runner takes its one job
 and exits; the spawner deletes the namespace and deregisters the runner.
 At most eight CI namespaces run at once, the rest queue. Since Task 65 the
@@ -4906,7 +4912,7 @@ since Stage 6, but neither has run under load.
 | Untrusted CI runner | factoryd's CI spawner: one ephemeral gVisor pod per job, repository-scoped ephemeral registration, read-only job token, no secrets; the privileged dind runner serves protected `main` only. Since Stage 17 a smoke job runs on a runner bound to its one job, the only pod staging admits on 8080 | Decided (Rulings 78, 89, 286) |
 | PR image builds | A throwaway Hetzner Cloud build VM per job in a CI project of its own, `buildkitd` over mutual TLS, no credential on the VM, cx23 by measurement. The gVisor build pod is gone | Decided (Rulings 103, 106, 110, 127) |
 | PR build speed | Changed images only, parallel builds, no warm step, build VMs, and an in-cluster read-only cache that only `main` writes, streamed to the VM through the runner pod | Built (Rulings 106, 111, 119) |
-| Go module egress | `storage.googleapis.com` joined the CI, build and sandbox allowlists by name while the proxy redirected downloads there; removed 2026-10-23, the proxy serves them itself, no mirror | Superseded (Ruling 114) |
+| Go module egress | `storage.googleapis.com` sits in the CI, build and sandbox allowlists by name: the proxy redirects some module zips (`segmentio/encoding@v0.5.4`) to signed URLs there, so removing it breaks every pull request's Go checks. Read-only on 443, no mirror | Decided (Ruling 114; the 2026-10-23 removal reversed the same day) |
 | Agent pull requests | From a `factory-agent` fork, so PR jobs get a read-only token; two session tokens, read upstream and write the fork; workflow-directory guard in the worker and factoryd | Decided (Rulings 97, 100) |
 | CI registrar | Dedicated `factory-ci` account, organisation owner because the runner API demands it, token scoped to the code repository, `main` protected with `apply_to_admins` | Decided (Rulings 101, 101a) |
 | Missed webhooks | The heal pass re-reads Forgejo every minute and signals what webhooks missed; `Reconcile` at the start of every workflow run | Decided |
