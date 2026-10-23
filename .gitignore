@@ -1,4 +1,5 @@
 .env*
+terraform.tfstate*
 __pycache__/
 demo/out/
 demo/video/*/clips/
