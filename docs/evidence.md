@@ -14,8 +14,8 @@ The chat replaces card writing, and the same chat reaches a running agent.
 
 | Guarantee | Enforced by | Tested by | Proven by |
 |---|---|---|---|
-| One chat tool per console action, 64 today | `internal/console/chat_tools.go`, `internal/policy/policy.go` (ChatTools) | `internal/console/chat_test.go`, `internal/policy/chat_test.go` | Scenes 01 and 03 of the bank: one sentence files a card |
-| Every write is a proposal with a 30 minute undo | `internal/console/chat_tools.go`, `internal/policy/policy.go` (ConfirmFor) | `internal/console/writes_test.go` | Scenes 03 and 24: the proposal and Do it |
+| One chat tool per console action, 73 today | `internal/console/chat_tools.go`, `internal/policy/policy.go` (ChatTools) | `internal/console/chat_test.go`, `internal/policy/chat_test.go` | Scenes 01 and 03 of the bank: one sentence files a card |
+| Every write is a proposal; the reversible ones carry a 30 minute undo | `internal/console/chat_tools.go`, `internal/policy/policy.go` (ConfirmFor) | `internal/console/writes_test.go` | Scenes 03 and 24: the proposal and Do it |
 | The chat drives the board's menus | `internal/console/chat_tools.go` (board_view), `internal/console/board.go` | `internal/console/board_test.go` | Scene 23 |
 | A human or the project agent messages a running session, and the gates judge the result | `cmd/agent-worker` (message endpoint), `internal/factoryd/message.go` | `cmd/agent-worker/message_test.go`, `internal/console/tell_card_test.go` | Scene 11: a line typed into a running card, the next turn quotes it |
 
@@ -76,8 +76,8 @@ Detectors and the supervisor answer in code before a human is asked.
 
 | Guarantee | Enforced by | Tested by | Proven by |
 |---|---|---|---|
-| Thirteen detectors watch every session | `internal/factoryd/supervise.go` | `internal/factoryd/supervise_test.go` | Scene 08: the flip-flop detector tripped |
-| The supervisor answers in code first, then by model, six model calls at most | `internal/factoryd/supervisor.go` | `internal/factoryd/supervisor_test.go` | Scene 08: redirect, then the next session on the stronger model |
+| Eleven detectors watch every session | `internal/factoryd/supervise.go` | `internal/factoryd/supervise_test.go` | Scene 08: the flip-flop detector tripped |
+| The supervisor answers in code first, then by the check-in model in the session's pod, twelve calls a card at most | `internal/factoryd/supervisor.go`, `internal/factoryd/checkin.go` | `internal/factoryd/supervisor_test.go`, `internal/factoryd/checkin_test.go` | Scene 08: redirect, then the next session on the stronger model |
 | The ladder: a stronger model after three returns from one stage, a human after the session cap | `internal/factoryd/workflow.go` (stronger_after), `infra:factory/policy.yaml` | `internal/factoryd/workflow_test.go` | Scenes 08 and 10 |
 
 ## 8. No model call runs without its cost covered
@@ -110,7 +110,7 @@ Every session runs in a throwaway pod with its own identity, and the network is 
 | Each session runs in its own throwaway gVisor pod: uid 1000, no capabilities, read-only root, emptyDir volumes, quota | `internal/factoryd/runner.go` (sandboxPodSpec) | `internal/factoryd/runner_test.go`, `internal/factoryd/sandbox_test.go` | Every session of every run. Scene 32 shows the pod's life |
 | Egress is denied by default and allowed by name, and the metadata address is denied outright | `internal/factoryd/runner.go` (workerEgressSpec) | `internal/factoryd/runner_test.go` | Every session, by the probe below |
 | The egress probe proves the closed network before the agent starts, or the start fails | `cmd/agent-worker/egress.go` | `cmd/agent-worker/egress_test.go` | Every session start of every run |
-| The agent never holds a push token: the read token lives in the clone init container, the write token is minted after the agent process is dead, used once and revoked | `internal/factoryd/forgejo.go`, `internal/factoryd/message.go`, `internal/factoryd/completion.go` | `internal/factoryd/forgejo_test.go`, `cmd/agent-worker/message_test.go`, `internal/factoryd/completion_test.go`, TestTaskHistoryCarriesNoCredential in `internal/factoryd/activities_test.go` | Every push of every run |
+| The agent never holds a push token: the read token lives in the clone init container, the write token is minted after the agent process is dead, used once and revoked | `internal/factoryd/forgejo.go`, `internal/factoryd/message.go`, `internal/factoryd/completion.go` | `internal/factoryd/forgejo_test.go`, `cmd/agent-worker/message_test.go`, `internal/factoryd/completion_test.go`, TestTaskHistoryCarriesNoCredential in `internal/factoryd/history_test.go` | Every push of every run |
 | The gateway identity is a projected token that expires in one hour and is verified against the cluster | `internal/factoryd/runner.go`, `internal/gateway/auth.go` | `internal/gateway/auth_test.go` | Every model call of every run |
 | The gateway dials out, resolves once and refuses non-public addresses | `internal/gateway/egress.go` | `internal/gateway/egress_test.go` | Every external tool call |
 | Model keys are per task, carry no budget and die with the run | `internal/gateway/litellm.go` | `internal/gateway/litellm_test.go` | Every run mints and blocks its key |
@@ -133,6 +133,6 @@ The pages read the same ledger the board reads.
 | Guarantee | Enforced by | Tested by | Proven by |
 |---|---|---|---|
 | The metrics and costs pages read the same ledger as the board | `internal/console/metrics.go`, `internal/factoryd/metrics.go` | `internal/console/metrics_test.go`, `internal/factoryd/metrics_test.go` | Scenes 26 to 28: the pages beside the board |
-| Costs are booked per card and per call, with a dated window | `internal/factoryd/meters.go`, `internal/factoryd/settle.go` | `internal/factoryd/meters_test.go`, `acceptance/costs_date_window_test.go` | Stage 18: cost per card 0.019 to 1.24 EUR |
+| Costs are booked per card and per call, with a dated window | `internal/gateway/server.go`, `internal/factoryd/store.go`, `internal/console/ledger.go` | `internal/console/chat_pages_parity_test.go`, `acceptance/costs_date_window_test.go` | Stage 18: cost per card 0.019 to 1.24 EUR |
 
 Rows that say not yet: hold-outs, the stale-plan refusal, cheat detection, the no-verdict finding, outsider screening, routines, the missing-cap stop, the model attempt on an ask and template seeding. Nine of forty-three guarantees wait for their run.
