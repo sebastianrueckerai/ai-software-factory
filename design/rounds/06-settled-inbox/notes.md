@@ -8,7 +8,7 @@ item 292 and the concept doc of 2026-10-17; the round shapes only the form.
 ## Built
 
 Six candidates as static pages over the console's own stylesheet
-(`refs/console.css`, verbatim from the code repository at 4286a6f), one fixed
+(`refs/console.css`, verbatim from the code repository at cec02b5), one fixed
 thread in `page.tmpl.html`, assembled by `build.js` into fourteen pages (dark
 and light). No image generation: the round is a styling question over real
 markup, the same call round 03 made for its glyph. Shot at 1440 and 390
@@ -86,7 +86,7 @@ Sebastian confirmed it on return, 2026-10-17 ("looks good"). Ruled as
 
 ## The build (phase 2, landed)
 
-The pick is in the code repository (2be0d7c on main, 2026-10-17). The
+The pick is in the code repository (f5203e1 on main, 2026-10-17). The
 settled row keeps its who line and folds to the reason word plus a content
 ellipsis; tap or click expands it back; the settled-row and badge rules
 match `cand/c2.css`. The badge is two pills, amber `1` and bordered `1`,

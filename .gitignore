@@ -1,6 +1,8 @@
 .env*
 terraform.tfstate*
 launch/revision/
+docs/pitch.md
+launch/concept.md
 __pycache__/
 demo/out/
 demo/video/*/clips/

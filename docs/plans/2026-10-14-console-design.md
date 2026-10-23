@@ -37,15 +37,15 @@ The lab shoots the four scenarios in both themes after every item and the sheet 
 
 ## Where it stands
 
-Step 0 of [the handover](2026-10-14-console-design-handover.md), answered on 2026-10-14 by the controller before the first commit. The code repository's `origin/main` was at 62fe22e.
+Step 0 of [the handover](2026-10-14-console-design-handover.md), answered on 2026-10-14 by the controller before the first commit. The code repository's `origin/main` was at 6f01f2e.
 
-1. **Since f0750ac8, one card touched `internal/console/`:** card 641 (roadmap 210, PR 648, commit 98eb5d2), the budget action. Item 221 (PR 636, commit 27a6681) landed before the baseline. Its element is a line under the pulse in `board.html`: "Configuration version N · commit <sha>", linked to the configuration tree. The design puts it into the expanded status panel, as a row of the fourth column (provider, GitHub, configuration), because the top bar's right end already holds the theme, the user and Log out. Decision C9. `design/ia.md` and the prototype get the row.
+1. **Since f98d5061, one card touched `internal/console/`:** card 641 (roadmap 210, PR 648, commit 1590ca3), the budget action. Item 221 (PR 636, commit 36db072) landed before the baseline. Its element is a line under the pulse in `board.html`: "Configuration version N · commit <sha>", linked to the configuration tree. The design puts it into the expanded status panel, as a row of the fourth column (provider, GitHub, configuration), because the top bar's right end already holds the theme, the user and Log out. Decision C9. `design/ia.md` and the prototype get the row.
 2. **Item 225 is not built.** Both process files in the infra repository carry a `lanes` block (`spec.yaml` and `maintenance.yaml`). `board.html` renders the lane columns, the move forms, Start plan and Accept plan. A worktree `work/lane-collapse` exists in the code repository at `main` with no commit. So items 3, 4 and 7 restyle the lane forms quietly and keep them working. The forms leave with item 225's round.
 3. **Item 226 is not built.** The title links to the drawer only for a member who may write the summary. The tabs are Overview, Activity, Files, Chat. Item 3 makes the whole card the opener and item 5 puts Files last. The roadmap's item 226 is the prompt pack. The handover and C7 use 226 for the card opener and the tab order, which the roadmap folds into 227.
 4. **Card 641 landed.** A capped card's escalation carries a Fund form: an amount in EUR, a reason and the button Fund, for the card's owner, under the answer form. It is in `design/inventory.md` now and in item 4 as the "raise the budget" row under "Grant one session with this answer".
-5. **The speed round has not started.** There is no `docs/plans/2026-10-14-speed.md`. `roll_holds` and `AwaitSessionGap` are on `main`. Roll PR 657 (bff4b59) is open and in review. Every roll of this round waits for a session gap. Five cards were running at the start (639, 649, 651, 652, 653).
+5. **The speed round has not started.** There is no `docs/plans/2026-10-14-speed.md`. `roll_holds` and `AwaitSessionGap` are on `main`. Roll PR 657 (9c27211) is open and in review. Every roll of this round waits for a session gap. Five cards were running at the start (639, 649, 651, 652, 653).
 6. **Open cards touching the console:** 654 (roadmap 229, queued) changes `titleClause` in `board.go`, the face's title. 653 (roadmap 228, running) changes the stale ring's input in `board.go` and adds a sweep in factoryd. No open pull request touches `internal/console/`. Neither changes the templates this round rewrites.
-7. **The lab branch is not merged.** `console-design` rebased onto 62fe22e without a conflict. `go vet ./internal/console/` is green on it. It is the first pull request.
+7. **The lab branch is not merged.** `console-design` rebased onto 6f01f2e without a conflict. `go vet ./internal/console/` is green on it. It is the first pull request.
 
 The baseline suite: `go test ./internal/console/` on `main`, green in 3.5 s.
 
@@ -54,7 +54,7 @@ Two decisions reached the round after the handover was written:
 - **C8, four columns (Sebastian, 2026-10-14, relayed by the portfolio session).** Working and Verifying merge into "In progress". The stage word with its own dot (planning, building, verifying) shows on the card, and the time on the card is the time in the current stage. The mapping: Needs you holds waiting-human and the human tasks, Queued holds queued and waiting-deps, In progress holds running, closing and in-review, Done holds done, failed and closed. Ruling 255's five titles become four. This round applies it in the design files, the prototype and the console. The report measures the merge queue's wait: if it still takes tens of minutes after the speed round, a Verifying column comes back.
 - **C9, the configuration version (the controller, 2026-10-14).** Step 0.1 above.
 - **C10, the Time section in the drawer (Sebastian, 2026-10-14, relayed by the portfolio session).** Item 5 carries it: the section, its data and the card's time derived from the runs. No stage bars on the board.
-- **The speed round started in another session:** its items 1 (a roll takes no turn in the merge queue, 60b47d4) and 2 (sessions survive a factoryd restart, no roll gap, 928a351) landed on `main` on 2026-10-14 while this round ran.
+- **The speed round started in another session:** its items 1 (a roll takes no turn in the merge queue, 2efb5bf) and 2 (sessions survive a factoryd restart, no roll gap, 8acbce3) landed on `main` on 2026-10-14 while this round ran.
 
 The round's pull requests, in order: the lab, the board page's figures (today's spend and the day cap, the GitHub remote, the plan flag), the structural check, then items 1, 2, 5, 6, 3, 4, 7, 8. The structural check lands with the prerequisites and tests the design's mechanics, so it is red on the mechanics an item has not built yet. Each pull request names the lines still red. From item 2 on it is green.
 
@@ -64,21 +64,21 @@ What landed, in order, on the code repository's `main` by the controller's direc
 
 | Step | Pull request | Commit on main |
 |---|---|---|
-| The lab | 665 (661 closed: same-repository) | 73de708 |
-| The figures (today's spend, the day cap, the GitHub remote, the stage) | 667 | d1a6584 |
-| The structural check | 668 | 32cc922 |
-| Item 1, the tokens and the base sheet | 672 | e821c96 |
-| Item 2, the shell | 677 | b34697a |
-| Item 5, the drawer | 684 | e533514 (its first test job red on a factoryd flake, the Temporal deadlock detector in TestWorkflowReportSixProviderRefusalsAskAHuman; green after a rebase on main) |
-| Item 6, the chat | 685 | 74e06c5 |
-| Item 3, the board | 692 | f6cbe93 |
-| Item 4, the Needs you items | 700 | 9c69c61 (rebased on a roll that landed first; CI green on 07fe7c6, the same change) |
-| Items 7 and 8, the New task page and the secondary pages | 701 | e9c6378 |
-| The review's fix pass | 711 | a6b70e4 |
-| The spend gauges' fill (the policy drops inline styles; a meter now) | 726 | 65dae57 |
-| No accent filter, the ticker on the last day, the board ticking beside an open drawer (Sebastian, 2026-10-14) | 731 | b754bf6 (the first commit carried a moved main's inverse and was refused; rebuilt from the branch's base) |
-| C11, one time on a card | 738 | da6a406 |
-| C12, no ticker along the foot | 746 | 9d49925 (landed by the board filters round on 2026-10-14, after three rebases on the day's rolls and that round's items) |
+| The lab | 665 (661 closed: same-repository) | 603ec46 |
+| The figures (today's spend, the day cap, the GitHub remote, the stage) | 667 | 13f0507 |
+| The structural check | 668 | d065ec9 |
+| Item 1, the tokens and the base sheet | 672 | ff0486f |
+| Item 2, the shell | 677 | c84b6ae |
+| Item 5, the drawer | 684 | fe4f1c1 (its first test job red on a factoryd flake, the Temporal deadlock detector in TestWorkflowReportSixProviderRefusalsAskAHuman; green after a rebase on main) |
+| Item 6, the chat | 685 | da495c6 |
+| Item 3, the board | 692 | 2989ec7 |
+| Item 4, the Needs you items | 700 | b4f2585 (rebased on a roll that landed first; CI green on dfacbd8, the same change) |
+| Items 7 and 8, the New task page and the secondary pages | 701 | 2609c36 |
+| The review's fix pass | 711 | 3d6d5ef |
+| The spend gauges' fill (the policy drops inline styles; a meter now) | 726 | 717c8f4 |
+| No accent filter, the ticker on the last day, the board ticking beside an open drawer (Sebastian, 2026-10-14) | 731 | d2ae5af (the first commit carried a moved main's inverse and was refused; rebuilt from the branch's base) |
+| C11, one time on a card | 738 | 82fab06 |
+| C12, no ticker along the foot | 746 | 0cada6e (landed by the board filters round on 2026-10-14, after three rebases on the day's rolls and that round's items) |
 
 The structural check's lines after item 2: two, both item 3's (the whole card opens the drawer, the PR link on a verifying card's face). After item 3: none, `ok: every control present, the mechanics work`.
 

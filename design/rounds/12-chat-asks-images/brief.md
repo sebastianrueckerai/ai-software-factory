@@ -5,7 +5,7 @@ opening move (2026-10-19), built straight into the console rather than as
 standalone candidates: the question the agent asks with pressable answers,
 the image the member pastes and the agent reads by tool, and the filing
 the ready check refused that then self-corrected. The build is landed
-(Forgejo 4a7536bb, 018b96c3, 4ad14fcd, 40ae0cef, 738d83ee, 4fa42a0c);
+(Forgejo cd15824f, f408be79, cb94df23, 2f80c724, cb7f8888, 42e0d646);
 this round is the design pass over what landed, in the condensed
 build-in-lab form: the lab's screenshots are the review unit, the critics
 judge real renders, and a defect the critics or the director find enters

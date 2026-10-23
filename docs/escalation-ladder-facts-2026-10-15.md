@@ -2,7 +2,7 @@
 
 This file collects facts for a later redesign of the escalation ladder and of how an outside agent checks in on a working agent. It describes four problems from one run of five cards and four more from the cards of the documents feature that followed, where the original data lives, and how the ladder works in the code today. It ends with the old roadmap items on the subject. The interpretations are the controller's and are marked as such.
 
-The code references point at the code repository's `origin/main` at commit `7fe834c`. The live policy values come from the infra repository (`factory/policy.yaml`, `factory/processes/spec.yaml`, `k8s/platform/litellm/helmrelease.yaml`). All times are UTC.
+The code references point at the code repository's `origin/main` at commit `83c7073`. The live policy values come from the infra repository (`factory/policy.yaml`, `factory/processes/spec.yaml`, `k8s/platform/litellm/helmrelease.yaml`). All times are UTC.
 
 ## Terms
 
@@ -80,8 +80,8 @@ The factoryd logs of that afternoon are gone with its restarts.
 **What happened.**
 
 - Card #837 started on the stronger rung, because its brief named `internal/factoryd`.
-- Its first session pushed after 18 minutes. The review of head `90d0460` (Forgejo comment 15830) answered `concerns`. It raised two points. The first was a possible change of meaning in a queue metric, a fair question. The second read: "the project's merge rule is 'human', so this cannot auto-merge."
-- The agent's second session answered the first point and pushed `02322e7`. The review of that head (comment 15866) said "The change itself is sound and complete" and still answered `concerns`. Its only reason was: "However, the project's merge rule is 'human', so auto-merge is not possible regardless of code correctness." It listed no finding.
+- Its first session pushed after 18 minutes. The review of head `19f86aa` (Forgejo comment 15830) answered `concerns`. It raised two points. The first was a possible change of meaning in a queue metric, a fair question. The second read: "the project's merge rule is 'human', so this cannot auto-merge."
+- The agent's second session answered the first point and pushed `571a1ff`. The review of that head (comment 15866) said "The change itself is sound and complete" and still answered `concerns`. Its only reason was: "However, the project's merge rule is 'human', so auto-merge is not possible regardless of code correctness." It listed no finding.
 - A `concerns` verdict without findings goes back to the agent as the single finding "model review: <summary>". So the card started a third session to fix nothing.
 - The third session used up the session cap of three. The card then came to the controller as an approval request. The controller read the diff, saw green checks and approved. The card merged at 14:15.
 - The reviews of cards #838 and #840 carried the same sentence ("MergeRule is human, so a human must decide", "Merge rule is 'human', so a human must decide"). There it sat beside real points.
@@ -92,22 +92,22 @@ The factoryd logs of that afternoon are gone with its restarts.
 - A model that reads "a human must merge" can conclude that it would not merge the change as it is, and answer `concerns`.
 - The rule belongs to code, which applies the verdict to the merge rule, not to the reviewer.
 
-**Change made without Sebastian's OK.** The controller changed this at 14:08 in code commit `42b608e`, live since 15:07. The review's input no longer holds the merge rule or the policy outcome, and its prompt no longer explains what an approve does under the merge rule. The verdict's use under the merge rule stays in code (`AutoMerge`, `internal/factoryd/gates.go:141`). The redesign should decide whether this change stays.
+**Change made without Sebastian's OK.** The controller changed this at 14:08 in code commit `8f71ca0`, live since 15:07. The review's input no longer holds the merge rule or the policy outcome, and its prompt no longer explains what an approve does under the merge rule. The verdict's use under the merge rule stays in code (`AutoMerge`, `internal/factoryd/gates.go:141`). The redesign should decide whether this change stays.
 
 ### Problem 2: a false review claim went round three times, and only the human could stop it (card #836)
 
 **What happened.**
 
 - Card #836 adds a lookup of a factory pull request card by its pull request number. The change uses `Store.TasksByPR`, a store method that already exists on main at `internal/factoryd/store.go:672`. The diff only adds the method to the `Store` interface and to the test stand-ins.
-- The review of head `9a02364` (comment 15848) answered `concerns`. Its findings said that `TasksByPR` "has no SQL-backed implementation" and that "production code ... will fail to compile". This was false. The pull request's checks, which compile and test the whole repository, were green (`stage_findings` in the timeline, and CI).
+- The review of head `2a18a40` (comment 15848) answered `concerns`. Its findings said that `TasksByPR` "has no SQL-backed implementation" and that "production code ... will fail to compile". This was false. The pull request's checks, which compile and test the whole repository, were green (`stage_findings` in the timeline, and CI).
 - The finding went back to the coding agent as its only input about the review.
-- In session 2, the agent ran `git merge-base --is-ancestor 739e848 origin/main` and changed the test stand-ins. The supervisor summary for that session reports it "just fixed the panicking TasksByPR stub". The agent did not state anywhere that the method exists on main.
-- The review of the next head `4b6c0ed` (comment 15876) repeated the claim: "The previous review's findings are not addressed. TasksByPR is still declared ... but no SQL-backed implementation is provided anywhere."
-- Session 3 changed the stand-ins again. The review of `ecd5dc9` (comment 15949) repeated the claim a third time.
+- In session 2, the agent ran `git merge-base --is-ancestor c72fc7d origin/main` and changed the test stand-ins. The supervisor summary for that session reports it "just fixed the panicking TasksByPR stub". The agent did not state anywhere that the method exists on main.
+- The review of the next head `ed5d81a` (comment 15876) repeated the claim: "The previous review's findings are not addressed. TasksByPR is still declared ... but no SQL-backed implementation is provided anywhere."
+- Session 3 changed the stand-ins again. The review of `35d0802` (comment 15949) repeated the claim a third time.
 - At the session cap the card came to the controller (approval 776, 14:40). The controller checked main, found the method, and approved. The approval recorded four `finding_adjudicated` entries ("approved in the console"). The card merged at 14:41.
 - During the three sessions the supervisor ran three times, all on the `no_progress` detector ("no harness events for 5m"). It answered `continue` each time, with no guidance. It reported progress ("The agent has completed all required work", "The agent is making solid progress").
 
-- **The same pattern returned the same day on card #853.** That card is the first of the documents feature, pull request 857, head `3cc686a`, review at about 17:36. The review held: "docRootOK(resolved) is called on line 106 but never defined in this part or any visible file; without it the package will not compile". `docRootOK` is defined on main at `internal/console/autonomy.go:227`. The controller told the running agent so through the console's steer action at 17:38:15, the event `card_steered`.
+- **The same pattern returned the same day on card #853.** That card is the first of the documents feature, pull request 857, head `a31398f`, review at about 17:36. The review held: "docRootOK(resolved) is called on line 106 but never defined in this part or any visible file; without it the package will not compile". `docRootOK` is defined on main at `internal/console/autonomy.go:227`. The controller told the running agent so through the console's steer action at 17:38:15, the event `card_steered`.
 
 **Controller's interpretation.**
 
@@ -124,13 +124,13 @@ The factoryd logs of that afternoon are gone with its restarts.
 - **Session 1 (13:20 to 14:13).** It made 87 model calls: 34 on the cheap rung for 0.066 EUR, then 53 on the stronger rung for 1.669 EUR. The calls sent 7.1 million prompt tokens and returned 41,000 output tokens. The agent wrote the migration, the check and test changes. It then started the full test suite against Postgres in the background and waited for it in loops: `sleep 120; ps aux | rg -c "go test|gosec|postgres"; tail -5 /tmp/opencode/check.log`, later `sleep 420; ...`. Each check-in on the background job is a model call that sends the whole conversation again, about 80,000 tokens each.
 - **The first check-in.** At 14:05:02 the scheduled check-in (every 45 minutes of agent time) sent a message. The agent had run `git checkout internal/factoryd/store.go`, which reverted all its own edits to that file. The supervisor told it so and how to re-apply them. This was a correct and useful intervention.
 - **The tests the new check broke.** The suite failed in two Postgres tests, `TestPGStoreBoardDoneOrder` and `TestPGStoreFinishedPages`. The controller had written both earlier that day. Both create a finished card without a finish time on purpose, to test its order on the board. The new database check makes such a row impossible. The right fix is to give those test cards a finish time. The agent instead wrote a helper that drops the check, inserts the rows and adds the check again. That helper failed on a foreign key.
-- **The end of session 1.** At 14:13 a call was refused: "free headroom 0.150168 EUR ... fits 0 output tokens after a request of ... about 121753 prompt tokens ... (status 402)". The session record says `outcome: no_push`, while its summary ends "work in progress pushed". The branch did hold commit `ddf3ffa`, which the gates judged later.
+- **The end of session 1.** At 14:13 a call was refused: "free headroom 0.150168 EUR ... fits 0 output tokens after a request of ... about 121753 prompt tokens ... (status 402)". The session record says `outcome: no_push`, while its summary ends "work in progress pushed". The branch did hold commit `0f1ad0d`, which the gates judged later.
 - **Sessions 2 and 3 could not run.** Session 2 started at 14:13:36 with 0.15 EUR of headroom. It made 15 calls and ended on the same 402 refusal after 1.3 minutes. Session 3 started at 14:15:36 with 0.04 EUR and ended on its first call. Each still counted as an attempt.
 - **What sessions 2 and 3 were told.** Their "findings from earlier attempts" were not findings. They were the last command lines of the session before, such as "ran `sleep 120; ps aux | ...` (exit 0)", "changed /workspace/repo/internal/factoryd/store.go", and "previous session ended without a pushed commit: APIError: free headroom ...".
 - **The budget question.** At 14:16:04 the factory asked a human: "the remaining budget cannot fund a call: Raise the budget (Fund on the board) and answer, or close the card." The controller funded 3 EUR, raising the budget to 5, and answered.
-- **The cap question.** The answer granted an attempt. The workflow first verified the unjudged work on the branch (`ddf3ffa`): checks red in the two tests (run 1295). The review of `ddf3ffa` (comment 15919) said the brief asked to audit every write that ends a task, and the diff touched only one. The card was at its cap, so at 14:21:01 the factory asked: "the session cap is reached: every finding sent to the agent so far goes to a human".
-- **The controller's answer.** At 14:24 it named the two tests, the fix (stamp the test cards, keep the expected order) and the audit result. The audit result was that `TransitionTask` and `EnsureChatTask` already stamp the finish time, so the one gap was `insertTask`. Attempt 5 removed the helper, stamped the cards and pushed `897de4a` after 15 minutes.
-- **The end.** The review of `897de4a` (comment 15965) again asked for the audit the controller had already answered. The migration made a human approval mandatory anyway. The controller approved at 14:48.
+- **The cap question.** The answer granted an attempt. The workflow first verified the unjudged work on the branch (`0f1ad0d`): checks red in the two tests (run 1295). The review of `0f1ad0d` (comment 15919) said the brief asked to audit every write that ends a task, and the diff touched only one. The card was at its cap, so at 14:21:01 the factory asked: "the session cap is reached: every finding sent to the agent so far goes to a human".
+- **The controller's answer.** At 14:24 it named the two tests, the fix (stamp the test cards, keep the expected order) and the audit result. The audit result was that `TransitionTask` and `EnsureChatTask` already stamp the finish time, so the one gap was `insertTask`. Attempt 5 removed the helper, stamped the cards and pushed `1b66c24` after 15 minutes.
+- **The end.** The review of `1b66c24` (comment 15965) again asked for the audit the controller had already answered. The migration made a human approval mandatory anyway. The controller approved at 14:48.
 
 **Controller's interpretation.**
 
@@ -200,10 +200,10 @@ This happened after the first version of this file.
 **What happened.**
 
 - **The card.** Card #853 is the first card of the documents feature, task t-b00242d88364, pull request 857.
-- **The first answer.** At 17:58 the card was at its session cap. All the review's findings at head `5e8bcd2` were settled, so the controller answered: "All findings are settled at head 5e8bcd2, so change nothing and end the session without a commit." Session 4 ended after 30 seconds, and the card reached approval 783.
+- **The first answer.** At 17:58 the card was at its session cap. All the review's findings at head `c3cd7b9` were settled, so the controller answered: "All findings are settled at head c3cd7b9, so change nothing and end the session without a commit." Session 4 ended after 30 seconds, and the card reached approval 783.
 - **The request for changes.** The controller then compared the console lab's screenshots with the design prototype. It found four gaps: no pins row, no path line, the phone head overflowing, and two labels. At 18:07:27 it denied the approval with "request changes", listing them.
 - **What session 5 received.** Its `ANSWERS` held the old answer ("change nothing and end the session without a commit"). Its `FINDINGS` held the new request ("reviewer controller requested changes: ... 1. The pins row is missing ...").
-- **What session 5 did.** It ended after 36 seconds with "no changes to push; the branch already held 5e8bcd2".
+- **What session 5 did.** It ended after 36 seconds with "no changes to push; the branch already held c3cd7b9".
 
 **Controller's interpretation.**
 
@@ -220,16 +220,16 @@ This happened after the first version of this file.
 - **Session 1 (18:52:40 to 19:26:38, session s-5b591a385b33).** It made 182 calls on coding-frontier: 15,421,409 prompt tokens (15,047,552 of them cached) and 104,165 output tokens, for 4.894 EUR. The last calls sent about 138,000 prompt tokens each.
 - **The supervisor.** At 18:59 the repetition detector tripped. The supervisor sent a message (0.034 EUR): "You've been reading and grepping for 60+ tool calls without writing any code", followed by a plan. The session then wrote the code.
 - **The browser.** The card carries 20 command lines of session 1 as findings. They show the agent trying to get a browser for the console lab into the sandbox: `npm install playwright`, `npx playwright install chromium`, `@sparticuz/chromium`, `apt-get download libnspr4 libnss3`, and `curl` to download hosts, several with exit 6 (host not resolved). The sandbox image (`Dockerfile.sandbox`) has Node but no browser, and the sandbox's network does not reach the browser download hosts. A session cannot do item 7 of the brief.
-- **The end of session 1.** At 19:26:38 the gateway refused a call: "free headroom 0.071585 EUR (task 0.071585, ...) fits 0 output tokens after a request of 573968 bytes (about 138390 prompt tokens), below the minimum call of 1024 (status 402)". The worker pushed the work in progress to `factory/t-2492d049a348` at `a2d7ef5`, 14 files. At 19:30 the controller applied it on its base `5fdc280`: it builds, and `go test ./internal/console/` passes, including the three acceptance tests. Its pull request 860 later had green checks (6 of 6).
+- **The end of session 1.** At 19:26:38 the gateway refused a call: "free headroom 0.071585 EUR (task 0.071585, ...) fits 0 output tokens after a request of 573968 bytes (about 138390 prompt tokens), below the minimum call of 1024 (status 402)". The worker pushed the work in progress to `factory/t-2492d049a348` at `3ab5768`, 14 files. At 19:30 the controller applied it on its base `19907ee`: it builds, and `go test ./internal/console/` passes, including the three acceptance tests. Its pull request 860 later had green checks (6 of 6).
 - **Session 2 (19:26:52, session s-065faa954cdf).** It started with 0.0716 EUR of headroom. opencode opens a session with two calls at once. The first, 18,363 bytes asking for 24,576 output tokens, took a hold of 0.0716 EUR, all the headroom (ledger row 48598). The second, 54,972 bytes, was refused at 19:27:24.076 with a free headroom of 0.000004 EUR. opencode ended, and the first call was cancelled at 19:27:24.154 (audit decision `client_canceled`). The gateway booked the full hold, because a cancelled call reports no cost (`internal/gateway/server.go:688`, "cost not reported, booked the hold"). Session 2 got no answer from any model and cost 0.072 EUR.
 - **The budget question.** At 19:27:27 the funding check refused attempt 3 before it started: "the remaining budget cannot fund a call: Raise the budget (Fund on the board) and answer, or close the card." No session ran as attempt 3.
 - **The fund and the answer.** At 19:31:43 the controller raised the budget by 5 EUR to 10 EUR (`card_funded`) and answered with the state of the pushed work and what was left (comment 16226).
-- **No session followed.** The answer resumed the attempt loop at attempt 4, which is past the cap of 3 sessions. The workflow verified the pushed work: policy, reproduction and checks from 19:31:47, then the review of `a2d7ef5` with 8 findings. At 19:35:43 the card asked: "the session cap is reached: every finding sent to the agent so far goes to a human" (comment 16237). The card had run two sessions. The `tasks` row read `attempts` 2 and `extra_attempts` 0.
+- **No session followed.** The answer resumed the attempt loop at attempt 4, which is past the cap of 3 sessions. The workflow verified the pushed work: policy, reproduction and checks from 19:31:47, then the review of `3ab5768` with 8 findings. At 19:35:43 the card asked: "the session cap is reached: every finding sent to the agent so far goes to a human" (comment 16237). The card had run two sessions. The `tasks` row read `attempts` 2 and `extra_attempts` 0.
 - **The answer to the budget question was lost.** No session received it, and the cap question's history of findings does not hold it.
 - **The review.** The controller judged one of the 8 findings real: after the commit has landed, a failed read of the commit's time makes the save answer an error, and no `doc_written` row is written. The finding's stated consequence, duplicate commits, does not follow, because a retry with the same text takes the unchanged-text path. The other seven are false:
   - Two contradict the picked prototype (`design/rounds/05-documents/wiki/index.html` lines 1708 and 1731 in this repository): "restored · discard" with a middle dot, and Discard only while a draft exists. The brief writes " - " where the prototype has "·". The review reads the brief, not the prototype.
   - Four name code "in part 1" that the reviewing call did not see: the pins' draft dot, the save's `base` field, the route `/lab/docs-slow`, and the CSS of the new elements. All four are in the diff. The review reads a large diff in up to three parts, one call per part (`internal/factoryd/gates.go:741-752`).
-  - One misreads the dot: it asks that a landed save clear the dot even when the member typed after the save. The code keeps the draft, and so the dot, only for text typed after the save (`internal/console/static/console.js` line 872 at `a2d7ef5`).
+  - One misreads the dot: it asks that a landed save clear the dot even when the member typed after the save. The code keeps the draft, and so the dot, only for text typed after the save (`internal/console/static/console.js` line 872 at `3ab5768`).
 - **The cap answer.** At 19:38:32 the controller answered the cap question (comment 16238) with the one real finding and why the other seven are false. The answer granted an attempt, and session s-dfb6d933101b started as attempt 4 at 19:38:36. The answer also told the agent to run the console lab and take the screenshots. At 19:39:08 the controller took that back with a steer (`card_steered`), because the sandbox has no browser.
 
 **Controller's interpretation.**
@@ -251,22 +251,22 @@ This happened after the first version of this file.
 
 **What happened.**
 
-- Hetzner's fsn1 object storage was degraded from 2026-10-15 18:19 UTC. Forgejo's registry answered 500s from about 23:30, Forgejo itself was down from 00:05 to 01:44 (22 restarts, `storage.Init` 503). Main's push run 1360 on `c38354e` was cancelled at 01:44:42 in the outage, as were runs 1365 and 1366 after it.
-- The mainfix card #885 "main is red at c38354e: ci / upstream (push)" was filed at 01:44:42. The controller closed it as noise at 01:45:34: the run had been cancelled by the outage, not failed on code.
-- Main went red again at 02:07:36. Run 1367 (`3b2d5eb`) failed in its `upstream` job: five of eight store uploads got 404, 504 and 500 from the registry while storage still flapped after the 01:44 recovery (job log 10429). The same job passed on run 1372 (`93d373e`, which contains `c38354e`) once storage was stable. No new mainfix card was filed for this second red.
-- At 03:44:56, two hours after #885 was filed, the revert card #889 fired: "Main's push run at c38354e failed and the fix-forward card did not land within 2h0m0s. This pull request reverts c38354e". Its pull request #888 reverted `c38354e`, a console-JavaScript change (the htmx guard of the board). The approval request 803 reached the human at 03:48.
+- Hetzner's fsn1 object storage was degraded from 2026-10-15 18:19 UTC. Forgejo's registry answered 500s from about 23:30, Forgejo itself was down from 00:05 to 01:44 (22 restarts, `storage.Init` 503). Main's push run 1360 on `d7e5038` was cancelled at 01:44:42 in the outage, as were runs 1365 and 1366 after it.
+- The mainfix card #885 "main is red at d7e5038: ci / upstream (push)" was filed at 01:44:42. The controller closed it as noise at 01:45:34: the run had been cancelled by the outage, not failed on code.
+- Main went red again at 02:07:36. Run 1367 (`a064585`) failed in its `upstream` job: five of eight store uploads got 404, 504 and 500 from the registry while storage still flapped after the 01:44 recovery (job log 10429). The same job passed on run 1372 (`552a28c`, which contains `d7e5038`) once storage was stable. No new mainfix card was filed for this second red.
+- At 03:44:56, two hours after #885 was filed, the revert card #889 fired: "Main's push run at d7e5038 failed and the fix-forward card did not land within 2h0m0s. This pull request reverts d7e5038". Its pull request #888 reverted `d7e5038`, a console-JavaScript change (the htmx guard of the board). The approval request 803 reached the human at 03:48.
 - The controller denied the approval and closed #889 as noise at 06:12 with the evidence above: the reverted commit cannot reach the failing job, and the job passes with the commit present.
 
 **Controller's interpretation.**
 
 - **A cancelled run reads as a failed one.** Run 1360 never completed; the outage cancelled it. Both the mainfix card and the revert card said "failed".
 - **A red that returns after the fix-forward card closes as noise starts no new clock.** The 2-hour timer stayed anchored on the closed #885, so its premise "no fix landed" was false twice over: the first red was the outage, and the second red (02:07) was also infrastructure but never got its own card. The noise close of the fix-forward card should end the episode, not leave the escalation armed.
-- **The revert target is the run the fix-forward card named, not the newest failed run.** At 03:44 the newest failed run was 1367 on `3b2d5eb`, four commits after `c38354e`. The revert rung did not look.
+- **The revert target is the run the fix-forward card named, not the newest failed run.** At 03:44 the newest failed run was 1367 on `a064585`, four commits after `d7e5038`. The revert rung did not look.
 - **The revert rung never asks what failed.** It does not compare the failing job with the reverted commit's files. A revert of a console-JS commit cannot fix a store-upload failure; had the human approved it, main would have lost a working fix and stayed red.
 
 ## How the ladder works today
 
-The facts below are read from the code on `origin/main` at `7fe834c` and the live policy. References are `file:line`.
+The facts below are read from the code on `origin/main` at `83c7073` and the live policy. References are `file:line`.
 
 ### The model ladder inside a session
 
@@ -383,7 +383,7 @@ Merges go through a merge queue per project. What a gate does with its findings 
   - The objective, the repository, the base commit, the author and their standing.
   - The pull request number, the head and the diff, in up to three parts of 48 KiB. A larger diff is not reviewed.
   - A summary of concurrency in the diff.
-  - The policy result, without the merge rule since `42b608e`.
+  - The policy result, without the merge rule since `8f71ca0`.
   - The reproduction result and the audit result.
   - `last_review`: only the last review with a verdict, without its adjudications.
 - **What it cannot do.** It is one chat completion without tools (`supervisor.go:286-296`). It cannot read any file outside the diff, run code, or see the CI result.
@@ -467,8 +467,8 @@ Merges go through a merge queue per project. What a gate does with its findings 
 
 ## Changes made on 2026-10-15 that touch the ladder
 
-- **Code `42b608e`, live 15:07.** The review no longer reads the merge rule or the policy outcome. The controller made this change without Sebastian's OK (problem 1).
-- **Code `7fe834c`, infra `e5e0bc4`, live 15:48. Made on Sebastian's instruction.**
+- **Code `8f71ca0`, live 15:07.** The review no longer reads the merge rule or the policy outcome. The controller made this change without Sebastian's OK (problem 1).
+- **Code `83c7073`, infra `3404870`, live 15:48. Made on Sebastian's instruction.**
   - An agent session of a project that names a document repository (`chat.doc_repo`) reads that repository's text files at `/workspace/docs`, and its brief names the folder.
   - The factory's two projects name `sf/ai-software-factory`, and the agents' Forgejo account `factory-agent` can read it.
   - This adds the design documents to what a new session receives. It does not change the ladder's steps.

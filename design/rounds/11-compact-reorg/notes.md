@@ -205,7 +205,7 @@ x 1388, position absolute; the title text ends at 1376 against the
 
 ## The build (2026-10-19)
 
-The pick, A with the input sizer, is built as ceabfe8d on branch
+The pick, A with the input sizer, is built as 37cece0b on branch
 round-11-build in the code repository (15 files, +326/−74). What landed:
 
 - The chat's floor is 24 rem and the composer spans threads and

@@ -156,7 +156,7 @@ concluded runs, the stall watch and the red watch (chainpoll.go `record`,
   that stopped while factoryd lives.
 
 Every row's status is its commit's verdict: the push runs on that commit
-ANDed with every `requires` context on that commit, as 8b86862b built it
+ANDed with every `requires` context on that commit, as c8343b74 built it
 ("rows carry the verdict"). The carry rows of a commit are refreshed with
 that verdict, not with the run's own status, so a run that is green before
 its required status arrives does not cover anything yet. The poller reads

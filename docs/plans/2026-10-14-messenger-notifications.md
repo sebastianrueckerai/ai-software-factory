@@ -145,7 +145,7 @@ The one real advantage is answering where the notification arrives, and the link
 
 ## Evidence
 
-From the code survey of main at 9307c16:
+From the code survey of main at e31058d:
 
 - Poke classes and recipients: `internal/factoryd/pokes.go:30-31`, `:95-98`, `:112-197`. `Poke` already answers each login's new row id, 0 for a repeat (`:56`, `:287`), so the delivery rows can name their rows.
 - The `notify` list is a plain list of logins: `internal/policy/project.go:220-222`.

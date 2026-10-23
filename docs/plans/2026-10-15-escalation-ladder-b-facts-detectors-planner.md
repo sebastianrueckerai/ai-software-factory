@@ -10,7 +10,7 @@
 
 **Spec:** [escalation-ladder-redesign-2026-10-15.md](../escalation-ladder-redesign-2026-10-15.md), section 5, "Changes that need no model": the rows "Budget left, time left...", "A spend-without-push detector", "A context-size detector", "A blocking wait tool", "The planner gets a warning", "The sandbox's capabilities", "A session record says `pushed`". Facts: [escalation-ladder-facts-2026-10-15.md](../escalation-ladder-facts-2026-10-15.md). Earlier plan: [2026-10-13-agent-facts-tools.md](2026-10-13-agent-facts-tools.md) (roadmap 199). Notes: [2026-10-15-escalation-ladder-implementation.md](2026-10-15-escalation-ladder-implementation.md).
 
-Repositories: code `~/repos/ai-software-factory-code` (all tasks but 10 and 11), infra `~/repos/ai-software-factory-infra` (task 10), docs `~/repos/ai-software-factory` (task 11). Code at `85be932` on `main` when this plan was written; other sessions push to main, so `git pull --rebase` before every push.
+Repositories: code `~/repos/ai-software-factory-code` (all tasks but 10 and 11), infra `~/repos/ai-software-factory-infra` (task 10), docs `~/repos/ai-software-factory` (task 11). Code at `461f4d8` on `main` when this plan was written; other sessions push to main, so `git pull --rebase` before every push.
 
 ## What was taken from the 2026-10-13 plan, and what was left
 
@@ -27,7 +27,7 @@ Left, because the design's scope says the injected facts and the warning are the
 5. **The planner has no session counter.** `reportSession` carries no attempt, so the planner's brief states budget and time, and the session line only for coding sessions (`Attempt == 0` leaves it out).
 6. **"Session cap" has no mid-session warning.** The cap is a count of sessions, not a quantity that runs down inside one. The brief's fact line carries "session N of M, the last one" (task 2). The budget and the wall clock are what the warning watches.
 7. **`session_started` records** that the design names do not exist under that name; the record is `session_start` (`activities.go:686`). Not touched here.
-8. **Line references of the facts file at `7fe834c`, checked against `85be932`:** `plan.go:1082-1085` holds (the remaining-time fail); `workflow.go:1288-1311` holds; `runner.go:554-556` is now `560-563`; `supervise.go:134-166` is `130-166`; `opencode.go:891-903` is stale (item 3). Every other reference in this plan is to the current tree.
+8. **Line references of the facts file at `83c7073`, checked against `461f4d8`:** `plan.go:1082-1085` holds (the remaining-time fail); `workflow.go:1288-1311` holds; `runner.go:554-556` is now `560-563`; `supervise.go:134-166` is `130-166`; `opencode.go:891-903` is stale (item 3). Every other reference in this plan is to the current tree.
 
 ## What opencode v1.18.32 offers for compaction (research)
 
@@ -1838,6 +1838,6 @@ Run by the plan: `bash check`, the Postgres tests, the infra schema comparison (
 ## Self-review
 
 - **Spec coverage.** Row 1 (facts and warning): tasks 2, 3. Row 2 (spend detector): task 4. Row 3 (context): research section, task 5. Row 4 (wait tool): task 6. Row 5 (planner warning, fresh session): tasks 3 (warning), 7. Row 6 (sandbox facts): task 8. Row 7 (`pushed`): task 9. Policy and landing: tasks 1, 10, 11. No gap found.
-- **Placeholders.** None: every step carries its code or command. The repository-style fakes named in tests (`fakeWorkerEndpoint`, `supervisedTask`, `testSupervisorModel`, `fakeLiteLLM`, `podEnv`, `pushedLine`, `resultLine`, `hangLogs`, `newPlanHarness`, `schematest.DSN`) exist in the tree at `85be932`.
+- **Placeholders.** None: every step carries its code or command. The repository-style fakes named in tests (`fakeWorkerEndpoint`, `supervisedTask`, `testSupervisorModel`, `fakeLiteLLM`, `podEnv`, `pushedLine`, `resultLine`, `hangLogs`, `newPlanHarness`, `schematest.DSN`) exist in the tree at `461f4d8`.
 - **Type consistency.** `newLimitWatch(l, planner, started, span)`, `due(spent, budget, now) []warning`, `sent(kind)` agree in tasks 3 and 4. `SupervisorConfig.NoPushSpend`/`PriorPush` and `Supervisor.Spent` agree between tasks 4's tests and code. `reportSession` gains `planner bool` in task 3 and is used in task 7. `buildOpencodeConfig`'s new `contextTokens` sits between `steps` and `subagent` in every call. `readsFinding`, `Reads`, `reportEnd.reads`, `sessionOutcome.reads` agree in task 7.
 - **Review Focus coverage.** Item 1: `TestLimitWatchSkipsWhatHasNoBudgetOrSpan`, `TestSpendWithoutPushIsOffWhereItDoesNotApply` (zero budget). Item 2: `TestLimitWatchKeepsAWarningUntilItIsSent`. Item 3: `TestLimitsStopValues` pinned case, `TestOpencodeConfigWithoutAContextCapLeavesOpencodesDefault`. Item 4: `TestWaitSaysWhenThePidIsNoJob`, `TestWaitCountsAZombieAsEnded`, `TestWaitRefusesBadArguments`, the 590 s cap in `runWait`. Item 5: `TestPlanLoopSecondTimeLimitFails`, `TestPlanLoopBeforePlannerRetryFailsAtTheLimit`.

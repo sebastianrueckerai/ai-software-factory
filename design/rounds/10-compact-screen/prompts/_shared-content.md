@@ -40,7 +40,7 @@ STATUS STRIP, the screen's bottom line, cells left to right: "● working" ·
 (the direction decides its shape): spend gauges "today €0.12 of €0.50 day
 cap" and "this month €1.20 of €5.00"; the readout line the direction
 defines over "model gateway", "GitHub sf/ai-software-factory-code",
-"configuration 019edb2"; the dependencies forgejo, object storage,
+"configuration 88928af"; the dependencies forgejo, object storage,
 postgres, provider api, temporal, all up, each "under a minute ago" —
 compressed the way the direction decides, with the one tooltip the shell
 asks for visible on a window control.

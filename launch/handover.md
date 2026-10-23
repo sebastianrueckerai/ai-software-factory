@@ -31,7 +31,7 @@ Rules: work in a git worktree, commit to master, push to origin and forgejo, and
 
 ## What exists
 
-- [concept.md](concept.md): the readers, the two tiers, what we do not claim, the hero drafts, the surfaces with their state, the three routes with their state, the script method, the process, the eight decisions.
+- `concept.md` (private, ignored by git): the readers, the two tiers, what we do not claim, the hero drafts, the surfaces with their state, the three routes with their state, the script method, the process, the eight decisions.
 - [script.md](script.md): the story graph with 19 named nodes, 18 beats with entry and exit nodes, the fold pass, the 90-second spine with timings and transitions, the six 20-second clips as sub-paths, what the recording needs. The film's card is the calendar, #105, and its child the week view, #110.
 - [site/index.html](site/index.html): the landing page skeleton, one static file, every section of concept section 6, the film slot empty, the clip and diagram slots captioned with their sources. The comparison table has the five names plus Factory, and the tradeoffs block sits under it.
 - Scene 33, [demo/scenes/33-issue-to-fix.js](../demo/scenes/33-issue-to-fix.js), recorded: a developer's issue with a repro block becomes card #126 within a minute, the agent reproduces and fixes the fault, the reproduction gate passes with `base_exit` 1 and `exit` 0, the fix merges. The story gained card #126 and `state.reproduction`.
@@ -52,7 +52,7 @@ Two cards for Sebastian to file (intake is closed to agents), both optional:
 
 - The spine stands approved in shape. Two points stay open, both fine as the script has them: the criteria's kinds (B2) and the two terminals (B12) off screen, and the calendar as the film's card.
 - The spoken lines of the voice track are not written; the next session drafts them from the spine's titles.
-- The pitch, [docs/pitch.md](../docs/pitch.md), carries the self-hosting claim now; its other guarded lines ("the only way", the stale counts, Conductor) wait for phase 5. The pitch is Sebastian's text.
+- The pitch, `docs/pitch.md` (private, ignored by git), carries the self-hosting claim now; its other guarded lines ("the only way", the stale counts, Conductor) wait for phase 5. The pitch is Sebastian's text.
 - The secret scan of the three repositories' histories has not run.
 - The three factory cards of [factory-bugs.md](../demo/handover/factory-bugs.md) are not filed.
 

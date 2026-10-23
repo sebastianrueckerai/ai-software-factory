@@ -79,8 +79,8 @@ delete worktrees, report.
 
 ## The rebase (2026-10-18 ~01:45)
 
-origin/main advanced twice mid-round (the landed C23 bar 9564f0d, then
-factory rolls to f9343d3). The commit rebased onto the landed bar: the C23
+origin/main advanced twice mid-round (the landed C23 bar 5b9ac7d, then
+factory rolls to 8567205). The commit rebased onto the landed bar: the C23
 CSS and classes stand as round 08 shipped them, the commit swaps in the six
 words and points `cur` at them; the settings page gets its own project
 select (`.pagehead`) since the bar's select is the board's alone again.

@@ -127,7 +127,7 @@ check green at this point (before the rebase below); `go test -race
 ## The rebase onto the landed bar
 
 origin/main moved twice mid-round: the round-08 session's C23 bar landed
-(9564f0d) with factory rolls behind it, then more rolls (f9343d3). The
+(5b9ac7d) with factory rolls behind it, then more rolls (8567205). The
 build rebased onto the landed bar: the C23 CSS and its classes stand as
 round 08 shipped them, and the round's commit now only swaps the words —
 six destinations (New task, Costs, Resources, Settings, Policy,
@@ -140,7 +140,7 @@ status panel passes `board`, so no word marks current there.
 Verified after the rebase: build ok, `go test -race ./...` exit 0, 21
 ok; the lab's 241 shots with every page check green. Three lab checks
 fail — the split tab title and two phone 44px target checks — and fail
-byte-identically on pure origin/main (f9343d3, lab run in a clean
+byte-identically on pure origin/main (8567205, lab run in a clean
 worktree): the notifications session's in-flight expectations, landed
 ahead of their chat.js and CSS. chat.js is byte-identical between this
 branch and origin/main; recorded, not fixed, as their tab's ground.
@@ -155,8 +155,8 @@ Running total ≈ $30.75 of $100.
 ## The live gap (2026-10-18)
 
 Sebastian pasted the live console against the reference: not the same.
-Four real gaps, all build-side, closed as 191991ba in the code
-repository (on edc623ac):
+Four real gaps, all build-side, closed as 2f39c6cf in the code
+repository (on 59d317af):
 
 1. Closed rows carried no quiet ground. The build had generalised the
    standing rule's no-tint to every row; the reference sits the
@@ -186,7 +186,7 @@ and the page head keeps the console's 15-px h2 with its meta
 paragraph (the mock's 36-px title was generator flourish the grammar
 never specified).
 
-Lab catch-up in the same push (ee298260): main's C20 roll made the
+Lab catch-up in the same push (c093cb8c): main's C20 roll made the
 status panel static, and the lab's chevron click hung the shoot on
 pure main; the lab now reads the panel where it sits.
 

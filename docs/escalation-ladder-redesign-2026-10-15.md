@@ -259,7 +259,7 @@ Five cards filed at 13:19:53 in project `ai-software-factory-code`, all merged b
 
 ### Why each problem happened
 
-**Problem 1, #837: `concerns` on finished work.** The review's input held the project's merge rule, `human`, and its prompt explained that an approve does not merge under that rule. The answer format says "approve when you would merge it as it is". The model concluded that it would not merge, since a human must, and answered `concerns` with no finding. Code turned that into a finding and started a session that fixed nothing. The cause is a rule in a prompt that belongs to code. Commit `42b608e` removed the merge rule from the review's input the same afternoon.
+**Problem 1, #837: `concerns` on finished work.** The review's input held the project's merge rule, `human`, and its prompt explained that an approve does not merge under that rule. The answer format says "approve when you would merge it as it is". The model concluded that it would not merge, since a human must, and answered `concerns` with no finding. Code turned that into a finding and started a session that fixed nothing. The cause is a rule in a prompt that belongs to code. Commit `8f71ca0` removed the merge rule from the review's input the same afternoon.
 
 **Problem 2, #836: a false finding three times.** The review claimed that `TasksByPR` had no implementation and the package would not compile. The method exists on main at `internal/factoryd/store.go:672`, and the checks were green. The reviewer could not open the file. The agent could not say "it exists". The next review re-read its last review and repeated the claim, as its prompt asks. The supervisor ran three times on `no_progress`, read the session's commands, and answered `continue` with "the agent is making solid progress". It never saw the review. Three sessions and a human later, the human opened main and approved. The same claim returned at 17:36 on card #853, about `docRootOK`, which is defined on main at `internal/console/autonomy.go:227`. On #854 seven of the review's eight findings were false. Four named code as missing that sat in another part of the diff, which the reviewing call had not read, since a large diff is reviewed in up to three parts with one call each. Two contradicted the design prototype, which the review does not read. One misread the code.
 
@@ -369,8 +369,8 @@ flowchart LR
 | Moment | Trigger | Statement |
 |---|---|---|
 | In session | A detector trip or the scheduled check-in, as today | "You check on session 2 of 3 of card #836, 'A Forgejo review reaches its card'. This session works on review findings: <list>. No harness event for 5 minutes. Budget left 3.1 of 5 EUR, time left 71 of 120 minutes. Decide: continue, message, or end with a handover." |
-| Session ended without a verified push | Budget refusal, time, step cap, loop, no changes | "Session 1 of card #839 ended: the gateway refused a call, 0.15 EUR left. The branch holds commit ddf3ffa, not yet judged. Write the handover for the next session, or ask a human if only a human can decide." |
-| Gate returned findings | Review `concerns`, red checks, failed reproduction, a human's request for changes | "Head 9a02364 of card #836: the review answered concerns with 2 findings. The checks are green. The agent's report says finding 1 is disputed: 'TasksByPR exists on main'. Confirm, drop or remark each finding. Then decide: a fresh session with a handover, or a human." |
+| Session ended without a verified push | Budget refusal, time, step cap, loop, no changes | "Session 1 of card #839 ended: the gateway refused a call, 0.15 EUR left. The branch holds commit 0f1ad0d, not yet judged. Write the handover for the next session, or ask a human if only a human can decide." |
+| Gate returned findings | Review `concerns`, red checks, failed reproduction, a human's request for changes | "Head 2a18a40 of card #836: the review answered concerns with 2 findings. The checks are green. The agent's report says finding 1 is disputed: 'TasksByPR exists on main'. Confirm, drop or remark each finding. Then decide: a fresh session with a handover, or a human." |
 
 **Where it runs.** In session, it is a second conversation inside the agent's own pod, with read-only tools on the live workspace. It sees the test log, the git state and the files as they are. At the other two moments the agent's pod is gone, so the check-in runs first in the next session's pod, before the coding conversation starts. It writes the handover, and the coding conversation starts with it. If the check-in decides that a human must act, the pod stops before the agent spends anything. No new pod shape, no new credentials.
 
@@ -487,7 +487,7 @@ These twenty-one changes are bugs or gaps in code, and the check-in agent does n
 | A session record says `pushed` when the worker pushed the work in progress. The handover and the verify step read that outcome. | 3, 8 |
 | A cancelled call is settled from the provider's spend log, not booked at its full hold. | 8 |
 
-Commit `42b608e`, which took the merge rule out of the review's input, stays.
+Commit `8f71ca0`, which took the merge rule out of the review's input, stays.
 
 ### Beside the ladder: the screen of a UI card
 

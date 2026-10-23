@@ -126,7 +126,7 @@ What goes: the second pane, the tab strip, the tree rail, a lock or presence whi
 
 From round 06 ([design/rounds/06-settled-inbox/](rounds/06-settled-inbox/index.html), roadmap 292), six candidates over the console's own stylesheet, row 00 the plain styles phase 1 had landed. The director picked 02 quiet-log provisionally under the away rule; Sebastian confirmed it 2026-10-17 ("looks good").
 
-The settled row. A row the settle rule has closed keeps its who line, the name muted and the avatar's dot faint, and folds to one quiet line in mono: the reason word first ("answered by sebastian · 14:02", "seen"), then the first words of the content with an ellipsis. Tap or click expands the full row, text, reason and buttons; tap again folds it. The fold is a 44 px target on the phone. What the settled row loses at rest: the amber rule, the action buttons, the full text. The reference is [cand/c2.css](rounds/06-settled-inbox/cand/c2.css); the build landed as 2be0d7c in the code repository, with same-region evidence in [ev/](rounds/06-settled-inbox/ev/).
+The settled row. A row the settle rule has closed keeps its who line, the name muted and the avatar's dot faint, and folds to one quiet line in mono: the reason word first ("answered by sebastian · 14:02", "seen"), then the first words of the content with an ellipsis. Tap or click expands the full row, text, reason and buttons; tap again folds it. The fold is a 44 px target on the phone. What the settled row loses at rest: the amber rule, the action buttons, the full text. The reference is [cand/c2.css](rounds/06-settled-inbox/cand/c2.css); the build landed as f5203e1 in the code repository, with same-region evidence in [ev/](rounds/06-settled-inbox/ev/).
 
 The badge. The switcher's inbox badge splits into two pills behind one aria-label: the amber pill counts open asks (needs you), the bordered pill counts unseen new rows, and the tab title carries both, "1 needs you · 3 new".
 
@@ -163,7 +163,7 @@ The bar. One 44 px bar, hairline rules, quiet small-capitals words: the home lin
 
 What goes: the runner-up's fixed panel (it needs collapse logic to survive a long slug or a narrow window, and its divider rule broke in the generator's own hands), lamps before destinations, folder tabs, a second stacked bar. The reference is [cand/fix-sparse-desk-dark.png](rounds/08-top-bar/cand/fix-sparse-desk-dark.png); the reasons are in [the round's notes](rounds/08-top-bar/notes.md). Revisit panel if the destinations grow past eight or the cyan underline proves too subtle in daily use.
 
-The build landed as 9564f0d in the code repository (rebased to main, race suite green on the result). One deviation from the mock: on the phone the wordmark is gone — Board targets the same page, and at 390 px the bar needed the width; the theme toggle stays in the bar at the right end, as here. Build evidence, including the magnified before/after crops of the phone overflow the pixel pass caught: [rounds/08-top-bar/ev/](rounds/08-top-bar/ev/).
+The build landed as 5b9ac7d in the code repository (rebased to main, race suite green on the result). One deviation from the mock: on the phone the wordmark is gone — Board targets the same page, and at 390 px the bar needed the width; the theme toggle stays in the bar at the right end, as here. Build evidence, including the magnified before/after crops of the phone overflow the pixel pass caught: [rounds/08-top-bar/ev/](rounds/08-top-bar/ev/).
 
 ## C24. The secondary pages follow one readout grammar; the bar carries six words (2026-10-18, the director under delegation)
 
@@ -175,9 +175,9 @@ The grammar, one for every secondary page including the notification page C19 al
 
 What goes: card fills, hero numerals, one giant ledger table, nav rails, disclosure folds for the tables. The reference is [cand/01-readout-fix-dark.png](rounds/09-secondary/cand/01-readout-fix-dark.png); the reasons are in [the round's notes](rounds/09-secondary/notes.md). Revisit the ledger if a page ever holds more than three sections.
 
-The build landed as d00586a in the code repository, rebased twice onto the moving main so C23's landed bar stands and this round's six words ride it; the settings page carries its own project select on its heading line, since the bar's select is the board's alone. Race suite green (21 ok); the lab's 241 shots with every page check green — three lab checks fail, byte-identically on pure main, from the notifications round's in-flight expectations. Build evidence: [rounds/09-secondary/build/](rounds/09-secondary/build/).
+The build landed as 9f016b7 in the code repository, rebased twice onto the moving main so C23's landed bar stands and this round's six words ride it; the settings page carries its own project select on its heading line, since the bar's select is the board's alone. Race suite green (21 ok); the lab's 241 shots with every page check green — three lab checks fail, byte-identically on pure main, from the notifications round's in-flight expectations. Build evidence: [rounds/09-secondary/build/](rounds/09-secondary/build/).
 
-Sebastian held the live page against the reference on 2026-10-18 and called the gap; four closes followed in the code repository as 191991ba. A closed row, its state outside open, sits on the quiet raised ground with faint text, as the reference drew the released row; the standing top rule stands. A lease's end words short in the cell ("in 2 h", "2 d ago") with the full stamp and the releaser in the cell's title, as the jobs table words its ages. Money carries the €, the board face's own eur2 idiom, not the letters. A project with no rows in the window says "none open or closed in the last 7 days" after its figures instead of dangling. Kept on purpose against the mock: the bar is C23's landed bar, and the page head keeps the console's h2 scale with its meta paragraph.
+Sebastian held the live page against the reference on 2026-10-18 and called the gap; four closes followed in the code repository as 2f39c6cf. A closed row, its state outside open, sits on the quiet raised ground with faint text, as the reference drew the released row; the standing top rule stands. A lease's end words short in the cell ("in 2 h", "2 d ago") with the full stamp and the releaser in the cell's title, as the jobs table words its ages. Money carries the €, the board face's own eur2 idiom, not the letters. A project with no rows in the window says "none open or closed in the last 7 days" after its figures instead of dangling. Kept on purpose against the mock: the bar is C23's landed bar, and the page head keeps the console's h2 scale with its meta paragraph.
 
 ## C25. The status panel returns behind the strip's click (2026-10-18, Sebastian)
 
@@ -189,19 +189,19 @@ The build: the strip is the summary of a details element whose only other child 
 
 The ask tool's question renders in the conversation and the newest unanswered one carries the C14 answer row: the choices as buttons, "or in your words below", free text always open. A press sends the choice at once as the member's own chat message, which starts the model turn — the same record a typed answer makes, per the question-format concept. Any later row settles the ask; the row is gone from the settled one. Escalations keep their own shape: ask is for chat questions, escalate files a needs-you card.
 
-The build is the ask tool and its row (Forgejo 018b96c3), reviewed in round 12.
+The build is the ask tool and its row (Forgejo f408be79), reviewed in round 12.
 
 ## C27. A member's image rides the composer as a chip and lands as a thumbnail; the agent reads it by tool (2026-10-19, Sebastian)
 
 Paste and drop collect pending images as chips in the queue-chip pattern — the picture, the name img1 the member can refer to in the text, an × that removes — and nothing uploads until Send. The sent row shows each image as a 96×96 thumbnail, a link to the full image. The agent never sees the pixels in its context: analyze_image resolves the name newest-first and answers from one priced vision call. A member-sent image is spend they approved — Sebastian's ruling, verbatim: "If I send an image somewhere as the human, we can assume I OK that spend." — so the look carries no confirm gate; the chat's monthly budget stays the hard bound.
 
-The build is the attachments spine end to end (Forgejo 4ad14fcd, 40ae0cef, 738d83ee, the vision alias in the infra repo), reviewed in round 12.
+The build is the attachments spine end to end (Forgejo cb94df23, 2f80c724, cb7f8888, the vision alias in the infra repo), reviewed in round 12.
 
 ## C28. A refused filing names what to fix and feeds a turn; the correction lands as a new proposal (2026-10-19, Sebastian)
 
 When a pressed Do it is refused — the ready check wanting acceptance tests a plan card did not carry — the refusal is not a dead end. The do- row keeps the refused colour and the check's words, and the refusal feeds the model a new turn, exactly as an in-turn tool refusal does. The agent's correction arrives as a new proposal that visibly carries what the refusal asked for, waiting on its own Do it. The record reads as recovery: refusal named, remedy proposed, nothing hidden. The tool's shape teaches the rule up front: new_card takes the acceptance tests as its own parameter, so the filing that knows the rule never meets the refusal.
 
-The build is the acceptance parameter and the refused-apply turn (Forgejo 4a7536bb), reviewed in round 12.
+The build is the acceptance parameter and the refused-apply turn (Forgejo cd15824f), reviewed in round 12.
 
 ## C29. The chat keeps its column: a spanning composer with a sizer seam, and a glyph that takes the screen (2026-10-19, Sebastian)
 
@@ -213,7 +213,7 @@ What goes: B's tab that put the thread table behind the chat, the Grow button, t
 
 The wide window settles in the same round: the five secondary pages hold the 62 rem measure, the board alone spans, and a test pins the measure so it cannot drift.
 
-The build is ceabfe8d on branch round-11-build in the code repository. The race suite is green (21 ok), and the lab's 269 shots and its structural check came back green, with the glyph, the sizer and the five-tab drawer asserted in the browser. Build evidence: [rounds/11-compact-reorg/build/](rounds/11-compact-reorg/build/).
+The build is 37cece0b on branch round-11-build in the code repository. The race suite is green (21 ok), and the lab's 269 shots and its structural check came back green, with the glyph, the sizer and the five-tab drawer asserted in the browser. Build evidence: [rounds/11-compact-reorg/build/](rounds/11-compact-reorg/build/).
 
 ## C30. The metrics page: one column of instrument rows, the spark from real weeks (2026-10-19, Sebastian)
 
@@ -238,7 +238,7 @@ The lock. From the press on, the card takes no other press, on the board and in 
 
 The truth. The card keeps its new place until the factory's board shows it out of the column it left. An approval's decision shows in the answer itself. An answer waits for the workflow's next step, seconds later. A refusal or a lost request puts the card back at once, with the reason in the flash. A card the factory has not moved within a minute goes back too. The column counts stay the factory's until its board answers.
 
-The build is c35ec615 on main of the code repository. The lab's structural check presses an escalation and asserts the move, the single press, the jump back on a refusal and the hold through a board that still shows the card waiting.
+The build is b35c662f on main of the code repository. The lab's structural check presses an escalation and asserts the move, the single press, the jump back on a refusal and the hold through a board that still shows the card waiting.
 
 ## C32. The level sets on one click, and the lamp's blue follows the level (2026-10-20, Sebastian)
 
@@ -250,7 +250,7 @@ The wait. The control shows the pick at once and nothing of the write: no greyed
 
 The lamp. One blue, the accent, from all but unlit to white-hot (Sebastian, 2026-10-21: "make the gradation between the states bigger … full auto glow really bright, manual even darker; the last stage needs to be clearly distinguishable"). Manual is 15 percent of the accent over the ground and assisted 38, both without a glow. Autonomous is 70 with a small glow. Full auto is the accent mixed toward white in a three-layer halo. In the light theme the unlit manual lamp carries a grey edge, so it does not vanish into the ground, and full auto is a vivid cyan in its own halo. The menu's checked row carries the same lamp.
 
-The build is 41698315 on main of the code repository. [Before and after](rounds/02-multi-chat/ev/ev-level-montage.png): the menu at assisted, then at full auto after one click; [the lamp at the four levels in both themes, before and after the wider ramp of a74d4180](rounds/02-multi-chat/ev/ev-level-lamps.png). The lab's structural check picks full auto and asserts the menu closed, the control set at once and unlocked after the write, and the lamp's colour changed. The first build locked and greyed the control for the write's seconds, and Sebastian read that as the delay; 652c8b35 took the lock out, chained the writes, loads the policy after the merge and keeps the actor's own inbox quiet. The lab's check asserts the control is never greyed after a pick.
+The build is d414cd1f on main of the code repository. [Before and after](rounds/02-multi-chat/ev/ev-level-montage.png): the menu at assisted, then at full auto after one click; [the lamp at the four levels in both themes, before and after the wider ramp of 0fbfa903](rounds/02-multi-chat/ev/ev-level-lamps.png). The lab's structural check picks full auto and asserts the menu closed, the control set at once and unlocked after the write, and the lamp's colour changed. The first build locked and greyed the control for the write's seconds, and Sebastian read that as the delay; 6e7cd0ab took the lock out, chained the writes, loads the policy after the merge and keeps the actor's own inbox quiet. The lab's check asserts the control is never greyed after a pick.
 
 ## C33. Every row of the level menu carries its own lamp (2026-10-22, Sebastian)
 
@@ -258,7 +258,7 @@ Sebastian, on the film's autonomy menu: "It should have lights that get brighter
 
 Every row now shows its level's lamp at that level's strength, so the menu reads as a ramp from manual to full auto; the ✓ still marks the current level. This revises C32's two lowest values: manual is 28 percent of the accent over the ground and assisted 48, both still without a glow, so manual stays the subdued blue C32 asked for and still reads as lit. Autonomous and full auto keep C32's values, and the control under Send uses the same lamps.
 
-The build is 549cbaee on main of the code repository.
+The build is 02b83737 on main of the code repository.
 
 
 ## C34. Only the current level's lamp is lit (2026-10-22, Sebastian)
@@ -267,7 +267,7 @@ Sebastian, on round 5 of the film: "Showing the manual to auto setting, multiple
 
 Each row keeps its lamp, but only the current level's lamp is lit; the other rows show an unlit socket with the strong line colour as its border. This returns to C32's single lit lamp and keeps C33's values: manual at 28 percent of the accent over the ground still reads as lit, and full auto keeps its glow, so the lamp of the current level gets brighter as the level rises.
 
-The build is c9dd1fe4 on main of the code repository.
+The build is f838387e on main of the code repository.
 
 ## C35. A message sent during a turn joins it and shows when the agent read it; a thinking mark; tool calls fold (2026-10-22, Sebastian)
 
@@ -279,7 +279,7 @@ A message whose turn is in flight ends with a cyan dot and the word "thinking" i
 
 A run of two or more tool calls in a row shows its newest call. The earlier calls fold behind one line, "n earlier calls", which opens on a click. Text, a proposal or an applied line ends a run.
 
-The build is f57d0312 on main of the code repository.
+The build is 37ea3535 on main of the code repository.
 
 ## C36. A lamp shows only beside the chosen level (2026-10-22, Sebastian)
 
@@ -287,4 +287,4 @@ Sebastian, on round 6: "Before they are always visible next to every setting. No
 
 The level menu draws a lamp only beside the current level, at that level's strength from C33; the other rows keep the lamp's space, so the names stay aligned, but show nothing. The control under Send already shows only the current level's lamp.
 
-The build is 9d3e1a21 on main of the code repository.
+The build is 4d879897 on main of the code repository.

@@ -19,7 +19,7 @@ Sebastian's decision of 2026-10-13: try the factory's coding sessions on his z.a
 
 ## The switch (infra only, no code change)
 
-Landed 2026-10-13, infra commit 31c55da, pushed to GitHub (the Forgejo origin returns
+Landed 2026-10-13, infra commit fe5ddf1, pushed to GitHub (the Forgejo origin returns
 with the re-seed): steps 2, 3, 5 and 6 below. Step 1 takes the plan's one-key branch:
 `Z_AI_KEY` seeds `ZAI_CODING_KEY` until a second key exists. Step 4 needed no change:
 no egress policy selects the LiteLLM pod (Cilium default allow; only the k8s-infra

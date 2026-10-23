@@ -10,7 +10,7 @@ The inbox thread's settled rows (asks whose settling event has passed, informs t
 
 ## What is fixed
 
-- The chat shell, its tokens and its rules: [console.css](refs/console.css) copied verbatim from the code repository at 4286a6f. The candidates add rules; they change none of it.
+- The chat shell, its tokens and its rules: [console.css](refs/console.css) copied verbatim from the code repository at cec02b5. The candidates add rules; they change none of it.
 - The concept's rulings: the reason line reads word, actor, time ("answered by sebastian · 13:47") in the decider line's faint mono idiom; the badge splits "needs you" (open asks) from "new" (unseen rows that are not asks).
 - Amber is the one signal that needs a person. A settled row carries no amber; an open ask carries it in full.
 - The thread's content and order, identical in every candidate: two settled asks, one seen inform, three new informs, one open escalation, one member reply. The candidates differ in treatment only.

@@ -1,6 +1,6 @@
 # Inventory: every control and data point of the console today
 
-Read off the templates in `internal/console/templates/` on 2026-10-13 (code commit 28ecf6f), then cut down on 2026-10-14 for item 225 (the lanes collapse: no lane columns, no move buttons, no plan accept; the track is set at filing) and item 226 (the whole card opens the drawer, Files is the last tab). A design may move any item; none may be dropped. "Where it goes" is filled per theme in `themes/<slug>/DESIGN.md`.
+Read off the templates in `internal/console/templates/` on 2026-10-13 (code commit 6a89f50), then cut down on 2026-10-14 for item 225 (the lanes collapse: no lane columns, no move buttons, no plan accept; the track is set at filing) and item 226 (the whole card opens the drawer, Files is the last tab). A design may move any item; none may be dropped. "Where it goes" is filled per theme in `themes/<slug>/DESIGN.md`.
 
 ## Page shell
 

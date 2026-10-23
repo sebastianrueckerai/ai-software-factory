@@ -35,7 +35,7 @@ Monday 13 October, 14:10, the busy scenario. Sebastian has opened `docs/roadmap.
 - "263. The backlog pull and the close-out." with the link "the plan" and the line "Where it stands: planned, the plan, not built."
 - "205. The main loop keeps the roadmap and its working notes."
 
-The linked plan is `docs/plans/2026-10-15-backlog-pull-and-close-out.md`, head "Plan: the backlog pull and the close-out". Three pins: "roadmap", "build plan", "backlog plan". The document's head shows the path in mono, the switch "Read | Edit" with Read pressed, and "Open in Forgejo ↗". The edit state shows the raw Markdown in a plain text area with "Save as commit" and the line "Saved: 603d2e6 on master · 14:12", or the refusal "The file changed since you opened it (Sebastian, 14:08). Your text is kept." in the amber text colour.
+The linked plan is `docs/plans/2026-10-15-backlog-pull-and-close-out.md`, head "Plan: the backlog pull and the close-out". Three pins: "roadmap", "build plan", "backlog plan". The document's head shows the path in mono, the switch "Read | Edit" with Read pressed, and "Open in Forgejo ↗". The edit state shows the raw Markdown in a plain text area with "Save as commit" and the line "Saved: 9e6bb40 on master · 14:12", or the refusal "The file changed since you opened it (Sebastian, 14:08). Your text is kept." in the amber text colour.
 
 The board stays the busy board of round 02 (the merge of PR #612 and the #603 question in Needs you). The chat shows the open thread "Session store: Postgres" with the composer.
 

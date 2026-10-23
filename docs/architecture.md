@@ -1219,7 +1219,7 @@ factory makes software and does not own how a project runs: the project's
 CI/CD, its environments and its promotion are the project's own code in its
 own repository, developed through the same gates (Ruling 146). The
 factory's interest is identity and hardware. Built in Task 65, and the demo
-app registered live after roll 7914efb:
+app registered live after roll 44aa5cc:
 
 - **Its own Forgejo organisation** (Ruling 164). Registration creates the
   organisation `<name>` with the repository `<name>/<name>`, its packages
@@ -1499,7 +1499,7 @@ provider key shapes, PEM blocks, provider response bodies, configured
 secrets, and any run of 32 or more token characters. The gateway's audit
 records, the worker's git errors and the gate supervisor's bundle (6.6) all
 use it. The 32-character rule masked commit ids, digests and long paths as
-well, until the bug lane fixed it (backlog 32, #197, merged as daf16c8):
+well, until the bug lane fixed it (backlog 32, #197, merged as 594bbdf):
 commit ids, sha256 digests and lowercase repository paths now pass. Since
 Stage 17 one pattern there, `redact.GitHubToken`, finds GitHub tokens for
 the chat's scrub (5.7) and the audit's diff scan (7). Proven live on task t-c4e5c525334f: 31 spans under its id (10
@@ -1809,7 +1809,7 @@ files, web search and scraping with caps, `escalate_to_human`, and no
 `request_info`, since the spec's author answers on the plan card. Nor did a need for SPIRE or OPA appear: one cluster, projected
 ServiceAccount tokens, and ten policy sections that Go code reads. `review-frontier` and `supervisor` stay out of the class's
 `models`, so no agent can call them. Every factoryd model call goes through
-the gateway like an agent's (Task 71, rolled 2026-09-28 in ba2d80a).
+the gateway like an agent's (Task 71, rolled 2026-09-28 in 031d430).
 The Task 71 brief assumed the gate supervisor already did. It did not:
 factoryd called LiteLLM directly for the session supervisor, the gate
 supervisor and the model review, held and booked the cost itself, and the
@@ -1829,7 +1829,7 @@ factoryd blocked every LiteLLM key with the task's id at each session's
 reconcile, the factoryd slot's key included, and the gateway kept the dead
 key in its cache, so the second supervisor call and the review after a
 session answered 401 on every task of the Stage 9 bug lane until the fix
-rolled on 2026-09-29 at 16:02Z (c6f374a, Ruling 195). The gateway now marks
+rolled on 2026-09-29 at 16:02Z (48fdbd8, Ruling 195). The gateway now marks
 the slot in the key's metadata, the reconcile leaves that key live, and a
 key LiteLLM answers "blocked" for is dropped from the cache, minted again
 and the call retried once. A sandbox's JWT never reads those headers, so an
@@ -3265,12 +3265,12 @@ file patterns treat a new branch as changing every file. Everything stays
 attributable: model and tool calls by the task identity, git pushes by the
 task tokens.
 
-**The sandbox contract** (Task 82, code 689cba1, 2026-09-29). The agent
+**The sandbox contract** (Task 82, code 84ce01d, 2026-09-29). The agent
 never pushes and never opens a pull request: at the session's end the
 worker commits the working tree and pushes it, and factoryd opens the pull
 request. A check-in stop pushes the work in progress, and the next
 session starts from it. A session that resumes on a branch already holding
-its work and adds nothing counts as a pushed result (f870bdb); before that
+its work and adds nothing counts as a pushed result (4e94cc3); before that
 fix the workflow read it as `no_push` and ran to the cap. The Stage 9 bug
 lane showed why the work guide must say so: one session spent 24 commands
 hunting for push credentials after a human's answer said "push", another
@@ -3381,7 +3381,7 @@ Sandbox hardening:
   the script in the sandbox.
 - Per-task namespace with a ResourceQuota and LimitRange, container limits,
   and size-capped emptyDir volumes. Since 2026-09-29 the sandbox
-  container's memory limit is 4Gi and the namespace ceiling 8Gi (1cd22b8):
+  container's memory limit is 4Gi and the namespace ceiling 8Gi (94b8fbd):
   three sessions of the first bug-lane round died with their unpushed work
   while a `go test` of factoryd ran beside the harness at 800 to 1370 MiB
   working set against the old 2 GiB. The kill reason itself was not
@@ -3494,7 +3494,7 @@ Sandbox hardening:
 - The worker pod has an ingress rule since Stage 10: only factoryd, on
   8091, the message port (6.2). Every other ingress to a sandbox is denied.
 - factory-gateway has an ingress policy since 2026-09-29 (backlog 26, fixed
-  by the bug lane as #198 and merged as ddf2c09): only the sandbox pods of
+  by the bug lane as #198 and merged as a74f9d0): only the sandbox pods of
   task namespaces and factoryd reach its port 8081. Before it, any
   in-cluster pod could reach the gateway and only the tokens guarded it.
   Proven live: nine audit rows in the 35 seconds after the apply, and a
@@ -3785,7 +3785,7 @@ A command event arrives when the command ends, so a long command's running
 time counts as time without a write: a cold `go test` compile of factoryd
 in the sandbox takes over two minutes, and it tripped `no_write` on the
 Stage 11 gate's lane task, whose redirect ended the session and its build
-cache with it (backlog 77). Since the roll of ce5f610 at the Stage 11
+cache with it (backlog 77). Since the roll of 86a3dc1 at the Stage 11
 close a command's own running time no longer counts. Since Stage 12 a file
 written through the shell counts as a write too: a heredoc or a `sed -i`
 shows only as a changed checkpoint diff, which moved neither `no_write`
@@ -3793,7 +3793,7 @@ nor the repetition count before, so both tripped on agents that were
 writing (Task 111).
 
 **The gate supervisor** (Rulings 141, 154, 162, 163, built in Task 67, live
-since roll e3f7c16). The session's check-in watches the agent. The gate
+since roll 8906c78). The session's check-in watches the agent. The gate
 supervisor watches the machine gates, so no gate waits in silence. Each
 activity has a bound, from the policy's `bounds` section, else the default
 of the ruling, else the policy's `default`, else 120 seconds:
@@ -3906,12 +3906,12 @@ run in `actions/runs`, the apply time is the `kustomize-controller` entry in
 the Deployments' managed fields, and the ready time is the Deployments'
 `Progressing` condition. It stores the row in `rolls`, emits
 `factory.roll.duration`, `.apply` and `.ready`, and logs, for example, "roll
-bad81fc... live: push to apply 60 s, apply to ready 13 s". A commit that
+3c773d0... live: push to apply 60 s, apply to ready 13 s". A commit that
 changed no image records nothing, which held live when a manifest-only push
 restarted both Deployments. The rolls of factoryd and the gateway measured
-61 to 73 seconds from push to ready (e3f7c16 61 s, c70a790 63 s, 7914efb
-69 s, bad81fc 73 s). The roll of all four images with migrations 0024 and
-0025, 95345e6, took 161 seconds, 123 of them from apply to ready.
+61 to 73 seconds from push to ready (8906c78 61 s, b379c79 63 s, 44aa5cc
+69 s, 3c773d0 73 s). The roll of all four images with migrations 0024 and
+0025, 2672077, took 161 seconds, 123 of them from apply to ready.
 
 Since Task 75 the roll watcher runs from boot every 15 seconds on the
 newest commit that touched `k8s/` and writes one `rolls` row per changed
@@ -3970,7 +3970,7 @@ green checks the workflow runs the gates as Temporal activities. Each one
 records a timeline step, with its start (5.6), and comments on the pull
 request. Stage 8 adds the `auto` outcome, the reproduction at the base and
 the head, and the non-reproducible path, all built in Task 66 and
-rolled 2026-09-28 in ba2d80a (Rulings 149, 150, 167, 168, 169).
+rolled 2026-09-28 in 031d430 (Rulings 149, 150, 167, 168, 169).
 
 **Stages and findings** (Rulings 177, 190, Task 74). Since Stage 9 the
 workflow is an ordered list of stages, since Stage 11 the `stages` block of

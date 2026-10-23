@@ -8,7 +8,7 @@
 
 **Tech Stack:** Go (factoryd, gateway, agent-worker, console), Temporal Go SDK test environment, PostgreSQL-backed tests through `scripts/pg-test.sh`, OpenTofu-free infra repo with `factory/policy.yaml`.
 
-**Spec:** [escalation-ladder-redesign-2026-10-15.md](../escalation-ladder-redesign-2026-10-15.md) section 5, "Changes that need no model", the rows on budget and attempts, `concerns` without findings, dead sessions' lines, answers and the approval at the cap. Facts: [escalation-ladder-facts-2026-10-15.md](../escalation-ladder-facts-2026-10-15.md) (its line numbers are for commit 7fe834c; this plan cites the code at 85be932). Notes and sibling plans: [2026-10-15-escalation-ladder-implementation.md](2026-10-15-escalation-ladder-implementation.md).
+**Spec:** [escalation-ladder-redesign-2026-10-15.md](../escalation-ladder-redesign-2026-10-15.md) section 5, "Changes that need no model", the rows on budget and attempts, `concerns` without findings, dead sessions' lines, answers and the approval at the cap. Facts: [escalation-ladder-facts-2026-10-15.md](../escalation-ladder-facts-2026-10-15.md) (its line numbers are for commit 83c7073; this plan cites the code at 461f4d8). Notes and sibling plans: [2026-10-15-escalation-ladder-implementation.md](2026-10-15-escalation-ladder-implementation.md).
 
 ## Global Constraints
 
@@ -37,7 +37,7 @@
 5. **"Strong rung" at filing means the `Rung` field.** A project file with `model: stronger` makes `TaskConfig.Stronger` true without a rung on the card (`activities.go:1351`); the card's budget does not rise for it. One rung test, one place.
 6. **The dead session's three facts ride as lines.** The handover note of the design's later step (top of the brief) does not exist yet. Task 8 removes the command lines and appends the branch state and the agent's last message as two lines to what the next session already receives; the check-in step replaces them with the note.
 7. **Explicit replacement of an older answer is the date, the question and one sentence of the heading.** Marking replaced answers by code would need a structured answer type through the worker's environment variables; Task 7 keeps the strings, adds the date and moves the findings, a request for changes among them, above the answers.
-8. **Two line numbers moved.** `SessionFunded` is at `activities.go:430` and `AttemptFunded` at `:422` (facts: 428 and 441-545); `rungOf` at `intake.go:485` (facts: 479-493). All other citations in the facts hold at 85be932.
+8. **Two line numbers moved.** `SessionFunded` is at `activities.go:430` and `AttemptFunded` at `:422` (facts: 428 and 441-545); `rungOf` at `intake.go:485` (facts: 479-493). All other citations in the facts hold at 461f4d8.
 
 ## File Structure
 

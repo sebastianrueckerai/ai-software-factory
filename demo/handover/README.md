@@ -1,6 +1,6 @@
 # Demo scene bank: handover for the next session
 
-Update of 22 October: the fake project is now a browser game, Nebula Run, not Studio Nord's booking app (commit c03c2e8). The scene descriptions below still name the old fiction. The recorder writes element boxes per step for the film's overlays; see [launch/film/notes.md](../../launch/film/notes.md).
+Update of 22 October: the fake project is now a browser game, Nebula Run, not Studio Nord's booking app (commit bb3e8f0). The scene descriptions below still name the old fiction. The recorder writes element boxes per step for the film's overlays; see [launch/film/notes.md](../../launch/film/notes.md).
 
 Written 21 October 2026 at the end of the session that designed and built the bank. Read this first, then the files beside it:
 
@@ -23,7 +23,7 @@ The factory becomes a portfolio project and an accelerator pitch. The thing to s
 
 ### The recorded bank
 
-38 scenes in `demo/out/` of the main checkout (`/home/womb/repos/ai-software-factory/demo/out`): per scene an mp4 cut to the script's span, the raw webm, a sidecar JSON (`name, title, story, group, theme, viewport, consoleCommit, designCommit, recordedAt, durationMs, videoMs, steps[].atMs`, and where a scene names them `steps[].acts`, the end of each action, `steps[].stillMs` and `steps[].boxes`, the page boxes of named elements at the still) and one PNG per step. The recorder draws an arrow pointer with a ripple on each click; `cursor: false` in a scene hides it. All 38 were recorded again on 22 October 2026 on the console at commit 549cbaee, 15.4 minutes in all, no scene failed. Scene 22 needs the local Forgejo running; scene 38 takes its weekly slot from the recording's clock, so the weekday and hour in its chat change from one recording to the next.
+38 scenes in `demo/out/` of the main checkout (`/home/womb/repos/ai-software-factory/demo/out`): per scene an mp4 cut to the script's span, the raw webm, a sidecar JSON (`name, title, story, group, theme, viewport, consoleCommit, designCommit, recordedAt, durationMs, videoMs, steps[].atMs`, and where a scene names them `steps[].acts`, the end of each action, `steps[].stillMs` and `steps[].boxes`, the page boxes of named elements at the still) and one PNG per step. The recorder draws an arrow pointer with a ripple on each click; `cursor: false` in a scene hides it. All 38 were recorded again on 22 October 2026 on the console at commit 02b83737, 15.4 minutes in all, no scene failed. Scene 22 needs the local Forgejo running; scene 38 takes its weekly slot from the recording's clock, so the weekday and hour in its chat change from one recording to the next.
 
 Beside the bank, procedural clips rendered from HTML under `demo/video/` (`p-loop`, `p-layers`, the sandbox variants `p-sandbox-a`, `-c`, `-d`, and the cuts built by `demo/video/film.js` from the bank: the film `p-film-a` and the landing page's clips `p-clip-*`, each with a sidecar in `demo/out/`) and the generated clips of group H under `demo/generated/` (committed, with their sidecars). The results page shows all three.
 
@@ -50,7 +50,7 @@ Every scene file exports `{ title, story, group, theme, viewport, steps }` (and 
 
 ### The lab (code repository)
 
-`internal/console/lab_test.go` and `lab_scene_test.go` on `main` (last lab commit 610f13a4). The lab serves the real console over the test rig's in-memory fakes. What the demo added, all test files: a scene-chosen project, repository and login with its own project rows, config, cap and pull request files; `POST /lab/scene` with a JSON scene and a `check` that refuses bad statuses, gates, lanes, future times, dangling references, missing timeline objects and bad cost dates; a scripted chat gateway (`chatGateway` in lenient mode: `Say` and `Call` chunks, tool calls keep their index across chunks; no reply left answers 500); a one-second heartbeat; issue creation on the scene's repository (Do it and File work for real, numbered on from the scene's highest issue); live chat rows stamped with the real clock; a wake on seed so an empty board redraws; a scene-carried `policy.Costs` ledger. The twelve existing Go scenes are unchanged. The structural check `scripts/console-lab/run.sh` is green again.
+`internal/console/lab_test.go` and `lab_scene_test.go` on `main` (last lab commit d0126af7). The lab serves the real console over the test rig's in-memory fakes. What the demo added, all test files: a scene-chosen project, repository and login with its own project rows, config, cap and pull request files; `POST /lab/scene` with a JSON scene and a `check` that refuses bad statuses, gates, lanes, future times, dangling references, missing timeline objects and bad cost dates; a scripted chat gateway (`chatGateway` in lenient mode: `Say` and `Call` chunks, tool calls keep their index across chunks; no reply left answers 500); a one-second heartbeat; issue creation on the scene's repository (Do it and File work for real, numbered on from the scene's highest issue); live chat rows stamped with the real clock; a wake on seed so an empty board redraws; a scene-carried `policy.Costs` ledger. The twelve existing Go scenes are unchanged. The structural check `scripts/console-lab/run.sh` is green again.
 
 ## What was not done
 
@@ -59,7 +59,7 @@ Every scene file exports `{ title, story, group, theme, viewport, steps }` (and 
 - **No cut yet, and the landing page is a skeleton.** The script is [launch/script.md](../../launch/script.md); its spine waits for Sebastian. The page is `launch/site/index.html` with an empty film slot. No public README.
 - **No secret scan of the three repositories' history** before going public. The infra repository has 1,500 commits of cluster configuration; `terraform.tfstate` sits untracked in this repository's root and must never be committed.
 - **The three factory defects are not fixed**; see [factory-bugs.md](factory-bugs.md).
-- **Not verified by me**: the 33 videos were not watched end to end, only their step frames; the lab's screenshot check last ran green at 3545dc68 and the two later lab commits touched only the seed and a test.
+- **Not verified by me**: the 33 videos were not watched end to end, only their step frames; the lab's screenshot check last ran green at 7f19f773 and the two later lab commits touched only the seed and a test.
 
 ## Known limits of the recordings
 

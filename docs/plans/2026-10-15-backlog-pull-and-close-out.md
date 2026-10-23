@@ -4,7 +4,7 @@ Sebastian's decisions of 2026-10-15, from the backlog discussion in the controll
 
 ## What exists
 
-Verified in the code on 2026-10-15, origin/main of the code repository read at 94a25fb:
+Verified in the code on 2026-10-15, origin/main of the code repository read at 8c91bcc:
 
 - The chat's document tools: `read_doc` and `write_doc` on the document repository, with a path allow-list, a size cap, a lock per repository, a content-hash compare-and-swap, a direct commit to master with attribution trailers, and a structure check on docs/roadmap.md alone (internal/console/autonomy.go). The scratchpad, `notes_read` and `notes_write` (internal/console/notes.go).
 - The ready check: acceptance items present, size inside the bounds, the backlog cap, the work slots. It runs at every agent start and filing (internal/factoryd/ready.go, `FileRefusal` and `StartRefusal`). It does not read the backlog.
@@ -32,7 +32,7 @@ One JSON column on the task, `backlog_ref`, opaque to everything but the three p
 
 ```json
 {"kind": "doc", "repository": "sf/ai-software-factory", "path": "docs/roadmap.md",
- "commit": "30db15f", "lines": "39-41", "passage": "- **242. A commit does not ...", "covers": "whole"}
+ "commit": "3019f91", "lines": "39-41", "passage": "- **242. A commit does not ...", "covers": "whole"}
 ```
 
 `passage` is the exact text of the lines. `covers` is `whole` or `part`. The human's link is Forgejo's permanent page, `/<repository>/src/commit/<commit>/<path>#L39-L41`. The issue body opens with the quoted passage and that link, so the drawer shows what was promised without a click. A plan's children inherit the plan card's reference, and a delegated card inherits its caller's. A human may file without one.

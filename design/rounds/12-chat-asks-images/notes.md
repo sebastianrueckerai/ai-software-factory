@@ -8,7 +8,7 @@ ran; the round is the design pass and the record, not the gate.
 
 ## The candidate
 
-One candidate: the landed console (Forgejo 4fa42a0c and its five
+One candidate: the landed console (Forgejo 42e0d646 and its five
 streams), shot in the lab. The two review images:
 
 - `shots/chat-tall-1440.png` — the chat opened tall, the whole story in

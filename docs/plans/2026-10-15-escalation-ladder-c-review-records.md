@@ -8,7 +8,7 @@
 
 **Tech Stack:** Go 1.2x, Temporal SDK (`go.temporal.io/sdk` v1.44.0), Postgres-backed tests through `scripts/pg-test.sh`, LiteLLM proxy admin API, `git` CLI.
 
-**Spec:** [escalation-ladder-redesign-2026-10-15.md](../escalation-ladder-redesign-2026-10-15.md) section 5, "Changes that need no model", rows "A review finding that claims a name is absent", "One review call reads the whole diff", "A deterministic anti-cheat check", "The stale sweep reads from Temporal", "A cancelled call is settled from the provider's spend log". Facts: [escalation-ladder-facts-2026-10-15.md](../escalation-ladder-facts-2026-10-15.md). Line references below were verified against code commit `85be932` (main), not the facts document's `7fe834c`.
+**Spec:** [escalation-ladder-redesign-2026-10-15.md](../escalation-ladder-redesign-2026-10-15.md) section 5, "Changes that need no model", rows "A review finding that claims a name is absent", "One review call reads the whole diff", "A deterministic anti-cheat check", "The stale sweep reads from Temporal", "A cancelled call is settled from the provider's spend log". Facts: [escalation-ladder-facts-2026-10-15.md](../escalation-ladder-facts-2026-10-15.md). Line references below were verified against code commit `461f4d8` (main), not the facts document's `83c7073`.
 
 ## Global Constraints
 
@@ -40,7 +40,7 @@ Failure modes the spec implies and no single task's happy path covers. Each has 
 
 ## Verified facts the plan rests on
 
-| Fact | Where (commit `85be932`) |
+| Fact | Where (commit `461f4d8`) |
 |---|---|
 | The review prompt, part prompt and answer format | `internal/factoryd/gates.go:747-756` |
 | `ModelReview`, the diff in parts, one `supervisor.Chat` per part | `internal/factoryd/gates.go:965-1060` |

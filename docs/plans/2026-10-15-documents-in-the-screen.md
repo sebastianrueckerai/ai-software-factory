@@ -10,7 +10,7 @@ Sebastian's pick of 2026-10-15 from design round 05 ([the round page](../../desi
 
 ## What exists
 
-Verified on the code repository's `origin/main` at 3244774, 2026-10-15:
+Verified on the code repository's `origin/main` at 437280e, 2026-10-15:
 
 - **The write door.** `doWriteDoc` in `internal/console/autonomy.go`: the path allow-list (docs/roadmap.md, docs/plans/, docs/board/, docs/<name>.md), the size cap, the structure check on docs/roadmap.md, a lock per repository, the content-hash compare-and-swap on `base_sha256`, one commit on master through `Forgejo.CreateFiles` with the attribution trailers, under the docs writer token. `readDoc` reads through Forgejo's contents API and answers the text with its hash. The chat's `read_doc` and `write_doc` call them. The door is the one place that writes a document, and this plan keeps it so.
 - **The member's identity.** Every console action runs with the member's own Forgejo token (5.7), so a save as the member is the same door with another token.

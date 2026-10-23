@@ -15,7 +15,7 @@ Each item is one pull request from the controller's fork with the lab's before a
 
 ## Where it stands
 
-Orientation on 2026-10-14 before the first commit, the code repository's `origin/main` at fc5f612 (roadmap 233 landed after C11):
+Orientation on 2026-10-14 before the first commit, the code repository's `origin/main` at 1d7e2b9 (roadmap 233 landed after C11):
 
 - The lab, the structural check and the four columns are on main. The board's filter is the project and the view (`boardFilter`, `urlFilter`, `formFilter`, `query()`, the `filter` template), the stream reads the board under `urlFilter` and sends the columns' counts as `counters`.
 - The console tests read the column by `>Title <span` (`col` in lanes_test.go) and the cards by `data-card` (`columnItems` in screen_test.go), so the menu's control sits after the head in the markup, at the head's right on the screen.
@@ -26,13 +26,13 @@ Orientation on 2026-10-14 before the first commit, the code repository's `origin
 
 | Step | Pull request | Commit on main |
 |---|---|---|
-| Item 0a, the columns' scrolling | 763 | 418a188 (rebased on a roll and on 762, the store's Done order, that landed first) |
-| Item 0b, arrival order | 766 | 8f2b0d1 (rebased twice on rolls and the factory's 759) |
-| Item 1, the find | 764 | 9dd3f0d (gosec refused the count's `template.HTML`, rendered by a template since; rebased on 759) |
-| Item 2, the menus | 768 | 3367ec9 (rebased on the ticker's landing) |
-| C12's ticker, pull request 746 from the console round, left open | 746 | 9d49925 |
+| Item 0a, the columns' scrolling | 763 | a2e1cc5 (rebased on a roll and on 762, the store's Done order, that landed first) |
+| Item 0b, arrival order | 766 | fd83ed2 (rebased twice on rolls and the factory's 759) |
+| Item 1, the find | 764 | 819a1ac (gosec refused the count's `template.HTML`, rendered by a template since; rebased on 759) |
+| Item 2, the menus | 768 | 9a8fc44 (rebased on the ticker's landing) |
+| C12's ticker, pull request 746 from the console round, left open | 746 | 0cada6e |
 
-The round's state at the end of 2026-10-14: every item is on the code repository's main (0a 418a188, 0b 8f2b0d1, 1 9dd3f0d, 2 3367ec9, and C12's ticker 9d49925), the structural check reads `ok: every control present, the mechanics work` on each, the shots of every item and of the final main are in [design/rounds/02-board-filters/console/](../../design/rounds/02-board-filters/console/) with the round's page. The IA, the inventory and the theme carry the find and the menus. Not verified: the live board, which serves the last roll, and no roll has carried today's landings: main's push CI fails its image jobs since the factory's own merge fcb23ab (the test job passes), which the controller could not read through the API and which is outside this round.
+The round's state at the end of 2026-10-14: every item is on the code repository's main (0a a2e1cc5, 0b fd83ed2, 1 819a1ac, 2 9a8fc44, and C12's ticker 0cada6e), the structural check reads `ok: every control present, the mechanics work` on each, the shots of every item and of the final main are in [design/rounds/02-board-filters/console/](../../design/rounds/02-board-filters/console/) with the round's page. The IA, the inventory and the theme carry the find and the menus. Not verified: the live board, which serves the last roll, and no roll has carried today's landings: main's push CI fails its image jobs since the factory's own merge b9698ab (the test job passes), which the controller could not read through the API and which is outside this round.
 
 ## Rulings
 

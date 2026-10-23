@@ -6,7 +6,7 @@ Paste this as the first message of a new session. It carries everything; you nee
 
 One static page, `launch/site/index.html`, no build step, dark design, no JavaScript. It sells the factory to two readers: an engineer who might run it (what does it do, can I run it) and a CTO or hiring reader (the sandbox, the gates, the proof). Sebastian's ruling of 21 October: the page must make its points in text and images early, with no walls of text and no dense summaries. Depth goes behind a fold or a link. The film is a later concern.
 
-## What exists, as of the commit after 83e3714 on 21 October
+## What exists, as of the commit after d5ce73f on 21 October
 
 The page is built for progressive disclosure. Nine stops, each one point:
 

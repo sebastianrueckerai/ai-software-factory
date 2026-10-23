@@ -8,7 +8,7 @@
 
 **Tech Stack:** Go 1.2x, Temporal SDK (`go.temporal.io/sdk` v1.44.0), Postgres-backed tests through `scripts/pg-test.sh`, the gateway's `/v1/chat/completions` with OpenAI tool calls, `git` CLI, LiteLLM proxy admin API.
 
-**Spec:** [escalation-ladder-redesign-2026-10-15.md](../escalation-ladder-redesign-2026-10-15.md) section 5, the check-in table's gate row, "Where it runs", "Its model", "Limits in code", "The handover note", the findings loop, the drop guardrails, the remark verdict and the replay testing section. Records: [escalation-ladder-validation.md](../escalation-ladder-validation.md) section 2. Phase 1's plans A, B and C are landed on main; their structs (`Review.Dropped`, `MergeSpec.RedChecks`, `capAnswer`) are the ground this plan builds on. Line references below were verified against code commit `f92f5b6` (main).
+**Spec:** [escalation-ladder-redesign-2026-10-15.md](../escalation-ladder-redesign-2026-10-15.md) section 5, the check-in table's gate row, "Where it runs", "Its model", "Limits in code", "The handover note", the findings loop, the drop guardrails, the remark verdict and the replay testing section. Records: [escalation-ladder-validation.md](../escalation-ladder-validation.md) section 2. Phase 1's plans A, B and C are landed on main; their structs (`Review.Dropped`, `MergeSpec.RedChecks`, `capAnswer`) are the ground this plan builds on. Line references below were verified against code commit `09e6fe5` (main).
 
 ## Design decisions this plan makes (the three the task left open)
 
@@ -61,7 +61,7 @@ Failure modes the spec implies and no single task's happy path covers. Each has 
 7. The handover must be at the top of the brief, above findings and answers, and a handover longer than the cap must be cut, never dropped (Task 2, `TestHandoverCut`; Task 4, `TestBriefWait`).
 8. A healed run (restart between the drop and the re-review) must converge: the verdicts come back from the timeline, and a lost `gateFindings` degrades to today's behavior, never to a skipped human (Task 6, `TestReconcileRebuildsCheckinVerdicts`).
 
-## Verified facts (commit `f92f5b6`)
+## Verified facts (commit `09e6fe5`)
 
 | Fact | Where |
 |---|---|
@@ -206,7 +206,7 @@ What happens today. Nothing exists. This task creates the check-in's vocabulary:
 
 Create `internal/factoryd/checkin_test.go`. Hand-derive every expectation.
 
-`TestEvidenceShape`: `evidenceOK` accepts `internal/factoryd/store.go:672 at main: func (s *PGStore) TasksByPR`, `store.go:672 at f92f5b6: line text`, and `go test ./internal/factoryd/ -run TestX: ok  PASS` (a command and its output); refuses `""`, `it exists on main`, `the method is defined somewhere`, and a string with a path but neither a `:line` nor a command shape. Keep the check to structure, not truth: a file and a line at a ref, or a command and an output marker.
+`TestEvidenceShape`: `evidenceOK` accepts `internal/factoryd/store.go:672 at main: func (s *PGStore) TasksByPR`, `store.go:672 at 09e6fe5: line text`, and `go test ./internal/factoryd/ -run TestX: ok  PASS` (a command and its output); refuses `""`, `it exists on main`, `the method is defined somewhere`, and a string with a path but neither a `:line` nor a command shape. Keep the check to structure, not truth: a file and a line at a ref, or a command and an output marker.
 
 `TestVerdictGuards`: `applyVerdictGuards` over a table —
 - a dropped finding whose evidence fails `evidenceOK` becomes confirmed with evidence `drop without evidence: <the text>` and `human` stays empty;

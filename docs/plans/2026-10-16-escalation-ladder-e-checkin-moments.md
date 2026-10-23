@@ -61,7 +61,7 @@ Failure modes the spec implies and no single task's happy path covers. Each has 
 7. The in-session check-in must not be able to edit: no `run` in its declared tools, and a live pod refuses the name even if the model insists (Task 2, `TestRunnerToolsLiveRefuseRun`).
 8. Replay: a history recorded before this plan must replay unchanged — no ask where none was recorded, no step where none was written (Task 5, the live-history replay test stays green).
 
-## Verified facts (commit `aa49ec0`, main)
+## Verified facts (commit `fa02b3a`, main)
 
 | Fact | Where |
 |---|---|

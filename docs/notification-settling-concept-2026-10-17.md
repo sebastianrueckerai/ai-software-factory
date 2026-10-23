@@ -1,6 +1,6 @@
 # Notification settling: a concept
 
-Written 2026-10-17. Status: concept, nothing built. This file turns Sebastian's request of 2026-10-17 into a model and a plan: "I just want to be able to glance on these notifications and see which still need me and which I can ignore. And if possible I don't want to have an LLM on a loop checking these manually all the time. I would hope that we can have a deterministic rule for all of them, to not keep them all looking current forever." Sources: the inbox pokes of roadmap 239, [notifications.md](notifications.md), the [messenger plan](plans/2026-10-14-messenger-notifications.md), and the code of `ai-software-factory-code` at `eccff67`.
+Written 2026-10-17. Status: concept, nothing built. This file turns Sebastian's request of 2026-10-17 into a model and a plan: "I just want to be able to glance on these notifications and see which still need me and which I can ignore. And if possible I don't want to have an LLM on a loop checking these manually all the time. I would hope that we can have a deterministic rule for all of them, to not keep them all looking current forever." Sources: the inbox pokes of roadmap 239, [notifications.md](notifications.md), the [messenger plan](plans/2026-10-14-messenger-notifications.md), and the code of `ai-software-factory-code` at `960e8b8`.
 
 ## 1. The problem in one picture
 

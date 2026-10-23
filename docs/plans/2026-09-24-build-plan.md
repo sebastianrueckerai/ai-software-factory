@@ -2848,7 +2848,7 @@ Closed 2026-09-28. Exit test run verbatim on 2026-09-28 (task 57, code
 f46c350, roll 7254da0): all seven steps pass. Step 3 failed on the first run
 because the console showed every EUR amount with two decimals, so a 0.000543
 EUR spend read 0.00; fixed in the final fix wave (ruling 135, four decimals)
-and re-checked live after roll 552d477. Measured: a Go-only pull request
+and re-checked live after roll 445128c. Measured: a Go-only pull request
 finishes its six checks in about 4 minutes, a Dockerfile pull request builds
 on a throwaway cx23 that is gone seconds after the job, the CI project ends
 at zero servers, a 60-minute lease books one hour and both provider deletes
@@ -3052,14 +3052,14 @@ work guide states the sandbox contract; and from the lane itself, six
 merged fixes (backlog 26, 3, 32, 4, 49, 63). The controller's fixes during the
 run: the supervisor timeout at 6 minutes (ruling 186), the sandbox limit at
 4Gi with an 8Gi namespace ceiling after three sessions died with their
-unpushed work (1cd22b8), a resumed session whose branch already holds the
-work counts as a pushed result (f870bdb), the ModelReview bound at 360 s
-(infra 0c86925, ruling 194), and the "Key is blocked" fix landed from the
-lane's pull request (c6f374a, ruling 195). Exit test run on 2026-09-29
+unpushed work (94b8fbd), a resumed session whose branch already holds the
+work counts as a pushed result (4e94cc3), the ModelReview bound at 360 s
+(infra e71be90, ruling 194), and the "Key is blocked" fix landed from the
+lane's pull request (48fdbd8, ruling 195). Exit test run on 2026-09-29
 (task 80, 14:29Z to 16:10Z), passed with two deviations. Step 1, deviation
 (ruling 195): the "Key is blocked" fix came from agent task #203 through
 the checks in pull request #209; the task ended at its wall-clock cap on
-one gosec line, the controller added that line and pushed c6f374a, and roll
+one gosec line, the controller added that line and pushed 48fdbd8, and roll
 task #213 took it live through card 104 at 16:02Z; no key was blocked
 after that roll (#216 took three answered supervisor calls), the planted
 restarts at 16:02Z cut #214's running attempt twice and it resumed and
@@ -3069,7 +3069,7 @@ lane end to end, pull requests #200, #208, #206, #207 and #211, merged by
 `factory-merge` after the card and rolled in #213. Step 3 passed live: #214's
 review answered `concerns` at 16:18Z (the agent had committed its scratch
 test, the defect the task fixes), the findings went back to the agent, and
-the second review approved at 16:34Z; pull request #217 merged as f333477.
+the second review approved at 16:34Z; pull request #217 merged as ba4bc40.
 Step 4 passed: factoryd's restarts filed code issues #193 and #216, each
 starting an agent task, and a failed platform Job filed infra issue #5 in
 the human lane; the gateway's 5xx alert #210 was real but came out `noise`
@@ -3101,7 +3101,7 @@ inside a tier, never crossing tiers; the screening stage on the stronger
 rung; four task metrics and a revert mark; a defect that blocks the lane
 itself is landed by the controller from the lane's pull request, once.
 Sebastian's ruling 196 at the close, "settle down": a task past the settle
-window is set to LiteLLM's final figure once (code 7dc76e8, migration
+window is set to LiteLLM's final figure once (code 8d4f6f7, migration
 0034, not rolled). The close itself went wrong: at 17:57Z the controller's
 `tofu apply` for a second home-address change of the day replaced the
 three nodes, because `hcloud_server.node` takes its `user_data` from the
@@ -3349,7 +3349,7 @@ SigNoz alert text through the sanitiser, roadmap 48 in part) after the
 controller's own drafts had failed #321 and #324: closing keywords, an HTML
 comment and a zero-width space in the test fixtures, which the inbound
 sanitiser neutralised before the agent read them. Landed and rolled in
-four rolls (517e29f, f6016eb, 2a4bbb0, 5e6119e) and the infra pin 0213ad7,
+four rolls (e038a4f, 34f6137, a02fdf1, 86146de) and the infra pin 9bdb51f,
 Tasks 93 to 104. Task 93 was the design (stage11-design.md, after two
 review rounds). Task 94 made processes YAML blocks in infra's
 `factory/processes/`, with `factoryd config check` and its 61 refusal
@@ -3429,7 +3429,7 @@ project.
 Round 1 ran on 2026-09-30 and 2026-10-01. The rebuild recovered generation
 v10 into v11 to the close's last transaction, brought Forgejo back from
 its dump and OpenBao from its snapshot, and passed the step-zero gate at
-22:29Z: the gate's roll of 2060cdf live at 22:16:58Z, and its lane task,
+22:29Z: the gate's roll of 5c11832 live at 22:16:58Z, and its lane task,
 the board's 3-second refresh (Task 107, ruling 215, code #342), merged in
 one session, with its 14 ledger rows equal to LiteLLM's at 0.01137014 EUR.
 Task 106 was the design (stage12-design.md), with six open questions ruled
@@ -3472,23 +3472,23 @@ as 218 to 221. The tasks:
 - Tasks 116 and 117, `run_checks`, were not built (ruling 221): the
   sandbox runs the same `bash check` CI runs.
 
-Three rolls carried the code. Roll 1, be962f6 (Tasks 109, 113, 114, 118),
+Three rolls carried the code. Roll 1, 270d3ab (Tasks 109, 113, 114, 118),
 was live at 23:05Z (roll #346, pull request #347), after the infra commits
-that it needed first: the StorageClass `factory-cache` (d9f3fa3, 78f857e)
+that it needed first: the StorageClass `factory-cache` (3944f54, 1c2991e)
 and OpenBao's kv mount, policy and role with the seeded admin login
-(04d932d, 4084d88), applied by the bootstrap and the seed by hand. The
-template followed on infra (40c677d, 001e04a). Roll 2, of 026ded8 (Tasks
-110, 111, 112, 115, 120, 108, the controller's guide fix 4506bbb and its
-gosec fix 026ded8), was live at 00:10Z (#351, pull request #352), with the
-time values on infra in the same window (6925852, d0fb868: agent time 2 h,
+(6319e2f, 7916767), applied by the bootstrap and the seed by hand. The
+template followed on infra (aa60882, e07b0ea). Roll 2, of 440b376 (Tasks
+110, 111, 112, 115, 120, 108, the controller's guide fix 52df40c and its
+gosec fix 440b376), was live at 00:10Z (#351, pull request #352), with the
+time values on infra in the same window (1b5b270, e859764: agent time 2 h,
 check-in 45 min, steps 1500, supervisor calls 6, the planner 30 min with
-no check-in) and the config check's pin (72ac1cb). Its first roll task
+no check-in) and the config check's pin (1b893cd). Its first roll task
 #349 failed on gosec G104 in Task 115's code, which the implementer and the
-landing had checked with vet and `-race` only. Roll 3, 549e32b (Task 122),
+landing had checked with vet and `-race` only. Roll 3, bc40f3c (Task 122),
 was live at 00:36Z (#353, pull request #354), with the pin bumped
-(462d803). Ruling 226's cache path and main CI's env landed on infra as
-61c4fde without a roll. The live proofs ran on a scratch project,
-`scratch12` (infra 88b207d): the button and Merge registered it from
+(0cac77a). Ruling 226's cache path and main CI's env landed on infra as
+eaac379 without a roll. The live proofs ran on a scratch project,
+`scratch12` (infra bfb8d22): the button and Merge registered it from
 OpenBao with no password in 30 seconds, its seed's main CI went green
 through staging with the pod on the run's digest (checks 4 min 11 s,
 image 39 s, staging 39 s), and two smoke cards merged, one through a queue
@@ -3530,7 +3530,7 @@ rule in code climbs the rung; a writer's change request at a cap is the
 answer; the cache class on its own exec-capable node path, and `main` CI
 off the shared cache. At the close Forgejo's self-registration, open since
 the start (no `[service]` section in its configuration), was switched off
-(infra a668a94); every factory repository and organisation is private.
+(infra cd08282); every factory repository and organisation is private.
 Ruling 213's goal is met in round 1.
 
 Round 2 ran on 2026-10-01, ruled by Sebastian as 228 (round2-proposal.md
@@ -3730,7 +3730,7 @@ place the chat misread an instruction.
 
 Budget (Sebastian's ruling): under 50 EUR for the whole round, build and
 exit test together. At the open October had spent 13.00 EUR, so the caps
-were raised for the round (infra 14817b1): a card may spend 5 EUR (10 at
+were raised for the round (infra 8cee59d): a card may spend 5 EUR (10 at
 most), the day 40 and the policy's month 80, LiteLLM's proxy stop follows at
 88 USD, and the code project's own month cap of 50 EUR is the round's stop,
 enforced by the factory. Back to 2, 5, 20, 50 and 55 at the close. The
@@ -3813,7 +3813,7 @@ projected 40 to 60 EUR more for the remaining phases against the round's
 
 The lane started each phase on the cheap tier with the climb, as planned.
 From 00:55Z the code project started cards on the stronger tier (infra
-4e36213) after the cheap tier's failures. A phase that failed on the lane
+b83faff) after the cheap tier's failures. A phase that failed on the lane
 went to the controller: an Opus implementer in a worktree, a second Opus
 review, then a direct push to main (rulings 257 and 258). From 04:59Z the
 model provider, Dashscope, answered 429 "budget exhausted" on every tier
@@ -3822,7 +3822,7 @@ cap. The lane's cards for 4b, 5 and 6 closed at zero spend, and the
 controller built the three. Lane spend: 33.26 EUR of the round's 50. The
 controller's Opus subagents ran outside the factory's budget. The first
 rolls of 6 and 4b failed on gosec G706, a log line of phase 6, which the
-controller fixed on main (fab2249, 6350e9b).
+controller fixed on main (86a0695, be5eb7c).
 
 Exit test (2026-10-11, 07:08 to 10:22Z): passed. The uptime app was built
 through the chat alone, on project uptime from the ts-go template. The spec
@@ -3999,13 +3999,13 @@ round, with a stop to ask at 40. The handover copied Stage 15's raises (the
 day 40, the month 80, LiteLLM 88 USD). But at the open October held 52.50
 EUR (32.11 that day) and LiteLLM 52.76 USD, so the month 80 would have
 stopped the factory after 27 EUR of the round, and the day 40 after 8. The
-round set its own caps instead (infra 8d75131): a card 5 EUR by default and
+round set its own caps instead (infra 4471b3d): a card 5 EUR by default and
 15 at most, the day 85, the policy's month 110 and LiteLLM's proxy stop 118
 USD. The code project ran on the stronger tier with 3 hours of agent time,
 and its own month cap was the round's stop. That cap started at 50 EUR, as
 in Stage 15, but it counts the whole month, and the code project had spent
 37 EUR of October before the round. At 12:09Z it refused a card's call with
-2.70 EUR of project headroom, and it went to 90 (infra ba44609). The close
+2.70 EUR of project headroom, and it went to 90 (infra 5ab39f6). The close
 restores the default card of 2, the day 20, the month 50 and LiteLLM's 55,
 removes the code project's model, agent time and month lines, and keeps the
 card maximum at 15 (ruling 268: ruling 266's large card needs 10, and the
@@ -4109,7 +4109,7 @@ What landed, in order, and who built it:
   In the exit test's second run it refused a revision without a deploy card
   with its full reason, and the planner's next revision put the card back.
 - 3.6b and 3.6c, the smoke test (controller: the template's half on infra
-  main ca99101 for every project seeded after it, factoryd's half live
+  main 24b7cb5 for every project seeded after it, factoryd's half live
   with roll #449 at 14:58Z): the ts-go template's CI runs
   `deploy/smoke.sh` after staging (healthz, the app page's root element,
   and an authenticated write that the deploy-owning card fills in), and
@@ -4142,7 +4142,7 @@ What landed, in order, and who built it:
   writable. The replay drops an assistant turn that claims an action
   without a tool call, the claim matched as whole words.
 - 3.7b, the large class and the provider refusal (controller, roll #449,
-  `risk.large_lines: 1000` in infra 8c417b3): a pull request over 1000
+  `risk.large_lines: 1000` in infra fe1d75f): a pull request over 1000
   changed lines is risk class large, which needs a human and ranks above
   normal. A session whose first call the provider refuses (an upstream
   429, 402 or 5xx, or LiteLLM unreachable, read from the gateway's audit
@@ -4384,7 +4384,7 @@ Findings:
 - The console's login sessions live in factoryd's memory, so a roll logs
   the member out, as five of this round's rolls did (roadmap 164).
 - An existing project keeps the template's CI from its seeding, so the
-  smoke test reaches only projects seeded after infra ca99101 (roadmap
+  smoke test reaches only projects seeded after infra 24b7cb5 (roadmap
   165).
 - A project's month cap counts the whole month, so a round's raise must
   add what the project spent before it.
@@ -4438,19 +4438,19 @@ failed with the approve's lag, and the import's three cases. At 21:18Z the
 controller reset LiteLLM's spend counter from 86.43 to 0 USD, with
 `max_budget` 55 and the monthly reset on 1 November unchanged. For the
 round the policy's day cap went to 85 and its month cap to 120 EUR (infra
-0488b6d), since October held about 85 EUR, so that the fixes' live checks
+d2b5203), since October held about 85 EUR, so that the fixes' live checks
 could run. Ruling 271 kept the lane out of the round. The controller made
 fix D itself. A, B and C were controller builds under ruling 257: an Opus
 implementer in a worktree, a second Opus review, the review's fixes, and
 one squashed commit pushed to main.
 
-- Fix D, the template (controller, infra 79982f5 at 21:19Z): the ts-go
+- Fix D, the template (controller, infra e31dec0 at 21:19Z): the ts-go
   template's `deploy/smoke.sh` tells the deploy card, in its comment and
   its placeholder, to print every failure reason to stdout, since the
   runner's job log hides stderr. The agent-filled script of uptime2 had the
   stderr form. Projects seeded before the change keep their own script
   (roadmap 165).
-- Fix A, the reads (code d2b5c73, on main at 21:49Z): the `session`
+- Fix A, the reads (code 29ac7dd, on main at 21:49Z): the `session`
   summary's second line says why the session started, "started because:
   <reason>", from the timeline and the card's events: an answer, a grant, a
   review's findings, a change request, a merge conflict, a provider wait, a
@@ -4465,7 +4465,7 @@ one squashed commit pushed to main.
   without a revision was never pinned, and the stream cut the longer
   refusal at 300 bytes, mid-word. Refusals now reach the stream whole, up
   to 2000 bytes.
-- Fix C, registration (code a3af002, on main at 21:54Z): `STAGING_SECRETS`
+- Fix C, registration (code cb0afb4, on main at 21:54Z): `STAGING_SECRETS`
   gains every key of every Opaque Secret that Flux applied for the project
   in its staging namespace. The file's entries come first, and a duplicate
   key appears once, with the file's value. A pass each minute rewrites a
@@ -4483,7 +4483,7 @@ one squashed commit pushed to main.
   while the repository still reads empty. The purge waits 7 days instead of
   the brief's 24 hours, since a filing whose infra pull request merges
   later would lose its import.
-- Fix B, the workflow (code d287eec, on main at 22:10Z): the provider
+- Fix B, the workflow (code 5311a3e, on main at 22:10Z): the provider
   refusal rule covers plan and report sessions (change id
   `provider-wait-sessions`). A card without an issue closes in the store
   alone from both doors, with one `card_closed` event and no Forgejo call,
@@ -4574,21 +4574,21 @@ down: backups, the next WAL generation, `tofu destroy`, every Hetzner
 project at zero.
 
 Budget: 50 EUR on the factory's own code, at most 30 of it on lane cards,
-the lane stopped at 40. Caps for the round (infra 8a8f52e, policy version
+the lane stopped at 40. Caps for the round (infra 48a96a9, policy version
 478): card 2 by default and 15 at most, day 60, month 141.25 (October's
 ledger at the open, 86.25 EUR, plus 55), LiteLLM `max_budget` 60.07 USD (its
 counter, 0.07, plus 60).
 
 The round changed the policy three more times: `stronger_after` from 1 to
-3 (ruling 299, infra ab54e8b, policy version 485), the template's smoke job
-on its own runner label (infra 14bb1bb, version 486), and
+3 (ruling 299, infra 7910b97, policy version 485), the template's smoke job
+on its own runner label (infra a0be355, version 486), and
 `risk.large_lines` from 1000 to 400 for the exit test only (ruling 301,
-infra 4bb7feb). factoryd's reading threshold went from 24 to 60 in its
-manifest (ruling 298, code 085cdaf).
+infra 9bbc6eb). factoryd's reading threshold went from 24 to 60 in its
+manifest (ruling 298, code c5d20f4).
 
 Outcome (the close, at about 11:30Z on 2026-10-12).
 
-Every item is on main and live. 4.11 landed last, as eeb8912 at
+Every item is on main and live. 4.11 landed last, as 7b380ca at
 09:13:16Z, and rolled with roll #488 at 09:28:15Z. The controller built
 eleven items, and two more (4.10 and 4.11) from lane pull requests. The
 lane probe built 4.3, which landed
@@ -4622,7 +4622,7 @@ landed, and its live check:
   135,000 / 480,000 = 139,218.75 tokens, 0.02190103125 EUR held, where the
   byte bound of a first call holds 0.154644 EUR against a booking of
   0.007818. It landed at about 780 lines with the alias pin (ruling 284),
-  as 14bc7fd at 23:42:38Z. Live: the probe's per-call figures (below)
+  as 297804e at 23:42:38Z. Live: the probe's per-call figures (below)
   came from the new columns. Live check passed at 09:16Z in the exit run.
   Asked to read card #36 again, the agent called `card`, whose result
   carried one cost line per alias: `coding-cheap` 390 calls, a median of
@@ -4647,7 +4647,7 @@ landed, and its live check:
   the session's model. No build changed the context limit of 200000. The
   build found that the gateway let an agent call any alias its class
   lists, so an agent could call `coding-frontier` itself (ruling 279,
-  built in 4.1a). It landed as 02d2d23 at 23:30:38Z. Live: the probe's
+  built in 4.1a). It landed as 00852cb at 23:30:38Z. Live: the probe's
   brief named two directories. The report records no read of the map in
   a live brief.
 - 4.2, Postgres tests in CI and the sandbox (controller): `Dockerfile.runner`
@@ -4662,9 +4662,9 @@ landed, and its live check:
   without the script. Under gVisor 1932 Postgres tests passed, and `bash
   check` took 274 s cold and 64 s warm in the sandbox, within the 600 s
   allowed. The runner image grew from 1.08 to 1.39 GB, and the sandbox's
-  /tmp peaks at 793 MB of its 1 GiB. The images landed alone as a5395f8
+  /tmp peaks at 793 MB of its 1 GiB. The images landed alone as f0f57e6
   and rolled with roll #469 at 00:18:32Z (ci-runner d9cab3d9bf43,
-  opencode-worker 05f1d71fb1c0). The workflows landed as f0b30d0 at
+  opencode-worker 05f1d71fb1c0). The workflows landed as 9e2bc08 at
   00:20:25Z and rolled with roll #472. Live in the sandbox at 00:51Z: the
   probe's agent ran `scripts/pg-test.sh go test ./internal/factoryd/ -run
   TestPGStoreConsoleSessions` and worked on a Postgres store test, which
@@ -4687,7 +4687,7 @@ landed, and its live check:
   deleted, and logout deletes the row. A store error answers 503 and keeps
   the stream. The follow-up (705588d) reads the row again before a token
   refresh, so two requests with one cookie no longer refresh with one
-  token, which Forgejo invalidates on use (ruling 300). Main d068d12
+  token, which Forgejo invalidates on use (ruling 300). Main c7be6f4
   carried both into the roll. Live: the login at 07:29:42Z wrote the
   first row. Live check passed at 09:01Z. factoryd restarted at about
   09:00Z with roll #486, and at 09:03Z the controller's cookie from the
@@ -4697,7 +4697,7 @@ landed, and its live check:
   staging's ingress on 8080 admits only pods of its own project labelled
   `factory.ai/ci-role: smoke`, and `pr-untrusted` pods lost their staging
   egress. The ts-go template's smoke job runs on `<project>-smoke` (infra
-  14bb1bb), and its step waits up to 2 minutes for staging. Forgejo
+  a0be355), and its step waits up to 2 minutes for staging. Forgejo
   15.0.9's jobs API names no run, event or ref for a waiting job. So the
   spawner binds a smoke runner to its one job by handle, starts it without
   staging, reads the run's index, event and ref from the runner's task,
@@ -4715,9 +4715,9 @@ landed, and its live check:
   and the pod commands named `sh` and `forgejo-runner` bare, so a
   pull-request job could plant a binary that the next smoke pod, main's
   staging job with `DEPLOY_KEY` or the next agent pod runs. Every pod
-  command now names its binary by absolute path (c41f840 at 00:02:30Z,
+  command now names its binary by absolute path (6cd03c6 at 00:02:30Z,
   landed alone), and the reproduction gate runs without the agents' cache
-  (ruling 291, 1448faa at 00:12:11Z). The rest landed as 376de47 at
+  (ruling 291, 6234d2d at 00:12:11Z). The rest landed as 9d88977 at
   06:30:32Z, once the template's smoke job had reached every staging
   project (rulings 287 and 295). Live check passed. uptime2's main run 1470
   held its smoke job queued on `uptime2-smoke` from 06:51Z, ran it with the
@@ -4735,7 +4735,7 @@ landed, and its live check:
   the form stored and, without one, refuses with the form's link. The
   review found no stored row that holds a GitHub token shape, so the
   removed code for a token held in the chat left nothing behind. It
-  landed as 19a2ae3 at 23:28:41Z. Live check passed at 00:00:26Z: a chat
+  landed as 163fff8 at 23:28:41Z. Live check passed at 00:00:26Z: a chat
   turn on uptime2 with a dummy `ghp_` token of 38 characters streamed "I
   removed a GitHub token from your message" with the form's link
   `https://console.aisoftwarefactory.world/projects#export-uptime2`, the
@@ -4755,7 +4755,7 @@ landed, and its live check:
   detected" refusal, matched with its `(status 400)` form, ends a session
   the same way. The worker pushes the work of every failed session, and
   the next brief reads "previous session ended unfinished: ..." when the
-  failed session pushed. No workflow command changed. It landed as c77c9f1
+  failed session pushed. No workflow command changed. It landed as 5dfc94d
   at 23:38:25Z. #471's third session pushed at its end on this path.
   Live: in the whole round no session ended on three nudges, and no
   provider refused a session as repetitive. From 22:40Z on 2026-10-11 the
@@ -4773,7 +4773,7 @@ landed, and its live check:
   prompt states one fact: the member decides, and a proposal shows them
   the facts (ruling 263). A proposal for `approve_merge` without a pending
   merge request is refused, as Do it refuses. It landed with 4.5 as
-  19a2ae3. Live check passed at 09:17Z. Three chat turns "Approve the
+  163fff8. Live check passed at 09:17Z. Three chat turns "Approve the
   merge of card #36." at 09:15:36Z, 09:15:39Z and 09:15:43Z each drew an
   `approve_merge` proposal with the warning "The review has 1 open
   finding", a compiled binary (10c01da) committed at the repository's
@@ -4796,13 +4796,13 @@ landed, and its live check:
   without the GitHub call (ruling 289). The 20 minutes count from the
   repository's creation in Forgejo, and failed rows join the 7-day purge.
   factoryd's egress gained api.github.com on 443. It landed at 764 lines
-  (ruling 290) as 98da9cf at 23:58:06Z. Live check passed at 08:38Z. The
+  (ruling 290) as d164d78 at 23:58:06Z. Live check passed at 08:38Z. The
   project sqlite-import from github.com/sqlite/sqlite (577 MB) read
   "copying github.com/sqlite/sqlite since 2026-10-12 08:36 UTC" at
   08:36:45Z. While the copy ran, uptime and uptime2 reconciled at
   08:36:46Z, the template pass ran over hello-import, linkshort to
   linkshort4, notes, scratch12, uptime and uptime2 from 08:36:49Z to
-  08:36:54Z, and main CI's spawn for f7a588e went on at 08:37:40Z. The
+  08:36:54Z, and main CI's spawn for 13498f6 went on at 08:37:40Z. The
   copy ended at 08:37:52Z after 67 s, and the next pass finished the
   project by 08:38:14Z.
 - 4.9, template updates (controller under ruling 293, roll #475, factoryd
@@ -4817,11 +4817,11 @@ landed, and its live check:
   longer merges merges main in, and a person's close without a merge
   stands until the render changes (ruling 296). The pass writes only
   `.forgejo/` and `deploy/`. It landed at 869 lines (ruling 290) as
-  dddc1f1 at 01:01:18Z. Live check passed at 06:28Z: the pass opened
+  4e4a0ef at 01:01:18Z. Live check passed at 06:28Z: the pass opened
   uptime/uptime#16 (`ci.yml` with the smoke job, `deploy/smoke.sh`) and
   hello-import/hello-import#1 (`deploy/base/`,
   `deploy/staging/kustomization.yaml`, `deploy/smoke.sh`). When infra
-  14bb1bb put the smoke job on `<project>-smoke`, the pass updated each
+  a0be355 put the smoke job on `<project>-smoke`, the pass updated each
   pull request within the minute and opened uptime2/uptime2#33, which
   merged at 06:40:07Z (8740866). uptime#16 and hello-import#1 stay open
   for Sebastian, since uptime's default `smoke.sh` passes only if its
@@ -4836,9 +4836,9 @@ landed, and its live check:
   lane's PR #484 wrote with the projects token, which cannot reach infra
   (ruling 164), because the controller's brief named that token. The
   controller's build took the card's two commits and the review's eight
-  points, and landed as f7a588e at 08:29Z. Before the roll the controller
-  regenerated the copies by hand once (infra cdef94e at 06:57Z, with
-  `github_sync` and `split_card` in the confirm list). Infra 4042f85 added
+  points, and landed as 13498f6 at 08:29Z. Before the roll the controller
+  regenerated the copies by hand once (infra 92d7173 at 06:57Z, with
+  `github_sync` and `split_card` in the confirm list). Infra fbe0ebe added
   one trailing newline to `factory/schema/policy.schema.json` for the live
   check. Roll #486 (PR #487) was approved at 08:44:55Z and merged at
   08:58:59Z in the session gap that #36's first session's end left. Live
@@ -4846,12 +4846,12 @@ landed, and its live check:
   and at 09:00:21Z logged "schema copies: created pull request #38". Infra
   PR #38 "Schema copies for f51974d71455" came from factory-agent's fork,
   mergeable, its body naming the differing file and saying that an
-  approver merges it, and its diff removed exactly 4042f85's newline. It
+  approver merges it, and its diff removed exactly fbe0ebe's newline. It
   stayed open on purpose for the replace path, which passed at 09:29Z.
   After roll #488 the new factoryd opened infra #39 at 09:29:16Z, with the
   seven `chat.confirm` values of 4.11 in both schemas, and at 09:29:17Z
   closed #38 with "Closed by factoryd: #39 replaces it." The controller
-  reviewed #39 and merged it at 09:37:33Z (1bce0eb).
+  reviewed #39 and merged it at 09:37:33Z (7571239).
 - 4.11, every console page a chat tool (lane cards #478 and #483, then the
   controller under ruling 306): #483's PR #485 added the reads, the writes
   and the parity test. The review found a hole: the chat's write tools
@@ -4860,7 +4860,7 @@ landed, and its live check:
   demo/demo only releasing factory resource 11 from that project's chat.
   The parity test did not take the routes from the mux, and the costs read
   grouped by ledger kind, not by alias. The controller built the ten
-  points on the PR's commits (branch stage17/411-controller from aeab7d4).
+  points on the PR's commits (branch stage17/411-controller from a3b9448).
   The chat's factory writes now pass the factory-writer check through the
   action functions, and the promote, release and verdict routes hold the
   check alone. The console's GET routes come from one table, which the
@@ -4869,8 +4869,8 @@ landed, and its live check:
   pulse route is a named exception. A test tries each write as a
   non-writer. A scoped Opus re-review at 09:09Z found every point
   addressed and sent back three minor ones, fixed in a98bcf0. It landed as
-  eeb8912 at 09:13:16Z (4bdd152 and 831a1e7 by card #483, 1ba05bb and
-  eeb8912 by the controller). Approval 490 of #483 was denied (reject),
+  7b380ca at 09:13:16Z (879b2dc and d879a3b by card #483, f0eafaf and
+  7b380ca by the controller). Approval 490 of #483 was denied (reject),
   naming the landed commits (ruling 306). Roll #488 (PR #489) was approved
   at 09:28Z (approval 493) and merged at 09:28:15Z in a session gap,
   factoryd 9657f451205b. Live check passed at 09:38Z on the factory's own
@@ -4899,7 +4899,7 @@ landed, and its live check:
   failure escalates while the approval waits. Approve is refused while a
   split runs. The split session spends from the large card's budget
   outside its session cap. Every new command sits behind the change id
-  `split`, and 28 recorded histories replay. It landed as be86f74 at
+  `split`, and 28 recorded histories replay. It landed as 595cd71 at
   00:38:25Z. No exit card's pull request crossed `large_lines` 400, since
   #36 to #39 merged small. So at 10:11Z the controller filed uptime2#48
   "Public status page" (t-12db1ae81145, budget 2 EUR), a server-rendered
@@ -4941,7 +4941,7 @@ landed, and its live check:
   deadline. The pod gained a 512Mi memory limit, a 1Gi /tmp emptyDir,
   `shareProcessNamespace` so the pause container reaps killed git
   helpers, and egress to github.com and api.github.com. The token travels
-  in git's environment only. It landed as e9937e2 at 00:22:31Z. The
+  in git's environment only. It landed as 5c3756b at 00:22:31Z. The
   export's token has no pull-request permission: GitHub answers `GET pulls`
   with 403 "Resource not accessible by personal access token" (ruling
   278). In the exit run at 08:07Z the chat set uptime2's export to
@@ -4976,7 +4976,7 @@ landed, and its live check:
   the counters and sends a board event when a card's fingerprint or the
   pulse's spend changes (ruling 288), and a reconnect reads the board
   once. A read-only board gets the stream with no rows. It landed at 1352
-  lines after two review rounds (ruling 294) as f22684a at 00:20:02Z. Live
+  lines after two review rounds (ruling 294) as 1dedef6 at 00:20:02Z. Live
   check passed. The before and after shots of uptime2
   (`board-shots/uptime2/20261012T010300Z-before414-cdp.png` and
   `20261012T0122Z-after414-cdp.png`) and their magnified crop pair
@@ -5015,7 +5015,7 @@ was four frontier cards at about 4.7 EUR each, none landed.
   median of 97,790 prompt tokens a call and a maximum of 175,562 (one
   compaction), 99 percent cached, 0.631 EUR on the agent and 0.224 on five
   supervisor calls. It pushed PR #474 after that one session. The second
-  session (01:23Z to 02:30Z) answered review round 1, pushed d6108bd with
+  session (01:23Z to 02:30Z) answered review round 1, pushed 6bde713 with
   green checks, met review round 2's concerns, and escalated at 02:37Z on
   its session cap at 1.59 EUR. The controller's review sent six points as
   the answer, which granted one session. That third session ran on
@@ -5054,7 +5054,7 @@ was four frontier cards at about 4.7 EUR each, none landed.
   304) and pushed PR #485 at 08:35Z at 3.45 EUR: 0.71 cheap, about 2.65
   frontier and 0.10 supervisor. The review found ten points, one of them a
   security hole (4.11 above). Outcome: not merged. The controller built
-  its points and landed them as eeb8912, and approval 490 was denied
+  its points and landed them as 7b380ca, and approval 490 was denied
   naming the landed commits (ruling 306). The card ended at 4.40 EUR:
   0.71 cheap, about 2.65 frontier, 0.10 supervisor and about 0.94 for its
   review gate.
@@ -5330,7 +5330,7 @@ checks its live children at least every 10 minutes. At 06:08Z the
 controller found #471's frontier session late, since it started no watch
 on the granted session. At 06:10Z it deleted the infra branch
 stage17/stronger with `git branch -D`, which the operating rules forbid,
-with nothing lost, since its commit was on main as ab54e8b. Its brief for
+with nothing lost, since its commit was on main as 7910b97. Its brief for
 #477 named the projects token, which cannot reach infra. At 08:31Z it
 found the alert card #479's approval waiting since 06:31Z, since its watch
 listed only uptime2's approvals. The controller's operating rules now
@@ -5343,7 +5343,7 @@ heartbeat running. A reviewer's cleanup
 also killed every `go test` binary on the machine at about 00:04Z, and the
 other agents ran their tests again.
 
-The close restored the caps in infra 09d748b on both remotes: day 40,
+The close restored the caps in infra fb79231 on both remotes: day 40,
 month 120, LiteLLM `max_budget` 55 and `risk.large_lines` 1000. The card's
 2 by default and 15 at most stay, and so do `stronger_after` 3 and
 factoryd's `SUPERVISE_READING_WITHOUT_WRITING` 60. `factoryd config check`
@@ -5364,7 +5364,7 @@ WAL archived to 0000000D000000070000005E, the OpenBao snapshot
 `forgejo-dumps/forgejo-2026-10-12.zip` (1.78 GB with sqlite-import), the
 edge TLS Secrets in `tls/edge-tls-20261012-1126.yaml`, and Flux
 suspended. Infra's `cluster.yaml` now recovers from `sf-cluster-v13` and
-archives into `sf-cluster-v14` (bd79d91, after d4df4ee had set both to
+archives into `sf-cluster-v14` (995dc19, after b0383f3 had set both to
 v14 by a sed that matched twice, caught before anything applied).
 `tofu destroy -auto-approve` destroyed 12 resources. The zero check then
 found one CI build machine with its IP and firewall in the CI project,
@@ -5469,36 +5469,36 @@ hold both rounds. The roadmap's prune of 2026-10-14 checked every item
 against the code's main and removed these, built unless the line says
 otherwise. Code commits unless named infra.
 
-- 158 the costs read's date window (2757ab2). 181 the CI queue alert
+- 158 the costs read's date window (41f22e9). 181 the CI queue alert
   over a window, capacity alerts to a human, the alert pre-check
-  (4b983a2). 190 a token's rotation proved by a write (infra 253c000).
-- 192 an adjudicated finding no longer bounces (1344b2b). 193 the
-  reproduction refuses `cd` chains and worktrees at filing (e83534d).
-  194 a signal card's pinned reproduction base (8efe76b). 195 "also
-  failing on main" (911e083). 196 the roll guard tests ancestry
-  (5f0fef2), and a roll takes no queue turn (60b47d4).
-- 206 tokens and modeled cost per call and task (36fa6fd). 207 the GLM
-  Coding Plan trial: the switch landed (infra 31c55da) and ended under
-  ruling 325 when the quota ran out (infra 501fca5).
-- 208 a verification card closes on its acceptance evidence (d43509f).
-  209 a merge approval only on a green staged head (826f050). 210 the
-  console's fund action (bff4b59). 215 the attempt's budget floor
-  (d5a8b2a). 218 the split pre-check, proven live (429437d).
-- 211, 212 and 213's label (470c8a5), 216 (4a567f8), 223 (28ecf6f): the
+  (d7570d5). 190 a token's rotation proved by a write (infra 2be6d83).
+- 192 an adjudicated finding no longer bounces (1ff5cc8). 193 the
+  reproduction refuses `cd` chains and worktrees at filing (1eb57ec).
+  194 a signal card's pinned reproduction base (0d86b0d). 195 "also
+  failing on main" (a144b29). 196 the roll guard tests ancestry
+  (334f4e5), and a roll takes no queue turn (2efb5bf).
+- 206 tokens and modeled cost per call and task (c5301da). 207 the GLM
+  Coding Plan trial: the switch landed (infra fe5ddf1) and ended under
+  ruling 325 when the quota ran out (infra 34642d6).
+- 208 a verification card closes on its acceptance evidence (dd3bba7).
+  209 a merge approval only on a green staged head (277c727). 210 the
+  console's fund action (9c27211). 215 the attempt's budget floor
+  (b805e1f). 218 the split pre-check, proven live (8c402f0).
+- 211, 212 and 213's label (13b8fb1), 216 (1abaa8e), 223 (6a89f50): the
   console's chip, scrollbars and chat page. 219 Needs you holds a roll
-  only at its decision (e197dca). 221 the configuration version on the
-  board (27a6681). 220 the Close action ran live on five cards on
+  only at its decision (dab5c32). 221 the configuration version on the
+  board (36db072). 220 the Close action ran live on five cards on
   2026-10-14.
 - 222 the speed round's six items ([the plan](2026-10-14-speed.md)),
   but for review beside the checks, which stays on the roadmap. 224 a
-  factory pull request's card files without a lane (a4d38b5). 227 the
-  console design (73de708 to e9c6378). 228 the stale card's ring and
-  sweep (57a8ee7). 229 the face's title (fcb23ab). 230 one-line step
-  outputs (d953a6e). 231 the workflow guard reads the merge-base
-  (4631262). 233 a card parked on a person frees its slot (fc5f612).
-  234 Done sorts by date (000d4bb). 236 the board's find box and
-  column menus (9dd3f0d, 3367ec9).
-- 232's epoch wiring and pinned base images (15fc239, fd4d280). The
+  factory pull request's card files without a lane (7eb3c76). 227 the
+  console design (603ec46 to 2609c36). 228 the stale card's ring and
+  sweep (af050c9). 229 the face's title (b9698ab). 230 one-line step
+  outputs (1f5689b). 231 the workflow guard reads the merge-base
+  (374d4c7). 233 a card parked on a person frees its slot (1d7e2b9).
+  234 Done sorts by date (d0b8507). 236 the board's find box and
+  column menus (819a1ac, 9a8fc44).
+- 232's epoch wiring and pinned base images (890d0f1, d1f876c). The
   rest of it stays on the roadmap as 242.
 - Gone for other reasons: 63 (LiteLLM's map prices every model in use),
   73 (the speed round's CI), 128 (the red re-run proven, the lane proof
@@ -5510,84 +5510,84 @@ The ledger's progress.md holds the steps. Code commits unless named
 infra.
 
 - 244 a needs-you card shows the question and a pointer, not the
-  findings history (cc14faf). 222's review beside the checks (cb1d409),
-  active for spec cards since infra 87fe0cf. 245 the task row's gate
-  follows the activity the workflow awaits (96be2a0). 246 a beside
+  findings history (7523ff6). 222's review beside the checks (a9adae5),
+  active for spec cards since infra c7d2624. 245 the task row's gate
+  follows the activity the workflow awaits (4dd12dc). 246 a beside
   review's trips stay on it until the review stage supervises them
-  (96be2a0), each long gate run has its own activity id, and a dropped
-  trip resolves its alert as noise (1f12e20, f75a37a, 3ee05a2). None of
+  (4dd12dc), each long gate run has its own activity id, and a dropped
+  trip resolves its alert as noise (6e4137f, bfed0ee, 88577d7). None of
   these was seen live, nor were the speed round's sync-skip, red-main
   backstop and delegate child card, which tests alone prove. The audit
   half of 222 and 246's trip during the checks wait stay on the roadmap.
 - 243 the fund floor fits against the gateway's free figure, holds
-  netted, and its refusal names the holds and both actions (60bb6aa).
+  netted, and its refusal names the holds and both actions (65b8cb6).
   241 Fit prices a cached prefix only as far as the model's measured
   cache floor, and an agent session whose call crossed its hold names
-  its tokens, hold and action (1b44239). 247 a refusal's actions lead
-  its first line, so the question row keeps them (6ca817e). 248 card
+  its tokens, hold and action (85f1157). 247 a refusal's actions lead
+  its first line, so the question row keeps them (ac9cd36). 248 card
   #756's orphan hold was a call a roll cut: a roll now lets the calls in
-  flight run 270 s, then cancels them so each books its hold (c3d4502).
-  249 Fund only for a budget refusal (7ac60a2). None of these was seen
+  flight run 270 s, then cancels them so each books its hold (bc75cad).
+  249 Fund only for a budget refusal (5a6e5de). None of these was seen
   live. 243's first-call floor and 241's plan and report sessions stay
   on the roadmap.
 - 202 and 67: a queue head red at its merge is re-staged or its red
   checks run again, three turns per entry, a pass on the same tree is
   recorded as flaky, and a head still red leaves the queue on an
-  escalation (731ebc1, 3211645, a3c2fef, 9f01fb1, its toolchain half
-  earlier in c14fbda). 58 each step before the harness fails with a
+  escalation (b33fc9a, e076b80, 68d0b35, e47bc6b, its toolchain half
+  earlier in 3a70cc9). 58 each step before the harness fails with a
   named reason, and a start failure goes to a human at no agent cost
-  (b4024ae, 3e51c74, 693afcc, 4dffa60). 214 a revived task clones its
-  pull request's head when its branch is gone (e7e7133). 237 an answer
-  in parts resumes the card whole after 30 seconds of quiet (c895140,
-  a3e8b38, d5fdac4). 240 the namespace-wait line shows only where a live
+  (228c76f, e0d87fb, 390d13b, ba00811). 214 a revived task clones its
+  pull request's head when its branch is gone (3345351). 237 an answer
+  in parts resumes the card whole after 30 seconds of quiet (970999f,
+  c543884, d852f32). 240 the namespace-wait line shows only where a live
   lease is held back (f903e10). None of these was seen live. The open
   parts of 202, 58, 237 and 240 stay on the roadmap.
 - 242 main's image jobs build on a buildkitd with rewrite-timestamp, and
   the Dockerfiles set the clocks inside the content to the epoch
-  (b4bfd50, 4e7af4a, 3beea51, a0edfe4). 250 each image's epoch is the
-  newest commit that touches its inputs (7264b62). Seen live: roll merge
-  c016138 kept all three amd64 manifests of 3beea51 (run 1234). Every
+  (27f02ed, 70b37c6, 72ef9fb, a3b99f5). 250 each image's epoch is the
+  newest commit that touches its inputs (da3e245). Seen live: roll merge
+  17791df kept all three amd64 manifests of 72ef9fb (run 1234). Every
   download is checked by ADD --checksum, and no layer keeps an archive:
-  60.6 MB less in the worker image, 137.6 MB in the runner (9f01496).
-  Main's push CI runs gosec (c2f58bb). 242's apt layers stay on the
+  60.6 MB less in the worker image, 137.6 MB in the runner (8a8df13).
+  Main's push CI runs gosec (4aded19). 242's apt layers stay on the
   roadmap.
-- 251 one Go toolchain by digest for all three images (d642ac3), and 255
+- 251 one Go toolchain by digest for all three images (7029f99), and 255
   moved it to the supported go1.26.9, with go.mod keeping go 1.25.0
-  (68abd66). 238 the image build prints each build's newest log line
-  every 30 seconds and fails at 45 minutes with its log (b993525), not
+  (4badb04). 238 the image build prints each build's newest log line
+  every 30 seconds and fails at 45 minutes with its log (04b3423), not
   yet seen on a pull request with an image change.
 - 252 the runner's prune sidecar measures the volume with du every
   minute and prunes from 22 GiB, a run's measured peak of 13.3 GiB below
-  the 40Gi limit (infra b21a483), live since 2026-10-14 21:26Z. A red
+  the 40Gi limit (infra 171a424), live since 2026-10-14 21:26Z. A red
   main whose failed jobs all lost their runner files a human re-run
-  card, not an agent card (8e594e3, 985372a). 253 the sidecar removes a
+  card, not an agent card (d7b6edc, 1f00bb4). 253 the sidecar removes a
   cancelled job's buildkitd and its state volume while no job runs
-  (infra eac8782). 254 read, not built: Go's trim keeps what a command
+  (infra a20e947). 254 read, not built: Go's trim keeps what a command
   uses, so an image epoch older than five days costs one slower CI job
   and no wrong result. 252's runner killed outright, its dind restart
   and sf-2's DiskPressure stay on the roadmap.
 - 47 both workflow-directory guards fold the case, and tests prove a
-  symlink is refused (c195b20). No case variant ever ran, since Forgejo
+  symlink is refused (54ab774). No case variant ever ran, since Forgejo
   reads the exact path. 49's pre-check read: it flags none of seven SSH
-  public-key forms, and a test pins four (417c29b). 42's gateway half
+  public-key forms, and a test pins four (72eda81). 42's gateway half
   read: the gateway connects to no address an agent chooses, so it needs
   no guard today. 84 proven: each month-cap threshold fired once a month
   (alerts rows 211 to 213, 526, 544 and 545). 49's model half and 42's
   worker probe stay on the roadmap.
 - 256 nine console layout faults from a lab pass of every screen
-  (07d51cc, 8a8770e, 61b0ff2, 252f22f, 8f5ecf8, cdce174, 2c9ff0b, and
-  2740bac for the lab), the thread title, its time and the rail badge
+  (ef03d1e, 6e52bf2, d985ae0, ca8d389, 919a918, f9c187b, 40f65a8, and
+  2e17d6e for the lab), the thread title, its time and the rail badge
   seen live after roll 799.
 - Two faults found on the morning of 2026-10-15, both fixed the same
   day. Main's nightly run (a schedule) went red because the runner build
   there passed no SOURCE_DATE_EPOCH; Forgejo files a scheduled run under
   event push, so the roller read it as main's CI, filed fix card #804
-  and then the revert of the roll merge 07f0f84 (card #806, rejected).
+  and then the revert of the roll merge c74ffc4 (card #806, rejected).
   ActionRuns now drops runs another trigger started, and the runner's
-  epoch defaults to 0 (ad582c0, 2b7c908). LiteLLM's proxy stop stood at
+  epoch defaults to 0 (332a8b9, b34c515). LiteLLM's proxy stop stood at
   55 USD under a counter of 154 USD and refused every model call from
   19:15Z on 2026-10-14: it is 370 now, held at 1.25 times the month cap
-  by a config-check script (infra ef8d0aa).
+  by a config-check script (infra 41bc2f6).
 
 ### The day of 2026-10-15: the roadmap items that landed
 
@@ -5599,21 +5599,21 @@ infra.
   take no connection, a lookup of the canary's name fails at once, and
   the worker runs as uid 1000; a sandbox more open than its policy
   fails the start with each probe named, a gateway that does not answer
-  is retried (94d95ea, e4a8170). Reproduction pods probe the same way
+  is retried (5fd12ed, 9186613). Reproduction pods probe the same way
   before the repository's code runs, and a start refusal names the
-  sandbox, not a session (0f939f4, 0bd01e5). Not yet seen live.
+  sandbox, not a session (0c57404, 4e168a1). Not yet seen live.
 - 201's gate inputs (items 12 to 16): a review in parts sends the
   shared block with part 1 alone, earlier reviews shrink to the last
   round's, the audit's later parts get a short prompt, and the gate
-  supervisor reads a last result only beyond its timeline tail (cc39e21,
-  75e56bd). A review's model input fell from 142,420 to 126,825 bytes.
+  supervisor reads a last result only beyond its timeline tail (43cfeeb,
+  04e09b4). A review's model input fell from 142,420 to 126,825 bytes.
   200 and 201's chat (items 18 and 19): one sentence per tool, tools
   offered by the member's role, a card named by its issue number in
   every card tool through the store, and the turn's opening context
   restates no read; the writer's first request fell from 27,696 to
-  14,520 bytes, the approver's from 27,989 to 19,735 (9566971, 7d76b78,
-  47869cb). Found on the way: the level control reset a project's
-  custom backlog cap to 8 on every change (47869cb).
+  14,520 bytes, the approver's from 27,989 to 19,735 (cc89094, adbe11a,
+  04267e6). Found on the way: the level control reset a project's
+  custom backlog cap to 8 on every change (04267e6).
 - 201's worker brief and supervisor (items 1 to 11): each fact once,
   every carried list capped, review findings outlast unpushed sessions,
   every factoryd model call reads compact JSON with its tails as lines,
@@ -5644,39 +5644,39 @@ infra.
   attempt when refused at its first call, and the card waits until the
   day's free headroom funds a session (checked every 5 minutes) or the
   UTC day turns, then resumes on its own and resolves its alert; a
-  healed run keeps that wait (0efe35e, 2bd10ce). Plan, split and report
+  healed run keeps that wait (7ed6ccb, 160f94d). Plan, split and report
   sessions read the day, month and project caps too, and name a call
-  that crossed its cost hold, 241's open part (f804adb, 2bd10ce). 58's
+  that crossed its cost hold, 241's open part (0dc219c, 160f94d). 58's
   open part: a clone that failed on the way to Forgejo is tried again,
-  and repro mode reports a failed init as a start failure (0c324cb).
+  and repro mode reports a failed init as a start failure (5799077).
   None seen live.
 - 237: a plan acceptance in the burst window after a planner session is
-  taken there (c192e61). The quiet window stays timed from the wait's
+  taken there (73b3155). The quiet window stays timed from the wait's
   take of the first comment: a window from the comment's own time would
   split a burst delivered late, so 237 is done. 202: a red queue head
   gets three re-runs, a turn on an unmoved main counting as one, and
   leaves after six turns while main keeps moving, its escalation naming
-  both counts (825b232, 1f2b1ae, 58d51b0).
+  both counts (ff60e23, d452ff7, b3ffcf4).
 - Run 1250 went red on a data race in the gate test harness: a review
   beside the checks wrote the harness's record under a lock the policy
   mock did not take. Every mock of the gate and queue harnesses now
-  locks one mutex (d67a02e). The roller's mainfix card #811 was closed
+  locks one mutex (99e23e2). The roller's mainfix card #811 was closed
   at 0.0025 EUR.
 - 252's open part: a red main whose job lost its runner outright (no
   runner line, the failure recorded at least 5 minutes after the log's
   last line), whose dind restarted, or which left no log files the human
-  re-run card, not an agent card (9e1b9c9, ff354a9). Sandbox and CI pods
+  re-run card, not an agent card (847857b, 52bec23). Sandbox and CI pods
   request the disk their emptyDirs may fill, so the scheduler counts it:
-  one fewer CI pod fits today, 7 instead of 8 (5be66bd, 879e489). The
+  one fewer CI pod fits today, 7 instead of 8 (5bf3e66, 741a600). The
   nodes' disk split waits for the rebuild (infra 6087b76). A fetch that
   failed on the way to Forgejo is a transient start failure, retried
-  like the egress probe's (f8aaf57).
+  like the egress probe's (1c706b1).
 - 260: the eight template-update cards of 2026-10-13 failed on a bug
-  0a467cc had fixed the next day. A template update whose card failed
+  3adfc3e had fixed the next day. A template update whose card failed
   before any gate judged it is reopened and filed again, once per pull
-  request (739e848). A factory pull request card is known by its source,
+  request (c72fc7d). A factory pull request card is known by its source,
   inserted with its pull request in one row, and a restart in a waiting
-  state runs its gates, never a session (ea38025).
+  state runs its gates, never a session (2feba74).
 - 49's model half checked live on code card #816 (pin an
   ecdsa-sha2-nistp256 and an ssh-rsa public key as clean in the diff
   scanner's test): the audit ran beside the checks on both heads (100
@@ -5702,22 +5702,22 @@ infra.
   asked and that limit; a day-cap refusal at the gate goes straight into
   the day-cap wait. LiteLLM keys carry no budget of their own: the
   gateway's holds are the budget, the proxy-wide max_budget the backstop
-  (7f75d81, e32d0ab, f5ee9cd, a2a39eb, 77b0c99, e1b9ebe, a803381,
-  501f4fa; infra 53999b8). 41: audit rows name the issue's author, and
+  (928600e, ccc9092, cba91cf, 5c76e51, 9de8d0d, be4e762, bc48ecd,
+  290cac3; infra 24389ef). 41: audit rows name the issue's author, and
   every commit factoryd, the console and the worker write carries
   Factory-Role, Factory-Task, Factory-Session, Requested-by and
-  Approved-by trailers through one helper (7f75d81, d84fedc).
+  Approved-by trailers through one helper (928600e, 9d3a533).
 - 258: the replay test decodes the newest recorded input of each
   activity into today's parameters, with card #816's live history (two
   audits and reviews beside the checks) in testdata; a deliberate retype
-  is declared in one list (e2ec17a, 4dca629). Found from that history:
+  is declared in one list (dc43718, 1c7beec). Found from that history:
   #816's first session was evicted at the 1 GiB /tmp, now 4 GiB like
-  CI's (1b166cf).
+  CI's (7aeb8a7).
 - 46 live: main CI signs every image it pushes with a cosign key kept in
   OpenBao (made by scripts/cosign-keygen.sh, its private half only in a
   throwaway container and a pipe), and the roller rolls only an image
-  signed with it (1240229, 4b1ab68, 5d7bbbf; infra 742c205, 217fec8,
-  bffae5d). The first roll the new roller checked, 3bee252's at 11:15Z,
+  signed with it (d5e7648, 5e18185, d4dd050; infra 0f9f39d, 71b8bc9,
+  01c5fbb). The first roll the new roller checked, 7aca8d5's at 11:15Z,
   passed. Deploy-time admission waits for a need.
 - 242 and 203 live: Debian from a dated snapshot and PGDG at exact
   versions; every outside image, chart and file of the factory's builds
@@ -5725,36 +5725,36 @@ infra.
   copied by main CI into Forgejo's org upstream, from which builds, pull
   request builds, the ts-go template and the cluster pull; the nodes
   pull through registry mirrors of the store with a fallback; a human
-  card a week bumps the list (ec47ebf, 4e8ce00, 67a5761, 1dff74c,
-  90e5c71, 5788545, 04d2fc3, 5ba629e, b5a66fd, abed328, d1d4a3f; infra
-  13650e7 to 44c8d52, 62ff745). The store check: 54 images, 0 failed.
+  card a week bumps the list (a2094ef, ce037d3, 5331f95, 693280b,
+  5ee687e, 4a89eed, a93e397, 3ee96b0, e50ea01, 12523c5, 7c4cb2c; infra
+  d0a2f17 to aae2c2c, 7c0c9bb). The store check: 54 images, 0 failed.
   Every HelmRelease retries a failed install and upgrade, which cleared
-  SigNoz's 33-hour stall (infra bdeea76).
+  SigNoz's 33-hour stall (infra 4a80430).
 - 259 a deployed environment whose Kustomization stands not Ready files
   an alert card, and the alerts rows are the one answer to what fires:
   every namespace label routes, a sweep heals a lost resolve, noise
-  holds no promotion (836d8ea, cc6ea68, f2e8c31, 7e33e0f). SigNoz's
+  holds no promotion (b24bbd8, b1b79a2, 2878c1c, 52597d0). SigNoz's
   collector sets an alert's namespace from the sending pod and drops an
   app-sent one, which closed a path by which a project could file cards
-  on another (infra 2be6b14, 3bee252).
+  on another (infra c3bd1c4, 7aca8d5).
 - 176 a GitHub import row lives until the infra pull request that files
   it merges or closes unmerged, and a failed filing is undone whole
-  (cc85b59, b60465b, 8eb4f01, 4bd496b, 4700328). 262 an earlier chat
+  (6e72163, 68ab593, ca252f1, ebf9c89, f13c9c4). 262 an earlier chat
   turn's read replays without its result and its words with their time,
-  so no old read stands as the present; seen live at 11:21Z (31e718c,
-  34caf74, 0ac9768). 261 a factory pull request's forbidden paths and
+  so no old read stands as the present; seen live at 11:21Z (07a6c72,
+  96adf3c, 10a8b67). 261 a factory pull request's forbidden paths and
   findings go to a human's approval, and the refused template-update
-  cards were filed again (3797576, 1eb4eca): nine at 11:26Z.
+  cards were filed again (f1d64dc, e07c1f6): nine at 11:26Z.
 - 266 live: the ClickHouse disk alert read the node's EPHEMERAL, not
   ClickHouse's volume; now one fill rule per filesystem of a node (Node
   disk, Local-path volume), and ClickHouse's system log tables keep one
   to three days with the memory profiler and zookeeper_log off (infra
-  9c44adc, 74507d9, 2f8fe0b, 71396ba). Their 7.95 GiB of 37 hours fell to
+  28c6f9c, 4733c15, b568e63, 51a051f). Their 7.95 GiB of 37 hours fell to
   275 MiB. ClickHouse's admin password, the SigNoz chart's public
   default until then, is generated by the seed and rotated live (infra
-  aa4fdeb); its network exposure is roadmap 274. The kubelet's image GC
+  06aeb99); its network exposure is roadmap 274. The kubelet's image GC
   runs at 75 % on all nodes, applied live (sf-1's EPHEMERAL 81 % to 51 %).
-- 265 rollout windows (code 8641d80, b0bfbb1). An alert that fires while
+- 265 rollout windows (code 5b754a7, 76bec70). An alert that fires while
   Flux applies a platform change waits for the window to close and files
   only if it still fires. A window ends at the latest 30 minutes after
   Flux applied the change, and a rollout not settled by then raises its
@@ -5763,20 +5763,20 @@ infra.
   HelmReleases for it (k8s/factoryd.yaml). Card #831 had spent its whole
   2.00 EUR on such a burst.
 - A factory pull request card is filed with the policy's task budget
-  (ab5a482). The template update and GitHub sync cards had none, so the
+  (2fd2171). The template update and GitHub sync cards had none, so the
   gateway refused their review and audit at 0 EUR.
 - 263 every writer of a chat thread queues behind a running turn
-  (6b0dcea): an escalation answer's rows and factoryd's pokes wait queued
+  (25c8a42): an escalation answer's rows and factoryd's pokes wait queued
   and land after the turn, so a retried turn no longer reads them as its
   own. Migration 20261015170000_chat_queued adds the queued column.
-- A failed card's poke names the reason its issue comment gives (64fdbcf).
+- A failed card's poke names the reason its issue comment gives (3654101).
   The poke "#36 failed: ." had read the card's empty title.
 - The chat's board read lists open cards apart from finished ones
-  (744e91d), so a count of open cards leaves out Done and Failed.
+  (bb72add), so a count of open cards leaves out Done and Failed.
 - 264 a factory pull request card's approval offers what fits its head
-  (ddd17df): on red checks Re-run the checks or Close, on green Approve
+  (04dac90): on red checks Re-run the checks or Close, on green Approve
   or Close. A change request closes the card with the human's words.
-- The board's finished columns page as the viewer scrolls (69ddc64), so
+- The board's finished columns page as the viewer scrolls (897f449), so
   the 300-task bound and its problem line are gone. Each finished column
   shows its newest 50 and loads the next 50 when its end scrolls into
   view or Load more is pressed. The pages follow the card's arrival (its
@@ -5786,7 +5786,7 @@ infra.
 - The toy projects are gone (Sebastian: "I only need the project of the
   factory building itself"). demo-app, hello-import, linkshort to
   linkshort4, notes, scratch12, scratch-seed, sqlite-import, uptime and
-  uptime2 left factory/projects (infra cc806fb, with demo-app's edge
+  uptime2 left factory/projects (infra 0333d6f, with demo-app's edge
   listeners and certificates). Their Kustomizations, GitRepositories and
   namespaces are deleted. In Forgejo, 90 container image versions, 31
   repositories (each project's own and its forks), the archived
@@ -5816,19 +5816,19 @@ infra.
   additional data). Two of the cards needed the controller: #839 ran out
   of its 2 EUR and was funded to 5, and #838 reached approval on red
   checks. Reviews twice claimed a function on main was missing.
-- The review reads no merge rule (code 42b608e), a change the controller
+- The review reads no merge rule (code 8f71ca0), a change the controller
   made on 2026-10-15 without Sebastian's OK: told the human merge
   rule, the review answered concerns on changes it called sound and
   complete, which sent finished cards back to their agents.
 - Agent sessions of a project that names a document repository
-  (chat.doc_repo) read its text files at /workspace/docs (code 7fe834c,
-  infra e5e0bc4, live on 1532d3b70f51): the session's read token covers
+  (chat.doc_repo) read its text files at /workspace/docs (code 83c7073,
+  infra 3404870, live on 1532d3b70f51): the session's read token covers
   the repository, the clone container makes a shallow, partial, sparse
   clone of the text files, and the brief names the folder. The factory's
   two projects name sf/ai-software-factory, and factory-agent reads it.
   Live: card #851's planning session held the design round's prototype
   there, 15 MB against the repository's 370 MB.
 - go.mod names toolchain go1.26.9, the images' Go, so a local test runs
-  the Go CI runs (a27f1c8). Under go 1.25.0 alone the race suite crashed
+  the Go CI runs (6365f54). Under go 1.25.0 alone the race suite crashed
   in factoryd with "fatal error: fault", the night's unexplained
   failure at 13.5 seconds.

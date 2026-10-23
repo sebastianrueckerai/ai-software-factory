@@ -37,4 +37,4 @@ Accepted because model APIs are a commodity, like the provider that runs your se
 
 The DNS allowlist names four public hosts, the price of a usable toolchain. A `go get` of an invented module path carries that path to proxy.golang.org, so an agent can leak a few hundred bytes per request (the code repository's README, ruling 99). The npm registry and the Go module storage carry the same class of channel, bounded the same way. Wider egress was rejected for this reason: it would widen the bound (roadmap item 281).
 
-Read with this: [architecture.md](architecture.md) sections 6.3 and 6.4, [evidence.md](evidence.md) and [the launch concept](../launch/concept.md) section 4.
+Read with this: [architecture.md](architecture.md) sections 6.3 and 6.4 and [evidence.md](evidence.md).

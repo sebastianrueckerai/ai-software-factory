@@ -116,7 +116,7 @@ pick.
   fix loop must pin the exact spellings. 06 leans maximal (lamp squares
   also on strip cells, a DEPENDENCIES block of rows) — its own brief, not
   a violation. Lab-built candidate sheet controls.html (real
-  console.css @eb59bac3): four window-control candidates A–D in both
+  console.css @86340274): four window-control candidates A–D in both
   states, hover-grip divider, dependency lamp chips with a painted
   tooltip, auto-grown composer; shot at 1440/390 both themes. A 4.5-model
   pre-read of the sheet raised four defects; all four overruled at 3x
@@ -124,7 +124,7 @@ pick.
   reads as a vertical pill — acceptable, composer intact).
 - 2026-10-19: contact sheets montage (contact-dark.jpg, contact-light.jpg);
   Gemini and GLM breadth critics dispatched on both sheets.
-- 2026-10-19: **lab before-run is RED** at code HEAD eb59bac3 (261 shots,
+- 2026-10-19: **lab before-run is RED** at code HEAD 86340274 (261 shots,
   11 findings, none mine — no code touched): tab title not split; busy
   missing "Two cards need your decision"; busy horizontal scroll at 1440
   (1508); drawer missing "Chat" tab; drawer and docs panels over the chat

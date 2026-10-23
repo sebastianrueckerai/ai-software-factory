@@ -10,7 +10,7 @@ Written on 2026-10-14 for a fresh controller session in this repository, from Se
 
 ## Rules of the round
 
-- Work in worktrees of `~/repos/ai-software-factory-code` (Forgejo `origin`, branch `main`), never in the main checkout. Controller-direct merges have precedent (item 222a, commit 28ecf6f); a card through the factory is the normal way.
+- Work in worktrees of `~/repos/ai-software-factory-code` (Forgejo `origin`, branch `main`), never in the main checkout. Controller-direct merges have precedent (item 222a, commit 6a89f50); a card through the factory is the normal way.
 - Every roll of your own change you approve yourself in the console as `controller` (ruling 109; the controller approved roll PR 647 on 2026-10-14).
 - Write the plan as `docs/plans/2026-10-14-speed.md` before the first code change, with the baseline below in it. Record every decision in the roadmap. Reports and commit messages follow the writing guide in `~/.claude/skills/ste-writing`.
 - No half measures: every item lands with its verification, or the report says at the top what did not.

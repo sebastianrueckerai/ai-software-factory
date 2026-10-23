@@ -15,7 +15,7 @@ paths.forEach(function (p) {
   check(D.files[p].md && D.files[p].md.length > 0, p + " has md");
   check(/^[0-9a-f]{7}$/.test(D.files[p].sha), p + " sha is 7 hex");
 });
-eq(D.files["docs/roadmap.md"].sha, "603d2e6", "roadmap sha");
+eq(D.files["docs/roadmap.md"].sha, "9e6bb40", "roadmap sha");
 
 var missing = 0;
 var html = {};
