@@ -3224,7 +3224,12 @@ container does while the agent lives. The session's clone runs in an init
 container that holds the one read token (read:repository on the upstream
 repository and the bot's fork), mounts the workspace only, and exits; the
 worker container's environment carries no Forgejo token at all, and
-`task-git` holds the read token alone. The worker records main's head at
+`task-git` holds the read token alone. The init container also supplies
+every ref the session's work needs before the agent runs, because the
+agent cannot fetch anything mid-session: the resume branch of the task's
+own pull request, and, when a card carries another pull request's commits
+(its issue's `Carries: #<n>` line, the chat's `new_card` `carry_pr`), that
+pull request's head as branch `pull/<n>`. The worker records main's head at
 clone time, so the final push needs no fetch: it takes main's commit from
 the agent's own objects. When the harness finishes, the worker kills and
 reaps every other process in the pod and then — and only then — asks for
