@@ -7,6 +7,3 @@ __pycache__/
 demo/out/
 demo/video/*/clips/
 demo/video/*/data.js
-# the film and the clips change with every cut; they enter git once Sebastian approves a cut
-launch/site/assets/film.mp4
-launch/site/assets/clips/
