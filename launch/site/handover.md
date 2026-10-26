@@ -64,6 +64,10 @@ From revision section 6 and section 11:
 - A section says its point once and stops. Depth goes behind a `<details>` fold or a link, never into a denser paragraph.
 - No working notes in the copy. A reminder such as "only when they are real" belongs in this handover, never on the page.
 
+## Where the page is served
+
+GitHub Pages serves `launch/site` at `https://aisoftwarefactory.world`. The workflow `.github/workflows/pages.yml` uploads the folder, minus `handover.md` and `evidence.js`, on every push to `master` that touches the folder or the workflow, and on manual dispatch. The custom domain sits in the repository's Pages settings, not in a `CNAME` file. Its DNS is at Namecheap: four A records on the apex to GitHub's Pages addresses, and `www` a CNAME to `sebastianrueckerai.github.io`. The subdomains `git`, `console` and `signoz` stay dynamic DNS records to the cluster's node-0 and belong to the infra repository's reseed runbook. GitHub issues the certificate. The privacy notice in `legal.html` names GitHub Pages as the host, so a move changes the notice.
+
 ## How to work in this repo
 
 - Terminal output of repo files is mangled by a renderer. Copy a file to `/tmp` and read it there, or view exact lines with `awk 'NR>=X && NR<=Y {printf "L%d|%.250s\n", NR, $0}'`. IDE spelling diagnostics are noise.
