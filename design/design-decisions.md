@@ -288,3 +288,7 @@ Sebastian, on round 6: "Before they are always visible next to every setting. No
 The level menu draws a lamp only beside the current level, at that level's strength from C33; the other rows keep the lamp's space, so the names stay aligned, but show nothing. The control under Send already shows only the current level's lamp.
 
 The build is 4d879897 on main of the code repository.
+
+## C37. The landing page's hero: the roadmap line, the film first, a byline, three points, alternating sections (2026-10-26, Sebastian)
+
+The first decision on the landing page, from round 14 (`design/rounds/14-landing-hero/`). The line is "Write the roadmap. Agents build it on your servers." and the sandbox line opens the sentence under it. A filled "Watch the film · 3 min" stands first in the button row and a play ring sits on the console frame, which is the film's poster. A byline, "Designed and built by Sebastian Rücker · Portfolio · GitHub", sits under the buttons and again in the footer. The three bracketed callouts over the frame are gone. Three points under the frame carry the chat and the board, the sandbox and the servers. Every section has 96 px above and 72 px below and every second section sits on the panel colour. Sebastian picked it on 2026-10-26 with the portfolio link kept.

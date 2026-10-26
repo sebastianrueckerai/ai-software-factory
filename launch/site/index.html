@@ -27,26 +27,25 @@
 
 <section id="hero" aria-labelledby="hero-h">
 <p class="eyebrow">AI software factory · Self-hosted · Source available</p>
-<h1 id="hero-h">The worst an agent can do is wreck its own sandbox.</h1>
-<p class="lede">Write a roadmap. Agents build it card by card, each in its own sandbox on your servers. Nothing merges until the checks pass.</p>
-<p class="cap">Use hosted models or your own.</p>
+<h1 id="hero-h">Write the roadmap. Agents build it on your servers.</h1>
+<p class="lede">The worst an agent can do is wreck its own sandbox. Nothing merges until the checks pass. You run it all from one chat and one board.</p>
 <div class="links">
-<a class="btn primary" href="#loop">How it works</a>
+<button type="button" class="btn film" id="film-button" aria-label="Play the film, three minutes, captions, no sound"><span aria-hidden="true">▶</span> Watch the film · 3 min</button>
+<a class="btn" href="#loop">How it works</a>
 <a class="btn" href="https://github.com/sebastianrueckerai/ai-software-factory">Source and setup</a>
 </div>
+<p class="cap hero-by">Designed and built by Sebastian Rücker · <a href="https://sebastianruecker.com">Portfolio</a> · <a href="https://github.com/sebastianrueckerai">GitHub</a></p>
 <figure>
 <div class="hero-stage">
-<svg class="hero-annot" viewBox="0 0 1600 1032" role="img" aria-labelledby="hero-shot-t hero-shot-d"><title id="hero-shot-t">The console on a busy afternoon</title><desc id="hero-shot-d">The chat on the left, the board on the right. Callouts: change anything from one chat, where the agent proposes and you press Do it. See what is stuck and what waits on you, in the amber Needs you column with a question, a budget stop and a merge approval. Decide what runs next, in the Queued column with priorities and a backlog. Five cards build in In progress, seven are done.</desc><g class="call cyan"><text class="ct" x="16" y="44">Change anything from one chat</text><text class="cs" x="16" y="78">The agent proposes. You press Do it.</text><path class="br" d="M12 122 V108 H635 V122"/></g><g class="call amber"><text class="ct" x="649" y="44">See what is stuck</text><text class="cs" x="649" y="78">and what waits on you</text><path class="br" d="M645 122 V108 H950 V122"/></g><g class="call cyan"><text class="ct" x="960" y="44">Decide what runs next</text><text class="cs" x="960" y="78">Priorities and a backlog</text><path class="br" d="M956 122 V108 H1159 V122"/></g><rect class="hit" x="108" y="782" width="67" height="38" rx="3"/></svg>
 <video id="film" class="film" controls playsinline preload="none" poster="assets/34-busy-board-3.png" width="1600" height="900" aria-label="The film, recorded on the real console. It opens on a busy afternoon: the chat with the agent's proposal to steer a card on the left, the board on the right with every column full."><source src="assets/film.mp4" type="video/mp4"></video>
-<button type="button" class="play" id="play-film" aria-label="Play the film, three minutes, captions, no sound"><span aria-hidden="true">▶</span> Watch the film · 3 min</button>
+<button type="button" class="bigplay" id="play-film" aria-label="Play the film, three minutes, captions, no sound"><span class="ring" aria-hidden="true">▶</span><span class="lbl">Watch the film · 3 min</span></button>
 </div>
-<ol class="hero-list" aria-hidden="true">
-<li><b>Change anything from one chat.</b> The agent proposes. You press Do it.</li>
-<li><b>See what is stuck</b> and what waits on you, in the amber column.</li>
-<li><b>Decide what runs next:</b> priorities and a backlog.</li>
-</ol>
-<figcaption class="cap">Recorded on the real console. The project is a demo game, seeded for the film.</figcaption>
 </figure>
+<ul class="points">
+<li><b>One chat, one board.</b> Say what you want. The agent proposes, you press Do it.</li>
+<li><b>Each card in its own sandbox.</b> A closed network, no credentials, deleted when the card is done.</li>
+<li><b>On your servers.</b> Hosted models or your own. The source is published.</li>
+</ul>
 <div class="band"><p>Built for teams that cannot sign off a hosted coding agent: regulated industries, and companies where security and compliance decide the tool choice.</p></div>
 </section>
 
@@ -772,24 +771,20 @@
 <p class="cap">The open limits live in the threat model: the hosted model APIs see diffs and briefs, the Go module proxy is a covert channel of a few hundred bytes per request, gVisor is not a microVM, and the model can write code that passes the checks.</p>
 </section>
 
-<footer><p><a href="legal.html#imprint">Imprint</a> · <a href="legal.html#privacy">Privacy</a></p></footer>
+<footer><p>Designed and built by Sebastian Rücker, alone, in 2026 · <a href="https://sebastianruecker.com">Portfolio</a> · <a href="https://github.com/sebastianrueckerai">GitHub</a></p>
+<p><a href="legal.html#imprint">Imprint</a> · <a href="legal.html#privacy">Privacy</a></p></footer>
 </main>
 <script>
-// The film rests on its first frame under the hero's callouts. A click on the film or its button starts it, and a
-// second later the callouts fade. When it ends, the callouts and the play button return.
+// The film rests on its first frame. The ring on the frame, the filled button in the row or a click on the frame starts
+// it. When it ends, the ring returns.
 (() => {
-  const button = document.querySelector("#play-film"), film = document.querySelector("#film");
-  const annot = document.querySelector("#hero .hero-annot");
-  let fade;
-  const start = () => { button.hidden = true; film.controls = true; film.play().catch(() => {}); };
+  const ring = document.querySelector("#play-film"), film = document.querySelector("#film");
+  const start = () => { ring.hidden = true; film.controls = true; film.scrollIntoView({ block: "nearest" }); film.play().catch(() => {}); };
   film.controls = false;
-  button.addEventListener("click", start);
+  ring.addEventListener("click", start);
+  document.querySelector("#film-button").addEventListener("click", start);
   film.addEventListener("click", () => { if (!film.controls) start(); });
-  film.addEventListener("playing", () => { fade ??= setTimeout(() => annot.classList.add("gone"), 1000); });
-  film.addEventListener("ended", () => {
-    clearTimeout(fade); fade = undefined;
-    film.controls = false; film.load(); annot.classList.remove("gone"); button.hidden = false;
-  });
+  film.addEventListener("ended", () => { film.controls = false; film.load(); ring.hidden = false; });
 })();
 // A clip plays only on a click. In What you get, the clicked clip takes the whole width of its row and the other cards
 // flow around it. Another clip, the close button or Escape shrinks it again.

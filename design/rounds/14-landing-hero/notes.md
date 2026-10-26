@@ -33,6 +33,10 @@ What the numbers say about R1 against the live page, both at 1440 wide:
 
 The play ring's top sits at 659 px at 1440x900, inside a first screen of 813 px. At a 1366x768 laptop it falls under the fold and the filled button is the film control there. No arrangement with a line above the frame keeps the ring inside 681 px.
 
+## The pick: C37
+
+Sebastian picked R1 on 2026-10-26, the portfolio link included, and it shipped in `launch/site/index.html` and `site.css` the same day. Recorded as C37 in [design-decisions.md](../../design-decisions.md). The live page differs from the R1 prototype in two ways: the points use the page's square mark in the stylesheet, and the phone keeps 64 px above and 40 px below each section.
+
 ## The runner-up
 
 For the line: **A07, "Coding agents for teams whose code must stay in house."** Gemini scored it 5/5/4 in the second loop and GLM 4/4/4 in both. It sells the reader the band already names and says nothing about the roadmap or the chat. A short form of A11, "A software factory you run yourself.", scores highest with both critics for the hiring reader but the eyebrow already says self-hosted and the full A11 wraps to four lines on the phone.
