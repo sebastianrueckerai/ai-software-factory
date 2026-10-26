@@ -1,0 +1,53 @@
+### 1. FIRST READ
+
+*   **F1:** This is a tool where I write a plan and AI agents build the software on my own servers; the author seems like a direct, product-focused builder.
+*   **F2:** This is an automated system for turning a roadmap into code on my servers; the author tries to be clever but is less clear than the others, though still credible.
+*   **F3:** This is a system where AI writes code, my servers run it, and automated checks handle merges; the author thinks clearly about process control and architecture, projecting strong technical leadership.
+
+### 2. TABLE
+
+| | A | B | C | Says one thing twice | Film found in 2s | First impression for A | Craft faults |
+|---|---|---|---|---|---|---|---|
+| **F1** | 5 | 5 | 4 | yes | yes | 4 | none |
+| **F2** | 3 | 3 | 4 | no | yes | 3 | none |
+| **F3** | 5 | 5 | 5 | no | yes | 5 | none |
+
+### 3. AGAINST THE LIVE PAGE (images 1, 6, 7)
+
+*   **Better:** The call to action is infinitely better. The live page (C0) has two weak, secondary-style buttons. The finalists have a single, clear, primary "Watch the film" button, reinforced by a large play icon on the product image itself. This makes the desired first action obvious.
+*   **Better:** The visual hierarchy of the hero is fixed. In C0, the three benefit callouts ("Change anything from one chat", etc.) are crammed into an awkward, bracketed space above the product UI. In the finalists, they are a clean, readable strip below the UI, creating a logical flow from "what it is" to "what it looks like" to "what it does for me".
+*   **Better:** The full-page structure is more professional and less fatiguing. C0 is a single, unbroken dark block. The finalists break up the page with alternating light-background sections and more generous vertical spacing, which makes the content easier to scan and digest.
+*   **Worse:** The hero headline lost its single most powerful and memorable line. C0's "The worst an agent can do is wreck its own sandbox" was a brilliant, concise statement that addressed the primary fear of a technical audience (safety, risk) and established the author's credibility as a systems thinker. The new headlines explain the *process*, but they lose the critical *promise of safety*.
+
+### 4. THE LAPTOP (image 5)
+
+At 1366x768, reader A sees the entire hero section clearly above the fold: headline, sub-headline, buttons, and the top portion of the product UI. The film is immediately findable via both the prominent blue "Watch the film" button and the large play icon on the UI image.
+
+### 5. THE PHONE (image 6)
+
+**Ranking:**
+1.  **F1**
+2.  **F2**
+3.  **F3**
+4.  **C0**
+
+**Worst Faults:**
+*   **C0:** Functionally broken. The three callouts above the product UI are rendered as illegible, microscopic text, and the primary call to action ("Watch the film") is completely off-screen.
+*   **F1:** The best of the lot, but the sub-headline is a bit long at four lines, creating a large block of small text.
+*   **F2:** The second part of the headline ("Everything between on your servers") wraps to an awkward and visually unbalanced three lines.
+*   **F3:** The headline is far too long for a mobile screen, wrapping to four full lines and creating an intimidating wall of text that pushes all other content down.
+
+### 6. THE SANDBOX LINE
+
+Yes, the hero loses the most important thing a CTO would look for. Moving "The worst an agent can do is wreck its own sandbox" down the page demotes it from a core principle to a section feature. For a CTO (Reader C), that line is not a feature—it's the entire thesis. It answers their first and biggest question: "How does this not destroy my production environment?" It communicates an understanding of risk, enterprise-level thinking, and architectural soundness. Its absence in the hero is a major loss of credibility for that specific audience.
+
+### 7. RANKING
+
+1.  **Winner: F3.** Despite the length on mobile, its headline is the clearest, most confident, and most impressive for all three readers on a desktop. It describes the system by its core actions and control points ("AI writes," "Servers run," "Checks decide"), which speaks directly to a technical leader's mindset.
+2.  **Runner-up: F1.** It's direct and action-oriented ("Write the roadmap. Agents build it."). It would become the winner if the headline from F3 proved to be a liability in testing; F1 is the safer, more straightforward choice. To win, it would need a headline with the authority of F3 without the redundancy it currently has with its sub-headline.
+
+### 8. THE ONE CHANGE
+
+On the winner (F3), I would re-integrate the core safety promise from the original page. Change the sub-headline to:
+
+"Write a roadmap. Agents build it card by card, each in a sandbox where the worst it can do is wreck itself. You run it all from one chat and one board."

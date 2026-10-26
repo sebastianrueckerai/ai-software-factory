@@ -1,0 +1,60 @@
+**1. FIRST READ**
+
+**F1:** This is a self-hosted AI platform where you write the roadmap and agents execute it on your infrastructure, and yes, the author reads as someone who builds real enterprise tooling, not just demos.  
+**F2:** This takes your roadmap and outputs checked code on your servers, though the phrasing is slightly ambiguous and makes me wonder if the author over-values cleverness over clarity.  
+**F3:** This is an AI coding agent that runs on your servers with merge-checks, which sounds competent but indistinguishable from ten other AI coding tools until you read the fine print.
+
+**2. TABLE**
+
+| | Clarity A (Hiring Mgr) | Clarity B (Incubator) | Clarity C (CTO) | Headline & sub say same thing twice | Film control found <2s | First impression A (1-5) | Craft faults |
+|---|---|---|---|---|---|---|---|
+| **F1** | 4 | 4 | 4 | no | yes | 4 | none |
+| **F2** | 3 | 3 | 3 | no | yes | 3 | none |
+| **F3** | 3 | 3 | 4 | yes | yes | 3 | none |
+
+**3. AGAINST THE LIVE PAGE (C0)**
+
+**Three things that got better:**
+*   **Button hierarchy (Hero region):** The “Watch the film” button is now filled/cyan and leftmost, creating a clear primary CTA. In C0, both buttons were equal-weight outlines, giving the user no entry point.
+*   **Console annotation (Fold region):** The three value props (“Change anything from one chat,” etc.) moved from *above* the console image (where they looked like disconnected navigation) to a clean strip *below* it with colored top-borders, creating a logical “see it → believe it” flow.
+*   **Video affordance (Console region):** The large play-circle overlay on the console screenshot makes it immediately obvious this is a demo/video, not a static UI mock. In C0, it looked like a dead image.
+
+**What got worse:**
+*   **Trust signal excision (Hero region):** Removing the line *“Use hosted models or your own”* and demoting *“The worst an agent can do is wreck its own sandbox”* to a lower section destroys the hero’s ability to address the CTO’s #1 objection (security lock-in) in the first 3 seconds. The hero now sells “productivity” but forgot to sell “safety.”
+
+**4. THE LAPTOP (1366×768)**
+
+Reader A sees a compressed but legible headline, the cyan film button (still prominent), and the console image with the play-overlay reduced to roughly 400px wide—still clickable, still obvious. The three callouts beneath the console squeeze into a single horizontal line with slightly tighter padding, but remain readable. **Yes, the film is findable**—the cyan button persists at full size, and the play icon on the image remains distinct even at this resolution.
+
+**5. THE PHONE (390 px)**
+
+**Ranking:** **F1 > F3 > C0 > F2**
+
+*   **C0 worst fault:** **Text bloat.** The original hero carries the long sandbox-wrecking headline *plus* the subhed *plus* “Use hosted models…” *plus* two buttons, pushing the actual demo (the proof) below the fold or into a tiny sliver. The user scrolls past a wall of philosophy before seeing the product.
+*   **F1 worst fault:** **Generic visual weight.** The headline is solid, but the phone view reveals the “Watch the film” button and the console’s play-button are competing calls-to-action (both cyan, both round-ish) sitting 120px apart, creating minor confusion about which one to hit first.
+*   **F2 worst fault:** **Typographic collision.** “Checked code out” breaks awkwardly on narrow viewports (likely rendering as “Checked / code out” or “Checke / d code out”), and the staccato rhythm (“Your roadmap in.”) feels like broken HTML, not intentional copy, on a small screen.
+*   **F3 worst fault:** **Identity erasure.** On mobile, “AI writes the code. Your servers run it.” fits perfectly but reads as Cursor/Copilot marketing. Without the roadmap context (which wrapped to a second line or got cut), the differentiator vanishes entirely.
+
+**6. THE SANDBOX LINE**
+
+**Yes.** For Reader C (the CTO), moving *“The worst an agent can do is wreck its own sandbox”* out of the hero is a critical error. That line is the only copy in the top 500px that proves the author understands **isolation, blast radius, and defense-in-depth**—the exact vocabulary a CTO uses to evaluate whether an AI architect is dangerous or disciplined. Buried in a lower section (which a 60-second scanner may never reach), it fails to filter out the “toy” impression. The hero loses its **risk-assessment credibility**.
+
+**7. RANKING**
+
+**Winner: F1**  
+**Runner-up: F3**  
+**Third: F2**
+
+**Reasoning:**
+*   **F1** wins because *“Write the roadmap. Agents build it on your servers”* is the only headline that works for all three personas: it tells the Hiring Manager (A) what the author built (a system, not a script), tells the Incubator (B) the business model (infrastructure-as-a-product), and tells the CTO (C) the architecture (agents + user-hosted). It is active, specific, and non-generic.
+*   **F3** is the runner-up because *“Checks decide what merges”* is the strongest technical phrase in any of the finals—it signals git-aware, production-grade workflow. However, it leads with *“AI writes the code,”* which commoditizes the product into the crowded “AI IDE” bucket before the reader reaches the differentiation.
+*   **F2** loses because *“Checked code out”* is ambiguous (git checkout? linting? manual review?) and the telegraphic style signals “marketing person pretending to be an engineer,” which hurts credibility with Reader A and C simultaneously.
+
+**What would make F3 win:** Swap the opening clause with F1’s. **“Write the roadmap. AI writes the code. Your servers run it. Checks decide what merges.”** This keeps F3’s killer closer (“Checks decide…”) while restoring the roadmap context that distinguishes this factory from a chat-with-git.
+
+**8. THE ONE CHANGE to the winner (F1)**
+
+**Restore the safety strapline immediately under the buttons.**  
+Add a single line in small caps or muted text: *“Sandboxed. Self-hosted. Nothing merges unchecked.”*  
+
+This re-injects the C0 “wreck its own sandbox” trust signal (critical for the CTO hire) without cluttering the headline, and it justifies why “on your servers” matters (it’s not just hosting—it’s isolation).

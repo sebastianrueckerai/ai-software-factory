@@ -1,0 +1,49 @@
+Here is the review.
+
+### 1. TABLE
+
+| | Film control found | Elements above frame | Product is clear (1-5) | HM impression (1-5) | Craft faults | Remark |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **B1** | yes | 3 | 3 | 4 | none | Clean, focused layout. It correctly prioritizes the film. |
+| **B2** | yes | 4 | 2 | 2 | unbalanced, cramped | Split layout weakens the product's presence, feels generic. |
+| **B3** | yes | 4 | 3 | 3 | cramped | Too much competing information above the frame creates noise. |
+| **B4** | yes | 4 | 4 | 4 | slightly cramped | Excellent clarity from the three points, but vertically long. |
+| **B5** | yes | 4 | 3 | 3 | none | Byline feels premature and shifts focus from product to person. |
+
+### 2. THE LAPTOP (image 6)
+
+At 1366x768, candidates **B1, B2, and B5** show the large play control clearly above the fold. B3 barely shows the top edge of the control. B4 pushes the control completely below the fold due to the height of the three callouts.
+
+### 3. THE PHONE (image 7)
+
+1.  **B1 (Best):** Balances text, buttons, and the top of the console. The callouts under the frame break up the wall of text that follows. Its fault is the large vertical gap between the buttons and the callouts.
+2.  **B5:** Nearly identical to B1, but the byline adds an unnecessary line of text, pushing content down.
+3.  **B4:** The three points are clear but make the top section very long. The console image appears far too late.
+4.  **B3:** The worst of both worlds. It has a tall text section *and* dense, unreadable callouts under the frame.
+5.  **B2 (Worst):** The split layout collapses into a disaster. The console frame is tiny and awkwardly right-aligned, followed by a jumble of competing text elements. It is incoherent.
+
+### 4. THE BYLINE
+
+Comparing B1 and B5, the byline in B5 subtly shifts the page's purpose. B1 feels like a product page. B5 feels like a portfolio piece *about* a product. For a hiring manager, this is a negative. It replaces confidence ("Here is my product") with neediness ("Here is a thing I made, please notice me").
+
+It hurts the layout by adding vertical space and another text style, distracting from the main call to action.
+
+A byline is better placed in the footer or on a dedicated "About" or "Evidence" page. Keep the hero screen focused on the product itself.
+
+### 5. THE CALLOUTS
+
+*   **For the hiring manager (20-60 seconds):** B4's treatment is best. "One chat, one board," "Each card in its own sandbox," and "On your servers" are concrete, benefit-oriented points that explain the product's value instantly. B1's treatment (callouts under the frame) is second best, as it gets them out of the way. B3's is the worst, adding clutter above the fold.
+*   **For the CTO:** B4 is also the best. The three points directly address core concerns: interface, security/isolation ("sandbox"), and deployment ("your servers"). This is exactly the kind of high-level architectural information a CTO wants to see first.
+
+### 6. RANKING
+
+1.  **B1 (Winner):** It has the best balance of focus, clarity, and performance across all screen sizes. It prioritizes the single most important action—watching the film—without clutter.
+2.  **B4 (Runner-up):** The text provides the most clarity about the product, but this comes at the cost of pushing the console image and play button below the fold on common laptops.
+    *   **What would make it win:** Reduce the vertical space taken by the headline and the three callouts so the play button stays above the fold at 1366x768. This might involve tighter line spacing or a smaller font size for the callouts.
+3.  **B5:** A good layout (it's just B1) undermined by a single line of text that changes the tone for the worse.
+4.  **B3:** Cluttered and unfocused. It tries to show everything at once and ends up highlighting nothing.
+5.  **B2:** Fundamentally broken. The split layout fails to present the product with confidence and falls apart completely on mobile.
+
+### 7. THE ONE CHANGE
+
+On the winner, B1, I would **reduce the font size and line height of the sub-headline.** That sentence ("Write a roadmap...") takes up three lines. Tightening it to two would pull the entire console section up, giving the play button more breathing room above the fold on smaller screens and improving the composition.

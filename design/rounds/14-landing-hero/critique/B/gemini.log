@@ -1,0 +1,51 @@
+### 1. TABLE
+
+| | Film control found? | Distinct elements above frame | What it is (1-5) | HM impression (1-5) | Craft faults | Remark (max 12 words) |
+| :-- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **B1** | yes | 5 | 4 | 4 | none | Clear hierarchy, unmissable film control. Looks professional and focused. |
+| **B2** | yes | 5 | 3 | 2 | none | Split layout weakens the product's visual impact, looks dated. |
+| **B3** | yes | 6 | 4 | 3 | cramped | Too much text above the frame feels cluttered and unfocused. |
+| **B4** | yes | 6 | 5 | 5 | none | The three points above the frame explain the product instantly. |
+| **B5** | yes | 6 | 4 | 5 | none | The byline adds a strong sense of personal ownership. |
+
+### 2. THE LAPTOP (image 6)
+
+All five candidates show the play control at 1366x768. None lose it below the fold. The vertical centering of the control within the frame guarantees its visibility on this common resolution.
+
+### 3. THE PHONE (image 7)
+
+1.  **B2:** Best. It gets to the product image and its play button faster than any other layout. The logical flow is preserved. Its worst fault is that the callouts below the image feel disconnected.
+2.  **B5:** Good. The byline is a small element that doesn't push the content down much. Its worst fault is the callout strip, which adds significant scroll before the user sees the product UI.
+3.  **B1:** Same as B5, but without the useful context of the byline. Its worst fault is the callout strip pushing the product image down.
+4.  **B4:** The product points take up too much vertical space, delaying the product view. Its worst fault is this delay; key information pushes the visual proof down.
+5.  **B3:** Worst. The stacked, multi-line callouts consume a massive amount of screen real estate, burying the product frame deep down the page.
+
+### 4. THE BYLINE
+
+Comparing B1 and B5, the byline in B5 is a net positive for a hiring manager. It immediately answers "Who made this?" and frames the product as a portfolio piece by a specific individual, not an anonymous corporate entity. It signals authorship and confidence.
+
+The byline does not hurt anything; its placement is discreet and the information is highly relevant to the target audience.
+
+A byline could also sit in the footer of the page, but that's standard and expected. Placing it prominently, but subtly, in the hero signals that the author *is* the product. It’s a power move for a consultant or job-seeker.
+
+### 5. THE CALLOUTS
+
+For the hiring manager, **B4 serves them best**. The three product points ("One chat, one board," "Each card in its own sandbox," "On your servers") are concrete, scannable, and explain the *what* and *how* in under 10 seconds. The other versions' callouts are abstract benefits.
+
+For the CTO, **B4 is also the best**. It speaks directly to architecture and features: sandboxing and self-hosting are critical concerns for a CTO. The clarity is superior to the vague callouts in B3 or the slightly less focused strip in B1. The B3 callouts are marketing fluff; the B4 points are technical substance.
+
+### 6. RANKING
+
+1.  **B4.** It is the most effective. It answers "what is this?" immediately with three concrete points, making the page instantly comprehensible.
+2.  **B5.** It has B1's clean layout but adds the crucial byline, which frames the page correctly for the intended audience.
+3.  **B1.** Clean and effective, but lacks the instant clarity of B4 or the personal context of B5. It's a good generic product page.
+4.  **B3.** The information hierarchy is broken. The secondary callouts are given too much prominence and create a wall of text before the main visual.
+5.  **B2.** The split-hero layout is weak. It shrinks the product image, making it less impressive and harder to parse, for no clear benefit.
+
+The runner-up is **B5**. It would win if the callout strip below the buttons was replaced by the three concrete product points from B4, placed above the buttons. This would combine the instant clarity of B4 with the valuable personal branding of B5.
+
+### 7. THE ONE CHANGE
+
+On the winner, **B4**, I would add the byline from B5.
+
+Place it directly under the button row: `Designed and built by Sebastian Rücker, alone, in 2026 · Portfolio · GitHub`. This combines the absolute best of B4 (clarity) and B5 (authorship) without cluttering the hierarchy.

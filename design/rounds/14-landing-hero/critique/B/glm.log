@@ -1,0 +1,71 @@
+**1. TABLE**
+
+`B1 | yes | 3 | 3 | 4 | none | Clean hero, impossible to miss the play button.`
+`B2 | yes | 0* | 4 | 5 | none | Classic SaaS layout balances text and demo perfectly.`
+`B3 | yes | 4 | 4 | 3 | none | Buries the console under explanatory text.`
+`B4 | yes | 4 | 5 | 4 | Underlines mislead as tabs | Best product clarity, but underlines confuse.`
+`B5 | yes | 4 | 3 | 4 | Byline looks orphaned | Adds author credit without cluttering the CTA.`
+
+*\*B2 uses a split layout; no content sits vertically above the frame.*
+
+---
+
+**2. THE LAPTOP (1366x768)**
+
+**Visible:** **B1, B2,** and **B5** keep the console frame high enough that the central play control sits comfortably within the first 768px.
+
+**Below the fold / at risk:** **B3** and **B4** insert content blocks (callouts or feature points) above the frame. On a 1366x768 screen, this pushes the frame’s top edge down and risks placing the play button—the primary conversion target—in the lower third or entirely below the fold, forcing a scroll to discover it.
+
+---
+
+**3. THE PHONE (390px)**
+
+| Rank | Candidate | Worst Fault |
+| :--- | :--- | :--- |
+| **1** | **B1** | None; the film CTA and demo are immediate. |
+| **2** | **B5** | The byline creates a visual speed bump between the CTA and the reward. |
+| **3** | **B4** | Static underlines on the three points falsely suggest interactive tabs. |
+| **4** | **B2** | The “demo” is pushed below three paragraphs of text and secondary buttons. |
+| **5** | **B3** | A wall of callouts buries the actual product deepest below the fold. |
+
+---
+
+**4. THE BYLINE**
+
+**Does it change what a hiring manager thinks?**  
+Yes. It shifts perception from “anonymous startup tool” to “bespoke instrument crafted by a specific engineer.” For a manager evaluating whether to hire the author as a consultant, it is a net positive—it signals deep ownership and capability.
+
+**Does it hurt anything?**  
+Yes, vertically. It consumes 30–40px of premium space above the fold, pushing the console frame (the proof) downward on every screen. It also introduces a lone line of body text that visually disconnects the action (buttons) from the result (the frame).
+
+**Where else could it sit?**  
+- Inline with the top navigation badges (*AI SOFTWARE FACTORY · SELF-HOSTED · BY SEBASTIAN RÜCKER*).  
+- As a small, muted caption directly beneath the main headline.  
+- Inside the frame’s terminal chrome (e.g., `user@factory:~$` in the top bar), reinforcing the “console” aesthetic.
+
+---
+
+**5. THE CALLOUTS**
+
+**Best for the hiring manager:** **B1 / B2 / B3** (the workflow callouts: *“Change anything from one chat,” “See what is stuck,” “Decide what runs next”*). These speak to **operational pain**—management, prioritization, and oversight—which is what a non-technical buyer scans for in the first minute.
+
+**Best for the CTO:** **B4** (the architectural points: *“One chat, one board,” “Each card in its own sandbox,” “On your servers”*). These address **security posture, data residency, and isolation**—the technical constraints a CTO must validate before allowing a tool onto their infrastructure.
+
+---
+
+**6. RANKING**
+
+1. **B1** – **Reasoning:** It obeys the hierarchy of needs for a time-poor viewer: bold claim → single, obvious CTA → immediate visual proof (the console with the giant play button). Zero friction to start the film.  
+2. **B5** – **Reasoning:** Identical to B1 but with a credibility signal that matters for consulting hires; loses the top spot only because the byline’s placement is slightly clumsy.  
+3. **B2** – **Reasoning:** The safest, most “corporate” option. It looks like a mature SaaS product. It loses points because the split layout dilutes the headline’s impact on narrow screens and makes the play button compete with a column of text.  
+4. **B4** – **Reasoning:** The clearest explanation of *what* the product actually is (critical for the incubator screener), but it punishes the user by delaying the demo—the single best explainer—behind a paragraph of abstractions and misleading underlines.  
+5. **B3** – **Reasoning:** The worst offender for the 20-second scan. It forces the reader to parse callouts *before* showing the product, violating “show, don’t tell.”
+
+**Runner-up:** **B5**.  
+**What would make it win:** Move the byline into the top navigation bar (alongside “SELF-HOSTED”). This recovers the vertical space, keeping B5’s exact layout while adding the trust signal that tips the scale for a hiring manager.
+
+---
+
+**7. THE ONE CHANGE to the winner (B1)**
+
+**Demote the secondary buttons.** Change “How it works” and “Source and setup” from outlined buttons to small, understated text links placed *inside* the console frame’s top chrome (next to “Factory console” and “nebula-run”) or immediately beneath the main CTA as a single line of muted text. This leaves the “Watch the film” button as the sole visual action in the hero, recovering ~40px of height to show more of the console—and making the path to the film even more inevitable.

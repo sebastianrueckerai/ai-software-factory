@@ -83,3 +83,4 @@ GitHub Pages serves `launch/site` at `https://aisoftwarefactory.world`. The work
 2. **The frames.** Eight frames picked by step, unverified by eye. If a frame shows the wrong beat, he names the scene and step from `demo/out/`.
 3. **The source of truth.** `launch/concept.md` or `launch/revision/concept.md`. Until ruled, the revision wins for the copy.
 4. **The film.** Where it sits once cut: the loop section's diagram stays and the film goes beside it, or the film replaces the diagram.
+5. **Round 14 on the hero.** `design/rounds/14-landing-hero/` recommends a new line, the film button first, a play ring on the frame, three points under it, a byline and alternating section panels. Its page is `index.html` there, its reasoning `notes.md`. Nothing from it is on the page until he picks.

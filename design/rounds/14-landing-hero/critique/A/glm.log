@@ -1,0 +1,53 @@
+1. TABLE
+
+`A00 | 4 | 4 | 5 | acceptable | Deep technical insight; negative frame may puzzle non-techs`
+`A01 | 2 | 2 | 3 | acceptable | Heavily duplicates subheadline; wastes the headline slot`
+`A02 | 4 | 4 | 3 | acceptable | Professional but generic; lacks specific differentiators`
+`A03 | 3 | 4 | 4 | acceptable | Strong tech detail; "walled" phrasing slightly awkward`
+`A04 | 4 | 3 | 2 | good | Simple and clear but omits core sandbox USP`
+`A05 | 3 | 3 | 4 | acceptable | Abstract "gates" term; unclear without subheadline context`
+`A06 | 5 | 5 | 4 | acceptable | Crystal clear triad; strongest for Reader A; complete`
+`A07 | 4 | 4 | 4 | acceptable | Sharp enterprise positioning; signals data-residency seriousness`
+`A08 | 3 | 3 | 2 | acceptable | Vague; misses self-hosted/sandbox architecture entirely`
+`A09 | 3 | 3 | 4 | bad | Nearly restates subheadline; verbose; poor mobile wrap`
+`A10 | 4 | 4 | 4 | bad | Rhythmic and clear but suffers from 4-line mobile wrap`
+`A11 | 5 | 4 | 4 | bad | Best vision/metaphor but 4 lines hurt mobile impact`
+
+2. DUPLICATION
+
+**A01** and **A09** are the worst offenders. A01’s first clause (“Write the roadmap. Agents build it…”) is a truncated copy-paste of the subheadline’s opening. A09 (“Software built by agents, each in its own sandbox, nothing merged unchecked”) is merely a compressed paraphrase of the entire sentence below it, making the pair read as a stutter. **A05** and **A11** overlap lightly with the “merges” and “agents build” concepts but add sufficient new framing (gates, steering, factory) to survive.
+
+3. TOP THREE AND BOTTOM THREE
+
+**TOP THREE**
+
+1. **A06** – *“AI writes the code. Your servers run it. Checks decide what merges.”*  
+   **Reasoning:** Wins Reader A (non-tech) instantly with a plain-English subject-verb-object chain that requires no parsing; gives Reader B (screener) a complete system boundary in one breath; gives Reader C (CTO) an accurate technical triad with no marketing fluff. The only weakness is it is slightly dry.
+
+2. **A11** – *“A software factory you run yourself: agents build, gates decide, you steer.”*  
+   **Reasoning:** The strongest “vision” line. Empowers Reader A with ownership language (“run yourself,” “you steer”); gives Reader B a memorable metaphor (factory); gives Reader C correct abstractions (gates = CI/CD checks). Loses points only on mobile wrap (4 lines).
+
+3. **A00** – *“The worst an agent can do is wreck its own sandbox.”*  
+   **Reasoning:** The highest credibility signal for Reader C (proves the author understands agent containment deeply) and Reader B (shows sophisticated risk modeling). Reader A may find the negative frame off-putting, but it demonstrates the exact kind of architectural judgment a Head of Engineering must have.
+
+**BOTTOM THREE**
+
+1. **A04** – *“Run a team of coding agents from one chat.”*  
+   **Reasoning:** Fatal for Reader C. It describes the UI (a chat) while omitting the entire technical reason to buy this over Cursor/Claude/Desktop: sandboxed isolation, self-hosting, and gated merges. Reads like a feature, not a system.
+
+2. **A08** – *“One board, one chat, and agents that build what is on it.”*  
+   **Reasoning:** Same sin as A04 but vaguer. Could describe Trello plus GPT-4. Fails to signal that this is a *self-hosted factory* with *architectural boundaries*. Weak for all three readers.
+
+3. **A01** – *“Write the roadmap. Agents build it on your servers.”*  
+   **Reasoning:** The duplication penalty is severe. It tells Reader A nothing the subheadline won’t say two seconds later, wasting the only moment to establish a unique angle or demonstrate insight. For Reader B, it suggests the product has no distinct identity beyond its own documentation.
+
+4. THE SANDBOX LINE
+
+**As the title (or bold epigraph) of the architecture / “how it works” section.**  
+The line states a foundational design principle (containment via sandboxing), not a value proposition or benefit. Placing it above the fold competes with whatever headline you choose; burying it in body copy wastes its punch. Anchoring the technical explanation—right before you detail the sandbox architecture—lets it function as a thesis statement that proves to Reader C (and skeptical B’s) that you understand agent failure modes deeply.
+
+5. ONE BETTER LINE
+
+**“Your roadmap in. Checked code out. Everything between on your servers.”** *(10 words)*  
+
+**What it foregrounds:** The clean input/output contract (roadmap → verified code) and the ownership layer (your servers) that matters most to Readers A and B, while implying the sandbox/gate mechanism (“everything between”) sufficiently for Reader C. It matches A06’s clarity but with a tighter, more rhythmic cadence that wraps to 3 lines on mobile (unlike A10’s 4-line version of this idea). If forced to pick strictly *better* than A06, I cannot—A06’s explicit mention of “checks” is marginally safer for Reader A—but this line ties it.

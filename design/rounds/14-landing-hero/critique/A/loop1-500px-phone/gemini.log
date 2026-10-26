@@ -1,0 +1,57 @@
+### 1. TABLE
+
+| Line | A | B | C | Phone wrap | Remark |
+| :--- | :-: | :-: | :-: | :--- | :--- |
+| A00 | 2 | 2 | 5 | bad | Leads with a technical feature, not the product's purpose. |
+| A01 | 5 | 5 | 5 | bad | Crystal clear cause-and-effect; explains what the user does and what happens. |
+| A02 | 4 | 4 | 4 | bad | Strong positioning, but "autonomous" can sound like an overpromise. |
+| A03 | 4 | 4 | 5 | bad | Evocative and clear, explaining both the agents and their constraints. |
+| A04 | 3 | 3 | 3 | good | Focuses on the user interface, not the product's core capability. |
+| A05 | 3 | 3 | 4 | bad | "The gates" is jargon that weakens an otherwise clear first part. |
+| A06 | 3 | 4 | 4 | bad | Weaker verbs; "AI writes" is generic, "Checks decide" is passive. |
+| A07 | 4 | 4 | 4 | bad | Focuses on a benefit ("stay in house") rather than the product's function. |
+| A08 | 3 | 3 | 3 | bad | Describes the interface ("board," "chat"), not the underlying system's power. |
+| A09 | 2 | 3 | 4 | bad | Clumsy phrasing and passive voice; reads like a feature list. |
+| A10 | 4 | 4 | 5 | good | Very clear benefit statement for a technical leader. |
+| A11 | 2 | 2 | 3 | acceptable | Too many concepts; abstract verbs like "steer" and "decide" are weak. |
+
+### 2. DUPLICATION
+
+**A01**, **A05**, and to a lesser extent **A06** and **A09**, repeat the sub-headline's concepts so closely that the two lines feel redundant. The sub-headline reads "Write a roadmap. Agents build it card by card...".
+
+*   **A01:** "Write the roadmap. Agents build it..." is nearly identical.
+*   **A05:** "Agents build your roadmap..." is the same idea.
+
+This is not a fatal flaw, but it wastes the opportunity for the second sentence to add new information.
+
+### 3. TOP THREE AND BOTTOM THREE
+
+**Top Three**
+
+1.  **A01: Write the roadmap. Agents build it on your servers.**
+    *   It is the clearest, most direct explanation of what the product does, for all three readers, in a simple "you do this, it does that" format.
+2.  **A10: Your roadmap in. Checked code out. Everything between on your servers.**
+    *   This is an extremely strong, concrete I/O proposition that makes the author sound like a serious systems builder who delivers tangible results.
+3.  **A03: A team of coding agents, each walled into its own sandbox.**
+    *   It explains the core technology and its primary safety mechanism in a single, evocative, and non-technical sentence.
+
+**Bottom Three**
+
+1.  **A11: A software factory you run yourself: agents build, gates decide, you steer.**
+    *   It is a jumble of abstract concepts and weak verbs that fails to communicate a clear action or benefit, making it confusing.
+2.  **A09: Software built by agents, each in its own sandbox, nothing merged unchecked.**
+    *   The passive voice and list-like structure make it sound like dry documentation, not a powerful headline for a product.
+3.  **A00: The worst an agent can do is wreck its own sandbox.**
+    *   It advertises a single (important) feature, not the product itself, leaving non-technical readers wondering what the system actually does.
+
+### 4. THE SANDBOX LINE
+
+If A00 is not the headline, "The worst an agent can do is wreck its own sandbox." belongs **as the title of the section about the sandbox.**
+
+Reasoning: It is the single best, most concrete sentence to explain the *point* of the sandbox architecture, making it a perfect, punchy summary for the section that details that specific feature.
+
+### 5. ONE BETTER LINE
+
+**Build your roadmap on your hardware, with an AI team you run.**
+
+This line foregrounds human agency and control ("build *your* roadmap," "team *you* run") while clearly stating the core value proposition (AI team) and key architecture (on your hardware), directly addressing the priorities of all three readers.

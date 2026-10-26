@@ -1,0 +1,73 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Design round 14: the landing page's hero</title>
+<style>body{font:14px/1.5 system-ui;margin:24px;color:#222;background:#f4f4f2}h1{font-size:20px}h2{font-size:16px;margin:32px 0 4px}p,li{max-width:80ch}p{margin:0 0 8px}figure{margin:12px 0}figure img{max-width:100%;border:1px solid #ccc;display:block}figcaption{color:#555;font-size:13px}.pair{display:flex;gap:16px;flex-wrap:wrap}.pair figure{flex:1 1 420px}table{border-collapse:collapse;font-size:13px}td,th{border:1px solid #ccc;padding:4px 8px;text-align:left;vertical-align:top}a{color:#0a58a6}</style></head><body>
+<h1>Design round 14: the landing page's hero, its line and its rhythm</h1>
+<p>Sebastian asked on 26 October 2026 for rounds on the first screen of <a href="https://aisoftwarefactory.world">aisoftwarefactory.world</a>: the line reads well to engineers and not to a hiring manager, the first screen is full, the film is missed, and the sections run together. <a href="brief.md">The brief</a> sets the limits, <a href="notes.md">the notes</a> hold every score, what the director overruled and what went wrong. Every candidate is a copy of the real page and opens in a browser.</p>
+
+<h2>The recommendation: R1</h2>
+<p><b>Line:</b> "Write the roadmap. Agents build it on your servers." <b>Under it:</b> "The worst an agent can do is wreck its own sandbox. Nothing merges until the checks pass. You run it all from one chat and one board." <b>Then:</b> a filled "Watch the film · 3 min" first in the button row, a byline under the buttons, the frame as the film's poster with a play ring, three points under the frame (one chat and one board, each card in its own sandbox, on your servers), the band. Below: 96 px above and 72 px below each section and every second section on the panel colour. The critics judged the parts, not R1 as a whole.</p>
+<p><a href="candidates/R1.html">Open R1</a> · <a href="candidates/C0.html">open the live page from the same build</a></p>
+<div class="pair">
+<figure><a href="shots/sheet-R-fold.png"><img src="shots/sheet-R-fold.png" alt="The live page and R1, first screen at 1440x900"></a><figcaption>first screen at 1440x900: the live page, then R1</figcaption></figure>
+<figure><a href="shots/sheet-R-full.png"><img src="shots/sheet-R-full.png" alt="The live page and R1, whole page"></a><figcaption>the whole page: the live page, then R1</figcaption></figure>
+<figure><a href="shots/sheet-R-390.png"><img src="shots/sheet-R-390.png" alt="The live page and R1 on the phone"></a><figcaption>the phone at 390: the live page, then R1</figcaption></figure>
+<figure><a href="shots/R1-fold-1366x768.png"><img src="shots/R1-fold-1366x768.png" alt="R1 at 1366x768"></a><figcaption>R1 on a 1366x768 laptop: the filled button is the film control, the ring is under the fold</figcaption></figure>
+</div>
+
+<h2>The runner-up</h2>
+<p>For the line, A07: "Coding agents for teams whose code must stay in house." For the arrangement, B4: the three points above the frame, which both critics called the clearest statement of the product and which pushes the play ring under the fold at 1440x900. R1 keeps B4's points and moves them under the frame.</p>
+
+<h2>What the critics said about the live page</h2>
+<table><tr><th>Question</th><th>Gemini</th><th>GLM</th></tr>
+<tr><td>The line, for the hiring reader (1 to 5)</td><td>2</td><td>2</td></tr>
+<tr><td>The line, for the CTO</td><td>5</td><td>4</td></tr>
+<tr><td>Elements competing in the first screen</td><td>9</td><td>11</td></tr>
+<tr><td>Whitespace between sections (1 to 5)</td><td>2</td><td>3</td></tr>
+<tr><td>The film control found (1 to 5)</td><td>1</td><td>2</td></tr>
+<tr><td>Author named anywhere</td><td>no</td><td>no</td></tr></table>
+
+<h2>Round A: twelve lines</h2>
+<p>Scores for the hiring reader over four readings (two critics, two loops), highest first: A11 17, A01 16, A07 16, A02 15, A06 15, A03 14, A05 13, A10 13, A00 12, A04 12, A08 12, A09 11. A11 wraps to four lines on the phone. The full table with all three readers is in <a href="notes.md">the notes</a>.</p>
+<div class="pair">
+<figure><a href="shots/sheet-A-1440-1.png"><img src="shots/sheet-A-1440-1.png" alt="Lines A00 to A05 in the hero"></a><figcaption>A00 to A05 at 1440</figcaption></figure>
+<figure><a href="shots/sheet-A-1440-2.png"><img src="shots/sheet-A-1440-2.png" alt="Lines A06 to A11 in the hero"></a><figcaption>A06 to A11 at 1440</figcaption></figure>
+<figure><a href="shots/sheet-A-390.png"><img src="shots/sheet-A-390.png" alt="The twelve lines on the phone"></a><figcaption>the twelve on the phone</figcaption></figure>
+</div>
+
+<h2>Round B: five arrangements</h2>
+<table><tr><th>Candidate</th><th>What it is</th><th>Gemini loop 1</th><th>Gemini loop 2</th><th>GLM loop 2</th><th>Play ring top, px</th></tr>
+<tr><td><a href="candidates/B1.html">B1</a></td><td>film button first, play ring, callouts under the frame</td><td>1st</td><td>3rd</td><td>1st</td><td>658</td></tr>
+<tr><td><a href="candidates/B2.html">B2</a></td><td>copy left, frame right</td><td>5th</td><td>5th</td><td>3rd</td><td>286</td></tr>
+<tr><td><a href="candidates/B3.html">B3</a></td><td>the live callouts kept, button and ring added</td><td>4th</td><td>4th</td><td>5th</td><td>701</td></tr>
+<tr><td><a href="candidates/B4.html">B4</a></td><td>three product points above the frame</td><td>2nd</td><td>1st</td><td>4th</td><td>765</td></tr>
+<tr><td><a href="candidates/B5.html">B5</a></td><td>B1 plus a byline</td><td>3rd</td><td>2nd</td><td>2nd</td><td>677</td></tr></table>
+<div class="pair">
+<figure><a href="shots/B1-fold-1440x900.png"><img src="shots/B1-fold-1440x900.png" alt="B1"></a><figcaption>B1</figcaption></figure>
+<figure><a href="shots/B2-fold-1440x900.png"><img src="shots/B2-fold-1440x900.png" alt="B2"></a><figcaption>B2</figcaption></figure>
+<figure><a href="shots/B3-fold-1440x900.png"><img src="shots/B3-fold-1440x900.png" alt="B3"></a><figcaption>B3</figcaption></figure>
+<figure><a href="shots/B4-fold-1440x900.png"><img src="shots/B4-fold-1440x900.png" alt="B4"></a><figcaption>B4</figcaption></figure>
+<figure><a href="shots/B5-fold-1440x900.png"><img src="shots/B5-fold-1440x900.png" alt="B5"></a><figcaption>B5</figcaption></figure>
+<figure><a href="shots/sheet-B-390.png"><img src="shots/sheet-B-390.png" alt="The five on the phone"></a><figcaption>the five on the phone</figcaption></figure>
+</div>
+
+<h2>Round C: three rhythms</h2>
+<p>Both critics put C3 first (5 of 5 on legible boundaries and on reading as stops), the live page last (1 of 5 on both). C1 adds space, C2 space and a hairline, C3 space and alternating panels. Pages: <a href="candidates/C1.html">C1</a>, <a href="candidates/C2.html">C2</a>, <a href="candidates/C3.html">C3</a>.</p>
+<figure><a href="shots/sheet-C-full.png"><img src="shots/sheet-C-full.png" alt="The four rhythms side by side"></a><figcaption>C0 to C3, whole page at 1440, scaled</figcaption></figure>
+
+<h2>Loop 2: three finalists</h2>
+<p>Three pages on B1 and C3 with the sandbox line as the sandbox section's title. Gemini ranked F3, F1, F2 and GLM F1, F3, F2. Both said the hero loses the CTO's trust signal without the sandbox line, so R1 keeps it under the new line. Pages: <a href="candidates/F1.html">F1</a> (A01), <a href="candidates/F2.html">F2</a> (A10), <a href="candidates/F3.html">F3</a> (A06).</p>
+<div class="pair">
+<figure><a href="shots/F1-fold-1440x900.png"><img src="shots/F1-fold-1440x900.png" alt="F1"></a><figcaption>F1</figcaption></figure>
+<figure><a href="shots/F2-fold-1440x900.png"><img src="shots/F2-fold-1440x900.png" alt="F2"></a><figcaption>F2</figcaption></figure>
+<figure><a href="shots/F3-fold-1440x900.png"><img src="shots/F3-fold-1440x900.png" alt="F3"></a><figcaption>F3</figcaption></figure>
+</div>
+
+<h2>Open, for Sebastian</h2>
+<ol>
+<li>The line: A01, the runner-up A07, or his own.</li>
+<li>The byline: the wording, and the portfolio link. sebastianruecker.com is a guess from his e-mail domain.</li>
+<li>The three points under the frame. "Say what you want" is new copy, the rest is lifted from the page.</li>
+<li>The rhythm: C3 as judged, or with space that varies with the section.</li>
+<li>Whether the three bracketed callouts over the frame may go.</li>
+</ol>
+<p>Fourteen critic calls, no image generation, $0.42 by the tool's estimate. The first loop's phone shots came from a 500 px layout, because headless Chrome floors its window at 500 px wide. The loop ran again with Playwright at a true 390 px. Details in <a href="notes.md">the notes</a>.</p>
+</body></html>

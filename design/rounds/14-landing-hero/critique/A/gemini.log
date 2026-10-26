@@ -1,0 +1,44 @@
+### 1. TABLE
+
+| ID  | A | B | C | Phone Wrap | Remark (at most twelve words)                                   |
+|:----|:-:|:-:|:-:|:-----------|:----------------------------------------------------------------|
+| A00 | 2 | 2 | 5 | acceptable | Clever for engineers, but starts with a negative; unclear to others.  |
+| A01 | 5 | 5 | 4 | good       | Direct, active, and clearly states what the product does.         |
+| A02 | 4 | 4 | 3 | acceptable | Clear but uses a generic buzzword, "autonomous."                  |
+| A03 | 3 | 3 | 4 | acceptable | Focuses on a technical detail, not the user's goal or benefit.    |
+| A04 | 2 | 2 | 3 | good       | Undersells the product, making it sound like a simple chat bot.     |
+| A05 | 3 | 3 | 4 | good       | Second sentence uses "gates," which is jargon to non-engineers.   |
+| A06 | 2 | 2 | 2 | bad        | Generic, staccato, and feels like every other AI coding tool.       |
+| A07 | 5 | 5 | 4 | acceptable | Directly addresses the crucial business need for privacy and control. |
+| A08 | 2 | 2 | 3 | bad        | Trivializes the system by focusing only on the simple UI elements. |
+| A09 | 2 | 3 | 3 | bad        | A passive, wordy feature list, not a compelling headline.         |
+| A10 | 1 | 1 | 2 | bad        | Too abstract and clever; communicates almost nothing of value.      |
+| A11 | 5 | 5 | 5 | bad        | Powerful concept and phrasing, but the mobile wrap is terrible.     |
+
+### 2. DUPLICATION
+
+*   **A01**, **A03**, and **A09** are highly duplicative. They rephrase concepts already stated immediately below them, making the headline and sub-headline pair redundant. A01 is the worst offender, repeating "Write a roadmap" and "Agents build it" almost verbatim.
+
+### 3. TOP THREE AND BOTTOM THREE
+
+**Top Three**
+
+1.  **A01: Write the roadmap. Agents build it on your servers.** It is a direct command that explains the entire product loop and benefit to all three readers instantly.
+2.  **A07: Coding agents for teams whose code must stay in house.** It sells the business case, not the tech, which is exactly what Reader A wants to see.
+3.  **A11: A software factory you run yourself: agents build, gates decide, you steer.** It best conveys the scale ("factory") and the user's ultimate control ("you steer"), but is let down by its poor wrapping on mobile.
+
+**Bottom Three**
+
+1.  **A10: Your roadmap in. Checked code out. Everything between on your servers.** It is abstract to the point of being meaningless and fails to establish credibility.
+2.  **A06: AI writes the code. Your servers run it. Checks decide what merges.** It is a generic, uninspired claim that could describe dozens of less serious projects.
+3.  **A08: One board, one chat, and agents that build what is on it.** It minimizes a "software factory" to a simple UI, completely failing to convey its power.
+
+### 4. THE SANDBOX LINE
+
+If A00 is not the headline, "The worst an agent can do is wreck its own sandbox" belongs as the **title of the section about the sandbox.** It is a brilliant, concise summary of the system's core safety principle, making it a perfect hook for a section that elaborates on that technical detail.
+
+### 5. ONE BETTER LINE
+
+**A software factory on your servers, steered from one chat.**
+
+This line foregrounds the scale ("factory"), the key business benefit ("on your servers"), and the user's role ("steered") while retaining the elegant simplicity of the user interface ("one chat"). It combines the strengths of A11, A01, and A04 without their weaknesses.

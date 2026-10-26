@@ -1,0 +1,21 @@
+1. TABLE
+
+`C0 | 1 | 1 | Indistinguishable wall; no breathing room; exhausts the reader.`
+`C1 | 3 | 3 | Relies on void only; gaps feel accidental, not structural.`
+`C2 | 4 | 4 | Hairlines add visual noise; risks feeling like a legal brief.`
+`C3 | 5 | 5 | Risks spreadsheet fatigue; alternating bands become monotonous.`
+
+2. WHERE THE EYE STILL LOSES THE BOUNDARY
+
+Between **“What you get”** and **“What the agent can reach.”** The dense grid of interface cards bleeds vertically into the architectural flowchart below; the background-value shift is the *only* separator, and because both sections share a similar information density (high), the eye skips the boundary during fast scrolling and reads them as one continuous technical specification block.
+
+3. RANKING
+
+*   **1st: C3** – Alternating backgrounds create unambiguous “containers”; the eye registers a chapter break via luminance change before it even processes the header.
+*   **2nd: C2** – Hairlines are crisp and functional, but they separate rather than envelop; they stop the eye without giving it a place to rest.
+*   **3rd: C1** – Whitespace is necessary but insufficient for an 8,000px document; without a hard edge or value change, the gaps look like rendering errors, not intentional pauses.
+*   **4th: C0** – It is not a landing page; it is a single, terrifyingly long screenshot pasted end-to-end.
+
+4. THE ONE RHYTHM CHANGE
+
+**Asymmetric vertical padding (e.g., 2× the space *below* a section as above it)** to create grouped “breaths,” or **alternating the content max-width (narrow–wide–narrow)** so the physical margins force the eye to re-acquire the left alignment at every stop.
