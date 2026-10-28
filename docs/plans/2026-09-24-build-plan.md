@@ -6015,3 +6015,33 @@ roadmap item that holds it is named.
   supply, a carried pull request's head resolved into the clone
   (0206f529). govulncheck, staticcheck and deadcode in CI before going
   public (73ff43f9). The PolyForm Noncommercial licence and SECURITY.md.
+
+### 2026-10-28: the roadmap items that landed
+
+- 308, the Forgejo part: Forgejo 17.0.1 from 15.0.9 in one step (image
+  pin in `k8s/platform/forgejo/helmrelease.yaml`, the chart 17.1.7
+  stays; queues flushed on the old pod, a backup round before: CNPG
+  backup, WAL switch, dump). The rerun API, the workflow run hook events
+  (both hooks carry them: the code repository's through the registrar,
+  the infra repository's by hand and in the seed), the commit status
+  `skipped` read as passed (`checksResult`, `pendingCheckFindings`,
+  `headVerdict`, the console's `headChecksGreen`), a hook that differs
+  deleted and made again (Forgejo's hook edit ignores the workflow run
+  events and the secret). The stall ladder's first move proven live: the
+  infra head's red run 225, hit by the restart, re-ran green through the
+  API (code 5e506581, infra f1e0667).
+- Built without a roadmap number, 2026-10-28: a red main whose failed
+  jobs all lost their runner re-runs itself once (`queue_pauses.rerun_at`),
+  the human card only when the re-run fails, Forgejo offers none or the
+  re-run lost its runner too, with the runner check named (the cause of
+  card #1283: `scripts/factory-off` deleted the servers under a running
+  job). An alert rule labelled `event: "true"` (`Job failed`) keeps its
+  card until a person closes it: no cleared close, no rollout hold, the
+  card names the Job and its logs. `deployment_health`'s refusal names
+  the Deployments of the searched namespaces and that factoryd reads
+  only the project's namespaces. The cheap pause: `scripts/factory-off`
+  (backup round, disk snapshots, servers deleted; refuses while a CI run
+  is waiting, running or blocked) and `scripts/factory-on` (servers from
+  the snapshots, the shutdown's leftover pods deleted), with
+  `docs/factory-off-runbook.md`. The platform agent question is roadmap
+  330.
