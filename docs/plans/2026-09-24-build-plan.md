@@ -3619,8 +3619,8 @@ Sebastian ruled as 243 to 248: the conversation behind a click with a hover
 peek, the console server-rendered htmx with SSE for the live parts, system
 lanes only, buttons as the state machine with drag for lane starts only,
 two colour channels that never mix, and replay and live from one log.
-[proposal-v1](../board/proposal-v1.md) and [the board
-roadmap](../board/roadmap.md) followed, then the dummy in `board-lab/`,
+[proposal-v1](../board/proposal-v1.md) and the board
+roadmap (since 2026-10-28 items 318 to 320 of [the roadmap](../roadmap.md)) followed, then the dummy in `board-lab/`,
 which three rounds of his click tests reshaped over four iterations (the
 chat inside the card as the drawer's main stage, an editable summary,
 colour as one channel), measured against the aggregate in [the gap
@@ -5832,3 +5832,186 @@ infra.
   the Go CI runs (6365f54). Under go 1.25.0 alone the race suite crashed
   in factoryd with "fatal error: fault", the night's unexplained
   failure at 13.5 seconds.
+
+### 2026-10-16 to 2026-10-25: the roadmap items that landed
+
+The ledger's progress.md holds the steps. Code commits unless named
+infra. The roadmap was pruned on 2026-10-28, and these are the records
+of the items that left it then. Where an item keeps an open part, the
+roadmap item that holds it is named.
+
+- 279 a roll pull request updated for a newer main: an update rebases
+  the roll's branch onto main's head through Forgejo's update endpoint,
+  writes the pins as one fresh commit, and a conflict closes the pull
+  request and files a fresh one (card #863 with #905, approved 798,
+  rolled #879). Its live proof is roadmap 329.
+- 272 `factoryd remove-project <name> [--dry-run]` runs register's
+  inverse as its own job under a ServiceAccount the admission policy
+  admits for DELETE, refuses while the project's file exists or a card
+  is open, and keeps closed tasks as history (cards #866 and #883, the
+  runbook as PR #893, db203dd).
+- 203 every build reads the store: ADD downloads at their sha256, the Go
+  module cache restored with GOPROXY=off, npm offline (PR #896), a guard
+  test that every build-time fetch resolves to the store or a named
+  mirror, the build VM's rules rejecting the four upstreams by name and
+  by DNS, and the image-build job's deadline at 60 minutes (PR #914).
+  Apt's dated snapshot and the PGDG line stay 242's exception. Cilium's
+  copies wait for the rebuild (roadmap 252).
+- 125 the filing check: the chat's `new_card` refuses a brief with
+  closing keywords, mentions, HTML comments or zero-width characters,
+  naming the findings, and the console's New task form shows them above
+  the form, filing as written only on a second submit. Words are never
+  flagged (card #865, approved 795, rolled #879).
+- 42's gateway half: internal/gateway/egress.go, one dialer for every
+  connection the gateway makes on an agent's behalf, the name resolved
+  once, every address that is not a checked public one refused, the
+  dial on the checked address. Firecrawl, Replicate and Fal route
+  through it (card #864, approved 790, rolled #875).
+- 64 the cheat check: cheat.go flags a diff that adds an unconditional
+  Skip, removes a Test, Benchmark or Fuzz function or excludes a file by
+  build constraint, Go only, as a finding on the policy gate (cap 10).
+  Its live run is roadmap 329.
+- 281 sandbox images: project images build FROM a sandbox base without
+  the harness, which an init container copies from the factory image. A
+  project declares images in `factory/images.yaml`, a card may name one,
+  a session that lacks a tool calls `request_tool`, parks in
+  `waiting-image` and restarts on the new image. The pin reaches the
+  project's infra file through a pull request factoryd merges itself
+  when it changes the images block alone, and a project image never sees
+  a token (0205b51d). Proven 2026-10-23: card #1234 asked for chromium,
+  tool card #1235 merged, infra PR #137 merged by the bot, the card
+  restarted about 90 seconds after the pin ([the
+  design](../sandbox-images-design-2026-10-19.md), [the
+  plan](2026-10-19-sandbox-images.md)).
+- 285 to 291 the spec intake in seven steps, 2026-10-16 to 17, from [the
+  concept](../spec-intake-concept-2026-10-16.md): criteria objects on a
+  plan with item citations and the `plan_catches` ledger (285),
+  `min_cards` and the one-card plan (286, 7d3bd82), the `criteria` gate
+  on the integration card (287, f9a83e9), the spec block, the
+  self-attack round and the confirmation question (288), hold-outs
+  drafted blind to the builder, the `plan_holdouts` rows and the audit
+  session with `file_verdict` (289), criteria verdicts as data, the
+  delta cards and the plan-close rule (290), criterion ids fixed after
+  confirmation, `tasks.plan_revision` and the stale-revision refusal at
+  merge (291).
+- 198 the hard data: `project_rolls` written at the confirmed rollout
+  (5931e6db), diff sizes on the task (b3a6eb25), chat tool call timing
+  (533a9eb9), the project on `gateway.calls` (52cbabee), the
+  empty-commit repair (5651d9ef). The intervention rate as diff share
+  stays roadmap 311.
+- 147 the metrics page, GET /projects/{name}/metrics, HTML and JSON,
+  live 2026-10-20: deploys, lead time, cost shares, the three escalation
+  figures (total, by a human, by any AI, policy key `ai_members`), tool
+  spend, with `ci_runs` and the merge commit behind it (C30, [the
+  plan](2026-10-19-metrics.md)). The open parts are roadmap 311.
+- 282 `board_view` and `board_view_reset`: the chat sets what a click
+  sets (the order menus, the find, the filed filter, the routines
+  window, the wide view, a card with its tab, the panel's fold, the
+  theme), one `view` event rides the stream and the page applies it as
+  a click would (ac6f91d, [the plan](2026-10-16-board-view.md)).
+- 267 routines as data: per project in the project's file, a schedule of
+  triggers (cron in the factory's time zone, a merge count, an event),
+  every routine a ghost card at the foot of its lane with its schedule
+  in words, the main chat's three tools, Run now and Skip once as acts,
+  time triggers as Temporal Schedules, merge and event triggers as
+  counters, idempotent filings (27109c6, infra 6f86ce3, [the
+  plan](2026-10-15-routines.md), design round 04). The find box filters
+  as the member types (f38fa44 to d7e5038).
+- 239 the multi-chat console: numbered threads per member with a title,
+  a seen marker and an unread count, turns serialised per thread under
+  `chat.parallel_turns`, a message sent during a turn joining it (C35),
+  compaction at 80 percent of `chat.window`, on the provider's refusal
+  or on `/compact`, the inbox thread with factoryd's pokes,
+  `commands.yaml`, `read_doc` and `write_doc`, archive and delete, the
+  `escalate` tool filing a human-lane card, the level control under Send
+  (f7a4ae4, 3dc8e35, e31058d, d414cd1f, 6e7cd0ab, C14 and C32). Threads
+  are readable by link and listed for their owner only, which answers
+  question 213. `read_doc` reads any file of the document repository,
+  and a `write_doc` edit whose passage is there once lands whatever its
+  hash (Sebastian 2026-10-21).
+- 304 a thread's title from a small model: chat_title.go names a thread
+  once after its first message on the chat's cheap rung, keeps the
+  60-character head as the fallback, and a member's rename wins.
+- 277 the documents in the screen: one document in the drawer's slot at
+  the right edge, Read | Edit with a text area, the draft in the browser,
+  Ctrl+S, a save as one commit on master through the chat's write door
+  with the member's token, a three-way merge when the file moved on and
+  a refusal when the same lines changed, "changed by X at T · Reload"
+  from the event stream, New document and Wide (cards #853 to #856, PRs
+  #870 and #899, [the plan](2026-10-15-documents-in-the-screen.md), C17).
+- 300 documents in the conversation: images and documents ride the
+  composer as chips, the sent message carries them as attachments in the
+  timelines' object store, the log shows thumbnails and link chips,
+  served attachments download, and the agent reads by tool
+  (`analyze_image`, `read_attachment`, `summarize_attachment`)
+  (cb94df23, 2fd1cacf to ff748c43, lab 214c3813, C27). A member-sent
+  image approves its own spend.
+- 305 card sessions look at images: `analyze_image` for coder, analyzer
+  and planner names a workspace file or an image of the card's issue,
+  its comments or its parent's, the class's `vision_model` looks on the
+  card's own account, and the project agent's `new_card` and `comment`
+  upload the thread's images there (ca931af2, roll #1245, infra 6d9f85f,
+  policy version 900). The first live card call is roadmap 329.
+- 301 the `ask` tool: the agent's question renders as a turn with the
+  C14 answer row, two to five choices, a press sends the choice as the
+  member's own message (f408be79, C26).
+- 292 to 295 the inbox: a poke row's state derived at read time, settled
+  rows folding to a reason line, the split badge (f26a6a2, f5203e1,
+  C18), the chat opening on its newest rows and Clear old (e859a6c,
+  d414cd1f), a poke's numbers naming cards and its row opening the card
+  (04ced41), a needs-you face bounded at its assembly point with a
+  stylesheet clamp (e84d4c7). The live settle check is roadmap 329.
+- 296, 297 and 302 the chain: a card is done when its merge commit runs
+  on the deployed digest, the chain tracked generically from Forgejo's
+  runs (`chain_runs`), the roller's verdict as the `factory/roll` commit
+  status (PRs 1113, 1118, 1121). Then the chain-and-autonomy design of
+  2026-10-20: the store's reconciler owns a card after merge and the
+  workflow ends there, the roll a visible card the merged cards name,
+  `requires: [factory/roll]` with a 24 h stall, one slider with four
+  positions (manual, assisted, autonomous, full auto), mechanical sources
+  merging on green at auto, the high class merging at full auto with the
+  audit's pass (amending rulings 76, 77 and 109), forbidden and
+  migration keeping a human, the discretionary pool and the `fund` tool,
+  the gate bot factory-gate posting the approval the gate decided (R59
+  to R64), the infra chain through Flux commit statuses (code 7a670a96,
+  81d99fda, 01220ca7, infra 0eb56e0, dd88c46, 330b406, 1814e4d). The
+  open ends are roadmap 308.
+- 298 one card per feature: the partial index narrowed to live cards,
+  `insertTask` refusing a second live card on an issue and naming the
+  holder, likeness never judged (PR 1118).
+- 299 the dependency light: factoryd probes the object store both ways,
+  the provider's control plane, Forgejo, Postgres and Temporal on a
+  minute clock, two failures mark down, one success lifts, over 2 s is
+  degraded. A dot in the status line in the worst state's colour, always
+  shown, the expanded line listing each dependency (PRs 1124 and 1127,
+  rolls #1126 and #1130). AWS and GCP probes are roadmap 82.
+- 197 a second provider: two model classes, big and small, each a z.ai
+  model first with an Alibaba model as the router's fallback, every
+  purpose alias gone, vision a model of its own, 64,619 audit rows
+  renamed (live 2026-10-20 15:03Z, [the
+  plan](2026-10-20-two-model-classes.md), infra k8s/platform/litellm). A
+  z.ai failure falling back is roadmap 329.
+- 145's messengers: Telegram (`setWebhook` with a secret header, a
+  connect code) and Discord, an outbox and sender, a member's level per
+  project (off, needs you, all), one line with a link to the card
+  (Sebastian's stack b73e726 and 3eed5a9, 2026-10-17, the panel b9e52be,
+  C19, [the plan](2026-10-14-messenger-notifications.md)). Web Push and
+  the live proof stay roadmap 145 and 329.
+- 35 budget steering: `limitWatch` tells a running agent to wrap up and
+  push at `warn_at` (default 80 percent) of the card's budget or the
+  session's agent time (internal/factoryd/limits.go).
+- Built without a roadmap number, 2026-10-18 to 24: the intake switch,
+  `intake: open|closed` in the project file, a wake-born turn refusing
+  `new_card`, `move_card`, `accept_plan` and `start_plan` while closed
+  (PRs 1092 and 1093). Needs-you cards, every human card a five-part
+  question from `HumanQuestion`, both heartbeats and the "call escalate
+  once" rule gone, a cleared alert closing its untouched human card
+  (6a305cd3, [the plan](2026-10-20-needs-you-cards.md)). The project
+  agent's own identity factory-chat for wakes (2026-10-21). The
+  factory's close as one function with a heal pass (f48e8012, [the
+  plan](2026-10-21-factory-close-heal.md)). The queue and the copier
+  guard (9cac7aca, d45e5d85). `deployment_health` for alert agents.
+  One-click fund buttons on budget-blocked cards (bf27f69a). Carry
+  supply, a carried pull request's head resolved into the clone
+  (0206f529). govulncheck, staticcheck and deadcode in CI before going
+  public (73ff43f9). The PolyForm Noncommercial licence and SECURITY.md.

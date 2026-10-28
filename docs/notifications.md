@@ -1,6 +1,6 @@
 # Notifications: channels, routing and bounds
 
-This file holds the facts behind roadmap item 145, the mobile notifications on Telegram and Discord, which absorbed 146, the PWA install. Sebastian ruled the messengers pagers on 2026-10-17: one line with a link, no chat and no answer buttons ([the plan](plans/2026-10-14-messenger-notifications.md)). The [roadmap](roadmap.md) holds its status. Sources: the [UX conversation](ai-software-factory-ux-conversation.md), ruling 256, the [board roadmap](board/roadmap.md), and Sebastian's discussions of 2026-10-13 and 2026-10-17 on the messengers.
+This file holds the facts behind roadmap item 145, the mobile notifications on Telegram and Discord, which absorbed 146, the PWA install. Sebastian ruled the messengers pagers on 2026-10-17: one line with a link, no chat and no answer buttons ([the plan](plans/2026-10-14-messenger-notifications.md)). The [roadmap](roadmap.md) holds its status. Sources: the [UX conversation](ai-software-factory-ux-conversation.md), ruling 256, the board roadmap (folded into the roadmap on 2026-10-28), and Sebastian's discussions of 2026-10-13 and 2026-10-17 on the messengers.
 
 ## What notifies
 
