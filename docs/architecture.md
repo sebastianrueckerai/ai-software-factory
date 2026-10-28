@@ -798,7 +798,7 @@ the factory should run on the providers its owner actually uses daily.
 Since 2026-10-20 LiteLLM holds two model classes, `small` and `big`, one
 alias each. `big` is the z.ai model `glm-5.3` and `small` is `glm-5.3-flash`.
 Each class has an Alibaba twin, `qwen3.8-max` for `big` and `qwen3.8-flash`
-for `small`. `small` is the start rung and serves the coder, the pulse and
+for `small`. `small` is the start rung and serves the coder and
 the cheap calls. `big` serves the stronger rung, the review, the supervisor,
 the audit, the check-in and the operator, so the stronger-model retry and
 the review stay a real step up from `small`. A call's purpose sits on its
@@ -1705,7 +1705,7 @@ told. Stage 16 added `invite`, `github_export`, `close`, `edit`,
 `grant_session` and `set_dependency` to the defaults, Stage 17
 `split_card` and `github_sync`, and no read tool is
 ever in them (Ruling 261). `monthly_eur` is the budget of the project's
-chat task each month, which the agent's and the pulse's calls share (5.4).
+chat task each month, which the agent's calls use (5.4).
 `confirm` is a preference, not a cap, so stricter wins (below) does not
 bind it: a project file's list replaces the policy's, shorter or longer,
 and the policy's list is the default for a file that sets none. The
@@ -1950,9 +1950,10 @@ books LiteLLM's own cost, cached tokens at the cache-read price, and the
 ledger rows checked equal their LiteLLM spend log rows.
 
 Stage 15 added two refs (Ruling 252, 5.7): the project agent's calls book
-under `operator` and the pulse's under `pulse`. Both book on the project's
+under `operator` and the pulse's under `pulse`. C20 (2026-10-17) removed the
+pulse and its ref. The agent's calls book on the project's
 chat task of the month, `t-chat-<name>-<yyyy-mm>` (kind `chat`, no card and
-no workflow), whose budget is `chat.monthly_eur`, so one figure caps both.
+no workflow), whose budget is `chat.monthly_eur`, so one figure caps them.
 The design had them outside any task. The chat task carries the project's
 repository, so its spend counts in the project's month and in the status
 line's figure.
@@ -2307,7 +2308,7 @@ factory and never does the work. It reads, explains, files cards, moves,
 answers, steers and approves. It runs no code, and work that needs a
 sandbox becomes a card.
 
-**Five parts, one job each.**
+**Four parts, one job each.**
 
 - **Status line**: what is the state. Per project, quantitative and always
   there: the project's state (working, waiting on you, idle, paused), the
@@ -2324,18 +2325,6 @@ sandbox becomes a card.
   Since Stage 17 the status line spans both columns, the board's and the
   chat's, and for a project in pull request mode it counts the open GitHub
   pull requests, live "GitHub: 0 open pull requests".
-- **Pulse**: what to understand about it. One sentence under the status
-  line, the single most useful thing to know now, which a click expands to
-  three or four bullets. A cheap model writes it from the board snapshot
-  and the last events, on every event (debounced 2 s, at most one call per
-  10 s) and every 60 s as the fallback, with a typing indicator while it
-  recomputes. It is subdued when all is well and prominent when something
-  needs a person. Its spend is the project's. Built on the `pulse` alias:
-  the prompt is the project agent's snapshot and the last 20 events, the
-  answer a sentence and its bullets as JSON, and code, not the model, sets
-  the prominence from the status line. The 60 s fallback runs while the
-  newest event is under an hour old. A failing call backs off from 60 s,
-  doubling to 15 minutes, and pulses are kept for a day.
 - **Board**: what work exists and where it is. Five columns in the split
   view (below), with proposal-v1's card face. The spend figure on a card
   stays muted until 80 percent of its budget, then turns prominent with the
@@ -2386,16 +2375,15 @@ sandbox becomes a card.
 **One event per act.** Every console action records one event, with the
 field `via` saying whether a button or the chat made it. The project's
 events are one feed at one endpoint, and SSE carries them to the board
-(Ruling 244), so the live badge replaces the 3-second poll and the pulse
-refreshes on events. Built as the `events` table, with `via` one of
+(Ruling 244), so the live badge replaces the 3-second poll. The pulse
+refreshed on events too, until C20 (2026-10-17) removed it. Built as the `events` table, with `via` one of
 `button`, `chat`, `webhook` and `factoryd`, the feed at
 `GET /projects/{name}/events` and the stream at its `/stream`, which
 replays from Last-Event-ID. Stage 15 ran a 30 s poll beside the stream for
 the counters, 3 s when the stream failed. Since Stage 17 no client timer
 runs (Ruling 288). The stream's server heartbeat every 25 s reads the
 counters and sends a board event when a card's fingerprint (the stale
-ring, a provider wait, the checks, the minute ages) or the pulse's spend
-changes, and a reconnect reads the board once. A writer's stream reads the
+ring, a provider wait, the checks, the minute ages) changes, and a reconnect reads the board once. A writer's stream reads the
 board at the heartbeat, and a reader's stream carries no event rows.
 Since 2026-10-20 the heartbeat is the event `ping`, which the stream also
 sends when it opens. Its data is the console's build, a hash of the
@@ -2415,7 +2403,8 @@ open. Live,
 a 156 s network trace of a board held one EventSource and no request after
 0.4 s. Stage 15's build added event kinds: `task_status` on every status or gate
 change, `question_asked`, `card_commented`, `comment_deleted`,
-`card_steered`, and `pulse` and `pulse_computing`, which stay out of the
+`card_steered`, and `pulse` and `pulse_computing`. C20 (2026-10-17) stopped
+writing the last two. Their old rows stay in the trail, out of the
 feed and the agent's context. Stage 17 added `session_said`, on the bus
 only, and `card_steered` carries the steer's text.
 
@@ -2512,8 +2501,7 @@ for the factory's writers, and five writes, `split_card`, `github_sync`
 reads and writes check the factory writer inside the shared functions,
 so a page and a tool refuse in the same words. The console's GET routes
 come from one table, and each names its tool or the reason it has none,
-such as the new project's form, since the chat creates no project, and
-the pulse sentence, which every turn's context carries. A parity test
+such as the new project's form, since the chat creates no project. A parity test
 reads the table and fails on a route with neither, and on a GET route
 registered beside it. Live in Stage 17 (09:39Z), one chat turn per new
 read was answered from its tool. One gap showed: `costs` by card reads
@@ -2594,8 +2582,8 @@ gates judge the result.
 
 **Spend.** The agent's calls go through the gateway under the project's
 identity with the ledger ref `operator`, on the LiteLLM alias `operator` on
-the high tier, and the pulse's under the ref `pulse` on the low tier (5.4).
-The project file's `chat.monthly_eur` caps both, and the status line's
+the high tier (5.4).
+The project file's `chat.monthly_eur` caps them, and the status line's
 spend figure includes them. The design booked them to the project outside
 any task. The build books them to the project's chat task of the month
 instead (5.4), so the gateway's budget check for a task caps them.
@@ -2702,8 +2690,8 @@ projects' reconciles went on. A filing whose infra pull request merges
 after the purge still loses its import (roadmap 176).
 
 **Round 1** (Ruling 256) built the event spine, the status line, the
-pulse, the chat, the board beside the chat with fewer columns, and inline
-answers on needs-you cards. Members with approvers per project and GitHub
+pulse (C20 removed it on 2026-10-17), the chat, the board beside the chat
+with fewer columns, and inline answers on needs-you cards. Members with approvers per project and GitHub
 import and export moved to Stage 16 for the round's budget. Its exit test,
 an app built through the chat (the plan's Stage 15), passed on 2026-10-11.
 Messenger push and the mobile layout are roadmap items, and so is the
@@ -4929,7 +4917,7 @@ since Stage 6, but neither has run under load.
 | Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list. Servers and volumes, no buckets. SSH certificates bound to one server. Outbound tcp 53, 80 and 443. Deletion at the last tick before the lease ends | Built (Rulings 80, 83, 121, 122, 124, 125) |
 | Collector safety | A pass that sees a cluster node's IPv4 or another project's label deletes nothing | Decided (Ruling 123) |
 | Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Built (Rulings 81, 84) |
-| Project screen | One screen per project (5.7): status line, pulse, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export. Since Stage 16 the board's reads and actions are chat tools, the `system` tool is rendered from the code, refusals name the fitting action, and the planner asks its open questions before acceptance. Stage 17 built the drawer's Chat tab, the message queue, the status line across both columns, the event stream without a poll, the split, the approve warning and GitHub pull request mode | Built in Stage 15 (Rulings 251 to 260), exit test passed. Stage 16 (Rulings 261 to 270) built the chat as the window, members, approvers per project and GitHub import and export on 2026-10-11. Its exit test's chat-only run had one gap, main's CI result, which the `ci` read built after the run closed. A fix round the same evening built the fixes for seven of its findings. Stage 17 (Rulings 272 to 307) built its items on 2026-10-12, 4.11 last, live since roll #488. Its exit test's chat run had one gap, a pull request the factory opened outside a card (roadmap 187), and its lane criterion failed |
+| Project screen | One screen per project (5.7): status line, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export. Since Stage 16 the board's reads and actions are chat tools, the `system` tool is rendered from the code, refusals name the fitting action, and the planner asks its open questions before acceptance. Stage 17 built the drawer's Chat tab, the message queue, the status line across both columns, the event stream without a poll, the split, the approve warning and GitHub pull request mode | Built in Stage 15 (Rulings 251 to 260), exit test passed. Stage 16 (Rulings 261 to 270) built the chat as the window, members, approvers per project and GitHub import and export on 2026-10-11. Its exit test's chat-only run had one gap, main's CI result, which the `ci` read built after the run closed. A fix round the same evening built the fixes for seven of its findings. Stage 17 (Rulings 272 to 307) built its items on 2026-10-12, 4.11 last, live since roll #488. Its exit test's chat run had one gap, a pull request the factory opened outside a card (roadmap 187), and its lane criterion failed |
 | Merge authority | The `factory-merge` bot merges after a whitelisted human's approval, enforced by Forgejo's branch protection. Merge retries are capped at six. A project on `auto` merges class `normal` without a card after a proven reproduction or a strict improvement and an approving review; the factory's repositories stay on `human` | Built (Rulings 109, 129). `auto` built (Rulings 149, 167, 169) |
 | Intake lanes | Lanes backlog, plan and ready from the project's process, `moved_by` judging every entry. Every bug from any account or alert starts a task. Improvements wait in the backlog for a writer, with an analyzer's write-up. Outsiders' bug reports pass a screening stage. Outsiders' writer-only labels are stripped. The poster's text is untrusted information between random markers | Built (Rulings 148, 150, 182, 185) |
 | Projects | Each project its own Forgejo organisation with a CI user, runner registration, deploy key and deploy branch. Flux tenancy through a namespaced account. A default-deny network policy with the file's outside hosts only and a quota per environment. Stricter wins: a project file only tightens the policy's defaults. Reconciled hourly. Settings from the project's file, `objects: factory \| seed` and `agents: coder \| none`, so the factory's two repositories are projects like any. Registered by the reconcile with the admin's login from OpenBao. A cache volume per project for agents and pull request CI. Hostnames are an infra commit. Since Stage 17 a Template update pull request per project keeps the template's files in step | Built (Rulings 146, 155, 156, 157, 164, 165, 166, 179, 296) |
@@ -4986,7 +4974,8 @@ works `factory` and `demo-app`.
    human password and the sanitiser for outsiders only. The Stage 11 spec
    then built clean in under two hours.
 9. The project screen (Stage 15, built 2026-10-11, 5.7): the event
-   spine and the live board, the status line, the pulse, five columns
+   spine and the live board, the status line, the pulse (removed by C20
+   on 2026-10-17), five columns
    beside the project agent's chat, and inline answers. Members with
    approvers per project and GitHub import and export moved to Stage 16.
    The exit test, an app built through the chat, passed on
@@ -5037,7 +5026,6 @@ works `factory` and `demo-app`.
 | Approvers | The policy's list of Forgejo users who may authorise spend in the console |
 | Hold | A reservation of a call's or a resource's worst-case cost, taken before it runs and replaced by the real cost |
 | Push mirror | Forgejo's push of every commit to the GitHub copy of a repository |
-| Pulse | One sentence under the status line, the most useful thing to know now, written by a cheap model from the board and the last events, refreshed on events and every 60 s while the project is active, booked under `pulse` (5.7) |
 | Heal pass | factoryd's pass at boot and every minute that starts missing workflows and re-reads Forgejo for signals a webhook missed |
 | Timeline | A task's step-by-step record in S3 (`sessions/<id>/timeline.jsonl`), from intake to its final state |
 | Envelope | The resource and euro allowance per project for commissioned cloud resources: monthly euros, server types, count, lease length, volume size. A block of the project's file, the policy default when absent |
@@ -5045,7 +5033,7 @@ works `factory` and `demo-app`.
 | Principal | The name an SSH certificate is valid for. A commissioned server accepts only its own, `resource-<row id>` |
 | Project | A repository the factory builds software for, with its settings in a file of the infra repository, its own Forgejo organisation, namespaces and quota. The factory's own repositories are projects on `human`, their objects from the seed |
 | Project agent | The chat's agent on the project screen: a tool-calling loop inside factoryd that acts as the human through the console's own actions, one event whatever the input, and runs no code. The tools that need a human's OK are the `chat.confirm` setting (5.7) |
-| Project screen | The human's tool, one per project: status line, pulse, board, chat and card drawer, each with one job (5.7) |
+| Project screen | The human's tool, one per project: status line, board, chat and card drawer, each with one job (5.7) |
 | Merge rule | A project's setting, `auto` or `human`: whether a qualifying change merges without a card |
 | Member | A write collaborator on a project's Forgejo repository. A member gets the project screen of the projects they write and never the factory-level pages (5.7) |
 | Deploy branch | A project's branch `deploy`, which holds the rolled state that Flux applies. Only the deploy key pushes to it |
