@@ -1691,7 +1691,7 @@ its monthly euros and the tools that need a human's OK. The defaults
 
 ```
 chat:
-  model: operator          # LiteLLM alias, tier-high
+  model: big               # LiteLLM alias, tier-high
   monthly_eur: 5           # the project agent's own line
   confirm: [new_card, move_card, answer, steer, start_plan, retry,
             accept_plan, request_changes, reject_plan, approve_merge,
@@ -1705,7 +1705,8 @@ told. Stage 16 added `invite`, `github_export`, `close`, `edit`,
 `grant_session` and `set_dependency` to the defaults, Stage 17
 `split_card` and `github_sync`, and no read tool is
 ever in them (Ruling 261). `monthly_eur` is the budget of the project's
-chat task each month, which the agent's calls use (5.4).
+chat task each month, which the agent's calls use (5.4). A raise of it
+reaches the month in progress, and a lower figure never cuts a fund.
 `confirm` is a preference, not a cap, so stricter wins (below) does not
 bind it: a project file's list replaces the policy's, shorter or longer,
 and the policy's list is the default for a file that sets none. The
@@ -2581,12 +2582,31 @@ artifacts. Humans and the project agent may message a running agent. The
 gates judge the result.
 
 **Spend.** The agent's calls go through the gateway under the project's
-identity with the ledger ref `operator`, on the LiteLLM alias `operator` on
-the high tier (5.4).
+identity with the ledger ref `operator`, on the alias `chat.model` names
+(`big` by default) (5.4).
 The project file's `chat.monthly_eur` caps them, and the status line's
 spend figure includes them. The design booked them to the project outside
 any task. The build books them to the project's chat task of the month
 instead (5.4), so the gateway's budget check for a task caps them.
+
+**The chat's budget stop** (2026-10-28). The gateway alone judges whether
+a chat call fits, and it shrinks every call to fit, so the spend stops a
+few cents short of the budget. A test of spend against budget therefore
+never fires, and the chat once stood silent on such a test. When the
+gateway refuses a chat call for money, the turn ends on a row of kind
+`budget` in its thread: a plain sentence and the gateway's reason. A
+refusal by the chat task's own budget is recorded once, as the
+`chat_budget_spent` event on the chat task with the fund it suggests (the
+last 7 days' spend rate carried to the month's end, in whole euros, at
+least 1). That event is the stop. It stands while the task's budget is
+not above the budget it recorded. It pokes the inbox at needs-you, holds
+every wake, and lights the status panel's Fund the chat form. Under the
+newest stop row an approver gets the amount, prefilled and editable, and
+one button, Fund and go on: the budget rises, and every turn the stop
+ended goes on, the pressed thread's in its own stream and the others in
+the background. The resumed context leaves the `budget` rows out. A
+refusal by a factory cap (day, month, project) names the cap and the
+commit that raises it, and offers no fund.
 
 **Members, approvers and GitHub** (Rulings 254 and 270, built in Stage
 16). A member is a write collaborator on the project's Forgejo repository.
@@ -2937,9 +2957,10 @@ card; timers never combine. At most one wake turn runs per 10 seconds,
 one wake judges a watched card per minute, a pass reads 100 events, and
 a wake that fails holds the project's next for a minute. A wake whose
 thread is gone, deleted or archived, is not a failure to retry: the
-watch or timer row goes with the thread. When the
-gateway refuses the chat task's spend, the Waker asks for money in code,
-once, the month-cap card, and no wake runs until the answer comes.
+watch or timer row goes with the thread. While the chat's budget stop
+stands (above), the console refuses every wake before it stores a row
+(`ErrChatUnfunded`), and the Waker holds the wake as it holds any refused
+one. The stop's own poke is the one ask, and a fund lifts it.
 
 The ask attempt, at autonomous and full auto: every ask that would reach
 a human gets one model turn before the human sees it, except an ask the
