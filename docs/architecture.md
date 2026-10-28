@@ -4738,7 +4738,9 @@ touched it (Sebastian, 2026-10-20): no comment by a person, no answer or
 park, no `noise` label. The minute pass beside the SigNoz sweep turns the
 row `unjudged` by factoryd and ends the card `closed` in one transaction.
 Then it comments and closes the issue as the factory's own close. An alert that fired again after it cleared, or a card a
-person acted on, keeps waiting for its verdict. The agent's `alerts`
+person acted on, keeps waiting for its verdict. So does the card of a
+rule labelled `event: "true"` (`Job failed`, 2026-10-28): a failure is an
+event, and its clear only says the rule's window moved on. The agent's `alerts`
 tool names such a row "cleared at …, verdict pending". Proven live in the Stage 9 exit test: three deletions of
 the factoryd pod filed #193 and started an agent task, a platform Job past
 its deadline filed infra issue #5 in the human lane, and the gateway's 5xx
