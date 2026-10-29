@@ -810,7 +810,11 @@ trace (Ruling 189). A class with none left fails the call, which the task's
 existing paths handle.
 
 Since 2026-10-29 a third class, `premium`, is OpenAI's `gpt-6.1-sol` at
-`reasoning_effort: max` (Ruling 328). The GLM plan is a flat fee, so its
+`reasoning_effort: max` (Ruling 328). Every premium call goes through OpenAI's
+Responses API (`openai/responses/`), since the chat completions API refuses
+`max` for this model and takes `low` to `xhigh` only. LiteLLM merges no price
+entry for that route, so the release pins Sol's per-token rates in
+`model_info` for the price book, and LiteLLM bills from its own entry. The GLM plan is a flat fee, so its
 spend in the ledger is modelled. Premium is paid per token, so its spend is
 real money, and `budget.premium_month_eur` caps it apart (5.4). Three steps
 run on it: the planner's session, through the planner class's
@@ -824,8 +828,9 @@ alias and reason record both. `big` is the review's model before premium, so
 no call lands below its old model. Every key minted from a list that holds
 `premium` also holds `big`. The class is a development stopgap: to remove it,
 delete the cap, point the three steps back at `big` and delete the alias, its
-fallback line and the `litellm-openai` secret. Until the key is seeded, the
-secret holds an empty key and every premium call runs on `big`.
+fallback line and the `litellm-openai` secret. The key is `OPENAI_API_TOKEN` in
+`.env.tools`. Without one the secret holds an empty key and every premium call
+runs on `big`.
 
 At Stage 9 the ranking of the three tiers came from a fixed coding and review sample, 117 calls for 0.25
 USD. All 13 candidates passed all 9 samples, so the samples could not rank
@@ -1943,8 +1948,9 @@ call reaches are left out: the service tiers and the batch API, the 12-hour
 cache, web search, and the regional uplift of a deployment without
 `data_residency`. The gateway refuses the request options that reach them
 (`service_tier`, `prompt_cache_retention`, `web_search_options`). LiteLLM's
-entry for `gpt-6.1-sol` carries all of them, and the uplift multiplier and the
-per-query search price would otherwise leave the alias unpriced. The OpenAI
+entry for `gpt-6.1-sol` carries all of them, and on the `openai/` route the
+uplift multiplier and the per-query search price would otherwise leave the
+alias unpriced. The OpenAI
 project must stay on the default service tier, since a project whose default
 is priority or flex bills at a rate no hold counts. It clamps the output-token limit so that
 the worst case fits the free headroom of the task and the day. It takes a
