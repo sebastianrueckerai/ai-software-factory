@@ -4425,11 +4425,20 @@ closed as real.
   the review notes it and makes no call. It has no cap on parts, and cuts
   a file larger than a part by hunks. Each call's input is built when the
   call starts, so the diff is held once, in its parts. The calls run four
-  at a time. Before the first, the review sums its calls' holds as the
-  gateway takes them (`policy.Fit` on each request, calibrated as the hold
-  is) and makes none when the card's free headroom cannot pay the sum: the
-  note names the calls, the estimate and the headroom, and asks to fund
-  the card, since a review cut off by its budget pays for nothing. A call
+  at a time. Before the first, the review estimates what its calls will
+  spend and makes none when the card's free headroom cannot pay it, since
+  a review cut off by its budget pays for nothing. The estimate refuses
+  only a fan-out that cannot finish: `policy.Fit` stays its one formula,
+  on a prompt calibrated on the task's newest settled call on the ref,
+  else the ref's newest of any task (the gateway's own first hold stays a
+  token a byte), on the ref's mean output over its newest 100 settled
+  calls for all but the last call, and on `big`'s price for a premium
+  call the premium month cannot hold, as the gateway serves it. With no
+  settled call on the ref it prices a token a byte and the whole limit.
+  The note names the calls, the estimate and the headroom, and what the
+  approval card offers: read the diff, then Approve the merge or Deny it.
+  An in-review card has no Fund, and nothing would run the review again
+  after one. A call
   the gateway refuses for headroom (the task's cap, the day's, the month's
   or the project's) is made again after the others, one at a time, so a
   budget that paid the parts one after the other still pays them; the note
@@ -4479,8 +4488,10 @@ closed as real.
   every part, in calls of four at a time, with no cap on parts, and its
   parts stay 48 KiB whatever `review_diff_kib` says. A diff past 8 MiB, or
   calls the card cannot pay for (estimated as the review's), is one
-  finding and no call. A refused or failed call is one finding for its
-  reason that names its parts, and the parts' findings keep the first 50.
+  finding and no call. A refused call is one finding for its refusal and
+  failed calls one for each status, so a burst of upstream 429s with
+  bodies of their own is one, each naming its parts, and the parts'
+  findings keep the first 50.
   Every finding's text passes the scrubber, fed with the secret values the
   diff itself holds, so the card and the timeline never show one. It posts
   no pull request comment. A roll skips it. Bound `GateAudit`, derived
