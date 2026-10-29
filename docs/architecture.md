@@ -3690,10 +3690,10 @@ The check-in conversation runs inside the session activity, because
 `continue` needs the live session (Ruling 87). It must answer strict JSON
 with one of the four decisions, a message carrying guidance, a handover
 carrying a note and a human escalation carrying a reason; an answer
-naming anything else escalates, and an unreadable answer gets one repair
-round before it escalates. On the last call an unreadable answer asks a
-human at once, as unreadable. Its input holds the guidance already delivered
-in this
+naming anything else escalates, and an unreadable answer, a handover
+without its note among them, gets one repair round before it escalates.
+On the last call an unreadable answer asks a human at once, as
+unreadable. Its input holds the guidance already delivered in this
 session, and the prompt asks it not to repeat a message that did not
 work. A message travels the loop nudge's path (6.2) and is recorded as a
 `message` step and an issue comment; once the worker accepts it, or
@@ -3706,15 +3706,19 @@ the same way (`Runner.MessageSession`), as a human message on this path
 under the human's name, and does not arm the stuck rule.
 
 The pod works on while the check-in runs, and its lines wait in the
-stream. The last answer to a trip, a delivered message, a continue or a
-climb, therefore sets a boundary at the moment it takes effect. For a
-message that moment is its delivery, taken before the issue comment. A
-tool call or a command whose pod time lies before the boundary goes into
-the findings and counts for no detector. A write from that window still
-counts: it resets `no_write`, reading without writing and the count of
-nudges, and it enters the flip-flop and churn memory. It does not disarm
-the stuck rule, which wants a write after the delivery. Card #1287 showed
-the gap on 2026-10-28. Its check-in answered message after 9 calls and 3
+stream. So every answer to a trip that lets the session go on, a
+delivered message, a continue or a climb, sets a boundary at the moment
+it takes effect, before the issue comment. For a message that moment is
+its delivery. A tool call or a command whose pod time lies before the
+boundary goes into the findings and counts for no detector, unless it is
+a command that passes. A pass is progress whenever it ran: the command
+leaves the failing set, resets churn when it was failing, and no
+flip-flop waits on it failing again. A checkpoint from that window sets
+the diff's baseline. A write from that window still counts: it resets
+`no_write`, reading without writing and the count of nudges, and it
+enters the flip-flop and churn memory. It does not disarm the stuck rule,
+which wants a write after the delivery. Card #1287 showed the gap on
+2026-10-28. Its check-in answered message after 9 calls and 3
 minutes 26 seconds. The 99 calls the pod made meanwhile then counted after
 the message: call 120, made before the delivery, tripped reading without
 writing again, and the stuck rule ended the session without a
