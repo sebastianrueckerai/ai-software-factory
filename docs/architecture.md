@@ -1035,9 +1035,13 @@ asks for plan where the process has a plan track. `backlog` or
 `agent` or `plan` label commits it. An issue with none of these labels is a
 direct card, so a bug from anyone still starts (Ruling 148). Tasks filed
 through the API, by alerts, by routines and by the roller are direct cards.
+`moved_by`, the move buttons and the presort write-up went with the
+backlog.
+
 A running direct card can turn plan-track between two of its sessions
-(roadmap 336). The signal `to_plan` (`SignalToPlan`, change id
-`direct-to-plan`) is taken once the card is running, after a person's wait.
+(roadmap 336; phases 3 and 4 send the signal, nothing does yet). The
+signal `to_plan` (`SignalToPlan`, change id `direct-to-plan`) is taken once
+the card is running, after a person's wait.
 `BecomePlan` then moves the row to the plan track first, so a refusal
 writes nothing and a retry completes the rest: the `to_plan` step, the
 session counters at zero and the issue label `plan` in place of `agent`.
@@ -1048,10 +1052,9 @@ went to the planner. A refusal names the card's state and the fitting
 action, and the card runs on as it was. A plan's open groups are the plans
 with a merged child and no `plan_closed` event, and a plan without
 criteria closes when its cards are done or closed (a migration closed the
-legacy ones). A dependency joins cards of one plan only: any other card is
-a group of one.
-`moved_by`, the move buttons and the presort write-up went with the
-backlog.
+legacy ones). The console refuses a dependency across groups; a card of
+no plan is a group of one. The machine edges (a delegated card, the tool
+park) cross groups by design.
 
 **The planner and the plan card** (Rulings 205, 208, Task 101). A card in
 lane `plan` starts a task of class `planner`, whose session mode is `plan`:
