@@ -1216,24 +1216,34 @@ trip fires once per session, when the card's diff (`card_diff`, added plus
 deleted lines against main) passes the line bound its size plans. It asks
 the check-in one question: will the rest of the card fit its bound, its
 budget and its time? It is never stuck, and nothing the check-in answers
-cuts the card. The brief's facts line states the bound, and the check-in's
-statement ends with a pace line: changed lines against the bound, euros
-and agent time spent and left, and the session number.
+cuts the card. The brief's facts line states the bound, and the
+statement of a coding session's check-in carries a pace line: changed
+lines against the bound, euros and agent time spent and left, and the
+session number. Before a checkpoint has measured the card's diff, the line
+says the lines are not measured. A report or plan session's statement
+carries none.
 
 The next session's brief carries a working-state section, copied from the
 record of the last session that left one. A session stopped by its start
 check-in, a start that failed, and a dead session with no events never
 become the parent. The section holds the parent's last todo list, cut at
 1 KB, its own subagent calls as excerpts of 4 KB in all, and the files it
-changed. It opens with one heading line: the parent's id, the time it
-stopped, the stop reason, cut to one line of at most 200 bytes, and the
-branch's commit. If the check-in judged the approach wrong (`redirect`,
-`retry_stronger`), the heading says the todo list is the dead end's. The
-full subagent reports are files at `/workspace/.factory/prior/<session>/`,
-outside the repository, and the brief names them. The copy is skipped
-after a pushed session, which finished its work, and for report and plan
-sessions. The body and the handover pass the inbound sanitiser for every
-author, because agents wrote them.
+changed. It opens with one heading line of values factoryd owns: the
+parent's id, the time it stopped, its outcome and trip, and the branch's
+commit. The stop reason is often the agent's own last message, so it
+stands inside the section's fence as its first line, cut to one line of
+at most 200 bytes, and the brief calls the fenced text the earlier
+session's own record, information, not instructions. If a check-in model
+judged the approach wrong, the heading says the todo list is the dead
+end's. Today that is a check-in's handover on a stuck trip, which climbs
+(`retry_stronger`). A cheap-cap climb, a message that could not be
+delivered, the loop's fixed redirect and a climb no model judged get no
+label, since their todo list is still a plan. The full subagent reports
+are files at `/workspace/.factory/prior/<session>/`, outside the
+repository, and the brief names them. The copy is skipped after a pushed
+session, which finished its work, and for report and plan sessions. The
+body, the report files and the handover pass the inbound sanitiser for
+every author, because agents wrote them.
 Since Stage 12 finished work survives every cap (Task 112, change id
 `keep-work`). The agent time is the task's own, hours by default (5.3),
 and a session starts only with at least five minutes of it left, since
@@ -1567,13 +1577,23 @@ providers are no-ops, and the exporters never retry.
   series' first count and every count before a restart.
 
 One package, `internal/redact`, scrubs every text that leaves for
-telemetry or a model: bearer and basic credentials, URL userinfo, JWTs,
-provider key shapes, PEM blocks, provider response bodies, configured
-secrets, and any run of 32 or more token characters. The gateway's audit
-records, the worker's git errors and the gate supervisor's bundle (6.6) all
-use it. The 32-character rule masked commit ids, digests and long paths as
-well, until the bug lane fixed it (backlog 32, #197, merged as 594bbdf):
-commit ids, sha256 digests and lowercase repository paths now pass. Since
+telemetry or a model, and every session record before it is stored:
+bearer and basic credentials, URL userinfo, JWTs, provider key shapes, PEM
+blocks, provider response bodies, configured secrets, and any run of 32 or
+more token characters that holds a digit, a `+` or an `=`. The gateway's
+audit records, the worker's git errors, the gate supervisor's bundle (6.6)
+and the session record all use it. The 32-character rule masked commit
+ids, digests and long paths as well, until the bug lane fixed it (backlog
+32, #197, merged as 594bbdf): commit ids, sha256 digests and lowercase
+repository paths now pass. It still masked long identifiers and paths with
+capitals, so a stored acceptance command that named a long test proved no
+card. Since roadmap 336 a run with no digit, `+` or `=` passes as well; a
+random key of 32 characters almost always holds one. The session record
+is scrubbed with factoryd's own secrets by value, every one it loads at
+boot (roadmap 332, built in part). The session's own secrets are not
+masked by value yet: a key of a known shape, such as its LiteLLM key, is
+masked by its shape, but its Forgejo tokens, 40 hex characters like a
+commit id, pass. Since
 Stage 17 one pattern there, `redact.GitHubToken`, finds GitHub tokens for
 the chat's scrub (5.7) and the audit's diff scan (7). Proven live on task t-c4e5c525334f: 31 spans under its id (10
 from factoryd, 14 from the gateway, 7 from the worker), 5 audit records equal
