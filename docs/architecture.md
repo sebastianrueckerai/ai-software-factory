@@ -792,8 +792,9 @@ The seed bundle holds keys for DeepSeek, Alibaba (Qwen via DashScope), z.ai
 gateway.
 
 Chat models reach LiteLLM as upstreams. The first alias table named three
-providers and four role aliases. Anthropic and OpenAI stay out at the start, deliberately:
-the factory should run on the providers its owner actually uses daily.
+providers and four role aliases. Anthropic and OpenAI stayed out at the start, deliberately:
+the factory should run on the providers its owner actually uses daily. OpenAI
+came in on 2026-10-29 for the premium class below.
 
 Since 2026-10-20 LiteLLM holds two model classes, `small` and `big`, one
 alias each. `big` is the z.ai model `glm-5.3` and `small` is `glm-5.3-flash`.
@@ -807,6 +808,24 @@ its Alibaba twin and never falls to the other class: a
 review that can merge on `auto` must not move to a weaker model without a
 trace (Ruling 189). A class with none left fails the call, which the task's
 existing paths handle.
+
+Since 2026-10-29 a third class, `premium`, is OpenAI's `gpt-6.1-sol` at
+`reasoning_effort: max` (Ruling 328). The GLM plan is a flat fee, so its
+spend in the ledger is modelled. Premium is paid per token, so its spend is
+real money, and `budget.premium_month_eur` caps it apart (5.4). Three steps
+run on it: the planner's session, through the planner class's
+`session_model` (Ruling 330), the chat, through `chat.model`, and the coder
+review, through `review_model`. The check-in names `checkin_model: big`, since
+without it the check-in would read the review's alias. Premium falls back to
+`big`, never below it (Ruling 329, amending 189): LiteLLM's router moves a
+call OpenAI fails to `big` and then `big-alibaba`, and the gateway serves a
+call the premium cap cannot fit on `big`. The audit row's deployment or its
+alias and reason record both. `big` is the review's model before premium, so
+no call lands below its old model. Every key minted from a list that holds
+`premium` also holds `big`. The class is a development stopgap: to remove it,
+delete the cap, point the three steps back at `big` and delete the alias, its
+fallback line and the `litellm-openai` secret. Until the key is seeded, the
+secret holds an empty key and every premium call runs on `big`.
 
 At Stage 9 the ranking of the three tiers came from a fixed coding and review sample, 117 calls for 0.25
 USD. All 13 candidates passed all 9 samples, so the samples could not rank
@@ -1900,11 +1919,34 @@ September's 18.26: a planted task parked at spend 0 with the card, and the
 infra issue was filed. The 50 and 80 percent alerts were not seen, since
 the window jumped past them.
 
+**The premium cap** (Ruling 329). `budget.premium_month_eur` caps the calls on
+the `premium` class in the UTC calendar month: its ledger rows since the 1st
+(an agent's ref `premium`, factoryd's `<purpose>/premium`) plus its outstanding
+holds, read under the same advisory lock. A premium call takes the smallest of
+its headrooms. If the premium headroom is the smallest and cannot fit the
+call's whole output, the refusal is `refused_premium_cap`, and the gateway
+takes a hold on `big` and serves the call there. A premium call never runs
+with an output limit the premium cap cut short, since a reasoning model at
+maximum effort can spend a short limit before it answers. The audit row names `big` and gives the reason. A call
+that LiteLLM's fallback answered books the answering deployment's price under
+the premium ref, so it counts against the cap. The console's status strip and
+its Spend panel show the month's premium spend against the cap while the key
+is set, and the chat's `policy` read names the cap. Absent or 0, premium has
+no cap of its own.
+
 Caps hold on the call itself (Ruling 113). LiteLLM checks a key's
 `max_budget` only before a call, so one call can run past it: in a proof, a
 supervisor call on a key capped at 0.0007 EUR cost 0.028 EUR. So the gateway
 prices each call's worst case from LiteLLM's `/model/info`, with every
-per-token rate, tier and cache rate. It clamps the output-token limit so that
+per-token rate, tier and cache rate. An OpenAI deployment's rates no gateway
+call reaches are left out: the service tiers and the batch API, the 12-hour
+cache, web search, and the regional uplift of a deployment without
+`data_residency`. The gateway refuses the request options that reach them
+(`service_tier`, `prompt_cache_retention`, `web_search_options`). LiteLLM's
+entry for `gpt-6.1-sol` carries all of them, and the uplift multiplier and the
+per-query search price would otherwise leave the alias unpriced. The OpenAI
+project must stay on the default service tier, since a project whose default
+is priority or flex bills at a rate no hold counts. It clamps the output-token limit so that
 the worst case fits the free headroom of the task and the day. It takes a
 `holds` row for that amount under a Postgres advisory lock before it calls,
 which closes the race between concurrent calls. After the call it books the
@@ -5212,3 +5254,4 @@ works `factory` and `demo-app`.
 | Protected files | Manifests, lockfiles, agent instruction files, `CODEOWNERS` and top-level dot files, which rank `high` in the policy gate |
 | Stricter wins | The rule that a project file may only tighten the policy's defaults and caps |
 | Month cap | `budget.month_eur`: the variable spend of every project and the factory in one UTC month; a task that meets it parks at a human card |
+| Premium cap | `budget.premium_month_eur`: the spend on the pay-per-token `premium` class in one UTC month; a premium call past it runs on `big` |
