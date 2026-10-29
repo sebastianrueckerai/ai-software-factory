@@ -1039,10 +1039,11 @@ through the API, by alerts, by routines and by the roller are direct cards.
 backlog.
 
 A running direct card can turn plan-track between two of its sessions
-(roadmap 336). Two things send the switch: the sizing step, through
-`switchToPlan`, before the card's first session, and phase 4, through the
-signal `to_plan` (`SignalToPlan`, change id `direct-to-plan`), which is
-taken once the card is running, after a person's wait.
+(roadmap 336). The sizing step sends the switch through `switchToPlan`
+before the card's first session. The signal `to_plan` (`SignalToPlan`,
+change id `direct-to-plan`) is taken once the card is running, after a
+person's wait. Phase 4 is to send it, and nothing sends it yet. A `to_plan`
+that waits when the sizing switches joins the sizing's switch.
 `BecomePlan` then moves the row to the plan track first, so a refusal
 writes nothing and a retry completes the rest: the `to_plan` step, the
 session counters at zero and the issue label `plan` in place of `agent`.
@@ -1700,7 +1701,8 @@ Besides its `version`, `policy.yaml` holds eleven sections:
   `budget.task_max_eur`. A hand-filed card gets the default unless a
   `Size:` or `Budget:` line in its text names one, and the last valid line
   wins, so the new-card form's size select beats a size word in the text.
-  The maximum is 15 from Stage 16 on (Ruling 268).
+  The sizing step sets a card's size, not its budget. The maximum is 15
+  from Stage 16 on (Ruling 268).
 - `classes`: per capability class, the allowed model aliases and tools, each
   tool with `max_requests` and `max_eur`, and the `review_model` and
   `supervisor_model` factoryd may call for a task of that class (Task 71),
@@ -4326,12 +4328,13 @@ closed as real.
 session of a card a person or the chat filed (issue, `new_card`, the form,
 the API) in a process with a plan track, an `analyzer` task in report mode
 (6.3) on the start rung reads the issue and the code and answers a size,
-a reason and the files the change touches. The session reads and writes no
-code. The filer's size is a floor, and none counts as small. A filed
-`medium` or `large` runs no session and goes to the planner. The step is
-recorded first, then the size is written with its budget. A budget raised
-since the step read it is never undone, and a retry completes the write.
-`small` runs the coder. `medium` or `large` turns the card plan-track
+a reason and the files the change touches. The session writes no code. A
+writer's filed size is a floor, and none counts as small: a writer's filed
+`medium` or `large` runs no session and goes to the planner. An outsider's
+filed size is no floor, so the session sizes the card. The step is
+recorded first, then the size is written, and a retry completes the write.
+The sizing sets the size, not the budget: the card keeps the budget its
+filing gave it. `small` runs the coder. `medium` or `large` turns the card plan-track
 before any coding session, through `switchToPlan`, and the planner starts
 from the files the sizing named. Machine cards, plan children and cards
 that carry a pull request skip the step. A sizing that fails or answers no
@@ -5212,7 +5215,7 @@ since Stage 6, but neither has run under load.
 | Answer chain for questions | `questions: [self, model:<tier>, human]` per stage (queue item B), on top of the message call | Not built, waits for Sebastian's scoping |
 | Rolls | The code repository rolls through a roll task: a digest pull request from factoryd, a card, the bot's merge, a row per image. Infra changes stay human commits. The merge waits for a session gap, and new sessions wait while it does | Built (Rulings 178, 269) |
 | Model routing | Two LiteLLM classes, `small` and `big`, each a z.ai model with an Alibaba twin as its fallback, a 60-second cooldown after 3 failures, no fallback across classes, the answering deployment in the audit row | Built (Rulings 181, 189, 192, 204) |
-| Capability classes | `coder`, `analyzer` with a report session mode for the improvement presort, the screening stage and the sizing step, and `planner` with a plan session mode. The release is the roll task, no class | Built (Rulings 182, 185, 191, 208) |
+| Capability classes | `coder`, `analyzer` with a report session mode for the screening stage and the sizing step, and `planner` with a plan session mode. The release is the roll task, no class | Built (Rulings 182, 185, 191, 208) |
 | Task analytics | Four task metrics, a revert mark and four panels, no report task | Built (Ruling 185) |
 | SPIRE and OPA | No need appeared in Stage 9 | Deferred |
 | Policy expressiveness | When the YAML outgrows plain Go: Cedar through cedar-go (no validator, no formal semantics in the Go port) or the OPA sidecar. Two ideas from Keycard worth taking either way: a soft rule that turns a deny into an approval card, and an observe-only replay of a new policy version against recent audit rows before it goes live (docs/market-research) | Revisit later |
