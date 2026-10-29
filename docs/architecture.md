@@ -1843,6 +1843,13 @@ the slot in the key's metadata, the reconcile leaves that key live, and a
 key LiteLLM answers "blocked" for is dropped from the cache, minted again
 and the call retried once. A sandbox's JWT never reads those headers, so an
 agent's purpose is always `agent`. factoryd's own model path is deleted.
+One factoryd call also runs on a card that waits on a person: its brief,
+the text the person reads first on a needs-you card, under its own purpose
+`brief` on the class's `supervisor_model` (2026-10-29). Before, the
+gateway refused the brief of every plan card with open questions, since the
+card moves to `waiting-human` before the brief is written. A brief the card's own budget
+refuses asks for the money on the card, and an approver's Fund there
+queues it again.
 
 ### 5.4 Cost ledger
 
