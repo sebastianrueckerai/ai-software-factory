@@ -1211,6 +1211,29 @@ brief. A mid-session handover's note rides the next session's brief when
 no ask goes with it and stays on the timeline when one does. The card's
 check-in share caps all three moments together, and `checkin_calls` caps
 each conversation (5.3, 6.6).
+Roadmap 336 adds a size trip and a working-state copy. The size
+trip fires once per session, when the card's diff (`card_diff`, added plus
+deleted lines against main) passes the line bound its size plans. It asks
+the check-in one question: will the rest of the card fit its bound, its
+budget and its time? It is never stuck, and nothing the check-in answers
+cuts the card. The brief's facts line states the bound, and the check-in's
+statement ends with a pace line: changed lines against the bound, euros
+and agent time spent and left, and the session number.
+
+The next session's brief carries a working-state section, copied from the
+record of the last session that left one. A session stopped by its start
+check-in, a start that failed, and a dead session with no events never
+become the parent. The section holds the parent's last todo list, cut at
+1 KB, its own subagent calls as excerpts of 4 KB in all, and the files it
+changed. It opens with one heading line: the parent's id, the time it
+stopped, the stop reason, cut to one line of at most 200 bytes, and the
+branch's commit. If the check-in judged the approach wrong (`redirect`,
+`retry_stronger`), the heading says the todo list is the dead end's. The
+full subagent reports are files at `/workspace/.factory/prior/<session>/`,
+outside the repository, and the brief names them. The copy is skipped
+after a pushed session, which finished its work, and for report and plan
+sessions. The body and the handover pass the inbound sanitiser for every
+author, because agents wrote them.
 Since Stage 12 finished work survives every cap (Task 112, change id
 `keep-work`). The agent time is the task's own, hours by default (5.3),
 and a session starts only with at least five minutes of it left, since
