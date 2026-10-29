@@ -16,7 +16,7 @@ Closed products were read from their documentation only, so their security cells
 - **The money is held before each call.** Is the cost of each model call reserved before the call, so a cap cannot be overshot, and does the product ask a person to fund or end the task at the cap?
 - **A fix must fail at base and pass at head.** When an issue or an alert starts a fix, must a reproduction fail at the base commit and pass at the fix's head before the fix merges?
 - **The gates run the tests the criteria name.** Do acceptance criteria name tests that a gate runs and requires green, and is there a floor of checks that no project file can remove?
-- **The process is a set of YAML files.** Are the stages a change passes, the lanes and the merge rule files in the repository?
+- **The process is a set of YAML files.** Are the stages a change passes, the tracks and the merge rule files in the repository?
 - **Delete everything and rebuild.** Can you delete the whole deployment, control plane included, and rebuild it from version control and a backup bucket?
 
 ## The control plane runs on your servers, source published
@@ -95,7 +95,7 @@ Closed products were read from their documentation only, so their security cells
 
 | Product | Cell | Source |
 |---|---|---|
-| This factory | Yes. Lanes, stages, merge rule. Ours is spec-driven, bring your own. | [layers.md](layers.md) |
+| This factory | Yes. Tracks, stages, merge rule. Ours is spec-driven, bring your own. | [layers.md](layers.md) |
 | GitHub Copilot cloud agent | Partial. Agents and workflows in YAML, the merge rule in settings. | [docs.github.com](https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-automations) |
 | Cursor cloud agents | Partial. Files set the environment, hooks and review, not the stages. | [cursor.com](https://cursor.com/docs/hooks) |
 | Devin | No. Files hold the environment, rules and skills, not stages or a merge rule. | [docs.devin.ai](https://docs.devin.ai/cli/extensibility) |

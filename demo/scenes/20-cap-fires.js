@@ -13,7 +13,7 @@ const named = (issue) => [issue, story.title(issue)];
 // the split in two turns: the two small cards first, then #112 points at #114 in #110's place and #110 closes. Offsets
 // are seconds after the first Do it; each turn's line comes 3 seconds before its first Do it.
 const TURN2 = 13;
-const filings = [story.filing(113, "ready"), story.filing(114, "backlog")];
+const filings = [story.filing(113, "direct", "a small, clear change"), story.filing(114, "direct", "a small, clear change")];
 const note = "Split into #113 and #114.";
 const splitting = state.reply(state.say(story.replies.split), ...filings.map((f) => state.call("new_card", f)));
 const repointing = state.reply(
@@ -37,7 +37,7 @@ function overnight(now, t) {
   ]);
 }
 
-// friday is week 1's Friday s seconds after the split's first Do it: the plan #105 accepted on Thursday evening, #109
+// friday is week 1's Friday s seconds after the split's first Do it: the plan #105 answered on Thursday evening, #109
 // and #111 live, #110 and #112 as their lives reached, the week's cards done, the inbox with the budget's question on
 // #110. o adds the split's cards, #112's dependencies once it moved, the inbox rows after the question, the pressed
 // proposals, events and alerts.
@@ -53,7 +53,7 @@ function friday(now, s, o = {}) {
     ...planned.map(([issue, live, spent]) => story.done(now, issue, age(issue), live, spent)),
     story.routineCard(now, 108, t), ...story.doneAt(now, t, finished),
   ]);
-  const plan = story.card(now, 105, { status: "done", lane: "plan", age: age(105), finished: age(110), spent: 0.46, model: "big" });
+  const plan = story.card(now, 105, { status: "done", track: "plan", age: age(105), finished: age(110), spent: 0.46, model: "big" });
   const chat = [...overnight(now, t), asked.inbox, ...(o.rows ?? [])];
   return state.scene(now, {
     tasks: [plan, ...b.tasks], objects: b.objects, deps: { 112: deps }, events: [...asked.events, ...(o.events ?? [])],
@@ -67,7 +67,7 @@ function friday(now, s, o = {}) {
 function split(now, s) {
   const first = state.pressedThread(now, filings.map((f) => state.cardFiling(now, f)), {
     line: story.requests.split, reply: story.replies.split, age: s + 3,
-    results: [`Filed ${project.repository}#113 in lane ready.`, `Filed ${project.repository}#114 in lane backlog.`],
+    results: [`Filed ${project.repository}#113 on track direct.`, `Filed ${project.repository}#114 on track direct.`],
   });
   const repoints = [
     state.depending(now, named(112), named(114)), state.depending(now, named(112), named(110), true),

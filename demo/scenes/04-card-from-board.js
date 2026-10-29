@@ -10,11 +10,11 @@ const filed = ui.face(103);
 // filed it from the form
 function monday(now, filed) {
   const queue = story.card(now, 101, {
-    status: "in-review", lane: "ready", age: 95 * MIN, gate: "merge-queue", gateSince: 3 * MIN, model: "small", spent: 0.71, pr: story.cards[101].pr,
+    status: "in-review", track: "direct", age: 95 * MIN, gate: "merge-queue", gateSince: 3 * MIN, model: "small", spent: 0.71, pr: story.cards[101].pr,
   });
-  const matchmaking = story.card(now, 102, { status: "running", lane: "ready", age: 57 * MIN, gate: "session", gateSince: 18 * MIN, model: "small", spent: 0.22 });
+  const matchmaking = story.card(now, 102, { status: "running", track: "direct", age: 57 * MIN, gate: "session", gateSince: 18 * MIN, model: "small", spent: 0.22 });
   const tasks = [queue, matchmaking];
-  if (filed) tasks.push(story.card(now, 103, { status: "queued", lane: "ready", age: 6 }));
+  if (filed) tasks.push(story.card(now, 103, { status: "queued", track: "direct", age: 6 }));
   return state.scene(now, {
     tasks,
     objects: {
@@ -30,7 +30,7 @@ function monday(now, filed) {
 
 module.exports = {
   title: "A card from the board",
-  story: "Sebastian files a card by hand through the New task form: title, description, lane and size, filed; the card lands on the board.",
+  story: "Sebastian files a card by hand through the New task form: title, description, track and size, filed; the card lands on the board.",
   group: "intake",
   theme: "dark",
   viewport: "desk",
@@ -42,7 +42,7 @@ module.exports = {
       actions: [
         { click: "#title" }, { type: ["#title", c.title] },
         { click: "#body" }, { type: ["#body", story.description(103)] },
-        { hover: "#lane" }, { type: ["#lane", "Ready"] },
+        { hover: "#track" }, { type: ["#track", "Direct"] },
         { hover: "#size" }, { type: ["#size", c.size] },
         { hover: 'form.newtask button[type="submit"]' },
       ],

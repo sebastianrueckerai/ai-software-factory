@@ -1,7 +1,7 @@
 const state = require("../lib/state");
 
 const card = (now, o) => state.card(now, {
-  issue: 12, lane: "ready", age: 600, title: "Co-op: a full lobby queues users for the next free seat", body: "Users ask for it.", ...o,
+  issue: 12, track: "direct", age: 600, title: "Co-op: a full lobby queues users for the next free seat", body: "Users ask for it.", ...o,
 });
 
 module.exports = {

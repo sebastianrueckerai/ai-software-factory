@@ -94,22 +94,22 @@ const cards = {
   },
   109: {
     title: "Asteroid field: one physics model for rocks and their fragments", size: "medium", plan: 105, key: "rock-physics", pr: 207,
-    body: "Card rock-physics of plan #105, accepted by sebastian. A rock is a body with mass and spin. A shot splits it into fragments that keep its momentum",
+    body: "Card rock-physics of plan #105 (1 of 4), filed for sebastian. Written by the planner. A rock is a body with mass and spin. A shot splits it into fragments that keep its momentum",
     acceptance: ["a shot rock splits into fragments that keep its momentum", "the rocks of levels 1 to 3 move as before on the new model"],
   },
   110: {
     title: "Level 4: the belt's map and its enemy waves", size: "medium", plan: 105, key: "belt-map", pr: 208,
-    body: "Card belt-map of plan #105, accepted by sebastian. The map scrolls from the start gate to the boss's arena, and the enemy waves come in along it",
+    body: "Card belt-map of plan #105 (2 of 4), filed for sebastian. Written by the planner. The map scrolls from the start gate to the boss's arena, and the enemy waves come in along it",
     acceptance: ["the map scrolls from the start gate to the boss's arena", "each enemy wave enters at its marker on the map"],
   },
   111: {
     title: "Level 4: the mining drone enemy", size: "small", plan: 105, key: "mining-drone", pr: 209,
-    body: "Card mining-drone of plan #105, accepted by sebastian. A drone that steers between the rocks and rams the nearest ship",
+    body: "Card mining-drone of plan #105 (3 of 4), filed for sebastian. Written by the planner. A drone that steers between the rocks and rams the nearest ship",
     acceptance: ["the drone steers around the rocks to the nearest ship", "a ram costs the ship one shield point and destroys the drone"],
   },
   112: {
     title: "Level 4: the belt boss, its fragments follow the physics", size: "medium", plan: 105, key: "belt-boss", pr: 212,
-    body: "Card belt-boss of plan #105, accepted by sebastian. A hollow asteroid with three phases. Each phase it loses breaks off fragments that fly on the physics model",
+    body: "Card belt-boss of plan #105 (4 of 4), filed for sebastian. Written by the planner. A hollow asteroid with three phases. Each phase it loses breaks off fragments that fly on the physics model",
     acceptance: ["the boss's fragments fly like the rocks", "the boss enters only after the last wave"],
   },
   113: {
@@ -227,22 +227,22 @@ const cards = {
   },
   137: {
     title: "Ice moon: ships slide on the ice with their momentum", size: "medium", plan: 136, key: "ice-physics",
-    body: "Card ice-physics of plan #136, accepted by sebastian. On ice a ship keeps its momentum and turns slowly",
+    body: "Card ice-physics of plan #136 (1 of 4), filed for sebastian. Written by the planner. On ice a ship keeps its momentum and turns slowly",
     acceptance: ["a ship on ice keeps its momentum after the thrust stops", "levels 1 to 4 fly as before"],
   },
   138: {
     title: "Ice moon: the frozen caves map and its waves", size: "medium", plan: 136, key: "cave-map",
-    body: "Card cave-map of plan #136, accepted by sebastian. The caves run from the landing site to the boss's glacier, the waves enter along them",
+    body: "Card cave-map of plan #136 (2 of 4), filed for sebastian. Written by the planner. The caves run from the landing site to the boss's glacier, the waves enter along them",
     acceptance: ["the map scrolls from the landing site to the glacier", "each wave enters at its marker in the caves"],
   },
   139: {
     title: "Ice moon: the snow crawler enemy", size: "small", plan: 136, key: "snow-crawler",
-    body: "Card snow-crawler of plan #136, accepted by sebastian. A crawler that slides on the ice toward the nearest ship",
+    body: "Card snow-crawler of plan #136 (3 of 4), filed for sebastian. Written by the planner. A crawler that slides on the ice toward the nearest ship",
     acceptance: ["a crawler slides toward the nearest ship", "two shots destroy a crawler"],
   },
   140: {
     title: "Ice moon: the avalanche boss", size: "medium", plan: 136, key: "avalanche-boss",
-    body: "Card avalanche-boss of plan #136, accepted by sebastian. A boss that sends down avalanches which slide on the ice model",
+    body: "Card avalanche-boss of plan #136 (4 of 4), filed for sebastian. Written by the planner. A boss that sends down avalanches which slide on the ice model",
     acceptance: ["each avalanche slides on the ice model", "the boss falls after three hits on its core"],
   },
   // the first run of the image-bump routine Sebastian adds in scene 38
@@ -272,7 +272,7 @@ function body(issue) {
   return `${description(issue)}\n\nSize: ${card(issue).size}`;
 }
 
-// boardCard is issue's card for the board: o sets its status, lane and age, and may override the rest.
+// boardCard is issue's card for the board: o sets its status, track and age, and may override the rest.
 function boardCard(now, issue, o) {
   const c = card(issue);
   return state.card(now, {
@@ -282,9 +282,9 @@ function boardCard(now, issue, o) {
 }
 
 // filing is the new_card call that files issue from the chat.
-function filing(issue, lane) {
+function filing(issue, track, trackReason) {
   const c = card(issue);
-  return { title: c.title, body: c.body, lane, size: c.size, acceptance: c.acceptance };
+  return { title: c.title, body: c.body, track, track_reason: trackReason, size: c.size, acceptance: c.acceptance };
 }
 
 // requests are what Sebastian types into the chat.
@@ -380,9 +380,9 @@ const replies = {
   matchmaking: "The alerts agree with you: the rule on GET /match's **p95 above 1 s** fired three times this week " +
     "and settled each time without a fix. The card sets the bar at 400 ms:",
   moon: "That is several cards: the ice, the caves, the crawlers and the boss. " +
-    "I file it in the plan lane, where the planner splits it into cards in their order, and the plan waits for you to accept it:",
+    "I file it on the plan track, where the planner splits it into cards in their order and asks what is open:",
   belt: "That is several cards: the map, the drones, the boss and the physics under them. " +
-    "I file it in the plan lane, where the planner splits it into cards in their order, and the plan waits for you to accept it:",
+    "I file it on the plan track, where the planner splits it into cards in their order and asks what is open:",
   report: "maria.k paid, and her receipt never came, while a friend's did: the receipt goes out only when the payment " +
     "settles before the store page closes. The fix sends it from Stripe's webhook, once per purchase:",
   alertsRead: "I read the alerts.",
@@ -394,7 +394,7 @@ const replies = {
   leaderboard500: "It has. **LeaderboardErrors** rose minutes after the merge of #118 and settled when #119 went live, with the verdict real. " +
     "No alert is open.",
   split: "#110 has €0.40 of its €5.00 left and failed its acceptance twice on the enemy waves. Two small cards fit a budget each: " +
-    "the map and its camera now, and the enemy waves on it, in the backlog until the map is in:",
+    "the map and its camera now, and the enemy waves on it:",
   repoint: "The boss enters after the last wave, so #112 waits on #114 in #110's place. Then #110 closes with the split in its note:",
   // shareLink is the agent's settling of #125's ask in its wake turn
   shareLink: "#117's challenge link, merged and live, opens the game at its target through src/links/game.ts. " +
@@ -486,7 +486,7 @@ const approvals = {
   },
 };
 
-// plans are the planner's plans: level 4, its cards by key with the issues they become on accept.
+// plans are the planner's plans: level 4, its cards by key with the issues they become when its question is answered.
 const plans = {
   105: {
     summary: "Four cards: the physics model first, then the map and the mining drone side by side, then the boss.",
@@ -789,7 +789,7 @@ function life(now, issue, age, { phases, admitted, steps = [], card: o = {} }) {
   const final = ["done", "failed", "closed"].includes(p.status);
   const ask = p.status === "waiting-human" ? p.ask : undefined;
   const task = boardCard(now, issue, {
-    lane: "ready", age, status: p.status, model: p.model, spent: p.spent, pr: p.pr ? cards[issue].pr : undefined, chain: p.chain,
+    track: "direct", age, status: p.status, model: p.model, spent: p.spent, pr: p.pr ? cards[issue].pr : undefined, chain: p.chain,
     gate: final ? undefined : p.gate, gateSince: final || !p.gate ? undefined : since, finished: final ? since : undefined,
     admitted: admitted === undefined || admitted > age ? undefined : age - admitted,
     escalation: ask && escalation(ask), choices: ask?.choices, escalatedAt: ask && since, escalationAlert: ask?.alert, ...o,
@@ -817,7 +817,7 @@ const filed = {
   115: date(2, "mon", "06:00"), 116: date(2, "tue", "08:00"), 117: date(2, "wed", "02:15"), 118: date(2, "thu", "16:00"),
   119: new Date(date(2, "thu", "17:19").getTime() + 30 * 1000), 120: date(2, "wed", "02:08"), 121: date(2, "wed", "02:18"),
   123: date(2, "fri", "07:00"),
-  // level 4: the plan #105 waits from Wednesday until Sebastian accepts it on Thursday evening, which files its four
+  // level 4: the plan #105 waits from Wednesday until Sebastian answers its question on Thursday evening, which files its four
   // cards; on Friday morning he splits #110, stopped by its budget overnight, from the chat
   105: date(1, "wed", "10:00"), 109: date(1, "thu", "20:00"), 110: date(1, "thu", "20:00"), 111: date(1, "thu", "20:00"),
   112: date(1, "thu", "20:00"), 113: date(1, "fri", "08:40"), 114: date(1, "fri", "08:40"),
@@ -1190,8 +1190,8 @@ const lives = {
   },
   // the boss waits on the map and the drone: on #110 until the split points it at #114
   112: { phases: [{ from: 0, status: "waiting-deps" }] },
-  // the enemy waves wait in the backlog until the map is in
-  114: { phases: [{ from: 0, status: "backlog" }], card: { lane: "backlog" } },
+  // the enemy waves are queued
+  114: { phases: [{ from: 0, status: "queued" }] },
   // the refund: its session takes scene 11's steer 13 minutes in; its high risk stops it at the merge gate until
   // Sebastian approves, 64 minutes after its filing
   122: {

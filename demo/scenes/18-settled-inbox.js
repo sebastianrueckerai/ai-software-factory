@@ -31,7 +31,7 @@ function morning(now, read) {
   const t = story.anchoredAt(now, 108);
   const ago = (d) => (t - d) / 1000;
   const report = state.filedThread(now, {
-    said: story.requests.report, reply: story.replies.report, args: story.filing(107, "ready"), issue: 107, age: ago(story.filed[107]) + 8,
+    said: story.requests.report, reply: story.replies.report, args: story.filing(107, "direct", "a small, clear fix"), issue: 107, age: ago(story.filed[107]) + 8,
   });
   const rows = inbox(now, ago);
   const chat = [...report.rows, ...rows];

@@ -19,12 +19,12 @@ function id(issue) {
 }
 
 function card(now, o) {
-  const { issue, status, lane, age, title, body } = o;
+  const { issue, status, track, age, title, body } = o;
   return present({
     ID: id(issue),
     Kind: o.kind ?? "agent",
     Status: status,
-    Lane: lane,
+    Track: track,
     Process: "spec",
     Repository: project.repository,
     IssueNumber: issue,
@@ -261,7 +261,7 @@ function truncate(s, n) {
 // cardFiling is the new_card proposal of args, described as the console describes it.
 function cardFiling(now, args, ttl) {
   const parts = ["File a card"];
-  for (const key of ["title", "body", "lane", "size"]) {
+  for (const key of ["title", "body", "track", "track_reason", "size"]) {
     if (args[key]) parts.push(`${key} ${truncate(args[key], 120)}`);
   }
   if (args.acceptance?.length) parts.push("acceptance " + args.acceptance.map((a) => truncate(a, 120)).join("; "));
@@ -285,7 +285,7 @@ function steering(now, { issue, title, text }) {
 }
 
 // UNDOABLE are the chat's writes that carry an undo.
-const UNDOABLE = ["move_card", "comment", "set_summary", "set_accent", "set_dependency"];
+const UNDOABLE = ["comment", "set_summary", "set_accent", "set_dependency"];
 
 // pressedThread is the rows the presses of Do it on each of ps leave, as the console stores them: the member's line at
 // age, the agent's reply proposing them all a second later, and from two seconds after that a Do it's row a second, each
@@ -309,7 +309,7 @@ function one(t) {
 
 // filedThread is the thread of a filing from the chat.
 function filedThread(now, { said: line, reply, args, issue, age }) {
-  return one(pressedThread(now, [cardFiling(now, args)], { line, reply, age, results: [`Filed ${project.repository}#${issue} in lane ${args.lane}.`] }));
+  return one(pressedThread(now, [cardFiling(now, args)], { line, reply, age, results: [`Filed ${project.repository}#${issue} on track ${args.track}.`] }));
 }
 
 // steeredThread is the thread of a steer from the chat.
@@ -421,7 +421,7 @@ function routineView(now, r, { runs = [], skip = false, needsMe, open, held } = 
     Last: runs[0],
     Open: open,
     Held: held,
-    Lane: "queued",
+    Column: "queued",
   });
 }
 

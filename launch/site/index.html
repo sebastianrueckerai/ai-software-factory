@@ -177,8 +177,8 @@
 </article>
 <article class="card" id="clip-plan">
 <div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/diagram-plan.png" aria-label="How a plan becomes cards, then the console: the plan card waits in Needs you, opens like any card, and on accept its four cards land." width="1600" height="900"><source src="assets/clips/clip-plan.mp4" type="video/mp4"></video></div>
-<h3>A plan is a card you accept</h3>
-<p>A big request becomes a plan card. The planner lists its cards in build order and asks what it cannot decide. Once you accept it, the cards land, each criterion naming its test before the code exists.</p>
+<h3>A plan asks, then files its cards</h3>
+<p>A big request becomes a plan card. The planner lists its cards in build order and asks what it cannot decide. Once you answer, the cards land, each criterion naming its test before the code exists.</p>
 <p class="more"><a href="evidence.html#3-it-plans-before-it-builds">the file · the test · the run</a> · <a href="https://github.com/sebastianrueckerai/ai-software-factory/blob/master/docs/spec-driven.md">how the spec-driven process works</a></p>
 </article>
 <article class="card" id="clip-ladder">
@@ -350,7 +350,7 @@
 <text class="t " x="34" y="156">Your process</text>
 <text class="s" x="34" y="178">How it builds. One YAML file. Ours ships, bring your own.</text>
 </g>
-<g class="file"><rect x="600" y="126" width="300" height="50"/><text class="ft" x="612" y="146">lanes · stages · merge rule</text><text class="fs" x="612" y="164">four stages stay in every process</text></g>
+<g class="file"><rect x="600" y="126" width="300" height="50"/><text class="ft" x="612" y="146">tracks · stages · merge rule</text><text class="fs" x="612" y="164">four stages stay in every process</text></g>
 <g class="panel ">
 <rect x="20" y="206" width="1100" height="86"/>
 <path class="corner" d="M20 213 V206 H27"/>
@@ -428,7 +428,7 @@
 <text class="s" x="414" y="126">the control plane: intake, gates,</text>
 <text class="s" x="414" y="144">caps, routines, the money ledger</text>
 </g>
-<g class="file"><rect x="414" y="166" width="282" height="42"/><text class="ft" x="426" y="184">processes/spec.yaml</text><text class="fs" x="426" y="200">lanes, stages, merge queue</text></g>
+<g class="file"><rect x="414" y="166" width="282" height="42"/><text class="ft" x="426" y="184">processes/spec.yaml</text><text class="fs" x="426" y="200">tracks, stages, merge queue</text></g>
 <g class="file"><rect x="414" y="222" width="282" height="42"/><text class="ft" x="426" y="240">policy.yaml</text><text class="fs" x="426" y="256">caps, models per class, risk rules</text></g>
 <g class="file"><rect x="414" y="278" width="282" height="42"/><text class="ft" x="426" y="296">projects/&lt;name&gt;.yaml</text><text class="fs" x="426" y="312">autonomy, merge rule, routines</text></g>
 <g class="panel ">
@@ -724,7 +724,7 @@
 </tr>
 <tr>
 <th scope="row">The process is a set of YAML files</th>
-<td><b class="v yes">Yes</b>. Lanes, stages, merge rule. Ours is spec-driven, bring your own.</td>
+<td><b class="v yes">Yes</b>. Tracks, stages, merge rule. Ours is spec-driven, bring your own.</td>
 <td><b class="v part">Partial</b>. Agents and workflows in YAML, the merge rule in settings.</td>
 <td><b class="v part">Partial</b>. Files set the environment, hooks and review, not the stages.</td>
 <td><b class="v no">No</b>. Files hold the environment, rules and skills, not stages or a merge rule.</td>

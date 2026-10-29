@@ -5,7 +5,7 @@ const ui = require("../lib/ui");
 const MIN = 60;
 const HOUR = 3600;
 const reporter = story.cards[106].reporter;
-const args = story.filing(107, "ready");
+const args = story.filing(107, "direct", "a small, clear fix");
 const merge = story.merges[107];
 
 const proposing = state.reply(state.say(story.replies.report), state.call("new_card", args));
@@ -15,12 +15,12 @@ const proposing = state.reply(state.say(story.replies.report), state.call("new_c
 // spend.
 const finished = [[101, 53, 2, 1.12], [102, 52.4, 2.9, 0.64], [103, 51.4, 1.4, 0.31], [104, 27, 1, 0.48]];
 
-// wednesday is the board m minutes after #107's filing, before it too: the report waits in the backlog until the fix
+// wednesday is the board m minutes after #107's filing, before it too: the report waits queued until the fix
 // merges, which closes it
 function wednesday(now, m, o = {}) {
   const report = m < merge.at / MIN
-    ? story.card(now, 106, { status: "backlog", lane: "backlog", age: (30 + m) * MIN, author: reporter })
-    : story.card(now, 106, { status: "closed", lane: "backlog", age: (30 + m) * MIN, finished: m * MIN - merge.at, author: reporter });
+    ? story.card(now, 106, { status: "queued", track: "direct", age: (30 + m) * MIN, author: reporter })
+    : story.card(now, 106, { status: "closed", track: "direct", age: (30 + m) * MIN, finished: m * MIN - merge.at, author: reporter });
   const fix = m >= 0 ? [story.life(now, 107, m * MIN, story.lives[107])] : [];
   const b = story.board([...fix, ...finished.map(([issue, age, after, spent]) => story.done(now, issue, (age + m / 60) * HOUR, after * HOUR, spent))]);
   return state.scene(now, { ...b, tasks: [report, ...b.tasks], ...story.spending(story.at(107, m * MIN)), ...o });
@@ -33,7 +33,7 @@ function filed(now, m) {
   return wednesday(now, m, {
     chat: t.rows, seen: state.seen(t.rows), usedProposals: [t.proposal],
     events: [
-      state.event(now, { issue: 107, kind: "card_filed", actor: "sebastian", via: "chat", age: m * MIN + 5, detail: { lane: "ready", thread: 1 } }),
+      state.event(now, { issue: 107, kind: "card_filed", actor: "sebastian", via: "chat", age: m * MIN + 5, detail: { track: "direct", thread: 1 } }),
       ...story.mergeEvents(now, 107, m * MIN, merge),
     ],
   });

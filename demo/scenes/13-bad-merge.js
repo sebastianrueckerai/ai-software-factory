@@ -82,7 +82,7 @@ function answers(now, t, k) {
     `${clock(now, t, LIVE)} #118 ${k.ID} task_ended by factoryd via factoryd {"reason":"live: covered by run ${merges[118].run}","state":"done"}\n` +
       `${clock(now, t, 0)} #118 ${k.ID} pull_request_merged by factoryd via factoryd {"by":"factory-merge","pr":${c.pr}}`,
     [
-      `#118 ${k.ID} "${c.title}" done (is done), €${k.SpentEUR.toFixed(2)} of €${k.BudgetEUR.toFixed(2)}`, "lane ready of process spec",
+      `#118 ${k.ID} "${c.title}" done (is done), €${k.SpentEUR.toFixed(2)} of €${k.BudgetEUR.toFixed(2)}`, "track direct of process spec",
       `issue ${git}/issues/118`, "sessions: 0 of 3", "cost: no model calls",
       `pull request #${c.pr} ${git}/pulls/${c.pr}, head ${story.sessions[118]["s-1"].commit}, merged`,
       "reviews: approve (0 findings): see pr", "checks: 4/4: see pr", "sessions: 1: see session", `objective: ${k.Objective}`,
@@ -133,7 +133,7 @@ module.exports = {
       state: (now) => thursday(now, 9.2, { replies: [checking, state.reply(state.say(broken(now, 9.2)))] }),
       actions: [
         { goto: "/" }, { click: "#chat-input" }, { type: ["#chat-input", story.requests.leaderboardCheck] }, { press: "Enter" },
-        { waitFor: named }, { click: toolRow(0) }, { hover: ui.park },
+        { waitFor: named }, { click: "#chat-log details.calls > summary" }, { click: toolRow(0) }, { hover: ui.park },
       ],
       hold: 5000,
     },

@@ -1,6 +1,6 @@
 {
  "id": "clip-plan",
- "name": "A plan is a card you accept",
- "title": "A plan is a card you accept",
- "story": "The theory first: one sentence becomes a plan card, the planner writes its cards in build order, and they land on accept. Then the console: the plan card waits in Needs you, it opens like any card, its question is answered, a click accepts it, and its four cards land."
+ "name": "A plan is a card you answer",
+ "title": "A plan is a card you answer",
+ "story": "The theory first: one sentence becomes a plan card, the planner writes its cards in build order, and they land once its question is answered. Then the console: the plan card waits in Needs you, it opens like any card, its question is answered, a click answers it, and its four cards land."
 }

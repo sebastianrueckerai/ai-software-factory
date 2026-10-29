@@ -25,12 +25,12 @@ function board(now, status, o = {}) {
   ]);
   const card = status === "waiting-human"
     ? story.life(now, 110, 380 * MIN, story.lives[110]).task
-    : story.card(now, 110, { status: "running", lane: "ready", age: 382 * MIN, gate: "session", gateSince: 60, budget: 5 + RAISE, spent: 4.6, model: "big" });
+    : story.card(now, 110, { status: "running", track: "direct", age: 382 * MIN, gate: "session", gateSince: 60, budget: 5 + RAISE, spent: 4.6, model: "big" });
   const asked = story.asking(now, ask, 2 * MIN, INBOX);
   const chat = [asked.inbox, ...(o.rows ?? [])];
   return state.scene(now, {
     // #110 is a card of plan #105, which the board keeps in Done
-    tasks: [...b.tasks, story.card(now, 105, { status: "done", lane: "plan", age: 26 * HOUR, finished: 9 * HOUR, spent: 0.46, model: "big" }), card],
+    tasks: [...b.tasks, story.card(now, 105, { status: "done", track: "plan", age: 26 * HOUR, finished: 9 * HOUR, spent: 0.46, model: "big" }), card],
     objects: b.objects, events: [...asked.events, ...(o.events ?? [])], alerts: status === "waiting-human" ? asked.alerts : [],
     chat, seen: { [INBOX]: chat.length - (o.unread ?? 0) }, inbox: INBOX, open: INBOX, autonomy: "autonomous", mergeRule: "auto",
     ...story.spending(story.at(122, 30 * MIN)),

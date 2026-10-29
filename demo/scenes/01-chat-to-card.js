@@ -4,7 +4,7 @@ const ui = require("../lib/ui");
 
 const DAY = 86400;
 const ask = story.asks.queue;
-const args = story.filing(101, "ready");
+const args = story.filing(101, "direct", "a small, clear change");
 const doIt = ui.doIt;
 const filed = ui.face(101);
 
@@ -13,7 +13,7 @@ const asking = state.reply(state.say(ask.question), state.call("ask", { ask: ask
 const proposing = state.reply(state.say(story.replies.queue), state.call("new_card", args));
 
 // #100 is off the board, finished before its seven days; the lab files the lobby queue as the card after it
-const before = (now) => story.card(now, 100, { status: "done", lane: "ready", age: 13 * DAY, finished: 12 * DAY, spent: 0.38, model: "small" });
+const before = (now) => story.card(now, 100, { status: "done", track: "direct", age: 13 * DAY, finished: 12 * DAY, spent: 0.38, model: "small" });
 
 // after is the state the Do it left: the thread as the console stored it and #101 as the lab filed it
 function after(now) {
@@ -24,7 +24,7 @@ function after(now) {
     ...f.rows,
   ];
   return state.scene(now, {
-    tasks: [before(now), story.card(now, 101, { status: "queued", lane: "ready", age: 5 })],
+    tasks: [before(now), story.card(now, 101, { status: "queued", track: "direct", age: 5 })],
     chat, seen: state.seen(chat), usedProposals: [f.proposal],
   });
 }

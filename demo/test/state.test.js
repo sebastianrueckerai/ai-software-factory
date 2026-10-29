@@ -8,14 +8,14 @@ test("id is t- and the first 12 hex digits of sha256 of 'lab <issue>'", () => {
   assert.equal(s.id(12), "t-4e4c15ef3f52");
 });
 test("card ages from now", () => {
-  const c = s.card(now, { issue: 12, status: "running", lane: "ready", age: 3600, title: "Lobby queue", body: "." });
+  const c = s.card(now, { issue: 12, status: "running", track: "direct", age: 3600, title: "Lobby queue", body: "." });
   assert.equal(c.CreatedAt, "2026-10-20T11:00:00.000Z");
   assert.equal(c.Repository, "orbit/nebula-run");
   assert.equal(c.Kind, "agent");
 });
 test("card is flat and takes its defaults", () => {
   const c = s.card(now, {
-    issue: 12, status: "waiting-human", lane: "ready", age: 7200, title: "Lobby queue", body: "Users ask.",
+    issue: 12, status: "waiting-human", track: "direct", age: 7200, title: "Lobby queue", body: "Users ask.",
     gate: "human", gateSince: 600, escalation: s.AGENT_ASKS + "Which?", choices: ["a", "b"], escalatedAt: 300, attempts: 2, spent: 1.5,
   });
   assert.equal(c.ID, s.id(12));
@@ -32,18 +32,18 @@ test("card is flat and takes its defaults", () => {
   assert.equal("FinishedAt" in c, false);
 });
 test("a finished card carries FinishedAt", () => {
-  const c = s.card(now, { issue: 5, status: "done", lane: "ready", age: 7200, title: "t", body: "b", finished: 3600 });
+  const c = s.card(now, { issue: 5, status: "done", track: "direct", age: 7200, title: "t", body: "b", finished: 3600 });
   assert.equal(c.FinishedAt, "2026-10-20T11:00:00.000Z");
 });
 test("scene fills every timeline", () => {
-  const sc = s.scene(now, { tasks: [s.card(now, { issue: 12, status: "backlog", lane: "backlog", age: 60, title: "x", body: "y" })] });
+  const sc = s.scene(now, { tasks: [s.card(now, { issue: 12, status: "queued", track: "direct", age: 60, title: "x", body: "y" })] });
   assert.ok(`sessions/${s.id(12)}/timeline.jsonl` in sc.Objects);
   assert.equal(sc.Project.Repository, "orbit/nebula-run");
 });
 test("scene keeps a given timeline", () => {
   const id = s.id(12);
   const sc = s.scene(now, {
-    tasks: [s.card(now, { issue: 12, status: "running", lane: "ready", age: 60, title: "x", body: "y" })],
+    tasks: [s.card(now, { issue: 12, status: "running", track: "direct", age: 60, title: "x", body: "y" })],
     objects: { [`sessions/${id}/timeline.jsonl`]: "kept" },
   });
   assert.equal(sc.Objects[`sessions/${id}/timeline.jsonl`], "kept");
@@ -103,40 +103,40 @@ test("two asks of one text at two ages have two call ids", () => {
   assert.equal(b.tool_calls[0].id, "ask-e387d31e");
 });
 test("cardFiling describes the filing as the console does", () => {
-  const args = { title: "Lobby queue", body: "Users join.", lane: "ready", size: "medium", acceptance: ["a", "b"] };
+  const args = { title: "Lobby queue", body: "Users join.", track: "direct", track_reason: "a small, clear fix", size: "medium", acceptance: ["a", "b"] };
   const p = s.cardFiling(now, args);
   assert.equal(p.Tool, "new_card");
   assert.deepEqual(p.Args, args);
-  assert.equal(p.Description, "File a card, title Lobby queue, body Users join., lane ready, size medium, acceptance a; b");
+  assert.equal(p.Description, "File a card, title Lobby queue, body Users join., track direct, track_reason a small, clear fix, size medium, acceptance a; b");
 });
 test("cardFiling cuts a field at 120 bytes on a character boundary", () => {
-  const p = s.cardFiling(now, { title: "t", body: "x".repeat(119) + "äy", lane: "plan" });
-  assert.equal(p.Description, `File a card, title t, body ${"x".repeat(119)}…, lane plan`);
+  const p = s.cardFiling(now, { title: "t", body: "x".repeat(119) + "äy", track: "plan", track_reason: "several cards" });
+  assert.equal(p.Description, `File a card, title t, body ${"x".repeat(119)}…, track plan, track_reason several cards`);
 });
 test("pressed is the do- row of the proposal's call", () => {
   const p = { Token: "labABCDEFGHIJKLMN", Tool: "new_card", Args: { title: "t" } };
-  assert.deepEqual(s.pressed(now, p, { age: 5, result: "Filed orbit/nebula-run#101 in lane ready. It cannot be undone." }), {
+  assert.deepEqual(s.pressed(now, p, { age: 5, result: "Filed orbit/nebula-run#101 on track direct. It cannot be undone." }), {
     role: "assistant", content: "", at: "2026-10-20T11:59:55.000Z",
     tool_calls: [{ id: "do-labABCDEFGHI", name: "new_card", arguments: '{"title":"t"}', read_at: "2026-10-20T11:59:55.000Z",
-      result: "Filed orbit/nebula-run#101 in lane ready. It cannot be undone." }],
+      result: "Filed orbit/nebula-run#101 on track direct. It cannot be undone." }],
   });
 });
 test("filedThread is the member's line, the proposing reply and the Do it's row", () => {
-  const args = { title: "t", lane: "ready" };
-  const token = "lab9f848efee1198e7200730a5f249d5091c4423c04";
+  const args = { title: "t", track: "direct", track_reason: "r" };
+  const token = "lab086aca643c4cbe2ca4594cb57900340e19dcae06";
   const f = s.filedThread(now, { said: "s", reply: "r", args, issue: 101, age: 10 });
   assert.equal(f.proposal.Token, token);
   assert.deepEqual(f.rows, [
     { role: "user", content: "s", at: "2026-10-20T11:59:50.000Z" },
     {
       role: "assistant", content: "r", at: "2026-10-20T11:59:51.000Z",
-      tool_calls: [{ id: "call_1", name: "new_card", arguments: '{"title":"t","lane":"ready"}', read_at: "2026-10-20T11:59:51.000Z", proposal: token,
-        result: "Proposed to sebastian: File a card, title t, lane ready. Nothing runs until they press Do it." }],
+      tool_calls: [{ id: "call_1", name: "new_card", arguments: '{"title":"t","track":"direct","track_reason":"r"}', read_at: "2026-10-20T11:59:51.000Z", proposal: token,
+        result: "Proposed to sebastian: File a card, title t, track direct, track_reason r. Nothing runs until they press Do it." }],
     },
     {
       role: "assistant", content: "", at: "2026-10-20T11:59:53.000Z",
-      tool_calls: [{ id: "do-lab9f848efee", name: "new_card", arguments: '{"title":"t","lane":"ready"}', read_at: "2026-10-20T11:59:53.000Z",
-        result: "Filed orbit/nebula-run#101 in lane ready. It cannot be undone." }],
+      tool_calls: [{ id: "do-lab086aca643", name: "new_card", arguments: '{"title":"t","track":"direct","track_reason":"r"}', read_at: "2026-10-20T11:59:53.000Z",
+        result: "Filed orbit/nebula-run#101 on track direct. It cannot be undone." }],
     },
   ]);
 });
@@ -172,7 +172,7 @@ test("a proposal expires after its ttl", () => {
   assert.equal(p.Kind, "proposal");
 });
 test("a card admitted after its creation carries AdmittedAt", () => {
-  const c = s.card(now, { issue: 117, status: "running", lane: "ready", age: 7200, title: "t", body: "b", admitted: 600 });
+  const c = s.card(now, { issue: 117, status: "running", track: "direct", age: 7200, title: "t", body: "b", admitted: 600 });
   assert.equal(c.AdmittedAt, "2026-10-20T11:50:00.000Z");
 });
 test("timeline stamps a gate step's from as started and leaves out a step after now", () => {
@@ -254,11 +254,11 @@ test("metrics report is orbit/nebula-run's window of days to now's UTC day", () 
 });
 test("a card filed by someone else is no writer's, and carries its alert and its chain", () => {
   const c = s.card(now, {
-    issue: 119, status: "merged", lane: "ready", age: 60, title: "t", body: "b", author: "factory-agent", source: "alert",
+    issue: 119, status: "merged", track: "direct", age: 60, title: "t", body: "b", author: "factory-agent", source: "alert",
     fingerprint: "e07c4a92d15b8f3e", chain: "pending",
   });
   assert.deepEqual([c.Author, c.AuthorWriter, c.Source, c.AlertFingerprint, c.ChainState], ["factory-agent", false, "alert", "e07c4a92d15b8f3e", "pending"]);
-  const own = s.card(now, { issue: 12, status: "queued", lane: "ready", age: 60, title: "t", body: "b" });
+  const own = s.card(now, { issue: 12, status: "queued", track: "direct", age: 60, title: "t", body: "b" });
   assert.deepEqual([own.Author, own.AuthorWriter, "AlertFingerprint" in own, "ChainState" in own], ["sebastian", true, false, false]);
 });
 test("a merge is the queue's turn, factory-merge's merge, its event and the card's end at merged", () => {
@@ -308,7 +308,7 @@ test("routineView words the next run and counts it from now", () => {
   const run = s.routineRun("security-scan", { run: 63, due: new Date("2026-10-20T02:00:00Z"), outcome: "no change" });
   const v = s.routineView(now, scan, { runs: [run] });
   // now is Tuesday 12:00: the next scan is Wednesday 02:00, 14 hours on
-  assert.deepEqual([v.Next, v.NextWords, v.Soon, v.Last.Run, v.State.Runs, v.Lane], ["2026-10-21T02:00:30.000Z", "Wed 02:00", false, 63, 63, "queued"]);
+  assert.deepEqual([v.Next, v.NextWords, v.Soon, v.Last.Run, v.State.Runs, v.Column], ["2026-10-21T02:00:30.000Z", "Wed 02:00", false, 63, 63, "queued"]);
   assert.equal("SkipNext" in v.State, false);
   const skipped = s.routineView(now, scan, { runs: [run], skip: true });
   assert.deepEqual([skipped.Next, skipped.NextWords, skipped.State.SkipNext, skipped.State.SkipBy], ["2026-10-22T02:00:30.000Z", "Thu 02:00", true, "sebastian"]);
@@ -389,5 +389,5 @@ test("scene sets the merge rule in the project's file and row, and the dependenc
   assert.equal(s.scene(now, {}).Config.merge_rule, "human");
 });
 test("a waiting card names what it waits on", () => {
-  assert.equal(s.card(now, { issue: 112, status: "waiting-deps", lane: "ready", age: 60, title: "t", body: "b", waitingOn: "#114" }).WaitingOn, "#114");
+  assert.equal(s.card(now, { issue: 112, status: "waiting-deps", track: "direct", age: 60, title: "t", body: "b", waitingOn: "#114" }).WaitingOn, "#114");
 });

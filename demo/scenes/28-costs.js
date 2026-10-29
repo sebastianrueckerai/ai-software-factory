@@ -10,7 +10,7 @@ function sunday(now) {
   const cards = Object.entries(story.ledger).filter(([issue]) => issue >= 101 && issue !== "110").map(([issue, c]) => {
     const age = story.ageAt(issue, AT);
     return story.card(now, Number(issue), {
-      status: "done", lane: issue === "105" ? "plan" : "ready", age, finished: age - c.end, spent: c.spent, model: c.model ?? "small",
+      status: "done", track: issue === "105" ? "plan" : "direct", age, finished: age - c.end, spent: c.spent, model: c.model ?? "small",
       pr: story.cards[issue].pr,
     });
   });

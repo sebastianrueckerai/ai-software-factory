@@ -103,7 +103,7 @@ const ids = (arr) => arr;
 
 beat(2.6, "One sentence goes into the <b>chat</b>.", true, (t) => { show(chat, t + 0.1); show(r1, t + 0.1); lit([r1], t + 0.1); });
 beat(2.6, "It answers: this is <b>several cards</b>.", false, (t) => { show(r2, t + 0.15); lit([r2], t + 0.15); });
-beat(3.2, "It files <b>one plan card</b> in the board's plan lane.", false, (t) => {
+beat(3.2, "It files <b>one plan card</b> on the plan track.", false, (t) => {
   tl.to(chat, { opacity: 0, duration: 0.4 }, t + 0.05);
   show(board, t + 0.45, 0.4); show(card, t + 0.6); lit([card], t + 0.6);
 });
@@ -120,7 +120,7 @@ beat(3.3, "<b>rock-physics</b> first, <b>belt-map</b> and <b>mining-drone</b> ne
   cur = [n[3].el, e[2].g, e[3].g];
 });
 beat(2.7, "The plan can ask <b>you</b> a question.", true, (t) => { show(question, t + 0.1); lit([question], t + 0.1); });
-beat(3.0, "It moves to <b>Needs you</b> to wait for an accept.", true, (t) => {
+beat(3.0, "It moves to <b>Needs you</b> to wait for your answer.", true, (t) => {
   tl.to([panel, ptitle, question, ...pg.nodes.map((n) => n.el), ...pg.edges.map((e) => e.g)], { opacity: 0, duration: 0.4 }, t + 0.1);
   tl.set(card, { "--lc": "#f4b13e" }, t);
   tl.to(card, { x: 263, duration: 0.8, ease: "power1.inOut" }, t + 0.5);
@@ -133,7 +133,7 @@ const last = (t) => {
   lit([hdr["Queued"], ...qg.nodes.map((n) => n.el), ...qg.edges.map((e) => e.g)], t + 0.5);
 };
 last.last = true;
-beat(3.9, "On accept, the four cards land in <b>Queued</b>; each waits for its dependencies.", false, last);
+beat(3.9, "Once you answer, the four cards land in <b>Queued</b>; each waits for its dependencies.", false, last);
 T += 1.0;
 tl.to(scene, { opacity: 0, duration: 0.6 }, T); T += 0.6;
 tl.set({}, {}, T);

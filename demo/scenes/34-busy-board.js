@@ -31,9 +31,9 @@ function hero(now, moved = {}) {
     ...DONE.map(([issue, after, spent]) => story.done(now, issue, after + 3 * HOUR, after, spent)),
   ]);
   const queued = [
-    story.card(now, 105, { status: "done", lane: "plan", age: 26 * HOUR, finished: 9 * HOUR, spent: 0.46, model: "big" }),
-    ...(still(125) ? [story.card(now, 125, { status: "queued", lane: "ready", age: 4 * MIN })] : []),
-    ...(still(118) ? [story.card(now, 118, { status: "backlog", lane: "backlog", age: 26 * HOUR })] : []),
+    story.card(now, 105, { status: "done", track: "plan", age: 26 * HOUR, finished: 9 * HOUR, spent: 0.46, model: "big" }),
+    ...(still(125) ? [story.card(now, 125, { status: "queued", track: "direct", age: 4 * MIN })] : []),
+    ...(still(118) ? [story.card(now, 118, { status: "queued", track: "direct", age: 26 * HOUR })] : []),
   ];
   const moves = Object.entries(moved).map(([i, st]) => face(now, Number(i), st));
   const asks = [still(110) && story.asking(now, story.asks.budget, 17 * MIN, INBOX), still(120) && story.asking(now, seasonPass, 39 * MIN, INBOX)].filter(Boolean);
@@ -65,7 +65,7 @@ function face(now, issue, status, o = {}) {
   const ended = status === "done" || status === "closed";
   const c = story.cards[issue];
   return story.card(now, issue, {
-    issue, status, lane: issue === 105 || issue === 136 ? "plan" : "ready", age: o.age ?? (busy ? 20 * MIN : 5 * HOUR),
+    issue, status, track: issue === 105 || issue === 136 ? "plan" : "direct", age: o.age ?? (busy ? 20 * MIN : 5 * HOUR),
     gate: busy ? (status === "running" ? "session" : "review") : undefined, gateSince: busy ? 4 * MIN : undefined,
     finished: ended ? (o.finished ?? 20 * MIN) : undefined, spent: o.spent ?? 0.4, model: issue === 105 || issue === 136 ? "big" : "small",
     pr: ["in-review", "merged", "done"].includes(status) ? c.pr : undefined, ...o,
@@ -100,7 +100,7 @@ const arrivals = (now) => [
   face(now, 134, "queued", { age: 40, author: "factory-agent", source: "alert" }),
   face(now, 133, "queued", { age: 30, author: story.cards[133].reporter, source: "webhook" }),
 ];
-const moonArgs = story.filing(136, "plan");
+const moonArgs = story.filing(136, "plan", "several cards, planned first");
 const moonReply = state.reply(state.say(story.replies.moon), state.call("new_card", moonArgs));
 function moonThread(now, age) {
   const f = state.filedThread(now, { said: story.requests.moon, reply: story.replies.moon, args: moonArgs, issue: 136, age });
@@ -122,7 +122,7 @@ function waiting(now) {
     approvals: [state.approval(now, { ...moon, spec: { revision: 1, sha256: revision.SHA256 }, age: 60 })],
   });
 }
-function accepted(now) {
+function filedCards(now) {
   const t = moonThread(now, 21 * MIN);
   const kid = (issue, status) => face(now, issue, status, { age: 20, parent: 136, planKey: story.cards[issue].key });
   return intake(now, 3, {
@@ -131,7 +131,7 @@ function accepted(now) {
   });
 }
 const moonDoIt = `${ui.doIt} >> nth=1`;
-const accept = `#board article.approval.plan[data-card="${state.id(136)}"] button[aria-label^="Accept revision"]`;
+const answer = `#board article.approval.plan[data-card="${state.id(136)}"] button:has-text("${story.plans[136].question.choices[0]}")`;
 const columns = { needs: "#needs-you", queued: '#board .column[aria-labelledby="col-1"]', progress: '#board .column[aria-labelledby="col-2"]', done: '#board .column[aria-labelledby="col-3"]' };
 
 module.exports = {
@@ -140,7 +140,7 @@ module.exports = {
     "holds the agent's proposal to steer the refund. He answers the season pass's question on its card with one click. The board " +
     "drains one card at a time as the work resolves. Then new " +
     "work comes in on its own, a nightly scan, an alert and a user's issue, and one sentence in the chat becomes the plan for " +
-    "level 5, whose four cards land on the board once he accepts it.",
+    "level 5, whose four cards land on the board once its question is answered.",
   group: "intake",
   theme: "dark",
   viewport: "desk",
@@ -176,8 +176,8 @@ module.exports = {
     },
     { state: () => null, actions: [{ click: moonDoIt }, { waitFor: "#chat-log .applied" }, { waitFor: ui.face(136) }], hold: 2000, boxes: { plan: ui.face(136) } },
     { state: planning, actions: [{ hover: ui.face(136) }], hold: 2200, boxes: { plan: ui.face(136) } },
-    { state: waiting, actions: [{ hover: accept }], hold: 2600, boxes: { plan: ui.face(136), accept } },
-    { state: accepted, actions: [{ hover: ui.park }], hold: 3000, boxes: { first: ui.face(137), last: ui.face(140) } },
+    { state: waiting, actions: [{ hover: answer }], hold: 2600, boxes: { plan: ui.face(136), answer } },
+    { state: filedCards, actions: [{ hover: ui.park }], hold: 3000, boxes: { first: ui.face(137), last: ui.face(140) } },
   ],
 };
 

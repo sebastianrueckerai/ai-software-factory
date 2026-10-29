@@ -166,7 +166,7 @@
     "act0",
     0.4
    ],
-   "text": "Answer its question, then accept",
+   "text": "Answer its question",
    "cls": "label",
    "amber": true
   },
@@ -188,7 +188,7 @@
     null,
     0.5
    ],
-   "text": "A plan is a card: you read it and accept it before any code exists.",
+   "text": "A plan is a card: you read it and answer its question before any code exists.",
    "cls": "moral",
    "dur": 99
   }

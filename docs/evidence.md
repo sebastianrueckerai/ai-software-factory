@@ -14,7 +14,7 @@ The chat replaces card writing, and the same chat reaches a running agent.
 
 | Guarantee | Enforced by | Tested by | Proven by |
 |---|---|---|---|
-| One chat tool per console action, 73 today | `internal/console/chat_tools.go`, `internal/policy/policy.go` (ChatTools) | `internal/console/chat_test.go`, `internal/policy/chat_test.go` | Scenes 01 and 03 of the bank: one sentence files a card |
+| One chat tool per console action, 69 today | `internal/console/chat_tools.go`, `internal/policy/policy.go` (ChatTools) | `internal/console/chat_test.go`, `internal/policy/chat_test.go` | Scenes 01 and 03 of the bank: one sentence files a card |
 | Every write is a proposal; the reversible ones carry a 30 minute undo | `internal/console/chat_tools.go`, `internal/policy/policy.go` (ConfirmFor) | `internal/console/writes_test.go` | Scenes 03 and 24: the proposal and Do it |
 | The chat drives the board's menus | `internal/console/chat_tools.go` (board_view), `internal/console/board.go` | `internal/console/board_test.go` | Scene 23 |
 | A human or the project agent messages a running session, and the gates judge the result | `cmd/agent-worker` (message endpoint), `internal/factoryd/message.go` | `cmd/agent-worker/message_test.go`, `internal/console/tell_card_test.go` | Scene 11: a line typed into a running card, the next turn quotes it |

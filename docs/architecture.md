@@ -994,26 +994,25 @@ Forgejo accounts (Ruling 144) and the policy's day cap. Since Stage 9 a
 screening stage reads an outside account's bug report before the coder
 starts (7, Rulings 182, 191).
 
-**Lanes come from the project's process** (Rulings 206, 208, Tasks 94, 97).
-Since Stage 11 the lanes above are configuration: each project names a
-process file (5.3), and the process lists two or three lanes, `backlog`,
-`ready` and optionally `plan`. A card in `backlog` does not start, a card
-entering `ready` starts a task of the lane's `class`, and a card entering
-`plan` starts a planner (below). The label underneath is `backlog`, `agent`
-or `plan`, and the intake rule is fixed in code for every process:
-`human` wins, then `agent` or `bug` asks for ready, `plan` asks for plan
-where the process has that lane, `backlog` or `improvement` is backlog, and
-no label asks for ready. A starting lane's `moved_by`, `writers` or
-`approvers`, judges every entry, at creation, by a label added later or by
-a label removed: a refused entry lands in backlog, the bot restores the
-label and comments once. The default entry keeps Ruling 148 on both shipped
-processes: under `writers` a bug from anyone enters ready. Tasks filed
-through the API and by alerts enter ready the same way, and rolls and
-human-lane tasks carry no lane. The task row gains `lane`, `process` and
-`plan_key`, and the status `suggested` became `backlog` (migration
-`20260930095046_lanes`). The shipped `maintenance` process is the flow
-above, with the presort as the backlog's `write_up`. The `spec` process
-adds the plan lane.
+**Tracks replace the lanes** (roadmap 225, 2026-10-29). Stage 11 made
+the lanes above configuration (Rulings 206, 208, Tasks 94, 97): each
+process listed `backlog`, `ready` and optionally `plan`, and a person moved
+a card from the backlog into a starting lane. Sebastian's flow ruling of
+2026-10-14 collapsed them. Whoever files a card sets its track, `direct`
+or `plan`, at the filing, and a queue holds only work that waits for
+capacity. The process file names its tracks (5.3): `direct` with its
+class, and optionally `plan` with the planner's class and the plan's
+bounds. The task row carries `track`, and the schema refuses an agent card
+without one (migration `20261103100000_task_track`, which dropped `lane`
+and closed the backlog rows). The intake rule is fixed in code for every
+process. `human` wins, then `agent` or `bug` asks for direct, and `plan`
+asks for plan where the process has a plan track. `backlog` or
+`improvement` files no card: the issue holds an interest until a writer's
+`agent` or `plan` label commits it. An issue with none of these labels is a
+direct card, so a bug from anyone still starts (Ruling 148). Tasks filed
+through the API, by alerts, by routines and by the roller are direct cards.
+`moved_by`, the move buttons and the presort write-up went with the
+backlog.
 
 **The planner and the plan card** (Rulings 205, 208, Task 101). A card in
 lane `plan` starts a task of class `planner`, whose session mode is `plan`:
@@ -1027,15 +1026,20 @@ to 5 choices each, which the member answers before acceptance (5.7).
 `ValidatePlan` refuses a plan that breaks the shape, and the findings go
 back to the planner. factoryd, not the model, adds the edges that put the
 foundation first and the integration last. Each valid answer is a row in
-`plan_revisions`, posted on the issue and filed as an approval request of
-kind `plan`. A writer's comment sends the planner round again, Reject fails
-the task, and "Accept plan" (approvers) runs `CreateChildren`: one task row
-and one bot issue per card in topological order, labelled `backlog`, with
-the Forgejo dependencies and rows in `task_deps`, idempotent by a marker in
-the body. A child's brief carries the spec and the plan's summary and the
-`featureGuide`, which asks for a test per acceptance item. "Start plan"
-(approvers) labels every child still in the backlog `agent` as the human,
-so each move passes `moved_by`. Live, the planner answered 9 cards in 58
+`plan_revisions`. Since roadmap 225 no person accepts a plan. A revision
+that asks no question files its cards in the same step: one task row and
+one bot issue per card in topological order, queued on the direct track at
+main's head, with the Forgejo dependencies and rows in `task_deps`,
+idempotent by a marker in the body, and the plan card ends done. A
+revision with open questions waits in Needs you, recorded as an approval
+request of kind `plan`, and the answer that leaves no question open sends
+the planner back. A writer's comment sends the planner round again too,
+and closing the issue ends the card. A child's brief carries the spec and
+the plan's summary and the `featureGuide`, which asks for a test per
+acceptance item. Each child starts under the work bound and waits in the
+queue, holding no work slot, until the cards it depends on are done.
+Before roadmap 225 an approver's "Accept plan" filed the children in the
+backlog and "Start plan" moved them to ready. Live, the planner answered 9 cards in 58
 seconds, took one change request and answered 10, and the acceptance filed
 them with 25 dependency rows. It sized the foundation, a Go API plus a Vite
 scaffold, `medium`, and the card failed at the wall-clock cap: the size
@@ -1056,9 +1060,9 @@ repository, the seed projects' included (5.1), the `priority/*`, `severity/*`
 and, since Stage 9, `noise` labels among them (8), and keeps exactly one
 `state/*` label on each task's issue: `state/queued`, `state/running`,
 `state/waiting-human`, `state/in-review`, `state/done`, `state/failed`,
-and since Stage 11 `state/backlog` (renamed in place from
-`state/suggested`) and `state/waiting-deps`, with the lane labels of the
-project's process. Forgejo's own issue list therefore shows the board's picture until the
+and since Stage 11 `state/waiting-deps`, with the track labels of the
+project's process: `backlog`, and `plan` where it has a plan track.
+`state/backlog` went with the backlog (roadmap 225). Forgejo's own issue list therefore shows the board's picture until the
 console exists.
 
 **The human lane.** A `human` issue gets a task row in `waiting-human` and no
@@ -1183,9 +1187,8 @@ clicks for one decision. `Finish` deletes the fork branch only of a task
 that ends `done` or `closed`, so a failed task's work stays for a refile,
 and nothing prunes those branches yet. A task's first session starts from
 the base branch's head as it is when the session starts and records it as
-the task's base, not from the commit its card held when it entered the
-lane, so a plan card that waited on its dependencies starts on their
-merged work. On the round's exit test no card reached a cap.
+the task's base, not from the commit its card held when it was filed, so
+a plan card that waited on its dependencies starts on their merged work. On the round's exit test no card reached a cap.
 Since Stage 10 no workflow or activity input or result carries a
 credential (Task 89): every activity takes the task id and plain values,
 and mints or reads its tokens inside itself, so Temporal's history, which
@@ -1696,10 +1699,9 @@ its monthly euros and the tools that need a human's OK. The defaults
 chat:
   model: big               # LiteLLM alias, tier-high
   monthly_eur: 5           # the project agent's own line
-  confirm: [new_card, move_card, answer, steer, start_plan, retry,
-            accept_plan, request_changes, reject_plan, approve_merge,
-            deny_merge, invite, github_export, close, edit,
-            grant_session, set_dependency, split_card, github_sync]
+  confirm: [new_card, answer, steer, retry, request_changes,
+            approve_merge, deny_merge, invite, github_export, close,
+            edit, grant_session, set_dependency, split_card, github_sync]
 ```
 
 A tool in `confirm` renders a proposal with a Do-it button, a tool outside
@@ -1732,32 +1734,33 @@ roll.
 
 **Processes composed from blocks** (Rulings 206, 208, Tasks 94, 95, 98).
 The factory ships no fixed development process. A process file holds four
-blocks with fixed keys and enumerated values: `lanes` (5.1),
-`dependencies` (only with a plan lane), `stages` (7) and `merge` (`queue:
-none | project`, 7). A project with `agents: coder` names one by
+blocks with fixed keys and enumerated values: `tracks` (5.1, roadmap
+225: `direct` and an optional `plan`), `dependencies` (only with a plan
+track), `stages` (7) and `merge` (`queue: none | project`, 7). A file that
+still carries the removed `lanes` block is refused by name. A project with `agents: coder` names one by
 `process:`, and another developer adds a process by adding a file that
 passes the check. Two ship: `maintenance`, today's flow, on the code repository and
 the demo app, and `spec`, plan then build. A class is defined in
 `policy.yaml` only and named by a process, so a process cannot widen what an
 agent may call. Each class carries a `session` mode, `code`, `report` or
 `plan`, which picks the workflow's program. The workflow reads its process,
-lane, class, stages, queue and dependencies from the task's pinned version
+track, class, stages, queue and dependencies from the task's pinned version
 (`TaskConfig`, change id `processes`), and no code path names a process: a
 test greps for the two file names. The check is mechanical, with no model:
-schema and names, needs met in order (a lane's class of the right session
+schema and names, needs met in order (a track's class of the right session
 mode, naming the review, audit and supervisor models the stages call, and
-`dependencies` for a plan lane), a graph in which every entry reaches done
+`dependencies` for a plan track), a graph in which every entry reaches done
 or a human card and every cycle is capped, and floor rules no process may
 lower (F1 to F11: checks always run, with findings to the agent or fail,
 policy fails on forbidden, approval stands right before merge, and merge
 comes last). Every
 refusal is one line, `<file>: <block>: <reason>`, and `factoryd config
 check` and the loader share the judgement, 66 fixtures agreeing. One rule
-only the running factoryd can apply: a head that removes a lane still
+only the running factoryd can apply: a head that removes a track still
 holding open cards is refused with their issue numbers. `factoryd config
 explain <process> <card kind>` prints the path a card takes, generated from
 the same graph, so the text and the check cannot drift. What no process may
-express, such as conditions, lanes beyond the three, triggers, a merge
+express, such as conditions, tracks beyond the two, triggers, a merge
 without checks or a per-project override, is listed in the design and left
 to later blocks (roadmap 27a). The switch from `workflow.yaml` was one
 infra commit: the old factoryd refused it (`CONFIG REJECTED`, infra #9),
@@ -2229,6 +2232,18 @@ Forgejo's API. Since Stage 16 the face offers Close on backlog and
 waiting-human cards, and since the fix round after it on a failed card
 without an issue. The chat's `close` runs the same action (5.7).
 
+Changed by roadmap 225 (2026-10-29): the board shows status only. The
+default view keeps its four columns, Needs you, Queued, In progress and
+Done, and the wide view drops the lane columns. No card carries a lane
+badge, a move button or a drag target. The plan card has neither "Accept
+plan" nor "Reject": it shows only while a revision waits for answers, with
+the questions, the hold-outs and "Request changes", and a done plan lists
+its children without "Start plan". The card's stage word comes from its
+track and status: planning, building, verifying, queued or waiting on you.
+Needs you holds every card whose next actor is a person, a card that waits
+on its author included, for every viewer. The new-task form's track select
+offers direct, the default, plan and human.
+
 - **Login.** Forgejo OAuth2, the authorisation code flow with PKCE (S256), a
   confidential client and an explicit scope list: `read:user`,
   `write:repository`, `write:issue`. Forgejo enforces requested scopes, and an
@@ -2436,6 +2451,12 @@ grouping becomes a block in its process file, with these five as the
 default. Buttons stay the state machine, and drag stays for lane starts
 only.
 
+Since roadmap 225 (2026-10-29) the lanes are gone (5.1). A plan with open
+questions is Needs you, and a plan with none files its cards without a
+wait. A card that waits on its author is Needs you for every viewer. The
+wide board keeps the state columns and no lane columns, and no drag
+remains.
+
 **Inline answers.** An agent's question carries structured choices, and a
 needs-you card renders them as buttons beside a text box, so most human
 input needs no drawer. The escalation gains a `choices` field, and the
@@ -2516,11 +2537,11 @@ the month only (roadmap 158).
 | `board`, `card`, `history`, `card_history`, `costs`, `diff` | read | none |
 | `system`, `plan`, `pr`, `file`, `ci` (Stage 16) | read | none |
 | `session`, `session_steps`, `session_step`, `session_search` (Stage 16) | read | none |
-| `new_card`, `move_card`, `start_plan` | file and move | confirm |
+| `new_card` (with its track since roadmap 225) | file | confirm |
 | `answer` (a needs-you question, and since Stage 16 a plan's question) | answer | confirm |
 | `comment` | comment | none |
 | `steer` (message a running agent) | message | confirm |
-| `retry`, `accept_plan`, `request_changes`, `reject_plan` | decide | confirm |
+| `retry`, `request_changes` | decide | confirm |
 | `approve_merge`, `deny_merge` | merge decisions | confirm |
 | `set_summary`, `set_accent` | metadata | none |
 | `invite` (Stage 16) | add a member | confirm |
@@ -2547,8 +2568,8 @@ once, for 30 minutes. Since Stage 16 they live in `chat_proposals`, so a
 restart loses none and a reload draws a pending proposal with its Do it. A
 take is one statement over the token, its kind, the route's project and
 the login. An undo is data, the inverse the tool's own run returned. A
-move's undo works only while the card is still in the backlog, which
-intake leaves within a second. Ruling 109, the approve button as the one
+move's undo worked only while the card was still in the backlog, until
+roadmap 225 removed the move with the backlog. Ruling 109, the approve button as the one
 door to a merge, becomes: the approve action is the one door, reachable by
 the button or by a confirmed tool call. Forgejo's whitelist stays the
 merge authority. A steer reaches the running session as a human message on
@@ -2782,8 +2803,7 @@ the history and every depth come through a tool. What each part does:
   the round built `ci` the same evening.
 - **The writes.** `close`, `edit`, `grant_session` and `set_dependency` run
   the lifted actions the board's buttons run, record one event each and
-  confirm by default. The face offers Close on backlog and waiting-human
-  cards, and a capped card's answer is a grant, which records
+  confirm by default. The face offers Close on waiting-human cards, and a capped card's answer is a grant, which records
   `session_granted` from either door. Since the fix round a card without an
   issue closes in the store alone, with one `card_closed` event and no
   Forgejo call, and the face offers Close on a failed one too. A card
@@ -2813,9 +2833,11 @@ the history and every depth come through a tool. What each part does:
   takes the revision. After the last answer the plan's approval is
   superseded, and the planner runs once more with the answers in its brief.
   The planner's guide holds the format key and one sentence (Ruling 263).
-  Since the fix round `accept_plan` without a revision takes the newest at
-  proposal time, and its proposal names the revision and sha it accepts, so
-  a revision added after the proposal is refused as stale.
+  Since the fix round `accept_plan` without a revision took the newest at
+  proposal time, and its proposal named the revision and sha it accepted, so
+  a revision added after the proposal was refused as stale. Since roadmap
+  225 no plan takes an acceptance: a revision with no open question files
+  its cards.
   In the exit test the planner asked three questions, and its next revision
   took the three answers.
 - **The deploy gate** (Ruling 265). Acceptance refuses a plan whose
@@ -2913,7 +2935,7 @@ table (5.6). What it adds to the chat besides:
   closes. factoryd checks the answer: 2 or 3 cards, each size's line
   figure under `large_lines`, dependencies acyclic among the children, and
   every changed file covered by a child's directories, where `.` covers
-  nothing. A pass files the children in lane ready and closes the card
+  nothing. A pass files the children on the direct track and closes the card
   with "split into #a, #b", a closed card with a reason, not a new state.
   A failed check gets one more planner session, and a second failure
   escalates while the approval waits. Approve is refused while the split
@@ -4378,7 +4400,7 @@ protection holds no status check. The required contexts differ per
 project, so the guard is factoryd's, not Forgejo's.
 
 **Dependencies between cards** (Rulings 205, 208, Task 100). A process
-with a plan lane carries `dependencies: {wait_until: done, on_failed:
+with a plan track carries `dependencies: {wait_until: done, on_failed:
 human}`, the one value of each in the first version. The workflow's first
 step after `Reconcile` (change id `dep-wait`) reads the task's rows in
 `task_deps`. With none open it goes on. With any open the task waits in
@@ -4987,8 +5009,8 @@ since Stage 6, but neither has run under load.
 | Policy engine | Go code now, OPA sidecar when rules multiply | Decided |
 | Policy source | The tree `factory/` in the infra repository (policy, projects, processes, templates), read by factoryd, the commit as the version, pinned per task, a generated JSON Schema and a CI check, the console read-only. Runtime decisions are Postgres rows. Kubernetes is the substrate only. Since Stage 17 the check validates against the binary's schemas, and factoryd opens a pull request for stale copies | Built (Rulings 107, 183, 184, 303) |
 | Workflow | An ordered list of stages, each with one `on_findings` setting (agent, human or fail); a repeat from one stage takes the stronger rung; the session cap is the round cap for every exhaustion; a review without a verdict is a finding on the card; a red head the agent left unchanged re-runs its checks once. Since Stage 11 only a green head merges. Since Stage 12 a pushed head is verified at every cap instead of failing, one cap card, a change request at the cap is the answer, the failing job's log lines in the checks finding | Built (Rulings 177, 190, 193, 201, 221, 225) |
-| Processes | No fixed process: lanes, dependencies, stages and the merge queue as YAML blocks in a process file a project names. A mechanical check (schema, names, needs, graph, floor rules) shared by the loader and `config check`, and `config explain`. Two shipped processes, `maintenance` and `spec`. The later blocks are roadmap 27a | Built (Rulings 206, 208) |
-| Building from a spec | A plan lane whose planner answers a plan, which approvers accept and factoryd turns into cards with their dependencies. Start plan, cards that wait on their dependencies, a merge queue per project, and a new project from the console seeded from a template. Since Stage 12 the template works out of the box with its own `check`, a deployable app and a staging job that waits for the rollout, and registration needs no human password | Built (Rulings 205, 209, 210, 212, 219, 222) |
+| Processes | No fixed process: tracks, dependencies, stages and the merge queue as YAML blocks in a process file a project names. A mechanical check (schema, names, needs, graph, floor rules) shared by the loader and `config check`, and `config explain`. Two shipped processes, `maintenance` and `spec`. The later blocks are roadmap 27a | Built (Rulings 206, 208) |
+| Building from a spec | A plan-track card whose planner answers a plan, which factoryd turns into direct-track cards with their dependencies once no question stays open, with no click (roadmap 225). Cards that wait in the queue on their dependencies, a merge queue per project, and a new project from the console seeded from a template. Since Stage 12 the template works out of the box with its own `check`, a deployable app and a staging job that waits for the rollout, and registration needs no human password | Built (Rulings 205, 209, 210, 212, 219, 222) |
 | Security audit | A stage after the review, per project, a secret pre-check on the added lines and one call on the class's `audit_model` with a six-item checklist; findings, a missing verdict included, to the card only | Built (Rulings 188, 200) |
 | Message-in | A `Message` call in the adapter contract; opencode as a server in the pod, one port only factoryd reaches, a per-session bearer; the restart as the fallback for a harness without it. First user: the loop nudge, counted from the event stream; since Stage 12 the supervisor's guidance | Built (Rulings 188, 202, 216) |
 | Untrusted text | One sanitiser: into the brief for outsiders' text only, hidden comments stripped outside code blocks; out to Forgejo, hidden comments stripped, mentions and closing keywords neutralised, off-list links defanged; agent commits squashed under a sanitised subject | Built (Task 89, Ruling 214) |
@@ -5034,7 +5056,7 @@ since Stage 6, but neither has run under load.
 | Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Built (Rulings 81, 84) |
 | Project screen | One screen per project (5.7): status line, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export. Since Stage 16 the board's reads and actions are chat tools, the `system` tool is rendered from the code, refusals name the fitting action, and the planner asks its open questions before acceptance. Stage 17 built the drawer's Chat tab, the message queue, the status line across both columns, the event stream without a poll, the split, the approve warning and GitHub pull request mode | Built in Stage 15 (Rulings 251 to 260), exit test passed. Stage 16 (Rulings 261 to 270) built the chat as the window, members, approvers per project and GitHub import and export on 2026-10-11. Its exit test's chat-only run had one gap, main's CI result, which the `ci` read built after the run closed. A fix round the same evening built the fixes for seven of its findings. Stage 17 (Rulings 272 to 307) built its items on 2026-10-12, 4.11 last, live since roll #488. Its exit test's chat run had one gap, a pull request the factory opened outside a card (roadmap 187), and its lane criterion failed |
 | Merge authority | The `factory-merge` bot merges after a whitelisted human's approval, enforced by Forgejo's branch protection. Merge retries are capped at six. A project on `auto` merges class `normal` without a card after a proven reproduction or a strict improvement and an approving review; the factory's repositories stay on `human` | Built (Rulings 109, 129). `auto` built (Rulings 149, 167, 169) |
-| Intake lanes | Lanes backlog, plan and ready from the project's process, `moved_by` judging every entry. Every bug from any account or alert starts a task. Improvements wait in the backlog for a writer, with an analyzer's write-up. Outsiders' bug reports pass a screening stage. Outsiders' writer-only labels are stripped. The poster's text is untrusted information between random markers | Built (Rulings 148, 150, 182, 185) |
+| Intake tracks | Whoever files a card sets its track, direct or plan, from the project's process (roadmap 225), and the schema refuses an agent card without one. Every bug from any account or alert starts a task. An improvement files no card until a writer's label commits it. Outsiders' bug reports pass a screening stage. Outsiders' writer-only labels are stripped. The poster's text is untrusted information between random markers | Built (Rulings 148, 150, 182, 185) |
 | Projects | Each project its own Forgejo organisation with a CI user, runner registration, deploy key and deploy branch. Flux tenancy through a namespaced account. A default-deny network policy with the file's outside hosts only and a quota per environment. Stricter wins: a project file only tightens the policy's defaults. Reconciled hourly. Settings from the project's file, `objects: factory \| seed` and `agents: coder \| none`, so the factory's two repositories are projects like any. Registered by the reconcile with the admin's login from OpenBao. A cache volume per project for agents and pull request CI. Hostnames are an infra commit. Since Stage 17 a Template update pull request per project keeps the template's files in step | Built (Rulings 146, 155, 156, 157, 164, 165, 166, 179, 296) |
 | Resource kinds | `task` (leased, agent-requested) and `standing` (no lease, registration or a human) in one envelope | Built (Ruling 147) |
 | Hand steps | OpenBao configuration, push mirrors and the console's OAuth app as converging CronJobs. The unseal and the OpenBao bootstrap, once and again after a change to its engines, policies or roles, stay by hand | Built (Ruling 143) |
@@ -5161,8 +5183,8 @@ works `factory` and `demo-app`.
 | Configuration tree | The directory `factory/` in the infra repository: `policy.yaml`, `projects/<name>.yaml`, `processes/<name>.yaml` and `templates/<name>/`, read by factoryd, with the commit as the version |
 | Pin | The configuration version a task started under; its caps and bounds come from it |
 | Stage | One step of the `stages` block of a process file, from screening to merge, with one `on_findings` setting |
-| Process | A file `processes/<name>.yaml` of four blocks, lanes, dependencies, stages and merge, that a project names. The loader and `config check` refuse one that cannot work |
-| Lane | Where a card waits or starts: `backlog` does not start, `ready` starts a coder, `plan` starts a planner. `moved_by` says who may put a card there |
+| Process | A file `processes/<name>.yaml` of four blocks, tracks, dependencies, stages and merge, that a project names. The loader and `config check` refuse one that cannot work |
+| Track | How a card's work runs, set by whoever files it: `direct` builds at once, `plan` plans first and files the plan's cards on the direct track. Replaced the lanes (roadmap 225) |
 | Planner | The capability class whose plan session answers a plan of cards from a spec, never code |
 | Plan card | The approval card of kind `plan` where approvers accept a plan revision, after which factoryd files one card per planned card |
 | Merge queue | A project's order of pull requests at the approval stage: one at a time, each synced with `main` and re-checked when `main` moved |

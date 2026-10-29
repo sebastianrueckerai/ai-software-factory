@@ -4,11 +4,10 @@ const environments = [
 ];
 const namespaces = environments.map((e) => e.namespace);
 
-const lanes = [
-  { name: "ready", class: "coder", moved_by: "writers" },
-  { name: "backlog" },
-  { name: "plan", class: "planner", moved_by: "writers", plan: { min_cards: 0, max_cards: 12, foundation: true, integration: true } },
-];
+const tracks = {
+  direct: { class: "coder" },
+  plan: { class: "planner", plan: { min_cards: 0, max_cards: 12, foundation: true, integration: true } },
+};
 
 const cron = (expr) => [{ cron: expr }];
 
@@ -20,16 +19,16 @@ module.exports = {
   rows: [{
     Name: "nebula-run", Repository: "orbit/nebula-run", MergeRule: "human", Objects: "factory", Agents: "coder",
     GitToken: "minted",
-    Namespaces: namespaces, Environments: environments, Process: "spec", Lanes: lanes, File: true,
+    Namespaces: namespaces, Environments: environments, Process: "spec", Tracks: tracks, File: true,
   }],
   config: {
     // a busy studio's board holds more than the default eight cards no agent has started yet
-    backlog_cap: 16,
+    queue_cap: 16,
     repository: "orbit/nebula-run", merge_rule: "human", objects: "factory", agents: "coder", process: "spec",
     namespaces, environments,
     // policy.DefaultChat's confirm list: the lab's own chat block confirms nothing, so the chat's writes would run unasked
     chat: {
-      confirm: ["new_card", "move_card", "answer", "tell_card", "steer", "start_plan", "retry", "accept_plan", "request_changes", "reject_plan",
+      confirm: ["new_card", "answer", "tell_card", "steer", "retry", "request_changes",
         "approve_merge", "deny_merge", "invite", "github_export", "github_sync", "close", "edit", "grant_session", "set_dependency", "split_card",
         "alert_verdict", "promote_resource", "release_resource", "write_doc", "set_autonomy", "routine_write", "routine_delete", "routine_run", "routine_skip"],
     },

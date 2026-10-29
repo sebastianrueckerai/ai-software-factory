@@ -3,7 +3,7 @@ const story = require("../lib/story");
 const ui = require("../lib/ui");
 
 const HOUR = 3600;
-const args = story.filing(102, "ready");
+const args = story.filing(102, "direct", "a small, clear change");
 const read = { state: "all" };
 const doIt = ui.doIt;
 const filed = ui.face(102);
@@ -25,13 +25,13 @@ const filing = state.reply(state.say(story.replies.matchmaking), state.call("new
 
 // the morning's lobby queue card has pushed its pull request, and the review reads it
 const queue = (now) => story.card(now, 101, {
-  status: "in-review", lane: "ready", age: 38 * 60, gate: "review", gateSince: 4 * 60, model: "small", spent: 0.42, pr: story.cards[101].pr,
+  status: "in-review", track: "direct", age: 38 * 60, gate: "review", gateSince: 4 * 60, model: "small", spent: 0.42, pr: story.cards[101].pr,
 });
 
 // the morning's thread is the first; Sebastian talks in a fresh one
 function morning(now) {
   const ask = story.asks.queue;
-  const f = state.filedThread(now, { said: ask.answer, reply: story.replies.queue, args: story.filing(101, "ready"), issue: 101, age: 39 * 60 });
+  const f = state.filedThread(now, { said: ask.answer, reply: story.replies.queue, args: story.filing(101, "direct", "a small, clear change"), issue: 101, age: 39 * 60 });
   const rows = [
     state.message(now, { role: "user", content: story.requests.queue, age: 40 * 60 }),
     state.ask(now, { question: ask.question, choices: ask.choices, age: 40 * 60 - 5 }),
@@ -80,7 +80,7 @@ module.exports = {
     },
     { state: () => null, actions: [{ hover: doIt }, { wait: 600 }, { click: doIt }, { waitFor: "#chat-log .applied" }, { waitFor: filed }], hold: 2000 },
     {
-      state: (now) => board(now, { thread: second(now), tasks: [story.card(now, 102, { status: "queued", lane: "ready", age: 5 })] }),
+      state: (now) => board(now, { thread: second(now), tasks: [story.card(now, 102, { status: "queued", track: "direct", age: 5 })] }),
       actions: [{ hover: filed }],
       hold: 2500,
     },

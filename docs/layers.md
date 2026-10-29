@@ -7,7 +7,7 @@ Sebastian's ruling of 2026-10-13, from a comparison with another agent factory: 
 Each layer answers one question:
 
 - **The factory** answers: can this run at all, attributed, capped and sandboxed? Sandboxed pods, the gateway, money, policy enforcement, task state, audit. It enforces. It holds no opinion about how software should be built.
-- **The process** answers: what must a change survive before it merges, and who acts next? A YAML file per project: lanes, dependencies, stages, merge. Two processes ship (`maintenance`, `spec`), a project names one, and a project may only tighten.
+- **The process** answers: what must a change survive before it merges, and who acts next? A YAML file per project: tracks, dependencies, stages, merge. Two processes ship (`maintenance`, `spec`), a project names one, and a project may only tighten.
 - **The prompts** answer: what does an agent read before it works? AGENTS.md, skills, brief guides, product directives.
 
 The test for every new idea: name the layer first. A deterministic check becomes a stage in a process file or a command in the project's own CI. Guidance an agent should follow becomes the prompt pack, or better a tool or a check, the roadmap's third guiding idea. A capability the process composes from becomes a factory primitive.

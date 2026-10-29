@@ -53,12 +53,12 @@ function added(now, o = {}) {
 // the first run: it came due, filed #141 a minute later, and the card builds; then the card is done and the routine waits
 // for next week
 function running(now) {
-  const card = story.card(now, ISSUE, { status: "running", lane: "ready", source: "routine", age: (now - due) / 1000 - MIN, gate: "session", gateSince: 5 * MIN, spent: 0.12, model: "small" });
+  const card = story.card(now, ISSUE, { status: "running", track: "direct", source: "routine", age: (now - due) / 1000 - MIN, gate: "session", gateSince: 5 * MIN, spent: 0.12, model: "small" });
   const run = state.routineRun(routine.name, { run: 1, due, outcome: "filed", issue: ISSUE });
   return added(now, { tasks: [card], run, open: { ID: card.ID, IssueNumber: ISSUE, Status: "running" } });
 }
 function done(now) {
-  const card = story.card(now, ISSUE, { status: "done", lane: "ready", source: "routine", age: (now - due) / 1000 - MIN, finished: 1, spent: 0.31, model: "small", pr: 231 });
+  const card = story.card(now, ISSUE, { status: "done", track: "direct", source: "routine", age: (now - due) / 1000 - MIN, finished: 1, spent: 0.31, model: "small", pr: 231 });
   const run = state.routineRun(routine.name, { run: 1, due, ended: new Date(now - 1000), outcome: "done", issue: ISSUE, cost: 0.31, note: "4 base images behind the newest release of their line" });
   return added(now, { tasks: [card], run });
 }
