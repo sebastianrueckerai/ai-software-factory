@@ -3007,9 +3007,10 @@ the history and every depth come through a tool. What each part does:
 - **The review per part** (7). The model review reads a diff in one call
   when it fits `limits.review_diff_kib`, else per file in up to three parts
   of that size, and each part's call reads the names the other parts add;
-  the audit reads parts of 48 KiB. Both answer "not reviewed" when they
-  cannot read it all, and carry the added lines' concurrency sites as
-  context.
+  the audit reads parts of 48 KiB. Both answered "not reviewed" when they
+  could not read it all, and carry the added lines' concurrency sites as
+  context. Since roadmap 336 they read the diff whole, with no cap on parts
+  (see the review gate in 7).
 - **Persistence.** Proposals and undo tokens in `chat_proposals`, a new
   conversation beside the old ones, and the replay rule (above).
 
@@ -4065,7 +4066,7 @@ of the ruling, else the policy's `default`, else 120 seconds:
 | RunSession | 7260 | The limits' agent time plus 60 s (1260 under the 20-minute cap before Stage 12): a session at the cap is stopped by the cap, so the bound catches a stuck runner (Ruling 154). A class, process or project with a longer agent time gets a longer session, while the bound stays the limits' and only alerts |
 | WaitChecks | 600 | Main CI took about 7.7 minutes at the step-zero gate |
 | GateReproduction | 900 | Task 66 runs the command twice, at the base and the head, and sets 1800 in the policy |
-| ModelReview | 3 × the supervisor timeout + 120 (1200 today) | Since Stage 16 the review makes one call per part, up to three, so its bound follows from the parts. Before, 360 s (Ruling 194: a review of a 100-line diff by glm-5.3 took 210 s on 2026-09-29, and the first default of 180 s, Ruling 140, cut a correct review twice) |
+| ModelReview | The waves of calls × the supervisor timeout + 120 (1200 for three waves) | Since Stage 16 the review makes one call per part, so its bound follows from the parts. Since roadmap 336 the calls run four at a time, so the bound follows from the waves of four, and again from the waves plus one for each retried call. Before, 360 s (Ruling 194: a review of a 100-line diff by glm-5.3 took 210 s on 2026-09-29, and the first default of 180 s, Ruling 140, cut a correct review twice) |
 | GateAudit | The same as ModelReview | The security audit (7), one frontier call per part like the review. One call answered in 2 s to 85 s in Stage 10 |
 | Merge | 90 | One API call under a 2-minute timeout, so the first default of 300 s could never fire (Ruling 163) |
 | every other activity | 120 | One API call each, seconds (Ruling 140) |
@@ -4412,7 +4413,24 @@ closed as real.
   absent), else at most three parts of that size, one call each, and
   combines the verdicts. Each part sees the whole file list and the
   functions, types, routes and selectors the other parts add. A bigger diff
-  is "not reviewed", with no call and no findings. The prompt carries the
+  was "not reviewed", with no call and no findings. Since roadmap 336 the
+  review reads the diff whole, up to 64 MiB, and splits it per file. It has
+  no cap on parts, and cuts a file larger than a part by hunks. The calls
+  run four at a time. A call the gateway refuses for headroom (the task's
+  cap, the day's, the month's or the project's) is made again after the
+  others, one at a time, so a budget that paid the parts one after the
+  other still pays them. The activity's bound follows the waves of calls.
+  The review of an integration card, the one that answers the plan's
+  criteria, adds one call per criterion over the diff of the cards that
+  cite it, every delta card's and its own, in parts when that diff needs
+  them, and one call for the feature's behaviours. The behaviours call
+  reads the cards' briefs, their file lists and the names they add, and
+  has no diff. A criterion over several parts takes the worst part's
+  verdict, and its evidence and fix come only from the parts at that
+  level. A part may answer `absent`, and a criterion absent from every part
+  is `unmet`, since a met that nothing shows would count toward auto merge.
+  A plain review answer that carries `criteria` or `behaviours` is
+  refused. The prompt carries the
   added lines' goroutines, channels, locks, selects and atomics as context,
   not as a rule (Ruling 263). A finding that claims a name is undefined or
   uncalled carries a claim (kind, symbol); `git grep` at the head and at
@@ -4438,8 +4456,9 @@ closed as real.
   widen, and the sandbox contract. It answers `clear` or `findings`. No
   verdict, a diff too large to read, a refused or failed call are findings
   too. Since Stage 16 the audit reads the diff per part like the review,
-  and a diff over three parts is "not audited in full", while its secret
-  pre-check still scans the whole diff.
+  and a diff over three parts was "not audited in full", while its secret
+  pre-check still scans the whole diff. Since roadmap 336 the audit reads
+  every part, in calls of four at a time, with no cap on parts.
   Every finding's text passes the scrubber, fed with the secret values the
   diff itself holds, so the card and the timeline never show one. It posts
   no pull request comment. A roll skips it. Bound `GateAudit`, derived
