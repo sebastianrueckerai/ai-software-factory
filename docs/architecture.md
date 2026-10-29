@@ -1590,10 +1590,16 @@ capitals, so a stored acceptance command that named a long test proved no
 card. Since roadmap 336 a run with no digit, `+` or `=` passes as well; a
 random key of 32 characters almost always holds one. The session record
 is scrubbed with factoryd's own secrets by value, every one it loads at
-boot (roadmap 332, built in part). The session's own secrets are not
-masked by value yet: a key of a known shape, such as its LiteLLM key, is
-masked by its shape, but its Forgejo tokens, 40 hex characters like a
-commit id, pass. Since
+boot (roadmap 332, built in part). The session's own Forgejo tokens are
+40 hex characters, like a commit id, which the rule keeps, so the worker
+masks them by value. Every event line and the result it sends factoryd
+lose the push token once factoryd sent it. The read token never reaches
+the session's container: only the clone init container holds it, and
+its git errors are scrubbed with it. The worker masks the values alone,
+so the content hashes reach factoryd's scrub, which keeps them. A run
+that holds a key shape, such as an `sk-` key inside a longer run, is
+masked whole. The session's LiteLLM key is masked by its `sk-` shape,
+not by its value. Since
 Stage 17 one pattern there, `redact.GitHubToken`, finds GitHub tokens for
 the chat's scrub (5.7) and the audit's diff scan (7). Proven live on task t-c4e5c525334f: 31 spans under its id (10
 from factoryd, 14 from the gateway, 7 from the worker), 5 audit records equal
