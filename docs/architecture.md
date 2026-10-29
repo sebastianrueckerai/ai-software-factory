@@ -1035,6 +1035,21 @@ asks for plan where the process has a plan track. `backlog` or
 `agent` or `plan` label commits it. An issue with none of these labels is a
 direct card, so a bug from anyone still starts (Ruling 148). Tasks filed
 through the API, by alerts, by routines and by the roller are direct cards.
+A running direct card can turn plan-track between two of its sessions
+(roadmap 336). The signal `to_plan` (`SignalToPlan`, change id
+`direct-to-plan`) is taken once the card is running, after a person's wait.
+`BecomePlan` then moves the row to the plan track first, so a refusal
+writes nothing and a retry completes the rest: the `to_plan` step, the
+session counters at zero and the issue label `plan` in place of `agent`.
+The planner reads the card's text and, last among its findings, a
+work-so-far block: the branch head, the caller's text and the reason.
+Comments written before the switch are recorded as written before the card
+went to the planner. A refusal names the card's state and the fitting
+action, and the card runs on as it was. A plan's open groups are the plans
+with a merged child and no `plan_closed` event, and a plan without
+criteria closes when its cards are done or closed (a migration closed the
+legacy ones). A dependency joins cards of one plan only: any other card is
+a group of one.
 `moved_by`, the move buttons and the presort write-up went with the
 backlog.
 
@@ -1208,8 +1223,9 @@ request at the last regular attempt or at a cap is the human's answer
 itself: it grants the one extra session with the request as its finding,
 and no cap card follows (Ruling 225), where Stage 11's exit test paid two
 clicks for one decision. `Finish` deletes the fork branch only of a task
-that ends `done` or `closed`, so a failed task's work stays for a refile,
-and nothing prunes those branches yet. A task's first session starts from
+whose pull request merged. The branch of any other task stays, so its work
+is there for a refile, and a sweep deletes it 30 days after the task
+ended (roadmap 336). A task's first session starts from
 the base branch's head as it is when the session starts and records it as
 the task's base, not from the commit its card held when it was filed, so
 a plan card that waited on its dependencies starts on their merged work. On the round's exit test no card reached a cap.
@@ -3397,8 +3413,10 @@ task tokens.
 never pushes and never opens a pull request: at the session's end the
 worker commits the working tree and pushes it, and factoryd opens the pull
 request. A check-in stop pushes the work in progress, and the next
-session starts from it. A session that resumes on a branch already holding
-its work and adds nothing counts as a pushed result (4e94cc3); before that
+session starts from it. A continued card's branch is created at the old
+card's branch head (`ContinueBranch`), so its first session resumes on that
+work, and its base stays the old card's base. A session that resumes on a
+branch already holding its work and adds nothing counts as a pushed result (4e94cc3); before that
 fix the workflow read it as `no_push` and ran to the cap. The Stage 9 bug
 lane showed why the work guide must say so: one session spent 24 commands
 hunting for push credentials after a human's answer said "push", another
