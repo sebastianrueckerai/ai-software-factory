@@ -1096,7 +1096,8 @@ issue finishes it `closed` (since the fix round after Stage 16, 7), a trusted
 change request runs another session with the request as findings.
 Attempts start on `small`. Two things switch the running session to `big`
 in place: the 8-minute cap on a first attempt that has pushed nothing, and
-the stuck rule's `retry_stronger` (6.6). Returns of one stage past
+the stuck rule's `retry_stronger`, which follows the check-in's handover
+on a stuck trip (6.6). Returns of one stage past
 `limits.stronger_after` start the next session on `big`. The limit is 3 in
 policy and 1 for a medium or large card.
 Since Stage 17 these climbs are the only way to `big`: the
@@ -1161,8 +1162,9 @@ check-in of its own is the dead moment: the next session's start asks
 about it, reads the dead session's record and writes the handover the
 work then starts from, the note waiting at the top of that session's own
 brief. A mid-session handover's note rides the next session's brief when
-no ask goes with it and stays on the timeline when one does. The per-card
-budget caps all three moments together.
+no ask goes with it and stays on the timeline when one does. The card's
+check-in share caps all three moments together, and `checkin_calls` caps
+each conversation (5.3, 6.6).
 Since Stage 12 finished work survives every cap (Task 112, change id
 `keep-work`). The agent time is the task's own, hours by default (5.3),
 and a session starts only with at least five minutes of it left, since
@@ -1645,12 +1647,13 @@ Besides its `version`, `policy.yaml` holds eleven sections:
   supervisor calls 6 (it was 3), check-ins not counted — the per-session
   count retired by plan E, the key left in the vocabulary a pinned policy
   loads. The escalation ladder's plan D added five keys for the check-in:
-  `checkin_calls` (12 model calls per card), `checkin_share` (10 percent
-  of its budget), `checkin_tail_kib` (24, the parent record's tail cut
-  into the statement), `checkin_handover_chars` (2000, the note cap) and
-  `checkin_sessions` (1, the fresh sessions one confirmed finding gets
-  before the human is asked); plan E shares them across the gate, session
-  and dead moments. The per-task spend
+  `checkin_calls` (20 model calls per check-in conversation since Ruling
+  327, 12 per card before), `checkin_share` (10 percent of the card's
+  budget, over all its conversations), `checkin_tail_kib` (24, the parent
+  record's tail cut into the statement), `checkin_handover_chars` (2000,
+  the note cap) and `checkin_sessions` (1, the fresh sessions one
+  confirmed finding gets before the human is asked); plan E applies them
+  to the gate, session and dead moments. The per-task spend
   cap of 2 EUR stays the cost guard. The two time values form
   `policy.Time`, which a class in `policy.yaml`, a process file and a
   project file may set too, each field on its own: the most specific set
@@ -2789,6 +2792,20 @@ the history and every depth come through a tool. What each part does:
   "issue closed without merge", not `failed` (7). `set_dependency` refuses
   a process without a dependencies block, reads Forgejo's list before it
   changes it, and has an undo. `new_card` takes a size.
+  At the proposal and at the run `new_card` judges the card the same way:
+  text the sanitiser or the provider would change, an ask to fetch a pull
+  request's commits without `carry_pr`, and the card's document links. It
+  resolves the relative links in the title, the body and the acceptance
+  items against the whole tree of the document repository at HEAD, read
+  from Forgejo's git tree API, the later pages by the first page's sha.
+  A link that resolves to no file, or to several, is refused, and the
+  refusal names the fitting action: name the path from the repository's
+  root, and write a code path as text, not as a link. If the project names
+  no `chat.doc_repo`, the console holds no docs token or the tree cannot
+  be read, `new_card` files the card without the check: the check helps
+  the agent and never blocks filing. The tree holds images too, so a link
+  to an image passes here, and the session's brief then says that it is
+  not among the text files (6.2).
 - **The planner's questions** (Ruling 264). A plan carries up to five
   questions with 2 to 5 choices each, stored per revision and asked on the
   plan card with a button per choice. Accept is refused while one is open.
@@ -3166,6 +3183,24 @@ map. The brief also tells the agent to run `bash check` when the
 repository has a `check` file, and the factory's own code has one since
 Stage 17 (6.4).
 
+A session of a project that names a document repository (`chat.doc_repo`)
+reads its text files at `/workspace/docs`, a shallow, sparse clone the
+clone container makes with the session's read token, and the brief's docs
+line names the folder. A relative link in a card, such as
+`../plans/x.md`, does not resolve there: the file is
+`/workspace/docs/docs/plans/x.md` (card #1287). So the worker resolves
+each relative markdown link of a writer's card against the clone and
+writes the section `Documents the issue links:` after the docs line, one
+line per link: `<link> is <path>`, `<link> is not among the text files at
+/workspace/docs`, or `<link> matches <n> files: a, b, c`, with the first
+three named. A link matches each file whose path ends in it, without its
+leading `../` and `./`, and an exact path from the repository's root wins
+over these suffix matches. The worker takes at most 20 links, skips a
+target over 300 bytes, and walks no symlink and no `.git`. A card from an
+outside author or from telemetry gets no section, since each line repeats
+the author's link text outside the issue's markers (Ruling 152). The rule
+lives in `InboundBrief`, which enforces Ruling 152 for the whole brief.
+
 `Message` (Ruling 188, Task 88) puts text into the running session as the
 next user turn. The first human-sourced message opens with the factory
 basics from `internal/manual`, the manual's one source; later messages
@@ -3535,8 +3570,9 @@ parent session ID, not as a resurrected process.
 Two layers. Cheap detectors in factoryd read the event stream and decide
 when to ask the check-in. The check-in, a model conversation in the
 agent's own pod, decides what to do: continue, message, handover or
-human. The wall clock, the cheap cap, the stuck rule and the agent's own
-asks never reach the conversation; they decide in code. Until plan E the
+human. The wall clock, the cheap cap and the agent's own asks never reach
+the conversation. They decide in code. Since Ruling 327 the stuck rule
+reaches the conversation as a line in its statement (below). Until plan E the
 trip called the session supervisor, a model asked beside the pod. Plan E
 deleted it, its `askSupervisor` caller and its per-session call count,
 and kept `SupervisorModel` for the gate supervisor, the review and the
@@ -3572,10 +3608,12 @@ review alias, 5.3), the live workspace readable through its tools and no
 the gates' results and the live transcript's tail, and answers continue,
 message (its guidance goes into the running session, which keeps its
 context and its work), handover (a note for the next work) or human. The
-progress digest, what a human reviewer would read to see a circle that
-the detectors cannot name — the commands run with their outcomes over
-time, the files touched with edit counts, the last error signatures and
-the diff so far — rides the recorded decision and its issue comment.
+progress digest rides the recorded decision and its issue comment. It
+holds what a human reviewer would read to see a circle that the detectors
+cannot name: the commands run with their outcomes over time, the files
+touched with edit counts, the other tool calls with the number the
+subagents made ("5 other tool calls (2 by subagents)"), the last error
+signatures and the diff so far.
 Until plan E the trip called the session supervisor, which since Stage 12
 (Rulings 216, 224, Task 111) picked continue, message or escalate, and
 before that among continue, redirect (the session ended and a new pod
@@ -3583,8 +3621,8 @@ resumed with the guidance as findings), retry on a stronger model and
 escalate, with every correction costing a session: on the Stage 11 exit
 test 23 of 58 sessions ended in a redirect. The check-in never raises a
 cap or a budget. Only a human does that. Most tasks never trip a
-detector, so the check-in costs little, and the per-card budget caps all
-moments together.
+detector, so the check-in costs little, and the card's check-in share
+caps all moments together.
 
 As built (Stage 6), with the defaults that tuning starts from:
 
@@ -3611,14 +3649,23 @@ As built (Stage 6), with the defaults that tuning starts from:
   `SUPERVISE_READING_WITHOUT_WRITING` in its manifest (Ruling 298): at 24,
   normal reading on a large card tripped twice within minutes, and the
   stuck rule moved the card to the frontier tier. A message comes at 60
-  reads, the climb at 120. **Stall** is five minutes without an event.
+  reads, and a stuck trip at 120, which the check-in judges (below).
+  **Stall** is five minutes without an event.
+- **Subagents.** opencode's research subagents run as child sessions of
+  its `task` tool, and the adapter marks their events. Their tool calls
+  and commands do not count toward reading without writing: the parent's
+  `task` call counts once, when it returns. They feed no trace detector
+  either, so no `same_call` nudge reaches a main agent that did not make
+  the call and cannot read a message until its subagents return. Their
+  writes count as writes. Before the mark, a research subagent's calls
+  tripped reading without writing within a minute.
 - The **check-in** trips at every `check_in` interval (45 minutes by
   default, 5.3) counted from the task's anchor, the deadline minus the
   agent time, so it continues across sessions without a stored flag; a
   session's first check-in comes no earlier than ten minutes after its
   start. Its detail reads "scheduled check-in, no detector tripped", it
-  writes no alert, and its conversation spends from the check-in's
-  per-card budget like any other moment. Half way, its predecessor, fired
+  writes no alert, and its conversation spends from the card's check-in
+  share like any other moment. Half way, its predecessor, fired
   once per task through a flag on
   the task row, which a migration dropped with it, and it tripped on a
   resumed session's first tick (#186) and on a planner's first tick when
@@ -3644,7 +3691,8 @@ The check-in conversation runs inside the session activity, because
 with one of the four decisions, a message carrying guidance, a handover
 carrying a note and a human escalation carrying a reason; an answer
 naming anything else escalates, and an unreadable answer gets one repair
-round before it escalates. Its input holds the guidance already delivered
+round before it escalates. On the last call an unreadable answer asks a
+human at once, as unreadable. Its input holds the guidance already delivered
 in this
 session, and the prompt asks it not to repeat a message that did not
 work. A message travels the loop nudge's path (6.2) and is recorded as a
@@ -3653,36 +3701,78 @@ answers that the session already ended, every progress detector starts
 afresh from the message's time, and the session reads on. A message the
 worker cannot take (a harness without messages, a network error) falls
 back to the old redirect: the session stops with the guidance as a
-finding. The per-card budget replaces the old per-session count
-(`limits.supervisor_calls`, which stayed in the vocabulary a pinned
-policy loads): at most `checkin_calls` model calls and the
-`checkin_share` percent of the card's budget, all moments and rounds
-together, and the next trip past either answers human in code, with no
-call spent. The project agent's `steer` (5.7, Stage 15) reaches a session
+finding. The project agent's `steer` (5.7, Stage 15) reaches a session
 the same way (`Runner.MessageSession`), as a human message on this path
 under the human's name, and does not arm the stuck rule.
 
-**The one stuck rule** (Rulings 216, 224). The model cannot choose a
-stronger model or a restart; one rule in code ends a session that does not
-take its message. After a delivered message, the next detector trip with
-no file written since, or a flip-flop or churn trip at all, since circles
-of writes are not progress, ends the session without a check-in
-conversation as `retry_stronger`, with the finding `stuck after the
-supervisor's message:
-<kind>: <detail>` and an issue comment. The workflow already runs that
-outcome: the next session on the stronger rung, from the pushed work in
-progress. A check-in, the wall clock and the stall detector never count as
-stuck: a long command such as a cold `bash check` is silence, not a
-circle. On Stage 12's exit test six trips in twelve sessions gave four
-messages and two continues, no restart and no stuck end: the frontend's
+The pod works on while the check-in runs, and its lines wait in the
+stream. The last answer to a trip, a delivered message, a continue or a
+climb, therefore sets a boundary at the moment it takes effect. For a
+message that moment is its delivery, taken before the issue comment. A
+tool call or a command whose pod time lies before the boundary goes into
+the findings and counts for no detector. A write from that window still
+counts: it resets `no_write`, reading without writing and the count of
+nudges, and it enters the flip-flop and churn memory. It does not disarm
+the stuck rule, which wants a write after the delivery. Card #1287 showed
+the gap on 2026-10-28. Its check-in answered message after 9 calls and 3
+minutes 26 seconds. The 99 calls the pod made meanwhile then counted after
+the message: call 120, made before the delivery, tripped reading without
+writing again, and the stuck rule ended the session without a
+conversation.
+
+The check-in's budget replaces the old per-session count
+(`limits.supervisor_calls`, which stayed in the vocabulary a pinned
+policy loads). Since Ruling 327 `checkin_calls` (20) bounds each
+check-in conversation, not the card. Each tool's answer says how many
+calls are left. The last call carries no tools and asks for the answer:
+"This is your last call: answer now with the JSON object, no tool." A
+conversation that still gives no answer asks a human: "The check-in gave
+no answer within its 20 calls. May the card go on?" The answer starts the
+session again with the comment as guidance and widens no cap, since no
+call cap outlives its conversation. `checkin_share` stays per card: the
+percent of the card's budget that all its conversations, moments and
+rounds may spend together. factoryd reads the share's spend from the
+ledger before each conversation, and a trip past the share answers human
+in code, with no call spent.
+
+**The one stuck rule** (Rulings 216, 224, 327). After a delivered
+message, the next detector trip with no file written since is stuck, and
+so is a flip-flop or churn trip after any message, since circles of writes
+are not progress. A check-in, the wall clock, the stall detector and
+`spend_no_push` never count as stuck: a long command such as a cold `bash
+check` is silence, not a circle. Until Ruling 327 (Sebastian, 2026-10-28)
+the rule ended a stuck session in code, without a check-in conversation.
+Since then every trip asks the check-in, and a stuck trip's statement
+carries the line `Stuck rule: after the message, the <kind> detector
+tripped with no file written since.` The check-in decides as on any trip:
+continue, message, handover or human. On a stuck trip a handover is the
+stuck rule's consequence, `retry_stronger` with the check-in's note. The
+session climbs to the stronger model in place when it can (5.1).
+Otherwise it stops as `retry_stronger`, and the next session starts on the
+stronger rung from the pushed work in progress, with the note as
+guidance. At the top rung the next session runs on the same model from
+the note. If the check-in cannot answer, because its provider refuses or
+no model serves its purpose, the rule acts in code as before:
+`retry_stronger` with the finding `stuck after the supervisor's message:
+<kind>: <detail>`. A spent check-in share asks a human, as on every trip.
+Ruling 327 amends Rulings 216 and 224: the model still never chooses a
+stronger model, code does, and the check-in decides whether the session
+is stuck. So Ruling 224's guard against circles rests on the
+check-in's decision and the card's check-in share. A check-in that keeps
+answering message can keep a card going until the share runs out, and
+then a human is asked. On Stage 12's exit test six trips in twelve
+sessions gave four messages and two continues, no restart and no stuck
+end: the frontend's
 supervisor saw a flip-flop on one file and told the session which hook did
 not read the route's context, and the auth card's two messages about a
 probe test kept a 41-minute session going to a pushed head.
 
 Each check-in call runs under the task's virtual key and takes a hold
 for its worst case like any model call (5.4), so the check-in spends from
-the task's money and cannot overrun it, the day cap or its per-card
-share. With nothing left, the task escalates without a call. The call
+the task's money and cannot overrun it or the day cap. The per-card share
+is checked only before each conversation, so one conversation can pass it
+by its own calls, about 0.3 EUR at the prices of 2026-10-28. With nothing
+left, the task escalates without a call. The call
 goes through the gateway under purpose `checkin`, which audits it and
 books it under `checkin/<alias>` (5.3, plan D); Task 71 (rolled
 2026-09-28) had put the supervisor, gate supervisor and review calls
@@ -4932,7 +5022,7 @@ since Stage 6, but neither has run under load.
 | Agent pull requests | From a `factory-agent` fork, so PR jobs get a read-only token; two session tokens, read upstream and write the fork; workflow-directory guard in the worker and factoryd | Decided (Rulings 97, 100) |
 | CI registrar | Dedicated `factory-ci` account, organisation owner because the runner API demands it, token scoped to the code repository, `main` protected with `apply_to_admins` | Decided (Rulings 101, 101a) |
 | Missed webhooks | The heal pass re-reads Forgejo every minute and signals what webhooks missed; `Reconcile` at the start of every workflow run | Decided |
-| Supervision | Cheap trace detectors over the event stream; since plan E a trip asks the in-session check-in, a second conversation in the agent's own pod under the `checkin` alias, read-only on the live workspace, choosing continue, message into the running session, handover or human, paid from the task's remaining budget under a per-card call cap and share shared by the gate, session and dead moments; one stuck rule in code ends a session that ignores a message and climbs a rung. Agent time and check-in per class, process and project. Human answers are kept across attempts in their own brief section. A `no_write` progress detector, and a gate supervisor for the six long gates with wait, retry, cancel or escalate. A 6-minute supervisor timeout, every exhausted task to the card, a repeated trip to the stronger rung. A nudge into the running session before the same-call trip. Since Stage 17 three nudges without new content end the session, the provider's repetition refusal ends it the same way, and the reading threshold is 60 | Built (Rulings 82, 86, 87, 118, 120, 141, 154, 161, 162, 163, 186, 193, 202, 216, 217, 218, 224, 280, 298) |
+| Supervision | Cheap trace detectors over the event stream; since plan E a trip asks the in-session check-in, a second conversation in the agent's own pod under the `checkin` alias, read-only on the live workspace, choosing continue, message into the running session, handover or human, paid from the task's remaining budget under a call cap per conversation, whose last call carries no tools, and a per-card share for the gate, session and dead moments together. Since Ruling 327 every trip asks the check-in: a stuck trip after an ignored message carries the stuck rule's line, and the check-in's handover on it climbs a rung. A subagent's calls count once and feed no trace detector, and calls made before the last answer took effect count for no detector. Agent time and check-in per class, process and project. Human answers are kept across attempts in their own brief section. A `no_write` progress detector, and a gate supervisor for the six long gates with wait, retry, cancel or escalate. A 6-minute supervisor timeout, every exhausted task to the card, a repeated trip to the stronger rung. A nudge into the running session before the same-call trip. Since Stage 17 three nudges without new content end the session, the provider's repetition refusal ends it the same way, and the reading threshold is 60 | Built (Rulings 82, 86, 87, 118, 120, 141, 154, 161, 162, 163, 186, 193, 202, 216, 217, 218, 224, 280, 298, 327) |
 | Alerts | An `alerts` table with a verdict per alert, counted in SigNoz, with a precision panel. Alerts on the factory's own namespaces route by the namespace label like a project's | Built (Rulings 140, 180) |
 | Factory model calls | The review and both supervisors call through the gateway with factoryd's token and purpose headers, audited and booked like an agent's | Built (Task 71) |
 | Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list. Servers and volumes, no buckets. SSH certificates bound to one server. Outbound tcp 53, 80 and 443. Deletion at the last tick before the lease ends | Built (Rulings 80, 83, 121, 122, 124, 125) |
@@ -5036,7 +5126,7 @@ works `factory` and `demo-app`.
 | MicroVM | A small virtual machine with its own kernel, started per pod or job on a KVM host (Kata, Firecracker); needs `/dev/kvm`, so bare metal or nested virtualisation |
 | Supervisor | The strongest configured model under the `supervisor` alias; since plan E it serves the gate supervisor, the review and the audit — the session supervisor it named is gone, its trip path the in-session check-in; never raises a cap |
 | Check-in | The scheduled look at a running session every `check_in` of agent time (45 minutes by default), with no detector tripped; since plan D also the model conversation that judges at the gate, mid-session and at a dead session's ask, under the `checkin` alias, choosing continue, message, handover or human |
-| Stuck rule | After a delivered message, a trip with no write since, or a flip-flop or churn, ends the session without a conversation and the next one runs on the stronger rung |
+| Stuck rule | After a delivered message, a trip with no write since, or a flip-flop or churn, is stuck. Since Ruling 327 the check-in judges it with the stuck line in its statement, and its handover climbs the session or runs the next one on the stronger rung |
 | Cache volume | A project's directory on its node, `/var/lib/factory-cache/cache-agent-<project>` or `cache-ci-<project>`, mounted at `/cache` for Go's build cache, installed tools and npm's cache |
 | Fork PR | A pull request from `factory-agent`'s fork into `sf`; Forgejo gives its CI jobs a read-only token and no secrets |
 | Job token | The token Forgejo Actions hands each CI job; writable on a same-repository PR, read-only on a fork PR |
