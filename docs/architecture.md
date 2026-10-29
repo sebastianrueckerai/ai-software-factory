@@ -1039,9 +1039,10 @@ through the API, by alerts, by routines and by the roller are direct cards.
 backlog.
 
 A running direct card can turn plan-track between two of its sessions
-(roadmap 336; phases 3 and 4 send the signal, nothing does yet). The
-signal `to_plan` (`SignalToPlan`, change id `direct-to-plan`) is taken once
-the card is running, after a person's wait.
+(roadmap 336). Two things send the switch: the sizing step, through
+`switchToPlan`, before the card's first session, and phase 4, through the
+signal `to_plan` (`SignalToPlan`, change id `direct-to-plan`), which is
+taken once the card is running, after a person's wait.
 `BecomePlan` then moves the row to the plan track first, so a refusal
 writes nothing and a retry completes the rest: the `to_plan` step, the
 session counters at zero and the issue label `plan` in place of `agent`.
@@ -4321,6 +4322,23 @@ outsider's report was screened clear and the coder started, and one asking
 for the registry password waited on a human before any session and was
 closed as real.
 
+**Sizing** (piece A, roadmap 336, change id `sizing`). Before the first
+session of a card a person or the chat filed (issue, `new_card`, the form,
+the API) in a process with a plan track, an `analyzer` task in report mode
+(6.3) on the start rung reads the issue and the code and answers a size,
+a reason and the files the change touches. The session reads and writes no
+code. The filer's size is a floor, and none counts as small. A filed
+`medium` or `large` runs no session and goes to the planner. The step is
+recorded first, then the size is written with its budget. A budget raised
+since the step read it is never undone, and a retry completes the write.
+`small` runs the coder. `medium` or `large` turns the card plan-track
+before any coding session, through `switchToPlan`, and the planner starts
+from the files the sizing named. Machine cards, plan children and cards
+that carry a pull request skip the step. A sizing that fails or answers no
+size lets the card run as filed. The gate is `sizing`, and the card's Time
+section shows the size and the reason, or why there is none. A card has one
+sizing task, as it has one screening task.
+
 - **Policy gate.** It reads the pull request's changed files, a rename under
   both names, and classifies each path under the policy's `risk` section
   (5.3). The first matching rule decides a path's class, and the pull request
@@ -5194,7 +5212,7 @@ since Stage 6, but neither has run under load.
 | Answer chain for questions | `questions: [self, model:<tier>, human]` per stage (queue item B), on top of the message call | Not built, waits for Sebastian's scoping |
 | Rolls | The code repository rolls through a roll task: a digest pull request from factoryd, a card, the bot's merge, a row per image. Infra changes stay human commits. The merge waits for a session gap, and new sessions wait while it does | Built (Rulings 178, 269) |
 | Model routing | Two LiteLLM classes, `small` and `big`, each a z.ai model with an Alibaba twin as its fallback, a 60-second cooldown after 3 failures, no fallback across classes, the answering deployment in the audit row | Built (Rulings 181, 189, 192, 204) |
-| Capability classes | `coder`, `analyzer` with a report session mode for the improvement presort and the screening stage, and `planner` with a plan session mode. The release is the roll task, no class | Built (Rulings 182, 185, 191, 208) |
+| Capability classes | `coder`, `analyzer` with a report session mode for the improvement presort, the screening stage and the sizing step, and `planner` with a plan session mode. The release is the roll task, no class | Built (Rulings 182, 185, 191, 208) |
 | Task analytics | Four task metrics, a revert mark and four panels, no report task | Built (Ruling 185) |
 | SPIRE and OPA | No need appeared in Stage 9 | Deferred |
 | Policy expressiveness | When the YAML outgrows plain Go: Cedar through cedar-go (no validator, no formal semantics in the Go port) or the OPA sidecar. Two ideas from Keycard worth taking either way: a soft rule that turns a deny into an approval card, and an observe-only replay of a new policy version against recent audit rows before it goes live (docs/market-research) | Revisit later |
@@ -5233,7 +5251,7 @@ since Stage 6, but neither has run under load.
 | Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Built (Rulings 81, 84) |
 | Project screen | One screen per project (5.7): status line, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export. Since Stage 16 the board's reads and actions are chat tools, the `system` tool is rendered from the code, refusals name the fitting action, and the planner asks its open questions before acceptance. Stage 17 built the drawer's Chat tab, the message queue, the status line across both columns, the event stream without a poll, the split, the approve warning and GitHub pull request mode | Built in Stage 15 (Rulings 251 to 260), exit test passed. Stage 16 (Rulings 261 to 270) built the chat as the window, members, approvers per project and GitHub import and export on 2026-10-11. Its exit test's chat-only run had one gap, main's CI result, which the `ci` read built after the run closed. A fix round the same evening built the fixes for seven of its findings. Stage 17 (Rulings 272 to 307) built its items on 2026-10-12, 4.11 last, live since roll #488. Its exit test's chat run had one gap, a pull request the factory opened outside a card (roadmap 187), and its lane criterion failed |
 | Merge authority | The `factory-merge` bot merges after a whitelisted human's approval, enforced by Forgejo's branch protection. Merge retries are capped at six. A project on `auto` merges class `normal` without a card after a proven reproduction or a strict improvement and an approving review; the factory's repositories stay on `human` | Built (Rulings 109, 129). `auto` built (Rulings 149, 167, 169) |
-| Intake tracks | Whoever files a card sets its track, direct or plan, from the project's process (roadmap 225), and the schema refuses an agent card without one. Every bug from any account or alert starts a task. An improvement files no card until a writer's label commits it. Outsiders' bug reports pass a screening stage. Outsiders' writer-only labels are stripped. The poster's text is untrusted information between random markers | Built (Rulings 148, 150, 182, 185) |
+| Intake tracks | Whoever files a card sets its track, direct or plan, from the project's process (roadmap 225), and the schema refuses an agent card without one. Every bug from any account or alert starts a task. An improvement files no card until a writer's label commits it. A direct card that is not small goes to the planner. Outsiders' bug reports pass a screening stage. Outsiders' writer-only labels are stripped. The poster's text is untrusted information between random markers | Built (Rulings 148, 150, 182, 185) |
 | Projects | Each project its own Forgejo organisation with a CI user, runner registration, deploy key and deploy branch. Flux tenancy through a namespaced account. A default-deny network policy with the file's outside hosts only and a quota per environment. Stricter wins: a project file only tightens the policy's defaults. Reconciled hourly. Settings from the project's file, `objects: factory \| seed` and `agents: coder \| none`, so the factory's two repositories are projects like any. Registered by the reconcile with the admin's login from OpenBao. A cache volume per project for agents and pull request CI. Hostnames are an infra commit. Since Stage 17 a Template update pull request per project keeps the template's files in step | Built (Rulings 146, 155, 156, 157, 164, 165, 166, 179, 296) |
 | Resource kinds | `task` (leased, agent-requested) and `standing` (no lease, registration or a human) in one envelope | Built (Ruling 147) |
 | Hand steps | OpenBao configuration, push mirrors and the console's OAuth app as converging CronJobs. The unseal and the OpenBao bootstrap, once and again after a change to its engines, policies or roles, stay by hand | Built (Ruling 143) |
