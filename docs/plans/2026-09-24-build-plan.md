@@ -6045,3 +6045,35 @@ roadmap item that holds it is named.
   the snapshots, the shutdown's leftover pods deleted), with
   `docs/factory-off-runbook.md`. The platform agent question is roadmap
   330.
+
+### 2026-10-29: the roadmap items that landed
+
+- 225, the lanes collapse: whoever files a card picks its track, direct
+  or plan, and no card waits undecided. A process file names `tracks:`
+  (direct required, plan optional), and a `lanes:` block is refused by
+  name. `tasks.track` replaces `tasks.lane`, a check constraint holds a
+  track on every agent card, and the open backlog rows and their
+  write-ups close. A direct card is filed queued and starts once a work
+  slot is free; admission also holds a card back while a dependency is
+  open or the project's month budget is spent, a parked card frees its
+  slot at once, and a close passes the bound. A plan revision with no
+  open question files its cards, queued on the direct track, and the plan
+  card ends done; one with open questions waits in Needs you. Accept,
+  Reject, Start plan and the moves go, with their routes and chat tools
+  (69 chat tools); `new_card` takes a track and a one-line reason; the
+  board has no lane column. A console write and the messenger sender ask
+  Forgejo whether the member writes the card's repository, for a project
+  of any agents: the sender's narrower lists deleted Sebastian's
+  notification level on the infra project at 01:31Z. The plan request
+  drafts the hold-outs before it asks a question, and a plan card's
+  dependencies are stored before its issue exists. Card #1287, the
+  factory's own attempt at this item on 2026-10-28, spent 4.75 EUR in
+  three sessions and pushed nothing. Code e0a6512a, 623d18b8, b6e179a1,
+  0a07b64d (rolls #1290, #1294 and after), infra 375c3a5. Live: chat to
+  direct card #1292, started at once with no planner and no click; plan
+  card #1293 asked three questions and the confirmation, waited in Needs
+  you, took the answers, and its revision 3 filed #1297, #1298 and #1299
+  and ended done; #1298 waited queued on #1297, holding no slot. Not seen
+  live: a child starting on its dependency's end, since #1297's merge
+  (pull request #1300) waits for a human under the code project's merge
+  rule.
