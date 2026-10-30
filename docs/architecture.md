@@ -1042,8 +1042,9 @@ A running direct card can turn plan-track between two of its sessions
 (roadmap 336). The sizing step sends the switch through `switchToPlan`
 before the card's first session. The signal `to_plan` (`SignalToPlan`,
 change id `direct-to-plan`) is taken once the card is running, after a
-person's wait. The sizing, a person's Replan and the cut send it (5.7). A `to_plan`
-that waits when the sizing switches joins the sizing's switch.
+person's wait. Only a person's Replan sends it (5.7). The cut, like the
+sizing, calls `switchToPlan` in place. A `to_plan` that waits when the
+sizing or the cut switches the card joins that switch.
 `BecomePlan` then moves the row to the plan track first, so a refusal
 writes nothing and a retry completes the rest: the `to_plan` step, the
 session counters at zero and the issue label `plan` in place of `agent`.
@@ -1717,7 +1718,8 @@ Besides its `version`, `policy.yaml` holds eleven sections:
   with its outcome. Since Stage 16 `large_lines` (1000) makes a pull
   request over that many changed lines class large, which needs a human
   and ranks above normal. 0 switches it off. The merge gate asks a person
-  to approve such a pull request or send it back (5.7).
+  to approve such a pull request or deny it, where requesting changes
+  sends it back to the agent (5.7).
 - `envelope_default`: the standard resource envelope (5.5).
 - `project_default`: a new project's quota and standing block (5.1, 5.5).
   Every project file names its own merge rule since Stage 9.
@@ -3075,15 +3077,19 @@ table (5.6). What it adds to the chat besides:
 
   A replan stops the cards it sends back. A running card stops through its
   live session, which ends and cuts the card in place. A card that waits
-  takes the replan in `awaitAnswer`, in `awaitApproval` and after the roll
-  hold, and its screening stays first: no wait takes the replan before a
-  fresh card's screening has passed. A final card is queued again, and a
-  done plan is reopened. A closed plan, a closing card or a merged
-  direct card refuses, and the refusal names the state and the fitting
-  action. A replan of a plan's
-  child stops that child, and the plan's cards that waited on it wait on
-  the plan. The plan goes back to its planner with its counters at zero and
-  money for one session. The planner starts after the stopped cards end.
+  takes the replan in `awaitAnswer`, `waitPoster`, `awaitImage` and
+  `awaitApproval`, in the merge queue's turn, right after `Reconcile`,
+  after the roll hold and right before an auto merge. Its screening stays
+  first: no wait takes the replan before a fresh card's screening has
+  passed. A final card is queued again, and a done plan is reopened. A
+  closed plan, a closing card, a merged direct card or a card that waits
+  for a person to judge its screening refuses, and the refusal names the
+  state and the fitting action. A cut of a plan's child stops that child.
+  A person's Replan of a child replans its plan and stops every started
+  open card of it. The plan's cards that waited on a stopped card wait on
+  the plan. The plan goes back to its planner with its counters at zero
+  and money for one session. The planner starts after the stopped cards
+  end, merge or close.
 
   The planner reads a record of each old card, fenced as information: the
   card's state, the reviews' and stages' findings, the check-in's notes and
@@ -3097,7 +3103,9 @@ table (5.6). What it adds to the chat besides:
   unchanged. A new card whose `from` names an old card changes it, and
   continues that card's branch. An old key left out is dropped, and a
   started card it drops stops. A kept key is a key with a card row. The
-  rules R1 to R10 check the revision at its filing. Among them, a `from` names a card
+  rules R1 to R10 check the revision when the planner files it, and again
+  when its cards file, so a card that ended in between gets its finding.
+  Among them, a `from` names a card
   of this plan's record, a merged card is not a start, one card carries one
   old card's work, a card that ended is left out and its work added under a
   new key, a merged integration card is left out when the revision adds
@@ -3112,13 +3120,14 @@ table (5.6). What it adds to the chat besides:
   spec or a criterion of the newest confirmed revision asks the
   confirmation again. The records: the plan's issue gets a comment with the
   counts of kept, changed, dropped and added cards and who asked, each old
-  card gets a step and a comment on its issue that says what it became, and
-  a cut says at which session and spend. The plan's `replanned` step comes
-  last, since it ends the replan. A failure before it runs the filing
-  again, which writes each comment once.
+  card gets a step that says what it became, and a cut says at which
+  session and spend. The plan's `replanned` step comes last, since it ends
+  the replan. A failure before it runs the filing again, which writes each
+  comment and step once.
 
   The merge gate no longer splits. A pull request over `large_lines` is
-  class large, and the gate asks a person to approve it or send it back.
+  class large, and the gate asks a person to approve it or deny it, where
+  requesting changes sends it back to the agent.
   The sizes a card may take are fractions of `large_lines`: small 30
   percent, medium 60 percent and large the bound itself, and 300, 600 and
   1000 lines where the bound is 0.
