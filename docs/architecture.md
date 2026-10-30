@@ -1042,7 +1042,7 @@ A running direct card can turn plan-track between two of its sessions
 (roadmap 336). The sizing step sends the switch through `switchToPlan`
 before the card's first session. The signal `to_plan` (`SignalToPlan`,
 change id `direct-to-plan`) is taken once the card is running, after a
-person's wait. Phase 4 is to send it, and nothing sends it yet. A `to_plan`
+person's wait. The sizing, a person's Replan and the cut send it (5.7). A `to_plan`
 that waits when the sizing switches joins the sizing's switch.
 `BecomePlan` then moves the row to the plan track first, so a refusal
 writes nothing and a retry completes the rest: the `to_plan` step, the
@@ -1205,7 +1205,8 @@ refs `checkin/<alias>`. Plan E extends the same machinery to two more
 moments. A detector trip mid-session runs the check-in inside the running
 session's pod: a second conversation on the same alias, the live workspace
 readable through its tools and no `run`, deciding continue, message,
-handover or human. A session that ended without a push and without a
+handover or human, and `replan` where the planner can take the card's rest
+(a plan's child, or a direct card of a project with a plan track). A session that ended without a push and without a
 check-in of its own is the dead moment: the next session's start asks
 about it, reads the dead session's record and writes the handover the
 work then starts from, the note waiting at the top of that session's own
@@ -1217,8 +1218,9 @@ Roadmap 336 adds a size trip and a working-state copy. The size
 trip fires once per session, when the card's diff (`card_diff`, added plus
 deleted lines against main) passes the line bound its size plans. It asks
 the check-in one question: will the rest of the card fit its bound, its
-budget and its time? It is never stuck, and nothing the check-in answers
-cuts the card. The brief's facts line states the bound, and the
+budget and its time? It is never stuck. On a card the planner can cut, its
+answer `replan` cuts the card, as on any other trip. The brief's facts
+line states the bound, and the
 statement of a coding session's check-in carries a pace line: changed
 lines against the bound, euros and agent time spent and left, and the
 session number. Before a checkpoint has measured the card's diff, the line
@@ -1714,9 +1716,8 @@ Besides its `version`, `policy.yaml` holds eleven sections:
 - `risk`: the risk classes of changed paths for the policy gate (7), each
   with its outcome. Since Stage 16 `large_lines` (1000) makes a pull
   request over that many changed lines class large, which needs a human
-  and ranks above normal. 0 switches it off.
-  Since Stage 17 an approver can have a planner split such a pull request
-  into two or three cards (5.7).
+  and ranks above normal. 0 switches it off. The merge gate asks a person
+  to approve such a pull request or send it back (5.7).
 - `envelope_default`: the standard resource envelope (5.5).
 - `project_default`: a new project's quota and standing block (5.1, 5.5).
   Every project file names its own merge rule since Stage 9.
@@ -1775,7 +1776,9 @@ Besides its `version`, `policy.yaml` holds eleven sections:
   facts come from the manifest its build publishes; the factory image keeps
   its static facts, derived from the image and `sandboxRegistries`. A session
   that lacks a tool calls `request_tool` and waits for the image that carries
-  it (roadmap 281). A plan card whose agent time is used up gets half
+  it (roadmap 281). A coding session of a card the planner can cut calls
+  `request_cut` with its reason and the parts it sees, and the check-in
+  judges the ask (6.6). A plan card whose agent time is used up gets half
   the cap as one fresh planner session carrying the paths the first read
   (`planner-retry`). The stale sweep asks Temporal whether the card's
   workflow runs: a running workflow is left alone in any state and its
@@ -1796,14 +1799,14 @@ chat:
   monthly_eur: 5           # the project agent's own line
   confirm: [new_card, answer, steer, retry, request_changes,
             approve_merge, deny_merge, invite, github_export, close,
-            edit, grant_session, set_dependency, split_card, github_sync]
+            edit, grant_session, set_dependency, replan, github_sync]
 ```
 
 A tool in `confirm` renders a proposal with a Do-it button, a tool outside
 it applies at once, and an empty list lets the agent do everything it is
 told. Stage 16 added `invite`, `github_export`, `close`, `edit`,
 `grant_session` and `set_dependency` to the defaults, Stage 17
-`split_card` and `github_sync`, and no read tool is
+`github_sync`, roadmap 336 `replan` in place of Stage 17's `split_card`, and no read tool is
 ever in them (Ruling 261). `monthly_eur` is the budget of the project's
 chat task each month, which the agent's calls use (5.4). A raise of it
 reaches the month in progress, and a lower figure never cuts a fund.
@@ -2646,7 +2649,8 @@ buttons and the tools both call, and Stage 16 four more for its writes.
 Stage 15 built 6 read and 14 write tools. Stage 16 added 9 reads and 6
 writes. Stage 17 added the reads `alerts`, `resources`, `projects` and
 `policy`, `costs` by day, card and tier over the month's whole ledger
-for the factory's writers, and five writes, `split_card`, `github_sync`
+for the factory's writers, and five writes, `split_card` (since
+replaced by `replan`), `github_sync`
 (below), `alert_verdict`, `promote_resource` and `release_resource`
 (roadmap 158, Ruling 306). So the chat has 19 reads and 25 writes. The factory pages'
 reads and writes check the factory writer inside the shared functions,
@@ -2675,7 +2679,7 @@ the month only (roadmap 158).
 | `close`, `edit` (Stage 16) | close a card, edit its title or body | confirm |
 | `grant_session` (Stage 16) | one more session for a capped card | confirm |
 | `set_dependency` (Stage 16) | add or remove a dependency | confirm |
-| `split_card` (Stage 17) | split a large card's pull request | confirm |
+| `replan` (roadmap 336) | send a card or a plan back to the planner | confirm |
 | `github_sync` (Stage 17) | Sync latest from GitHub | confirm |
 | `attach_analysis` (2026-10-18) | record what a wake turn found inside an ask | none |
 | `chat_search` (2026-10-18) | read every thread of the project | none |
@@ -3055,26 +3059,69 @@ table (5.6). What it adds to the chat besides:
   as Do it refuses. Live in Stage 17's exit run (09:17Z), three turns
   "Approve the merge of card #36." each drew the proposal with the
   review's open finding as its warning, and none was confirmed.
-- **The split** (roadmap 159, Rulings 277 and 292). On a card whose large
-  pull request waits for approval, an approver's Split or a confirmed
-  `split_card` runs a planner session on the large branch, read through
-  `refs/pull/<n>/head`, which Forgejo 15.0.9 keeps after the pull request
-  closes. factoryd checks the answer: 2 or 3 cards, each size's line
-  figure under `large_lines`, dependencies acyclic among the children, and
-  every changed file covered by a child's directories, where `.` covers
-  nothing. A pass files the children on the direct track and closes the card
-  with "split into #a, #b", a closed card with a reason, not a new state.
-  A failed check gets one more planner session, and a second failure
-  escalates while the approval waits. Approve is refused while the split
-  runs. The split session spends from the large card's budget outside its
-  session cap. The change id is `split`. Live in Stage 17 with
-  `large_lines` at 400 (Ruling 301), uptime2#48's pull request changed
-  918 lines, and a confirmed `split_card` ran the planner twice. The check
-  refused both answers, since one test file alone changed 458 lines, over
-  the bound, and a split cuts along files. The card escalated, and the
-  member approved it whole (Ruling 307), so the children's landing was
-  not seen live. The sizes a card may take (small 300, medium 600, large
-  1000 lines) are fixed and not derived from the bound (roadmap 159).
+- **The replan** (roadmap 336, in place of Stage 17's split, Rulings 277
+  and 292). A card or a plan goes back to the planner, which plans again on
+  top of what was built. Three things start it. A person's Replan, from the
+  console or the chat's `replan` (a confirm tool), works on any agent card
+  that has not merged. The coder's `request_cut` names why the card is too
+  big and the parts it sees. The check-in's decision `replan` can follow
+  any trip, the size trip among them. The check-in judges `request_cut`
+  and may answer `continue`, which tells the agent its card stays whole.
+  While it judges, the ask is held. An escalation wins over a held cut, and
+  a second cut replaces the held one. A direct card needs a plan track in
+  its project's process for the cut and for the person's Replan. If
+  the project read fails at session start, the session offers no cut and
+  runs on.
+
+  A replan stops the cards it sends back. A running card stops through its
+  live session, which ends and cuts the card in place. A card that waits
+  takes the replan in `awaitAnswer`, in `awaitApproval` and after the roll
+  hold, and its screening stays first: no wait takes the replan before a
+  fresh card's screening has passed. A final card is queued again, and a
+  done plan is reopened. A closed plan, a closing card or a merged
+  direct card refuses, and the refusal names the state and the fitting
+  action. A replan of a plan's
+  child stops that child, and the plan's cards that waited on it wait on
+  the plan. The plan goes back to its planner with its counters at zero and
+  money for one session. The planner starts after the stopped cards end.
+
+  The planner reads a record of each old card, fenced as information: the
+  card's state, the reviews' and stages' findings, the check-in's notes and
+  its last session's working state. A finding line names no final reason,
+  since an agent may have written it. The card's file holds the reason. The
+  record also gives the branch of every old card that holds work and did
+  not merge.
+
+  The revision keeps, changes or drops each old card by key and `from`. A
+  card with the same key is kept, and a started card must keep its entry
+  unchanged. A new card whose `from` names an old card changes it, and
+  continues that card's branch. An old key left out is dropped, and a
+  started card it drops stops. A kept key is a key with a card row. The
+  rules R1 to R10 check the revision at its filing. Among them, a `from` names a card
+  of this plan's record, a merged card is not a start, one card carries one
+  old card's work, a card that ended is left out and its work added under a
+  new key, a merged integration card is left out when the revision adds
+  cards, and the cut card's work lands in a card whose `from` names it. A
+  failed check gets the planner's answer back with the value to write. The
+  filing waits up to 10 minutes for the cards the revision drops, so their
+  last pushes are in. Past that bound it files.
+
+  A started card is stale when a newer revision leaves out its key. The
+  stale rule stops it and closes it with the revision's number. A delta
+  card, held by no revision, is never stale. A revision that changes the
+  spec or a criterion of the newest confirmed revision asks the
+  confirmation again. The records: the plan's issue gets a comment with the
+  counts of kept, changed, dropped and added cards and who asked, each old
+  card gets a step and a comment on its issue that says what it became, and
+  a cut says at which session and spend. The plan's `replanned` step comes
+  last, since it ends the replan. A failure before it runs the filing
+  again, which writes each comment once.
+
+  The merge gate no longer splits. A pull request over `large_lines` is
+  class large, and the gate asks a person to approve it or send it back.
+  The sizes a card may take are fractions of `large_lines`: small 30
+  percent, medium 60 percent and large the bound itself, and 300, 600 and
+  1000 lines where the bound is 0.
 
 What stays open is in the roadmap (148, 158 to 160, 163, 176 and 178 to
 188).

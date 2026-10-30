@@ -29,7 +29,7 @@ module.exports = {
     // policy.DefaultChat's confirm list: the lab's own chat block confirms nothing, so the chat's writes would run unasked
     chat: {
       confirm: ["new_card", "answer", "tell_card", "steer", "retry", "request_changes",
-        "approve_merge", "deny_merge", "invite", "github_export", "github_sync", "close", "edit", "grant_session", "set_dependency", "split_card",
+        "approve_merge", "deny_merge", "invite", "github_export", "github_sync", "close", "edit", "grant_session", "set_dependency", "replan",
         "alert_verdict", "promote_resource", "release_resource", "write_doc", "set_autonomy", "routine_write", "routine_delete", "routine_run", "routine_skip"],
     },
   },
