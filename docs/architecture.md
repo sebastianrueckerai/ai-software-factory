@@ -1053,9 +1053,9 @@ work-so-far block: the branch head, the caller's text and the reason.
 Comments written before the switch are recorded as written before the card
 went to the planner. A refusal names the card's state and the fitting
 action, and the card runs on as it was. A plan's open groups are the plans
-with a merged child that is not reverted and no `plan_closed` event, and a plan without
-criteria closes when its cards are done or closed (a migration closed the
-legacy ones). The console refuses a dependency across groups; a card of
+with a merged child that is not reverted and no `plan_closed` event. A plan
+without criteria closes when its cards are done or closed (a migration
+closed the legacy ones). The console refuses a dependency across groups; a card of
 no plan is a group of one. The machine edges (a delegated card, the tool
 park) cross groups by design.
 
@@ -3141,7 +3141,7 @@ table (5.6). What it adds to the chat besides:
 
   An off-main replan reverts first. Its stops and its return to the planner
   follow when the revert lands or ends. The revert is one plain git revert
-  of the merges, newest first, with `-m 1`. Before it, main's head goes to
+  of the merges, newest first, with `-m 1` for a merge commit. Before it, main's head goes to
   the branch `salvage/<plan>` of the bot's fork. The revert goes to a
   pull request, and its factory pull request card (source `revert`) merges
   under the revert gates, as a mechanical source. On a conflict, or when
@@ -3152,8 +3152,8 @@ table (5.6). What it adds to the chat besides:
   it names the plan and the cards. While it stands, a plain Replan and a
   child's cut answer "wait for the revert, card #M". Another pause, or a
   second plan's revert, refuses a new one. A minute pass heals a pause
-  whose revert card ended and whose hook was lost, and files a card that
-  never filed after 10 minutes.
+  whose revert card ended and whose hook was lost. It also files a card
+  that never filed after 10 minutes.
 
   When the revert lands, the cards are marked reverted, and a plan whose
   merged children are all reverted is no longer an open group. When it
