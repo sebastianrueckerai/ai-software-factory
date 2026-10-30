@@ -3134,32 +3134,40 @@ table (5.6). What it adds to the chat besides:
   Replan has a box for it on a plan's card and its children, and the chat's
   `replan` takes `off_main`. The planner takes a merged card's work off
   main only by naming its key in a top-level `take_off_main` list. R5 finds
-  a merged card on main that the revision neither keeps nor names. A card
-  of a later revision lands the work again with `from`, from the plan's
-  salvage branch. Phase 6's held-production ask calls `Runner.Replan` with
-  `OffMain`, as the console does.
+  a merged card still on main that the revision before held, when the
+  revision neither keeps nor names it. R5 leaves out the integration card.
+  R6 has the planner drop a merged integration card's key when the revision
+  adds cards, and its code stays on main. A card of a later revision lands
+  the work again with `from`, from its merge in main's history, which
+  `git diff <merge>^1 <merge>` shows. `Runner.Replan` with `OffMain` is
+  the seam that phase 6's held-production ask will call, as the console
+  does.
 
   An off-main replan reverts first. Its stops and its return to the planner
-  follow when the revert lands or ends. The revert is one plain git revert
-  of the merges, newest first, with `-m 1` for a merge commit. Before it, main's head goes to
-  the branch `salvage/<plan>` of the bot's fork. The revert goes to a
-  pull request, and its factory pull request card (source `revert`) merges
-  under the revert gates, as a mechanical source. On a conflict, or when
-  the revert's checks are red, an agent card of 2 sessions with the normal
+  follow when the revert lands or ends. The stops then also take the plan's
+  cards that started while the revert ran. The revert is one plain git
+  revert of the merges, newest first, with `-m 1` for a merge commit.
+  Before the plan's first revert, main's head goes to the branch
+  `salvage/<plan>` of the bot's fork. That branch keeps main as it stood
+  then, and a later revert of the plan keeps it. The revert goes to a pull
+  request, and its factory pull request card (source `revert`) merges under
+  the revert gates, as a mechanical source. On a conflict, or when the
+  revert's checks are red, an agent card of 2 sessions with the normal
   gates continues it. A person decides at the cap. The card holds a pause
   of the project's merge queue. The main-red pause (`mainfix`) holds the
   queue while main's push run is red. The group pause is the same row, and
-  it names the plan and the cards. While it stands, a plain Replan and a
-  child's cut answer "wait for the revert, card #M". Another pause, or a
-  second plan's revert, refuses a new one. A minute pass heals a pause
-  whose revert card ended and whose hook was lost. It also files a card
-  that never filed after 10 minutes.
+  it names the plan and the cards. A red main never writes into it. While
+  its card runs, a plain Replan and a child's cut answer "wait for the
+  revert, card #M". Another pause, or a second plan's revert, refuses a new
+  one. A minute pass heals a pause whose revert card ended and whose hook
+  was lost. It also files a card that never filed after 10 minutes.
 
   When the revert lands, the cards are marked reverted, and a plan whose
-  merged children are all reverted is no longer an open group. When it
-  ends without landing, the plan hears that its cards stay on main. Either
-  way the replan goes on and the pause lifts. The branch `salvage/<plan>`
-  goes 30 days after the plan closed.
+  merged children are all reverted is no longer an open group. When it ends
+  without landing, the plan hears that its cards stay on main, and the
+  planner's record says so for each card. Either way the replan goes on and
+  the pause lifts. The branch `salvage/<plan>` goes 30 days after the plan
+  closed.
 
   The merge gate no longer splits. A pull request over `large_lines` is
   class large, and the gate asks a person to approve it or deny it, where
@@ -5216,15 +5224,16 @@ at boot and every 24 hours, sets a revert mark, `tasks.reverted_at`, on a
 done task when a pull request merged into the same repository within 14
 days undoes every file the task changed, compared by each file's net
 change, or when an alert of the same fingerprint is filed again after the
-fix, and counts `factory.task.reverted{project}`. Four panels on the
-pipeline dashboard show tasks per outcome per day with the reverts, cost
-per merged pull request per alias, review verdicts per round, and human
-interventions per kind; they sum over pods, since each pod counts only its
-own events. There is no report task: humans read the panels, and a weekly
-report is one schedule away. Proven live: a planted revert of demo-app #6
-as #11 set the mark at the next boot. The first revert rule compared the
-sets of changed lines and missed that revert, because git aligned a moved
-loop the other way.
+fix, and counts `factory.task.reverted{project}`. A plan's group revert
+that lands sets the mark on each card it takes off main, and counts it the
+same way. Four panels on the pipeline dashboard show tasks per outcome per
+day with the reverts, cost per merged pull request per alias, review
+verdicts per round, and human interventions per kind; they sum over pods,
+since each pod counts only its own events. There is no report task: humans
+read the panels, and a weekly report is one schedule away. Proven live: a
+planted revert of demo-app #6 as #11 set the mark at the next boot. The
+first revert rule compared the sets of changed lines and missed that
+revert, because git aligned a moved loop the other way.
 
 ## 9. What the 2026-09-24 verification pass established
 
