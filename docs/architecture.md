@@ -1062,10 +1062,11 @@ park) cross groups by design.
 **The planner and the plan card** (Rulings 205, 208, Task 101). A card in
 lane `plan` starts a task of class `planner`, whose session mode is `plan`:
 a report session on the stronger rung that reads the repository and the
-spec, writes nothing, and ends with one JSON block of 2 to `max_cards`
-cards, each with a key, a role (`foundation`, `feature`, `integration`),
-a brief of at most 1500 characters, guidance directories, dependencies,
-acceptance items and a size of `small` or `medium`, and since Stage 16
+spec, writes nothing, and ends with one JSON block of `min_cards` to
+`max_cards` cards of one round, each with a key, a role (`foundation`,
+`feature`, `integration`), a brief of at most 1500 characters, guidance
+directories, dependencies, acceptance items and a size of `small` or
+`medium`, and since Stage 16
 `large`. Since Stage 16 a plan may also carry up to five questions with 2
 to 5 choices each, which the member answers before acceptance (5.7).
 `ValidatePlan` refuses a plan that breaks the shape, and the findings go
@@ -1099,6 +1100,27 @@ not run. The planner's own class runs 30 minutes with no check-in. On the
 round's exit test the planner answered seven cards in about a minute, the
 human accepted the first revision, and the foundation finished in one
 session of 19 minutes.
+
+**Big plans run in rounds** (roadmap 336). A plan bigger than one round
+of cards carries an `outline`, one line per part its later rounds plan.
+The planner files the first round. `Plan.Round` and each card's `round`
+are factoryd's stamps. A later round's answer holds only its own cards:
+factoryd keeps the settled cards of the earlier rounds, done and not
+reverted, in the stored revision, and the planner reads its last plan
+without them. The round rules: the first round files `min_cards` to
+`max_cards` cards, a later round 1 to `max_cards`; a later round holds at
+most one foundation card; the integration card comes only in the round
+that empties the outline, in its count, on its round's cards only; no
+dependency crosses a round; every criterion is cited by some card of
+some round, checked in the last round. Once every card of a round is
+done or closed, one at
+least done, `roundCheck`, in the criteria pass, records the replan step
+of origin `round` and sends the plan back to its planner, its issue left
+open. The plan closes, and `all_children_done` comes, only in the last
+round. Until then its group stays open, and so production stays held,
+through every round (decision 6). A person's close of the plan card ends
+its round: the card ends `closed`, nothing starts, and the group closes
+once none of its cards is open (`done`, `failed` or `closed`).
 
 **Labels.** factoryd creates the label set at boot on every project's
 repository, the seed projects' included (5.1), the `priority/*`, `severity/*`
