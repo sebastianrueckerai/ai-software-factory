@@ -3160,11 +3160,14 @@ table (5.6). What it adds to the chat besides:
   gates continues it. A person decides at the cap. The card holds a pause
   of the project's merge queue. The main-red pause (`mainfix`) holds the
   queue while main's push run is red. The group pause is the same row, and
-  it names the plan and the cards. A red main never writes into it. While
-  its card runs, a plain Replan and a child's cut answer "wait for the
-  revert, card #M". Another pause, or a second plan's revert, refuses a new
-  one. A minute pass heals a pause whose revert card ended and whose hook
-  was lost. It also files a card that never filed after 10 minutes.
+  it names the plan and the cards. A red main never writes into it and
+  files no card while it stands. While its card runs, a plain Replan and a
+  child's cut answer "wait for the revert, card #M". Once the card has
+  ended, and until factoryd records its end, they answer that factoryd "is
+  still recording its end: replan again in two minutes". Another pause, or
+  a second plan's revert, refuses a new one. A minute pass heals a pause
+  whose revert card ended and whose hook was lost. It also files a card
+  that never filed after 10 minutes.
 
   When the revert lands, the cards are marked reverted, and a plan whose
   merged children are all reverted is no longer an open group. When it ends
