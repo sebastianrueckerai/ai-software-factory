@@ -1053,7 +1053,7 @@ work-so-far block: the branch head, the caller's text and the reason.
 Comments written before the switch are recorded as written before the card
 went to the planner. A refusal names the card's state and the fitting
 action, and the card runs on as it was. A plan's open groups are the plans
-with a merged child and no `plan_closed` event, and a plan without
+with a merged child that is not reverted and no `plan_closed` event, and a plan without
 criteria closes when its cards are done or closed (a migration closed the
 legacy ones). The console refuses a dependency across groups; a card of
 no plan is a group of one. The machine edges (a delegated card, the tool
@@ -3129,6 +3129,37 @@ table (5.6). What it adds to the chat besides:
   session and spend. The plan's `replanned` step comes last, since it ends
   the replan. A failure before it runs the filing again, which writes each
   comment and step once.
+
+  A person may take a plan's merged cards off main first. The console's
+  Replan has a box for it on a plan's card and its children, and the chat's
+  `replan` takes `off_main`. The planner takes a merged card's work off
+  main only by naming its key in a top-level `take_off_main` list. R5 finds
+  a merged card on main that the revision neither keeps nor names. A card
+  of a later revision lands the work again with `from`, from the plan's
+  salvage branch. Phase 6's held-production ask calls `Runner.Replan` with
+  `OffMain`, as the console does.
+
+  An off-main replan reverts first. Its stops and its return to the planner
+  follow when the revert lands or ends. The revert is one plain git revert
+  of the merges, newest first, with `-m 1`. Before it, main's head goes to
+  the branch `salvage/<plan>` of the bot's fork. The revert goes to a
+  pull request, and its factory pull request card (source `revert`) merges
+  under the revert gates, as a mechanical source. On a conflict, or when
+  the revert's checks are red, an agent card of 2 sessions with the normal
+  gates continues it. A person decides at the cap. The card holds a pause
+  of the project's merge queue. The main-red pause (`mainfix`) holds the
+  queue while main's push run is red. The group pause is the same row, and
+  it names the plan and the cards. While it stands, a plain Replan and a
+  child's cut answer "wait for the revert, card #M". Another pause, or a
+  second plan's revert, refuses a new one. A minute pass heals a pause
+  whose revert card ended and whose hook was lost, and files a card that
+  never filed after 10 minutes.
+
+  When the revert lands, the cards are marked reverted, and a plan whose
+  merged children are all reverted is no longer an open group. When it
+  ends without landing, the plan hears that its cards stay on main. Either
+  way the replan goes on and the pause lifts. The branch `salvage/<plan>`
+  goes 30 days after the plan closed.
 
   The merge gate no longer splits. A pull request over `large_lines` is
   class large, and the gate asks a person to approve it or deny it, where
