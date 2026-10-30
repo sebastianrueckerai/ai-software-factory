@@ -3107,6 +3107,9 @@ table (5.6). What it adds to the chat besides:
   planner files it, and again before its first card files, so a card that
   ended or merged in between gets its finding. A `filing` step marks that
   second check passed, and a retried filing files the rest without a third.
+  The mark holds until the next replan is asked: a revision filed again
+  under a new replan is checked again, and a run that heals while a replan
+  is pending goes back to the planner, not to the revision it was asked at.
   Among them, a `from` names a card
   of this plan's record, a merged card is not a start, one card carries one
   old card's work, a card that ended is left out and its work added under a
