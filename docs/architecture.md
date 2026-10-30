@@ -3103,8 +3103,10 @@ table (5.6). What it adds to the chat besides:
   unchanged. A new card whose `from` names an old card changes it, and
   continues that card's branch. An old key left out is dropped, and a
   started card it drops stops. A kept key is a key with a card row. The
-  rules R1 to R10 check the revision when the planner files it, and again
-  when its cards file, so a card that ended in between gets its finding.
+  rules R1 to R10 check the revision against the one before it when the
+  planner files it, and again before its first card files, so a card that
+  ended or merged in between gets its finding. A `filing` step marks that
+  second check passed, and a retried filing files the rest without a third.
   Among them, a `from` names a card
   of this plan's record, a merged card is not a start, one card carries one
   old card's work, a card that ended is left out and its work added under a
