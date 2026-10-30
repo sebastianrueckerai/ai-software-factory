@@ -34,7 +34,7 @@ A big request is measured and split, and the criteria name their proofs before a
 
 | Guarantee | Enforced by | Tested by | Proven by |
 |---|---|---|---|
-| A big request splits into a plan of dependent cards | `internal/factoryd/plan.go` | `internal/factoryd/plan_test.go`, `internal/factoryd/split_test.go` | Stage 11: a spec card became ten planned cards and a deployed link shortener |
+| A big request splits into a plan of dependent cards: the sizing sends a person's card that is not small to the planner, where the process has a plan track | `internal/factoryd/sizing.go`, `internal/factoryd/plan.go` | `internal/factoryd/sizing_workflow_test.go`, `internal/factoryd/plan_test.go` | Stage 11: a spec card became ten planned cards and a deployed link shortener |
 | Criteria carry an id, a kind and a named test, and the gate runs the named tests on the assembled feature | `internal/factoryd/criteria.go` | `internal/factoryd/criteria_test.go` | Stage 11's integration card passed the criteria gate (ledger task-105-report.md, named in roadmap.md) |
 | The builders never see the hold-out tests: written by a separate session, stored outside every workspace | `internal/factoryd/holdout.go` | `internal/factoryd/holdout_test.go` | not yet |
 | A card started on an older spec cannot merge | `internal/factoryd/plan.go` (ErrStalePlan) | `internal/factoryd/plan_stale_test.go` | not yet |
