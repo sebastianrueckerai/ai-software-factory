@@ -4048,7 +4048,8 @@ After the exit test's first run the controller built one more read, `ci`.
 What landed, in order, and who built it:
 
 - 3.7a, budgets by size (controller, after lane card #431, live with roll
-  #435 at 12:51Z): small 2, medium 5 and large 10 EUR, held to the
+  #435 at 12:51Z): small 2 (4 since 2026-10-30, decision 7 of roadmap
+  336), medium 5 and large 10 EUR, held to the
   policy's card maximum and to the project file's new
   `budget.task_max_eur`. The plan format accepts large, and the planner's
   guide says what each size means in lines. Plan acceptance files each

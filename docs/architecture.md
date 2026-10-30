@@ -1699,13 +1699,16 @@ Besides its `version`, `policy.yaml` holds eleven sections:
 
 - `budget`: the task default, the task maximum, the day cap and, since
   Stage 10, the month cap `month_eur` (5.4), in euros. Since Stage 16
-  (Ruling 266) a card's budget follows its plan row's size: small 2, medium
+  (Ruling 266) a card's budget follows its plan row's size: small 4, medium
   5 and large 10 EUR, held to the policy's maximum and to a project file's
   `budget.task_max_eur`. A hand-filed card gets the default unless a
   `Size:` or `Budget:` line in its text names one, and the last valid line
   wins, so the new-card form's size select beats a size word in the text.
-  The sizing step sets a card's size, not its budget. The maximum is 15
-  from Stage 16 on (Ruling 268).
+  The sizing step sets the size of a card a person or the chat files. It
+  also sets the budget to the size's, when the card still holds its
+  filing's budget, so a `Budget:` line or a fund keeps its value. A small
+  card got 2 EUR until 2026-10-30, when decision 7 of roadmap 336 made it
+  4. The maximum is 15 from Stage 16 on (Ruling 268).
 - `classes`: per capability class, the allowed model aliases and tools, each
   tool with `max_requests` and `max_eur`, and the `review_model` and
   `supervisor_model` factoryd may call for a task of that class (Task 71),
@@ -3002,7 +3005,8 @@ the history and every depth come through a tool. What each part does:
   In the exit test the deploy card's Secret reached CI only after an
   operator named it in the project file, the gap the fix round closed.
 - **Budgets by size** (Rulings 266 and 268, 5.3): small 2, medium 5 and
-  large 10 EUR, 15 at most. A pull request over 1000 changed lines is risk
+  large 10 EUR, 15 at most. Small is 4 EUR since 2026-10-30 (decision 7
+  of roadmap 336). A pull request over 1000 changed lines is risk
   class large and needs a human (5.3).
 - **A provider refusal is no attempt** (Ruling 267, 6.6). A code session
   whose first call the provider refuses costs no attempt, no agent time
