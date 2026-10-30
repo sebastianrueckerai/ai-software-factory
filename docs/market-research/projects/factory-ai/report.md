@@ -7,9 +7,9 @@ category: enterprise-agent-platform
 license: proprietary
 open_source: no
 self_hostable: partial
-hosting_model: vendor SaaS control plane, agent binary runs on laptops, CI runners, BYO machines or Factory-managed E2B VMs; hybrid and airgapped only on Enterprise
+hosting_model: vendor SaaS control plane, agent binary runs on laptops, CI runners, BYO machines or Factory-managed E2B VMs; Factory Private (private preview, since 2026-09) runs sandboxes in the customer VPC through the closed OpenCompute orchestrator, control plane stays Factory-hosted; hybrid and airgapped only on Enterprise
 company: Factory AI (Matan Grinberg, Eno Reyes), San Francisco, founded 2023, over 400M USD raised, 200M at 5B valuation in September 2026
-maturity: closed product; public docs mirror Factory-AI/factory (37 stars), droid-action (57 stars, pushed 2026-09-29), 181 dated release-note entries, CLI v0.179.0 by 2026-07-23, several releases per week
+maturity: closed product; public docs mirror Factory-AI/factory (72 stars by 2026-10-30), droid-action (57 stars, pushed 2026-09-29), 254 dated release-note entries, CLI v1.0.0 on 2026-10-29, several releases per week
 similarity: 3
 axes:
   signals_intake: 4
@@ -27,12 +27,13 @@ steal:
   - Software Factory coverage map - one console row per lifecycle stage (triage, code-gen, validate, release, document, monitor) showing automation count, health and which repositories are covered
   - Mission Control layout - orchestrator, worker and validator sessions in a left rail, per-role model dropdowns, feature checklist, live progress log, time and credits in the header, pause and re-plan button
   - Incident runbook as agent-maintained memory - after each RCA the agent updates `.factory/skills/incident-guidelines/SKILL.md` so the next alert of the same kind starts from learned guidance
+  - Incident-to-change correlation - their continual-learning pillar claims "an incident correlates with the PR that caused it"; stamp each deploy with the task and PR that produced it so an alert opens pointing at the change
   - Agent Readiness report - score a repository on how well an agent can build, run and test it, offer a fix task, and refuse long autonomous runs below a set level
   - Cost estimate before a run - `total runs ≈ features + 2 × milestones` as a floor, shown before approval
   - Extension-only policy merge - arrays union and cannot be removed, scalars first-wins, object keys locked per level, and a malformed org file resolves to an empty policy that is logged, never silently skipped
 differs:
   - The agent runs on the user's laptop, CI runner or a persistent sudo-enabled VM with the machine's own git credentials, and policy is enforced inside the agent client. We run one disposable sandbox per task and enforce policy in a gateway the agent cannot touch.
-  - The control plane, billing and model routing are Factory's SaaS. Self-hosting is an Enterprise sales conversation and nothing about the control plane can be rebuilt from Git.
+  - The control plane, billing and model routing are Factory's SaaS. Factory Private (private preview) moves only sandbox capacity into the customer VPC, through the closed OpenCompute orchestrator; a customer-hosted control plane is a "Custom Deployment" sales conversation, and nothing can be rebuilt from Git.
   - Human approval is a session dial (Autonomy Off to High) on an interactive agent. We treat the human as a rare tool call and an approval as a workflow state.
 ux_verdict: Far ahead of our console. Desktop app, CLI, Slack, Linear, mobile and a Mission Control view with live worker logs and a pause button, first result in about five steps.
 slop_verdict: Real, heavily funded and shipped almost daily, but closed. Security and deployment docs promise more than a buyer can check, and the benchmark and customer claims are self-reported.
@@ -44,7 +45,9 @@ slop_verdict: Real, heavily funded and shipped almost daily, but closed. Securit
 
 Factory is a closed, commercial platform for AI coding agents called Droids. It is made by Factory AI in San Francisco, founded in 2023. It raised a 150M USD Series C at 1.5B in April 2026 and 200M USD at 5B in September 2026 (press coverage, 2026-09). It shares our name and our "software factory" framing. As of 2026-09-29 `factory.ai` redirects to `factory.com`.
 
-The core is one agent harness, the `droid` binary. It runs as an interactive CLI, headless (`droid exec`), inside a desktop and web app, behind Slack and Linear, and in GitHub Actions. Around it Factory sells a hosted layer: Automations (triggers), Missions (multi-agent orchestration), Droid Computers (persistent remote machines), Software Factory (a lifecycle dashboard, private preview), a model router and enterprise controls. It is sold per seat with rolling rate limits: Pro 20 USD, Plus 100 USD, Max 200 USD per month, and Business and Enterprise by sales contact.
+The core is one agent harness, the `droid` binary. It runs as an interactive CLI, headless (`droid exec`), inside a desktop and web app, behind Slack and Linear, and in GitHub Actions. Around it Factory sells a hosted layer: Automations (triggers), Missions (multi-agent orchestration), Droid Computers (persistent remote machines), Software Factory (a lifecycle dashboard, private preview), a model router and enterprise controls. It is sold per seat with rolling rate limits: Pro 20 USD, Plus 100 USD, Max 200 USD per month, Teams 60 USD per team plus 40 USD per seat, and Business and Enterprise by sales contact.
+
+"Factory 2.0: From coding agents to software factories" (`/news/software-factory`, dated 2026-06-15; the September funding post says "In April we announced Factory 2.0") repositions the company on our loop: outside signals (bug reports, conversations, requirements) are "triaged and turned into planned changes", then "built, tested, reviewed, secured, shipped, and monitored", and monitoring generates new signals. Three pillars: model independence (any model per task, or their Router), sovereign intelligence (hosted to fully air-gapped), and continual learning ("every agent session, code review, and resolved incident" feeds back; "an incident correlates with the PR that caused it"). Autonomy is a ladder from a single Droid through Automations and Droid Computers to Missions, gated by "Agent Readiness", and is sold as "a maturation process that is gradual". Named customers in production on the post: NVIDIA, EY, Adobe, Palo Alto Networks, Adyen, Blackstone, Wipro, Comarch.
 
 Claim: "a 24/7 autonomous system that connects AI agents across the software development lifecycle" (`docs/web/software-factory.mdx`). What the docs show: a strong single-agent harness, an automation scheduler with Slack, GitHub and cron triggers, and a dashboard. Release and deploy are listed as "as available". Software Factory and Incident Response are both private preview.
 
@@ -54,7 +57,7 @@ Claim: "a 24/7 autonomous system that connects AI agents across the software dev
 |---|---|---|---|
 | Signals | Slack mentions, Slack alert channels (bots only by default), Linear assignment, Jira fetch, GitHub events via workflow files, cron schedules, Sentry via Linear | Forgejo issues and comments, SigNoz alert webhooks, intake API | they lead |
 | Control plane | Hosted: automations with owner, run-as identity, run target, run history, pause and resume. Missions orchestrator with milestones. Admin audit log. Engine and storage not disclosed | factoryd, Temporal per task, Postgres, policy in Git, approvals as states, cost ledger | we lead |
-| Worker plane | `droid` on laptops, CI runners, BYO machines or managed "Droid Computers" (4 CPU, 8 GB, E2B-hosted, persistent, `factory-user` with passwordless sudo). Optional per-command bubblewrap or Seatbelt sandbox (beta) | One gVisor pod per task, namespace and ServiceAccount per task, default-deny egress, disposable | we lead |
+| Worker plane | `droid` on laptops, CI runners, BYO machines or managed "Droid Computers" (4 CPU, 8 GB, E2B-hosted, persistent, `factory-user` with passwordless sudo). Optional per-command bubblewrap or Seatbelt sandbox (beta). Since 2026-10: Environments (GA) gives Droids "a fleet of sandboxes", and Factory Private runs them in the customer VPC through OpenCompute (private preview) | One gVisor pod per task, namespace and ServiceAccount per task, default-deny egress, disposable | we lead |
 | Verification | droid-action review (candidates then validator), STRIDE security review, CI Steward auto-fix, Mission validators that run the app ("user testing") | Forgejo Actions on gVisor runners, path risk classes, reproduction gate, stronger-model review | equal |
 | Merge and deploy | Left to GitHub branch protection. "Release" stage is "as available" | Bot merge after approval or `auto` rule, Flux, staging soak, prod | we lead |
 | Policy outside the model | Hierarchical `.factory/settings.json`, command risk classes, allow, deny and blocklists, org max autonomy, kernel sandbox, hooks. Enforced by the `droid` client on the agent's host | Policy YAML in Git, enforced in gateway code and network policy | we lead |
@@ -67,9 +70,11 @@ Closed source. Everything below comes from the public docs mirror and the open G
 
 The docs source is the whole of `Factory-AI/factory` (`docs/`, Mintlify MDX, `docs.json`). The README says "All rights reserved". The binary is installed by `curl -fsSL https://app.factory.ai/cli | sh` or `npm -g install droid`. The SDK repositories (`droid-sdk-typescript`, `droid-sdk-python`) hold examples. The SDK spawns the `droid` CLI or connects to a running "Droid daemon".
 
-Three deployment patterns are documented in `docs/enterprise/network-and-deployment.mdx`. Cloud-managed: `droid` on laptops and CI, Factory cloud holds "control plane and org metadata". Hybrid: `droid` in the customer's network with the customer's LLM gateway and OTEL collector. Fully airgapped: no Factory cloud at runtime, artifacts imported offline. The airgapped mode appears to be the CLI with a system-managed policy file at `/etc/factory/settings.json`, not a self-hosted control plane. Automations, Missions dashboards and Software Factory are not described for airgapped use. Not verified.
+Deployment is now sold as two named tiers (`/deployment/factory-managed`, `/deployment/factory-private`, both fetched 2026-10-30). Factory Managed: "Factory runs the control plane", agents on "Local machines, CI/CD, computers connected through Remote Control, or Droid Computers", customer content tenant-isolated. Factory Private (announced 2026-09-18, private preview): "Code execution stays in your VPC" through OpenCompute, the customer's team "runs the OpenCompute orchestrator and sandbox capacity", and the control plane stays "Factory-hosted by default, with support for customer-hosted if needed". In the docs, customer-hosted means "contact your Factory account team to discuss a Custom Deployment", not a tier. A "Sovereign Software Development" white paper sits behind a lead-capture form. The older docs also describe hybrid (customer LLM gateway and OTEL collector) and fully airgapped modes; the airgapped mode appeared to be the CLI with a policy file, and Automations, Missions dashboards and Software Factory were not described for airgapped use (docs mirror of 2026-09-29). Not verified.
 
 Remote compute is "Droid Computers" (`docs/cli/features/droid-computers.mdx`). The managed kind is described as "E2B-hosted", provisioned with a daemon, reached through a WebSocket relay, auto-paused when idle. It keeps state between sessions. BYOM registers any machine with `droid computer register`. "Cloud Templates" (repo plus setup script) are marked as superseded.
+
+OpenCompute (`/news/opencompute`, 2026-10-14, private preview) is the piece closest to our worker plane: a self-hosted orchestrator for agent sandboxes that the customer runs. A Go control plane records desired and observed computer state in a customer-side Postgres database and reconciles. Computers boot from immutable "Builds", artifacts and snapshots land in S3-compatible storage, and each runtime integration is a standalone gRPC driver with a required Core conformance profile plus optional Suspend, Snapshot and Fork profiles; providers evaluated include AWS Lambda MicroVMs, Kubernetes, EC2 and the Kubernetes SIG agent-sandbox. It reaches Factory over an outbound TLS-secured WebSocket, so it needs no inbound firewall ports. It is vendor-neutral ("Factory is one possible client of OpenCompute") with its own API, CLI and administration panel, and "we plan to open-source OpenCompute". As of 2026-10-30 there is no such repository in the Factory-AI GitHub organisation.
 
 Model access: Factory-billed inference by default ("Standard Usage"), BYOK for many providers, and "Droid Core", a pool of open-weight models (GLM-5.2, Kimi K2.7 Code, DeepSeek V4 Pro, MiniMax M3) with its own limits (`docs/models.mdx`). "Factory Router" picks a model per task and per request with prompt-cache awareness and claims 43 percent lower aggregate cost (`docs/web/factory-router.mdx`, self-reported). The Continuum review notes that BYOK only applies to the local CLI and desktop app. Hosted delegation runs on Factory-billed inference.
 
@@ -119,6 +124,8 @@ Easier than ours: live streams of each agent, a diff and commit view, per-role m
 
 **Incident runbook memory.** Let the agent write a per-project runbook per alert class after each telemetry-driven task, committed to the project repo. This gives us project memory for our weakest area, stored as Git artifacts.
 
+**Incident-to-change correlation.** Their 2.0 post claims "an incident correlates with the PR that caused it". We control both ends of that link: stamp every deploy with the task and PR that produced it, and a SigNoz alert opens already pointing at the change. One label on the deploy event is enough.
+
 **Pre-run cost estimate.** Show `features + 2 × milestones` style run counts, priced at the tier rate, on the approval card. It fits our budget holds.
 
 **Extension-only merge.** If projects get their own policy overlays, adopt the merge rules and the "malformed org file means empty policy, logged" behaviour.
@@ -149,13 +156,13 @@ Easier than ours: live streams of each agent, a diff and commit view, per-role m
 
 ## 8. Red flags and slop assessment
 
-The product is real and busy. There are 181 dated release-note entries, CLI versions landing several times a week, and droid-action commits on the day of writing. The Action source is careful (fork checks, post-run path enforcement).
+The product is real and busy. There are 254 dated release-note entries, CLI v1.0.0 landed on 2026-10-29, and versions ship several times a week. The Action source is careful (fork checks, post-run path enforcement).
 
 Closed core. The binary, backend and SDK are proprietary. Every security claim about the client (blocklist resolution, sandbox scope, Shield) is documentation only. The docs mirror carries "All rights reserved". The Action has no licence.
 
 Enterprise gating. Service accounts, sub-organisations, on-premise deployment, customer-managed keys, data residency and "full admin controls" are Enterprise only. SSO, SCIM and audit logging start at Business. Self-hosting is not a product you can download.
 
-Marketing ahead of evidence. The Terminal-Bench number (58.75 percent on v0.1.1, September 2025) is self-reported and dated. Claims of "hundreds of thousands" of daily developers and six months of month-over-month revenue doubling are unverified (Ry Walker research, 2026-06). Router savings of 43 percent are self-measured. The Software Factory dashboard is private preview and its screenshot uses demo figures. The "Release" and "Deploy" stages have no documented mechanism.
+Marketing ahead of evidence. The Terminal-Bench number (58.75 percent on v0.1.1, September 2025) is self-reported and dated. Claims of "hundreds of thousands" of daily developers and six months of month-over-month revenue doubling are unverified (Ry Walker research, 2026-06). Router savings of 43 percent are self-measured. The Software Factory dashboard is private preview and its screenshot uses demo figures. The "Release" and "Deploy" stages have no documented mechanism. The customer names appear only on factory.com pages; searches on 2026-10-30 found no independent coverage of Factory 2.0, Factory Private or OpenCompute. Blackstone, also an investor, carries the one case study: agents "inside of our data center, under our control" (John Stecher, CTO, 2026-10-15). The deployment index page still calls Factory Private's control plane "Customer-hosted", contradicting the two tier pages. The "sovereign software development" white paper is a lead-capture form, and OpenCompute is "we plan to open-source" with no repository.
 
 Pricing opacity. Plans are sold as multipliers of Pro with unpublished token amounts. Reviews name mid-Mission exhaustion and prepaid-credit dependence as problems (Continuum 2026-08, UsagePricing 2026-09).
 
@@ -166,6 +173,20 @@ Sentiment is mixed. Hacker News comments range from "pretty good for a cross-pro
 ## 9. Sources
 
 - https://factory.ai (307 redirect to https://factory.com/, fetched 2026-09-29)
+- https://factory.com/news/software-factory (fetched 2026-10-30, post dated 2026-06-15)
+- https://factory.com/deployment/factory-managed (fetched 2026-10-30)
+- https://factory.com/deployment/factory-private (fetched 2026-10-30)
+- https://factory.com/deployment (fetched 2026-10-30, older messaging)
+- https://factory.com/news/factory-private (fetched 2026-10-30, posted 2026-09-18)
+- https://factory.com/news/opencompute (fetched 2026-10-30, posted 2026-10-14)
+- https://factory.com/news/droids-now-have-a-fleet-of-sandboxes (fetched 2026-10-30, posted 2026-10-12)
+- https://factory.com/news/5-billion-valuation (fetched 2026-10-30, posted 2026-09-15)
+- https://factory.com/case-studies/blackstone (fetched 2026-10-30, posted 2026-10-15)
+- https://factory.com/factory-private-whitepaper (fetched 2026-10-30, gated form)
+- https://factory.com/pricing (fetched 2026-10-30)
+- https://docs.factory.com/opencompute/overview (fetched 2026-10-30)
+- https://docs.factory.com/enterprise/network-and-deployment (fetched 2026-10-30)
+- https://github.com/orgs/Factory-AI/repositories (fetched 2026-10-30, 22 public repos, no OpenCompute)
 - https://factory.com/ (fetched 2026-09-29)
 - https://github.com/Factory-AI (org repository list via `gh api orgs/Factory-AI/repos`, 2026-09-29)
 - https://factory.ai/news/series-c (search result, 2026-04)

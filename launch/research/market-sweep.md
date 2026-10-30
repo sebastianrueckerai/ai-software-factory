@@ -43,7 +43,7 @@ Open and self-hosted is common (74 of 148 rows are open source, 87 are self-host
 | Product | Has it? | Evidence | Source |
 |---|---|---|---|
 | Devin | lacks | Control plane stays in Cognition's cloud at every tier. The VPC option moves sandbox compute only | [devin §7][devin] |
-| Factory | lacks | Closed. Hybrid and airgapped modes are Enterprise only. Airgapped is the CLI with a policy file | [factory §3][factory] |
+| Factory | lacks | Closed. Factory Private (private preview since 2026-09) moves sandbox capacity into the customer VPC via the closed OpenCompute orchestrator; the control plane stays Factory-hosted. Airgapped is the CLI with a policy file | [factory §3][factory] |
 | Cursor | lacks | Self-hosted machines move the worker only. Agent loop and inference stay in Cursor's cloud. No on-prem | [cursor §3][cursor] |
 | Jules | lacks | Google-hosted SaaS only | [jules front matter][jules] |
 | GitHub Agent HQ | lacks | SaaS only, on GitHub-hosted runners and Azure | [github §7][github] |
