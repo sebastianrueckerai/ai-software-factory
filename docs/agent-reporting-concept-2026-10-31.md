@@ -58,15 +58,34 @@ Adding gh to the sandbox image would build the wrong thing twice over:
 
 So the tool card the project agent proposed (gh in the project image) is refused, and no image change is needed.
 
+## What the refusal is, and why the ask did not carry it
+
+The refusal is the answer to a tool call. Filing a plan is a tool call by the planner session: the session calls the filing tool with its plan, and the factory checks the plan before it stores anything. On a problem the tool refuses the call and returns its findings as the result. The refusal of that night, in full:
+
+```
+the plan was refused:
+- criterion store_function_comments_v11: replaces store_function_comments_v10, an id the previous revision does not hold
+- criterion kube_routine_comments_v11: replaces kube_routine_comments_v10, an id the previous revision does not hold
+correct the plan and file it again in this session
+```
+
+So yes, the blocker was a tool call's rejection: the session filed, the filing tool said no with those lines, and the ask on the card never showed them. The text takes three paths, and the third is where it drops:
+
+1. **Into the session.** The tool's result lands in the session, and the agent reads it and acts on it. That is why the session had the refusal in hand.
+2. **Into the record.** Every tool call and its result stream with the session to factoryd and land in the controller's database (primer, sessions and sandboxes). The refusal is stored.
+3. **Into the ask: nothing.** When the session later stops, it writes a stop note, its own short text stating why it cannot go on: "I was told to report the exact refusal and cannot". The ask carries that note as its reason. Composing the ask, factoryd reads the stop note and the card state, and no code looks into the session record for the last tool refusal, so the two lines never reach the card. The incident analysis surfaced them with a hand-run query against the database, which is the "one query away" in the next section.
+
+The machine held the blocker the human needed, in the record it already stores, and the ask pipeline did not copy it over. That is the gap the fix closes.
+
 ## How a blocker reaches you today
 
 A session that cannot go on stops and asks. The ask lands on the card, the card waits for a human, the ask shows in Needs you and the board, and the answer can come through the main chat ("answer card 1345: go on") or the card page. That path is the last step of the diagram, and it worked: the planner stopped rather than thrash, and the ask reached Sebastian at 01:41 with the session's reason for stopping.
 
-What the ask did not carry was the blocker itself. The session's stop note said "I was told to report the exact refusal and cannot"; the exact refusal sat one query away in the session's findings, and only the controller's database read surfaced it. That gap is the real defect.
+What the ask did not carry was the blocker itself. The session's stop note said "I was told to report the exact refusal and cannot"; the exact refusal sat one query away in the session's findings (the third path above), and only the controller's database read surfaced it. That gap is the real defect.
 
 ## The fix by construction
 
-1. **The ask quotes the refusal.** When a session stops right after a tool refusal, the ask's info block carries the refusal verbatim from the session's findings. The human then sees "the plan was refused: criterion v11 replaces v10, an id the previous revision does not hold" on the card, not only "this card stopped and needs your decision". No new credential, no new channel; factoryd composes the ask and already holds the findings.
+1. **The ask quotes the refusal.** When a session stops right after a tool refusal, the ask's info block carries the refusal verbatim from the session's findings. The human then sees "the plan was refused: criterion v11 replaces v10, an id the previous revision does not hold" on the card, not only "this card stopped and needs your decision". No new credential, no new channel; factoryd composes the ask and already holds the findings. The database read the incident needed by hand becomes part of the ask composition.
 2. **Plan cards get plan wording.** A plan card's stop ask says what its choices do: go on starts another planner session, leave it waiting holds the plan, end the card closes the plan and its cards with it. The current text talks about pull requests and re-verification, which fits no plan card.
 
 With the refusal in the ask, no instruction needs to send a session to the issue again: the ask is the report.
