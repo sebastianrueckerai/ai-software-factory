@@ -1,6 +1,6 @@
 # Rulings taken on Sebastian's behalf
 
-Decisions I made while he was away, each with what it costs if he wants it otherwise. The ledger with the full trail is `.superpowers/sdd/2026-10-20-demo-scenes/progress.md` in the main checkout (gitignored).
+Decisions I made while he was away, each with what it costs if he wants it otherwise. The ledger with the full trail is gitignored in the main checkout.
 
 1. **The base is the console lab, not a project seeded into the live factory.** The lab (`TestLab` in `internal/console/lab_test.go` of the code repository) serves the real console over in-memory fakes. A seeded live project would have needed a real Forgejo repository, would have had its running cards picked up by the heal pass every minute, would have made a model call for every approval without a brief, and its chat would have cost money and answered differently each run. Cost if wrong: the seeding route is a separate build.
 2. **The fake project is Studio Nord**, a yoga studio's class booking site, repository `nord/booking`, project `nord-booking`, login `sebastian`. Dark theme, desk viewport 1600 by 900, phone 390 by 844. Cost: the scenes regenerate from changed data in minutes.

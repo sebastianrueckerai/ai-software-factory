@@ -18,7 +18,7 @@
 - Exact strings the spec fixes: the end reason `live: covered by run %d`, the done poke `%s is done and live: %s. €%.2f in all.` (as built), the merged inform `%s merged; the chain is running.` (as built), the board words `blocked by roll #%d`, `chain red`, `stalled`, `waiting for the chain`, `chain running`, the alert kinds `chain_red`, `chain_stalled`, `chain_uncarried`, the gauge `factory.chain.poll_age` in seconds.
 - Project file keys: `chain: {mode, requires, stall}` as built, `budget: {discretionary_eur, raise_max_eur}` new. The factory's own file: `chain: {requires: [factory/roll], stall: 24h}`.
 - TDD throughout. Before each push: `go test -race ./...` green, the PG tests green with `FACTORYD_TEST_DATABASE_URL`, `gofmt`, `go vet`, `gosec` clean.
-- Branch per phase in a worktree, merged to `main`, pushed to origin and github. Infra changes on the infra repository's `main`, its `config-check` green. The ledger (`.superpowers/sdd/2026-09-24-build-plan/progress.md` in the design repository) records each phase and the reversed rulings.
+- Branch per phase in a worktree, merged to `main`, pushed to origin and github. Infra changes on the infra repository's `main`, its `config-check` green. The build ledger (in the design repository) records each phase and the reversed rulings.
 - British spelling in every string a human reads.
 
 ## Review Focus
@@ -179,7 +179,7 @@
 - Produces: `AutoMerge(g GateResults, rv Review, source string) (ok bool, unmet []string)`, every caller updated. Rules: (1) `source` in {roll, revert, template-update, schema-copy, github sync}: ignore the class and the review; require the merge rule auto, checks green, and for a roll every changed path under `k8s/` (the gate's path list, as the risk evaluation reads it); the image references being the only changed lines is `RollCommit`'s construction, and the signatures are verified by the roller's existing refusal before a roll is filed. (2) An agent's change: class normal as built; class high passes only with `g.Policy.MergeRule == auto` and `g.Audit != nil && g.Audit.Verdict == "pass"` (the audit's pass value as `audit.go` names it), else `unmet` gains `risk class high: the audit must pass for a merge without a human`; forbidden and migration unmet as built. (3) Proof: the reproduction rule as built, or `len(rv.Criteria) > 0` and every verdict `met` or `waived`.
 
 - [ ] **Step 1: Write the failing tests**: `TestARollMergesOnItsOwnAtFullAuto`; `TestARollWithANonDigestChangeAsksAHuman`; `TestARevertMergesOnChecksAtFullAuto`; `TestAHighClassChangeMergesWithTheAuditAtFullAuto`; `TestAHighClassChangeWithAuditFindingsAsksAHuman` (unmet names the audit); `TestAHighClassChangeBelowFullAutoAsksAHuman`; `TestAForbiddenChangeAlwaysAsksAHuman`; `TestCriteriaMetProveAFeature`.
-- [ ] **Step 2: Run** → FAIL. **Step 3: Implement.** Update the policy comment: "an agent's high-class change merges at full auto when the audit passes (Sebastian, 2026-10-20, amending rulings 76, 77, 109); forbidden and migration keep a human". `internal/policy/risk_test.go` mirrors the risk block: keep `TestInfraRiskIsTheCopy` green. **Step 4: Run** → PASS. **Step 5: Commit** `the merge gate decides by who wrote the change`.
+- [ ] **Step 2: Run** → FAIL. **Step 3: Implement.** Update the policy comment: "an agent's high-class change merges at full auto when the audit passes (Sebastian, 2026-10-20, amending the standing merge contracts of Stages 5 to 7); forbidden and migration keep a human". `internal/policy/risk_test.go` mirrors the risk block: keep `TestInfraRiskIsTheCopy` green. **Step 4: Run** → PASS. **Step 5: Commit** `the merge gate decides by who wrote the change`.
 
 ### Task 11: The confirm set at full auto, the fund tool, the pool
 
@@ -200,7 +200,7 @@
 ### Task 12: Phase B lands
 
 - [ ] **Step 1:** Full suite, merge, push both remotes. The infra repository: the policy comment and the schema land, `config-check` green.
-- [ ] **Step 2:** Ledger entry naming the amended rulings 76, 77, 109 and the pool's two keys. The factory's own project file keeps `merge_rule: human` until Sebastian moves the slider.
+- [ ] **Step 2:** Ledger entry naming what the amendment changes (the standing merge contracts of Stages 5 to 7) and the pool's two keys. The factory's own project file keeps `merge_rule: human` until Sebastian moves the slider.
 
 ## Phase C: the infra chain and Forgejo 17
 

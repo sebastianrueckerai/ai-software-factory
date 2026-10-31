@@ -68,7 +68,7 @@ Failure modes the spec implies and no single task's happy path covers. Each has 
 | `SessionInput` has `CheckIn time.Duration` (the check-in's time budget) and no ask field | workflow.go:253-277 |
 | `SessionResult` outcomes are a closed string set; `LastMessage` cut at `maxHandoverMessage` 2000 | workflow.go:208-237, 279-310; store.go:148 |
 | The attempt loop calls `RunSession`, switches on `res.Outcome`, then `t.verify(res.Commit)` and `apply(v)` | workflow.go:1504-1507, 1611-1646 |
-| `apply(v)` takes a verification's findings for the next session; a change request with none left buys the session (`capAnswer`, ruling 225) | workflow.go:1150-1170 |
+| `apply(v)` takes a verification's findings for the next session; a change request with none left buys the session (`capAnswer`) | workflow.go:1150-1170 |
 | `handoverLines` builds "the branch holds …" and the last-message line; its comment already says the check-in's handover replaces them | workflow.go:1693-1720 |
 | `drainChanges` returns the change requests as finding texts | workflow.go:2879-2889 |
 | Human asks go through `ask` → `ActivityEscalate` (reason, choices) and `awaitHuman` | workflow.go:2915-2960 |

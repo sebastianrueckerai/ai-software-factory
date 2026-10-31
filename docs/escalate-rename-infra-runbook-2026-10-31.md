@@ -17,11 +17,11 @@ Verify before push: `grep -rn escalate_to_human .` returns nothing.
 
 Push, and Flux reconciles it with the next sync — that is the plan's reconciliation window.
 
-## Hand 2 — ruling 326 (the ledger)
+## Hand 2 — the ledger entry
 
-Append one line to `.superpowers/sdd/2026-09-24-build-plan/progress.md`:
+Append one line to the build-plan ledger:
 
-`326. (2026-10-31) The ask tool names the request; policy names the route. escalate_to_human becomes escalate.`
+`(2026-10-31) The ask tool names the request; policy names the route. escalate_to_human becomes escalate.`
 
 Commit and push as usual for the ledger.
 

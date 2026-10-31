@@ -17,7 +17,7 @@
 - Nodes: 3x Hetzner Cloud cpx42 (x86, 8 shared vCPU, 16 GB, 320 GB), 69.49 EUR per month each net, verify orderability with a create-and-delete probe at order time, the API availability lists are unreliable. All three run control-plane and workloads.
 - Talos 1.14, Cilium 1.20, OpenTofu (`tofu`). No SSH on nodes, Talos API only.
 - Go module `github.com/sebastianrueckerai/ai-software-factory-code`, binaries `factoryd` and `factory-gateway`.
-- New work happens in a git worktree. Every task ends with a commit to master and a push. (Exception, Ruling 1: the infra repo works on main directly so untracked tofu and Talos state survives task and stage boundaries.)
+- New work happens in a git worktree. Every task ends with a commit to master and a push. (Exception: the infra repo works on main directly so untracked tofu and Talos state survives task and stage boundaries.)
 - Repositories: `ai-software-factory-infra` and `ai-software-factory-code`, private on GitHub now, Forgejo becomes the primary in Stage 2 with GitHub as backup remote. File paths below say `infra/` and `factory/` for short.
 - British English in all documents.
 
@@ -54,12 +54,12 @@ Each stage ends with an exit test. A stage starts only after the previous one pa
 | 14 Rebuild | The cluster rebuilt from the round 2 close's backups on a new address set, round 2's findings folded in through the factory's own lane | The step-zero gate passed, and three fold-in cards merged through the lane and rolled |
 | 15 Project chat | The event spine and the live board, the project screen (status line, pulse, five columns, chat, drawer), the project agent inside factoryd, inline answers. Built, exit test passed. Members, approvers per project and GitHub import and export moved to the roadmap | An app built through the chat alone: uptime, about ten cards, a staging deployment and a smoke test, under 50 EUR for the round. Passed |
 | 16 Chat as the window | Proposals and conversations kept in tables, every console read and action as a chat tool, the `system` tool rendered from code, refusals that name the fitting action, the planner's questions before acceptance, the deploy gate and a staging smoke test, budgets by plan size, a provider refusal as no attempt, the review's whole diff, rolls that keep sessions, members and per-project approvers, GitHub import and export. Built by the controller after the lane failed its cards, all of it live, and a `ci` read after the exit test's first run | The uptime spec twice under 50 EUR for the round: through the chat alone with zero chat gaps, then each new path once against Stage 15's baseline. Run 1 built the app through the chat alone in 2 h 45 min with one chat gap, main's CI result, so zero gaps was not met as run. The `ci` read built the same evening closed the gap. Run 2 took the six new paths in 48 minutes with no gap |
-| 17 The lane back | Every finding Stage 16 left open: the lane's cost on the factory's own code (the corrected record on 160, the default tier, a repository map in the brief, the hold's cached input, a cost line), Postgres tests in CI and the sandbox, console logins kept in a table, staging admitting only the smoke job, no GitHub token through the chat, a looping session ended before the provider refuses it, approve proposals with the review's findings, an import that blocks no project, template updates and schema copies as pull requests, every console page a chat tool, a large pull request split by a planner, GitHub pull request mode, the drawer's Chat tab, the message queue and no poll. Then the cluster shut down. Built by the controller, 4.10 and 4.11 from lane pull requests, and the lane probe's 4.3 with a controller follow-up. Every item is on main, 4.11 last at 09:13Z | The lane probe and two more lane cards land within their size budgets with no budget 402 and ruling 271 never triggered, every item's live check, and one chat run on uptime2 through the new paths, against Stage 16's run 2. The probe landed at 4.92 EUR of 5, ruling 271 triggered once, and no later lane card landed through the lane, so the lane's criterion failed. Live checks passed for 4.1a, 4.2, 4.3, 4.4, 4.5, 4.7, 4.8, 4.9, 4.10, 4.11, 4.13's push and Sync latest, 4.14 and three of 4.15's. 4.12's split ran live, and its check refused both answers, since one file alone was over the bound, so the member approved #48 whole (ruling 307). Not seen live: 4.6's loop end, 4.15's first-call refusal, and the import's empty-source and purge cases. The chat run passed: the seven cards of plan #35 were done from 07:33Z to about 10:44Z, with 3 misreads, 1 chat gap, 2 clicks outside the chat and 2.88 EUR on the cards, against run 2's 2 misreads, 0 gaps, 2 clicks and 1.53 EUR. Closed at about 11:30Z on 2026-10-12, shut down at 11:33Z: backup 20261012T112654 in generation v13, `tofu destroy` of 12 resources, every Hetzner project at zero. |
-| 18 The lane works | The lane's preparation built by the controller: a card's scope bounded at filing by a validating plan tool (184, with 178), every console route and chat tool's access in one table with one generic write test (185), the briefs' prose rules moved into checks and tools (186), and the factory's own work filed through the planner as a project's spec (160). The probe doubled as the checkpoint tolerance fix (182) and landed with its roll. Then the lane's ten plans: the costs read's date window (158), the lease admission's read layer and wait (188), the alert burst rule (181), the import's purge cut (176), the CI sweep's read layer (189), and the chat's fixes (180, 183, 179, 187) and the split pre-check (159) frozen mid-build by the provider's budget refusal (DashScope, Sebastian's account, from 01:36Z on 13 Oct) | The probe and two more lane cards land within their budgets with no controller rebuild, no budget 402 and ruling 271 never triggered: passed. The probe (0.13) and 17 lane cards landed at 0.019 to 1.24 EUR, ten of them root plans on their first attempt; the controller answered two provider-refusal escalations as the writer and the merge queue drained on its deterministic gates through the outage. Frozen by the outage: the chat fixes, the split pre-check and the tails of 181, 188, 189 and 176, with the two never-run live checks (a plan over the bound, a split's window) named in the summary; the GitHub pull request stayed blocked by the rotated token (190). Closed and shut down under the outage's two-hour rule |
+| 17 The lane back | Every finding Stage 16 left open: the lane's cost on the factory's own code (the corrected record on 160, the default tier, a repository map in the brief, the hold's cached input, a cost line), Postgres tests in CI and the sandbox, console logins kept in a table, staging admitting only the smoke job, no GitHub token through the chat, a looping session ended before the provider refuses it, approve proposals with the review's findings, an import that blocks no project, template updates and schema copies as pull requests, every console page a chat tool, a large pull request split by a planner, GitHub pull request mode, the drawer's Chat tab, the message queue and no poll. Then the cluster shut down. Built by the controller, 4.10 and 4.11 from lane pull requests, and the lane probe's 4.3 with a controller follow-up. Every item is on main, 4.11 last at 09:13Z | The lane probe and two more lane cards land within their size budgets with no budget 402 and no abort for a runaway cost pattern, every item's live check, and one chat run on uptime2 through the new paths, against Stage 16's run 2. The probe landed at 4.92 EUR of 5, the abort rule (a cost pattern that would exhaust a card's budget stops the lane at once) triggered once, and no later lane card landed through the lane, so the lane's criterion failed. Live checks passed for 4.1a, 4.2, 4.3, 4.4, 4.5, 4.7, 4.8, 4.9, 4.10, 4.11, 4.13's push and Sync latest, 4.14 and three of 4.15's. 4.12's split ran live, and its check refused both answers, since one file alone was over the bound, so the member approved #48 whole. Not seen live: 4.6's loop end, 4.15's first-call refusal, and the import's empty-source and purge cases. The chat run passed: the seven cards of plan #35 were done from 07:33Z to about 10:44Z, with 3 misreads, 1 chat gap, 2 clicks outside the chat and 2.88 EUR on the cards, against run 2's 2 misreads, 0 gaps, 2 clicks and 1.53 EUR. Closed at about 11:30Z on 2026-10-12, shut down at 11:33Z: backup 20261012T112654 in generation v13, `tofu destroy` of 12 resources, every Hetzner project at zero. |
+| 18 The lane works | The lane's preparation built by the controller: a card's scope bounded at filing by a validating plan tool (184, with 178), every console route and chat tool's access in one table with one generic write test (185), the briefs' prose rules moved into checks and tools (186), and the factory's own work filed through the planner as a project's spec (160). The probe doubled as the checkpoint tolerance fix (182) and landed with its roll. Then the lane's ten plans: the costs read's date window (158), the lease admission's read layer and wait (188), the alert burst rule (181), the import's purge cut (176), the CI sweep's read layer (189), and the chat's fixes (180, 183, 179, 187) and the split pre-check (159) frozen mid-build by the provider's budget refusal (DashScope, Sebastian's account, from 01:36Z on 13 Oct) | The probe and two more lane cards land within their budgets with no controller rebuild, no budget 402 and no abort for a runaway cost pattern: passed. The probe (0.13) and 17 lane cards landed at 0.019 to 1.24 EUR, ten of them root plans on their first attempt; the controller answered two provider-refusal escalations as the writer and the merge queue drained on its deterministic gates through the outage. Frozen by the outage: the chat fixes, the split pre-check and the tails of 181, 188, 189 and 176, with the two never-run live checks (a plan over the bound, a split's window) named in the summary; the GitHub pull request stayed blocked by the rotated token (190). Closed and shut down under the outage's two-hour rule |
 
 The stages map to the build order in architecture 11: Ranch is stages 0 to 3, First loop is 4 to 6, Teeth is 7, Customer is 8, Self is 9. Hardening, Spec and the bugfix rounds are its items 6 to 8, and the project screen its item 9.
 
-No shutdown question at stage boundaries: Stages 3 to 9 run under standing authorization and stop only when stuck or when Sebastian's input is genuinely needed (Rulings 56, 62, 69). At a real stopping point, take a completed base backup of the live Postgres generation (Ruling 63), then `tofu destroy` stops the meter; the Stage 3 drill is the way back.
+No shutdown question at stage boundaries: Stages 3 to 9 run under standing authorization and stop only when stuck or when Sebastian's input is genuinely needed. At a real stopping point, take a completed base backup of the live Postgres generation, then `tofu destroy` stops the meter; the Stage 3 drill is the way back.
 
 ---
 
@@ -1188,9 +1188,9 @@ Sebastian's instruction (2026-09-24): run Stage 1 as a test and leave nothing bi
 
 Goal: the platform services run on the persistent cluster, deployed by Flux from Forgejo, with TLS.
 
-The cluster PERSISTS through this stage (ruling 38): about 0.29 EUR per hour, about 7 EUR per day, the 20 EUR cost alert from ruling 37 stands. Hetzner Object Storage adds 6.49 EUR per month from the first bucket (Task 12), storage and traffic included up to 1 TB each. Stage 3 is the destroy and rebuild drill, nothing here is torn down.
+The cluster PERSISTS through this stage: about 0.29 EUR per hour, about 7 EUR per day, the 20 EUR cost alert stands. Hetzner Object Storage adds 6.49 EUR per month from the first bucket (Task 12), storage and traffic included up to 1 TB each. Stage 3 is the destroy and rebuild drill, nothing here is torn down.
 
-Research basis: `.superpowers/sdd/2026-09-24-build-plan/research-g2-{edge,storage,git,platform}.md`, web verified 2026-09-25. No Forgejo dump exists to restore, so the restore path stays a Stage 3 concern.
+Research basis: web research on edge, storage, git and platform choices, verified 2026-09-25. No Forgejo dump exists to restore, so the restore path stays a Stage 3 concern.
 
 Sebastian's queued steps. Each blocks the named task, not the plan:
 
@@ -1914,7 +1914,7 @@ git commit -m "Forgejo on CNPG and S3 behind the gateway"
 
 ### Task 15: Git primary and Flux bootstrap
 
-**Files:** Create: `infra/k8s/platform/kustomization.yaml`, `infra/k8s/platform/namespaces.yaml`, `infra/k8s/platform/coredns.yaml`, `infra/clusters/sf/platform.yaml`, `infra/clusters/sf/kustomization.yaml`, `infra/k8s/platform/cert-manager/helmrelease.yaml`, `infra/k8s/platform/forgejo/helmrelease.yaml`, `infra/k8s/platform/sources.yaml`. Delete: `infra/k8s/platform/forgejo/values.yaml` (Task 14's applied-values record, superseded by the HelmRelease's inline values). Modify: `infra/README.md` (Flux layout, the Cilium-outside-Flux ruling, the push ritual).
+**Files:** Create: `infra/k8s/platform/kustomization.yaml`, `infra/k8s/platform/namespaces.yaml`, `infra/k8s/platform/coredns.yaml`, `infra/clusters/sf/platform.yaml`, `infra/clusters/sf/kustomization.yaml`, `infra/k8s/platform/cert-manager/helmrelease.yaml`, `infra/k8s/platform/forgejo/helmrelease.yaml`, `infra/k8s/platform/sources.yaml`. Delete: `infra/k8s/platform/forgejo/values.yaml` (Task 14's applied-values record, superseded by the HelmRelease's inline values). Modify: `infra/README.md` (Flux layout, Cilium outside Flux, the push ritual).
 
 **Interfaces:**
 - Consumes: Forgejo from Task 14 with admin credentials, the hand-applied slice (Tasks 11 to 14).
@@ -2788,7 +2788,7 @@ The detailed task plan for each stage below is written when the previous stage p
 
 Goal: prove the immutability claim from goal.md on the real cluster.
 
-Steps: back up (ScheduledBackup through the barman-cloud plugin, Forgejo dump, OpenBao snapshot), `tofu destroy`, `tofu apply`, re-apply configs, Flux converge, restore Postgres through the plugin's ObjectStore CR (the in-tree `barmanObjectStore` path is dead at CNPG 1.31, Ruling 59), Forgejo from its dump extracted into `gitea-repositories`, OpenBao from its S3 snapshot with the seed unseal key, then re-create the imperative state the restores do not carry: the gateway database role, the Forgejo tokens, the imperative namespace secrets, and any OpenBao KV newer than the last snapshot. The recovery origin always names the newest generation holding a completed base backup while the live archive runs one sibling ahead; a teardown that must preserve Postgres state takes that base backup first; a rebuild is green only when the restored repositories' HEADs match the last pushed commits (Rulings 61, 63). Measure the wall-clock duration (about five hours, 2026-09-25). This stage is also the off-switch rehearsal: the same path with cancellation instead of rebuild. Closed 2026-09-25; the drill is the standing rebuild recipe for every later stage.
+Steps: back up (ScheduledBackup through the barman-cloud plugin, Forgejo dump, OpenBao snapshot), `tofu destroy`, `tofu apply`, re-apply configs, Flux converge, restore Postgres through the plugin's ObjectStore CR (the in-tree `barmanObjectStore` path is dead at CNPG 1.31), Forgejo from its dump extracted into `gitea-repositories`, OpenBao from its S3 snapshot with the seed unseal key, then re-create the imperative state the restores do not carry: the gateway database role, the Forgejo tokens, the imperative namespace secrets, and any OpenBao KV newer than the last snapshot. The recovery origin always names the newest generation holding a completed base backup while the live archive runs one sibling ahead; a teardown that must preserve Postgres state takes that base backup first; a rebuild is green only when the restored repositories' HEADs match the last pushed commits. Measure the wall-clock duration (about five hours, 2026-09-25). This stage is also the off-switch rehearsal: the same path with cancellation instead of rebuild. Closed 2026-09-25; the drill is the standing rebuild recipe for every later stage.
 
 Exit test: the cluster is whole again, all Stage 2 exit tests still pass, the restored repositories' HEADs match the last pushed commits, and the drill duration is written down in architecture 3.
 
@@ -2800,7 +2800,7 @@ Steps: TDD the JWT validation against the cluster OIDC issuer (unit tests forge 
 
 Exit test: on the cluster, a call with a valid task JWT reaches LiteLLM under a per-task virtual key, a call with no or foreign JWT gets 401, and a call past the task budget gets 402 with an audit row for each outcome.
 
-Closed 2026-09-26. Standing contracts: `coding-cheap` is a load-balanced DeepSeek and Qwen pair and `review-frontier` maps to GLM (Ruling 64); the gateway tracks budget itself and maps LiteLLM's proactive 429 `budget_exceeded` to 402 at the edge, LiteLLM is the second line (Ruling 65); `deepseek-chat` stays pinned unless the API rejects it (Ruling 66). Architecture 5.1 step 4b, the tool path and OpenBao minting, lands in Stage 7.
+Closed 2026-09-26. Standing contracts: `coding-cheap` is a load-balanced DeepSeek and Qwen pair and `review-frontier` maps to GLM; the gateway tracks budget itself and maps LiteLLM's proactive 429 `budget_exceeded` to 402 at the edge, LiteLLM is the second line; `deepseek-chat` stays pinned unless the API rejects it. Architecture 5.1 step 4b, the tool path and OpenBao minting, lands in Stage 7.
 
 ### Stage 5: worker plane
 
@@ -2811,7 +2811,7 @@ Steps: land the Stage 4 runner gate before any commit the controller did not pus
 Exit test: a task submitted to factoryd produces a branch and a commit on Forgejo, the session record lands in S3, and a curl from inside the sandbox to any address outside that allowlist fails.
 
 Closed 2026-09-26 after three review rounds. Standing contracts:
-- **The runner gate:** CI runs on push to protected `main` only, and only the human pushes or merges there (Rulings 76, 77). The unprivileged pull-request runner is Stage 6's first step.
+- **The runner gate:** CI runs on push to protected `main` only, and only the human pushes or merges there. The unprivileged pull-request runner is Stage 6's first step.
 - **Git credentials:** the agent never holds the Forgejo token. The worker clones with it before the harness starts, kills every agent process, and pushes from a clean repository of its own.
 - **Egress:** the sandbox reaches the gateway and Forgejo, and DNS resolves only their names. The Go module proxy was dropped because the sandbox image has no Go toolchain; a registry joins by name with the toolchain that needs it.
 - **factoryd itself:** it is confined by a ValidatingAdmissionPolicy to `factory-agents-*` namespaces. Its intake takes a bearer token and clamps the budget. It restarts with `Recreate`, and a mid-run restart requeues the task, anchored to its persisted start time.
@@ -2823,18 +2823,18 @@ Closed 2026-09-26 after three review rounds. Standing contracts:
 
 Goal: a signal becomes a merged change.
 
-Steps: first the untrusted-CI runner, because Forgejo Actions checks on agent pull requests are this stage's first verification gate and Stage 5 closed its runner exposure only by running CI on protected `main` alone (Ruling 76): privileged dind is node root regardless of egress policy, so pull-request builds run on a separate runner (Ruling 78): an ephemeral runner pod under the gVisor RuntimeClass that takes one job and exits, jobs on the host executor inside that unprivileged pod, image builds through rootless BuildKit, the architecture 5.3 egress allowlist, and no registry or repository credentials, with image publishing staying on the `main` runner; then Forgejo webhooks into factoryd intake (issues, pull request comments and reviews; priority from labels and severity), task rows from issues, the Temporal task workflow end to end (intake, sandbox, run, verify, PR), durable across crashes, with retry on a stronger model while the previous attempt's artifacts stay in place, the run activity carrying heartbeat and wall-clock timeouts enforced by the workflow, the supervisor from architecture 6.6: the Stage 5 detectors stay (stall, wall-clock cap, tool calls without file changes) and four join them over the stored event stream (the same command failing with the same error signature repeatedly, the same tool call repeated, a file flipping back to earlier content, churn while the diff against base stops growing), and a detector trip or a task past half its wall-clock cap or half its budget calls the supervisor activity with a progress digest (commands and outcomes over time, files with edit counts, last error signatures, the diff so far), which runs the strongest configured model under the new `supervisor` alias over the brief, the session record and the work-tree history and picks one bounded action: continue, redirect (resume as a new pod with its guidance as findings), retry on a stronger model, or stop and escalate to a human; it never raises a cap or a budget, Forgejo Actions as the first verification gate, the human merge as the delivery step.
+Steps: first the untrusted-CI runner, because Forgejo Actions checks on agent pull requests are this stage's first verification gate and Stage 5 closed its runner exposure only by running CI on protected `main` alone: privileged dind is node root regardless of egress policy, so pull-request builds run on a separate runner: an ephemeral runner pod under the gVisor RuntimeClass that takes one job and exits, jobs on the host executor inside that unprivileged pod, image builds through rootless BuildKit, the architecture 5.3 egress allowlist, and no registry or repository credentials, with image publishing staying on the `main` runner; then Forgejo webhooks into factoryd intake (issues, pull request comments and reviews; priority from labels and severity), task rows from issues, the Temporal task workflow end to end (intake, sandbox, run, verify, PR), durable across crashes, with retry on a stronger model while the previous attempt's artifacts stay in place, the run activity carrying heartbeat and wall-clock timeouts enforced by the workflow, the supervisor from architecture 6.6: the Stage 5 detectors stay (stall, wall-clock cap, tool calls without file changes) and four join them over the stored event stream (the same command failing with the same error signature repeatedly, the same tool call repeated, a file flipping back to earlier content, churn while the diff against base stops growing), and a detector trip or a task past half its wall-clock cap or half its budget calls the supervisor activity with a progress digest (commands and outcomes over time, files with edit counts, last error signatures, the diff so far), which runs the strongest configured model under the new `supervisor` alias over the brief, the session record and the work-tree history and picks one bounded action: continue, redirect (resume as a new pod with its guidance as findings), retry on a stronger model, or stop and escalate to a human; it never raises a cap or a budget, Forgejo Actions as the first verification gate, the human merge as the delivery step.
 
 Exit test: an issue created on the factory repo becomes a pull request with green checks, a human merges it, and the session record shows the full path.
 
-Closed 2026-09-27: issue #37 became fork pull request #43 with five green checks on fresh unprivileged gVisor runner pods, the merge finished the workflow and the task within two seconds, and the timeline in S3 shows the path from intake to done. The controller merged as Sebastian's delegate after reading the diff and the checks (Ruling 88). Standing contracts:
-- **The runner gate:** agent pull requests come from the `factory-agent` fork, so their jobs get a read-only job token and no secrets (Ruling 97); `job-env-audit` asserts on every run that the token cannot push. factoryd's CI spawner runs each `pr-untrusted` job in one ephemeral gVisor pod with a repository-scoped ephemeral registration (Ruling 89). Image builds run BuildKit as sandbox root in a separate gVisor build pod without credentials, because gVisor has no working rootless path (Ruling 91). The worker refuses a push whose `.forgejo`, `.gitea` or `.github` tree entries differ from the base, and factoryd re-checks before the pull request (Rulings 90, 100). The privileged runner still builds protected `main` only, its dind storage bounded to a 40 GiB `emptyDir`.
+Closed 2026-09-27: issue #37 became fork pull request #43 with five green checks on fresh unprivileged gVisor runner pods, the merge finished the workflow and the task within two seconds, and the timeline in S3 shows the path from intake to done. The controller merged as Sebastian's delegate after reading the diff and the checks. Standing contracts:
+- **The runner gate:** agent pull requests come from the `factory-agent` fork, so their jobs get a read-only job token and no secrets; `job-env-audit` asserts on every run that the token cannot push. factoryd's CI spawner runs each `pr-untrusted` job in one ephemeral gVisor pod with a repository-scoped ephemeral registration. Image builds run BuildKit as sandbox root in a separate gVisor build pod without credentials, because gVisor has no working rootless path. The worker refuses a push whose `.forgejo`, `.gitea` or `.github` tree entries differ from the base, and factoryd re-checks before the pull request. The privileged runner still builds protected `main` only, its dind storage bounded to a 40 GiB `emptyDir`.
 - **Git credentials:** two tokens per session, read on the upstream repository and write on the fork only, both revoked at session end; the worker clones from upstream and pushes `factory/<id>` to the fork.
-- **The workflow:** factoryd runs the Temporal worker; every task is an issue with one `state/*` label; the wall-clock cap counts agent time across attempts (Ruling 93); attempts start on `coding-cheap` and climb to `coding-frontier` (Ruling 86). The heal pass (boot and every minute) starts missing workflows and re-reads Forgejo for signals a webhook missed, because Forgejo never retries a delivery; every run starts with `Reconcile`. Signals count only from owner, admin or write authors.
-- **Supervision:** the detectors from architecture 6.6 run inside the session activity (Ruling 87); at most three supervisor calls per session under a per-task `supervisor` key capped at the remaining budget; stops push the work in progress; escalation waits in `waiting-human` for a trusted comment, which may grant a bounded time slice.
-- **factory-ci:** the CI registrar is its own account, an organisation owner because Forgejo's runner API demands it, with a token scoped to the code repository; `main` on both repositories has `apply_to_admins` on and refuses its pushes (Rulings 101, 101a).
-- **The sandbox:** carries the Go 1.25 toolchain and reaches the Go module proxy and checksum database by name (Ruling 99). factoryd itself runs under default-deny egress (Ruling 94).
-- **Rebuild:** the drill took about 21 minutes (2026-09-26 to 27) with every trap pre-solved; the Forgejo `SECRET_KEY` lives in the seed bundle (Ruling 85), the webhook secret and a fresh CI registrar token are re-seed items.
+- **The workflow:** factoryd runs the Temporal worker; every task is an issue with one `state/*` label; the wall-clock cap counts agent time across attempts; attempts start on `coding-cheap` and climb to `coding-frontier`. The heal pass (boot and every minute) starts missing workflows and re-reads Forgejo for signals a webhook missed, because Forgejo never retries a delivery; every run starts with `Reconcile`. Signals count only from owner, admin or write authors.
+- **Supervision:** the detectors from architecture 6.6 run inside the session activity; at most three supervisor calls per session under a per-task `supervisor` key capped at the remaining budget; stops push the work in progress; escalation waits in `waiting-human` for a trusted comment, which may grant a bounded time slice.
+- **factory-ci:** the CI registrar is its own account, an organisation owner because Forgejo's runner API demands it, with a token scoped to the code repository; `main` on both repositories has `apply_to_admins` on and refuses its pushes.
+- **The sandbox:** carries the Go 1.25 toolchain and reaches the Go module proxy and checksum database by name. factoryd itself runs under default-deny egress.
+- **Rebuild:** the drill took about 21 minutes (2026-09-26 to 27) with every trap pre-solved; the Forgejo `SECRET_KEY` lives in the seed bundle, the webhook secret and a fresh CI registrar token are re-seed items.
 
 ### Stage 7: teeth
 
@@ -2847,16 +2847,15 @@ Exit test: a task over budget has its next model call refused by the gateway, a 
 Closed 2026-09-28. Exit test run verbatim on 2026-09-28 (task 57, code
 f46c350, roll 7254da0): all seven steps pass. Step 3 failed on the first run
 because the console showed every EUR amount with two decimals, so a 0.000543
-EUR spend read 0.00; fixed in the final fix wave (ruling 135, four decimals)
+EUR spend read 0.00; fixed in the final fix wave (four decimals)
 and re-checked live after roll 445128c. Measured: a Go-only pull request
 finishes its six checks in about 4 minutes, a Dockerfile pull request builds
 on a throwaway cx23 that is gone seconds after the job, the CI project ends
 at zero servers, a 60-minute lease books one hour and both provider deletes
-of a server with a volume are issued before the lease end (ruling 130,
-cutoff 210 s), a hand-made server in the agent project is deleted by the
+of a server with a volume are issued before the lease end (cutoff 210 s),
+a hand-made server in the agent project is deleted by the
 collector's next pass, and the ledger's spent_eur equals the LiteLLM key
-spend to the cent. Standing contracts from this stage, all in the ledger as
-rulings 114 to 137: egress by name including storage.googleapis.com; policy
+spend to the cent. Standing contracts from this stage: egress by name including storage.googleapis.com; policy
 in Git with `risk` and `approvers` sections and a strict decoder; holds
 booked or released exactly once with real cost over hold and one shared
 over-hold flag; commissioning with servers and volumes only, outbound
@@ -2873,8 +2872,7 @@ GitHub; cx23 build VMs (cx33 measured equal). What Stage 7 leaves for Stage
 
 Goal: the demo app, the first external customer of the factory.
 
-Steps, amended 2026-09-28 with Sebastian (rulings 140 to 152 in the ledger,
-the discussion in stage8-answers.md): step zero, factory instrumentation and
+Steps, amended 2026-09-28 with Sebastian: step zero, factory instrumentation and
 the three hand steps as CronJobs; the gate supervisor and the alerts table
 with a verdict per alert; project registration and per-project settings
 (merge rule, notify list, the envelope with task and standing resources, an
@@ -2920,14 +2918,14 @@ on kept its last value, and a sum across factoryd pods), fixed and rolled
 before the stage closed. The rebuild that opened the stage
 took 62 minutes end to end, the platform whole after 18, and the step-zero
 gate passed on its intent (one supervisor call cut by its timeout booked its
-hold, ruling 115). Measured: a roll takes 61 to 73 s from push to ready for
+hold). Measured: a roll takes 61 to 73 s from push to ready for
 two images and 161 s for four; the demo app's own chain builds on a build VM
 in about a minute and rolls staging and prod by its own CI, and its 15-minute
 promote gate refused prod once on eight load-generator failures; a task's
 gate durations equal its timeline to the hundredth of a second; the
 factory's spend equals LiteLLM's key spend to the last digit once every
 model call, review and supervisor included, passes the gateway. Standing
-contracts from this stage, all in the ledger as rulings 140 to 172: step
+contracts from this stage: step
 zero's metrics, dashboard, bounds and alerts table with verdicts; the gate
 supervisor for the five long gates with one wait and one retry per run, a
 finished gate winning over a late answer; transcripts instead of heartbeats;
@@ -2970,8 +2968,7 @@ Steps: grant the `coder` class scoped access to `factory` (never `infra`), let r
 
 Exit test: an agent PR to `factory` merges under the same policy a human change would face, with the audit trail complete.
 
-Steps, amended 2026-09-28 with Sebastian (rulings 176 to 188 in the ledger,
-the discussion in stage9-answers.md). What the plan's steps asked for is
+Steps, amended 2026-09-28 with Sebastian. What the plan's steps asked for is
 partly built: agents have worked on the code repository from a fork with
 per-task tokens since Stage 6, a review verdict of `concerns` ends at a
 human card and never dead-ends, and no need for SPIRE or OPA appeared (one
@@ -3015,8 +3012,8 @@ LiteLLM's to the last digit, the timeline, the alert rows, the roll row.
 Closed 2026-09-29. The rebuild that opened the stage ran from 07:29Z to
 08:16Z, the platform whole after 29 minutes, and the step-zero gate passed
 with the spend equal to LiteLLM's to the last digit (EUR 0.01831564 over 17
-rows). Landed, rolled and proven, with rulings 176 to 195 in the ledger:
-Task 72, configuration as files (ruling 183): factoryd reads the tree
+rows). Landed, rolled and proven:
+Task 72, configuration as files: factoryd reads the tree
 `factory/` from the infra repository's `main` every 30 seconds
 (`policy.yaml` with a `limits` section, `projects/<name>.yaml`,
 `workflow.yaml`), the commit is the version, every task pins the version it
@@ -3024,40 +3021,39 @@ started under, a JSON Schema generated from the Go types, `factoryd config
 check` as a CI job on the infra repository, and a refused commit keeps the
 old version and files a `config_rejected` issue in the human lane (proven
 with a bad push and its revert, versions 155 and 156); Task 73, the factory
-as a normal project (ruling 179): every project's settings from its file,
+as a normal project: every project's settings from its file,
 `objects: factory | seed` and `agents: coder | none`, the infra repository
 on `agents: none` (`POST /tasks` answers 422, infra issue #4 ran in the
 human lane), no repository name in code; Task 74, the workflow as an
-ordered list of stages with one `on_findings` setting each (rulings 177,
-190), the review loop, the `analyzer` class with its `report` session mode,
+ordered list of stages with one `on_findings` setting each, the review loop, the `analyzer` class with its `report` session mode,
 the improvement presort and the screening stage for outside accounts on the
-stronger rung (rulings 182, 185, 191); Task 75, the roll as a factory task
-(ruling 178): from 13:10Z every roll was a pull request the roller opened,
+stronger rung; Task 75, the roll as a factory task:
+from 13:10Z every roll was a pull request the roller opened,
 six merged through the card (#185, #188, #190, #192, #202, #213), a newer
 commit folded into an open roll at 14:06Z, and the roll watcher records a
-row per image; Task 76, alerts on the factory routed by the namespace label
-(ruling 180), ten rules as code, and a fix to factoryd's admission policy
+row per image; Task 76, alerts on the factory routed by the namespace label,
+ten rules as code, and a fix to factoryd's admission policy
 that keeps it out of the infra-owned namespaces; Task 77, model tiers in
-LiteLLM (rulings 181, 189, 192): tier-high holds zai/glm-5.3,
+LiteLLM: tier-high holds zai/glm-5.3,
 dashscope/qwen3.8-max and deepseek/deepseek-v4-pro at equal weight for
 `supervisor`, `review-frontier` and `coding-frontier`, tier-low serves
 `coding-cheap`, no fallback crosses a tier, the audit row names the
 deployment that answered, and Groq left both lower tiers after it refused
 multi-turn sessions; Task 78, four task metrics, the revert mark (live:
-demo-app #6 marked reverted by #11) and four panels (ruling 185); Task 79,
+demo-app #6 marked reverted by #11) and four panels; Task 79,
 backlog items 23, 27, 44 and 45, memory limits set from measured cgroup
 peaks; Task 81, every exhaustion of the session loop opens the card, and a
-repeated supervisor trip takes the stronger rung (ruling 193); Task 82, the
+repeated supervisor trip takes the stronger rung; Task 82, the
 work guide states the sandbox contract; and from the lane itself, six
 merged fixes (backlog 26, 3, 32, 4, 49, 63). The controller's fixes during the
-run: the supervisor timeout at 6 minutes (ruling 186), the sandbox limit at
+run: the supervisor timeout at 6 minutes, the sandbox limit at
 4Gi with an 8Gi namespace ceiling after three sessions died with their
 unpushed work (94b8fbd), a resumed session whose branch already holds the
 work counts as a pushed result (4e94cc3), the ModelReview bound at 360 s
-(infra e71be90, ruling 194), and the "Key is blocked" fix landed from the
-lane's pull request (48fdbd8, ruling 195). Exit test run on 2026-09-29
-(task 80, 14:29Z to 16:10Z), passed with two deviations. Step 1, deviation
-(ruling 195): the "Key is blocked" fix came from agent task #203 through
+(infra e71be90), and the "Key is blocked" fix landed from the
+lane's pull request (48fdbd8). Exit test run on 2026-09-29
+(task 80, 14:29Z to 16:10Z), passed with two deviations. Step 1, deviation:
+the "Key is blocked" fix came from agent task #203 through
 the checks in pull request #209; the task ended at its wall-clock cap on
 one gosec line, the controller added that line and pushed 48fdbd8, and roll
 task #213 took it live through card 104 at 16:02Z; no key was blocked
@@ -3081,15 +3077,14 @@ on five of seven, and the other two book calls cut by the gate at their
 hold. The bug lane: 11 issues filed by the controller on seven backlog
 items (1 three times, 4 and 49 twice, 3, 26, 32, 63 once), five merged by
 the lane, one landed by the controller, five failed (one at the round cap
-before ruling 193, four at the wall-clock cap, two of them after sandbox
+before the session-cap card rule, four at the wall-clock cap, two of them after sandbox
 memory kills), and #214 (backlog 63) merged after a concerns loop; EUR 2.92 over the
 eleven finished tasks, EUR 1.30 of it on the six merges. The first
 round of six issues produced one merge; the controller fixed four
 machinery defects before the second. Measured: checks 2 min 24 s to 8 min
 41 s, a review 4 s to 1 min 27 s (210 s once, cut at the old 180 s bound),
 an approval click 31 s to 1 min 56 s, a merge 1 s, a session 17 s to 7 min
-51 s. Standing contracts from this stage, all in the ledger as rulings 176
-to 195: configuration and processes as typed files in the infra
+51 s. Standing contracts from this stage: configuration and processes as typed files in the infra
 repository, Git as the editing surface and the console read-only, the
 commit as the version and a pin per task; Kubernetes as the substrate only;
 findings from any stage go back to the agent, to the card or fail the task
@@ -3100,7 +3095,7 @@ factory by namespace label; model tiers by quality, ordered by latency
 inside a tier, never crossing tiers; the screening stage on the stronger
 rung; four task metrics and a revert mark; a defect that blocks the lane
 itself is landed by the controller from the lane's pull request, once.
-Sebastian's ruling 196 at the close, "settle down": a task past the settle
+Sebastian's word at the close, "settle down": a task past the settle
 window is set to LiteLLM's final figure once (code 8d4f6f7, migration
 0034, not rolled). The close itself went wrong: at 17:57Z the controller's
 `tofu apply` for a second home-address change of the day replaced the
@@ -3116,19 +3111,18 @@ raft since Stage 8 (re-seeded), Forgejo's git storage (re-pushed at the
 rebuild) and the merge commits of demo-app #11 and #12. The README names
 the trap; the next rebuild's step-zero gate is the test of the recovery.
 What Stage 9 leaves: backlog items 58 to 68 in stage9-backlog.md as the
-next bug lane (66 closed by ruling 196), the Stage 8 items not yet worked
+next bug lane (66 closed by the settle rule), the Stage 8 items not yet worked
 in their lanes, the thirteen accepted risks (14, 16, 21, 22, 30, 31, 41,
 46, 48, 50, 51, 53, 54), and the proofs the exit test left open; the
 handover lists them.
 
-After Stage 9, at Sebastian's explicit wish that neither is forgotten
-(ruling 188): messages into a running agent session and agent-to-agent
+After Stage 9, at Sebastian's explicit wish that neither is forgotten:
+messages into a running agent session and agent-to-agent
 interaction, through the harness's serve mode, about 1.5 days; and a final
 security audit stage whose findings always go to a human.
 
 Also after Stage 9, at Sebastian's wish (2026-09-29), from the harness
-discussion (research-harnesses.md and stage10-queue.md in the ledger
-folder hold the evidence and the detail): seven items. Stage 10 built the
+discussion: seven items. Stage 10 built the
 headless config, the loop nudge and the housekeeping, and the rest are in
 [the roadmap](../roadmap.md).
 
@@ -3139,24 +3133,21 @@ to the agent, progress on the issue, "I am going in", the board patterns)
 are in [the roadmap](../roadmap.md).
 
 Also after Stage 9, from the market research's worker, credential and
-policy items Sebastian accepted (2026-09-29, detail in stage10-queue.md
-section I): nine items. Stage 10 built five of them (Task 89), and the
+policy items Sebastian accepted (2026-09-29): nine items. Stage 10 built five of them (Task 89), and the
 rest are in [the roadmap](../roadmap.md).
 
 ### Stage 10: hardening
 
-Settled 2026-09-29 at the Stage 9 close (rulings 197 to 199), on
+Settled 2026-09-29 at the Stage 9 close, on
 Sebastian's steer: hardening, security, small incremental improvements and
 bug fixes first; the larger items of the lists above (the UX phase, the pi
 adapter, parallelism, setup snapshots, no credential in the pod, composite
-attribution) wait for his scoping and are Stage 11 at the earliest. The
-handover `handover-stage10.md` in the ledger folder holds the round in
-full; the ledger holds the rulings.
+attribution) wait for his scoping and are Stage 11 at the earliest.
 
 Steps: the rebuild with the recovery from CNPG generation v8 and the
 re-push of every repository from the controller's machine (the test of the
 close's recovery), the step-zero gate with the mirror check; Task 85, the
-security audit stage of ruling 188 (`on_findings: human`, an analyzer
+security audit stage (`on_findings: human`, an analyzer
 session on the stronger rung over the diff with a fixed checklist); Task
 86, the merge path (a model review with a verdict for every risk class,
 backlog 68; the roller's registry read on a read-only package token;
@@ -3169,11 +3160,11 @@ in and out); the bug lane by the factory itself from the gate's first roll
 on (backlog 58, 59, 61, 62, 64, 65, 67, then Stage 8's 2, 8, 9, 11, 18, 20,
 24, 25, 29, 33, 34, 37, 47 and demo-app 15, 17); last, Task 88, message-in
 in its smallest form (one adapter call, opencode's serve mode on one port
-only factoryd reaches, the loop nudge as its first user), the item ruling
-188 asked not to forget; the answer chain only if 88 lands with days to
+only factoryd reaches, the loop nudge as its first user), the item
+Sebastian asked not to forget; the answer chain only if 88 lands with days to
 spare.
 
-Exit test (ruling 199), on the factory's own repository, a human clicking
+Exit test, on the factory's own repository, a human clicking
 cards only: the recovery brings back every table of Stage 9's exit test
 and Forgejo's issues and pull requests; a planted secret in a test file
 reaches the card with the audit stage's finding and a clean pull request
@@ -3183,7 +3174,7 @@ bug-lane fixes merged through the card and rolled, with cost and gate
 durations; one loop nudge into a running session that changes its course
 and one repetition trip after a nudge that did not help; the audit trail
 complete, the ledger equal to LiteLLM's figure on every finished task after
-the settle window (ruling 196). Fallbacks named in the report: a planted
+the settle window. Fallbacks named in the report: a planted
 pull request for the audit and the review cases; the nudge reported as not
 built if Task 88 does not land.
 
@@ -3200,11 +3191,11 @@ initialised fresh and re-seeded. The step-zero gate passed at 20:30Z with
 the spend equal to LiteLLM's to the last digit (EUR 0.008096722 over 8
 calls) and `github/main` equal to Forgejo's for code and infra; the gate's
 roll went live at 20:37Z and its lane task merged at 20:57Z. Landed, rolled
-and proven, with rulings 200 to 204 in the ledger: Task 85, the security
-audit stage of ruling 188: stage `audit` between review and approval,
+and proven: Task 85, the security
+audit stage: stage `audit` between review and approval,
 `on_findings: human` only, switched on per project, a secret pre-check on
 the diff's added lines and one call on the class's `audit_model`
-(coding-frontier, ruling 200) with a six-item checklist, findings to the
+(coding-frontier) with a six-item checklist, findings to the
 card and never to the agent, and no verdict counted as a finding; Task 86,
 the merge path: a review without a verdict is a finding on the card, never
 a pass (backlog 68, change id `review-verdict`), the roller reads the
@@ -3221,8 +3212,8 @@ the session's start with a sanitised subject; Task 88, message-in in its
 smallest form: a `Message` call in the adapter contract, opencode under
 `serve`, a port on the worker pod only factoryd reaches with a
 per-session bearer, and the loop nudge after three identical calls as its
-first user, counted from the session's event stream (ruling 202); Task 91,
-one model provider (ruling 204): the three tiers on Alibaba's Qwen 3.8 max,
+first user, counted from the session's event stream; Task 91,
+one model provider: the three tiers on Alibaba's Qwen 3.8 max,
 3.7 plus and 3.8 flash, one deployment each, retries without a cooldown,
 and a LiteLLM proxy budget of 55 USD a month behind the factory's cap; and
 Task 92, the month cap: `budget.month_eur` 50 over every project and the
@@ -3233,15 +3224,16 @@ items, 25 merged through the card (23 on the code repository, 2 on
 demo-app), every code merge rolled by 01:29Z on 2026-09-30, 3 failed and
 each refiled and merged; EUR 3.55 over the lane, EUR 1.91 on the merges,
 19 of the 25 in one cheap session. It fixed Stage 9's own findings (58, 59, 61,
-62 as a re-run of an unchanged red head once, ruling 201, 64, 65, 67),
+62 as a re-run of an unchanged red head once, by an empty commit after the
+same head failed twice, 64, 65, 67),
 Stage 8's items 11, 20 (a per-project egress host list in place of `world`
-on 443), 24, 25 and 29 and demo-app's 15 and 17 (ruling 203 closed 2, 9 and
-33 and accepted 8, 18, 34, 37 and 47), and the round's own findings 69 to
+on 443), 24, 25 and 29 and demo-app's 15 and 17 (closed 2, 9 and
+33, accepted 8, 18, 34, 37 and 47), and the round's own findings 69 to
 76 and 89a, among them a merge conflict sent back to the agent (70) and
 the spend repair (73). Exit test run on 2026-09-29 and 30 (task 90), passed
 with named fallbacks and deviations. Step 1 passed with deviations: every
 table and every issue came back, #179 to #181 excepted (purged with an
-outside account before the close), and task-80-report.md's own counts
+outside account before the close), and task 80's own counts
 held three errors. Step 2 passed: the planted PEM key in a test file
 (#241, PR #245) reached card 147 with the pre-check's and the model's
 findings, and a clean pull request (#252) passed with `clear` in 2 s and
@@ -3249,8 +3241,8 @@ merged. Step 3's first half passed live: the migration-class pull request
 #249 reached its card with the review's verdict, the migration finding and
 an audit finding, and lane #281 did the same on a real migration; the
 planted 2 s review bound (#288) did not yield a review without a verdict,
-because the review finished before the gate supervisor's answer (ruling
-171's race), so the second half rests on the fallback: Task 86's tests and
+because the review finished before the gate supervisor's answer (a finished
+gate wins over a late answer), so the second half rests on the fallback: Task 86's tests and
 the live no-verdict audit finding on #276, whose audit call died with a
 roll's gateway restart. Step 4 passed: backlog 58, 59, 61, 64 and 65
 merged through the card and rolled first, with cost and gate durations,
@@ -3282,29 +3274,27 @@ additions after the Stage 9 close, one model provider and the month cap,
 were found late: he added them to the handover at 20:34Z, after the
 controller had read it once, and they surfaced at 00:4xZ; until Task 91
 landed at 00:56Z every tier spent on three providers and only `day_eur`
-bounded spend, about EUR 5.9 by then. Both were applied that night (ruling
-204): the proof window at 18 EUR, below September's 18.26, parked a
+bounded spend, about EUR 5.9 by then. Both were applied that night:
+the proof window at 18 EUR, below September's 18.26, parked a
 planted task at its card with spend 0 and filed the infra issue. Standing
-contracts from this stage, in the ledger as rulings 200 to 204: the audit
+contracts from this stage: the audit
 stage on the task class's `audit_model`; a red head the agent left as it
 was re-runs its checks once before its findings go back; the loop nudge
 counts from the harness's event stream; the Stage 8 lane items settled as
 built, closed or accepted; one model provider, Alibaba, and a month cap of
 50 EUR on all variable spend with a LiteLLM budget behind it. What Stage 10 leaves: an empty lane queue, the
 month cap's 50 and 80 percent alerts to see in October's first days, the
-accepted risks, the open proofs of task-90-report.md, and the rotation of
+accepted risks, the open proofs of task 90, and the rotation of
 the Forgejo admin password, which reached two local transcripts; the
-handover `handover-stage11.md` lists them.
+stage's handover lists them.
 
-A second round of accepted items (2026-09-29, detail in stage10-queue.md
-section J, revisit-later items and rejections in architecture 10):
+A second round of accepted items (2026-09-29, revisit-later items and rejections in architecture 10):
 thirteen worker, budget and dispatch items, now in [the
 roadmap](../roadmap.md).
 
 The UX phase also gets a stop button on the card that closes the issue.
 
-A third round of accepted items (2026-09-29, detail in stage10-queue.md
-section K, revisit-later items in architecture 10): fourteen items on
+A third round of accepted items (2026-09-29, revisit-later items in architecture 10): fourteen items on
 configurable pipelines, verification, signals and the gateway, now in [the
 roadmap](../roadmap.md).
 
@@ -3313,17 +3303,17 @@ Every other future topic is in [the roadmap](../roadmap.md).
 
 ### Stage 11: building software from a spec
 
-Settled 2026-09-30 after the Stage 10 close (rulings 205 to 208). The
+Settled 2026-09-30 after the Stage 10 close. The
 factory so far fixes and improves
 existing code; this stage makes it build a new application from a written
-spec, with several agents in parallel. Sebastian's principle (ruling 206):
+spec, with several agents in parallel. Sebastian's principle:
 no fixed development process, only primitives, each a plain YAML block with
 a schema and a fixed list of options, composed by the user and checked by
 `factoryd config check`, which refuses a composition that cannot work.
 
 Steps: the rebuild and the step-zero gate; a design task for the primitives'
 YAML, schemas and refusals; then a new project from the console (a button
-that opens a pull request on infra, ruling 183 kept, with a loading
+that opens a pull request on infra, configuration as files kept, with a loading
 indicator, step status and tooltips); board lanes Backlog and Ready as
 configuration; a planner class whose accepted plan factoryd turns into
 child cards with dependencies; "Start plan", with a card that waits on its
@@ -3350,8 +3340,8 @@ controller's own drafts had failed #321 and #324: closing keywords, an HTML
 comment and a zero-width space in the test fixtures, which the inbound
 sanitiser neutralised before the agent read them. Landed and rolled in
 four rolls (e038a4f, 34f6137, a02fdf1, 86146de) and the infra pin 9bdb51f,
-Tasks 93 to 104. Task 93 was the design (stage11-design.md, after two
-review rounds). Task 94 made processes YAML blocks in infra's
+Tasks 93 to 104. Task 93 was the design, after two
+review rounds. Task 94 made processes YAML blocks in infra's
 `factory/processes/`, with `factoryd config check` and its 61 refusal
 subtests (schema, names, needs in order, the graph and the floor rules F1
 to F11) and `factoryd config explain`. Task 95 made the engine read each
@@ -3371,7 +3361,7 @@ Task 101 built the planner class, plan revisions, the approval kind `plan`
 and `CreateChildren`. Task 102 built the merge queue per project with
 `SyncWithMain`. Task 103 gave the console lane columns, moves, the plan
 card and Start plan, and Task 104 the new-project button and its status
-panel. Exit test run on 2026-09-30 (Task 105, ruling 210), passed at
+panel. Exit test run on 2026-09-30 (Task 105), passed at
 18:16Z, 6 h 12 min into the 7-hour window. The button's infra pull request
 merged from the panel, and registration seeded `linkshort` from template
 `ts-go`. The planner answered 9 cards, took one change request and
@@ -3386,7 +3376,7 @@ page, sign-up, log-in, a link, its redirect and its clicks), and main holds
 commits by `factory-projects`, `factory-agent` and `factory-merge` only,
 none by the controller. The cost was far above the design's. 12 of 28
 tasks failed, 11 at the 20-minute wall-clock cap, and the controller filed
-17 refile, split or fix cards as the human (ruling 211), answered 20 cards
+17 refile, split or fix cards as the human, answered 20 cards
 and made 3 acts outside the console. The causes, by cost: the cheap tier
 looped on probes, library sources and tool installs within 20 minutes (58
 sessions: 18 pushed, 23 supervisor redirects), finished work was discarded
@@ -3396,8 +3386,8 @@ finding carries no log (backlog 85, 86), and the template seeded no deploy
 skeleton for Pod Security `restricted` and the registry pull secret, so
 staging ran no pod while its CI job read green, until two fix cards
 (backlog 89). Spend: linkshort EUR 5.99, the day EUR 7.33, the month EUR
-24.33. Standing contracts from this stage, in the ledger as rulings 209 to
-211. Infra `main` needs 0 approvals, so a console-authored pull request can
+24.33. Standing contracts from this stage.
+Infra `main` needs 0 approvals, so a console-authored pull request can
 merge, and sebastian stays its only pusher and merger. The exit test ran
 as designed, with its named fallbacks. A plan card that fails at a cap is
 refiled by the human in cards that fit one session, and its dependents are
@@ -3405,20 +3395,20 @@ answered in the plan's order. The round's findings are backlog 77 to 89,
 now in [the roadmap](../roadmap.md).
 
 After Stage 11: Stage 12 below, a series of short bugfix rounds settled
-with Sebastian after the close (ruling 213). Every other future topic is in
+with Sebastian after the close. Every other future topic is in
 [the roadmap](../roadmap.md).
 
 ### Stage 12: bugfix rounds
 
-Settled 2026-09-30 after the Stage 11 close. Ruling 213, Sebastian's: the
+Settled 2026-09-30 after the Stage 11 close. Sebastian's decision: the
 next rounds are short bugfix rounds, no features, until the factory builds
 the Stage 11 test software reliably and quicker, with fewer loops and gates
 rather than more. Each round ends with that build as its test: linkshort
-from the same spec (exit11-spec.md) on a fresh project, with no refile, the
+from the same spec on a fresh project, with no refile, the
 human's clicks only the plan and the approvals, in under three hours,
 measured in time, refiles, clicks, failures and spend, and the next round
 fixes what it shows. The work of round 1 was the Stage 11 root cause
-analysis's seven suggestions, with Sebastian's rulings 212 and 214 to 217
+analysis's seven suggestions, with Sebastian's decisions
 of the same evening: no human types a password for an internal service,
 the sanitiser for outsiders' text only, a board he can watch live, an
 agent-time cap of hours with a periodic check-in in place of the half-way
@@ -3430,30 +3420,29 @@ Round 1 ran on 2026-09-30 and 2026-10-01. The rebuild recovered generation
 v10 into v11 to the close's last transaction, brought Forgejo back from
 its dump and OpenBao from its snapshot, and passed the step-zero gate at
 22:29Z: the gate's roll of 5c11832 live at 22:16:58Z, and its lane task,
-the board's 3-second refresh (Task 107, ruling 215, code #342), merged in
+the board's 3-second refresh (Task 107, code #342), merged in
 one session, with its 14 ledger rows equal to LiteLLM's at 0.01137014 EUR.
-Task 106 was the design (stage12-design.md), with six open questions ruled
-as 218 to 221. The tasks:
+Task 106 was the design, with six open questions settled. The tasks:
 
 - Task 107, the board refreshes every 3 seconds (the gate's lane task).
-- Task 108, the sanitiser for outsiders' text only (ruling 214, backlog
+- Task 108, the sanitiser for outsiders' text only (backlog
   90): hidden comments stripped outside code blocks, no neutralising on
   the way in, a writer's text as written. Built by a subagent, not the
   lane, since its test data is the very text the old sanitiser rewrote.
-- Task 109, registration from OpenBao (rulings 212, 219): the reconcile
+- Task 109, registration from OpenBao: the reconcile
   registers with the admin's login read from OpenBao, and the console's
   password field and register click went.
-- Task 110, agent time and check-in per class, process and project
-  (rulings 216 to 218).
+- Task 110, agent time and check-in per class, process and project.
 - Task 111, the supervisor's continue, message or escalate, with its
   message delivered into the running session, the check-in in place of
-  half way, shell writes counted, and one stuck rule (ruling 224).
+  half way, shell writes counted, and one stuck rule: after a delivered
+  message, flip_flop and churn count as stuck like the no-write trips.
 - Task 112, finished work kept at every cap, one cap card, a change
-  request at the cap as the answer (ruling 225), and first sessions from
+  request at the cap as the answer, and first sessions from
   main's head (change id `keep-work`).
 - Task 113, the per-project cache volume for sandboxes and CI, with Go's
-  module cache per pod (ruling 223); Task 113b moved the cache to its own
-  exec-capable node path and kept main CI off it (ruling 226), after a
+  module cache per pod; Task 113b moved the cache to its own
+  exec-capable node path and kept main CI off it, after a
   warm cache segfaulted the second `go run` of gosec on scratch12.
 - Task 114, gcc, make and python3 in the worker image, and evictions
   recorded as such.
@@ -3463,13 +3452,13 @@ as 218 to 221. The tasks:
 - Task 118, the alerts endpoint's digest query, which the template's
   staging job waits on.
 - Task 119, the template `ts-go` that works out of the box, with its
-  `check` (ruling 222: CI fails a `check` that drops gosec or
+  `check` (CI fails a `check` that drops gosec or
   `go test -race`).
 - Task 120, the guides: bash check, then end; named tests; cards sized by
   what they produce; the foundation's contracts.
 - Task 122, the gateway's 499 for a caller's cancel, after an alert on 502s
-  from sessions the supervisor ended filed code #348 (debug-gateway-5xx.md).
-- Tasks 116 and 117, `run_checks`, were not built (ruling 221): the
+  from sessions the supervisor ended filed code #348.
+- Tasks 116 and 117, `run_checks`, were not built: the
   sandbox runs the same `bash check` CI runs.
 
 Three rolls carried the code. Roll 1, 270d3ab (Tasks 109, 113, 114, 118),
@@ -3486,7 +3475,7 @@ no check-in) and the config check's pin (1b893cd). Its first roll task
 #349 failed on gosec G104 in Task 115's code, which the implementer and the
 landing had checked with vet and `-race` only. Roll 3, bc40f3c (Task 122),
 was live at 00:36Z (#353, pull request #354), with the pin bumped
-(0cac77a). Ruling 226's cache path and main CI's env landed on infra as
+(0cac77a). The cache path and main CI's env landed on infra as
 eaac379 without a roll. The live proofs ran on a scratch project,
 `scratch12` (infra bfb8d22): the button and Merge registered it from
 OpenBao with no password in 30 seconds, its seed's main CI went green
@@ -3494,7 +3483,7 @@ through staging with the pod on the run's digest (checks 4 min 11 s,
 image 39 s, staging 39 s), and two smoke cards merged, one through a queue
 conflict settled by a session that merged `main`.
 
-Closed 2026-10-01. The round's exit test (Task 121, ruling 220) built the
+Closed 2026-10-01. The round's exit test (Task 121) built the
 spec on the fresh project `linkshort2`, beside `linkshort`, which stays
 registered. It passed clean: no refile, no failed card, no answer to a
 card and no cap card. From the button at 00:36:50Z the planner's seven
@@ -3519,8 +3508,8 @@ staging smoke passes from a pod in the namespace. The run's findings, in
 [the roadmap](../roadmap.md): every feature card conflicted once with
 `main` on the template's one route list and spent a short session on it,
 and staging serves only plain http in the cluster, so a `Secure` cookie
-does not round-trip there. Standing contracts from this round, in the
-ledger as rulings 218 to 226: agent time 2 hours, check-in 45 minutes,
+does not round-trip there. Standing contracts from this round:
+agent time 2 hours, check-in 45 minutes,
 1500 steps and 6 supervisor calls by default, the planner 30 minutes;
 registration in the reconcile with no human step; `run_checks` only if a
 run shows a failure CI found and `bash check` could not; a repository's
@@ -3531,25 +3520,25 @@ answer; the cache class on its own exec-capable node path, and `main` CI
 off the shared cache. At the close Forgejo's self-registration, open since
 the start (no `[service]` section in its configuration), was switched off
 (infra cd08282); every factory repository and organisation is private.
-Ruling 213's goal is met in round 1.
+The bugfix rounds' goal is met in round 1.
 
-Round 2 ran on 2026-10-01, ruled by Sebastian as 228 (round2-proposal.md
-with every recommendation taken) and closed by this build. The rebuild
+Round 2 ran on 2026-10-01, settled by Sebastian with every recommendation
+of its proposal taken, and closed by this build. The rebuild
 recovered generation v11 into v12, passed the step-zero gate (the gate's
 roll needed a second try: the first failed at its own checks, root-caused
 as gVisor's gofer permission-checking an open of a 0644 file another
 sandbox wrote on the shared build cache — fixed by umask 0000 in the two
-containers that mount a project claim, ruling 241), and the lane task
+containers that mount a project claim), and the lane task
 proved the content-filter escalation end to end with its ledger spend
-equal to LiteLLM's to the cent. Ruling 227's account work landed first
-(Task 123, rulings 229 and 239): a machine admin `factory-admin` and the
+equal to LiteLLM's to the cent. The machine-account work landed first
+(Task 123): a machine admin `factory-admin` and the
 controller's own account `controller` now hold every credential the
 factory uses — the chart's admin, OpenBao's registration login, the seed,
 both CronJobs, the OAuth app, the registry, Flux — and Sebastian's
 account holds no token at all, so he may switch TOTP on whenever he
 likes; the audit trail names the controller's clicks as its own. Forgejo
 now requires a login to view anything (item 138) and probe_sent's two
-repositories went private. The security review (Task 125, ruling 230)
+repositories went private. The security review (Task 125)
 walked every accepted risk and kept all of them, none reachable under
 the agent-PR-outsider threat model; its one finding, demo-app's main CI
 still sharing the warm cache with its untrusted PR jobs, was fixed the
@@ -3571,7 +3560,7 @@ clean, and the two failures became Roll 3's fixes: the Retry route's
 nil wiring (now guarded by a test that every console function field is
 wired) and the stuck rule's alternation memory, which a delivered
 message used to clear, letting a circling agent buy message after
-message for 38 minutes (ruling 224's intent restored: flip_flop and
+message for 38 minutes (the stuck rule's intent restored: flip_flop and
 churn stay armed across messages). The eviction drill found its wording
 cannot make the cheap tier sit in the loop the kubelet needs to sample
 usage, and that gVisor plus an emptyDir sizeLimit gives no write-time
@@ -3596,26 +3585,25 @@ cap card, acceptance 9/9 under `-race` each and staging smokes passing;
 one genuine design question (a root catch-all route against the
 foundation's store hand-back) was asked well and answered with the
 agent's own three-line fix. Its one finding became the round's last fix:
-ruling 226 keeps main's jobs off the shared cache, and their cold caches
+the round's contract keeps main's jobs off the shared cache, and their cold caches
 filled the runner pod's 1 GiB tmp emptyDir until the kubelet killed the
-pod mid-run — tmp is now 4 GiB (ruling 242, Roll 4), and linkshort3's
+pod mid-run — tmp is now 4 GiB (Roll 4), and linkshort3's
 rerun went green with staging rolling the digest. Item 144 (main's cold
-CI cost) closed on that ruling at the Stage 14 rebuild: every main run is
-off the shared cache by design (ruling 226), and the code repository's
+CI cost) closed on that contract at the Stage 14 rebuild: every main run is
+off the shared cache by design, and the code repository's
 main `test` job ran green in 5 min 28 s on the freshly rebuilt cluster
 (run 566, 2026-10-10, everything cold) and in 2 min 0 s on the next
 merge (run 570), inside round 2's 4 to 5.5 minutes either way; a warm
-main-side cache stays item 71's ground. Standing contracts
-from this round, in the ledger as rulings 229 to 242.
+main-side cache stays item 71's ground.
 
-The board UX round (Stage 13, 2026-10-01 and 02, rulings 243 to 248, Tasks
+The board UX round (Stage 13, 2026-10-01 and 02, Tasks
 142 to 159) ran with no cluster and no spend, on Sebastian's scope:
 research the kanban field, decide what the factory's board should steal,
 refuse and leave out, and iterate an improved board on a local click dummy
 with real card data, restored from the round 2 close's backup into a local
 Postgres. Twelve solutions got a report each on one template, and one
 aggregate ranked seventeen steals and named six exclusive choices, which
-Sebastian ruled as 243 to 248: the conversation behind a click with a hover
+Sebastian ruled on: the conversation behind a click with a hover
 peek, the console server-rendered htmx with SSE for the live parts, system
 lanes only, buttons as the state machine with drag for lane starts only,
 two colour channels that never mix, and replay and live from one log.
@@ -3627,7 +3615,7 @@ colour as one channel), measured against the aggregate in [the gap
 analysis](../board/gap-analysis.md). The round's artifacts are in
 [docs/board/](../board/README.md).
 
-The Stage 14 rebuild (2026-10-10, ruling 250) brought the round 2
+The Stage 14 rebuild (2026-10-10) brought the round 2
 close's backups back on a new address set and folded round 2's findings
 in through the factory's own lane: items 141 (Start plan waits up to
 15 s for an accepted plan's cards to be filed instead of answering 409),
@@ -3643,11 +3631,11 @@ probes Forgejo's token endpoint before it trusts the stored secret.
 
 ### Stage 15: the project chat
 
-Settled 2026-10-10 after the Stage 14 rebuild (rulings 251 to 256), once
+Settled 2026-10-10 after the Stage 14 rebuild, once
 Sebastian had read his conversation on the human's side of the factory,
 [the UX conversation](../ai-software-factory-ux-conversation.md), which is
-the round's design baseline as the export is the factory's. The spec is the
-ledger's proposal-project-chat.md, OK'd by Sebastian that evening with his
+the round's design baseline as the export is the factory's. The spec was
+OK'd by Sebastian that evening with his
 answers: the project agent inside factoryd, `operator` on the high tier and
 the pulse on the low tier, the confirm defaults, the phases through the
 factory's own lane with the controller as the reviewer under 50 EUR, and
@@ -3662,7 +3650,7 @@ piece of work. Behind the chat runs the project agent, which operates the
 factory as the human through the console's own actions and never does the
 work. Round 1 builds the status line, the pulse, the chat, the board beside
 the chat with fewer columns, inline answers on needs-you cards, and GitHub
-import and export (ruling 256). Messenger push and the mobile layout are
+import and export. Messenger push and the mobile layout are
 roadmap items 145 and 146.
 
 Phases: each is a spec card on the factory's own code project where the
@@ -3674,7 +3662,7 @@ fold-ins ran. A phase the lane fails twice goes to the controller.
    real data and every tool call rendered, as the design reference before
    any console code. The documents land first.
 2. The event spine: every console action records one event with `via`, the
-   project event feed as one endpoint, SSE to the board (ruling 244, the
+   project event feed as one endpoint, SSE to the board (the
    board roadmap's first item). The live badge replaces the 3-second poll.
 3. The project screen: the status line, five columns with chips, the
    drawer's tabs, the full-width board kept.
@@ -3689,7 +3677,7 @@ fold-ins ran. A phase the lane fails twice goes to the controller.
 9. The exit test below, then the close: the documents folded, the roadmap
    updated with what the test found.
 
-Exit test (ruling 256). A member builds an app of the Stage 11 size (eight
+Exit test. A member builds an app of the Stage 11 size (eight
 to twelve planned cards, a staging deployment, a smoke test) using only the
 chat and the needs-you cards, with the board looked at but not clicked:
 
@@ -3728,7 +3716,7 @@ agent's and the pulse's spend as their own lines, the number of clicks
 outside the chat (target: only Do it and the inline answers), and every
 place the chat misread an instruction.
 
-Budget (Sebastian's ruling): under 50 EUR for the whole round, build and
+Budget (Sebastian's decision): under 50 EUR for the whole round, build and
 exit test together. At the open October had spent 13.00 EUR, so the caps
 were raised for the round (infra 8cee59d): a card may spend 5 EUR (10 at
 most), the day 40 and the policy's month 80, LiteLLM's proxy stop follows at
@@ -3739,27 +3727,28 @@ these phases are larger, so the phases run cheap first and climb to the
 stronger tier on their second session (`stronger_after: 1`), and the
 session reports the spend at every phase close.
 
-The rulings, in the ledger:
+The rulings:
 
-- 251. The project screen is the human's tool: status line, pulse, board,
+- The project screen is the human's tool: status line, pulse, board,
   chat and drawer, each with one job. Per project. Members get the same
   screen.
-- 252. The project agent is a tool-calling agent inside factoryd that acts
+- The project agent is a tool-calling agent inside factoryd that acts
   as the human through the console's own actions, one event whatever the
   input. Whether a tool needs an OK is the `chat.confirm` setting, with the
   defaults of architecture 5.7. It runs no code.
-- 253. No containment of chat-to-agent text beyond the sandbox and the
+- No containment of chat-to-agent text beyond the sandbox and the
   gates. It amends the baseline sentence "agents exchange artifacts, not
   chat" to: agents exchange artifacts, humans and the project agent may
   message a running agent, and the gates judge the result.
-- 254. A member is a writer on the project's repository and sees only their
+- A member is a writer on the project's repository and sees only their
   projects. The chat never creates or manages projects. Approvers per
   project file.
-- 255. Five columns in the split view as a fixed grouping of the task
+- Five columns in the split view as a fixed grouping of the task
   states, lane and fine state as chips, and the full-width board keeps
   today's columns, lanes first. Processes keep composing their lanes.
-  Rulings 245 and 246 stand.
-- 256. Round 1's scope with GitHub import and export, and the exit test
+  System lanes only, and buttons as the state machine with drag for lane
+  starts only, stand.
+- Round 1's scope with GitHub import and export, and the exit test
   through the chat. Messenger push and the mobile layout are roadmap items.
 
 Outcome (2026-10-11, the exit test pending). The eight code phases the
@@ -3815,7 +3804,7 @@ The lane started each phase on the cheap tier with the climb, as planned.
 From 00:55Z the code project started cards on the stronger tier (infra
 b83faff) after the cheap tier's failures. A phase that failed on the lane
 went to the controller: an Opus implementer in a worktree, a second Opus
-review, then a direct push to main (rulings 257 and 258). From 04:59Z the
+review, then a direct push to main. From 04:59Z the
 model provider, Dashscope, answered 429 "budget exhausted" on every tier
 and alias. The Alibaba Cloud account's own budget was spent, not LiteLLM's
 cap. The lane's cards for 4b, 5 and 6 closed at zero spend, and the
@@ -3849,16 +3838,16 @@ the deploy manifests, so staging runs without the admin token's Secret
 was skipped (phase 8 on the roadmap). The round's total: 38.54 EUR of the
 50, of which 35.55 on the factory's own code.
 
-The round's rulings, in the ledger:
+The round's rulings:
 
-- 257. A controller-built phase lands by a direct push to main after a
+- A controller-built phase lands by a direct push to main after a
   local gofmt, vet and race-test pass and a second Opus review. Rolls stay
   on the lane.
-- 258. When a card's remaining budget cannot cover its review's list, the
+- When a card's remaining budget cannot cover its review's list, the
   controller takes the phase without a second lane attempt.
-- 259. `answer` and `steer` join the `chat.confirm` defaults, since the
+- `answer` and `steer` join the `chat.confirm` defaults, since the
   text the agent reads from cards is untrusted.
-- 260. The state word "waiting on you" wins over "working", and the
+- The state word "waiting on you" wins over "working", and the
   project agent's snapshot reads the screen's status line.
 
 Findings:
@@ -3908,9 +3897,8 @@ topic, and its items 145 to 157 hold what this round left for later, 151 to
 
 ### Stage 16: the chat as the window
 
-Approved by Sebastian on 2026-10-11, after the Stage 15 exit test (rulings
-261 to 267). The spec is the ledger's proposal-stage16.md, and the design
-is in architecture 5.7. His decisions with the OK: the `system` tool is
+Approved by Sebastian on 2026-10-11, after the Stage 15 exit test. The
+design is in architecture 5.7. His decisions with the OK: the `system` tool is
 generated from code, the planner's open questions are asked with choices
 before a plan can be accepted, a plan without a deploy owner is refused
 when its spec has a Deploy line, budgets follow the plan's size, the chat
@@ -3938,7 +3926,8 @@ shape every item:
 The items. Each is one or more cards on the factory's own code project,
 sized to land under about 1000 changed lines, with the budget following the
 size (item 7). The controller takes an item when the lane fails it twice,
-or at once under ruling 258, and lands it under ruling 257.
+or at once when a card's remaining budget cannot cover its review's list,
+and lands it by direct push to main after a second review.
 
 1. Persistence (roadmap 153, 154): proposals and undo tokens move to a
    `chat_proposals` table with the same binding and expiry, so a restart
@@ -3994,7 +3983,7 @@ Then:
 5. The exit test, then the close: the documents, the plain summary for
    Sebastian and the caps.
 
-Budget (Sebastian's ruling): 50 EUR on the factory's own code for the
+Budget (Sebastian's decision): 50 EUR on the factory's own code for the
 round, with a stop to ask at 40. The handover copied Stage 15's raises (the
 day 40, the month 80, LiteLLM 88 USD). But at the open October held 52.50
 EUR (32.11 that day) and LiteLLM 52.76 USD, so the month 80 would have
@@ -4008,7 +3997,7 @@ in Stage 15, but it counts the whole month, and the code project had spent
 2.70 EUR of project headroom, and it went to 90 (infra 5ab39f6). The close
 restores the default card of 2, the day 20, the month 50 and LiteLLM's 55,
 removes the code project's model, agent time and month lines, and keeps the
-card maximum at 15 (ruling 268: ruling 266's large card needs 10, and the
+card maximum at 15 (a large card needs 10, and the
 factory's own code 15).
 
 
@@ -4028,19 +4017,19 @@ the chat, misreads and chat gaps), run twice:
 Stage 15's result is the baseline: 3 h 13 min, 2.64 EUR on the cards, 0
 clicks outside the chat, 1 misread and 1 chat gap.
 
-The round's rulings, in the ledger:
+The round's rulings:
 
-- 261. Every read the console offers is a read tool, never behind an OK.
-- 262. The `system` tool is rendered from the code at call time.
-- 263. No rule goes into a prompt that a tool, a result, a structured field
+- Every read the console offers is a read tool, never behind an OK.
+- The `system` tool is rendered from the code at call time.
+- No rule goes into a prompt that a tool, a result, a structured field
   or a deterministic step can carry.
-- 264. The planner's open questions are escalations with choices on the
+- The planner's open questions are escalations with choices on the
   plan card, answered before acceptance.
-- 265. A plan with a Deploy line and no deploy owner is refused at
+- A plan with a Deploy line and no deploy owner is refused at
   acceptance.
-- 266. Budgets by plan size: 2, 5 and 10 EUR, with a project maximum of 15
+- Budgets by plan size: 2, 5 and 10 EUR, with a project maximum of 15
   for the factory's own code.
-- 267. A provider refusal at a session's first call is no attempt.
+- A provider refusal at a session's first call is no attempt.
 
 Outcome (2026-10-11, the close). All eighteen of the round's slices are on
 main and live, and the controller built every one. The lane landed none.
@@ -4070,7 +4059,7 @@ What landed, in order, and who built it:
   found the defect the controller's review found.
   In the exit test a webhook card's review named the goroutine per
   notification and the WaitGroup drain it read.
-- 3.8b, the roll's session gap (controller, ruling 269, roll #435): before
+- 3.8b, the roll's session gap (controller, roll #435): before
   a roll's merge factoryd writes a `roll_holds` row and polls every 15 s
   until no session runs. The bound is the longest agent time in force
   plus 30 minutes, after which the merge goes ahead with a log line. While
@@ -4090,7 +4079,7 @@ What landed, in order, and who built it:
   rounds of 16 concurrent takes gave one success each. An undo is data,
   the inverse that the tool's own run returned. The stored Do-it row
   leaves out the proposal's description, since the replay would speak
-  card text as the agent's own words (ruling 259).
+  card text as the agent's own words.
 - 3.3a, the `system` tool and the state in words (controller, from lane
   card #433's PR #434 plus eleven review points, roll #439 at 13:14Z): the
   agent's manual, rendered from the code at call time, with the card
@@ -4162,7 +4151,7 @@ What landed, in order, and who built it:
   holds `[token]` in its place, events hold the remote only, and an
   unconfirmed token expires with its proposal. The status line and
   the snapshot end with "GitHub: <state>", which the registrar refreshes each minute. Seed projects are
-  refused, since ruling 126's job mirrors them.
+  refused, since the standing push mirrors cover them.
   In the exit test the chat set uptime2's export to
   sebastianrueckerai/ai-factory-export, and GitHub held its branches within
   a minute.
@@ -4176,7 +4165,7 @@ What landed, in order, and who built it:
   closed four routes that the wider login exposed without a project-writer
   check (answer, request changes, reject plan and the timeline page), and
   its security review two more: filing a card on any project, and reading
-  any project's board (ruling 270). Through a Forgejo failure the last good
+  any project's board. Through a Forgejo failure the last good
   writer list holds for 5 minutes. Live, exit16-member, who wrote no
   project, was refused at the console's login with 403. In the exit test
   the chat's `invite` made them a member of uptime2. They logged in within
@@ -4246,13 +4235,13 @@ first session after 7 minutes, so its second started fresh. #442 (3.2a)
 and #441 (3.1b) pushed pull requests that the controller's reviews sent
 back with sixteen and ten points, and #441's fix session added four new
 defects. #446 (3.5) met the provider outage. The controller took every
-item under rulings 257 and 258: an Opus implementer in a worktree, a
+item: an Opus implementer in a worktree, a
 second Opus review, a local gofmt, vet, race-test and gosec pass on the
 merged tree, and a direct push to main, with the rolls on the lane. 3.8a,
 3.8b and the template's half of 3.6 were controller work by design. The
-controller read ruling 258 per item, so each card got its own try at the
+controller read the fails-twice rule per item, so each card got its own try at the
 same cause. The first card's failure at 12:13Z was the moment to stop, and
-ruling 271 (below) now says so. From about 13:58Z to 16:45Z the model
+the abort rule (below) now says so. From about 13:58Z to 16:45Z the model
 provider, Dashscope, answered 429 "budget exhausted" on every alias, as at
 Stage 15's 04:59Z: the Alibaba Cloud account's own budget was spent, while
 LiteLLM's counter stood at 79.50 of 118 USD. Under Stage 15's precedent the
@@ -4329,12 +4318,12 @@ with the smoke job at 21:00Z. Card spend 1.53 EUR: the plan's four planner
 runs 1.04, the five cards 0.49. Both runs together: 4 h 15 min and 5.03 EUR
 on the cards.
 
-The round's rulings, in the ledger:
+The round's rulings:
 
-- 268. From Stage 16 the policy's card maximum is 15 EUR, and it stays so
+- From Stage 16 the policy's card maximum is 15 EUR, and it stays so
   after the close. The default stays 2, and a project file sets its own
   maximum up to the policy's.
-- 269. A roll merges only in a session gap, in factoryd's own workflow. An
+- A roll merges only in a session gap, in factoryd's own workflow. An
   approved roll waits before its merge until no agent session is live,
   and new sessions wait before any agent time while it does, up to the
   longest agent time plus 30 minutes. A pod drain was rejected, since the
@@ -4342,18 +4331,18 @@ The round's rulings, in the ledger:
   down for the drain. So was a second replica, since the runner's live
   sessions, the timeline lock, the event bus and twelve loops assume one
   process.
-- 270. Under ruling 254, a member who writes no project and cannot read
+- A member who writes no project and cannot read
   its repository gets 404 on that project's board. The writers of the
   factory's own code keep their read-only view of every project.
-- 271. Abort and fix before the bill (Sebastian). When a card's session
+- Abort and fix before the bill (Sebastian). When a card's session
   shows a cost pattern that will exhaust its budget before it lands (Stage
   16: a 5 EUR card gone in one 17-minute session on the factory's own code;
-  the ruling's "250 to 490 thousand input tokens a call" was a byte count,
+  the original "250 to 490 thousand input tokens a call" was a byte count,
   see Stage 17), the controller stops the lane
   at once, closes the cards running with the same pattern, fixes the cause
   (brief, tier, a session split after reading, size) and only then resumes.
-  One lost card is the limit. The rule comes before ruling 258's "fails
-  twice": the item count does not matter when the cause is the same across
+  One lost card is the limit. The rule comes before the "fails
+  twice" rule: the item count does not matter when the cause is the same across
   cards. The stop and its reason go to Sebastian at once in their own
   message.
 
@@ -4363,7 +4352,7 @@ Findings:
   17 minutes, about 200 calls on the frontier tier at 10 to 20 times a
   cheap call's price. The "250 thousand tokens" this line once named was
   the gateway's 402 text counting body bytes (see Stage 17). The lane's
-  sizes assume a far smaller context (roadmap 160). Ruling 271 stops the
+  sizes assume a far smaller context (roadmap 160). The abort rule stops the
   lane at the first card that shows the pattern.
 - The Postgres tests skip in the lane's CI, so a store defect reaches the
   review unseen. PR #444's new conversation stored nothing, and Postgres
@@ -4440,8 +4429,8 @@ controller reset LiteLLM's spend counter from 86.43 to 0 USD, with
 `max_budget` 55 and the monthly reset on 1 November unchanged. For the
 round the policy's day cap went to 85 and its month cap to 120 EUR (infra
 d2b5203), since October held about 85 EUR, so that the fixes' live checks
-could run. Ruling 271 kept the lane out of the round. The controller made
-fix D itself. A, B and C were controller builds under ruling 257: an Opus
+could run. The abort rule kept the lane out of the round. The controller made
+fix D itself. A, B and C were controller builds: an Opus
 implementer in a worktree, a second Opus review, the review's fixes, and
 one squashed commit pushed to main.
 
@@ -4526,8 +4515,7 @@ to 166, 172 and 176 hold what this round and its fix round left open.
 ### Stage 17: the lane back, every open fix, the screen as specified
 
 Planned on 2026-10-11 after Stage 16's fix round. Sebastian started it the
-same night and approved the cluster's teardown at its end. The spec is the
-ledger's proposal-stage17.md. The goal: every finding Stage 16 left open is
+same night and approved the cluster's teardown at its end. The goal: every finding Stage 16 left open is
 fixed, the lane builds the factory's own code again within its budgets, and
 the project screen matches its visual spec. The notification service and
 the mobile layout (roadmap 145 and 146) stay out.
@@ -4566,7 +4554,7 @@ live check:
 - 4.15 The fix round's checks still owed.
 
 Order: the controller builds 4.1 and 4.2 first, since both unblock the
-lane. Then one lane probe card (4.3, medium) runs under ruling 271. If it
+lane. Then one lane probe card (4.3, medium) runs under the abort rule. If it
 lands within 5 EUR the lane takes 4.9, 4.10 and 4.11, while the controller
 builds the rest in parallel. The close folds the round into this plan, the
 roadmap, architecture and proposal-v2, restores the caps (card 2 and 15,
@@ -4581,11 +4569,11 @@ ledger at the open, 86.25 EUR, plus 55), LiteLLM `max_budget` 60.07 USD (its
 counter, 0.07, plus 60).
 
 The round changed the policy three more times: `stronger_after` from 1 to
-3 (ruling 299, infra 7910b97, policy version 485), the template's smoke job
+3 (infra 7910b97, policy version 485), the template's smoke job
 on its own runner label (infra a0be355, version 486), and
-`risk.large_lines` from 1000 to 400 for the exit test only (ruling 301,
-infra 9bbc6eb). factoryd's reading threshold went from 24 to 60 in its
-manifest (ruling 298, code c5d20f4).
+`risk.large_lines` from 1000 to 400 for the exit test only
+(infra 9bbc6eb). factoryd's reading threshold went from 24 to 60 in its
+manifest (code c5d20f4).
 
 Outcome (the close, at about 11:30Z on 2026-10-12).
 
@@ -4593,7 +4581,7 @@ Every item is on main and live. 4.11 landed last, as 7b380ca at
 09:13:16Z, and rolled with roll #488 at 09:28:15Z. The controller built
 eleven items, and two more (4.10 and 4.11) from lane pull requests. The
 lane probe built 4.3, which landed
-with one controller follow-up. Each controller build followed ruling 257:
+with one controller follow-up. Each controller build followed the same shape:
 an Opus implementer in a worktree off origin/main, a second Opus review,
 the fixes, the controller's read of the fix diff, then a rebase onto
 origin/main and a fast-forward, with gofmt, vet, the whole suite with
@@ -4606,11 +4594,11 @@ landed, and its live check:
   2001421e8200 ready at 23:55:41Z): every ledger row of a model call
   carries its prompt, cached and output tokens and its body bytes
   (`prompt_tokens`, `cached_tokens`, `output_tokens`, `body_bytes`). The
-  gateway's hold calibrates from the task's earlier call on the same ref
-  (ruling 274). The `card` and `session` reads carry a cost line in EUR
-  per call (ruling 275), and a step line shows its prompt tokens with the
-  cached share and no EUR (ruling 283). An agent's call on an alias other
-  than its task's is refused with 403 naming both aliases (ruling 279). The
+  gateway's hold calibrates from the task's earlier call on the same ref.
+  The `card` and `session` reads carry a cost line in EUR
+  per call, and a step line shows its prompt tokens with the
+  cached share and no EUR. An agent's call on an alias other
+  than its task's is refused with 403 naming both aliases. The
   build found the booking right: the gateway books LiteLLM's own cost,
   cached tokens at the cache-read price, and ledger rows 20163 and 20097
   equal their spend log rows. What misled in Stage 16 was the gateway's
@@ -4622,7 +4610,7 @@ landed, and its live check:
   spend sum went. The review recomputed the hold by hand: 495,000 bytes x
   135,000 / 480,000 = 139,218.75 tokens, 0.02190103125 EUR held, where the
   byte bound of a first call holds 0.154644 EUR against a booking of
-  0.007818. It landed at about 780 lines with the alias pin (ruling 284),
+  0.007818. It landed at about 780 lines with the alias pin,
   as 297804e at 23:42:38Z. Live: the probe's per-call figures (below)
   came from the new columns. Live check passed at 09:16Z in the exit run.
   Asked to read card #36 again, the agent called `card`, whose result
@@ -4639,7 +4627,7 @@ landed, and its live check:
   characters dropped and cut at 120 characters, `.git` refused. factoryd
   takes the directories from the card's plan row or from the last
   `Directories:` line of a writer's issue body, and a card with neither
-  gets no map (ruling 273). A code card starts on `coding-cheap` and
+  gets no map. A code card starts on `coding-cheap` and
   reaches `coding-frontier` only through the existing climbs:
   `retry_stronger`, findings past `stronger_after`, repeated sessions
   without a push, and a healed run. opencode v1.18.32 compacts at 175,424
@@ -4647,8 +4635,8 @@ landed, and its live check:
   15,000 tokens verbatim plus one structured summary, at one extra call on
   the session's model. No build changed the context limit of 200000. The
   build found that the gateway let an agent call any alias its class
-  lists, so an agent could call `coding-frontier` itself (ruling 279,
-  built in 4.1a). It landed as 00852cb at 23:30:38Z. Live: the probe's
+  lists, so an agent could call `coding-frontier` itself (built in
+  4.1a). It landed as 00852cb at 23:30:38Z. Live: the probe's
   brief named two directories. The report records no read of the map in
   a live brief.
 - 4.2, Postgres tests in CI and the sandbox (controller): `Dockerfile.runner`
@@ -4684,11 +4672,11 @@ landed, and its live check:
   login, the CSRF token, the created and last-seen times, and the member's
   Forgejo access and refresh tokens, sealed with AES-256-GCM under a key
   derived from the console's session key, with the id hash as additional
-  data (ruling 276). The cookie is unchanged, an expired row is refused and
+  data. The cookie is unchanged, an expired row is refused and
   deleted, and logout deletes the row. A store error answers 503 and keeps
   the stream. The follow-up (705588d) reads the row again before a token
   refresh, so two requests with one cookie no longer refresh with one
-  token, which Forgejo invalidates on use (ruling 300). Main c7be6f4
+  token, which Forgejo invalidates on use. Main c7be6f4
   carried both into the roll. Live: the login at 07:29:42Z wrote the
   first row. Live check passed at 09:01Z. factoryd restarted at about
   09:00Z with roll #486, and at 09:03Z the controller's cookie from the
@@ -4706,7 +4694,7 @@ landed, and its live check:
   run's `event_payload`, since Forgejo shows a tag named main as `main`
   too. It tears down any other run's runner with one log line. A pull
   request's smoke job gets a pod for at most one tick inside the
-  `pr-untrusted` egress (ruling 286). Smoke runners mount no cache. The
+  `pr-untrusted` egress. Smoke runners mount no cache. The
   research on Forgejo 15.0.9: a `pull_request` run uses the head's
   workflow, except that a fork's pull request with an untrusted poster and
   a trusted doer uses the base's. A fork's pull request gets no secrets
@@ -4718,9 +4706,9 @@ landed, and its live check:
   staging job with `DEPLOY_KEY` or the next agent pod runs. Every pod
   command now names its binary by absolute path (6cd03c6 at 00:02:30Z,
   landed alone), and the reproduction gate runs without the agents' cache
-  (ruling 291, 6234d2d at 00:12:11Z). The rest landed as 9d88977 at
+  (6234d2d at 00:12:11Z). The rest landed as 9d88977 at
   06:30:32Z, once the template's smoke job had reached every staging
-  project (rulings 287 and 295). Live check passed. uptime2's main run 1470
+  project. Live check passed. uptime2's main run 1470
   held its smoke job queued on `uptime2-smoke` from 06:51Z, ran it with the
   new spawner, and passed at 07:28:26Z, and promote passed at 07:28:39Z. A
   probe pull request's job on `pr-untrusted` (uptime2#34, run 1475) logged
@@ -4743,7 +4731,7 @@ landed, and its live check:
   stored row 276 reads `[token]`, no stored row holds the dummy, and
   LiteLLM's spend log row of the turn holds no trace of it. In the exit
   run a steer from the drawer stored `[token]` too (4.14). The rotation
-  was not done (ruling 272). `GITHUB_MIRROR_PAT` is unchanged since
+  was not done. `GITHUB_MIRROR_PAT` is unchanged since
   2026-09-29, valid until 2026-10-28, and is the token Stage 16's exit run
   typed into the chat. The re-seed was skipped, both mirror paths keep
   that token, and Sebastian rotates it (roadmap 163).
@@ -4752,7 +4740,7 @@ landed, and its live check:
   the trip kind `loop`, with no supervisor call. The work is pushed, and
   the next brief names the loop. A new file change is a content hash the
   session has not seen, so a write back to an earlier content does not
-  reset the count (ruling 280). The provider's "Repetitive tool calls
+  reset the count. The provider's "Repetitive tool calls
   detected" refusal, matched with its `(status 400)` form, ends a session
   the same way. The worker pushes the work of every failed session, and
   the next brief reads "previous session ended unfinished: ..." when the
@@ -4772,7 +4760,7 @@ landed, and its live check:
   "and N more") and the failing checks, or "Checks: <state>." for a red
   run with no failing job listed, as a warning in its description. The
   prompt states one fact: the member decides, and a proposal shows them
-  the facts (ruling 263). A proposal for `approve_merge` without a pending
+  the facts. A proposal for `approve_merge` without a pending
   merge request is refused, as Do it refuses. It landed with 4.5 as
   163fff8. Live check passed at 09:17Z. Three chat turns "Approve the
   merge of card #36." at 09:15:36Z, 09:15:39Z and 09:15:43Z each drew an
@@ -4792,12 +4780,13 @@ landed, and its live check:
   empty repository older than 20 minutes now asks GitHub whether the
   source has a commit. A 409 "Git Repository is empty" makes it an empty
   source, seeded whole. A commit means a cut copy: the site admin deletes
-  the empty repository after a second read and copies again (ruling 281).
+  the empty repository after a second read and copies again.
   A failed row's repository is deleted and copied again after 20 minutes
-  without the GitHub call (ruling 289). The 20 minutes count from the
+  without the GitHub call. The 20 minutes count from the
   repository's creation in Forgejo, and failed rows join the 7-day purge.
-  factoryd's egress gained api.github.com on 443. It landed at 764 lines
-  (ruling 290) as d164d78 at 23:58:06Z. Live check passed at 08:38Z. The
+  factoryd's egress gained api.github.com on 443. It landed at 764 lines,
+  past the bound only by its review rounds, as d164d78 at 23:58:06Z. Live
+  check passed at 08:38Z. The
   project sqlite-import from github.com/sqlite/sqlite (577 MB) read
   "copying github.com/sqlite/sqlite since 2026-10-12 08:36 UTC" at
   08:36:45Z. While the copy ran, uptime and uptime2 reconciled at
@@ -4806,7 +4795,7 @@ landed, and its live check:
   08:36:54Z, and main CI's spawn for 13498f6 went on at 08:37:40Z. The
   copy ended at 08:37:52Z after 67 s, and the next pass finished the
   project by 08:38:14Z.
-- 4.9, template updates (controller under ruling 293, roll #475, factoryd
+- 4.9, template updates (controller, roll #475, factoryd
   ded772426685 at 05:3xZ): a template pass 5 minutes after the start,
   hourly and on each new config version compares each project's
   `.forgejo/` files and `deploy/smoke.sh` with the template's render, and
@@ -4816,9 +4805,9 @@ landed, and its live check:
   token can write and the template's `job-env-audit` refuses that.
   `deploy/smoke.sh` comes only when main lacks it. A pull request that no
   longer merges merges main in, and a person's close without a merge
-  stands until the render changes (ruling 296). The pass writes only
-  `.forgejo/` and `deploy/`. It landed at 869 lines (ruling 290) as
-  4e4a0ef at 01:01:18Z. Live check passed at 06:28Z: the pass opened
+  stands until the render changes. The pass writes only
+  `.forgejo/` and `deploy/`. It landed at 869 lines, past the bound only
+  by its review rounds, as 4e4a0ef at 01:01:18Z. Live check passed at 06:28Z: the pass opened
   uptime/uptime#16 (`ci.yml` with the smoke job, `deploy/smoke.sh`) and
   hello-import/hello-import#1 (`deploy/base/`,
   `deploy/staging/kustomization.yaml`, `deploy/smoke.sh`). When infra
@@ -4827,15 +4816,15 @@ landed, and its live check:
   merged at 06:40:07Z (8740866). uptime#16 and hello-import#1 stay open
   for Sebastian, since uptime's default `smoke.sh` passes only if its
   staging answers `/healthz` and `/app/` with `id="root"`.
-- 4.10, schema copies (lane card #477, then the controller under rulings
-  258 and 303): `factoryd config check` validates against the schemas
+- 4.10, schema copies (lane card #477, then the
+  controller): `factoryd config check` validates against the schemas
   built into the binary. A stale copy exits 0 with a warning that names
   `factory/schema/`, and a foreign file exits 1. When factoryd's schemas
   differ from infra main's copies, the bot opens one infra pull request
   "Schema copies for <id>" from its fork, as a roll does. It cuts the
   branch fresh each time and closes an older one naming the new. The
   lane's PR #484 wrote with the projects token, which cannot reach infra
-  (ruling 164), because the controller's brief named that token. The
+  because the controller's brief named that token. The
   controller's build took the card's two commits and the review's eight
   points, and landed as 13498f6 at 08:29Z. Before the roll the controller
   regenerated the copies by hand once (infra 92d7173 at 06:57Z, with
@@ -4854,7 +4843,7 @@ landed, and its live check:
   closed #38 with "Closed by factoryd: #39 replaces it." The controller
   reviewed #39 and merged it at 09:37:33Z (7571239).
 - 4.11, every console page a chat tool (lane cards #478 and #483, then the
-  controller under ruling 306): #483's PR #485 added the reads, the writes
+  controller): #483's PR #485 added the reads, the writes
   and the parity test. The review found a hole: the chat's write tools
   (`release_resource`, `promote_resource`, `alert_verdict`) skipped the
   factory-writer check the pages make, and a test showed a writer of
@@ -4872,7 +4861,7 @@ landed, and its live check:
   addressed and sent back three minor ones, fixed in a98bcf0. It landed as
   7b380ca at 09:13:16Z (879b2dc and d879a3b by card #483, f0eafaf and
   7b380ca by the controller). Approval 490 of #483 was denied (reject),
-  naming the landed commits (ruling 306). Roll #488 (PR #489) was approved
+  naming the landed commits. Roll #488 (PR #489) was approved
   at 09:28Z (approval 493) and merged at 09:28:15Z in a session gap,
   factoryd 9657f451205b. Live check passed at 09:38Z on the factory's own
   chat, one turn for each new read, each answered from its tool. `alerts`
@@ -4891,10 +4880,10 @@ landed, and its live check:
   2.77, pulse 0.60, resource 0.02, tool 0.01 and settlement -3.46.
 - 4.12, the split (controller, roll #475): on a card whose large pull
   request waits for approval, an approver's Split or a confirmed
-  `split_card` runs a planner session (ruling 292). factoryd checks its
+  `split_card` runs a planner session. factoryd checks its
   answer: 2 or 3 cards, each size's line figure under `large_lines`,
   dependencies acyclic among the children, and every changed file covered
-  by a child's directories, where `.` covers nothing (ruling 277). A pass
+  by a child's directories, where `.` covers nothing. A pass
   files the children in lane ready and closes the card with "split into
   #a, #b". A failed check gets one more planner session, and a second
   failure escalates while the approval waits. Approve is refused while a
@@ -4915,12 +4904,12 @@ landed, and its live check:
   stays under 400". At 11:15:17Z the card escalated with "The split failed
   its check twice; approve, deny or split the pull request again." The
   cause is by construction. `internal/server/routes_status_test.go` alone
-  changed 458 lines, over the bound of 400 (ruling 301), and a split cuts
+  changed 458 lines, over the bound of 400, and a split cuts
   along files, so no split could meet it. The sizes a card may take (small
   300, medium 600, large 1000 lines) are fixed and not derived from the
-  bound (roadmap 159). The member approved #48 whole through the chat
-  (ruling 307), and it was done at 0.59 EUR. So the planner, the check and
-  the escalation ran live, and the children's landing was not seen live.
+  bound (roadmap 159). The member approved #48 whole through the chat,
+  and it was done at 0.59 EUR. So the planner, the check and the
+  escalation ran live, and the children's landing was not seen live.
   At 11:13:54Z, between two sessions of #48, factoryd logged one lease
   admission write refused as forbidden, since the previous session's
   namespace was being deleted. The next session ran, and no effect was
@@ -4936,16 +4925,15 @@ landed, and its live check:
   a plain line. Sync latest (`github_sync`) runs asynchronously, brings
   GitHub's default branch back as `github/sync-<sha>`, and the bot opens
   the Forgejo pull request from its fork. A GitHub head that changes
-  `.forgejo`, `.gitea` or `.github` is refused (rulings 90 and 100). git
-  runs inside factoryd (ruling 285), one operation at a time, with
+  `.forgejo`, `.gitea` or `.github` is refused. git
+  runs inside factoryd, one operation at a time, with
   low-memory settings, a 200 MiB cap before any fetch and a 4-minute pass
   deadline. The pod gained a 512Mi memory limit, a 1Gi /tmp emptyDir,
   `shareProcessNamespace` so the pause container reaps killed git
   helpers, and egress to github.com and api.github.com. The token travels
   in git's environment only. It landed as 5c3756b at 00:22:31Z. The
   export's token has no pull-request permission: GitHub answers `GET pulls`
-  with 403 "Resource not accessible by personal access token" (ruling
-  278). In the exit run at 08:07Z the chat set uptime2's export to
+  with 403 "Resource not accessible by personal access token". In the exit run at 08:07Z the chat set uptime2's export to
   `pull_requests` mode with no token in the chat, and the status line read
   "GitHub: 0 open pull requests". The push's live check passed at 09:29Z.
   #36 merged at 09:28:29Z (PR #42), and by 09:29:05Z the pass had pushed
@@ -4953,7 +4941,7 @@ landed, and its live check:
   its head 1ac02216aa43, PR #42's head. GitHub refused the pull request,
   and the card's GitHub line read "failed: factory/t-fe37611fcddb is on
   GitHub, but the export's token may not open pull requests: it needs the
-  permission "Pull requests: read and write"", as ruling 278 expected.
+  permission "Pull requests: read and write"", as expected.
   Sync latest's live check passed at 09:36Z. A commit 4bfef69 adding
   SYNC-CHECK.md went onto GitHub's main through the contents API at 09:29Z.
   The chat turn "GitHub's main has a new commit. Bring it into this
@@ -4975,9 +4963,9 @@ landed, and its live check:
   order as their own turns. The 30-second poll, the 3-second fallback and
   every client timer went. The stream's server heartbeat every 25 s reads
   the counters and sends a board event when a card's fingerprint or the
-  pulse's spend changes (ruling 288), and a reconnect reads the board
+  pulse's spend changes, and a reconnect reads the board
   once. A read-only board gets the stream with no rows. It landed at 1352
-  lines after two review rounds (ruling 294) as 1dedef6 at 00:20:02Z. Live
+  lines after two review rounds as 1dedef6 at 00:20:02Z. Live
   check passed. The before and after shots of uptime2
   (`board-shots/uptime2/20261012T010300Z-before414-cdp.png` and
   `20261012T0122Z-after414-cdp.png`) and their magnified crop pair
@@ -5007,7 +4995,7 @@ landed, and its live check:
   no fixture allowed it.
 
 The lane ran four cards on the factory's own code. The probe landed within
-its budget, ruling 271 triggered once, and no later card landed through
+its budget, the abort rule triggered once, and no later card landed through
 the lane, so the exit test's lane criterion failed. Stage 16's baseline
 was four frontier cards at about 4.7 EUR each, none landed.
 
@@ -5024,46 +5012,48 @@ was four frontier cards at about 4.7 EUR each, none landed.
   findings return a second time: 142 calls, 3.08 EUR in 20 minutes. It
   pushed, and the card stood at 4.85 EUR. The delta review left one point,
   a stale refresh token. The controller approved the pull request at 4.92
-  EUR of 5 and fixed that point itself (ruling 300). Outcome: landed within
+  EUR of 5 and fixed that point itself. Outcome: landed within
   its budget, with a controller follow-up.
-- #478 (4.11, large, 10 EUR, filed at 05:41Z under ruling 297): its first
+- #478 (4.11, large, 10 EUR, filed at 05:41Z): its first
   session on `coding-cheap` read 24 tool calls, got the supervisor's
   message, read 24 more, and the stuck rule ended it with `retry_stronger`
   after 2 min 59 s. The second session ran on `coding-frontier`: 25 calls,
   a median of 100,942 prompt tokens, 94 percent cached, 0.032 EUR a call
-  against the cheap tier's 0.0015. Ruling 271 triggered at 05:5xZ, and the
+  against the cheap tier's 0.0015. The abort rule triggered at 05:5xZ, and the
   controller closed the card at 1.38 EUR. The cause was factoryd's reading
   threshold `SUPERVISE_READING_WITHOUT_WRITING`, at its default of 24 and
   not set in `k8s/factoryd.yaml`: normal reading on a large card tripped
   the detector twice within minutes, and the stuck rule climbed the tier.
-  Ruling 298 set it to 60. Outcome: stopped.
+  The threshold was set to 60. Outcome: stopped.
 - #477 (4.10, medium, 5 EUR, filed at 05:41Z with #478): its first session
   ran on `coding-cheap` from 05:41Z to 07:27Z, changed 9 files with +1155
   -24, and ended on the stuck rule's `retry_stronger` at 07:27:38Z on the
   old threshold, two minutes before 60 went live. Its second session ran
-  on `coding-frontier` (ruling 302) and pushed PR #484 at 07:47Z at 2.17
-  EUR. The review asked for changes: the write half used the projects
+  on `coding-frontier`, continued since its cause was fixed, and pushed
+  PR #484 at 07:47Z at 2.17 EUR. The review asked for changes: the write
+  half used the projects
   token, which cannot reach infra, because the controller's brief named
   it, and about half the lines were dead or duplicated. The controller
-  closed the card at 2.22 EUR under ruling 258 and built 4.10 from its two
-  commits. Outcome: closed, its work carried on by the controller.
+  closed the card at 2.22 EUR, its remaining budget unable to cover the
+  review's list, and built 4.10 from its two commits. Outcome: closed,
+  its work carried on by the controller.
 - #483 (4.11 again, large, 10 EUR, filed at 07:29Z): its first session on
   `coding-cheap` (07:33Z to 08:12Z) got the supervisor's message at 60
   reads twice, changed 9 files with +938, and ended on the stuck rule's
   `retry_stronger` after a flip-flop on `chat_page_tools.go`, a real
-  circle of writes. Its second session ran on `coding-frontier` (ruling
-  304) and pushed PR #485 at 08:35Z at 3.45 EUR: 0.71 cheap, about 2.65
+  circle of writes. Its second session ran on `coding-frontier` and pushed
+  PR #485 at 08:35Z at 3.45 EUR: 0.71 cheap, about 2.65
   frontier and 0.10 supervisor. The review found ten points, one of them a
   security hole (4.11 above). Outcome: not merged. The controller built
   its points and landed them as 7b380ca, and approval 490 was denied
-  naming the landed commits (ruling 306). The card ended at 4.40 EUR:
+  naming the landed commits. The card ended at 4.40 EUR:
   0.71 cheap, about 2.65 frontier, 0.10 supervisor and about 0.94 for its
   review gate.
 
-Ruling 299 set the policy's `stronger_after` from 1 to 3, the session cap,
-so returning findings no longer climb a card. With ruling 298 both
-automatic climbs that cost Stage 16 and this round are closed, and the
-frontier tier comes only through `retry_stronger`.
+The round set the policy's `stronger_after` from 1 to 3, the session cap,
+so returning findings no longer climb a card. With the reading threshold
+at 60, both automatic climbs that cost Stage 16 and this round are closed,
+and the frontier tier comes only through `retry_stronger`.
 
 Spend: the gateway ledger since 2026-10-11 22:40Z, all of it on
 2026-10-12, holds 19.28 EUR for the round. The factory's own code took
@@ -5158,97 +5148,96 @@ At 01:15Z Sebastian asked whether the card's information hierarchy from
 the UX conversation is built. It is planned and built in part. Roadmap 177
 holds the spec and the gap, first for the next round (docs ad1dc96).
 
-The round's rulings, in the ledger:
+The round's rulings:
 
-- 272. The token rotation was not done, so the re-seed is skipped, both
+- The token rotation was not done, so the re-seed is skipped, both
   mirror paths keep the current token, 4.5's code half is built as
   planned, and the rotation goes first in the summary for Sebastian.
-- 273. The repository map comes from the card's directories, from its plan
+- The repository map comes from the card's directories, from its plan
   row or a hand-filed `Directories:` line. A card without them gets no
   map. The map holds at most 4 KiB.
-- 274. The gateway's hold calibrates from the task's earlier call on the
+- The gateway's hold calibrates from the task's earlier call on the
   same alias: tokens = bytes x its prompt tokens / its bytes, up to its
   prompt tokens at the cache-read price, the rest at the input price, plus
   25 percent. The first call keeps the byte bound.
-- 275. The cost line shows EUR per call, the ledger's currency, not the
+- The cost line shows EUR per call, the ledger's currency, not the
   plan's USD.
-- 276. `console_sessions` also stores the member's Forgejo access and
+- `console_sessions` also stores the member's Forgejo access and
   refresh tokens, AES-256-GCM under a key derived from the console's
   session key, since a session without them cannot make the member's reads
   after a roll.
-- 277. The member's confirmed `split_card` or the Split button is the
+- The member's confirmed `split_card` or the Split button is the
   split's acceptance. A deterministic check reads the planner's answer: 2
   or 3 children, each under `large_lines`, dependencies acyclic, every file
   covered. One retry, then an escalation.
-- 278. 4.13 is built whole. Its live check reaches the branch push only,
+- 4.13 is built whole. Its live check reaches the branch push only,
   and the GitHub pull request step needs the rotated token with "Pull
   requests: read and write".
-- 279. The gateway refuses an agent's call whose alias differs from the
+- The gateway refuses an agent's call whose alias differs from the
   task's `model_alias`. factoryd's own identities keep theirs.
-- 280. A new file change is a content hash not yet seen in the session. A
+- A new file change is a content hash not yet seen in the session. A
   write back to a content seen before does not reset the nudge count.
-- 281. GitHub decides an import's empty source, not time. A 409 "Git
+- GitHub decides an import's empty source, not time. A 409 "Git
   Repository is empty" is an empty source, seeded whole. A commit means a
   cut or refused copy: the empty repository is deleted as admin and copied
   again. A migrate's 409 never leads to a delete.
-- 282. Never issued. The numbers went from 281 to 283, a skipped number,
-  not a lost ruling.
-- 283. The step line shows no EUR, since opencode's step cost is always 0.
+- The step line shows no EUR, since opencode's step cost is always 0.
   The median of an even count is the lower middle value.
-- 284. 4.1a lands whole at about 780 lines, over the bound of about 700,
+- 4.1a lands whole at about 780 lines, over the bound of about 700,
   since the alias pin joined it after the build.
-- 285. git stays in factoryd, bounded by one git operation at a time,
+- git stays in factoryd, bounded by one git operation at a time,
   low-memory settings, a size cap before any fetch and a 512Mi memory
   limit. Sync latest runs asynchronously.
-- 286. A pull request's smoke job gets a pod for at most one tick inside
+- A pull request's smoke job gets a pod for at most one tick inside
   the `pr-untrusted` egress, since Forgejo 15's job listing names no run,
   event or ref.
-- 287. 4.4 rolls only after every staging project carries the template's
+- 4.4 rolls only after every staging project carries the template's
   smoke job on `<project>-smoke`. If the lane's 4.9 is late, the controller
   builds it.
-- 288. No client timer. The stream's server heartbeat reads the counters
+- No client timer. The stream's server heartbeat reads the counters
   and sends a board event when a card's fingerprint or the pulse's spend
   changes. `session_said` triggers no counters read.
-- 289. A failed import row's repository is deleted and copied again after
+- A failed import row's repository is deleted and copied again after
   20 minutes without asking GitHub. Only pending and copying rows ask
   GitHub.
-- 290. A branch pushed past the bound of about 700 lines only by its review
+- A branch pushed past the bound of about 700 lines only by its review
   rounds lands whole.
-- 291. The reproduction gate runs without the agents' shared cache: a fresh
+- The reproduction gate runs without the agents' shared cache: a fresh
   Go and npm cache in its own emptyDir, PATH without `/cache`, `/bin/sh`
   by its absolute path.
-- 292. A split is an approver's action, since it files cards that spend.
-- 293. The controller builds 4.9, since it gates 4.4's roll. The lane takes
+- A split is an approver's action, since it files cards that spend.
+- The controller builds 4.9, since it gates 4.4's roll. The lane takes
   the probe, then 4.10 and 4.11.
-- 294. 4.14 lands whole at 1352 lines, its stream work in a commit of its
+- 4.14 lands whole at 1352 lines, its stream work in a commit of its
   own.
-- 295. The landing order for 4.4, revising 287: 4.9 rolls, infra's
+- The landing order for 4.4, revising the order above: 4.9 rolls, infra's
   template moves the smoke job to `<project>-smoke`, the Template update
   pull requests merge, then 4.4 rolls.
-- 296. A human's close of a Template update pull request stands until the
+- A human's close of a Template update pull request stands until the
   template's render changes.
-- 297. The next lane cards are filed before the probe's merge, since the
+- The next lane cards are filed before the probe's merge, since the
   probe showed the healthy pattern and its pull request waited only on the
   human gate.
-- 298. factoryd's reading threshold goes from 24 to 60: a message at 60
+- factoryd's reading threshold goes from 24 to 60: a message at 60
   reads, the climb at 120.
-- 299. The policy's `stronger_after` goes from 1 to 3, the session cap, so
+- The policy's `stronger_after` goes from 1 to 3, the session cap, so
   returning findings never climb a card.
-- 300. The probe's pull request merges at 4.92 EUR of 5, and a controller
+- The probe's pull request merges at 4.92 EUR of 5, and a controller
   follow-up fixes its last review point before the roll that carries it.
-- 301. `risk.large_lines` goes from 1000 to 400 for the exit test only, so
+- `risk.large_lines` goes from 1000 to 400 for the exit test only, so
   the split runs live. The close restores 1000.
-- 302. #477's frontier session continues, since its cause is fixed and its
+- #477's frontier session continues, since its cause is fixed and its
   work mostly done. The controller closes it past 4 EUR without a push.
-- 303. The schema-copies pull request comes from the bot's fork of infra,
-  as a roll's does. Ruling 164 stands.
-- 304. #483's frontier session continues. The controller closes it past 7
+- The schema-copies pull request comes from the bot's fork of infra,
+  as a roll's does. The factory-projects bound stands: it owns the project
+  organisations and holds nothing in sf.
+- #483's frontier session continues. The controller closes it past 7
   EUR without a push.
-- 305. The alert card #479's PR #480 is rejected.
-- 306. PR #485 is not merged with a known security hole. The controller
+- The alert card #479's PR #480 is rejected.
+- PR #485 is not merged with a known security hole. The controller
   builds every review point on its commits and credits the card. The
   card's approval is then denied, naming the landed commit.
-- 307. #48 is accepted as one pull request, since its review approved it,
+- #48 is accepted as one pull request, since its review approved it,
   and no second large card is filed. The split's planner, check and
   escalation ran live, and the children's filing is the plan's filing,
   which the exit run showed live. The children's landing after a split
@@ -5259,16 +5248,14 @@ Findings:
 - The Stage 16 figure of 250 to 490 thousand input tokens a call was the
   gateway's 402 text counting body bytes (4.1a).
 - The gateway let an agent call any alias its class lists, so an agent
-  could call `coding-frontier` itself. Fixed in the round (ruling 279).
+  could call `coding-frontier` itself. Fixed in the round.
 - Every CI pod mounted the shared cache with `/cache/go/bin` first on PATH,
   while the pod commands named their binaries bare, a hole older than the
-  round. Fixed in the round (4.4, ruling 291).
+  round. Fixed in the round (4.4).
 - Forgejo 15.0.9 keeps the repository when it refuses a migrate, so a
-  failed import was never copied again. Fixed in the round (4.8, rulings
-  281 and 289).
+  failed import was never copied again. Fixed in the round (4.8).
 - Two automatic climbs moved lane cards to the frontier tier: the reading
-  threshold of 24 and `stronger_after: 1`. Fixed in the round (rulings 298
-  and 299).
+  threshold of 24 and `stronger_after: 1`. Fixed in the round.
 - Every push to main cancels the running main CI (runs 1427, 1428 and 1429
   were cancelled), so a roll waits for the newest run, and landings in a
   row delay it. The controller held landings until the newest run was
@@ -5284,12 +5271,12 @@ Findings:
   template pass opened three pull requests at once. Its PR #480 raised
   `CI_MAX_CONCURRENT` from 8 to 12 with no capacity evidence: the requests
   fit, but limits of 12 x 4 GiB = 48 GiB do not fit on 3 x 15 GiB nodes
-  (ruling 305, roadmap 181).
+  (roadmap 181).
 - A checkpoint fails when a file goes away during `git add -A`: #36's
   worker logged "fatal: unable to stat internal/sqlite/dbg34_test.go" at
   08:24:51Z (roadmap 182).
 - The export's GitHub token has no pull-request permission and was not
-  rotated (rulings 272 and 278, roadmap 148 and 163).
+  rotated (roadmap 148 and 163).
 - The chat answered a question about a card's current cost from a tool
   result 64 minutes old in its history instead of reading again, misread
   2 (roadmap 180).
@@ -5301,7 +5288,7 @@ Findings:
   judged (roadmap 184).
 - The lane's PR #485 gave the chat write tools that skipped the
   factory-writer check, while the card's brief stated that check in
-  prose (ruling 306, roadmap 185 and 186).
+  prose (roadmap 185 and 186).
 - The `costs` read by card covers the month only, with no window for
   today (roadmap 158).
 - The pull requests the factory opens outside a card (Sync from GitHub,
@@ -5311,7 +5298,7 @@ Findings:
   uptime#16 and hello-import#1 stayed open all round (roadmap 187).
 - A split cannot meet the bound when one file alone is over it, and the
   sizes a card may take are fixed, not derived from the bound (4.12,
-  ruling 307, roadmap 159).
+  roadmap 159).
 - The lease admission wrote into an agent namespace that was being
   deleted, once, with no effect seen (4.12, roadmap 188).
 
@@ -5394,7 +5381,7 @@ Item 159 holds the live split's result and its two open defects.
 ### Stage 18: the lane works
 
 Planned on 2026-10-12 from the roadmap's Next after Stage 17's close. The
-spec is the ledger's proposal-stage18.md. The goal, Sebastian's word of
+goal, Sebastian's word of
 2026-10-12: finish what Stage 17 started and build the fixes it found, no
 new features, and above all the factory's agents build the factory's own
 changes within budget, with the controller only planning, reviewing and
@@ -5405,21 +5392,21 @@ The round rebuilt the cluster from Stage 17's backups first: generation
 v14 from v13's close backup, re-seeded, the export re-set, policy 530 at
 open (caps raised for the round: day 60, month 160.07, LiteLLM 79.35).
 
-The controller built the lane's preparation (ruling 257's shape, Opus
-implementer, second Opus review, controller reads the fix diff, land,
-roll): the validating plan tool that bounds every card at filing against
+The controller built the lane's preparation (Opus implementer, second
+Opus review, controller reads the fix diff, land, roll): the validating
+plan tool that bounds every card at filing against
 `large_lines` and answers the planner in-session (184, with 178), the one
 access table every route and chat tool declares into, with the generic
 non-writer write test (185), the briefs' prose rules moved into checks
 and tools (186), and the factory's own project taking a spec through the
 chat like any project (160, with the planner filing the round's ten
-plans). Ruling 310 measured the model per class and confirmed the live
+plans). The model per class was measured and confirmed the live
 assignment: planner on coding-frontier at 0.190 EUR a card, coder on
 coding-cheap at 0.086 to 0.134.
 
 The probe doubled as the checkpoint tolerance fix (182): three cards
 through the planner, the fix landed and rolled at 0.134 EUR for the
-integration card, one escalation answered by ruling (a verify-only card
+integration card, one escalation answered by decision (a verify-only card
 lands its verification as a test). Then the lane's ten plans (27 cards)
 ran as the exit test.
 
@@ -5434,7 +5421,7 @@ the trip was the provider), approved the merges, and the exit test
 closed: the probe and 17 lane cards landed at 0.019 to 1.24 EUR, ten
 root plans on their first attempt, no controller rebuild of any card, no
 budget 402 beyond the one uptime2 card named at 17:00Z on 12 October, and
-ruling 271 never triggered. The criterion Stage 17 failed was met.
+the abort rule never triggered. The criterion Stage 17 failed was met.
 
 The outage froze what only model steps could finish: the chat's fixes
 (180 fresh reads, 183 tell-card, 179 batched answers, 187 orphan-pull-
@@ -5460,13 +5447,12 @@ The round closed under the outage's two-hour rule: caps restored (day
 spawner and swept before the backups (the controller's sweep, since the
 lane's own card 3.15 was frozen), backup sf-cluster-stage18-close in
 generation v14, cluster.yaml archive v15, `tofu destroy`, every Hetzner
-project at zero. The unfinished items are listed first in
-stage18-summary.md.
+project at zero. The unfinished items are listed first in the round's
+summary.
 
 ### Stage 19 and the restart round: the roadmap items that landed
 
-The ledger's stage19-summary.md, restart-round-report.md and progress.md
-hold both rounds. The roadmap's prune of 2026-10-14 checked every item
+The roadmap's prune of 2026-10-14 checked every item
 against the code's main and removed these, built unless the line says
 otherwise. Code commits unless named infra.
 
@@ -5479,8 +5465,9 @@ otherwise. Code commits unless named infra.
   failing on main" (a144b29). 196 the roll guard tests ancestry
   (334f4e5), and a roll takes no queue turn (2efb5bf).
 - 206 tokens and modeled cost per call and task (c5301da). 207 the GLM
-  Coding Plan trial: the switch landed (infra fe5ddf1) and ended under
-  ruling 325 when the quota ran out (infra 34642d6).
+  Coding Plan trial: the switch landed (infra fe5ddf1) and ended when the
+  quota ran out, the factory moving back to DashScope and heavy work local
+  (infra 34642d6).
 - 208 a verification card closes on its acceptance evidence (dd3bba7).
   209 a merge approval only on a green staged head (277c727). 210 the
   console's fund action (9c27211). 215 the attempt's budget floor
@@ -5507,7 +5494,7 @@ otherwise. Code commits unless named infra.
 
 ### The night of 2026-10-14 to 15: the roadmap items that landed
 
-The ledger's progress.md holds the steps. Code commits unless named
+Code commits unless named
 infra.
 
 - 244 a needs-you card shows the question and a pointer, not the
@@ -5592,7 +5579,7 @@ infra.
 
 ### The day of 2026-10-15: the roadmap items that landed
 
-The ledger's progress.md holds the steps. Code commits unless named
+Code commits unless named
 infra.
 
 - 42 the worker probes its sandbox's egress before the agent starts:
@@ -5640,7 +5627,7 @@ infra.
   ($178.83 of its $200 budget spent in October, a test card costs about
   0.01 EUR), z.ai serves heavy work while its quota lasts and the local
   session between, and a provider's budget refusal waits on the
-  provider-wait gate (ruling 267) with a named card.
+  provider-wait gate with a named card.
 - 240 a session the day cap refused names the refusal, counts no
   attempt when refused at its first call, and the card waits until the
   day's free headroom funds a session (checked every 5 minutes) or the
@@ -5836,7 +5823,7 @@ infra.
 
 ### 2026-10-16 to 2026-10-25: the roadmap items that landed
 
-The ledger's progress.md holds the steps. Code commits unless named
+Code commits unless named
 infra. The roadmap was pruned on 2026-10-28, and these are the records
 of the items that left it then. Where an item keeps an open part, the
 roadmap item that holds it is named.
@@ -5971,7 +5958,8 @@ roadmap item that holds it is named.
   `requires: [factory/roll]` with a 24 h stall, one slider with four
   positions (manual, assisted, autonomous, full auto), mechanical sources
   merging on green at auto, the high class merging at full auto with the
-  audit's pass (amending rulings 76, 77 and 109), forbidden and
+  audit's pass (amending the standing merge contracts of Stages 5 to 7),
+  forbidden and
   migration keeping a human, the discretionary pool and the `fund` tool,
   the gate bot factory-gate posting the approval the gate decided (R59
   to R64), the infra chain through Flux commit statuses (code 7a670a96,

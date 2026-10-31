@@ -89,7 +89,7 @@ output. The pod is the division of roles made concrete:
 - **The confinement is the session machinery.** The pod runs where task
   pods run: gVisor, restricted pod security, no root, read-only root
   filesystem, the Cilium egress policy. No shared project cache mount,
-  the way reproPodSpec refuses it (ruling 291): the cache is a write
+  the way reproPodSpec refuses it: the cache is a write
   surface between sessions, and a research pod builds cold in its own
   emptyDir.
 - **It runs on the project's image**, resolved the way the sandbox-images

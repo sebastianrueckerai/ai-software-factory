@@ -143,8 +143,8 @@ surface.
   [chat-new-tools-plan-2026-10-31.md](chat-new-tools-plan-2026-10-31.md)
   builds it on this plan's wrapper. The one-shot digest stays this
   plan's own rung.
-- Any change to the chat's own model, the premium fallback chain
-  (ruling 329), or the replay elision of plain reads.
+- Any change to the chat's own model, the premium fallback chain,
+  or the replay elision of plain reads.
 - Web tools for projects without a chat: the doors sit on the chat task.
 - Every gap named under "The jobs this touches", and the chat task's
   monthly cap.
@@ -167,8 +167,9 @@ surface.
 
 Sebastian 2026-10-31 (the cost ask: "let it use lower grade subagents
 for things like info summary"; "the factory agent should be able to
-search the web"; "the rest sounds good"). The premium class, rulings 328
-and 329. Roadmap 300 (documents read by tools, never from context; the
+search the web"; "the rest sounds good"). The premium class decisions of
+2026-10-29 (the third text class, the fallback to big). Roadmap 300
+(documents read by tools, never from context; the
 subagent summariser). The 2026-10-19 documents session (the summariser,
 priced replay). chat-research-design-2026-10-19 (the context discipline
 the ask parameter extends). architecture 5.7 (the operator model). The

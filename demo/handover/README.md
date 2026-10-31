@@ -9,7 +9,7 @@ Written 21 October 2026 at the end of the session that designed and built the ba
 - [factory-bugs.md](factory-bugs.md): three defects of the factory found on the way, as card texts to file.
 - [research-procedural-video.md](research-procedural-video.md): the research on making 2D explainer clips from code.
 
-The design document is [docs/superpowers/specs/2026-10-20-demo-scenes-design.md](../../docs/superpowers/specs/2026-10-20-demo-scenes-design.md), the plan [docs/superpowers/plans/2026-10-20-demo-scenes.md](../../docs/superpowers/plans/2026-10-20-demo-scenes.md). The execution ledger with every review and fix round is `.superpowers/sdd/2026-10-20-demo-scenes/progress.md` in the main checkout (gitignored, about 140 lines; the task reports and review packages sit beside it).
+The design document is [docs/superpowers/specs/2026-10-20-demo-scenes-design.md](../../docs/superpowers/specs/2026-10-20-demo-scenes-design.md), the plan [docs/superpowers/plans/2026-10-20-demo-scenes.md](../../docs/superpowers/plans/2026-10-20-demo-scenes.md). The execution ledger with every review and fix round is gitignored in the main checkout (about 140 lines; the task reports and review packages sit beside it).
 
 ## The purpose
 

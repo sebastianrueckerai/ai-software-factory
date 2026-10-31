@@ -1,6 +1,6 @@
 # Plan: notifications on Telegram and Discord
 
-Ruled 2026-10-17. This is the messenger part of roadmap item 145. A member connects Telegram or Discord once and sets a level per project. The factory then sends each notification that pulls the member back in as one line with a link to the card. Decisions 1 to 3 below are Sebastian's rulings of 2026-10-17, the inbound path is his ruling of 2026-10-14, and decisions 4 and 5 stand as drafted.
+Ruled 2026-10-17. This is the messenger part of roadmap item 145. A member connects Telegram or Discord once and sets a level per project. The factory then sends each notification that pulls the member back in as one line with a link to the card. Decisions 1 to 3 below are Sebastian's decisions of 2026-10-17, the inbound path is his decision of 2026-10-14, and decisions 4 and 5 stand as drafted.
 
 ## What and why
 
@@ -36,7 +36,7 @@ A repeat counts on its inbox row and sends nothing new. Routine agent activity n
 
 The poke writer sends a row to the project file's `notify` list, else to the project's approvers. That stays. A member whose effective level for a project is needs you or all joins the recipients of that project's rows, so their inbox holds every row their messenger gets. A member of the notify list keeps their inbox rows whatever their level: the level stops the messenger, never the inbox.
 
-A member sets a level only for a project they can read in the console. The sender checks access again before each send. Forgejo's per-user permission endpoint refuses every token but a site admin's (rulings 101 and 101a), so the sender re-derives access with the tokens the factory already holds, the org-read token and the project's read token, through the `RepoWriters` composition (`internal/factoryd/forgejo.go:308`), which fails closed. A member counts as a reader when the composition grants them write: members are Forgejo writers (ruling 254), and finer read roles wait on item 149. The result is cached for 10 minutes. A member who lost access loses the level, and the console says so.
+A member sets a level only for a project they can read in the console. The sender checks access again before each send. Forgejo's per-user permission endpoint refuses every token but a site admin's, so the sender re-derives access with the tokens the factory already holds, the org-read token and the project's read token, through the `RepoWriters` composition (`internal/factoryd/forgejo.go:308`), which fails closed. A member counts as a reader when the composition grants them write: members are Forgejo writers, and finer read roles wait on item 149. The result is cached for 10 minutes. A member who lost access loses the level, and the console says so.
 
 ## Connecting a messenger
 
@@ -116,7 +116,7 @@ A notifications panel holds the member's connections (connect, disconnect, and w
 
 ## Reuse
 
-The unlanded push work of 2026-10-14 is saved in the ledger as `push-slice-145.patch` (871 lines). It brings the HTTP call with the token scrub, the Telegram and Discord senders, a binding table, the k8s secret env and the egress. Its senders change from choice buttons to one link button. Its answer path (`AnswerPushed`) is not needed under decision 2. Its egress lacks the DNS `matchName` entries.
+The unlanded push work of 2026-10-14 is saved as `push-slice-145.patch` (871 lines). It brings the HTTP call with the token scrub, the Telegram and Discord senders, a binding table, the k8s secret env and the egress. Its senders change from choice buttons to one link button. Its answer path (`AnswerPushed`) is not needed under decision 2. Its egress lacks the DNS `matchName` entries.
 
 ## Why no chat over the messengers
 

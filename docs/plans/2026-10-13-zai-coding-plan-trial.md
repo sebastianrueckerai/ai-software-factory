@@ -12,7 +12,7 @@ Sebastian's decision of 2026-10-13: try the factory's coding sessions on his z.a
 
 ## Money without prices
 
-- Real bill: the plan fee. Pools: 28,000 credits per 5 hours, 140,000 per week (Max). Exhaustion is a hard stop; the error is a 429 (code 1113), which parks by ruling 316 at no spend. Peak window 06:00 to 10:00 UTC on weekdays; everything else costs half.
+- Real bill: the plan fee. Pools: 28,000 credits per 5 hours, 140,000 per week (Max). Exhaustion is a hard stop; the error is a 429 (code 1113), which parks at no spend. Peak window 06:00 to 10:00 UTC on weekdays; everything else costs half.
 - Modeled money: LiteLLM prices every call at pay-as-you-go rates and the gateway books them USD to EUR 1:1 as today. Every cap, hold, alert, settle and per-key maxBudget keeps working on modeled figures. The ledger's meaning changes, not its mechanics: EUR is what the call would cost without the plan.
 - Conversion at the lane's measured call shape (mean 72,433 prompt tokens, 94 percent cached): a frontier call is about 17 credits, a flash call about 5.6; a frontier session of about 200 calls about 3,400 credits, a cheap session of 335 calls about 1,600 (item 160's shapes). A card draws roughly 1,000 to 2,500 credits, 4 to 9 percent of a 5-hour pool. These are estimates; the probe card measures the real draw.
 - Tokens per task are the primary fact (roadmap 206, landed first).
@@ -48,7 +48,7 @@ close. The handover (ledger, handover-next-round.md) carries the window's rules.
 
 ## Known losses under GLM
 
-The DashScope-specific refusal strings (content filter, repetitive calls) will not match GLM error bodies: those land as generic upstream refusals, still parked by ruling 316 with a less specific reason. The `reasoning_content` interleaved field the worker config expects may differ; harmless if absent.
+The DashScope-specific refusal strings (content filter, repetitive calls) will not match GLM error bodies: those land as generic upstream refusals, still parked with a less specific reason. The `reasoning_content` interleaved field the worker config expects may differ; harmless if absent.
 
 ## Not in this trial
 

@@ -454,8 +454,9 @@ positions say "money beyond a card's budget" where they say "money".
    at the head, or by a recorded fault, or by the review's criteria verdicts
    all met for a feature card. High merges at full auto on the same proof
    with the audit pass required, and stays human below full auto. Forbidden
-   and migration are human at every position. This reverses rulings 76, 77
-   and 109 for the high class at full auto only (Sebastian, 2026-10-20): a
+   and migration are human at every position. This reverses the standing
+   merge contracts of Stages 5 to 7 for the high class at full auto only
+   (Sebastian, 2026-10-20): a
    click without reading is no control, the audit and the pinned mirror are.
 2. **The factory's own mechanical change.** No risk class. A pull request
    factoryd wrote (source roll, revert, template update, schema copy,

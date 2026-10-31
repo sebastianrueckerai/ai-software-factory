@@ -23,7 +23,7 @@ The cards by kind:
 |---|---|
 | Real work cards, agent sessions | #911, #920, #921, #939, #940, #941, #953 (7) |
 | Probes and live checks filed by the build | #925, #927, #930, #936, #937, #959 (running) |
-| Roll cards (no model call, ruling 178) | #912, #916, #918, #923, #928, #932, #934, #942, #946, #949, #951, #955, #957 (13) |
+| Roll cards (no model call) | #912, #916, #918, #923, #928, #932, #934, #942, #946, #949, #951, #955, #957 (13) |
 | Infra repository cards, no spend | #78, #79, #82, #83 |
 | Screening report tasks, no issue | `t-8f13ccc787b0`, `t-d2a03c2aba0d`, `t-6a3be80b6616` |
 
@@ -129,7 +129,7 @@ No finding reached a check-in confirm or drop in the batch: the confirm/drop pat
 
 **The agent.** No budget refusal exists in the batch (the `audit` table holds no `refused`, `held` or `cancelled` row in the window), so the push-before-refusal and warning questions have nothing to measure: every real card pushed well inside its 5 EUR budget. The repetition detector stopped three reading sessions (60 to 98 tool calls without a file change) at 0.6 to 0.8 EUR each, and every next session pushed. The wait-tool question is not answerable from this data: the timelines' digests aggregate commands, and the session transcripts are not in the bucket.
 
-**The review.** Fifteen real reviews (roll cards skip it by ruling 178): 7 `approve`, 8 `concerns`. Multi-round cards dropped old findings with reasons instead of repeating them: six drop records, kinds `uncalled` and `undefined`, one to three per re-review. Ten findings were adjudicated by the human approving over them (#941: 5, #937: 4, #921: 1).
+**The review.** Fifteen real reviews (roll cards skip it): 7 `approve`, 8 `concerns`. Multi-round cards dropped old findings with reasons instead of repeating them: six drop records, kinds `uncalled` and `undefined`, one to three per re-review. Ten findings were adjudicated by the human approving over them (#941: 5, #937: 4, #921: 1).
 
 Two adjudicated findings were re-judged for this file, evidence repeated at the merge commits:
 

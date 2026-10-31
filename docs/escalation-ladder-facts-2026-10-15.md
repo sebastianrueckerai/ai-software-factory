@@ -69,7 +69,7 @@ All five merged between 14:15 and 14:48. Every merge needed a human, because thi
 
 6. **The briefs.** The issue bodies of #836 to #840.
 
-7. **The controller's log.** The gitignored ledger `.superpowers/sdd/2026-09-24-build-plan/progress.md` on the controller's machine, the entries of 2026-10-15 from "batch of five filed" on.
+7. **The controller's log.** The gitignored build ledger on the controller's machine, the entries of 2026-10-15 from "batch of five filed" on.
 
 The factoryd logs of that afternoon are gone with its restarts.
 

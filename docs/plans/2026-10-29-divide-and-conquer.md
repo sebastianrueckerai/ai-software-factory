@@ -32,7 +32,7 @@ Most cards carry no size. Of 478 direct cards in the code repository since 2026-
 
 ### 1.2 What "size large always goes through the plan track" meant
 
-new_card would refuse a card of size large on the direct track and point the filer to the plan track. It was the narrow version of Sebastian's ruling of 2026-10-28. His wish now is wider: every change that is not obviously small goes through the planner. Piece A does that.
+new_card would refuse a card of size large on the direct track and point the filer to the plan track. It was the narrow version of Sebastian's decision of 2026-10-28. His wish now is wider: every change that is not obviously small goes through the planner. Piece A does that.
 
 ### 1.3 How the factory checks the whole today
 
@@ -57,7 +57,7 @@ The runway was not the missing fact. The missing fact was how much work the card
 
 ### 1.5 Are sessions restarted too quickly?
 
-#1287's three restarts all came from faults fixed in roll #1303: the stuck rule ended a session without the check-in, and the per-card call cap sent every later trip to a person. Under Ruling 327 every trip goes to the check-in, whose default answer is a message into the running session.
+#1287's three restarts all came from faults fixed in roll #1303: the stuck rule ended a session without the check-in, and the per-card call cap sent every later trip to a person. Every trip now goes to the check-in, whose default answer is a message into the running session.
 
 A session still ends in three cases:
 
@@ -146,7 +146,7 @@ The coder's ask and the size trip go to the check-in first, which decides `repla
 
 **A cut throws no work away.** The work on the branch is pushed at the stop and becomes the start of the first new card. That card finishes what the branch holds, makes it build green and lands it. The planner plans only the rest as further cards. The cut changes how the remaining work is packaged, not what was done.
 
-**The merge gate is too late for a cut.** Today a pull request over 1,000 changed lines is class large and waits for a person. The person may approve it whole or split it (ruling 277). A split at that point does not redo the work. A planner cuts the finished diff into 2 or 3 cards, and each card carries over its files and hunks as a smaller pull request. It still costs a planner session and one session per new card. Its one live use failed: uptime2#48 changed 918 lines, and one test file alone held 458 lines. The split's own check refused that, because a new card's files must stay under its size's lines (400 then). The review could have read the file: one part holds 256 KiB, about 2,300 changed lines. The check was too strict, and it goes with the split.
+**The merge gate is too late for a cut.** Today a pull request over 1,000 changed lines is class large and waits for a person. The person may approve it whole or split it. A split at that point does not redo the work. A planner cuts the finished diff into 2 or 3 cards, and each card carries over its files and hunks as a smaller pull request. It still costs a planner session and one session per new card. Its one live use failed: uptime2#48 changed 918 lines, and one test file alone held 458 lines. The split's own check refused that, because a new card's files must stay under its size's lines (400 then). The review could have read the file: one part holds 256 KiB, about 2,300 changed lines. The check was too strict, and it goes with the split.
 
 So the cut happens while the card works, at the size trip (piece E), and the merge gate stops offering a split. The gate stays as a backstop that asks a person to approve or send back. With pieces A, B and E in place it fires only when the check-in let a card run past its bound. Its line figure is the policy's `large_lines`, already a setting (0 switches it off). It stays at 1,000 until fanned-out reviews (piece F) have proved themselves.
 
@@ -160,7 +160,7 @@ The cut runs in these steps:
 6. The children file with their dependencies. The first card starts from the branch's commit and lands what it holds: factoryd creates the new card's branch on the bot's fork at the old branch's head, and the card starts on it as a resumed session does. The sandbox needs no credential for that.
 7. The cut card is now the group's plan card and behaves as every plan card does today: it ends done once its children are filed, has no pull request of its own, and its rollup shows the group until `plan_closed`. It records "cut into #a, #b, #c at session N, X EUR spent". Its branch stays until the group closes. The group's members are the children.
 
-One way only: the split of ruling 277 (a large pull request at its approval gate) goes. Its planner check and its filing become the cut's.
+One way only: the merge-gate split (a large pull request at its approval gate) goes. Its planner check and its filing become the cut's.
 
 The cut is the replan of piece H, started by size.
 
@@ -171,7 +171,7 @@ A plan and its children form a group, named by the plan card. A direct card outs
 The rule: merged is not live. While a group is open on main, the factory holds whatever takes main to production. That is a different step in the factory and in a project:
 
 - **The factory's own code** goes to production only through a roll. While a group is open, the roller opens no roll.
-- **A project** deploys through its own CI (Ruling 146). The template ts-go rolls staging on every main run. Its `promote` job waits 15 minutes, asks the factory's alerts endpoint, and rolls prod when the factory answers no alert. The hold gets its own endpoint, not an alert, because the staging step waits on any alert from factoryd and the promote job fails red on any alert: `GET /projects/{name}/release` answers `{"held": true, "reason": "plan #N is open on main"}` or `{"held": false}`. The promote job asks it before its 15-minute wait and skips prod green while held. Staging still gets every merge, so the half-built feature shows there, which is what staging is for. Prod waits.
+- **A project** deploys through its own CI. The template ts-go rolls staging on every main run. Its `promote` job waits 15 minutes, asks the factory's alerts endpoint, and rolls prod when the factory answers no alert. The hold gets its own endpoint, not an alert, because the staging step waits on any alert from factoryd and the promote job fails red on any alert: `GET /projects/{name}/release` answers `{"held": true, "reason": "plan #N is open on main"}` or `{"held": false}`. The promote job asks it before its 15-minute wait and skips prod green while held. Staging still gets every merge, so the half-built feature shows there, which is what staging is for. Prod waits.
 
 **Proposed: the group hold.** It runs in these steps:
 
@@ -185,7 +185,7 @@ The rule: merged is not live. While a group is open on main, the factory holds w
    - A project's last main run rolls prod after its 15 minutes on staging. If that run's promote job already skipped, the factory runs it again. It already uses Forgejo's re-run API for stalled runs.
 7. The whole feature goes live at once.
 
-A project whose own CI does not ask the factory is not held. That stays its choice under Ruling 146. Projects seeded from an older template get the new promote job through a template-update card, which exists. Until it merges they are not held.
+A project whose own CI does not ask the factory is not held. That stays its choice. Projects seeded from an older template get the new promote job through a template-update card, which exists. Until it merges they are not held.
 
 The hold is per project. The infra project has no deploy step to hold: its merges go live within 30 seconds, so a group there is not held and its planner orders its cards. Rolls are pull requests of the code repository, so a code group holds them and nothing in infra.
 
@@ -383,7 +383,7 @@ The whole plan is built (Sebastian, 2026-10-29: "execute it"). Each step leaves 
 
 1. Piece A, the filing rule and the sizing step. It stops the next #1287 at the door.
 2. Pieces E and D, the size in the brief, the size trip, the pace and the working-state copy. They are cheap and independent.
-3. Pieces H and B, the replan path with its Replan button, the salvage branch and the group revert, and the cut as its size trigger. Close keeps unmerged work. It needs the planner to read branches, and it absorbs ruling 277's split.
+3. Pieces H and B, the replan path with its Replan button, the salvage branch and the group revert, and the cut as its size trigger. Close keeps unmerged work. It needs the planner to read branches, and it absorbs the merge-gate split.
 4. Piece C, the group hold, for the factory's roller and the template's promote job together, with both `groups` answers.
 5. Piece I, plans in rounds. It reuses piece H's replan.
 6. Piece F, the review fan-out. It is needed before any plan's whole diff grows past 768 KiB or 1 MiB.
@@ -408,4 +408,4 @@ Count these weekly from the database:
 4. **Issues without a size.** Decided 2026-10-29 by Sebastian: the sizing step (piece A) sizes every card a person or the chat files, sized or not.
 5. **The time limit.** Decided 2026-10-29 by Sebastian: 6 hours of held production, one clock. What the ask offers is piece H, under discussion.
 6. **What goes live when.** Decided 2026-10-29 by Sebastian: a plan goes live whole, through all its rounds, and overlapping groups go live together, to batch the slow rolls.
-7. **The budget of a sized card.** Decided 2026-10-30 by Sebastian: a small card gets 4 EUR, and the sizing sets the budget of a card that still holds its filing's budget. Before the decision the size set the budget: small 2, medium 5, large 10 EUR (ruling 266). Unsized cards get `task_default_eur`, 5 EUR today, and 442 of 478 direct cards since 2026-10-01 were unsized. Once every card is sized, a small card gets 2 EUR. Of 99 finished direct cards under 300 lines, 19 spent more than 2 EUR, 11 more than 3, 5 more than 4 and 2 more than 5.
+7. **The budget of a sized card.** Decided 2026-10-30 by Sebastian: a small card gets 4 EUR, and the sizing sets the budget of a card that still holds its filing's budget. Before the decision the size set the budget: small 2, medium 5, large 10 EUR. Unsized cards get `task_default_eur`, 5 EUR today, and 442 of 478 direct cards since 2026-10-01 were unsized. Once every card is sized, a small card gets 2 EUR. Of 99 finished direct cards under 300 lines, 19 spent more than 2 EUR, 11 more than 3, 5 more than 4 and 2 more than 5.

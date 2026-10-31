@@ -1,10 +1,10 @@
 # The ask tool's rename: `escalate_to_human` becomes `escalate`
 
-Written 2026-10-31. Status: all landed but the merge of code PR #1385 (branch factory/t-6eadec8912ab), which the project agent presses after the fund press on #1387 — infra 82ab246 on both remotes, the living docs and this status line, ruling 331 in the ledger. See "What still waits" below.
+Written 2026-10-31. Status: all landed but the merge of code PR #1385 (branch factory/t-6eadec8912ab), which the project agent presses after the fund press on #1387 — infra 82ab246 on both remotes, the living docs and this status line. See "What still waits" below.
 
 ## What still waits (added 2026-10-31, landed the same day)
 
-- Landed: the infra repo commit 82ab246 (factory/policy.yaml classes, the schema enum, the README mention), on both remotes inside the reconciliation window; the living docs (architecture, roadmap, target-architecture) and this status line; ruling 331 in .superpowers/sdd/2026-09-24-build-plan/progress.md — the plan's "ruling 326" was a stale number, 326 was taken 2026-10-23 and the ledger is outside every clone.
+- Landed: the infra repo commit 82ab246 (factory/policy.yaml classes, the schema enum, the README mention), on both remotes inside the reconciliation window; the living docs (architecture, roadmap, target-architecture) and this status line.
 - The one-line quote fix in docs/manual/policy.md (returned to the branch session).
 
 ## The decision
@@ -14,13 +14,12 @@ siblings (`request_info`, `request_tool`, `request_cut`). Who answers first is
 policy, and policy already overrides the name: at autonomous and full auto the
 project agent reads the ask before any human. The chat side already calls its
 same-shaped tool `escalate`. The stored vocabulary (`escalation`,
-`question_asked`) already avoids the route. The rename aligns all of them and
-becomes ruling 326.
+`question_asked`) already avoids the route. The rename aligns all of them.
 
 ## What the new copy says
 
-The name change reaches the worker through model-facing text. Ruling 263 keeps
-tool names out of the briefs, so descriptions, the manual and refusal texts are
+The name change reaches the worker through model-facing text. Tool names stay
+out of the briefs, so descriptions, the manual and refusal texts are
 the whole surface. Exact new wording:
 
 - Tool description, `internal/gateway/tools.go` beside `policy.ToolEscalate`:
@@ -93,9 +92,8 @@ agent reads and retries. No both-names shim.
    green.
 2. Infra repo, one commit: `policy.yaml`, the schema enum, the README lines.
 3. Docs repo, one commit: the living docs, this plan's status line.
-4. Ruling 326 in the ledger
-   (`.superpowers/sdd/2026-09-24-build-plan/progress.md`): the ask tool names
-   the request, policy names the route, with the date.
+4. The ruling in the build-plan ledger: the ask tool names the request,
+   policy names the route, with the date.
 5. Verification: `grep -rn escalate_to_human` returns nothing in the code and
    infra repos and in the living docs; the history docs keep theirs.
 

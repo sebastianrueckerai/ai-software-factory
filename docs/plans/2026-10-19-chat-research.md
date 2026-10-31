@@ -14,7 +14,7 @@
 
 - Caps: files answers at most 50 paths plus the total count; research output cuts at 8 KiB with the cut named; a command runs 300 seconds by default, 900 hard; the pod lives ten minutes past its last command; at most 2 live research pods per project, oldest reaped.
 - Keyring: the research pod's git token is read-only and short-lived, scoped to the project's origin and its fork. No write token, no model credentials, no card tools.
-- No shared cache mount on the research pod (ruling 291's refusal, the reproPodSpec pattern): it builds cold in its own emptyDir.
+- No shared cache mount on the research pod (the reproPodSpec pattern's refusal): it builds cold in its own emptyDir.
 - Context rules: two tool schemas with one-line descriptions; search answers carry addresses, not content; no standing preamble or echoed state; the reap is the one named notice.
 - Access: the research tool refuses for projects with `agents: none` (the AgentsNone policy field), naming why.
 - The plan lands after sandbox-images' image resolution task (its Task 4), which the research pod's image resolution rides; no temporary image source (the sandbox-images migration ruling).

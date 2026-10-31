@@ -199,7 +199,7 @@ git commit -m "console: summarize_attachment hands a document to a one-shot mode
 **Files:**
 - Modify: `scripts/console-lab/check.js` (and `shoot.js` if the scenario wants a shot)
 - Modify: `docs/roadmap.md` (item 300, Where it stands), this repository
-- Modify: the ledger `.superpowers/sdd/2026-09-24-build-plan/progress.md`, this repository
+- Modify: the build ledger, this repository
 
 **Interfaces:**
 - Consumes: Tasks 1 to 4 live on the code repo's main.

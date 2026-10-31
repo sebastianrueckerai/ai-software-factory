@@ -1,11 +1,11 @@
 # Proposal v2: the project screen
 
-Stage 15. Everything here is decided by rulings 251 to 256, from Sebastian's
+Stage 15. Everything here is decided by Sebastian's
 conversation on the human's side of the factory
 ([the UX conversation](../ai-software-factory-ux-conversation.md)) and his
 three answers of 2026-10-10. The architecture behind it is
 [architecture.md](../architecture.md) 5.7. The scope stays the console's
-server-rendered htmx shape, with SSE for the live parts (ruling 244). This
+server-rendered htmx shape, with SSE for the live parts. This
 document is the spec the dummy's iteration 5 implements and the console
 follows. Stage 15 built it on 2026-10-11, with the deviations below, and
 Stage 17 closed four of them on 2026-10-12.
@@ -33,7 +33,7 @@ deviation until the stage it names:
 - The human lane (approvals, escalations, human tasks) folds into Needs
   you.
 - The state word is "waiting on you" whenever a card waits on a human,
-  else "working" while a card runs, else "idle" (ruling 260).
+  else "working" while a card runs, else "idle".
 - Stage 15's status line had no GitHub figure. Since Stage 16 it ends with
   "GitHub: <state>" for a project with an export.
 - Closed in Stage 17: the drawer's Chat tab. Stage 15 built three tabs,
@@ -53,7 +53,7 @@ deviation until the stage it names:
 
 ## The screen
 
-One screen per project, five parts, each with one job (ruling 251):
+One screen per project, five parts, each with one job:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
@@ -79,8 +79,8 @@ One screen per project, five parts, each with one job (ruling 251):
 5. **Card drawer**: everything about one piece of work.
 
 The chat is per project and never creates or manages projects. Anyone who
-steers a project, Sebastian or an invited member, gets the same screen
-(rulings 251 and 254). Three principles from the conversation:
+steers a project, Sebastian or an invited member, gets the same screen.
+Three principles from the conversation:
 
 - The board state is the truth. The event log is the history. The chat is
   an operator over both.
@@ -101,7 +101,7 @@ steers a project, Sebastian or an invited member, gets the same screen
   the stale ring (v1, "Design tokens"). The pills now also mark the fine
   state on a column's cards.
 - **The human accents**: eight fixed accents as task metadata and a filter,
-  never a state's hue (ruling 247).
+  never a state's hue.
 - **Comments on the card**, through the issue-comment store (v1, "Where
   comments live").
 - **The iteration notes** of Sebastian's click tests: the per-card chat as
@@ -112,24 +112,23 @@ steers a project, Sebastian or an invited member, gets the same screen
   chat as the drawer's default tab, checks chip, evidence row, lane-start
   buttons, deny with a redirect box and icon buttons
   ([gap-analysis.md](gap-analysis.md)).
-- **Buttons are the state machine** and drag stays for lane starts only
-  (ruling 246).
+- **Buttons are the state machine** and drag stays for lane starts only.
 
 ## What it changes
 
-**The split layout** (ruling 251). v1's three bands (the needs-you band,
+**The split layout**. v1's three bands (the needs-you band,
 the agent lane, nothing else) become the status line and the pulse on
 top, then the board on the left and the chat on the right half. The
 needs-you band becomes the board's first column. On a narrow screen the
 chat and the board become two tabs.
 
-**The status line** (ruling 251). Per project, quantitative, always there:
+**The status line**. Per project, quantitative, always there:
 the project's state (working, waiting on you, idle, paused), cards working,
 cards that need you, spend against the project's monthly cap, and the
 GitHub mirror's state. Each figure opens its page: the costs, the
 needs-you list, the mirror panel.
 
-**The pulse** (ruling 251). One sentence under the status line, the single
+**The pulse**. One sentence under the status line, the single
 most useful thing to know now. A click expands it to three or four
 bullets. A cheap model writes it from the board snapshot and the last
 events. It refreshes on every event (debounced 2 s, at most one call per
@@ -137,7 +136,7 @@ events. It refreshes on every event (debounced 2 s, at most one call per
 recomputes. It is subdued when all is well and prominent when something
 needs a person. Its spend is the project's.
 
-**Five columns** (ruling 255). The split view has five columns, a view over
+**Five columns**. The split view has five columns, a view over
 the task states the factory already has, not a new state machine:
 
 | Column | States |
@@ -153,18 +152,18 @@ is Working, and a plan that waits for acceptance is Needs you. The lane is
 a chip on the card, and so is the fine state (waiting on the author,
 failed, closed, retrying, stale) in v1's pill vocabulary. The full-width
 board keeps v1's columns, lanes first, for a member who wants a process's
-lanes as columns, and processes keep composing their lanes in YAML (rulings
-245, 246 stand). If a process ever needs another grouping, the grouping
+lanes as columns, and processes keep composing their lanes in YAML. If a
+process ever needs another grouping, the grouping
 becomes a block in its process file, with these five as the default. On
 the card face the spend figure stays muted until 80 percent of its budget,
 then turns prominent with the warning sign and the text, never colour
 alone.
 
-**Inline answers** (ruling 256). An agent's question carries structured
+**Inline answers**. An agent's question carries structured
 choices. A needs-you card renders them as buttons plus a text box, so most
 human input needs no drawer.
 
-**The chat as a surface** (rulings 251 to 253). The click tests made the
+**The chat as a surface**. The click tests made the
 per-card chat the point of opening a running card. v2 gives the project
 one too: the right half holds the project agent's conversation. Streaming
 replies. Tool calls as collapsed blocks with their arguments and duration.
@@ -176,19 +175,19 @@ human through the console's own actions, so a button and a tool call
 record the same event, the tool call's with `via: chat`, and the agent
 runs no code.
 
-**The drawer's four tabs** (ruling 251). The drawer opens beside the board
+**The drawer's four tabs**. The drawer opens beside the board
 at 40 to 50 percent of the width, with the tabs Overview, Activity, Files
 and Chat. Chat is the default tab on a running card, as in iteration 4.
 Iteration 4's two tabs, chat and card, become four: its card tab becomes
 Overview, and Activity and Files are new.
 
-**Live by events** (ruling 244). Every console action records one event
+**Live by events**. Every console action records one event
 with `via`, the project's events are one feed at one endpoint, and SSE
 carries them to the board. The live badge replaces v1's 3-second poll.
 
 ## Non-goals
 
-Round 1 (ruling 256) leaves to the [main roadmap](../roadmap.md): messenger
+Round 1 leaves to the [main roadmap](../roadmap.md): messenger
 push (item 145), the mobile layout and PWA install (item 146), the project
 analytics page (item 147), pull request workflows to GitHub (item 148) and
 member roles beyond writer (item 149). v1's other non-goals stand: no

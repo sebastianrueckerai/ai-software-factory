@@ -5,7 +5,7 @@ The context audit of 2026-10-13 read every input a model sees: the worker brief,
 ## The worker brief
 
 1. **The tool list restated.** The brief's toolsLine enumerates every factory tool and ends "No other factory tool is", while the MCP server's tool list already delivers each tool with its schema and the middleware deletes the disallowed ones (`internal/factoryd/opencode.go:634-639`, `internal/gateway/tools.go:217-262`). Fix: one sentence naming the MCP server, no enumeration.
-2. **Guide prose restating tool descriptions.** The work guide's request_info and escalate sentences restate the descriptions at `internal/gateway/tools.go:236-242` (`internal/factoryd/opencode.go:648-657`). Ruling 263 forbids exactly this. Fix: the rule lives in the tool description only.
+2. **Guide prose restating tool descriptions.** The work guide's request_info and escalate sentences restate the descriptions at `internal/gateway/tools.go:236-242` (`internal/factoryd/opencode.go:648-657`). Fix: the rule lives in the tool description only.
 3. **One sentence copied across sibling guides.** The bash-check and finish sentence sits in the work guide and the feature guide (`internal/factoryd/opencode.go:661-662` and `688-689`). Fix: one shared constant.
 4. **AGENTS.md ordered and injected.** The feature guide says "Follow the repository's AGENTS.md." while the pinned harness injects AGENTS.md itself (`internal/factoryd/opencode.go:678`, its injection documented at `699-712`). Fix: drop the line.
 5. **The untrusted-poster rule twice.** The standing line and the PosterInfo section both state it (`internal/factoryd/opencode.go:585-593`, `603-610`). Fix: once, in the PosterInfo section.

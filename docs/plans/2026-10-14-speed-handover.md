@@ -5,13 +5,13 @@ Written on 2026-10-14 for a fresh controller session in this repository, from Se
 ## Read first
 
 - [roadmap.md](../roadmap.md): items 222 (development speed), 157 (a second replica, rejected; the reattach form below is a different thing), 225 (the lanes collapse, planned), 227 (the console design, planned, waits for this round).
-- [architecture.md](../architecture.md): rulings 269 (rolls in a session gap), 205 and 208 (the merge queue), 299 (`stronger_after`), 109 (the approve click is the only door to a merge), 322 (the attempt's floor).
+- [architecture.md](../architecture.md): rolls in a session gap, the merge queue, `stronger_after`, the approve click as the only door to a merge, the attempt's floor.
 - [2026-10-14-lane-collapse.md](2026-10-14-lane-collapse.md): the track at filing, which item 5a below must fit.
 
 ## Rules of the round
 
 - Work in worktrees of `~/repos/ai-software-factory-code` (Forgejo `origin`, branch `main`), never in the main checkout. Controller-direct merges have precedent (item 222a, commit 6a89f50); a card through the factory is the normal way.
-- Every roll of your own change you approve yourself in the console as `controller` (ruling 109; the controller approved roll PR 647 on 2026-10-14).
+- Every roll of your own change you approve yourself in the console as `controller` (the controller approved roll PR 647 on 2026-10-14).
 - Write the plan as `docs/plans/2026-10-14-speed.md` before the first code change, with the baseline below in it. Record every decision in the roadmap. Reports and commit messages follow the writing guide in `~/.claude/skills/ste-writing`.
 - No half measures: every item lands with its verification, or the report says at the top what did not.
 

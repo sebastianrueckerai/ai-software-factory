@@ -13,7 +13,7 @@
 ## Rulings the plan argues from
 
 - C1 (piece 1): a criterion has an id, a kind and the fields its kind names. Kind `test`: test name, inputs, expected numbers, the house format. Kind `invariant`: a test suite, no inputs. Kind `judgement`: claim, fixed inputs, pinned prompt, no test. Kind `human`: claim, evidence. The planner drafts the cheap judgement by default; the human moves criteria between judgement and human later (flip rules are piece 10, not this step).
-- C2 (piece 1, ruling 2026-10-17): a criterion's test must run under the project's own `check` in-process. Beyond the sandbox it becomes a human criterion or a note; nothing pretends to a proof that cannot run. The guide says this; the validation cannot check it.
+- C2 (piece 1): a criterion's test must run under the project's own `check` in-process. Beyond the sandbox it becomes a human criterion or a note; nothing pretends to a proof that cannot run. The guide says this; the validation cannot check it.
 - C3 (piece 2): the citation rides in the acceptance item itself, `criterion` beside `text`, no second list. One criterion, several cards; one card, several criteria. A foundation card need not cite any, though it may.
 - C4 (piece 3): three rules, only when the plan carries criteria: every criterion cited by at least one card; every non-foundation card cites at least one; the integration card's items are the criteria, one item per criterion by id, a judgement or human criterion arriving as an item that names its claim.
 - C5 (recording rule): every hole catch names its finder on the plan. The table lands now with kind `question`, finder `planner`; later steps add kinds.
@@ -190,7 +190,7 @@ After `PutPlanQuestions` inserts, `PutPlanCatches(ctx, t.ID, revision, CatchQues
 ### Task 6: Ship the step
 
 **Files:**
-- Modify: `docs/roadmap.md` (item 285, docs repo), `.superpowers/sdd/2026-09-24-build-plan/progress.md` (docs repo, untracked ledger)
+- Modify: `docs/roadmap.md` (item 285, docs repo), the build-plan ledger (untracked)
 - Modify: none in code beyond Tasks 1 to 5.
 
 - [ ] **Step 1: Full gates**

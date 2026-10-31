@@ -23,8 +23,8 @@ More runs on a clock without filing cards: the hourly reconcile, the daily rever
 - The autonomy plan, decision 2: the agent never invents tasks. A routine is the factory's, not the agent's. A member writes it through the chat.
 - Architecture 5.6, "Settings read-only": the Policy page shows the commit in force, and a change is a commit. Roadmap 239: a level change lands as the approver's pull request on the project file.
 - Roadmap 239: the inbox is the one thread the factory speaks in uninvited, one poke per state change, with a decider line when the agent acted on its own. Roadmap 145: routine agent activity never notifies, the pulse covers it.
-- Ruling 178: one roll is open per repository, and a newer set folds into it. Ruling 296: a human's close of a template update stands until the render changes.
-- Ruling 261: every read the console offers is a read tool of the chat.
+- One roll is open per repository, and a newer set folds into it. A human's close of a template update stands until the render changes.
+- Every read the console offers is a read tool of the chat.
 - [goal.md](goal.md): immutable and re-seedable end to end, and modern development practice without half measures.
 
 ## The design: a routine is data per project, its run is a card, its ghost stands on the board
@@ -96,7 +96,7 @@ What this gives the reader from operations: declarative configuration in git, a 
 
 Each rule is construction, not a prompt.
 
-1. **Announced.** Every routine of the project stands as a ghost card at the foot of Queued, with its schedule in words, its next run and its last. A control hides the far ones or all. The routine's work reaches Needs you only as its filed card, through the card flow (ruling of 2026-10-17).
+1. **Announced.** Every routine of the project stands as a ghost card at the foot of Queued, with its schedule in words, its next run and its last. A control hides the far ones or all. The routine's work reaches Needs you only as its filed card, through the card flow.
 2. **Predictable.** A run is at a clock time or a count, "Mon 06:00", "every 20 merges", never "7 days after the last filing".
 3. **One open instance.** `hold` is the default. The ghost says "held: #781 is still open".
 4. **The card explains itself.** Source routine, the routine's name, the run's number, the last run's outcome and a link to the routine, on the face as a chip and in the drawer's provenance. The body comes from the brief file in the tree.

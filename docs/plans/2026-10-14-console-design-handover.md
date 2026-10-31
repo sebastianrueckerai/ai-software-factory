@@ -7,12 +7,12 @@ Written on 2026-10-14 for a fresh controller session in this repository. The des
 - The plan: [2026-10-14-console-design.md](2026-10-14-console-design.md), its work items and their order.
 - The design: `design/ia.md` (the structure every part follows), `design/inventory.md` (every control that must stay), `design/themes/06-mission-control/DESIGN.md` (the rule set), `design/prototypes/06-mission-control/index.html` (the spec where words are ambiguous; open it with `?scenario=busy&theme=dark`), `design/design-decisions.md` C1 to C7, and the images the plan links.
 - [roadmap.md](../roadmap.md): items 177, 219, 221, 225, 226, 227, and 210 (the budget action on a capped card, card 641).
-- [architecture.md](../architecture.md): rulings 247 (colour), 251 (the five parts), 255 (the columns are a view).
+- [architecture.md](../architecture.md): the colour rule, the five parts, the columns as a view.
 
 ## Rules of the round
 
 - Work in a worktree of `~/repos/ai-software-factory-code` (Forgejo `origin`, branch `main`); the lab lives on its branch `console-design` (`scripts/console-lab/run.sh`, `internal/console/lab_test.go`), rebase it onto `main` and merge it first if nobody has.
-- One pull request per plan item, each with the lab's before and after shots in the pull request's description, `go test ./internal/console/` green, and the structural check (below) green. Approve your own rolls in the console as `controller` (ruling 109).
+- One pull request per plan item, each with the lab's before and after shots in the pull request's description, `go test ./internal/console/` green, and the structural check (below) green. Approve your own rolls in the console as `controller`.
 - The console tests read the markup. Keep the class names and data attributes they read (`card`, `data-card`, the column titles, `approval-<id>`) unless an item has to change them; then the test gets the one-line change and the commit names it.
 - The page copy stays factual and never says how it was made. Every text pair in both themes at 4.5:1, measured.
 - Record every decision in the roadmap and in `design/design-decisions.md` (C8 onward). Reports and commit messages follow the writing guide in `~/.claude/skills/ste-writing`.

@@ -2,7 +2,7 @@
 
 ## The product
 
-The console is the one screen a member uses to steer a software project that agents build. Server-rendered Go templates with htmx, one stylesheet, a dark and a light theme. Five parts, one job each (ruling 251): the status line (what is the state), the pulse (what to understand about it), the board (five columns: Needs you, Queued, Working, Verifying, Done), the chat with the project agent (ask or change anything) and the card drawer (everything about one piece of work). Secondary pages: Costs, Resources, Projects, Alerts, Policy, a card's Timeline, New task, New project.
+The console is the one screen a member uses to steer a software project that agents build. Server-rendered Go templates with htmx, one stylesheet, a dark and a light theme. Five parts, one job each: the status line (what is the state), the pulse (what to understand about it), the board (five columns: Needs you, Queued, Working, Verifying, Done), the chat with the project agent (ask or change anything) and the card drawer (everything about one piece of work). Secondary pages: Costs, Resources, Projects, Alerts, Policy, a card's Timeline, New task, New project.
 
 ## The goal
 
@@ -14,7 +14,7 @@ Two readers, one screen.
 ## The impression
 
 - A product by a slick, modern tech company. The field: Linear, Vercel, Raycast, Railway, Warp, Stripe's dashboard, Height. Dense but calm, type-led, exact spacing, one accent, colour that always means something.
-- Easy to parse. The important things are seen first: what needs you, the project's state, the spend. Normal states whisper, exceptional states speak (ruling 251). A done card is quiet; a card that waits for a human is the loudest thing on the screen.
+- Easy to parse. The important things are seen first: what needs you, the project's state, the spend. Normal states whisper, exceptional states speak. A done card is quiet; a card that waits for a human is the loudest thing on the screen.
 - Cool, but a tool. No marketing fluff, no illustration for its own sake, no dashboard-template look.
 
 ## The look

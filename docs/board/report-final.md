@@ -108,12 +108,12 @@ and our one-line version. Pattern numbers refer to the old ranked seventeen.
     the face when unread; the agent's next session reads them (the answer
     path already exists).
 
-## 2. Exclusive alternatives (rulings 243 to 248)
+## 2. Exclusive alternatives
 
 Six forks the field answers in mutually exclusive ways. Each carries the
 tradeoff and this report's recommendation; Sebastian rules.
 
-**A. Chat on the card vs behind a click (ruling 243).** Vibe Kanban and
+**A. Chat on the card vs behind a click.** Vibe Kanban and
 Conductor make the conversation the product; Automaker hides it entirely;
 Nimbalyst splits it - summary on the card, streaming tail on hover, full
 transcript on click. Conductor's users love the stream, and our own
@@ -122,7 +122,7 @@ issue. *Recommendation: behind a click, with the hover-peek tail (steal 11)
 and the last few messages on the expanded card - Nimbalyst's split, which is
 also Sebastian's instinct.*
 
-**B. Server-rendered htmx vs SPA (ruling 244).** Linear, Plane and every
+**B. Server-rendered htmx vs SPA.** Linear, Plane and every
 AI-native board are SPAs; the cost shows (Plane's live service exists but is
 unwired to the board - 24 s without refresh, their users' top complaint;
 Vibe gated its board behind a dead login server). Our console renders on
@@ -132,7 +132,7 @@ names this fork. *Recommendation: stay server-rendered htmx; SSE carries
 the live badge and the task page. Revisit only if a second client (the
 phone) forces it.*
 
-**C. Free lanes vs system lanes (ruling 245).** Trello and Wekan let anyone
+**C. Free lanes vs system lanes.** Trello and Wekan let anyone
 mint columns; Plane makes state a user-made entity; Hermes, cline/kanban
 and Automaker own their columns as a contract (one role per transition; a
 free lane promises nothing to a scheduler). Our columns are already
@@ -141,7 +141,7 @@ lanes come from the project's process definition in git, as today; a
 human-made free column is the first step of the Trello sprawl and breaks
 the machine contract.*
 
-**D. Drag vs buttons when agents mutate state under you (ruling 246).**
+**D. Drag vs buttons when agents mutate state under you.**
 Plane and Trello make drag the primary mutation (drag-to-delete included);
 Automaker's drag writes status directly and can move a card past
 verification - the cautionary tale; cline/kanban rule-gates drags (humans
@@ -154,7 +154,7 @@ the state machine, steal 7); keep the existing backlog-to-lane drag only
 where policy already allows it, as a form submit, and never a drag that
 asserts a machine-owned state.*
 
-**E. Human-set colours vs system-only semantics (ruling 247).** Trello's
+**E. Human-set colours vs system-only semantics.** Trello's
 split is the field's answer: system colours (states) and user colours
 (labels, backgrounds) never borrow from each other; Plane lets users recolour
 states themselves (which agents then cannot trust); cline/kanban and
@@ -164,7 +164,7 @@ channels that never mix - system states own their fixed palette; humans get
 a small fixed palette (eight) as card accents/labels they may set and
 filter by; the human palette is metadata, never state.*
 
-**F. Timeline replay vs live-only (ruling 248).** Every live board shows
+**F. Timeline replay vs live-only.** Every live board shows
 now; only event-sourced ones (Hermes's append-only `task_events`, Vibe's
 one-log design, our own `timeline.jsonl` per task) can replay a card's
 life. Conductor's per-turn metadata chips show what replay buys:
@@ -236,8 +236,7 @@ performance. Our board is one artifact of one factory. Named refusals:
 - **No advisory limits** ("limits are approximate, may overshoot" - Linear).
   Ours are hard at the gateway, and the card shows real numbers.
 - **No drag that asserts machine-owned state** (Automaker's
-  drag-to-Verified). Human gestures request; the system disposes (ruling
-  246).
+  drag-to-Verified). Human gestures request; the system disposes.
 - **No chat-as-the-product** (Vibe Kanban's magnificent timeline is still
   the wrong primary surface; Conductor's stream home screen likewise). The
   conversation is one click behind the card.
@@ -255,8 +254,8 @@ performance. Our board is one artifact of one factory. Named refusals:
 - **No second layout family** (Plane's gantt/calendar/spreadsheet). We are
   a board with a timeline detail; the matrix view is a roadmap item, not a
   v1 surface.
-- **No human-minted states or columns** (ruling 245), **no user-recycled
-  system colours** (ruling 247), **no ambient notification layer** beyond
+- **No human-minted states or columns**, **no user-recycled
+  system colours**, **no ambient notification layer** beyond
   done, question and approval (item 24's rule stands; Conductor's
   sounds-and-colours ambient layer is the counter-example we refuse).
 - **Not this round:** the recorder tool (Sebastian's idea - it belongs to

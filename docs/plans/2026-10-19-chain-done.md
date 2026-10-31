@@ -18,7 +18,7 @@
 - Existing done rows are grandfathered: tasks finished before the state exists stay done (deployLive's third clause).
 - No per-project deploy code: the chain's facts come from Forgejo runs and commit statuses only.
 - TDD throughout: every task is test-first, the full race suite (`scripts/pg-test.sh go test -race -p 1 ./...` in CI; locally with FACTORYD_TEST_DATABASE_URL) green before each push.
-- Branch per phase in a worktree, merged to main, pushed to origin and github; the ledger (`.superpowers/sdd/2026-09-24-build-plan/progress.md`) records each phase.
+- Branch per phase in a worktree, merged to main, pushed to origin and github; the build ledger records each phase.
 
 ## Review Focus
 

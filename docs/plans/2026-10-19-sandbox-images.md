@@ -6,7 +6,7 @@
 
 **Spec:** [docs/sandbox-images-design-2026-10-19.md](../sandbox-images-design-2026-10-19.md), as amended by Sebastian's answers of 2026-10-22 below. Where the two differ, this plan's decisions hold.
 
-**Revised 2026-10-22.** The first version (2026-10-19) assumed a demo-app project, factoryd commits to the policy tree, per-project CI with cosign on untrusted runners, and a slimmed base for every project. None of that holds today. Code maps of today's code: `.superpowers/sdd/2026-10-19-sandbox-images/survey-*.md` in the docs repo.
+**Revised 2026-10-22.** The first version (2026-10-19) assumed a demo-app project, factoryd commits to the policy tree, per-project CI with cosign on untrusted runners, and a slimmed base for every project. None of that holds today. Code maps of today's code sit in this plan's gitignored ledger in the docs repo (survey-*.md).
 
 ## Decisions (Sebastian, 2026-10-22)
 

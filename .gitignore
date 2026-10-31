@@ -1,4 +1,5 @@
 .env*
+.superpowers/
 terraform.tfstate*
 launch/revision/
 docs/pitch.md

@@ -1,14 +1,14 @@
 # Proposal v1: the first improved board
 
 Superseded for the console's layout by [proposal-v2.md](proposal-v2.md),
-the project screen of Stage 15 (rulings 251 to 256). This file stays as
+the project screen of Stage 15. This file stays as
 the record the click dummy implemented, and v2 keeps what it does not
 change.
 
 Task 157. Everything here is decided by the aggregate
-([report-final.md](report-final.md)) and rulings 243 to 248; each choice
+([report-final.md](report-final.md)); each choice
 cites its evidence. The scope: the console's current server-rendered htmx
-shape (ruling 244) - no framework, no build step, one artifact. This
+shape - no framework, no build step, one artifact. This
 document is the spec the click dummy implements and the console follows.
 
 ## The board
@@ -23,10 +23,10 @@ One screen, three bands, top to bottom:
    steal 14). This band replaces the today's Approvals/Escalations/Human
    tasks blocks.
 2. **Agent lane** - the columns: the project's process lanes (backlog, plan,
-   ready; ruling 245: system lanes only) then the state columns (running,
+   ready; system lanes only) then the state columns (running,
    waiting on a human, waiting on the author, in review, done, failed,
-   closed). Column headers carry counts. Cards move by buttons (ruling
-   246); the backlog-to-lane drag stays as a form submit.
+   closed). Column headers carry counts. Cards move by buttons; the
+   backlog-to-lane drag stays as a form submit.
 3. **Nothing else.** Roll tasks, costs and alerts keep their own pages; the
    board is one artifact (the Trello lesson, report-final section 4).
 
@@ -48,7 +48,7 @@ content):
 
 - Line 1: issue ref, the card's title (plan key, or the objective's first
   clause - the full objective moves off the face), and the human accent
-  label if set (ruling 247).
+  label if set.
 - Line 2: status pill + elapsed + checks + spend against budget (Factory's
   triple plus the spend their users miss; Linear's status row).
 - Line 3: the live activity line, one line, monospace, muted (cline/kanban;
@@ -61,13 +61,13 @@ content):
 
 Expanded in place (one click): the full objective, the agent's summary, the
 dependency list, the approval's payload (review verdict, findings), the
-last three conversation messages (ruling 243), and unread human comments.
+last three conversation messages, and unread human comments.
 The conversation and the full timeline replay open one click deeper - the
 task page, which stays the existing timeline page upgraded with the
-conversation column and per-turn chips (Conductor's shape; ruling 248:
+conversation column and per-turn chips (Conductor's shape:
 replay is the default view of a card's life).
 
-Hover (ruling 243): a peek popover with the streaming tail of the
+Hover: a peek popover with the streaming tail of the
 conversation, last 100 lines (Nimbalyst's hover-peek).
 
 ## Design tokens
@@ -88,7 +88,7 @@ material; Plane report, "the oklch single-hue token ladder"):
 | `--text-muted` | oklch(0.68 0.01 250) | oklch(0.45 0.012 250) | metadata |
 | `--accent` | oklch(0.72 0.14 250) | oklch(0.55 0.16 250) | links, focus, running |
 
-The status-light vocabulary - system colours only (ruling 247), each state
+The status-light vocabulary - system colours only, each state
 one hue, checked against both themes for the 4.5:1 contrast floor on text
 and 3:1 on the pill fill:
 
@@ -103,7 +103,7 @@ and 3:1 on the pill fill:
 | closed | grey | ended without merge |
 | stale (badge) | amber ring | no event for 30 min (Linear's 10 s/30 min clock) |
 
-The human palette (ruling 247): eight fixed accents - red, orange, amber,
+The human palette: eight fixed accents - red, orange, amber,
 green, teal, blue, violet, pink - never any state's hue at the state's
 chroma; applied as a small label chip on the face and a 3 px left edge on
 the card. Set from the card's expanded view, stored as task metadata,
@@ -126,7 +126,7 @@ input on the next session (the existing `human_comment` intake path).
 
 ## The human-colour mechanism
 
-Ruling 247: the eight-accent palette above, chosen from the expanded card,
+The eight-accent palette above, chosen from the expanded card,
 one accent per card plus optional free-text note; a filter control in the
 board header selects accents across projects. The accent is task metadata
 (set through the console's own action, one POST), visible to anyone who
@@ -141,8 +141,8 @@ inherits these:
   folded transcript: session headers, the agent's messages as bubbles, tool
   calls as collapsed monospace blocks, and a steering box that is ENABLED
   while the card runs (or waits on the author) and becomes read-only
-  history once the run ends - a small Claude-Code-shaped chat per card
-  (ruling 243 sharpened). Queued steering messages stay editable and
+  history once the run ends - a small Claude-Code-shaped chat per card.
+  Queued steering messages stay editable and
   removable until they land (Conductor's queue).
 - **The card's one-line summary is editable by the human**: the generated
   one is a default, the human's version wins and shows on the face.

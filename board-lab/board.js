@@ -515,7 +515,7 @@ function actError(a) {
   const c = BYID[a.card], s = cardState(c, T), ref = `#${c.issue_number}`, at = fmt.clock(T);
   if (a.kind === "move") {
     if (!LANES.includes(a.lane)) return `"${a.lane}" is not a lane; the lanes are backlog, plan and ready.`;
-    if (!s.status.startsWith("lane")) return `${ref} is ${STATUS_TEXT[s.status]} at ${at}. Only a card that waits in a lane moves; running, review and done belong to the factory's state machine and change by its buttons, never by a move (ruling 246).`;
+    if (!s.status.startsWith("lane")) return `${ref} is ${STATUS_TEXT[s.status]} at ${at}. Only a card that waits in a lane moves; running, review and done belong to the factory's state machine and change by its buttons, never by a move.`;
     if (s.lane === a.lane) return `${ref} already sits in ${a.lane}.`;
   }
   if (a.kind === "approve" && !s.approvals.length) return `Nothing on ${ref} waits for an approval at ${at}.`;
@@ -1153,7 +1153,7 @@ async function newestTranscript(c) {
   return [];
 }
 
-// ---- drag: only backlog cards, only into lane columns (ruling 246) --------
+// ---- drag: only backlog cards, only into lane columns --------
 document.addEventListener("dragover", (e) => {
   const col = e.target.closest(".column");
   if (!col) return;
@@ -1168,7 +1168,7 @@ document.addEventListener("drop", (e) => {
   e.preventDefault();
   const refuse = col.classList.contains("drop-refuse");
   col.classList.remove("drop-ok", "drop-refuse");
-  if (refuse) { toast("moves between machine-owned states are buttons here; a drag only starts a lane (ruling 246)", true); return; }
+  if (refuse) { toast("moves between machine-owned states are buttons here; a drag only starts a lane", true); return; }
   const c = BYID[e.dataTransfer.getData("text/plain")];
   if (c && col.dataset.col !== cardState(c, T).lane) {
     applyAct({ kind: "move", card: c.id, lane: col.dataset.col }, "card");
