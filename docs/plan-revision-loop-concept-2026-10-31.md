@@ -4,15 +4,43 @@ Written 2026-10-31, from the live incident of the night of 30 to 31 October and 
 
 ## What you need to know first
 
-Seven things, in plain words:
+Four things, in plain words:
 
 1. **Cards.** The factory turns a request into a card: one unit of work with its own budget in euros and a small cap on how many agent runs it may use.
 2. **Sessions.** A card runs agent sessions: short work runs by an AI agent inside a sealed sandbox it cannot leave. Every session spends from the card's budget. A session that cannot go on stops and asks, and the card then waits for a human. That question is the ask. It shows on the card and in the Needs you list.
 3. **The chat.** Beside the board sits a chat with the project agent. It reads and writes files in the project's document repository, files cards and answers asks for Sebastian, the one human the factory calls the member. It is the main channel between the two.
-4. **Plans.** A card too big for a single run goes to the plan track. A planner agent writes a plan: the work cards to create, plus criteria, the named checks that later decide the work counts as good. The plan lives in numbered versions called revisions. The newest revision is the current one.
-5. **Criterion ids.** Every criterion has an id, and the meaning behind an id never changes. When a check changes, its new version gets a new id and names the old id in a `replaces` field: v11 replaces v10 means v11 is v10's successor. This keeps the record honest from revision to revision.
-6. **Confirmations.** A revision whose criteria changed asks the member to confirm it. The answer wakes a planner session, which is expected to file the next revision.
-7. **Money.** The factory holds the cost of every model call against the card's budget before the call runs. A card with too little budget runs nothing, not even the delivery of an answer.
+4. **Money.** The factory holds the cost of every model call against the card's budget before the call runs. A card with too little budget runs nothing, not even the delivery of an answer.
+
+## How the factory runs work today
+
+Small work and big work run different paths, and the plan machinery sits between them:
+
+```mermaid
+flowchart TD
+    request["A request: a chat line, an issue, an alert"] --> card["A card is filed"]
+    card --> sizing{"Sizing"}
+    sizing -->|"small"| work["Work track: sessions build, a pull request passes the gates, merge"]
+    sizing -->|"medium or large"| plan["Plan card"]
+    plan --> planner["A planner session writes a plan and files it as the next revision"]
+    planner --> rule{"The filing rule checks the revision"}
+    rule -->|"refused: correct and file again"| planner
+    rule -->|"accepted"| changed{"Did the criteria change against the previous revision?"}
+    changed -->|"no"| file["The plan's work cards are filed, the plan ends done"]
+    changed -->|"yes"| confirm["A confirmation ask: the card waits for the member"]
+    confirm --> answer["The member answers"]
+    answer --> planner
+    file --> work
+```
+
+**Plans and revisions.** A medium or large card goes to the plan track and becomes a plan card. A planner session reads the request and writes a plan: the work cards to create, plus criteria. A criterion is a named check: an id, a kind, and the test that proves it. Filing the plan creates a revision: one numbered version of the plan, revision 5, then 6, then 7. The filing rule accepts it, the factory stores it, and it becomes the newest revision, the current plan. Every old revision stays stored, so the history of the promise is never lost. A new revision appears whenever a planner session files a plan: on a first split, on a member's change request, or after an answer it must fold in.
+
+**The filing rule.** It checks the revision's shape, among others two lineage checks. A criterion id keeps its meaning for all time. And a criterion that claims `replaces vN` must name an id the previous revision actually holds. Both checks exist to keep the record honest: no id may silently change what it means.
+
+**Why criteria change.** The criteria are the contract: the checks that decide at the end that the whole feature counts as good. They change for real reasons. The member asks for a different shape, as with the territory split that started this night. A finished card changes what is left to do. The spec moves. Or the filing rule refused the last attempt, and the correction counts as a change. A changed criterion files under a new id that names the old one in `replaces` (v11 replaces v10), so the succession is always written down.
+
+**The confirmation.** Because the criteria are the contract, a revision whose criteria changed asks the member to confirm before any work runs: no work runs against criteria the member has not seen. Today every answer to that ask, including a plain okay, wakes a new planner session that is expected to file the next revision. That arrow, from the answer back to the planner in the diagram, is one half of the night's circle.
+
+**From plan to work.** When nothing is left to ask, the plan's work cards are filed as normal cards and the plan ends done. They run the work track: sessions build in sandboxes, a pull request passes the gates, the merge goes live. The criteria gate then runs the plan's named tests on the assembled result.
 
 ## The night, step by step
 
