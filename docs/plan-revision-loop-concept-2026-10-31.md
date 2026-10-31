@@ -8,7 +8,7 @@ Four things, in plain words:
 
 1. **Cards.** The factory turns a request into a card: one unit of work with its own budget in euros and a small cap on how many agent runs it may use.
 2. **Sessions.** A card runs agent sessions: short work runs by an AI agent inside a sealed sandbox it cannot leave. Every session spends from the card's budget. A session that cannot go on stops and asks, and the card then waits for a human. That question is the ask. It shows on the card and in the Needs you list.
-3. **The chat.** Beside the board sits a chat with the project agent. It reads and writes files in the project's document repository, files cards and answers asks for Sebastian, the one human the factory calls the member. It is the main channel between the two.
+3. **The chat.** Beside the board sits a chat with the project agent. It reads and writes files in the project's document repository, files cards and answers asks for Sebastian, the factory's one human. It is the main channel between the two.
 4. **Money.** The factory holds the cost of every model call against the card's budget before the call runs. A card with too little budget runs nothing, not even the delivery of an answer.
 
 ## How the factory runs work today
@@ -26,13 +26,13 @@ flowchart TD
     rule -->|"refused: correct and file again"| planner
     rule -->|"accepted"| changed{"Did the criteria change against the previous revision?"}
     changed -->|"no"| file["The plan's work cards are filed, the plan ends done"]
-    changed -->|"yes"| confirm["A confirmation ask: the card waits for the member"]
-    confirm --> answer["The member answers"]
+    changed -->|"yes"| confirm["A confirmation ask: the card waits for the human"]
+    confirm --> answer["The human answers"]
     answer --> planner
     file --> work
 ```
 
-**Plans and revisions.** A medium or large card goes to the plan track and becomes a plan card. A planner session reads the request and writes a plan: the work cards to create, plus criteria. A criterion is a named check: an id, a kind, and the test that proves it. Filing the plan creates a revision: one numbered version of the plan, revision 5, then 6, then 7. The filing rule accepts it, the factory stores it, and it becomes the newest revision, the current plan. Every old revision stays stored, so the history of the promise is never lost. A new revision appears whenever a planner session files a plan: on a first split, on a member's change request, or after an answer it must fold in.
+**Plans and revisions.** A medium or large card goes to the plan track and becomes a plan card. A planner session reads the request and writes a plan: the work cards to create, plus criteria. A criterion is a named check: an id, a kind, and the test that proves it. Filing the plan creates a revision: one numbered version of the plan, revision 5, then 6, then 7. The filing rule accepts it, the factory stores it, and it becomes the newest revision, the current plan. Every old revision stays stored, so the history of the promise is never lost. A new revision appears whenever a planner session files a plan: on a first split, on a human's change request, or after an answer it must fold in.
 
 **The filing rule, step by step.** Filing a plan is a tool call by the planner session. The factory checks the plan before it stores anything, and refuses the whole filing on the first problem. The checks, in their order:
 
@@ -46,9 +46,9 @@ flowchart TD
 8. On any finding: the filing is refused, nothing is stored, the findings return to the session with the advice to correct the plan and file it again in the same session. The refusal of that night was two findings of the lineage checks.
 9. With no finding: the factory stores the plan as the next revision number, records what the criteria added, removed and revised, restarts the child cards the change touches, and only then decides the next step: the confirmation ask, or the filing of the work cards.
 
-**Why criteria change.** The criteria are the contract: the checks that decide at the end that the whole feature counts as good. They change for real reasons. The member asks for a different shape, as with the territory split that started this night. A finished card changes what is left to do. The spec moves. Or the filing rule refused the last attempt, and the correction counts as a change. A changed criterion files under a new id that names the old one in `replaces` (v11 replaces v10), so the succession is always written down.
+**Why criteria change.** The criteria are the contract: the checks that decide at the end that the whole feature counts as good. They change for real reasons. The human asks for a different shape, as with the territory split that started this night. A finished card changes what is left to do. The spec moves. Or the filing rule refused the last attempt, and the correction counts as a change. A changed criterion files under a new id that names the old one in `replaces` (v11 replaces v10), so the succession is always written down.
 
-**The confirmation.** Because the criteria are the contract, a revision whose criteria changed asks the member to confirm before any work runs: no work runs against criteria the member has not seen. Today every answer to that ask, including a plain okay, wakes a new planner session that is expected to file the next revision. That arrow, from the answer back to the planner in the diagram, is one half of the night's circle.
+**The confirmation.** Because the criteria are the contract, a revision whose criteria changed asks the human to confirm before any work runs: no work runs against criteria the human has not seen. Today every answer to that ask, including a plain okay, wakes a new planner session that is expected to file the next revision. That arrow, from the answer back to the planner in the diagram, is one half of the night's circle.
 
 **From plan to work.** When nothing is left to ask, the plan's work cards are filed as normal cards and the plan ends done. They run the work track: sessions build in sandboxes, a pull request passes the gates, the merge goes live. The criteria gate then runs the plan's named tests on the assembled result.
 
@@ -112,8 +112,8 @@ Checking them found a second defect: alerts 2292 and 2294 sit open on a card tha
 1. **A re-file that equals the newest revision is a no-op.** In `FilePlan`, after the plan is normalised exactly as the stored one was (round stamps, settled cards of earlier rounds prepended), compare it with the newest revision by value. Equal: return "this is already revision N", store nothing, ask nothing, run none of the filing bookkeeping (no criteria records, no child restarts). Compare by value, not by hash: a settled card gaining its issue number between filings changes the hash of an otherwise equal plan.
 2. **An unchanged criterion is exempt from the replaces check.** `revisionFindings` skips a criterion that the previous revision holds with the exact same definition. Its `replaces` marker is history, not an amendment. This keeps the no-op stable even when the value comparison drifts, and it is the correct reading of the freeze rule: only a criterion that is new or changed needs a lineage claim.
 3. **A confirmed plan files its cards instead of waking a planner.** In `RequestPlan`, when the revision's questions are all answered and every question was a confirmation answered with its offered choice word, the criteria are fixed: file the cards, end the plan done ("revision N filed M cards"). This covers the moment the confirmation is answered and every later pass, such as a plan card's stop ask answered with Go on. An answer that adds words returns to the planner as today, because it may carry a change. Real questions also return to the planner as today.
-4. **The ask carries its own facts.** A plan card's stop ask names what its choices do (a planner session, holding the plan, closing the plan), not the generic card-stop wording about pull requests. When a session stops right after a tool refusal, the ask quotes the refusal verbatim in its info block. The blocker then reaches the member without any agent-side reporting; see the reporting concept for the channel question.
-5. **An unanswered question carries over.** When a member message holds a question the reply does not address, the console carries the question into the next turn's prompt until a reply answers it, and the chat shows it as open. The morning's dropped question then cannot happen.
+4. **The ask carries its own facts.** A plan card's stop ask names what its choices do (a planner session, holding the plan, closing the plan), not the generic card-stop wording about pull requests. When a session stops right after a tool refusal, the ask quotes the refusal verbatim in its info block. The blocker then reaches the human without any agent-side reporting; see the reporting concept for the channel question.
+5. **An unanswered question carries over.** When a human message holds a question the reply does not address, the console carries the question into the next turn's prompt until a reply answers it, and the chat shows it as open. The morning's dropped question then cannot happen.
 
 ## Tests, hand-derived from the live shape
 
@@ -125,7 +125,7 @@ Checking them found a second defect: alerts 2292 and 2294 sit open on a card tha
 - The same revision answered with extra words ("okay, but drop the third criterion"): back to the planner.
 - A revision with a real question answered: back to the planner, unchanged behaviour.
 - A plan card's stop ask names planner sessions; the info block quotes the session's last tool refusal.
-- A member question the reply does not address reaches the next turn's prompt, and clears when a reply answers it.
+- A human question the reply does not address reaches the next turn's prompt, and clears when a reply answers it.
 
 ## What the fixes retire
 
@@ -140,7 +140,7 @@ Answer "Go on" at its ask. No session starts, so the empty budget and the 12 of 
 1. An answer to a stop ask at the card's budget floor: guaranteed by the project pool, or refused as today? The fixes make the case rare.
 2. The alert resolution pass: close a card's open alerts when it ends, or when their subject ends?
 3. The press that names money: a choice like "Fund €1.50" either moves the money and carries the instruction to its card, or its wording says it records the decision only.
-4. The project pool: give the project a small discretionary pool so the chat can fund a card the member has approved, or keep every fund in the member's hand.
+4. The project pool: give the project a small discretionary pool so the chat can fund a card the human has approved, or keep every fund in the human's hand.
 
 ## Sources
 

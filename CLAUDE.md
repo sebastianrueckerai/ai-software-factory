@@ -34,6 +34,10 @@ The console's design runs as rounds by the process in [design/process.md](design
 - Provider keys live in the gitignored `.env.tools`. Never print a key.
 - Read [design/process.md](design/process.md) before any image generation or critique, [design/models.md](design/models.md) before calling a provider, and [design/design-decisions.md](design/design-decisions.md) before changing the look.
 
+## Wording
+
+- A human is a human. Never call one a member, an operator or a resource in docs, copy or chat wording. Code identifiers may keep their names.
+
 ## Launch surfaces
 
 The landing page, the claims page, the film and the README are public. Read the handover before changing one: `launch/site/handover.md` for the landing page, its wording rules and its assets; `launch/handover.md` and `launch/film/notes.md` for the film and the seven clips; `demo/handover/README.md` for the scene bank they are recorded from.
