@@ -139,9 +139,10 @@ surface.
 
 ## Non-goals
 
-- A small-alias subagent that loops over tools and returns a conclusion:
-  the research sandbox design (chat-research-design-2026-10-19) covers
-  multi-step work. The one-shot digest is the rung that holds.
+- A subagent that loops over tools and returns a conclusion: phase 5 of
+  [chat-new-tools-plan-2026-10-31.md](chat-new-tools-plan-2026-10-31.md)
+  builds it on this plan's wrapper. The one-shot digest stays this
+  plan's own rung.
 - Any change to the chat's own model, the premium fallback chain
   (ruling 329), or the replay elision of plain reads.
 - Web tools for projects without a chat: the doors sit on the chat task.

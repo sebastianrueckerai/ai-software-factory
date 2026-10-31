@@ -3,7 +3,13 @@
 Written 2026-10-19, from the design discussion of the same day. This file
 turns the discussion into a concept: the decided parts, the constraints,
 and what the builder settles. Status: design, approved by Sebastian in
-conversation. Nothing here is built.
+conversation. Nothing here is built. Update 2026-10-31: the pod is
+deferred without a date, by the ruling that the factory agent gets no
+shell for now. The files tool below is superseded by the tree and grep
+of [chat-repo-reads-plan-2026-10-31.md](chat-repo-reads-plan-2026-10-31.md),
+and the research name by the phase 5 subagent of
+[chat-new-tools-plan-2026-10-31.md](chat-new-tools-plan-2026-10-31.md).
+The pod design stays the second rung, the questions that need code run.
 
 ## Why
 

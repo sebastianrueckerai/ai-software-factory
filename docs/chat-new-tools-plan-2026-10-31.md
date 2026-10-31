@@ -6,14 +6,16 @@ the date line), and what they taught is folded in below.
 
 ## The plan in one view
 
-Four phases, each shippable alone. Phases 1 to 3 run in order, phase 4
-whenever:
+Five phases, each shippable alone. Phases 1 to 3 run in order, phase 4
+whenever, phase 5 last, for it rides 2, 3 and 4:
 
 1. The date line, the cheapest steal: one line and four test pins.
 2. The digest purpose and the ask on the big reads, the spend cut.
 3. The web door, search and scrape with the digest inside (it needs
    phase 2's Digest wrapper).
 4. The repository reads, tree and grep, independent of the rest.
+5. The research subagent, one mid-tier loop behind one tool, the
+   biggest cut on research-shaped questions.
 
 The full reasoning lives in the two detail plans and the survey; this
 plan carries the order, the seams and what the aborted builds taught.
@@ -93,6 +95,61 @@ cut at 500; `grep` as one archive call plus in-memory scanning with
 every bound named in the answer. No shell anywhere: the model names a
 ref, a path prefix and a pattern, fixed Go does the rest.
 
+## Phase 5: the research subagent
+
+One tool on the premium menu, `research(question)`, and behind it one
+bounded loop on the mid tier (Sebastian's example: a GPT-5.3-class
+model). The premium thread sees only the report. One tool, not one for
+the codebase and one for the web: a real question spans both, the
+caller cannot know in advance where the answer lives, and the
+researcher's own tool schemas ride its own calls, so the split would
+spend a second menu slot and buy nothing.
+
+- The loop runs in the console process. The researcher drives the same
+  reads the chat has: `tree`, `grep`, `file` and `read_doc` (phase 4
+  and the standing reads), `web_search` and `web_scrape` (phase 3),
+  and phase 2's digest wrapper on big reads and pages. No sandbox, no
+  new credentials: repository reads ride the member token as `file`
+  does, the web rides the chat task's Firecrawl holds, and the agent
+  runs no code.
+- Routing like digest's: `FactoryModel` maps a chat task's research to
+  the class below premium (big today), hard-coded, no policy knob.
+- Bounds in code, not the prompt: at most 12 steps and 5 minutes of
+  wall time (starting points, tuned from live use), credits under the
+  chat.tools holds, the report cut at 2,048 tokens. A bound's refusal
+  names the stop and the fitting action: the narrower question, or one
+  direct read of the trail's best address.
+- The loop's history is the scratchpad. Named scratchpads wait for a
+  real question that hits the step cap.
+- The report: findings, then sources (path at ref, url), then open
+  questions. It enters the thread whole, and replay keeps it whole,
+  the asked-read rule's shape. The builder settles the mechanism:
+  `research` outside `isRead`, or the keep-whole rule on it.
+- The trail is recorded beside the thread, every step, call and
+  answer, for the human's audit. Judgement stays premium: the chat
+  model judges the report and may check a load-bearing claim with one
+  direct read.
+- The premium menu keeps the direct tools: one grep is one call, a
+  subagent for it is latency. The prompt gains one steering line, and
+  `research` joins `policy.ChatTools`, the manual and the access-table
+  floor with the reads.
+- Seams: the chatGateway fake gains a research branch beside its
+  title, compact, vision and digest branches. The chat stream's write
+  deadline needs the keepalive against a call that runs minutes.
+
+## No shell for the factory agent
+
+Sebastian, 2026-10-31: no shell for now, "lets see how far we get
+without a shell and hence a coding sandbox for the factory agent". The
+research sandbox of
+[chat-research-design-2026-10-19.md](chat-research-design-2026-10-19.md),
+a pod with a shell, was approved that day and never built. It is
+deferred without a date. The subagent takes its first rung, the
+questions that need reading and searching. The pod stays the second
+rung, the questions that need code run (build, measure), and the
+decision comes back when a real question asks for it. The `research`
+name moves to the subagent; the pod takes another if it lands.
+
 ## What the aborted builds taught
 
 - The date line touches four test pins in three files, listed in phase
@@ -111,13 +168,17 @@ ref, a path prefix and a pattern, fixed Go does the rest.
 The folds of the survey
 ([chat-tools-survey-2026-10-31.md](chat-tools-survey-2026-10-31.md))
 are not in this plan: they reshape old tools, they add none, and they
-wait for their own OK. The non-goals of the two detail plans stand: no
-subagent loop, no chat model change, no shell, no outline view.
+wait for their own OK. The detail plans' other non-goals stand: no chat
+model change, no outline view, and no shell anywhere, in the console or
+a pod, per the ruling above.
 
 ## Sources
 
 Sebastian 2026-10-31 ("I still only want a PLAN", twice; the two detail
-plans' asks). The detail plans and the survey, this repository. Roadmap
+plans' asks; the research ask, "use the mid tier model to research a
+question", one general tool agreed in conversation; "No shell for the
+agent for now"). The detail plans and the survey, this repository, and
+chat-research-design-2026-10-19, whose pod the ruling defers. Roadmap
 300 (the digest pattern) and 306 (the repository reads). The aborted
 builds of 2026-10-31, unwound the same day, their findings recorded
 above.
