@@ -64,6 +64,10 @@ flowchart TD
 
    The check. A criterion that changes files under a new id, and the new criterion carries a field `replaces` with the old id: store_function_comments_v11 with `replaces: store_function_comments_v10`. The rule reads that field and checks it against the newest stored revision: the named old id must be in that revision's list of criteria. The point of the check: a new plan may only replace a criterion that the previous revision still holds. A criterion that does not change keeps its id and must arrive with the exact same definition. That passes.
 
+   A small example, with plan 1 and plan 2. Plan 1 holds the criterion A. A session files plan 2, with the criterion B and `replaces: A`. The rule checks against plan 1, the newest stored plan: A is in plan 1, the field is true, plan 2 is stored. Plan 2's list now holds B, and A stays in plan 1 only. Then plan 2 is filed again, word for word, still saying `replaces: A`. The rule checks against the newest stored plan, which is plan 2 itself, and asks: does plan 2 hold A? No, plan 2 holds B. Refused. The field was written for the moment plan 2 was filed, when plan 1 was still the newest. A re-file reuses it against plan 2 itself.
+
+   The rule has no case for an identical filing. It never asks whether the arriving plan differs from the newest stored one. Every filing is treated as an amendment of the newest, and the `replaces` fields are checked against that newest revision. For a genuinely new plan that is right. For a re-file the check turns on itself, and that is the night.
+
    The last turn, move by move:
    1. Revision 12 was the newest stored revision. Its list held the criterion under the id v10.
    2. A session filed a new revision: the criterion under the new id v11, with `replaces: v10`. The rule asked whether revision 12's list holds v10. It does. Accepted, and stored as revision 13. Revision 13's list holds v11. Revision 12 stays in the stored history, still holding v10, but it is no longer the newest.
