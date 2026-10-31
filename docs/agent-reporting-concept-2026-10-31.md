@@ -2,14 +2,34 @@
 
 Written 2026-10-31, from the escalation at the end of card #1345's revision loop (see the revision-loop concept). Status: concept, waiting for Sebastian's go.
 
-## What gh is, and why it is not the answer
+## What you need to know first
 
-gh is GitHub's command-line client: it talks to GitHub's API with a stored login. The factory's forge is Forgejo, a different API; gh cannot speak to it. The card session tried gh because its instruction said "report the refusal on the issue" and gh was the only issue-shaped command it knew.
+Six things, in plain words:
+
+1. **Card sessions.** A card's work runs in agent sessions: short work runs by an AI agent inside a sealed sandbox. The session writes files in its clone of the repository, runs commands and spends the card's budget. It has no tool that talks to the forge.
+2. **Asks.** A session that cannot go on stops and asks. The ask lands on the card, the card waits for a human, and the ask shows in Needs you. Stopping and asking is the one designed way out of a sandbox.
+3. **The chat.** Beside the board sits a chat with the project agent. It reads and writes files in the project's document repository, files cards and answers asks for Sebastian, the one human the factory calls the member. It runs outside the sandboxes, with factory-served tools.
+4. **Tool cards.** A tool card is the card that adds a program to a sandbox image: it edits `factory/images.yaml`, the image rebuilds, and every session from then on finds the program installed. Card #1235 added chromium that way.
+5. **The credential rule.** An agent session never holds a forge credential. For every session factoryd mints two Forgejo tokens: one reads the upstream repository, one writes only to a fork owned by the `factory-agent` account. The worker container clones with the read token before the agent starts, keeps both tokens out of the agent's reach, and pushes with the write token only after the agent process is dead, once, and both tokens are revoked at the session's end. No write credential exists while the agent lives.
+6. **Who may write to an issue.** Only the factory. A report session's last message becomes an issue comment, an escalation's comment comes from factoryd, and in every case the factory holds the credential and does the posting. An agent hands over text and holds nothing.
+
+## Who wanted gh, and for what
+
+gh is GitHub's command-line client: it talks to GitHub's API with a stored login. It came up twice in the incident, both times for the same purpose: to post a comment on the issue, which is a write.
+
+1. **The card session reached for it at 01:41.** Sebastian's instruction to the card said: if the gate refuses the metadata again, do not re-plan, report the exact refusal on the issue. The gate refused again (the revision loop's defect, see the revision-loop concept). The session had the refusal text in hand, in its own findings, and lacked one thing: a tool that posts text to an issue. No such tool exists in a sandbox, so it reached for the one issue-shaped command agents know from training, `gh issue comment`. gh is not installed in the sandbox image, so the command did not run. The instruction had asked for a destination the sandbox cannot reach. The session's last move was the designed one: stop and ask.
+2. **The chat proposed the tool card.** After the night, the project agent proposed a tool card that puts gh into the project image, so future sessions could run that comment command. Same purpose, asked at install time instead of at run time.
+
+Neither actor wanted to read. Nothing in the incident needed a read: the refusal sat in the session's own findings, one query away in the controller's database, and every input the session worked from had been fed to it. The wanted access was a standing write credential for the forge, held inside the sandbox.
+
+If a read is ever wanted, it needs no gh either. The repository is already in the sandbox as the worker's clone, the card's context carries the request and its background, and anything else a session needs goes through an ask, which reaches the member. A read-grade gh login would still be a stored credential in the sandbox, and it still speaks to the wrong service.
+
+## Why a write can never be the answer
 
 Adding gh to the sandbox image would build the wrong thing twice over:
 
-1. It speaks to the wrong service. Even installed, it reaches no Forgejo.
-2. It breaks the credential rule. An agent session holds no write credential by design: the read token lives in the clone container, and the write token is minted after the agent process is dead, used once, revoked. A gh login in the sandbox would hand the agent exactly the standing credential the architecture refuses to give it.
+1. It speaks to the wrong service. The factory's forge is Forgejo, a different API. Even installed, gh reaches no Forgejo.
+2. It breaks the credential rule. A gh login in the sandbox is a standing credential in the agent's reach while it lives, exactly the credential the architecture refuses to give it. The rule exists because a token inside the agent's reach leaks through git hooks and lingering processes. That is why the write token is minted only after the agent process is dead, used once, and revoked.
 
 So the tool card the project agent proposed (gh in the project image) is refused, and no image change is needed.
 
@@ -23,6 +43,8 @@ What the ask did not carry was the blocker itself. The session's stop note said 
 
 1. **The ask quotes the refusal.** When a session stops right after a tool refusal, the ask's info block carries the refusal verbatim from the session's findings. The human then sees "the plan was refused: criterion v11 replaces v10, an id the previous revision does not hold" on the card, not only "this card stopped and needs your decision". No new credential, no new channel; factoryd composes the ask and already holds the findings.
 2. **Plan cards get plan wording.** A plan card's stop ask says what its choices do: go on starts another planner session, leave it waiting holds the plan, end the card closes the plan and its cards with it. The current text talks about pull requests and re-verification, which fits no plan card.
+
+With the refusal in the ask, no instruction needs to send a session to the issue again: the ask is the report.
 
 ## The report tool, named and declined for now
 
