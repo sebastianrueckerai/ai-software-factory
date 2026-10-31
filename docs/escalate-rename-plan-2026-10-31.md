@@ -1,11 +1,10 @@
 # The ask tool's rename: `escalate_to_human` becomes `escalate`
 
-Written 2026-10-31. Status: built in code (PR #1385, branch factory/t-6eadec8912ab) — pending the infra commit and ruling 326, both needing sebastian's hands. See "What still waits" below.
+Written 2026-10-31. Status: all landed but the merge of code PR #1385 (branch factory/t-6eadec8912ab), which the project agent presses after the fund press on #1387 — infra 82ab246 on both remotes, the living docs and this status line, ruling 331 in the ledger. See "What still waits" below.
 
-## What still waits (added 2026-10-31)
+## What still waits (added 2026-10-31, landed the same day)
 
-- The infra repo commit (factory/policy.yaml classes + schema enum + README): the sandbox cannot read sf/ai-software-factory-infra (anonymous gets no read). Sebastian lands it inside the reconciliation window, per the risk clause.
-- Ruling 326 in .superpowers/sdd/2026-09-24-build-plan/progress.md: outside every clone. Sebastian's hands.
+- Landed: the infra repo commit 82ab246 (factory/policy.yaml classes, the schema enum, the README mention), on both remotes inside the reconciliation window; the living docs (architecture, roadmap, target-architecture) and this status line; ruling 331 in .superpowers/sdd/2026-09-24-build-plan/progress.md — the plan's "ruling 326" was a stale number, 326 was taken 2026-10-23 and the ledger is outside every clone.
 - The one-line quote fix in docs/manual/policy.md (returned to the branch session).
 
 ## The decision

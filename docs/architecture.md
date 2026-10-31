@@ -1933,13 +1933,13 @@ classes from the baseline conversation (analyzer, integration-tester,
 release-agent, prod-operator) arrive one per phase as the loops that need them
 come online. Stage 9 added the second, `analyzer` (Rulings 182, 185, Task
 74): the coder's models and the supervisor, the tools `web_search` and
-`web_scrape` with caps, `request_info` and `escalate_to_human`, no
+`web_scrape` with caps, `request_info` and `escalate`, no
 commissioning tools, and a session in report mode (6.3). It serves the
 improvement presort (5.1) and the screening stage (7). No Stage 9 loop
 needed another class: the release is the roll task, code with no class (7).
 Stage 11 added the third, `planner` (session `plan`, 5.1): the coder's
 models, starting on the stronger rung since one plan steers every card it
-files, web search and scraping with caps, `escalate_to_human`, and no
+files, web search and scraping with caps, `escalate`, and no
 `request_info`, since the spec's author answers on the plan card. Nor did a need for SPIRE or OPA appear: one cluster, projected
 ServiceAccount tokens, and ten policy sections that Go code reads. `review-frontier` and `supervisor` stay out of the class's
 `models`, so no agent can call them. Every factoryd model call goes through
@@ -2123,7 +2123,7 @@ line's figure.
 
 Tool calls reach the gateway's `/mcp` endpoint, an MCP server over stateless
 streamable HTTP. It offers `web_scrape` and `web_search` (Firecrawl),
-`replicate_predict`, `fal_run`, `escalate_to_human` (6.6) and the
+`replicate_predict`, `fal_run`, `escalate` (6.6) and the
 commissioning tools (5.5). A paid call takes a hold for its worst case, calls
 the provider without the agent's cancel, so a disconnect cannot cut a billed
 call, and books the real cost: Firecrawl's `creditsUsed` times the credit
@@ -2616,7 +2616,7 @@ remains.
 **Inline answers.** An agent's question carries structured choices, and a
 needs-you card renders them as buttons beside a text box, so most human
 input needs no drawer. The escalation gains a `choices` field, and the
-agent's tool schema gains it too. Built: the gateway's `escalate_to_human`
+agent's tool schema gains it too. Built: the gateway's `escalate`
 tool takes 2 to 5 choices of 1 to 60 characters, which factoryd validates
 at its boundary. It drops invalid choices and keeps the question. The card
 renders one button per choice above the text box, posting the same answer
@@ -3650,7 +3650,7 @@ Sandbox hardening:
 - Non-root, dropped capabilities, read-only root filesystem.
 - The harness configuration is hardened against the pinned opencode's
   source (Task 87): the `question` tool is hidden, so the only ask path is
-  the gateway's `request_info` and `escalate_to_human`; a step cap per
+  the gateway's `request_info` and `escalate`; a step cap per
   session from `limits.steps` (1500 since Stage 12, 200 before), a soft cap, at which opencode asks the
   model to summarise and stop, while the agent time stays the hard stop;
   `doom_loop` stays on allow, since a denied doom loop would stop the
@@ -4157,7 +4157,7 @@ record (Ruling 120). Each answer is cut at 4000 bytes in the brief, and the
 issue keeps it in full. Before this, an agent treated an answer as one more
 finding and asked the same question again.
 
-The agent can escalate by itself too, with the `escalate_to_human` tool. The
+The agent can escalate by itself too, with the `escalate` tool. The
 gateway passes the question and the reason to factoryd, which records an
 intake event and hands the escalation to the live session. The session stops
 with a work-in-progress push, asks no check-in, and the workflow posts the
