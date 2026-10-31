@@ -62,7 +62,7 @@ flowchart TD
 4. The answer woke a planner session. Nothing had changed, so the session filed the plan unchanged: the same revision, word for word.
 5. The filing rule refused that re-file. The refusal was not about a change: the split had been accepted and stored hours before, cards and all. It came from the lineage check. First the check itself, then the night's last turn, one move at a time.
 
-   The check. A criterion that changes files under a new id, and the new criterion carries a field `replaces` with the old id: store_function_comments_v11 with `replaces: store_function_comments_v10`. The rule reads that field and checks it against the newest stored revision: the named old id must be in that revision's list of criteria. The point of the check: a new check may only succeed a check that is there. A criterion that does not change keeps its id and must arrive with the exact same definition. That passes.
+   The check. A criterion that changes files under a new id, and the new criterion carries a field `replaces` with the old id: store_function_comments_v11 with `replaces: store_function_comments_v10`. The rule reads that field and checks it against the newest stored revision: the named old id must be in that revision's list of criteria. The point of the check: a new plan may only replace a criterion that the previous revision still holds. A criterion that does not change keeps its id and must arrive with the exact same definition. That passes.
 
    The last turn, move by move:
    1. Revision 12 was the newest stored revision. Its list held the criterion under the id v10.
@@ -70,7 +70,7 @@ flowchart TD
    3. A criterion had changed, so the plan asked for the confirmation. Sebastian answered okay.
    4. The answer woke a session. Nothing had changed, so it filed the plan of revision 13 unchanged. The plan still carried `replaces: v10`.
    5. The rule asked whether the newest stored revision's list holds v10. The newest stored revision was revision 13, the very plan being re-filed. Its list holds v11, not v10.
-   6. The field named an id that was no longer in the newest list. The field had been true at move 2, when revision 12 was still the newest. Storing revision 13 moved the newest list from v10 to v11, and the same field, filed again, went stale. Refused:
+   6. The field named an id that was no longer in the newest list. The field had been true at move 2, when revision 12 was still the newest. Storing revision 13 moved the newest list from v10 to v11, and the same field, filed again, went stale. The rule assumes every filing is a new plan that amends the newest revision, so it checks each `replaces` field against that revision. This filing was not a new plan: it was the newest revision itself, unchanged. Its fields were checked against the very plan they came from, and that plan holds the successors, not the predecessors. Refused:
 
 ```
 the plan was refused:
