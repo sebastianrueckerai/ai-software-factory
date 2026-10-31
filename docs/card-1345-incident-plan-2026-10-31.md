@@ -1,6 +1,6 @@
 # Card #1345: the incident and the plan
 
-Written 2026-10-31, from the live incident of the night of 30 to 31 October and the morning after. One plan, merged from the two concepts of that day, the revision loop and the blocker report, which this file replaces. Status: plan, waiting for Sebastian's go. The filing fixes live in `internal/factoryd/plan.go` of ai-software-factory-code, the ask and carry-over fixes in the console.
+Written 2026-10-31, from the live incident of the night of 30 to 31 October and the morning after. One plan, merged from the two concepts of that day, the revision loop and the blocker report, which this file replaces. Status: plan, execution handed over on 31 October; the order of work below is the run order. The filing fixes live in `internal/factoryd/plan.go` of ai-software-factory-code, the ask and carry-over fixes in the console.
 
 ## What you need to know first
 
@@ -190,6 +190,15 @@ Checking them found a second defect: alerts 2292 and 2294 sit open on a card tha
 - A plan card's stop ask names planner sessions; the info block quotes the session's last tool refusal.
 - A human question the reply does not address reaches the next turn's prompt, and clears when a reply answers it.
 
+## The order of work
+
+1. The five fixes, with their tests, in ai-software-factory-code. Work in a worktree, one commit per fix with its tests, `go test -race ./...` green.
+2. Retire the batching instruction: find it by search in the code and infra repositories and delete it, with fix 3 in the commit message.
+3. Pull request, gates green, merge, and the roll through the factory's own deploy path. Confirm the live factoryd runs the new build before the next step.
+4. Card #1345: answer Go on at its ask (the section below).
+5. The board sweep (the section below).
+6. One summary to Sebastian: the cards that are genuinely his, one line each with the decision it needs and what it costs to leave it open, and the money any of them needs. The open decisions ride along.
+
 ## What the fixes retire
 
 The batching instruction. "File everything in one revision, keep confirmations down" was a prompt rule patching this loop. With confirmations filing cards, the tax is gone and the rule goes.
@@ -197,6 +206,22 @@ The batching instruction. "File everything in one revision, keep confirmations d
 ## What card #1345 does once this rolls
 
 Answer "Go on" at its ask. No session starts, so the empty budget and the 12 of 12 sessions stop mattering and no Fund press is needed. factoryd files the two territory cards from the confirmed revision 13 and ends the plan done. If a planner session is already awake when the fix rolls, its re-file is a no-op and harmless.
+
+## The board sweep
+
+After the fixes roll, the board still holds the night's leftovers. Walk the board and deal with each card so nothing wanted gets lost and the factory runs again. Sebastian's rule for this sweep: act for him, and no thing we still want to build gets lost.
+
+1. Enumerate first: every card in Needs you, every open ask, every open alert, every project.
+2. Sort each card into one of four, then act:
+   - **The plan already holds the answer.** Answer it. Card #1345 first: Go on, and factoryd files its two territory cards with no session.
+   - **Obsolete because of the fixes.** Close it with a note that names where its intent lives. The gh tool card the chat proposed is one: closed refused, reason in the exit section above. Cards that exist only to work around the loop close the same way.
+   - **Stuck on a defect this plan fixes.** Unblock it through the new machinery: answer its ask again, or let its next filing be the no-op it now is. No hand edits to stored state.
+   - **Genuinely Sebastian's.** Do not answer it. Collect it for the final summary, one line each: the decision it needs and what it costs to leave it open.
+3. Known leftovers of today, to sort like any other: the policy-gate migration ask on PR #1358 (task t-3eb04c964c1f), the check-in-share ask on t-5600b1b1474b, the approval on card #1362, and anything else the night and the morning left waiting.
+4. Money: fund nothing Sebastian has not approved by name. A card that needs money goes in the summary with the amount.
+5. Alerts: close 2815 to 2828, the loop's detector alerts, resolved by the fix, and 2292 and 2294, orphaned on their finished card. The automatic resolution pass stays an open decision, not part of this sweep.
+6. Nothing wanted gets lost: a card closes only when its intent survives somewhere, in another open card, in this plan, or in a comment on its issue naming the successor. In doubt, keep the card open and put it in the summary.
+7. The end state: no card waits except the ones in the summary, work cards are running, the factory produces again.
 
 ## Open decisions
 
