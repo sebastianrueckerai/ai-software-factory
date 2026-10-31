@@ -85,10 +85,16 @@ What the ask did not carry was the blocker itself. The session's stop note said 
 
 ## The fix by construction
 
-1. **The ask quotes the refusal.** When a session stops right after a tool refusal, the ask's info block carries the refusal verbatim from the session's findings. The human then sees "the plan was refused: criterion v11 replaces v10, an id the previous revision does not hold" on the card, not only "this card stopped and needs your decision". No new credential, no new channel; factoryd composes the ask and already holds the findings. The database read the incident needed by hand becomes part of the ask composition.
-2. **Plan cards get plan wording.** A plan card's stop ask says what its choices do: go on starts another planner session, leave it waiting holds the plan, end the card closes the plan and its cards with it. The current text talks about pull requests and re-verification, which fits no plan card.
+The ask is machine-made, so the fix is a change in the machine's code, not a prompt change. When a session stops, factoryd records the ask, the card waits, and the console, the program behind your screen, renders the ask on the card page and in the Needs you list. The frame and the choices are fixed text in that program. The wording you saw, "This card stopped and needs your decision: how should it go on?", is that fixed text, with the session's stop note inserted, and the stop note is the only part an agent writes. No model is called to build an ask, and no agent is instructed when one appears.
 
-With the refusal in the ask, no instruction needs to send a session to the issue again: the ask is the report.
+Two changes, both mechanical:
+
+1. **The ask quotes the refusal.** When a session stops right after a tool refusal, the ask's info block carries the refusal verbatim from the session's findings. The human then sees "the plan was refused: criterion v11 replaces v10, an id the previous revision does not hold" on the card, not only "this card stopped and needs your decision". This is machine text added by machine code: the refusal is the tool's own answer, already stored in the controller's record (path two above), and the code copies it over word for word. The hand-run database query of the incident becomes code that runs every time an ask is built. Where the copy sits, in factoryd when the ask is recorded or in the console when it is rendered, is an implementation detail; the revision-loop concept files the ask fixes under the console.
+2. **Plan cards get plan wording.** A plan card's stop ask says what its choices do: go on starts another planner session, leave it waiting holds the plan, end the card closes the plan and its cards with it. The current text talks about pull requests and re-verification, which fits no plan card. The same kind of change: fixed text in the program, chosen per card kind.
+
+Why code and not a prompt rule: a rule like "when you stop, quote the refusal in your stop note" would depend on the session remembering and obeying, could paraphrase the refusal wrongly, would spend tokens, and would do nothing when a session stops for another reason or stops without a note. The code path fires on every stop after a refusal, copies word for word, and costs nothing. That is the factory's design principle for its steps: fix by construction, in code, in a tool's shape or in a check, and treat a prompt rule as the last resort.
+
+No instruction to any agent changes for this case. The instruction that pushed the session at gh was Sebastian's own to that card. With the refusal in the ask, no instruction needs to send a session to the issue again: the ask is the report.
 
 ## The report tool, named and declined for now
 
