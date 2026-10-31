@@ -1,6 +1,12 @@
 # The ask tool's rename: `escalate_to_human` becomes `escalate`
 
-Written 2026-10-31. Status: decided — Sebastian put it on the board 2026-10-31. Nothing changed yet.
+Written 2026-10-31. Status: built in code (PR #1385, branch factory/t-6eadec8912ab) — pending the infra commit and ruling 326, both needing sebastian's hands. See "What still waits" below.
+
+## What still waits (added 2026-10-31)
+
+- The infra repo commit (factory/policy.yaml classes + schema enum + README): the sandbox cannot read sf/ai-software-factory-infra (anonymous gets no read). Sebastian lands it inside the reconciliation window, per the risk clause.
+- Ruling 326 in .superpowers/sdd/2026-09-24-build-plan/progress.md: outside every clone. Sebastian's hands.
+- The one-line quote fix in docs/manual/policy.md (returned to the branch session).
 
 ## The decision
 
