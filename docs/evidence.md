@@ -34,7 +34,7 @@ A big request is measured and split, and the criteria name their proofs before a
 
 | Guarantee | Enforced by | Tested by | Proven by |
 |---|---|---|---|
-| A big request splits into a plan of dependent cards: the sizing sends a person's card that is not small to the planner, where the process has a plan track | `internal/factoryd/sizing.go`, `internal/factoryd/plan.go` | `internal/factoryd/sizing_workflow_test.go`, `internal/factoryd/plan_test.go` | Stage 11: a spec card became ten planned cards and a deployed link shortener |
+| A big request splits into a plan of dependent cards: the sizing sends a person's card that is not small to the planner, where the process has a plan track | `internal/factoryd/sizing.go`, `internal/factoryd/plan.go` | `internal/factoryd/sizing_workflow_test.go`, `internal/factoryd/plan_test.go` | Stage 11: a spec card became ten planned cards and a deployed link shortener. 2026-10-30: two cards filed by the chat were sized live (large, medium) and switched to the plan track; the large plan filed ten cards |
 | Criteria carry an id, a kind and a named test, and the gate runs the named tests on the assembled feature | `internal/factoryd/criteria.go` | `internal/factoryd/criteria_test.go` | Stage 11's integration card passed the criteria gate (ledger task-105-report.md, named in roadmap.md) |
 | The builders never see the hold-out tests: written by a separate session, stored outside every workspace | `internal/factoryd/holdout.go` | `internal/factoryd/holdout_test.go` | not yet |
 | A card started on an older spec cannot merge | `internal/factoryd/plan.go` (ErrStalePlan) | `internal/factoryd/plan_stale_test.go` | not yet |
@@ -46,7 +46,7 @@ The gate chain stands before every merge. It has run on every stage exit, and tw
 | Guarantee | Enforced by | Tested by | Proven by |
 |---|---|---|---|
 | Nine gate stages, with a floor of four no process file may lower | `internal/policy/process.go` (validateStages), `infra:factory/processes/*.yaml` | `internal/policy/process_test.go` (its testdata holds the shipped files) | Every stage-exit merge passed the chain |
-| Policy fails forbidden paths, and migrations wait for a human | `internal/policy/risk.go`, `internal/factoryd/gates.go` | `internal/policy/risk_test.go` (TestClassify), `internal/factoryd/gates_test.go` | Every merge of every stage run passed the policy gate |
+| Policy fails forbidden paths, and migrations wait for a human | `internal/policy/risk.go`, `internal/factoryd/gates.go` | `internal/policy/risk_test.go` (TestClassify), `internal/factoryd/gates_test.go` | Every merge of every stage run passed the policy gate. 2026-10-31: the policy gate classed a metrics commit a migration and held the card for the member |
 | Checks run in untrusted gVisor pods with no push credential | `internal/factoryd/ci.go`, `.forgejo/workflows/pr.yml` | `internal/factoryd/ci_test.go`, the pr.yml job-env-audit asserts the job token cannot push | Every pull request of the factory's own code |
 | Deleted or weakened tests are a finding returned to the agent | `internal/factoryd/cheat.go` | `internal/factoryd/cheat_test.go` | not yet |
 | A review with no verdict is a finding on the human's card | `internal/factoryd/gates.go`, `internal/factoryd/checkin.go` | `internal/factoryd/checkin_test.go` | not yet |
@@ -68,7 +68,7 @@ Alerts and routines file cards on their own.
 | Guarantee | Enforced by | Tested by | Proven by |
 |---|---|---|---|
 | A SigNoz alert files a bug card, judged real or noise | `internal/factoryd/signozwebhook.go`, `internal/factoryd/alerts.go`, `k8s/alerts/*.json` | `internal/factoryd/signozwebhook_test.go`, `internal/factoryd/projectalerts_test.go` | Stage 8: the regression's alert filed the card that fixed it |
-| Routines run by cron, by every n merges or by event | `internal/factoryd/routines.go`, `internal/policy/routine.go` | `internal/factoryd/routines_test.go`, `internal/factoryd/routine_run_test.go` | not yet (template-pass is scheduled hourly in `infra:factory/policy.yaml`) |
+| Routines run by cron, by every n merges or by event | `internal/factoryd/routines.go`, `internal/policy/routine.go` | `internal/factoryd/routines_test.go`, `internal/factoryd/routine_run_test.go` | not yet (template-pass runs hourly in `infra:factory/policy.yaml`; 346 passes to 2026-10-30, all no change, because no registered project uses a template) |
 
 ## 7. It does not stall
 
