@@ -5961,8 +5961,8 @@ roadmap item that holds it is named.
   audit's pass (amending the standing merge contracts of Stages 5 to 7),
   forbidden and
   migration keeping a human, the discretionary pool and the `fund` tool,
-  the gate bot factory-gate posting the approval the gate decided (R59
-  to R64), the infra chain through Flux commit statuses (code 7a670a96,
+  the gate bot factory-gate posting the approval the gate decided, the
+  infra chain through Flux commit statuses (code 7a670a96,
   81d99fda, 01220ca7, infra 0eb56e0, dd88c46, 330b406, 1814e4d). The
   open ends are roadmap 308.
 - 298 one card per feature: the partial index narrowed to live cards,

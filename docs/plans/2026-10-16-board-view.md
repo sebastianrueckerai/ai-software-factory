@@ -8,7 +8,7 @@
 
 **Tech Stack:** Go (console package), vanilla JS (chat.js, console.js), the node-vm driver in `events_test.go`, the Playwright console lab.
 
-**Spec:** `docs/roadmap.md` item 282 and its decided line (2026-10-16: the view change holds for the page as a click does, nothing stored). The design rulings R1-R10 below carry the conversation's decisions.
+**Spec:** `docs/roadmap.md` item 282 and its decided line (2026-10-16: the view change holds for the page as a click does, nothing stored). The design decisions R1-R10 below carry the conversation's decisions.
 
 ## Rulings the plan argues from
 
