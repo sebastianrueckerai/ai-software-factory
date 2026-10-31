@@ -48,17 +48,21 @@ flowchart TD
 
 **Why criteria change.** The criteria are the contract: the checks that decide at the end that the whole feature counts as good. They change for real reasons. The human asks for a different shape, as with the territory split that started this night. A finished card changes what is left to do. The spec moves. Or the filing rule refused the last attempt, and the correction counts as a change. A changed criterion files under a new id that names the old one in `replaces` (v11 replaces v10), so the succession is always written down.
 
-**The confirmation.** Because the criteria are the contract, a revision whose criteria changed asks the human to confirm before any work runs: no work runs against criteria the human has not seen. Today every answer to that ask, including a plain okay, wakes a new planner session that is expected to file the next revision. That arrow, from the answer back to the planner in the diagram, is one half of the night's circle.
+**The confirmation.** Because the criteria are the contract, a revision whose criteria changed asks the human to confirm before any work runs: no work runs against criteria the human has not seen. Cards ask nothing: the planner may split a card, add cards or drop cards, and a change in the number of cards alone asks no one, because only the filing rule judges the cards. Today every answer to that ask, including a plain okay, wakes a new planner session that is expected to file the next revision. That arrow, from the answer back to the planner in the diagram, is one half of the night's circle.
 
 **From plan to work.** When nothing is left to ask, the plan's work cards are filed as normal cards and the plan ends done. They run the work track: sessions build in sandboxes, a pull request passes the gates, the merge goes live. The criteria gate then runs the plan's named tests on the assembled result.
 
 ## The night, step by step
 
 1. Card #1345 asked for house doc comments on three old files of factoryd. The chat filed it, the sizing called it medium, and a medium card goes to the plan track.
-2. Sebastian asked from the console for a split by territory. The planner delivered it: two territory cards and their criteria.
-3. The plan asked for a confirmation of its criteria. Sebastian answered okay.
-4. The answer woke a planner session. Nothing had changed, so the session filed the plan unchanged.
-5. The filing rule compares a new plan with the newest stored revision. The newest stored revision was that same plan. The rule asked whether that revision still holds the ids its own criteria had replaced. It does not, because a revision drops an id when another replaces it: when v11 replaced v10, v10 left. The filing was refused:
+2. Sebastian asked from the console for a split by territory. The planner filed it as a new revision. The split changed two things at once. The cards: one work card became two, one per territory. The criteria: the checks were split to match the cards, one criterion per territory card, and each new criterion was a changed criterion, filed under a fresh id that named its predecessor in `replaces`. The work stayed the same, writing doc comments. The checks that judge that work were re-shaped, and a re-shaped check is a changed criterion.
+3. Of those two changes, only the criteria asked. Cards are the planner's craft: a plan may split a card, add cards or drop cards, and no one is asked, because only the filing rule judges cards. A change in the number of cards alone would have asked nothing. The criteria are the contract, and they had changed, so the plan asked Sebastian to confirm before any work ran. He answered okay.
+4. The answer woke a planner session. Nothing had changed, so the session filed the plan unchanged: the same revision, word for word.
+5. The filing rule refused that re-file. The refusal was not about a change: the split had been accepted and stored hours before, cards and all. It came from the lineage check. That check, on the night's last turn, step by step:
+   - Every stored revision holds a list of its criteria, the ids current at its moment. When v11 replaced v10, the new revision's list held v11 and stopped holding v10. Nothing was lost: revision 12 still holds v10 in the stored history. Only the newest revision, revision 13, holds v11 instead of v10.
+   - The re-filed plan carried the same claim it was stored with: v11 `replaces` v10.
+   - The rule reads every `replaces` claim against the newest stored revision and asks one question: does that revision hold the named id? The newest stored revision was revision 13, the very plan being re-filed. Revision 13 holds v11. It does not hold v10.
+   - So the claim failed. It had been true at the filing of revision 13, when the newest stored revision was revision 12, which still held v10. Once revision 13 was stored, v10 left the newest list. The same claim, filed again, named an id that was no longer there. A re-file of the newest revision always hits this: its succession claims name ids the newest revision has already replaced. Refused:
 
 ```
 the plan was refused:
