@@ -96,6 +96,26 @@ Why code and not a prompt rule: a rule like "when you stop, quote the refusal in
 
 No instruction to any agent changes for this case. The instruction that pushed the session at gh was Sebastian's own to that card. With the refusal in the ask, no instruction needs to send a session to the issue again: the ask is the report.
 
+## The quoted refusal may not be the blocker
+
+The quote fix keys on one condition: a stop right after a tool refusal. The condition can misfire. A session can trip over a tool, recover, and stop an hour later for a different reason, and the last refusal on record would then be a red herring in the ask's info block. The quote stays the right minimal patch for the night's exact shape, a session stopped by the very refusal it was told to report. The standing answer is not a sharper heuristic on one field but the ask contract below: an ask whose every part is filled from the stop's own facts, whatever kind of stop it is, with the session record among the sources.
+
+## Two audiences: the agent that looks first, and the human
+
+Asks do not always land with the human, and the agent-first path exists, twice over. The check-in agent, live since 2026-10-15, resolves worker failures before a human sees them, reading the worker's transcript with search tools of its own. And by the ruling of 2026-10-17, at the autonomy levels autonomous and full auto, every ask that would reach a human gets one project-agent attempt first: the agent wakes on the ask, reads the five parts and the card's records, session search among them, and either settles the ask, finds it obsolete, or lets it reach the human with its analysis attached. For that audience the terse internal reason is enough, because the agent gathers the rest itself.
+
+Below those autonomy levels no attempt runs, and the human is first. That was the night of #1345: the ask reached Sebastian unattempted and unannotated, and the chat's own paths to act on the card were refused on its empty budget (the money walls, told in the revision-loop concept). Whenever no agent stands between, the ask is the only carrier of the problem, and that is the case the ask must be built for.
+
+## The standing contract, and why the night's ask was empty anyway
+
+The demand is old, and the factory recorded it. The question-format concept of 2026-10-17 was filed as Sebastian's ask: five parts, always the same order, the ask with the numbers in it, the why, what you need for the call, a recommendation with a named source when grounds exist, and premade answers. Rulings of 2026-10-16 and 2026-10-20 fixed the board shape: a one-line ask on the card face, the five parts in the drawer, every human card a five-part question.
+
+The frame shipped. An ask is a record of five fields, ask, why, info, recommendation with source, choices (`HumanQuestion` in internal/factoryd/question.go), the deterministic families, about 85% of every question ever asked, get code-filled templates, and the board renders the face and the fold.
+
+The content did not. Every stop without a template falls to one generic fallback: the fixed sentence you saw as the ask, the stop reason's first line as the why, a fixed info text about pull requests and re-verification, and three generic choices. The parts exist and the facts are absent, because no fallback path reads the session record, and the choices carry labels only, with no word of what each one costs. No rule anywhere said otherwise: the writing guide's question rule rides only in model prompts, the fallback is written by code, and neither CLAUDE.md mentioned asks at all. The shape shipped, the content rule did not. That is why the night's ask was empty.
+
+The rule now stands in the project's CLAUDE.md: every ask a human answers carries a clear ask, a short summary, a longer plain-context text a newcomer to the system and the factory can decide by, and the choices with their effects and tradeoffs, and the fallback is no exception: its parts come from the stop's own facts, never from fixed generic text. The refusal quote above is one source that rule draws on. Implementing it, a fallback that fills itself and choices that carry their tradeoffs, is build work, not done here.
+
 ## The report tool, named and declined for now
 
 A factory-served tool (the session calls `report(text)`, factoryd posts the comment on the issue in the human's name, rate-limited to one per stop) would give the issue a durable record without any credential reaching the agent. It is declined for now: with the refusal quoted in the ask, it duplicates a channel, and no case has appeared where a record must reach the issue and no human ask is involved. Revisit when one does. It would follow the one pattern the factory already uses for issue comments: the factory posts, the agent supplies text (primer, who may write to an issue).

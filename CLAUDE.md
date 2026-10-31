@@ -23,6 +23,10 @@ Five planes in a loop: signals (issues, telemetry, alerts) feed a durable contro
 
 Reliability comes from how an AI step is built, not from its prompt (Sebastian, 2026-10-12). Each step has a limited scope. It gets all the context it needs, including the history of the steps before it, all the tools it needs, tools to gather more, and a clear view of its goal. It checks its own work and corrects itself, and every refusal names the state and the fitting action, so it can. When a step goes wrong, fix it by construction: in code, in a tool's shape, in a check or in the configuration, and make a step that is too large smaller. A prompt rule is the last resort: needed at times, but brittle, and such rules accumulate. Stage 16's four principles above apply this to the chat. The roadmap's third guiding idea and `docs/architecture.md` section 1 carry it.
 
+## Every ask a human answers carries its own context
+
+Any ask, question or escalation a human answers carries, always: a clear ask or problem description, then a short summary, then a longer text with enough context, in simple terms, that someone not versed in the system being built or the factory can understand the issue and decide, and the offered choices with what each does and its tradeoffs whenever the choice's name alone does not say so. The five-part contract is [docs/question-format-concept-2026-10-17.md](docs/question-format-concept-2026-10-17.md); the prose follows [docs/writing-guide.md](docs/writing-guide.md). The fallback is no exception: a stop no template covers still fills every part from the stop's own facts, never with fixed generic text. Text an agent reads may stay terse when that agent can gather more itself; the human-facing shape never does.
+
 ## Design rounds
 
 The console's design runs as rounds by the process in [design/process.md](design/process.md): image models go wide, a vision critic judges, Sebastian picks, code follows. A round that designs one control or one feature uses the condensed form described there.
