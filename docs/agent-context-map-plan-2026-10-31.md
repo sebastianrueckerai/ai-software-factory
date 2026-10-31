@@ -57,9 +57,10 @@ Per documented agent it does three things:
    modes run the pinned opencode binary against the in-process fake
    OpenAI server (the record-test machinery), each with one fixed
    fixture task; the literal first POST body is captured. The direct
-   clients run their real prompt builders with one fixed fixture input
-   each, rendered into the exact body shape the code sends
-   (`chatPayload`, the operator streaming body).
+   clients go the same way: factoryd and the console make their real
+   calls against an in-process fake gateway, which records the literal
+   first POST body; the prompt builders run unmodified, fed by one fixed
+   fixture input each.
 2. Labels every part. A registry names, per agent, the builders that
    make up its context (system, guide, sandbox facts, objective wrap,
    tools list, statement, fixture data). The tool runs each builder on
@@ -138,6 +139,9 @@ Four phases, each shippable alone:
 - Offline fixture capture, not live S3 session records: regenerable at
   will, no secrets, no cluster, and the captured request is the real
   assembly's output on a fixed task.
+- The capture boundary is the gateway: the recorded body is what our
+  code sends. What LiteLLM or the provider changes beyond it is out of
+  scope.
 - Output lands in the design repo's `docs/agents/`, regenerated and
   committed on demand.
 - One page per agent, the shared trunk explained once in the index.
