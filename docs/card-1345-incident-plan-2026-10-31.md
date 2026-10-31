@@ -1,15 +1,20 @@
-# Concept: the card #1345 incident from the ground up
+# Card #1345: the incident and the plan
 
-Written 2026-10-31, from the live incident of the night of 30 to 31 October and the morning after. Status: concept, waiting for Sebastian's go. The plan fixes live in `internal/factoryd/plan.go` of ai-software-factory-code, the ask and carry-over fixes in the console.
+Written 2026-10-31, from the live incident of the night of 30 to 31 October and the morning after. One plan, merged from the two concepts of that day, the revision loop and the blocker report, which this file replaces. Status: plan, waiting for Sebastian's go. The filing fixes live in `internal/factoryd/plan.go` of ai-software-factory-code, the ask and carry-over fixes in the console.
 
 ## What you need to know first
 
-Four things, in plain words:
+Nine things, in plain words:
 
-1. **Cards.** The factory turns a request into a card: one unit of work with its own budget in euros and a small cap on how many agent runs it may use.
-2. **Sessions.** A card runs agent sessions: short work runs by an AI agent inside a sealed sandbox it cannot leave. Every session spends from the card's budget. A session that cannot go on stops and asks, and the card then waits for a human. That question is the ask. It shows on the card and in the Needs you list.
-3. **The chat.** Beside the board sits a chat with the project agent. It reads and writes files in the project's document repository, files cards and answers asks for Sebastian, the factory's one human. It is the main channel between the two.
-4. **Money.** The factory holds the cost of every model call against the card's budget before the call runs. A card with too little budget runs nothing, not even the delivery of an answer.
+1. **The forge and the issue.** The factory's code and work record live in a forge: a Forgejo instance, a self-hosted git host with an issue tracker. GitHub is a different service of the same shape, and gh is its client. Every card is tracked by an issue in the forge, and comments on that issue are the durable record of what happened to the card. An instruction that says report on the issue means: post a comment on the card's issue.
+2. **Cards, money and the board.** The factory turns a request into a card: one unit of work with its own budget in euros and a small cap on how many agent sessions it may use. The board shows the project's cards. A card that waits for a human shows in the Needs you list. The factory holds the cost of every model call against the card's budget before the call runs: a card with too little budget runs nothing, not even the delivery of an answer.
+3. **Sessions and sandboxes.** A card runs agent sessions: short work runs by an AI agent inside a sealed sandbox. The sandbox holds a clone of the repository, and the session writes files, runs commands and spends the card's budget. It has no tool that talks to the forge. While it lives, the whole session, prompts, tool calls and findings, streams to factoryd, the controller, so everything a session sees is recorded outside the sandbox.
+4. **The plan track.** Sizing sends a small card straight to the work track: sessions build, a pull request passes the gates, the merge goes live. A medium or large card becomes a plan card. A planner session reads the request and writes a plan: the work cards to create, plus criteria, the named checks that decide at the end that the whole feature counts as good. Filing the plan creates a revision, one numbered version, and the filing rule checks it before anything is stored. A refused filing stores nothing: the findings return to the session with the advice to correct the plan and file it again in the same session. An accepted filing whose criteria changed asks the human to confirm before any work runs. When nothing is left to ask, the plan's work cards are filed and the plan ends done.
+5. **Asks.** A session that cannot go on stops and asks. The ask lands on the card, the card waits for a human, and the ask shows in Needs you. Stopping and asking is the one designed way out of a sandbox.
+6. **The chat.** Beside the board sits a chat with the project agent. It runs outside the sandboxes, with factory-served tools: it reads and writes files in the project's document repository, files cards and answers asks for Sebastian, the factory's one human. It is the main channel between the two.
+7. **Tool cards.** A tool card is the card that adds a program to a sandbox image: it edits `factory/images.yaml`, the image rebuilds, and every session from then on finds the program installed. Card #1235 added chromium that way.
+8. **The credential rule.** An agent session never holds a forge credential while it lives. For every session factoryd mints two Forgejo tokens: one reads the upstream repository, one writes only to a fork owned by the `factory-agent` account. The worker, the container around the agent, clones with the read token before the agent starts, keeps both tokens out of the agent's reach, and pushes with the write token only after the agent process is dead, once, and both tokens are revoked at the session's end. That push is the one write path out of a sandbox: the worker commits the session's tree, and factoryd opens the pull request. The rule exists because a token inside the agent's reach leaks through git hooks and lingering processes.
+9. **Who may write to an issue.** Only the factory. A report session, an analysis run with a read token only, has its last message posted as an issue comment by the factory. An escalation's comment comes from factoryd. In every case the factory holds the credential and does the posting, and an agent hands over text and holds nothing.
 
 ## How the factory runs work today
 
@@ -45,7 +50,7 @@ flowchart TD
 5. The shape checks. They run on every filing, the first one included. The round files a number of cards the process allows. Every card key is well formed and no key is used twice. Every card has a known role, and where the process wants them there is exactly one foundation card and exactly one integration card, the integration card last. Dependencies point at cards of the plan, no card depends on itself, nothing depends on the integration card, and the dependencies form no cycle. Each card's brief fits the size limits, and a named sandbox image is one the project has pinned. A spec process wants the plan to carry the spec's outcome before its criteria. The criteria are well formed: at least one, at most a cap, ids well formed and unique, each of a known kind with exactly the fields its kind uses (a test criterion names its test, its inputs and its expected numbers, and carries nothing else). Every card of the round cites its criteria, every citation names a criterion of the plan, and the integration card carries one item per criterion. The plan's questions, at most five, each offer two to five distinct choices. The outline of the rounds still to come is short and small.
 6. The lineage checks. They compare the plan with the newest stored revision, so they run from the second filing on. The first plan has no previous revision to compare with, and these checks do not run on it. Two rules: an id the previous revision already holds must arrive with the exact same definition, and a changed criterion files under a new id. And a criterion that carries a `replaces` field must name an id the previous revision actually holds: nothing can succeed something that is not there. Both rules keep the record honest, no id may silently change what it means.
 7. The replan checks, about the work cards rather than the criteria. A card is kept by its key, changed by a new card whose `from` names the old key, dropped by leaving the key out. A merged card's work stays on main unless the plan names it in `take_off_main`. A `from` must name a real card of the record, two cards cannot both start from the same old card, and a card that starts from another card's work takes a new key.
-8. On any finding: the filing is refused, nothing is stored, the findings return to the session with the advice to correct the plan and file it again in the same session. The refusal of that night was two findings of the lineage checks.
+8. On any finding: the filing is refused, nothing is stored, the findings return to the session with the advice to correct the plan and file it again in this session. The refusal of that night was two findings of the lineage checks.
 9. With no finding: the factory stores the plan as the next revision number, records what the criteria added, removed and revised, restarts the child cards the change touches, and only then decides the next step: the confirmation ask, or the filing of the work cards.
 
 **Why criteria change.** The criteria are the contract: the checks that decide at the end that the whole feature counts as good. They change for real reasons. The human asks for a different shape, as with the territory split that started this night. A finished card changes what is left to do. The spec moves. Or the filing rule refused the last attempt, and the correction counts as a change. A changed criterion files under a new id, and the new criterion carries a field `replaces` whose value is the old id: store_function_comments_v11 with `replaces: store_function_comments_v10`. The plan text itself names the successor and the predecessor, so the succession is always written down.
@@ -55,6 +60,28 @@ flowchart TD
 **From plan to work.** When nothing is left to ask, the plan's work cards are filed as normal cards and the plan ends done. They run the work track: sessions build in sandboxes, a pull request passes the gates, the merge goes live. The criteria gate then runs the plan's named tests on the assembled result.
 
 ## The night, step by step
+
+The whole night in one picture:
+
+```mermaid
+flowchart TD
+    request["A request: house doc comments on three factoryd files"] --> filed["The chat files card #1345"]
+    filed --> sizing{"Sizing calls it medium"}
+    sizing --> plan["The card becomes a plan card"]
+    plan --> planner["A planner session runs in its sandbox and files a plan as the next revision"]
+    planner --> rule{"The filing rule checks the revision"}
+    rule -->|"refused: findings return to the session, correct and file again"| planner
+    rule -->|"accepted, criteria changed"| confirm["A confirmation ask: the card waits for the human"]
+    confirm -->|"okay"| planner
+    rule -->|"accepted, criteria unchanged"| cards["The plan's work cards are filed, and they run the work track to a merge"]
+    planner -->|"after nine turns, the instruction: do not re-plan, report the exact refusal on the issue"| nopath["The sandbox holds no tool that posts to an issue"]
+    nopath --> gh["The session reaches for the one issue-shaped command it knows: gh issue comment"]
+    gh --> deadend["gh is not installed, and it speaks GitHub's API, not the forge's"]
+    deadend --> stop["The session stops and asks, at 01:41"]
+    stop --> ask["The ask lands on the card and in Needs you: it carries the stop note, not the refusal"]
+```
+
+The two arrows back to the planner, refused and okay, are the circle of steps 3 to 6 below. Why the circle could not end is the two defects. The exit from the circle was the instruction to report the refusal on the issue, and that exit is the second subject of this plan, told after the defects.
 
 1. Card #1345 asked for house doc comments on three old files of factoryd. The chat filed it, the sizing called it medium, and a medium card goes to the plan track.
 2. Sebastian asked from the console for a split by territory. The planner filed it as a new revision. The split changed two things at once. The cards: one work card became two, one per territory. The criteria: the checks were split to match the cards, one criterion per territory card, and each new criterion was a changed criterion, filed under a fresh id that named its predecessor in `replaces`. The work stayed the same, writing doc comments. The checks that judge that work were re-shaped, and a re-shaped check is a changed criterion.
@@ -85,7 +112,7 @@ correct the plan and file it again in this session
 
 6. That advice, correct the plan and file it again, demands exactly the one change the rule accepts: fresh ids. The session renumbered. A renumbered criterion is a changed criterion, so the plan asked a new confirmation. Step 3 again. And a filing without any criteria change could not break out either. Criteria that keep their ids and their definitions do pass, and no one is asked. But this plan's criteria carried `replaces` fields from their birth in the split, and a stored revision's `replaces` fields go stale the moment it becomes the newest. Re-filed with the fields, the plan is refused as in step 5. Re-filed without them, the criterion differs from its stored version, and the other lineage rule refuses it: the previous revision holds this id with another definition. Fresh ids are the only pass, and fresh ids ask again.
 7. Nine turns ran this way, revisions 5 to 13. Revisions 8 to 13 each renamed both judgement criteria one step (v6 replaces v5, up to v11 replaces v10) inside 34 minutes. Fifteen planner sessions ran on the card between 23:39 and 01:40, all on the strong model, and the card asked and received confirmations for revisions 9 to 13 between 01:15 and 01:40. No work card was ever filed, no comment written, no issue touched.
-8. Sebastian's instruction to the card said: if the gate refuses the metadata again, do not re-plan, report the exact refusal on the issue. The gate refused again. The session reached for gh, GitHub's command line client. It is not installed in the sandbox, and it speaks GitHub's API, not the forge's (see the reporting concept). Its last move was to stop and ask, at 01:41.
+8. Sebastian's instruction to the card said: if the gate refuses the metadata again, do not re-plan, report the exact refusal on the issue. The gate refused again. The session reached for gh, GitHub's command line client. It is not installed in the sandbox, and it speaks GitHub's API, not the forge's (the exit below). Its last move was to stop and ask, at 01:41.
 
 ## The two defects, each harmless alone
 
@@ -94,9 +121,29 @@ correct the plan and file it again in this session
 
 No move from the agent side can end it. Filing unchanged hits defect 1. Filing the criteria without the `replaces` markers hits the other refusal, "the previous revision holds this id with another definition". New ids pass, but re-ask the confirmation. The machinery must be fixed. The agents did nothing wrong.
 
-## The ask reached the human, the blocker did not
+## The exit that failed: reporting the refusal
 
-The stop ask at 01:41 said: "This card stopped and needs your decision: how should it go on?" Its reason carried the session's stop note: told to report the exact refusal, and cannot. The refusal itself, the two criterion lines above, sat in the session's findings one query away. The ask wording also speaks of pull requests and re-verification, which fits no plan card. The fix: the ask quotes the refusal verbatim, and a plan card's ask names what its choices do. The channel question, why gh is refused on both counts, is argued in the reporting concept.
+A session that cannot go on stops and asks. The ask lands on the card, the card waits for a human, the ask shows in Needs you and the board, and the answer can come through the main chat ("answer card 1345: go on") or the card page. That path is the last step of the diagram, and it worked: the planner stopped rather than thrash, and the ask reached Sebastian at 01:41 with the session's reason for stopping.
+
+**Who wanted gh, and for what.** gh is GitHub's command-line client: it talks to GitHub's API with a stored login. It came up twice in the incident, both times for the same purpose: to post a comment on the issue, which is a write.
+
+1. **The card session reached for it at 01:41.** Sebastian's instruction to the card said: if the gate refuses the metadata again, do not re-plan, report the exact refusal on the issue. The gate refused again (defect 1). The session had the refusal text in hand, in its own findings, and lacked one thing: a tool that posts text to an issue. No such tool exists in a sandbox, so it reached for the one issue-shaped command agents know from training, `gh issue comment`. gh is not installed in the sandbox image, so the command did not run. The instruction had asked for a destination the sandbox cannot reach. The session's last move was the designed one: stop and ask.
+2. **The chat proposed the tool card.** After the night, the project agent proposed a tool card that puts gh into the project image, so future sessions could run that comment command. Same purpose, asked at install time instead of at run time.
+
+Neither actor wanted to read. Nothing in the incident needed a read: the refusal sat in the session's own findings, one query away in the controller's database, and every input the session worked from had been fed to it. The wanted access was a standing write credential for the forge, held inside the sandbox.
+
+If a read is ever wanted, it needs no gh either. The repository is already in the sandbox as the worker's clone, the card's context carries the request and its background, and anything else a session needs goes through an ask, which reaches the human. A read-grade gh login would still be a stored credential in the sandbox, and it still speaks to the wrong service.
+
+**Why a write can never be the answer.** Adding gh to the sandbox image would build the wrong thing twice over:
+
+1. It speaks to the wrong service. The factory's forge is Forgejo, a different API. Even installed, gh reaches no Forgejo.
+2. It breaks the credential rule. A gh login in the sandbox is a standing credential in the agent's reach while it lives, exactly the credential the architecture refuses to give it. It would sit outside the one write path out of a sandbox, the worker's push after the agent is dead, and it would leak through git hooks and lingering processes.
+
+So the tool card the project agent proposed, gh in the project image, is refused, and no image change is needed.
+
+**The report tool, named and declined for now.** A factory-served tool, the session calls `report(text)` and factoryd posts the comment on the issue in the human's name, rate-limited to one per stop, would give the issue a durable record without any credential reaching the agent. It is declined for now: with the refusal quoted in the ask (fix 4), it duplicates a channel, and no case has appeared where a record must reach the issue and no human ask is involved. Revisit when one does. It would follow the one pattern the factory already uses for issue comments: the factory posts, the agent supplies text.
+
+**The ask reached the human, the blocker did not.** The stop ask at 01:41 said: "This card stopped and needs your decision: how should it go on?" Its reason carried the session's stop note: told to report the exact refusal, and cannot. The refusal itself, the two criterion lines above, sat in the session's findings one query away. The ask wording also speaks of pull requests and re-verification, which fits no plan card. The fix: the ask quotes the refusal verbatim, and a plan card's ask names what its choices do.
 
 ## The money walls
 
@@ -115,7 +162,7 @@ The same morning, in the chat. At 06:46 Sebastian asked for both concepts as com
 
 The reply promised three things: raise the card's budget, send the answer, and check where concept files can live. The check was a read of docs/roadmap.md, a read and not a write: nothing was ever added to the roadmap. Then the money walls took the turn, the next message was all fund and board, and the question can you do that was never answered. Every turn after that was a timer or a poke with its own job, and nothing in the chat carries an unanswered question into the next turn. The word concept appears nowhere in the chat after 06:48, and no file write happened at all that day.
 
-The tool was never the gap. `write_doc` commits a new file to the document roots (docs/roadmap.md, docs/plans/, docs/board/ or docs/<name>.md), straight to master. The gap is the carry-over, and it is one of the fixes below.
+The tool was never the gap. `write_doc` commits a new file with its content to the document roots (docs/roadmap.md, docs/plans/, docs/board/ or docs/<name>.md), straight to master, and edits a single passage of an existing file with `old` and `new`. It refuses empty documents, documents over the size cap, deletions, and roadmap edits that break that file's structure. A card session inside its sandbox has no document access at all, by design: its output is a pull request. Concept files, incident records and designs are the chat's to write, in one file per subject. The gap is the carry-over, and it is one of the fixes below.
 
 ## The alerts
 
@@ -128,7 +175,7 @@ Checking them found a second defect: alerts 2292 and 2294 sit open on a card tha
 1. **A re-file that equals the newest revision is a no-op.** In `FilePlan`, after the plan is normalised exactly as the stored one was (round stamps, settled cards of earlier rounds prepended), compare it with the newest revision by value. Equal: return "this is already revision N", store nothing, ask nothing, run none of the filing bookkeeping (no criteria records, no child restarts). Compare by value, not by hash: a settled card gaining its issue number between filings changes the hash of an otherwise equal plan.
 2. **An unchanged criterion is exempt from the replaces check.** `revisionFindings` skips a criterion that the previous revision holds with the exact same definition. Its `replaces` marker is history, not an amendment. This keeps the no-op stable even when the value comparison drifts, and it is the correct reading of the freeze rule: only a criterion that is new or changed needs a `replaces` field.
 3. **A confirmed plan files its cards instead of waking a planner.** In `RequestPlan`, when the revision's questions are all answered and every question was a confirmation answered with its offered choice word, the criteria are fixed: file the cards, end the plan done ("revision N filed M cards"). This covers the moment the confirmation is answered and every later pass, such as a plan card's stop ask answered with Go on. An answer that adds words returns to the planner as today, because it may carry a change. Real questions also return to the planner as today.
-4. **The ask carries its own facts.** A plan card's stop ask names what its choices do (a planner session, holding the plan, closing the plan), not the generic card-stop wording about pull requests. When a session stops right after a tool refusal, the ask quotes the refusal verbatim in its info block. The blocker then reaches the human without any agent-side reporting; see the reporting concept for the channel question.
+4. **The ask carries its own facts.** A plan card's stop ask names what its choices do (a planner session, holding the plan, closing the plan), not the generic card-stop wording about pull requests. When a session stops right after a tool refusal, the ask quotes the refusal verbatim in its info block. The blocker then reaches the human without any agent-side reporting, and the channel question, why gh is refused on both counts, is argued above.
 5. **An unanswered question carries over.** When a human message holds a question the reply does not address, the console carries the question into the next turn's prompt until a reply answers it, and the chat shows it as open. The morning's dropped question then cannot happen.
 
 ## Tests, hand-derived from the live shape
@@ -160,4 +207,4 @@ Answer "Go on" at its ask. No session starts, so the empty budget and the 12 of 
 
 ## Sources
 
-The live events and plan_revisions of task t-cdb2a651712a and the chat ledger rows 3173 to 3201 of 31 October, both read from the controller's database. `internal/factoryd/plan.go` (`FilePlan`, `revisionFindings`, `RequestPlan`, `askConfirmation`). The conversations with Sebastian and the project agent's read of the same incident, 31 October.
+The live events and plan_revisions of task t-cdb2a651712a and the chat ledger rows 3173 to 3201 of 31 October, both read from the controller's database. `internal/factoryd/plan.go` (`FilePlan`, `revisionFindings`, `RequestPlan`, `askConfirmation`), `internal/console/autonomy.go` (`write_doc`), `internal/console/chat_budget.go` and `internal/policy/project.go` (the budget policy fields). The conversations with Sebastian and the project agent's read of the same incident, 31 October.
