@@ -1,8 +1,8 @@
 # The repository reads: tree and grep without a shell
 
 Written 2026-10-31, on Sebastian's ask: "Can we give it grep and tree
-like capabilities without running arbitrary bash?" Status: plan, the
-shapes approved in conversation, nothing built. It designs roadmap 306's
+like capabilities without running arbitrary bash?" Status: plan, awaiting
+Sebastian's OK, nothing built. It designs roadmap 306's
 two repository reads. The survey
 ([chat-tools-survey-2026-10-31.md](chat-tools-survey-2026-10-31.md))
 endorsed the shapes from the field; this plan designs them for the
