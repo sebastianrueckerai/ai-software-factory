@@ -139,7 +139,8 @@ names the exits.
 
 ### 4. A new ask read as an answered one. New, this file.
 
-Status: not in the register, not in either spec. Found 2026-11-01 on
+Status: fixed on code main (`59f8490b`, 2026-11-01; register fault 20 in
+[needed-fixes.md](needed-fixes.md)). Found 2026-11-01 on
 #1427.
 
 The wake loop deduplicates asks by the sha256 of the ask sentence, per
@@ -188,8 +189,9 @@ Cost: one branch, one file plus its test.
 Checked 2026-11-01 about 20:50 UTC:
 
 - The head-adoption fix `ee585427` is on main and rolled (fault 1 above).
-- Main at `ef520517` still hashes the wake key from the sentence alone.
-  No merge-base line check exists in the push path. No repetition guard
+- The wake key fix landed on code main as `59f8490b` (fault 4 below; not
+  yet rolled to the cluster). No merge-base line check exists in the push
+  path. No repetition guard
   exists in the answer path. Both specs' status blocks stand.
 - The board holds no card that builds any of this. Running: #1399 (pool
   control) and the two chat tasks. Queued: #1414, #1428, #1441 to #1444.

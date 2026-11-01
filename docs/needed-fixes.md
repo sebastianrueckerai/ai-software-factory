@@ -195,9 +195,11 @@ times over stops before the pull opens, with a named error.
 
 ## 20. An ask that repeats a sentence wakes nobody
 
-Status: plan written
-([unseen-ask-plan-2026-11-01.md](unseen-ask-plan-2026-11-01.md), fault 4
-with the fix in detail), awaiting the word. Found 2026-11-01 on card
+Status: the fix landed on code main 2026-11-01 (59f8490b: the wake key
+takes the ask's issue comment id, the sentence hash only as the fallback),
+built as the plan's fault 4
+([unseen-ask-plan-2026-11-01.md](unseen-ask-plan-2026-11-01.md)). Found
+2026-11-01 on card
 #1427: two asks 5 minutes apart carried the same sentence, so the wake
 loop's dedup key ("ask:" plus the task id plus the sha256 of the
 sentence) read the second, unanswered ask as the first, answered one. The
