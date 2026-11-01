@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="build" content="d0d27da6c340">
+<meta name="htmx-config" content='{"includeIndicatorStyles":false,"allowEval":false,"allowScriptTags":false}'>
+<title>d4-face — round 15</title>
+
+<link rel="stylesheet" href="./console.css">
+<style>
+/* the round's own chrome: the states band and nothing else. Tokens,
+   type and colours come from the stylesheet as it stands. The main area
+   keeps the real console's height (viewport minus the 44px header), the
+   band flows below it. */
+body:has(#screen) { height: auto; min-height: 100dvh; }
+body:has(#screen) > main { flex: none; height: calc(100dvh - 44px); }
+.states { flex: none; padding: 18px 18px 40px; border-top: 1px solid var(--line); }
+.states > h3 { margin: 0 0 12px; color: var(--text-muted); font: 600 12.5px/20px var(--font-ui); font-variant-caps: all-small-caps; letter-spacing: .07em; }
+/* scells/scell: no name the console already owns (.cell is the top strip's
+   flex, nowrap cell, .cards a lane's list; both would bleed in here) */
+.states .scells { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; align-items: start; }
+.states .scell { min-width: 0; }
+.states .tail { margin-top: 8px; padding: 8px 12px; border: 1px solid var(--line); background: var(--bg-panel); overflow: hidden; }
+.states .tail .figs { margin: 0 0 4px; overflow-wrap: anywhere; }
+.states .tail .k { font-weight: 600; }
+.states .tail .related li { flex-wrap: wrap; }
+</style>
+
+
+</head>
+<body hx-headers='{"X-CSRF-Token":"UCshokhW57deNTUkL_bIWs4ODs5XrP3he7dflU0JNxQ"}'>
+<header class="top">
+<a class="home" href="/">Factory console</a>
+<form method="get" action="" class="switch auto-submit"><label for="project-filter" class="visually-hidden">Project</label><select id="project-filter" name="project">
+<option value="ai-software-factory-code" selected>ai-software-factory-code</option>
+<option value="demo-app">demo-app</option>
+</select></form>
+<nav aria-label="Main"><span class="ng ng-work"><a class="act" href="/tasks/new"><span class="w">New task</span><span class="p">+</span></a></span><span class="ng ng-ref"><a href="/costs">Costs</a><a href="/projects/ai-software-factory-code/metrics">Metrics</a><a href="/resources">Resources</a></span><span class="ng ng-gov"><a href="/settings">Settings</a><a href="/policy">Policy</a><a href="/notifications">Notifications</a></span></nav><details class="menu"><summary><span class="w">More</span><span class="p">Menu</span></summary><div class="sheet"><div class="sg g-work"><a class="s-work" href="/tasks/new">New task</a></div><div class="sg"><a class="s-ref" href="/costs">Costs</a><a class="s-ref" href="/projects/ai-software-factory-code/metrics">Metrics</a><a class="s-ref" href="/resources">Resources</a></div><div class="sg"><a class="s-gov" href="/settings">Settings</a><a class="s-gov" href="/policy">Policy</a><a class="s-gov" href="/notifications">Notifications</a></div><form method="post" action="/logout" class="logout s-out"><input type="hidden" name="csrf" value="UCshokhW57deNTUkL_bIWs4ODs5XrP3he7dflU0JNxQ"><button type="submit">Log out</button></form></div></details>
+<div id="theme-switch" class="theme-switch" role="group" aria-label="Theme"><button type="button" data-theme-set="dark" aria-pressed="true" aria-label="Dark theme"><svg viewBox="1.5 1 18 18" aria-hidden="true"><path d="M10.5 5.25a3.17 3.17 0 0 0 4.75 4.75 4.75 4.75 0 1 1-4.75-4.75Z"/></svg></button><button type="button" data-theme-set="light" aria-pressed="false" aria-label="Light theme"><svg viewBox="20.75 1 18 18" aria-hidden="true"><circle cx="29.75" cy="10" r="2.5"/><path d="M29.75 4.6v1.2M29.75 14.2v1.2M24.35 10h1.2M33.95 10h1.2M25.93 6.18l.85.85M32.72 12.97l.85.85M25.93 13.82l.85-.85M32.72 7.03l.85-.85"/></svg></button></div>
+<form method="post" action="/logout" class="logout"><input type="hidden" name="csrf" value="UCshokhW57deNTUkL_bIWs4ODs5XrP3he7dflU0JNxQ"><span>sebastian</span> <button type="submit">Log out</button></form>
+</header>
+<main>
+<p id="flash" class="problem" role="alert" hidden></p>
+
+
+<details id="status-line" class="status" aria-label="Status"><summary class="strip">
+<span class="cell state" data-state="working"><i class="dot" aria-hidden="true"></i>working</span>
+<span class="cell"><span><b class="n">3</b> working</span></span>
+<a href="#needs-you" class="cell needs"><span><b class="n">0</b> need you</span></a>
+<span class="cell spend" title="spend this UTC month against the project's month cap"><a href="/costs"><span><b class="n">€4.10</b> <span class="of">/ €120.00</span></span><span class="gauge"><meter min="0" max="100" value="3" aria-label="Spend of the month cap">3 percent</meter></span></a><span class="pct">3%</span></span>
+<span class="cell warn hold" title="plan #12 is open on main: production waits until no plan is open on main">production held · 7 h</span>
+</summary>
+<div class="sp" id="status-panel" role="region" aria-label="The status in detail">
+<section><h3>Spend</h3><div class="sp-g"><span class="lbl">today</span><span class="fig">€0.28 of €20.00 day cap</span><span class="gauge"><meter min="0" max="100" value="1" aria-label="today">1 percent</meter></span></div><div class="sp-g"><span class="lbl">this month</span><span class="fig">€4.10 of €120.00</span><span class="gauge"><meter min="0" max="100" value="3" aria-label="this month">3 percent</meter></span></div></section>
+<section><h3>Production</h3><p class="sp-note warn">Held for 7 h: plan #12 is open on main.</p><div class="chiprow"><span class="lchip wait">plan #12 · 3 of 5 merged</span></div><form method="post" action="/projects/ai-software-factory-code/deploy-now" hx-post="/projects/ai-software-factory-code/deploy-now" hx-target="#board" hx-swap="outerHTML" hx-confirm="Deploy main of ai-software-factory-code as it is? The open plans' merged cards go live half-built." class="inline">
+<input type="hidden" name="csrf" value="UCshokhW57deNTUkL_bIWs4ODs5XrP3he7dflU0JNxQ"><input type="hidden" name="project" value="ai-software-factory-code">
+<button type="submit">Deploy now</button>
+</form></section>
+<section><h3>Factory</h3><div class="chiprow"><a class="lchip" href="https://git.example/sf/infra/src/commit/c9d98bb0aa11/factory" target="_blank" rel="noopener" data-tip="version 4 · c9d98bb0aa11">config</a><p class="none">unknown</p></div></section>
+</div></details>
+<div id="screen" class="main with-chat">
+<button type="button" class="edge-tab" data-tip="The board back; Esc also works">board</button>
+<section id="chat" class="chat with-threads sw-collapsed" aria-labelledby="chat-title" data-project="ai-software-factory-code" data-login="sebastian">
+<div class="chat-head"><h2 id="chat-title">Chat</h2> <span class="chat-who">project agent · ai-software-factory-code</span> <button type="button" id="chat-full" class="wctl" aria-pressed="false" aria-label="Chat and board" data-tip="Grow the chat to the whole screen; the glyph flips, click again or press Esc for the board back"><svg viewBox="0 0 16 16" aria-hidden="true"><path class="exp" d="M9.5 2.5h4v4M6.5 13.5h-4v-4M3 13l10-10" fill="none" stroke="currentColor" stroke-width="1.5"/><path class="col" d="M13.5 6.5v-4h-4M2.5 9.5v4h4M13 3L3 13" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button> <button type="button" id="intake-btn" class="intake" data-intake="open" aria-pressed="false" data-tip="The project's intake: open takes the agent's own filings, closed refuses them; your ask always files.">intake <span class="intake-name">open</span></button> <button type="button" id="chat-new" class="chat-new" data-tip="Start a new thread">New</button></div>
+<nav id="switcher" class="ttable" aria-label="Your threads"><div class="thr"><span aria-hidden="true">mark · thread · last</span><button type="button" class="swtg" data-swtoggle aria-expanded="false" aria-label="Unfold the threads" data-tip="Unfold the threads">›</button></div>
+<div id="thread-rows" class="trows"></div></nav>
+<button type="button" class="sw-sum" data-swtoggle aria-expanded="false" aria-controls="switcher" hidden></button>
+<div class="chat-main">
+<div id="thread-head" class="thead"></div>
+<p class="chat-start" title="Ask or tell the project agent. It reads, explains, files, answers, steers and approves as you, through the console's own actions; it runs no code.">Ask or tell the project agent. It reads, explains, files, answers, steers and approves as you, through the console's own actions; it runs no code.</p>
+<div id="chat-log" class="chat-log" role="log" aria-label="The conversation with the project agent">
+</div>
+<div id="chat-answer" class="answer" role="group" aria-label="Answer" hidden></div>
+<form id="chat-form" class="chat-form composer" method="post" action="/projects/ai-software-factory-code/chat">
+<input type="hidden" name="csrf" value="UCshokhW57deNTUkL_bIWs4ODs5XrP3he7dflU0JNxQ">
+<p class="arch-note" hidden>archived, read-only <button type="button" class="linkbtn" data-restore-open>restore</button></p>
+<div id="chat-palette" class="palette" role="listbox" aria-label="Commands" hidden></div>
+
+<ol id="chat-images" class="chat-images" aria-label="Images riding your next message" title="Each rides the message you send next, named for your text to point at; × drops one. A reload drops them all." hidden></ol>
+<ol id="chat-docs" class="chat-docs" aria-label="Documents riding your next message" title="Each rides the message you send next, named for your text to point at; × drops one. A reload drops them all." hidden></ol>
+<div class="prompt"><span class="ps" aria-hidden="true">›</span><label for="chat-input" class="visually-hidden">Your message to the project agent</label>
+<textarea id="chat-input" name="message" rows="3" maxlength="8192" placeholder="Ask or tell the project… (Enter sends, Shift+Enter breaks the line, / lists the commands)" aria-keyshortcuts="/" aria-controls="chat-palette" aria-expanded="false"></textarea>
+<button type="submit">Send</button></div>
+<div class="own"><div class="own-l"><span class="cmds"><button type="button" class="cmd" data-cmd="compact" title="the older turns of this thread become a summary">/compact</button><button type="button" class="cmd" data-cmd="new" title="a new thread">/new</button></span></div>
+<span class="lvlctl"><button type="button" id="level-btn" data-level="manual" aria-haspopup="menu" aria-expanded="false" aria-label="The project's autonomy level: manual"><i aria-hidden="true"></i><span class="lvl-name">manual</span></button><div class="lvlpop" id="level-pop" role="menu" aria-label="Autonomy" hidden></div></span>
+</div>
+</form>
+</div>
+</section>
+<div id="chat-divider" role="separator" aria-orientation="vertical" aria-label="Drag it, or press the arrow keys, to resize the chat and the board" tabindex="0" data-tip="Drag to resize; the arrow keys step it"><span class="grip" aria-hidden="true">⤥</span></div>
+<div id="board" data-project="ai-software-factory-code" data-query="?project=ai-software-factory-code">
+<div class="board-head"><h2 id="board-title">Board</h2>
+<form class="find" id="find" role="search" method="get" action="/" hx-get="/" hx-trigger="input changed delay:250ms" hx-target="#board" hx-select="#board" hx-swap="outerHTML" hx-preserve><input type="hidden" name="project" value="ai-software-factory-code"><label class="visually-hidden" for="q">Find on the board</label><input id="q" name="q" type="text" value="" placeholder="Find: a word, #612, plan:558" autocomplete="off" spellcheck="false" aria-keyshortcuts="f"><a class="find-x" href="/?project=ai-software-factory-code" aria-label="Clear the find" title="Clear the find">×</a></form>
+<button type="button" id="documents" class="documents" aria-controls="doc-view" aria-expanded="false" title="The project's documents; the last one opens where you left it">Documents</button>
+<a href="/?project=ai-software-factory-code&amp;view=wide" id="view-toggle" class="view-toggle" data-view="wide" aria-keyshortcuts="w">Wide view</a>
+
+<button type="button" id="keys-toggle" class="keys-toggle" aria-haspopup="dialog" aria-controls="keys" aria-keyshortcuts="Shift+?" title="Keys" aria-label="Keys">?</button></div>
+
+
+<div class="lane five">
+<section class="column" aria-labelledby="col-0" id="needs-you" data-holds="waiting-human waiting-poster"><h3 id="col-0">Needs you <span class="count">0</span></h3>
+<div class="cards">
+</div>
+</section>
+<section class="column" aria-labelledby="col-1" data-holds="queued waiting-deps waiting-image"><h3 id="col-1">Queued <span class="count">0</span></h3>
+<details class="col-menu"><summary aria-label="Order and show, Queued" title="Order and show"></summary>
+<form method="get" action="/" class="menu-pop auto-submit" hx-get="/" hx-select="#board" hx-target="#board" hx-swap="outerHTML"><input type="hidden" name="project" value="ai-software-factory-code"><fieldset><legend>Order</legend><label><input type="radio" name="queued" value="" checked><span>newest first</span></label><label><input type="radio" name="queued" value="oldest"><span>oldest first</span></label><label><input type="radio" name="queued" value="next"><span>next up</span></label></fieldset><fieldset><legend>Show</legend><label><input type="radio" name="queued-only" value="" checked><span>all</span></label><label><input type="radio" name="queued-only" value="blocked"><span>blocked only</span></label></fieldset><noscript><button type="submit" class="apply">Apply</button></noscript></form></details>
+
+<div class="cards">
+</div>
+</section>
+<section class="column" aria-labelledby="col-2" data-holds="running closing in-review merged"><h3 id="col-2">In progress <span class="count">3</span></h3>
+<details class="col-menu"><summary aria-label="Order and show, In progress" title="Order and show"></summary>
+<form method="get" action="/" class="menu-pop auto-submit" hx-get="/" hx-select="#board" hx-target="#board" hx-swap="outerHTML"><input type="hidden" name="project" value="ai-software-factory-code"><fieldset><legend>Order</legend><label><input type="radio" name="progress" value="" checked><span>newest first</span></label><label><input type="radio" name="progress" value="oldest"><span>oldest first</span></label><label><input type="radio" name="progress" value="stage"><span>by stage</span></label><label><input type="radio" name="progress" value="spend"><span>by spend</span></label></fieldset><fieldset><legend>Show</legend><label><input type="radio" name="progress-only" value="" checked><span>all</span></label><label><input type="radio" name="progress-only" value="exceptional"><span>exceptional only</span></label></fieldset><noscript><button type="submit" class="apply">Apply</button></noscript></form></details>
+
+<div class="cards">
+<article class="card face" data-card="t-5aa01bf9afab" data-place="running direct  false false 0 2">
+<p class="line1"><span class="ref">#626</span> - <strong class="title" title="roll 5e1f0a2: factoryd, gateway, worker, ci-runner"><a href="#card=t-5aa01bf9afab" class="open">roll 5e1f0a2: factoryd, gateway, worker, ci-runner</a></strong></p>
+<p class="line2"><span class="pill st-running">building</span> <span class="elapsed">9 min</span></p>
+
+
+
+
+</article><article class="card face" data-card="t-707af7b639ad" data-place="running direct  false false 0 2">
+<p class="line1"><span class="ref">#624</span> - <strong class="title" title="README.md: extend the intro"><a href="#card=t-707af7b639ad" class="open">README.md: extend the intro</a></strong></p>
+<p class="line2"><span class="pill st-running">building</span> <span class="elapsed">3 min</span></p>
+<p class="activity">status running, gate session, at 23:16</p>
+
+
+
+</article><article class="card face stale" data-card="t-c5ec5de6a7bf" data-place="merged direct  false false 0 2">
+<p class="line1"><span class="ref">#623</span> - <strong class="title" title="Footer: link the licence"><a href="#card=t-c5ec5de6a7bf" class="open">Footer: link the licence</a></strong></p>
+<p class="line2"><span class="pill st-merged">merged</span> <span class="st st-merged"><a href="https://git.example/sf/code/actions/runs/3251" target="_blank" rel="noopener">chain run 3251</a></span> <span class="elapsed">14 min</span> <span class="pill fine st-stale">stale</span> <a href="https://git.example/sf/code/pulls/623" target="_blank" rel="noopener" class="pr">PR #623</a></p>
+<p class="activity">no event yet, 2 h 0 min on the card</p>
+
+
+
+</article></div>
+</section>
+<section class="column fold" aria-labelledby="col-3" data-holds="done failed closed" data-finished="done"><h3 id="col-3">Done <span class="count">3</span></h3>
+<details class="col-menu"><summary aria-label="Order and show, Done" title="Order and show"></summary>
+<form method="get" action="/" class="menu-pop auto-submit" hx-get="/" hx-select="#board" hx-target="#board" hx-swap="outerHTML"><input type="hidden" name="project" value="ai-software-factory-code"><fieldset><legend>Order</legend><label><input type="radio" name="done" value="" checked><span>newest first</span></label><label><input type="radio" name="done" value="oldest"><span>oldest first</span></label></fieldset><fieldset><legend>Show</legend><label><input type="radio" name="done-only" value="" checked><span>all</span></label><label><input type="radio" name="done-only" value="failed"><span>failed only</span></label></fieldset><noscript><button type="submit" class="apply">Apply</button></noscript></form></details>
+
+<div class="cards">
+<article class="card face final d-done" data-card="t-46431f820e40" data-place="done direct  false false 0 3">
+<p class="line1"><span class="ref">#622</span> - <strong class="title" title="Chat form: center the Send button next to the two-row textarea"><a href="#card=t-46431f820e40" class="open">Chat form: center the Send button next to the two-row textarea</a></strong></p>
+<div class="dmeta"><span class="st"><span class="g" aria-hidden="true">✓</span>done</span><span class="elapsed">1 h 0 min in all</span></div>
+</article><article class="card face final d-done" data-card="t-bef4f5c8f40c" data-place="done direct  false false 0 3">
+<p class="line1"><span class="ref">#621</span> - <strong class="title" title="Costs: the day cap line under the table"><a href="#card=t-bef4f5c8f40c" class="open">Costs: the day cap line under the table</a></strong></p>
+<div class="dmeta"><span class="st"><span class="g" aria-hidden="true">✓</span>done</span><span class="elapsed">1 h 0 min in all</span></div>
+</article><article class="card face final d-done" data-card="t-cd4c2b2eee44" data-place="done direct  false false 0 3">
+<p class="line1"><span class="ref">#620</span> - <strong class="title" title="Console: show the configuration version"><a href="#card=t-cd4c2b2eee44" class="open">Console: show the configuration version</a></strong></p>
+<div class="dmeta"><span class="st"><span class="g" aria-hidden="true">✓</span>done</span><span class="elapsed">1 h 0 min in all</span></div>
+</article></div>
+</section>
+</div>
+</div>
+<aside id="drawer" class="drawer" aria-label="The card" hidden></aside>
+<aside id="doc-view" class="doc-view" aria-label="The project's documents" tabindex="-1" hidden>
+<div class="doc-head"><div class="doc-row doc-row-nav">
+<button type="button" id="doc-back" class="xs" aria-label="Nothing back" title="Nothing back" disabled>&#8249;</button>
+<button type="button" id="doc-fwd" class="xs" aria-label="Nothing forward" title="Nothing forward" disabled>&#8250;</button>
+<details id="doc-recent" class="doc-recent"><summary aria-haspopup="menu">Recent &#9662;</summary><div class="doc-recent-menu" id="doc-recent-menu" role="menu"></div></details>
+<span class="seg doc-mode"><button type="button" id="doc-mode-read" aria-pressed="true">Read</button><button type="button" id="doc-mode-edit" aria-pressed="false">Edit</button></span>
+<span class="doc-gap" aria-hidden="true"></span>
+<a id="doc-forgejo" class="doc-forgejo" target="_blank" rel="noopener" hidden>Open in Forgejo &#8599;</a>
+<button type="button" id="doc-wide" class="xs" aria-pressed="false" title="Wide: across the board and the chat">Wide</button>
+<button type="button" id="doc-new" class="xs" title="Write a new document under docs/">New document</button>
+<button type="button" id="doc-close" class="xs doc-x" aria-label="Close the document" title="Close the document">&#215;</button>
+</div>
+<form id="doc-new-form" class="doc-row doc-new" autocomplete="off" hidden>
+<label class="doc-new-l" for="doc-name">New document</label>
+<span class="doc-new-at" aria-hidden="true">docs/</span>
+<input id="doc-name" class="doc-name" name="name" placeholder="goal" spellcheck="false">
+<span class="doc-new-at" aria-hidden="true">.md</span>
+<button type="submit" class="primary doc-sm">Create</button>
+<button type="button" id="doc-new-cancel">Cancel</button>
+</form>
+<p class="doc-pathline" id="doc-pathline"><span class="doc-file"><span class="doc-dot" id="doc-dot" aria-hidden="true" hidden>&#9679;</span><span class="doc-path" id="doc-path"></span></span><span class="doc-facts" id="doc-facts"></span></p>
+</div>
+<nav class="doc-pins" id="doc-pins" aria-label="Pinned documents"></nav>
+<p class="doc-note" id="doc-note" role="status" hidden></p>
+<article id="doc-article"></article>
+<div id="doc-edit" class="doc-edit" hidden>
+<label class="doc-vh" for="doc-editor">The Markdown of the document</label>
+<textarea id="doc-editor" spellcheck="true"></textarea>
+<div class="doc-theirs-wrap" id="doc-theirs-slot" hidden></div>
+<div class="doc-edit-row" id="doc-edit-row"></div>
+</div>
+</aside>
+</div>
+<footer id="live" role="status"></footer>
+<div id="keys" class="overlay" role="dialog" aria-modal="true" aria-labelledby="keys-title" hidden>
+<div class="overlay-box">
+<h2 id="keys-title">Keys</h2>
+<dl>
+<dt><kbd>w</kbd></dt><dd>the wide view, the board across the full width with the chat hidden, or back</dd>
+<dt><kbd>Escape</kbd></dt><dd>close the card's drawer, the document, or this list</dd>
+<dt><kbd>?</kbd></dt><dd>this list</dd>
+<dt><kbd>f</kbd></dt><dd>find on the board: a word or a ref, or <code>plan:558</code>, <code>stage:verifying</code>, <code>is:failed</code> (blocked, stale, provider, near), <code>by:sebastian</code>, <code>model:coding-cheap</code>; <kbd>Escape</kbd> in the box clears it</dd>
+<dt><kbd>Ctrl</kbd>+<kbd>S</kbd></dt><dd>in the document's editor: save the draft as one commit on master</dd>
+<dt><kbd>/</kbd></dt><dd>write to the project agent; <kbd>/</kbd> at the start of the box lists the commands</dd>
+<dt><kbd>Ctrl</kbd>+<kbd>k</kbd></dt><dd>the threads: open one, or the inbox</dd>
+<dt><kbd>Enter</kbd></dt><dd>send the message; <kbd>Shift</kbd>+<kbd>Enter</kbd> breaks the line</dd>
+<dt><kbd>Escape</kbd></dt><dd>in the chat's input: leave it</dd>
+</dl>
+<button type="button" id="keys-close">Close</button>
+</div>
+</div>
+</main>
+<section class="states" aria-label="The chain's states"><h3>The chain's states</h3><div class="scells"><div class="scell"><article class="card face"><p class="line1"><span class="ref">#623</span> - <strong class="title" title="Footer: link the licence"><a href="#" class="open">Footer: link the licence</a></strong></p><p class="line2"><span class="pill st-merged">merged</span> <span class="st st-failed"><a href="https://git.example/sf/code/actions/runs/3251" target="_blank" rel="noopener">run 3251 red</a></span> <span class="elapsed">12 min</span> <a href="https://git.example/sf/code/pulls/623" target="_blank" rel="noopener" class="pr">PR #623</a></p></article></div><div class="scell"><article class="card face"><p class="line1"><span class="ref">#623</span> - <strong class="title" title="Footer: link the licence"><a href="#" class="open">Footer: link the licence</a></strong></p><p class="line2"><span class="pill st-merged">merged</span> <span class="st st-waiting"><a href="https://git.example/sf/code/actions/runs/3252" target="_blank" rel="noopener">run 3252 stalled</a></span> <span class="elapsed">26 h</span> <a href="https://git.example/sf/code/pulls/623" target="_blank" rel="noopener" class="pr">PR #623</a></p></article></div><div class="scell"><article class="card face"><p class="line1"><span class="ref">#623</span> - <strong class="title" title="Footer: link the licence"><a href="#" class="open">Footer: link the licence</a></strong></p><p class="line2"><span class="pill st-merged">merged</span> <span class="st st-merged">waiting for the chain</span> <span class="elapsed">8 min</span> <a href="https://git.example/sf/code/pulls/623" target="_blank" rel="noopener" class="pr">PR #623</a></p></article></div><div class="scell"><article class="card face"><p class="line1"><span class="ref">#623</span> - <strong class="title" title="Footer: link the licence"><a href="#" class="open">Footer: link the licence</a></strong></p><p class="line2"><span class="pill st-merged">merged</span> <span class="st st-merged"><a href="#card=t-5aa01bf9afab">blocked by roll #626</a></span> <span class="elapsed">14 min</span> <a href="https://git.example/sf/code/pulls/623" target="_blank" rel="noopener" class="pr">PR #623</a></p></article></div><div class="scell"><article class="card face final d-done"><p class="line1"><span class="ref">#623</span> - <strong class="title" title="Footer: link the licence"><a href="#" class="open">Footer: link the licence</a></strong></p><div class="dmeta"><span class="st"><span class="g" aria-hidden="true">✓</span>done</span><span class="elapsed">live through run 3248, 25 min after merge</span></div></article></div></div></section>
+</body>
+</html>
+

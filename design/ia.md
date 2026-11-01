@@ -42,12 +42,12 @@ Three elements in order of weight: the pulse says what to know now, the chat is 
 The face shows what matters for the card's state and no more. Elements in order, each only when it has content:
 
 1. Issue ref and title, the title at most two lines. The whole card opens the drawer (item 226), for every member; the buttons on the face act without opening it.
-2. State row: a dot and the state word in the state's hue, on an In progress card the stage from the session (planning, building, verifying; item 225, C8) with its own dot, then the card's age (C11: one time on the card, the time in the stage and the gates in the drawer), then only when exceptional: `n/n checks` while verifying, spend from 80 percent of budget with the warning sign, the fine state (retrying, held, on the provider, stale). No gate line on the face (C11).
+2. State row: a dot and the state word in the state's hue, on an In progress card the stage from the session (planning, building, verifying; item 225, C8) with its own dot, then the card's age (C11: one time on the card, the time in the stage and the gates in the drawer), then only when exceptional: `n/n checks` while verifying, spend from 80 percent of budget with the warning sign, the fine state (retrying, held, on the provider, stale). On a merged card waiting on the chain, the stage word carries its run and links the forge: `chain run 3251`, `run 3251 red`, `run 3252 stalled`, `waiting for the chain`, `blocked by roll #n` as it stands (C38). No gate line on the face (C11).
 3. Activity line, monospace, one line, only on a working card or a card that waits: the newest event or the question. "answer on the issue" link stays.
 4. Chips only when exceptional: blocked by n, waiting on #n, from plan #n. No lane badge: there are no lanes (225). The model alias leaves the face and goes into the drawer's top block.
 5. Actions as a quiet row of small buttons: Retry, Close. No Start plan, no lane moves (225). They stay visible (no hover-only controls).
 
-A done, failed or closed card is one or two lines: ref, title, the state word, the elapsed time. No spend, no activity, no chips. The "More" fold is gone: its content (the objective, the agent's summary, the plan's cards, the PR and timeline links, the summary and accent forms) lives in the drawer.
+A done, failed or closed card is one or two lines: ref, title, the state word, the elapsed time; on a card the chain covered, the cover clause sits in the elapsed slot, `live through run 3248, 25 min after merge` (C38). No spend, no activity, no chips. The "More" fold is gone: its content (the objective, the agent's summary, the plan's cards, the PR and timeline links, the summary and accent forms) lives in the drawer.
 
 ## Needs you items
 
@@ -69,7 +69,7 @@ Overview, top to bottom:
 2. Open: the one thing that needs the member, if any (the question with its choices, the review's open findings, a failing check, a refusal), with its actions.
 3. Collapsed sections, in this order: Time (how the card's life went: one row per run of a stage with its start, duration, cost and the note that ended it, the at-a-glance line as the section's hint; C10), Objective (the full text with provenance), The agent's summary, The plan (summary and the cards table), Reviews and audit (the merge facts and Split), Related cards, Edit (the summary and accent forms, writers only), Links (issue, PR, timeline).
 
-Activity and Files stay as they are. Chat stays as it is, with the steer box.
+Activity carries the chain readout after the gates and steps tables (C38): a section in the drawer's own idiom, small-capitals summary, the live fact as the hint, collapsed while the chain is quiet and open when red or stalled. Its rows are the carry run with its clock, age and verdict, the required contexts, the head of main, the repair card of a red head, the stall card, the ladder's re-run, and the cover run on a done card. Files stays as it is, and Chat stays as it is, with the steer box.
 
 The document mode (C17). The same slot holds one document of the project's document repository instead of a card: the head with the named history arrows, Recent, the path with the saved-state indicator, Read | Edit, Open in Forgejo, Wide, New document and ×, then the pins row, then the rendered text at a 70-character measure. Links open in place; the browser's back is the arrow's step. Edit swaps the text for a plain text area with Save as commit, Cancel and Discard; the draft lives in the browser, the save is one commit as the member. A newer version shows one quiet changed line and never replaces the text by itself. A card takes the slot back, and a Documents button in the board head reopens the document.
 

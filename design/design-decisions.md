@@ -292,3 +292,13 @@ The build is 4d879897 on main of the code repository.
 ## C37. The landing page's hero: the roadmap line, the film first, a byline, three points, alternating sections (2026-10-26, Sebastian)
 
 The first decision on the landing page, from round 14 (`design/rounds/14-landing-hero/`). The line is "Write the roadmap. Agents build it on your servers." and the sandbox line opens the sentence under it. A filled "Watch the film · 3 min" stands first in the button row and a play ring sits on the console frame, which is the film's poster. A byline, "Designed and built by Sebastian Rücker · Portfolio · GitHub", sits under the buttons and again in the footer. The three bracketed callouts over the frame are gone. Three points under the frame carry the chat and the board, the sandbox and the servers. Every section has 96 px above and 72 px below and every second section sits on the panel colour. Sebastian picked it on 2026-10-26 with the portfolio link kept.
+
+## C38. The chain's steps read on the card and in the drawer's Activity (2026-11-01, Sebastian)
+
+The pick of round 15 (`design/rounds/15-chain-steps/`), the fusion candidate, both critics' choice in the compare loop. A merged card waiting on the chain no longer says a bare stage word: the word carries its run and links the forge, `chain run 3251`, `run 3251 red`, `run 3252 stalled`, `waiting for the chain`; `blocked by roll #n` stands as it was. A done card the chain covered carries the cover clause in the elapsed slot, `live through run 3248, 25 min after merge`, and keeps its one or two lines.
+
+The drawer's Activity tab carries the chain readout after the gates and steps tables: a section in the drawer's own idiom, a small-capitals summary, the live fact as the hint, collapsed while the chain is quiet and open when a run is red or stalled. Its rows follow the related-cards grammar: the carry run with its clock, age and verdict, the required contexts, the head of main, the repair card of a red head, the stall card, the ladder's re-run, the cover run on a done card.
+
+The section stays after the tables and is neither pinned nor dimmed. Activity reads oldest first and the chain is the newest chapter; a pinned block fights the tab's grammar and shouts through the hours-long quiet wait; dimmed type would sink below the 4.5:1 contrast floor the style pins. The build grounds three words of the prototype: the red head's row names the repair card rather than a re-run, the re-run row is the stall ladder's own, and ages read `1 d 2 h`.
+
+The build is 87e2350a on main of the code repository.

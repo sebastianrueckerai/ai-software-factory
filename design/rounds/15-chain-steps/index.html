@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Round 15 — the chain's steps on the card</title>
+<style>
+:root { color-scheme: dark; --bg: #10151d; --bg-panel: #151b25; --line: #232b38; --text: #dfe7f1; --muted: #93a1b5; --faint: #7c8ba0; --accent: #53d6e2; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.65 system-ui, sans-serif; }
+main { max-width: 68rem; margin: 0 auto; padding: 28px 22px 80px; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+h2 { font-size: 13px; font-variant-caps: all-small-caps; letter-spacing: .08em; color: var(--faint); margin: 34px 0 8px; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+p { margin: 8px 0; max-width: 78ch; }
+code, .mono { font: 12.5px/1.6 ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: var(--muted); }
+code { color: var(--accent); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+table { border-collapse: collapse; margin: 12px 0; font: 12.5px/1.6 ui-monospace, Menlo, Consolas, monospace; }
+th, td { border: 1px solid var(--line); padding: 4px 10px; text-align: left; }
+th { font-variant-caps: all-small-caps; letter-spacing: .06em; color: var(--muted); font-family: system-ui; }
+td.win { color: var(--accent); }
+figure { margin: 14px 0; }
+figure img { max-width: 100%; border: 1px solid var(--line); display: block; }
+figcaption { color: var(--muted); font-size: 12px; margin-top: 4px; max-width: 78ch; }
+ul { margin: 8px 0; padding-left: 22px; }
+li { margin: 3px 0; }
+.meta { color: var(--muted); font-size: 12.5px; }
+.pick { border: 1px solid var(--accent); padding: 10px 14px; margin: 12px 0; }
+.pick strong { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+<h1>Round 15 — the chain's steps on the card</h1>
+<p class="meta">2026-10-31 → 11-01 · one session · no generation: 6 directions plus the compare fusion, built as HTML in the console's own stylesheet over the harvested markup, 56 Playwright shots · 5 critic runs · ≈ $0.15 of the $1 cap · <a href="brief.md">brief</a> · gemini was down (the fal account is locked for top-up), so the round ran on glm-5v-turbo and qwen</p>
+
+<p class="pick"><strong>The pick request.</strong> <strong>A, the fusion</strong> (recommended): the face's stage word becomes the carry run and its link (<code>chain run 3251</code>, <code>run 3251 red</code>, <code>run 3252 stalled</code>); the Activity tab carries a Chain readout after the tables in the C24 grammar — carry run, required contexts, head of main, each with its clock and verdict, the stall card linked, the re-run named — collapsed to its summary when the chain is quiet, open when red or stalled; the done face reads "live through run 3248, 25 min after merge". Or <strong>B, d4-face</strong>: only the face changes, the drawer stays as today, and every question past "which run" leaves the console for the forge.</p>
+
+<h2>Try the two finalists</h2>
+<p>Both are live pages, not pictures. Open each, then open a card, read the face's second line, scroll the drawer's Activity tab, and switch the theme top right. Below the board every page carries the states band: the same merged card drawn in each chain state — chain red, stalled, waiting for the chain, blocked by roll, done — each with the tail this direction gives it.</p>
+<p><strong><a href="cand/fusion.html">A — the fusion</a></strong> (try it). The face links the run. The Activity tab answers "what must go green": carry run, <code>factory/roll</code>, head of main. On red the block names the failure and the queued re-run; on stall it links the stall card; the done face carries the cover.</p>
+<figure><img src="cand/fusion-tall-1440.png" alt="the fusion: the drawer's Activity tab with the Chain readout under the tables, the states band below the board" loading="lazy"><figcaption>A at 1440. The drawer's full Activity tab, then the states band with every chain state in this direction's wording.</figcaption></figure>
+<p><strong><a href="cand/d4-face.html">B — d4-face</a></strong> (try it). Only the face's stage word changes, into the run and its link. The drawer is exactly today's: gates table, steps, nothing about the chain.</p>
+<figure><img src="cand/d4-face-tall-1440.png" alt="d4-face: today's drawer, the face's stage word is a run link" loading="lazy"><figcaption>B at 1440. The face carries the run; the drawer stays silent about the wait.</figcaption></figure>
+
+<h2>The six directions</h2>
+<ol>
+<li><strong>d1-table</strong> — the chain as the gates table's tail: one row that meters the wait like any gate, its runs and required contexts nested under it as the jobs nest under checks. <a href="cand/d1-table.html">prototype</a> · <a href="cand/d1-table-light.html">light</a></li>
+<li><strong>d2-block</strong> — a Chain readout block of its own after the tables: the C24 grammar, one row per fact, every run linked. <a href="cand/d2-block.html">prototype</a> · <a href="cand/d2-block-light.html">light</a></li>
+<li><strong>d3-section</strong> — a Chain section beside Time in the Overview, the Status line naming the run. <a href="cand/d3-section.html">prototype</a> · <a href="cand/d3-section-light.html">light</a></li>
+<li><strong>d4-face</strong> — the face carries the run: the stage word becomes the run and its link, the drawer stays as it is. <a href="cand/d4-face.html">prototype</a> · <a href="cand/d4-face-light.html">light</a></li>
+<li><strong>d5-open</strong> — the normal wait stays as today; the exceptions speak in the Overview's Open block, and done closes the story. <a href="cand/d5-open.html">prototype</a> · <a href="cand/d5-open-light.html">light</a></li>
+<li><strong>d6-lean</strong> — the lean hybrid: one row in the gates table, one clause in the Status line, an Open item only when red or stalled, the done face carries the cover. <a href="cand/d6-lean.html">prototype</a> · <a href="cand/d6-lean-light.html">light</a></li>
+</ol>
+<p>Every candidate is a static page in the production console.css over the real harvested board and drawer markup, shot at 1440 and 390 in both themes. The style never moves; only the placement and wording of the chain does.</p>
+
+<h2>The breadth sheet</h2>
+<figure><img src="cand/montage-dark.png" alt="contact sheet of the six directions, dark theme" loading="lazy"><figcaption>The six directions, dark theme. The light twin: <a href="cand/montage-light.png">montage-light.png</a>. The critics judged the full-size shots, not these cells; the sheet is the round's own overview.</figcaption></figure>
+
+<h2>Critics, breadth pass</h2>
+<table>
+<tr><th>rank</th><th>glm</th><th>qwen</th></tr>
+<tr><td>1</td><td class="win">d4-face</td><td class="win">d4-face</td></tr>
+<tr><td>2</td><td>d2-block</td><td>d2-block</td></tr>
+<tr><td>3</td><td>d6-lean</td><td>d3-section</td></tr>
+<tr><td>4</td><td>d5-open</td><td>d1-table</td></tr>
+<tr><td>5</td><td>d1-table</td><td>d6-lean</td></tr>
+<tr><td>6</td><td>d3-section</td><td>d5-open</td></tr>
+</table>
+<p>Both crown d4 on the same argument — the blocking condition belongs in the card's headline, answered in one glance — and both put d2 second for giving the chain its own instrument without polluting the gates table. glm would drop d1 outright: putting the chain inside the gates table "teaches every user that the CI chain is a quality gate of the task", the exact misconception the brief warns against. qwen would drop d5: the normal wait is not an exception, so Open is the wrong mouth. qwen ranked from the contact sheet plus two full-size shots (its API caps at three images), so its lower half carries the sheet-scale discount.</p>
+
+<h2>Director's pixel pass and overrules</h2>
+<p>The candidates were also measured in the browser, and one real defect was found and fixed before any critic ran: the states band's first build named its cells <code>.cell</code> and <code>.cards</code>, names console.css already owns (the top strip's flex, nowrap cell and a lane's list). The inherited <code>white-space: nowrap</code> clipped the band's tails on 8 of 12 pages. Renamed to <code>.scell</code>/<code>.scells</code>; after the rebuild, measured on every page at 1440 and 390: no element overflows its box, the drawer sits inside the viewport, the gates table is exactly 621 px — the drawer's content width, flush by design. The vision pass that first claimed "text clipped at right edge" was right; its sibling claim "meter bars clipped" is the same 621 px flush fit and is overruled.</p>
+<p>From the critics' passes, measured against the code:</p>
+<ul>
+<li>glm's light pass: "the done state approaches the 4.5:1 floor and may disappear". Measured: <code>#5b6678</code> on <code>#fffdf8</code> is 5.71:1, and every state colour clears the floor on the light card (st-merged 5.70, st-failed 5.86, st-waiting 6.46, st-done 5.67). Overruled on the numbers.</li>
+<li>qwen's "d4 uses the word face too broadly": it read the direction's label, not the design. Overruled.</li>
+<li>qwen's sheet-scale reads (d6's "text blending at the bottom", d5's "crammed wall") do not survive the full-size shots: the band cells are legible and unclipped at 1440, and glm's full-size pass names no unreadable text anywhere. Discounted as sheet scale.</li>
+</ul>
+
+<h2>Compare loop</h2>
+<p>Candidate A, the fusion: d4's face carries the run, d2's block carries the facts, the done face carries the cover. Candidate B, d4-face alone. Both critics pick A.</p>
+<table>
+<tr><th>critic</th><th>verdict</th><th>the one change asked</th></tr>
+<tr><td>glm</td><td>A</td><td>subordinate the block to the gates table (opacity, smaller type, or a bar above it)</td></tr>
+<tr><td>qwen</td><td>A</td><td>pin the chain section above the gates table, collapsible</td></tr>
+</table>
+<p>glm: "the difference between 'stalled' and 'stalled · stall card #209' is the difference between alarm and resolution"; B's serenity "is bought at the price of ignorance". qwen: "mission control is visibility into dependencies; B turns a moment of decision into a forced navigation step to the forge".</p>
+<p>Both one-change asks point at the same thing: the block's hierarchy against the gates table. The ruling takes the substance and refuses both mechanisms. The block keeps its place after the tables — the Activity tab reads oldest first, and the chain is the newest chapter of the card's story, so it reads last like every newest thing in the console; a block pinned above the table would fight the tab's grammar and shout during the hours-long quiet wait. It renders in the drawer's own section idiom instead: a <code>details.sec</code> with the small-capitals summary, the hint carrying the live fact (<code>run 3251 pending · 14 min</code>), collapsed when the chain is quiet, open when it is red or stalled. Hierarchy answered with the console's own grammar, no opacity hack — dimmed type would sink below the 4.5:1 floor the style pins.</p>
+
+<h2>Recommendation</h2>
+<p><strong>A, the fusion.</strong> The brief asked four questions and A is the only candidate that answers all four: the wait has a block of its own on Activity (not a row in the task's gates), the face's stage word carries the run and its link, the exceptions speak with their actions (the stall card, the re-run), and done leaves the cover trace. Both critics' passes agree, and the compare loop turned their reason into words worth keeping: the face answers "where is my merge" in one glance, the block keeps "what must go green" inside the console. d4-face stays the recorded alternative: pick it to hold the build to one template line and leave the drawer untouched, knowing that every question past "which run" leaves the console for the forge.</p>
+<p>The build inherits, recorded: the block in the <code>details.sec</code> idiom, open on exception, collapsed when quiet; the stall card and the re-run as links in the block's rows; the done face's cover clause; the face's run link in the stage word's own state colour. The store reads behind it: the carry run with its verdict and first-seen time, the required contexts of the project file, the head of main, the roll, the stall ladder, the cover run (table <code>chain_runs</code>, roadmap 297).</p>
+
+<h2>Cost</h2>
+<p>$0.15 critics (5 runs: glm dark, glm light, qwen breadth, glm compare, qwen compare) of the $1 cap; no image generation. Gemini sat the round out: the fal account is locked for top-up. Round time: one session, 2026-10-31 → 11-01.</p>
+</main>
+</body>
+</html>
