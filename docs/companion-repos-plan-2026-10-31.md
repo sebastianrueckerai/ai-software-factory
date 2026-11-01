@@ -57,10 +57,14 @@ Five phases, each shippable alone, in order, phase 5 last as the proof:
   `read:repository` to exactly `sf/ai-software-factory-infra`
   (`scripts/seed-secrets.sh:210-218` and `:293-296` of the infra tree), so the
   dogfood's read needs no seed change. A companion the token cannot read is
-  refused at config load, by name, at declaration time and never first at the
-  gate. Declaring a companion on a new repository pairs the declaration with
-  one scope line in the same infra commit. The grant stays a human act, one
-  tree, re-seedable. No admin mint, least privilege keeps its user.
+  refused by name at the plan filing, as findings, and at every later gate
+  pass it holds the card as verdict data instead of failing it; the config
+  load itself only checks the declaration's shape (owner/name, given once,
+  not the project's own repository), so a config reload never depends on a
+  companion being up. Declaring a companion on a new repository pairs the
+  declaration with one scope line in the same infra commit. The grant stays
+  a human act, one tree, re-seedable. No admin mint, least privilege keeps
+  its user.
 - One Forgejo instance: an entry names a repository, never a host. The read,
   the gate and the clone all ride the one in-cluster Forgejo, and a repository
   on another host is refused at load with a named refusal.
