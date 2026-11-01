@@ -179,9 +179,11 @@ rename with it, so the tree never names a tool no factoryd knows.
 
 ## 18. A card branch swallows main as a flat copy
 
-Status: spec written
-([stuck-card-faults-spec-2026-11-01.md](stuck-card-faults-spec-2026-11-01.md),
-fix 1), awaiting the word. Found 2026-11-01 on #1396: the branch synced
+Status: the fix landed on code main 2026-11-01 (576b8afb: the sync lands
+as a merge, a diff over the card's line bound is refused by name before
+the pull opens, and the gate enforces the same bound), built as fix 1 of
+[stuck-card-faults-spec-2026-11-01.md](stuck-card-faults-spec-2026-11-01.md).
+Found 2026-11-01 on #1396: the branch synced
 main's newer state as one flat commit (e91ada1e, 101 files, +7205/−247, no
 merge ancestry), so git counted main's own work as the branch's additions.
 Pull #1408 read 9282 changed lines against the card's 1000-line bound, its

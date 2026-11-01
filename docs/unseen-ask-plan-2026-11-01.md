@@ -100,11 +100,10 @@ Residual: every task that started before the roll keeps the old path. No
 deployment reaches a running workflow. Nothing to build. Old stuck runs
 take the manual salvage route below. New cards are covered.
 
-### 2. The branch swallowed main as a flat copy. Fault 18, spec written.
+### 2. The branch swallowed main as a flat copy. Fault 18, landed.
 
-Status: spec written
-([stuck-card-faults-spec-2026-11-01.md](stuck-card-faults-spec-2026-11-01.md),
-fix 1), awaiting the word.
+Status: the fix landed on code main 2026-11-01 (576b8afb), built as fix 1
+of [stuck-card-faults-spec-2026-11-01.md](stuck-card-faults-spec-2026-11-01.md).
 
 Tonight's evidence is the sharpest yet for it. Merged as-is, `59b29abc`
 would have deleted about 1572 lines of main's recent work (+302/−1572
