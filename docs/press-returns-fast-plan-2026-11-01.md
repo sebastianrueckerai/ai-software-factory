@@ -1,6 +1,14 @@
 # The press that returns fast, and the deploy panel that carries its release
 
-Written 2026-11-01. Status: plan, awaiting Sebastian's OK. Nothing changed.
+Written 2026-11-01. Status: built on code main the same day. Fix 1 as
+14523ff7 (signalTimeout of 10 s per attempt, one retry, the dial's 5 s
+connect timeout and keepalive), fix 2 as 2f2681ba, fe4f36fb, 2cea6290 and
+bad53ef3 (pressNote, the #note outlet, the board-refresh trigger), fix 3
+as 75b474cd (form.htmx-request button in console.css:100), fix 4 as
+00094a2a (Hold.Released from the standing Deploy now) with 071db830 (a
+failed settle ends the window in the store's own statement). The note
+outlet then moved into the board's grid cell (b36ba3cb, the register's
+fault 19).
 
 ## What happened
 
