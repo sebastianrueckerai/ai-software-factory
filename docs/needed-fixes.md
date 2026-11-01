@@ -12,6 +12,10 @@ served-window follow 91ec3b8a), the board's month meter (13d47231) and
 fault 13, the resumed card that died on a moved head (code ee585427, the
 fix salvaged from #1408's branch by hand: the branch's flat copy of main
 made its pull unmergeable, so 7b59efeb was rebased onto main directly).
+Fault 19, the note press outlet that broke the screen grid: the outlet sat
+as a fourth child of the screen's three-column grid, took the board's
+column and pushed the board under the chat; it now shares the board's cell
+(code b36ba3cb).
 
 ## 1. The check-in's policy stop preempts the approval card
 
