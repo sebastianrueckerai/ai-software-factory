@@ -795,17 +795,20 @@ the factory should run on the providers its owner actually uses daily. OpenAI
 came in on 2026-10-29 for the premium class below.
 
 Since 2026-10-20 LiteLLM holds two model classes, `small` and `big`, one
-alias each. `big` is the z.ai model `glm-5.3` and `small` is `glm-5.3-flash`.
-Until 2026-11-01 each class also had an Alibaba twin, `qwen3.8-max` and
-`qwen3.8-flash`; Sebastian removed the twins that day, and each class is
-its one z.ai model. `small` is the start rung and serves the coder and
+alias each. `big` is the z.ai model `glm-5.3` and `small` is `glm-5.3-flash`,
+and behind each stands its Alibaba twin, `qwen3.8-max` and `qwen3.8-flash`,
+for the plan's quota limit. The twins are paid per token, so a class's spend
+is modelled while the z.ai model answers and real while the twin does.
+Sebastian removed every fallback on the morning of 2026-11-01 and gave these
+two classes their twins back the same day: premium alone has none. `small`
+is the start rung and serves the coder and
 the cheap calls. `big` serves the stronger rung, the review, the supervisor,
 the audit, the check-in and the operator, so the stronger-model retry and
 the review stay a real step up from `small`. A call's purpose sits on its
-audit row and in its ledger ref, not in its alias. A model that fails or
-refuses fails the call after its retries, which the task's
-existing paths handle: a review that can merge on `auto` must not move to a
-weaker model without a trace.
+audit row and in its ledger ref, not in its alias. A z.ai model that fails
+or refuses after its retries hands the call to its twin, and the audit
+row's deployment names which answered, so a weaker model never serves
+without a trace.
 
 Since 2026-10-29 a third class, `premium`, is OpenAI's `gpt-6.1-sol` at
 `reasoning_effort: max`. Every premium call goes through OpenAI's
@@ -856,9 +859,12 @@ backstop behind the factory's month cap (5.4); its refusal names no entity, and 
 cap.
 
 Since 2026-10-20 the router retries a failed call twice with backoff on the
-same deployment. Since 2026-11-01 a deployment with no answer left fails the
-call: no fallback list stands behind a class, and no cooldown idles the
-class's only model.
+same deployment. Since 2026-11-01 a fallback list stands behind `big` and
+`small` alone, pointing at the class's Alibaba twin: a z.ai deployment with
+no answer left hands the call to the twin, and a model that failed three
+calls within a minute rests a minute in cooldown while the twin serves its
+class. `premium` has one deployment and nothing behind it, so a call OpenAI
+fails fails.
 
 Replicate, Firecrawl and fal.ai are not chat models for our loop: they are paid
 capabilities. They enter as connectors on the capability gateway with per-task
@@ -5318,7 +5324,7 @@ since Stage 6, but neither has run under load.
 | Untrusted text | One sanitiser: into the brief for outsiders' text only, hidden comments stripped outside code blocks; out to Forgejo, hidden comments stripped, mentions and closing keywords neutralised, off-list links defanged; agent commits squashed under a sanitised subject | Built (Task 89) |
 | Answer chain for questions | `questions: [self, model:<tier>, human]` per stage (queue item B), on top of the message call | Not built, waits for Sebastian's scoping |
 | Rolls | The code repository rolls through a roll task: a digest pull request from factoryd, a card, the bot's merge, a row per image. Infra changes stay human commits. The merge waits for a session gap, and new sessions wait while it does | Built |
-| Model routing | Two LiteLLM classes, `small` and `big`, each its one z.ai model (2026-11-01: no Alibaba twin, no fallback list, no cooldown; a failed model fails the call after two retries), the answering deployment in the audit row | Built |
+| Model routing | Two LiteLLM classes, `small` and `big`, each its z.ai model with its Alibaba twin behind it for the plan's quota limit (2026-11-01), `premium` OpenAI's Sol alone with no twin; a failed model hands the call to the twin after two retries if its class has one, else the call fails, and the answering deployment sits in the audit row | Built |
 | Capability classes | `coder`, `analyzer` with a report session mode for the screening stage and the sizing step, and `planner` with a plan session mode. The release is the roll task, no class | Built |
 | Task analytics | Four task metrics, a revert mark and four panels, no report task | Built |
 | SPIRE and OPA | No need appeared in Stage 9 | Deferred |
