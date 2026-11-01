@@ -15,7 +15,13 @@ made its pull unmergeable, so 7b59efeb was rebased onto main directly).
 Fault 19, the note press outlet that broke the screen grid: the outlet sat
 as a fourth child of the screen's three-column grid, took the board's
 column and pushed the board under the chat; it now shares the board's cell
-(code b36ba3cb).
+(code b36ba3cb). The chain-run links that spoke the run's global id where
+the forge's pages address the per-repo run number, so every /actions/runs
+link read "resource does not exist" (card #1439, run 3356 against the
+page of 2260): the run's number is now recorded beside the id with a
+guard a numberless rerun cannot erase, old rows are backfilled, and the
+board, the drawer and the facts link number with number (code a0e2803e,
+docs/plan-run-link-index-2026-11-01.md).
 
 ## 1. The check-in's policy stop preempts the approval card
 
