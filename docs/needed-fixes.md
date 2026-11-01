@@ -98,7 +98,8 @@ watch factoryd uses, or re-read the month line when a refusal would fire.
 
 ## 7. The criteria gap approval carries no brief
 
-Status: plan wanted. Found 2026-11-01 on approval 1005 of plan #1345.
+Status: built 2026-11-01 on the code repo's main. Found 2026-11-01 on
+approval 1005 of plan #1345.
 
 The gap ask's console card renders a brief error ("kind 'criteria' carries
 no brief") instead of the five parts: which criteria, what state each is in,
@@ -111,7 +112,7 @@ the rows already marked.
 
 ## 8. The criteria gap approval is console-only
 
-Status: parked spec by Sebastian
+Status: built 2026-11-01 on the code repo's main, from the parked spec
 (planfilingfact-and-criteria-closeout-spec-2026-10-31.md, pieces 2 and 3,
 widened 2026-11-01). Found 2026-11-01 on plan #1345, approval 1005.
 
@@ -130,7 +131,8 @@ human the decider of record, and the card ends.
 
 ## 9. The gap card loses the typed reasons, and its close is a guess
 
-Status: plan wanted. Found 2026-11-01 on approval 1005 of plan #1345.
+Status: built 2026-11-01 on the code repo's main. Found 2026-11-01 on
+approval 1005 of plan #1345.
 
 Each criterion's Waive is its own form, and the press re-renders the whole
 board from server state, so the reasons typed into the sibling forms
@@ -149,8 +151,8 @@ today.
 
 ## 10. attach_analysis cannot reach an approval ask, and its refusal points at the wrong one
 
-Status: plan wanted. Found 2026-11-01 on card #1345, during the 1005
-close-out.
+Status: built 2026-11-01 on the code repo's main. Found 2026-11-01 on
+card #1345, during the 1005 close-out.
 
 The tool attaches findings to the newest question asked on a card and to
 nothing else. The one ask that needed the findings, the open criteria
@@ -165,8 +167,8 @@ a refusal names the ask, its kind and its state.
 
 ## 11. The chat's file tool cannot read past 64 KiB
 
-Status: plan wanted. Found 2026-11-01 reading main's store.go (111 KB)
-for the 1005 close-out.
+Status: built 2026-11-01 on the code repo's main. Found 2026-11-01
+reading main's store.go (111 KB) for the 1005 close-out.
 
 The file tool serves the first 64 KiB and appends a cut note, and takes
 no range, so the chat read FundCard's merged wording out of other agents'

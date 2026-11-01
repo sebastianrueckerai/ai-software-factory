@@ -2,6 +2,8 @@
 
 Filed 2026-10-31 after #1345's plan reached its terminal state with a criteria request (1005) still pending on a card whose two children are done. Widened 2026-11-01 after the same request closed by hand; the needed-fixes register's faults 8 to 10 carry the evidence.
 
+Status: built 2026-11-01 on the code repo's main, widened pieces included.
+
 ## Observed
 
 Plan #1345 (store-side doc comments) split into two children: #1379 (store-sql-doc-comments, done, merged 21:52) and #1380 (kube-routine-doc-comments, done). The plan track itself shows its session cap spent (26 sessions) and its planner output gone ("the planner filed no plan"; the last sessions died on opencode serve: context canceled). A criteria request (1005) sits pending with nothing left to deliver against it: both children merged, the plan's whole objective is in main.
