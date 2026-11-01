@@ -108,10 +108,13 @@ from the plan's criteria and their missing verdict rows.
 
 ## 8. The criteria gap approval is console-only
 
-Status: plan wanted. Found 2026-11-01 on plan #1345.
+Status: parked spec by Sebastian
+(planfilingfact-and-criteria-closeout-spec-2026-10-31.md, piece 2). Found
+2026-11-01 on plan #1345.
 
 Every other ask that reaches a human is answerable from the chat: the chat
 agent holds answer tools for questions, merges, checks. The criteria gap
 approval has none, so the one actor awake at 03:00 cannot close the plan.
-Fix direction: a waive or grant tool in the chat's answer set, or fold the
-gap into the ask the chat already answers.
+The parked spec's answer: on a plan whose children are all done and
+merged, the pending criteria request takes the member's confirmation that
+the delivered children satisfy the criteria, and the card ends.
