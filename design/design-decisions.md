@@ -311,4 +311,4 @@ The reasoning a model streams beside its text (the wire's reasoning_content) fol
 
 Compaction no longer counts rows alone. The gateway serves each model's context window, and the chat compacts when a thread's context passes 80 percent of it; the worker sets each model's session limit at 75 percent of the served window under the 200 K trust cap, on opencode's own compaction. A model that serves no window degrades as before: the chat bounds by rows, the worker keeps the trust cap. The `limits.context_tokens` knob is gone; `/compact` still runs by hand.
 
-The build is ee2498a2 on main of the code repository.
+The build is 48fcdbc4 on main of the code repository.
