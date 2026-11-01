@@ -65,3 +65,53 @@ The stop that fault 1 surfaced shows the shape: a check-in stop renders a
 generic question with no numbers, no recommendation and no fitting buttons.
 Fault 1's fix removes the worst case. The remaining human stops still
 deserve the five-part treatment the concept promises.
+
+## 5. A review refused for money vanishes, and the plan cannot close
+
+Status: plan wanted. Found 2026-11-01 on plan #1345 (incident plan),
+card #1380.
+
+The integration card's final model review was refused by the spent October
+cap and left no trace a person can see: no session row, no review event, no
+note on the approval card. The approval ask named only "risk class normal:
+a human decides the merge", and the merge went through with no model review
+at all. The hidden half: that review is also the only writer of the plan's
+criteria verdict rows. With none written, the plan can never close, and the
+close check files a gap ask that reads as "criteria not met" when the truth
+is "criteria never judged". Fix direction: a review that does not run for
+money must be named on the approval card and must hold the merge; and the
+plan close must tell an empty verdict table (a plumbing failure, ask again
+or re-run the review) from verdict rows that say unmet (a real gap).
+
+## 6. A raised month cap takes effect only on a roll, which the spent cap blocks
+
+Status: plan wanted. Found 2026-11-01 on the gateway of the live cluster.
+
+The cap raise to €600 landed in policy version 974 at 23:35 and factoryd's
+own loader activated it within seconds, but the enforcing gateway kept
+refusing calls against the €544 of version 971 it loaded at boot. Only a
+pod restart applies it, and a restart comes only with a roll, and the roll
+is held while a plan is open on main, and the plan's cards need the money
+the raise would free. The loop closes only through the six-hour production
+hold ask. Fix direction: the enforcing gateway must follow the same policy
+watch factoryd uses, or re-read the month line when a refusal would fire.
+
+## 7. The criteria gap approval carries no brief
+
+Status: plan wanted. Found 2026-11-01 on approval 1005 of plan #1345.
+
+The gap ask's console card renders a brief error ("kind 'criteria' carries
+no brief") instead of the five parts: which criteria, what state each is in,
+what granting costs, what waiving means. The decision is left to a card
+that shows nothing. Fix direction: give the criteria approval a brief built
+from the plan's criteria and their missing verdict rows.
+
+## 8. The criteria gap approval is console-only
+
+Status: plan wanted. Found 2026-11-01 on plan #1345.
+
+Every other ask that reaches a human is answerable from the chat: the chat
+agent holds answer tools for questions, merges, checks. The criteria gap
+approval has none, so the one actor awake at 03:00 cannot close the plan.
+Fix direction: a waive or grant tool in the chat's answer set, or fold the
+gap into the ask the chat already answers.
