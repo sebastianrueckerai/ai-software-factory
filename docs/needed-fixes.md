@@ -21,7 +21,16 @@ link read "resource does not exist" (card #1439, run 3356 against the
 page of 2260): the run's number is now recorded beside the id with a
 guard a numberless rerun cannot erase, old rows are backfilled, and the
 board, the drawer and the facts link number with number (code a0e2803e,
-docs/plan-run-link-index-2026-11-01.md).
+docs/plan-run-link-index-2026-11-01.md). Fault 18, the card branch that
+swallowed main as a flat copy, left with its fix (code 576b8afb: the sync
+lands as a merge, a diff over the card's line bound is refused by name,
+the gate enforces the same bound), and the spec's other two fixes landed
+the same day: a reply that cannot change anything stops asking (c1716385),
+and a stop that names a decision offers that decision while a grant
+carries its instruction (5dc22e59). Fault 20, the ask that repeated a
+sentence and woke nobody, left with its fix (code 59f8490b: the wake key
+takes the ask's issue comment id, the sentence hash only as the
+fallback).
 
 ## 1. The check-in's policy stop preempts the approval card
 
@@ -66,8 +75,10 @@ not read as success.
 ## 3. Sessions open that the task budget cannot pay for
 
 Status: plan wanted. Found 2026-10-31 on card #1345; four openings burned
-about €0.53 and filed nothing. Verified unbuilt on main 2026-11-01: no
-opening-cost check anywhere in the grant path.
+about €0.53 and filed nothing. Re-verified unbuilt on main a0e2803e: the
+session floor (SessionFunded, every session's start since 6c579a24 of
+2026-10-16) predates the fault and did not stop the four openings, and
+nothing since changes what a grant buys.
 
 The factory grants and opens planner sessions without checking that the
 task's remaining budget covers a whole session opening. With €0.03 to €0.44
@@ -81,7 +92,13 @@ the gateway that the task row's spent amount never recorded.
 ## 4. Generic check-in stops carry no five parts
 
 Status: noted, part of the question-format contract's unfinished tail work
-(question-format-concept-2026-10-17.md).
+(question-format-concept-2026-10-17.md). The check-in stops gained most of
+the parts on main 2026-11-01: the spend guard's stop carries the findings
+and the last review verdict (b58d8e86), a stop whose answer changed
+nothing is not repeated and names its exits (c1716385), and a stop that
+names a decision offers Extend, Overrule or Close while a grant carries
+its instruction (5dc22e59). The part that stays open at a0e2803e: no
+check-in template builds a recommendation, the concept's fifth part.
 
 The stop that fault 1 surfaced shows the shape: a check-in stop renders a
 generic question with no numbers, no recommendation and no fitting buttons.
@@ -183,39 +200,3 @@ Fix direction: the config loader accepts the union of the old and the new
 name across a rename, or the roll that carries a rename commits the tree's
 rename with it, so the tree never names a tool no factoryd knows.
 
-## 18. A card branch swallows main as a flat copy
-
-Status: the fix landed on code main 2026-11-01 (576b8afb: the sync lands
-as a merge, a diff over the card's line bound is refused by name before
-the pull opens, and the gate enforces the same bound), built as fix 1 of
-[stuck-card-faults-spec-2026-11-01.md](stuck-card-faults-spec-2026-11-01.md).
-Found 2026-11-01 on #1396: the branch synced
-main's newer state as one flat commit (e91ada1e, 101 files, +7205/−247, no
-merge ancestry), so git counted main's own work as the branch's additions.
-Pull #1408 read 9282 changed lines against the card's 1000-line bound, its
-four chat migrations clashed with main's own copies, and Forgejo reported
-mergeable=false. The card closed stale at €9 spent; its fix was three
-files (+155/−4).
-
-Fix direction: the worker brings main into a branch only by merge or
-rebase, and a push whose own diff exceeds the card's line bound several
-times over stops before the pull opens, with a named error.
-
-## 20. An ask that repeats a sentence wakes nobody
-
-Status: the fix landed on code main 2026-11-01 (59f8490b: the wake key
-takes the ask's issue comment id, the sentence hash only as the fallback),
-built as the plan's fault 4
-([unseen-ask-plan-2026-11-01.md](unseen-ask-plan-2026-11-01.md)). Found
-2026-11-01 on card
-#1427: two asks 5 minutes apart carried the same sentence, so the wake
-loop's dedup key ("ask:" plus the task id plus the sha256 of the
-sentence) read the second, unanswered ask as the first, answered one. The
-chat never woke, and the card sat in waiting-human behind a green checks
-badge until a human looked by hand.
-
-The dedup's purpose is delivery idempotence, one wake per ask when an
-event batch is reprocessed. Fix direction: the key takes the ask's own
-identity, the issue comment id, and falls back to the sentence hash only
-when the ask carries no comment. A new ask then always wakes the chat,
-however it is worded.
