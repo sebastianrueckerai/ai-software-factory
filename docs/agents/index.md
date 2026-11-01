@@ -4,7 +4,7 @@ One page per agent: the first model request verbatim, every part pinned to the b
 
 ## The self-check
 
-- code SHA `648a095e8038d797d003a4fead456dd5e6a37436`; every permalink points there.
+- code SHA `0dbb13c4cb2e4bbc2a54a9d20878b8a94842886d`; every permalink points there.
 - policy `3a8a734a860e`, the tree the captures read.
 - harness `opencode 1.18.32`, the pinned opencode the loop captures drove.
 - unlabelled spans: 0 — the tool exits non-zero on any unlabelled byte, so an index that shipped means none.
@@ -38,6 +38,31 @@ Fixture ids: `agentdoc-fixture` (coding, screening, sizing, planner, holdout-aud
 | [project-agent](project-agent.md) | B | The always-on repo chat agent; also answers escalations | `premium` | `operator` | console, own tool loop | 52 | 23975 |
 | [compact](compact.md) | B | Summarises a chat thread's older turns | `small` | `compact` | console | 0 | 921 |
 | [vision](vision.md) | B | Describes an image the human attached | `vision` | `vision` | console | 0 | 315 |
+
+## The agents in one line each
+
+- [coding](coding.md): Writes the card's code in the sandbox and commits it. No other agent in the factory writes code.
+- [screening](screening.md): Reads a fresh issue before any code exists and answers clear or suspect as JSON. Only work it understands becomes a card.
+- [sizing](sizing.md): Reads a clear issue and sizes the card small, medium or large before the first session starts.
+- [planner](planner.md): Reads the repository and files a plan through the file_plan tool before the session writes code.
+- [holdout-audit](holdout-audit.md): Reads one hold-out criterion against the finished work and files a verdict the gates read.
+- [message-responder](message-responder.md): Answers a writer's message pushed into a running session. The message becomes the loop's next turn.
+- [opencode-subagents](opencode-subagents.md): opencode's own general and explore subagents, set by the agent block in our session config. Their prompts live inside the pinned binary; the config sets their model and step cap.
+- [checkin](checkin.md): Reads a session that stopped at a checkpoint short of done and answers one of continue, message, handover, human or replan.
+- [model-review](model-review.md): Judges the change against one review criterion or behaviour, the texts the criteria and behaviours agents draft.
+- [security-audit](security-audit.md): Checks the change against the security checklist. No other agent makes this reading.
+- [gate-supervisor](gate-supervisor.md): Reads the verdicts and answers approve or escalate. Nothing merges past this agent unjudged.
+- [review-criteria](review-criteria.md): Drafts the criteria text the model reviews judge by.
+- [review-behaviours](review-behaviours.md): Drafts the behaviours text the model reviews watch for.
+- [delta-planner](delta-planner.md): Plans the delta work between one review and the next.
+- [holdout-proposer](holdout-proposer.md): Proposes the hold-out criteria the finished work is judged by. The session that writes the work does not see them.
+- [holdout-redrafter](holdout-redrafter.md): Rewrites one hold-out criterion after the gates dropped it.
+- [answer-screener](answer-screener.md): Screens a late answer from the issue's author before it changes the card.
+- [brief-writer](brief-writer.md): Writes the approval brief a human reads to decide.
+- [title](title.md): Names a chat thread from its first message. One cheap call.
+- [project-agent](project-agent.md): The always-on chat about the repository, with the project's tools. Its escalations file cards the factory then works.
+- [compact](compact.md): Summarises a chat thread's older turns when the thread grows long. One cheap call.
+- [vision](vision.md): Describes an image a human attached, in words the text-only agents read.
 
 ## The one loop
 
@@ -130,32 +155,61 @@ Blocks several agents carry byte for byte, by content hash:
 
 ```mermaid
 graph LR
-  subgraph A["family A"]
-    coding["coding"]
+  signals["signals: issues, telemetry, alerts"]
+  subgraph intake["intake"]
     screening["screening"]
     sizing["sizing"]
-    planner["planner"]
-    holdout_audit["holdout-audit"]
-    message_responder["message-responder"]
-    opencode_subagents["opencode-subagents"]
+    answer-screener["answer-screener"]
   end
-  subgraph B["family B"]
+  subgraph planning["planning"]
+    planner["planner"]
+    delta-planner["delta-planner"]
+  end
+  subgraph the-session["the session"]
+    coding["coding"]
+    message-responder["message-responder"]
     checkin["checkin"]
-    model_review["model-review"]
-    security_audit["security-audit"]
-    gate_supervisor["gate-supervisor"]
-    review_criteria["review-criteria"]
-    review_behaviours["review-behaviours"]
-    delta_planner["delta-planner"]
-    holdout_proposer["holdout-proposer"]
-    holdout_redrafter["holdout-redrafter"]
-    answer_screener["answer-screener"]
-    brief_writer["brief-writer"]
+    opencode-subagents["opencode subagents"]
+  end
+  subgraph verification["verification"]
+    review-criteria["review-criteria"]
+    review-behaviours["review-behaviours"]
+    model-review["model-review"]
+    security-audit["security-audit"]
+    holdout-proposer["holdout-proposer"]
+    holdout-redrafter["holdout-redrafter"]
+    holdout-audit["holdout-audit"]
+    gate-supervisor["gate-supervisor"]
+  end
+  subgraph the-human["the human's page"]
+    brief-writer["brief-writer"]
+    human["the human"]
+  end
+  subgraph console["console"]
+    project-agent["project-agent"]
     title["title"]
-    project_agent["project-agent"]
     compact["compact"]
     vision["vision"]
   end
-```
+  deploy["merge and deploy"]
+  telemetry["telemetry"]
 
-The authored master diagram lands here once drafted and picked.
+  signals --> screening --> sizing --> planner --> coding
+  signals -.-> answer-screener
+  coding -.-> opencode-subagents
+  message-responder --> coding
+  coding --> checkin
+  checkin -.-> coding
+  model-review --> gate-supervisor
+  security-audit --> gate-supervisor
+  holdout-audit --> gate-supervisor
+  review-criteria -.-> model-review
+  review-behaviours -.-> model-review
+  holdout-proposer -.-> holdout-audit
+  holdout-redrafter -.-> holdout-audit
+  model-review -.-> delta-planner
+  delta-planner -.-> coding
+  gate-supervisor -->|approve| deploy
+  gate-supervisor -->|escalate| brief-writer --> human
+  deploy --> telemetry --> signals
+```
