@@ -172,3 +172,19 @@ three-way deadlock. Only the manual name revert (infra bed2930) broke it.
 Fix direction: the config loader accepts the union of the old and the new
 name across a rename, or the roll that carries a rename commits the tree's
 rename with it, so the tree never names a tool no factoryd knows.
+
+## 18. A card branch swallows main as a flat copy
+
+Status: spec written
+([stuck-card-faults-spec-2026-11-01.md](stuck-card-faults-spec-2026-11-01.md),
+fix 1), awaiting the word. Found 2026-11-01 on #1396: the branch synced
+main's newer state as one flat commit (e91ada1e, 101 files, +7205/−247, no
+merge ancestry), so git counted main's own work as the branch's additions.
+Pull #1408 read 9282 changed lines against the card's 1000-line bound, its
+four chat migrations clashed with main's own copies, and Forgejo reported
+mergeable=false. The card closed stale at €9 spent; its fix was three
+files (+155/−4).
+
+Fix direction: the worker brings main into a branch only by merge or
+rebase, and a push whose own diff exceeds the card's line bound several
+times over stops before the pull opens, with a named error.
