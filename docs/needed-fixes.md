@@ -53,9 +53,11 @@ open, go to the checks that end in the approval card instead of stopping.
 
 ## 2. A flavoured confirmation never files, and the file tool lies about it
 
-Status: plan wanted. Found 2026-10-31 on card #1345, cost about €2 in dead
-sessions before it was caught. Verified unbuilt on main 2026-11-01:
-confirmedByAnswers (plan.go:2052) still demands the bare choice word.
+Status: plan written, awaiting Sebastian's OK
+(handover-fault02-confirmation-and-file-tool-2026-11-01.md). Found
+2026-10-31 on card #1345, cost about €2 in dead sessions before it was
+caught. Verified unbuilt on main a0e2803e: confirmedByAnswers (plan.go:2061)
+still demands the bare choice word.
 
 Two defects that make one loop:
 
@@ -70,12 +72,12 @@ Two defects that make one loop:
   the factory's own rule that every result names the real state and the
   fitting action.
 
-Fix direction: a confirmation whose answer begins with the choice word, or
-carries it as its own word, confirms; everything else still goes to the
-planner. The file tool reports what actually happened: which revision it
-wrote, which cards exist after the call, and when it cannot file, why and
-what can. A session that ends with no new revision and no filed cards must
-not read as success.
+Fix direction: the confirmation becomes a decision field with closed values,
+written by the card's buttons and the chat tool's structured call, held by a
+database check. No code parses prose for a decision: the words stay findings,
+and where the chat must read them, its model sets the field. The file tool
+names what its call reached: stored, and what the revision waits for. The
+plan carries the details.
 
 ## 3. Sessions open that the task budget cannot pay for
 
