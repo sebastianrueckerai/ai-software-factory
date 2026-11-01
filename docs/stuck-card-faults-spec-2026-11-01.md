@@ -20,17 +20,36 @@ main), and Forgejo reported `mergeable=false`. No card limits could admit
 it, the review demanded a split, and the card spent €9 and a day before
 closing stale. Its real fix was three files (`7b59efeb`, +155/−4).
 
-The fix, two halves:
+Falling behind main is normal and costs little; the fault is the sync's
+shape. The flat commit's tree was almost what a merge would have
+produced. Only the second parent was missing, and that alone billed
+main's 25 commits to the card. So the fix never has to prevent falling
+behind, only record the sync as a merge, and give the rare too-big merge
+somewhere to go. Three layers:
 
-- The worker brings main's newer state into a branch only by merge or
-  rebase, never a flat copy of files. Git then sees the shared history
-  and the pull counts only the card's own lines.
-- A guard at push time: a branch whose own diff against its merge base
-  exceeds the card's line bound several times over stops before the pull
-  opens, with a named error that says what the sync mistake looks like.
+- One rule, checked by a tool, shared by worker and gate: before every
+  push, the branch's diff against its merge base must fit the card's
+  line bound. If it does not, the worker merges main (or rebases), runs
+  the checks, and pushes. The gate runs the same check as the push
+  guard, so a flat copy cannot pass however it is made. The rule is a
+  deterministic step, not a prompt line.
+- The merge is normal paid work. It costs a session, the checks must
+  pass, and identical migrations deduplicate on their own once the
+  history is shared. A day of divergence then costs about one session
+  (€0.60), not the €9 the loop burned. Frequent pushes keep each merge
+  small, because every push re-runs the rule.
+- When the merge truly exceeds the card, the limit is spent or the
+  conflicts are too large, the card does not hand git to the human. It
+  closes itself with its state recorded and opens a successor card that
+  starts from main's tip and carries the patch and the findings. The
+  successor is small: #1396's own diff was three files. Humans keep the
+  product decisions (extend, overrule, close, split); git mechanics stay
+  with the factory.
 
-Where it lands: the agent worker's git steps (merge/rebase discipline)
-and the push path (the bound guard). Trace first: whether the session or
+Where it lands: the agent worker's git steps (the pre-push check and the
+merge), the push path (the same check as the guard, with the named
+error), the stop templates (the successor exit joins fix 3's forms) and
+factoryd (the successor-card path). Trace first: whether the session or
 the worker harness performed the flat copy (`e91ada1e`'s author is
 factory-agent; the harness's sync step has not been read).
 
