@@ -192,3 +192,20 @@ files (+155/−4).
 Fix direction: the worker brings main into a branch only by merge or
 rebase, and a push whose own diff exceeds the card's line bound several
 times over stops before the pull opens, with a named error.
+
+## 20. An ask that repeats a sentence wakes nobody
+
+Status: plan written
+([unseen-ask-plan-2026-11-01.md](unseen-ask-plan-2026-11-01.md), fault 4
+with the fix in detail), awaiting the word. Found 2026-11-01 on card
+#1427: two asks 5 minutes apart carried the same sentence, so the wake
+loop's dedup key ("ask:" plus the task id plus the sha256 of the
+sentence) read the second, unanswered ask as the first, answered one. The
+chat never woke, and the card sat in waiting-human behind a green checks
+badge until a human looked by hand.
+
+The dedup's purpose is delivery idempotence, one wake per ask when an
+event batch is reprocessed. Fix direction: the key takes the ask's own
+identity, the issue comment id, and falls back to the sentence hash only
+when the ask carries no comment. A new ask then always wakes the chat,
+however it is worded.
