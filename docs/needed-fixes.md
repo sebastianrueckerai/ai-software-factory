@@ -2,13 +2,20 @@
 
 A standing register. Each entry names the fault, the evidence from the live
 run, the fix direction and its status. Nothing here is implemented until
-Sebastian says go. Updated as faults are found and as fixes land.
+Sebastian says go. Updated as faults are found and as fixes land. A fault
+whose fix lands on a code or infra main leaves the list, its number stays
+retired, and the plan or spec that built it keeps the record. Gone on
+2026-11-01: faults 7 to 11 (the criteria card's brief, its chat answer and
+its draft state, attach_analysis, the file read's ranges, all on code main),
+the compaction fold with thinking off (code 34b778bd, infra c53d5bb, the
+served-window follow 91ec3b8a) and the board's month meter (13d47231).
 
 ## 1. The check-in's policy stop preempts the approval card
 
 Status: plan written, awaiting Sebastian's OK
 (checkin-policy-approval-plan-2026-10-31.md). Found 2026-10-31 on card
-#1347.
+#1347. Verified unbuilt on main 2026-11-01: no change id
+checkin-policy-verification anywhere.
 
 A supervising agent stops a card with a bare "how should it go on?"
 question one step before the card's own flow would show the proper approval
@@ -20,7 +27,8 @@ open, go to the checks that end in the approval card instead of stopping.
 ## 2. A flavoured confirmation never files, and the file tool lies about it
 
 Status: plan wanted. Found 2026-10-31 on card #1345, cost about €2 in dead
-sessions before it was caught.
+sessions before it was caught. Verified unbuilt on main 2026-11-01:
+confirmedByAnswers (plan.go:2052) still demands the bare choice word.
 
 Two defects that make one loop:
 
@@ -45,7 +53,8 @@ not read as success.
 ## 3. Sessions open that the task budget cannot pay for
 
 Status: plan wanted. Found 2026-10-31 on card #1345; four openings burned
-about €0.53 and filed nothing.
+about €0.53 and filed nothing. Verified unbuilt on main 2026-11-01: no
+opening-cost check anywhere in the grant path.
 
 The factory grants and opens planner sessions without checking that the
 task's remaining budget covers a whole session opening. With €0.03 to €0.44
@@ -69,7 +78,7 @@ deserve the five-part treatment the concept promises.
 ## 5. A review refused for money vanishes, and the plan cannot close
 
 Status: plan wanted. Found 2026-11-01 on plan #1345 (incident plan),
-card #1380.
+card #1380. Verified unbuilt on main 2026-11-01.
 
 The integration card's final model review was refused by the spent October
 cap and left no trace a person can see: no session row, no review event, no
@@ -86,6 +95,8 @@ or re-run the review) from verdict rows that say unmet (a real gap).
 ## 6. A raised month cap takes effect only on a roll, which the spent cap blocks
 
 Status: plan wanted. Found 2026-11-01 on the gateway of the live cluster.
+Verified unbuilt on main 2026-11-01: the gateway still reads its policy at
+boot, no watch, no re-read on refusal.
 
 The cap raise to €600 landed in policy version 974 at 23:35 and factoryd's
 own loader activated it within seconds, but the enforcing gateway kept
@@ -96,82 +107,80 @@ the raise would free. The loop closes only through the six-hour production
 hold ask. Fix direction: the enforcing gateway must follow the same policy
 watch factoryd uses, or re-read the month line when a refusal would fire.
 
-## 7. The criteria gap approval carries no brief
+## 12. The planner dies on a big spec's read set
 
-Status: built 2026-11-01 on the code repo's main. Found 2026-11-01 on
-approval 1005 of plan #1345.
+Status: the cap relief landed 2026-11-01 on infra main (18e7418:
+limits.context_tokens goes, premium's window pinned at its real 128000).
+The structural fix, phase 2's digest and ask reads, is still unfiled since
+#1383 closed. Found 2026-10-31 on card #1383: three planner sessions in a
+row ended without filing a plan, each after reading 20+ files against the
+98K context max, twice on "opencode serve: context canceled". Six sessions
+ran under a grant of three, then the session cap closed the card, €3.54 of
+€5.00 sunk.
 
-The gap ask's console card renders a brief error ("kind 'criteria' carries
-no brief") instead of the five parts: which criteria, what state each is in,
-what granting costs, what waiving means. The decision is left to a card
-that shows nothing. The mark is permanent, too: the brief sweep skips rows
-it has once marked failed, so a criteria card never heals even after the
-writer learns the kind. Fix direction: give the criteria approval a brief
-built from the plan's criteria and their missing verdict rows, and retry
-the rows already marked.
+Fix direction: file phase 2, the digest and the ask reads. Until it lands,
+a big card needs a trimmed read set, the cheap rung, or the spec-on-card
+shape that saved #1383.
 
-## 8. The criteria gap approval is console-only
+## 13. A reply that resumes a card dies on a moved head
 
-Status: built 2026-11-01 on the code repo's main, from the parked spec
-(planfilingfact-and-criteria-closeout-spec-2026-10-31.md, pieces 2 and 3,
-widened 2026-11-01). Found 2026-11-01 on plan #1345, approval 1005.
+Status: fix in flight. Card #1408 carries it (pull open, funded 07:58 UTC
+on 2026-11-01), and main has none of it as of 6812942d. Found 2026-10-31 on
+card #1381: the reply to the check-in wall re-entered the gate stage,
+GatePolicy compared the pull request head (4cb359cb, pushed by the fix
+session) with the sha its checks verdict was recorded for (65e9881f) and
+errored head-moved, retryable false, which ended the task. The same error
+on the normal path at 22:29:34 recovered by design (adopt the head, wait
+for checks, ask again). The fix was already pushed and its CI green when
+the card died.
 
-Every other ask that reaches a human is answerable from the chat: the chat
-agent holds answer tools for questions, merges, checks. The criteria gap
-approval has none, so the one actor awake at 03:00 cannot close the plan.
-The 00:19 to 00:30 close-out ran the failure whole: locked out of the
-request, the chat opened a second ask about it and handed Sebastian five
-reason lines to retype into the console himself. The kind is invisible to
-the chat besides: the poke path escalates merge and plan only, and the
-access table carries no criteria row a chat tool could sit behind. The
-parked spec's answer, widened with the run's evidence: the request's whole
-answer surface (waive with a reason, approve the grant, confirm the
-delivered children) is answerable from the chat on the human's word, the
-human the decider of record, and the card ends.
+Fix direction: the resume path uses the same head adoption the normal gate
+path has. A moved head adopts and waits, it never fails the task.
 
-## 9. The gap card loses the typed reasons, and its close is a guess
+## 14. The chat's answer tool failed twice on plan questions
 
-Status: built 2026-11-01 on the code repo's main. Found 2026-11-01 on
-approval 1005 of plan #1345.
+Status: a fix landed on code main 2026-11-01 (05cd9e12), and whether it was
+this failure is not proven. Found 2026-10-31 on card #1383 at 21:20. The
+chat worked around it by posting the answers as issue comments, which the
+planner reads.
 
-Each criterion's Waive is its own form, and the press re-renders the whole
-board from server state, so the reasons typed into the sibling forms
-vanish with the first submit. The board's find field carries the preserve
-attribute that saves it across a swap; the waive inputs carry none, and no
-typed field on the board is safe from any action. The close is guessed
-too: nothing on the card says that every criterion met or waived ends the
-request on the next sweep with no final press, so the chat advised
-pressing Approve to submit the waivers, and the record gained an approved
-grant (one more bounded card) with no criterion left open, a card nobody
-drafted and a toast that miscounts. Fix direction: typed text on the
-board is draft state and survives any swap; the card names its closing
-rule; the grant is offered only while a criterion is open; the store
-refuses to waive a criterion already met, which a stale board offers
-today.
+What the fix changed: a chat tool with no parameters marshalled
+"properties: null", which the model rejects with a 4xx, and the chat read
+every 4xx as "The model could not be reached", so the call read as a failed
+tool. The 4xx now names its refusal. Watch the next plan-question ask
+before closing this.
 
-## 10. attach_analysis cannot reach an approval ask, and its refusal points at the wrong one
+## 15. A red-main revert card does not jump the queue
 
-Status: built 2026-11-01 on the code repo's main. Found 2026-11-01 on
-card #1345, during the 1005 close-out.
+Status: the queue policy is unbuilt. The #1333 revert itself merged by hand
+(pull 1332, 2026-11-01 02:42). Found 2026-10-31 on card #1333: "Revert
+6b368fd: main red since 2026-10-30T03:30:07Z, no fix landed" sat open more
+than a day while ten-plus pulls merged after it. Either main was red and
+the merges rode a broken base, or the card was stale and nothing closed it.
 
-The tool attaches findings to the newest question asked on a card and to
-nothing else. The one ask that needed the findings, the open criteria
-request, is out of reach by construction, and the refusal that came back
-("The ask of #1345 is answered by sebastian. An ask already answered is
-done.") named the card, not the ask it had examined: an already-answered
-question, not the open request. The chat read that as the decision
-existing somewhere, spent its calls hunting a decision that was never
-made, then opened a fresh ask instead. Fix direction: the tool addresses
-an open ask by identity across both families, question and approval, and
-a refusal names the ask, its kind and its state.
+Fix direction: a revert card for red main blocks the queue or jumps it.
 
-## 11. The chat's file tool cannot read past 64 KiB
+## 16. No scripted door into the chat
 
-Status: built 2026-11-01 on the code repo's main. Found 2026-11-01
-reading main's store.go (111 KB) for the 1005 close-out.
+Status: candidate only. Found 2026-10-31: the console's OAuth2 login works
+end to end with curl (PKCE, grant, callback), and the trust gate then 403s
+factory-admin, which is not a writer of the code repository. That is
+correct by design (task 54), but it means no agent, script or CI can file a
+chat turn or read the thread without a writer's session.
 
-The file tool serves the first 64 KiB and appends a cut note, and takes
-no range, so the chat read FundCard's merged wording out of other agents'
-session transcripts instead: three tools deep to see one function's
-comment on main. Fix direction: the tool takes a range (a start line and
-a count) and its cut names the range that continues the read.
+Fix direction: a service identity with read-only access to the project, or
+a scoped chat API token.
+
+## 17. A rename that changes the policy tree cannot land before its roll
+
+Status: candidate only. The loader still rejects an unknown tool name
+outright (policy.go:267). Found 2026-10-31: the ask tool's rename merged
+into the code main (5a07d16c) and the infra tree (82ab246) while the
+running factoryd knew only escalate_to_human, so the tree's tip sat
+unloadable and the roller held the rename's roll on the open plans
+#1344/#1345, whose cards needed the spend the month cap had stopped. A
+three-way deadlock. Only the manual name revert (infra bed2930) broke it.
+
+Fix direction: the config loader accepts the union of the old and the new
+name across a rename, or the roll that carries a rename commits the tree's
+rename with it, so the tree never names a tool no factoryd knows.
