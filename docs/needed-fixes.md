@@ -125,8 +125,11 @@ or re-run the review) from verdict rows that say unmet (a real gap).
 ## 6. A raised month cap takes effect only on a roll, which the spent cap blocks
 
 Status: plan wanted. Found 2026-11-01 on the gateway of the live cluster.
-Verified unbuilt on main 2026-11-01: the gateway still reads its policy at
-boot, no watch, no re-read on refusal.
+Re-verified unbuilt on main a0e2803e: the gateway's per-call holds read
+policy on a 30-second TTL (currentPolicy, since be62e0ac of 2026-09-28),
+but the refusal that night came from LiteLLM's proxy-wide max_budget
+(server.go:1026 maps its 429 to refused_month_cap), a value no gateway
+re-read reaches; only a restart moved it.
 
 The cap raise to €600 landed in policy version 974 at 23:35 and factoryd's
 own loader activated it within seconds, but the enforcing gateway kept
