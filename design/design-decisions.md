@@ -302,3 +302,13 @@ The drawer's Activity tab carries the chain readout after the gates and steps ta
 The section stays after the tables and is neither pinned nor dimmed. Activity reads oldest first and the chain is the newest chapter; a pinned block fights the tab's grammar and shouts through the hours-long quiet wait; dimmed type would sink below the 4.5:1 contrast floor the style pins. The build grounds three words of the prototype: the red head's row names the repair card rather than a re-run, the re-run row is the stall ladder's own, and ages read `1 d 2 h`.
 
 The build is 87e2350a on main of the code repository.
+
+## C39. The thinking mark stops the turn; reasoning folds behind it; compaction rides the model's own served window (2026-11-01, Sebastian)
+
+Amends C35. The breathing "thinking" mark is the stop control as well: it carries the name "Stop", and a press ends the thread's turn. A turn in flight ends at its next step boundary — a model call is cut at once, a tool call once the one in flight ran — and a turn still waiting, behind the thread's turn in flight or for one of the project's model slots, ends there and then. The answer so far stays as a row marked cut, a stop row names the member who pressed, and one chat_stopped event names the thread. A press with no turn to stop, or a second press on the same turn, changes nothing; a later press stops the thread's next waiting turn. Card sessions keep their doors: only the chat's own message turns can be stopped.
+
+The reasoning a model streams beside its text (the wire's reasoning_content) folds live behind the thinking mark, under the turn, a chevron opening it. The fold keeps the reasoning's newest 16 K characters, cut at a line boundary. Reasoning is never stored and never replayed, and no thinking parameter crosses the gateway.
+
+Compaction no longer counts rows alone. The gateway serves each model's context window, and the chat compacts when a thread's context passes 80 percent of it; the worker sets each model's session limit at 75 percent of the served window under the 200 K trust cap, on opencode's own compaction. A model that serves no window degrades as before: the chat bounds by rows, the worker keeps the trust cap. The `limits.context_tokens` knob is gone; `/compact` still runs by hand.
+
+The build is ee2498a2 on main of the code repository.

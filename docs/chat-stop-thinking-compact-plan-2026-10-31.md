@@ -1,6 +1,6 @@
 # The chat's stop and thinking, and compaction by the model's own window: one build plan
 
-Written 2026-10-31. Status: plan, awaiting Sebastian's OK. Nothing built.
+Written 2026-10-31. Status: built 2026-11-01.
 Scope rulings from Sebastian's answers the same day: the stop and the
 thinking cover the chat's turns only; card sessions keep their doors. A
 builder read the plan against the code; its five questions are settled in
