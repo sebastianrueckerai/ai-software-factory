@@ -1,0 +1,1 @@
+{"max_tokens":16384,"messages":[{"content":[{"text":"What blocks the staging deploy?","type":"text"},{"image_url":{"url":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAEElEQVR4nGK6VCEHCAAA//8DkAFrOr1fdAAAAABJRU5ErkJggg=="},"type":"image_url"}],"role":"user"}],"model":"vision","stream":true}

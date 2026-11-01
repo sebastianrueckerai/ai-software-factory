@@ -1,0 +1,1 @@
+{"max_tokens":200,"messages":[{"role":"system","content":"You name a chat thread from its first message. Answer with the title alone: a name, not a sentence, a few words, at most 60 characters, no surrounding quotes. Answer in the message's language."},{"role":"user","content":"Set the staging budget to 40 euros."}],"model":"small","stream":true}
