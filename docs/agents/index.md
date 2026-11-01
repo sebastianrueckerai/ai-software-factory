@@ -4,8 +4,8 @@ One page per agent: the first model request verbatim, every part pinned to the b
 
 ## The self-check
 
-- code SHA `0dbb13c4cb2e4bbc2a54a9d20878b8a94842886d`; every permalink points there.
-- policy `3a8a734a860e`, the tree the captures read.
+- code SHA `4f021ca832af5fbaef1593b613874b4435e34153`; every permalink points there.
+- policy `bca247a3f3b6`, the tree the captures read.
 - harness `opencode 1.18.32`, the pinned opencode the loop captures drove.
 - unlabelled spans: 0 — the tool exits non-zero on any unlabelled byte, so an index that shipped means none.
 - 22 pages. Regenerate: `go run ./cmd/agentdoc -out docs/agents -policy <factory tree> -opencode <pinned binary>`; no LLM runs.
@@ -22,7 +22,7 @@ Fixture ids: `agentdoc-fixture` (coding, screening, sizing, planner, holdout-aud
 | [planner](planner.md) | A | Reads repo, files a plan via the file_plan MCP tool | `premium` | `session` | agent-worker, report mode | 16 | 43887 |
 | [holdout-audit](holdout-audit.md) | A | Judges one hold-out criterion, files file_verdict | `small` | `session` | agent-worker, report mode | 28 | 48175 |
 | [message-responder](message-responder.md) | A | Answers POST /message pushes mid-session | `small` | `session` | agent-worker, the session's next turn in the sandbox | 28 | 50004 |
-| [opencode-subagents](opencode-subagents.md) | A | opencode-internal task and explore delegation | `—` | `config` | inside opencode, under the session config's agent block | 0 | 0 |
+| [opencode-subagents](opencode-subagents.md) | A | opencode-internal task and explore delegation | `—` | `config` | inside opencode, under the session config's agent block | 0 | — |
 | [checkin](checkin.md) | B | Decides continue, message, handover, human or replan on a session trip | `big` | `checkin` | factoryd, in-process loop, tools executed in the sandbox | 7 | 9020 |
 | [model-review](model-review.md) | B | Reviews a diff for one criterion or one behaviour | `premium` | `review` | factoryd direct | 0 | 4713 |
 | [security-audit](security-audit.md) | B | Audits changes against the security checklist | `big` | `audit` | factoryd direct | 0 | 2641 |
@@ -32,7 +32,7 @@ Fixture ids: `agentdoc-fixture` (coding, screening, sizing, planner, holdout-aud
 | [delta-planner](delta-planner.md) | B | Plans delta work between reviews | `premium` | `review` | factoryd direct | 0 | 1704 |
 | [holdout-proposer](holdout-proposer.md) | B | Proposes hold-out criteria | `premium` | `review` | factoryd direct | 0 | 1402 |
 | [holdout-redrafter](holdout-redrafter.md) | B | Rewrites a dropped hold-out criterion | `premium` | `review` | factoryd direct | 0 | 709 |
-| [answer-screener](answer-screener.md) | B | Screens a late answer of the issue author | `premium` | `review` | factoryd direct | 0 | 1268 |
+| [answer-screener](answer-screener.md) | B | Screens a late answer of the issue author | `premium` | `review` | factoryd direct | 0 | 1244 |
 | [brief-writer](brief-writer.md) | B | Writes the human approval brief | `big` | `brief` | factoryd direct | 0 | 2152 |
 | [title](title.md) | B | Names a chat thread from its first message | `small` | `title` | the console's naming call, a factoryd direct client | 0 | 348 |
 | [project-agent](project-agent.md) | B | The always-on repo chat agent; also answers escalations | `premium` | `operator` | console, own tool loop | 52 | 23975 |
