@@ -103,18 +103,73 @@ Status: plan wanted. Found 2026-11-01 on approval 1005 of plan #1345.
 The gap ask's console card renders a brief error ("kind 'criteria' carries
 no brief") instead of the five parts: which criteria, what state each is in,
 what granting costs, what waiving means. The decision is left to a card
-that shows nothing. Fix direction: give the criteria approval a brief built
-from the plan's criteria and their missing verdict rows.
+that shows nothing. The mark is permanent, too: the brief sweep skips rows
+it has once marked failed, so a criteria card never heals even after the
+writer learns the kind. Fix direction: give the criteria approval a brief
+built from the plan's criteria and their missing verdict rows, and retry
+the rows already marked.
 
 ## 8. The criteria gap approval is console-only
 
 Status: parked spec by Sebastian
-(planfilingfact-and-criteria-closeout-spec-2026-10-31.md, piece 2). Found
-2026-11-01 on plan #1345.
+(planfilingfact-and-criteria-closeout-spec-2026-10-31.md, pieces 2 and 3,
+widened 2026-11-01). Found 2026-11-01 on plan #1345, approval 1005.
 
 Every other ask that reaches a human is answerable from the chat: the chat
 agent holds answer tools for questions, merges, checks. The criteria gap
 approval has none, so the one actor awake at 03:00 cannot close the plan.
-The parked spec's answer: on a plan whose children are all done and
-merged, the pending criteria request takes the member's confirmation that
-the delivered children satisfy the criteria, and the card ends.
+The 00:19 to 00:30 close-out ran the failure whole: locked out of the
+request, the chat opened a second ask about it and handed Sebastian five
+reason lines to retype into the console himself. The kind is invisible to
+the chat besides: the poke path escalates merge and plan only, and the
+access table carries no criteria row a chat tool could sit behind. The
+parked spec's answer, widened with the run's evidence: the request's whole
+answer surface (waive with a reason, approve the grant, confirm the
+delivered children) is answerable from the chat on the human's word, the
+human the decider of record, and the card ends.
+
+## 9. The gap card loses the typed reasons, and its close is a guess
+
+Status: plan wanted. Found 2026-11-01 on approval 1005 of plan #1345.
+
+Each criterion's Waive is its own form, and the press re-renders the whole
+board from server state, so the reasons typed into the sibling forms
+vanish with the first submit. The board's find field carries the preserve
+attribute that saves it across a swap; the waive inputs carry none, and no
+typed field on the board is safe from any action. The close is guessed
+too: nothing on the card says that every criterion met or waived ends the
+request on the next sweep with no final press, so the chat advised
+pressing Approve to submit the waivers, and the record gained an approved
+grant (one more bounded card) with no criterion left open, a card nobody
+drafted and a toast that miscounts. Fix direction: typed text on the
+board is draft state and survives any swap; the card names its closing
+rule; the grant is offered only while a criterion is open; the store
+refuses to waive a criterion already met, which a stale board offers
+today.
+
+## 10. attach_analysis cannot reach an approval ask, and its refusal points at the wrong one
+
+Status: plan wanted. Found 2026-11-01 on card #1345, during the 1005
+close-out.
+
+The tool attaches findings to the newest question asked on a card and to
+nothing else. The one ask that needed the findings, the open criteria
+request, is out of reach by construction, and the refusal that came back
+("The ask of #1345 is answered by sebastian. An ask already answered is
+done.") named the card, not the ask it had examined: an already-answered
+question, not the open request. The chat read that as the decision
+existing somewhere, spent its calls hunting a decision that was never
+made, then opened a fresh ask instead. Fix direction: the tool addresses
+an open ask by identity across both families, question and approval, and
+a refusal names the ask, its kind and its state.
+
+## 11. The chat's file tool cannot read past 64 KiB
+
+Status: plan wanted. Found 2026-11-01 reading main's store.go (111 KB)
+for the 1005 close-out.
+
+The file tool serves the first 64 KiB and appends a cut note, and takes
+no range, so the chat read FundCard's merged wording out of other agents'
+session transcripts instead: three tools deep to see one function's
+comment on main. Fix direction: the tool takes a range (a start line and
+a count) and its cut names the range that continues the read.
