@@ -3,16 +3,21 @@
 A standing register. Each entry names the fault, the evidence from the live
 run, the fix direction and its status. Nothing here is implemented until
 Sebastian says go. Updated as faults are found and as fixes land. A fault
-whose fix lands on a code or infra main leaves the list, its number stays
-retired, and the plan or spec that built it keeps the record. Gone on
-2026-11-01: faults 7 to 11 (the criteria card's brief, its chat answer and
+whose fix lands on a code or infra main leaves the list, the remaining
+faults are renumbered to stay contiguous, and the plan or spec that built
+it keeps the record. Renumbered on 2026-11-02 to close the gaps the
+departures left: 12 became 7, 14 became 8, 15 became 9, 16 became 10,
+17 became 11. Older documents cite the numbering of their day, and the old
+numbers 7 to 11, 13 and 18 to 20 in them name faults that have left. Gone
+on 2026-11-01: the criteria-card family (the criteria card's brief, its
+chat answer and
 its draft state, attach_analysis, the file read's ranges, all on code main),
 the compaction fold with thinking off (code 34b778bd, infra c53d5bb, the
 served-window follow 91ec3b8a), the board's month meter (13d47231) and
-fault 13, the resumed card that died on a moved head (code ee585427, the
+the resumed card that died on a moved head (code ee585427, the
 fix salvaged from #1408's branch by hand: the branch's flat copy of main
 made its pull unmergeable, so 7b59efeb was rebased onto main directly).
-Fault 19, the note press outlet that broke the screen grid: the outlet sat
+The note press outlet that broke the screen grid: the outlet sat
 as a fourth child of the screen's three-column grid, took the board's
 column and pushed the board under the chat; it now shares the board's cell
 (code b36ba3cb). The chain-run links that spoke the run's global id where
@@ -21,14 +26,14 @@ link read "resource does not exist" (card #1439, run 3356 against the
 page of 2260): the run's number is now recorded beside the id with a
 guard a numberless rerun cannot erase, old rows are backfilled, and the
 board, the drawer and the facts link number with number (code a0e2803e,
-docs/plan-run-link-index-2026-11-01.md). Fault 18, the card branch that
-swallowed main as a flat copy, left with its fix (code 576b8afb: the sync
+docs/plan-run-link-index-2026-11-01.md). The card branch that
+swallowed main as a flat copy left with its fix (code 576b8afb: the sync
 lands as a merge, a diff over the card's line bound is refused by name,
 the gate enforces the same bound), and the spec's other two fixes landed
 the same day: a reply that cannot change anything stops asking (c1716385),
 and a stop that names a decision offers that decision while a grant
-carries its instruction (5dc22e59). Fault 20, the ask that repeated a
-sentence and woke nobody, left with its fix (code 59f8490b: the wake key
+carries its instruction (5dc22e59). The ask that repeated a
+sentence and woke nobody left with its fix (code 59f8490b: the wake key
 takes the ask's issue comment id, the sentence hash only as the
 fallback).
 
@@ -140,7 +145,7 @@ the raise would free. The loop closes only through the six-hour production
 hold ask. Fix direction: the enforcing gateway must follow the same policy
 watch factoryd uses, or re-read the month line when a refusal would fire.
 
-## 12. The planner dies on a big spec's read set
+## 7. The planner dies on a big spec's read set
 
 Status: the cap relief landed 2026-11-01 on infra main (18e7418:
 limits.context_tokens goes, premium's window pinned at its real 128000).
@@ -155,7 +160,7 @@ Fix direction: file phase 2, the digest and the ask reads. Until it lands,
 a big card needs a trimmed read set, the cheap rung, or the spec-on-card
 shape that saved #1383.
 
-## 14. The chat's answer tool failed twice on plan questions
+## 8. The chat's answer tool failed twice on plan questions
 
 Status: a fix landed on code main 2026-11-01 (05cd9e12), and whether it was
 this failure is not proven. Found 2026-10-31 on card #1383 at 21:20. The
@@ -168,7 +173,7 @@ every 4xx as "The model could not be reached", so the call read as a failed
 tool. The 4xx now names its refusal. Watch the next plan-question ask
 before closing this.
 
-## 15. A red-main revert card does not jump the queue
+## 9. A red-main revert card does not jump the queue
 
 Status: the queue policy is unbuilt. The #1333 revert itself merged by hand
 (pull 1332, 2026-11-01 02:42). Found 2026-10-31 on card #1333: "Revert
@@ -178,7 +183,7 @@ the merges rode a broken base, or the card was stale and nothing closed it.
 
 Fix direction: a revert card for red main blocks the queue or jumps it.
 
-## 16. No scripted door into the chat
+## 10. No scripted door into the chat
 
 Status: candidate only. Found 2026-10-31: the console's OAuth2 login works
 end to end with curl (PKCE, grant, callback), and the trust gate then 403s
@@ -189,7 +194,7 @@ chat turn or read the thread without a writer's session.
 Fix direction: a service identity with read-only access to the project, or
 a scoped chat API token.
 
-## 17. A rename that changes the policy tree cannot land before its roll
+## 11. A rename that changes the policy tree cannot land before its roll
 
 Status: candidate only. The loader still rejects an unknown tool name
 outright (policy.go:267). Found 2026-10-31: the ask tool's rename merged
