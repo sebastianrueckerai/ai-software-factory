@@ -3,9 +3,8 @@
 From the death of card #1396 (task `t-ab4be8e03ffc`, pull #1408). The
 moved-head adoption that card carried is fixed on code main (`ee585427`,
 salvaged from the branch by hand the same day; the branch itself closed
-stale). Three faults remain. Each turned a card that could not finish
-into a card that would not stop asking. Nothing below is built; each
-section names where a fix lands.
+stale). Three faults turned a card that could not finish into a card
+that would not stop asking. Each section names where a fix lands.
 
 ## 1. A card branch never swallows main wholesale
 
@@ -111,6 +110,11 @@ count.
 
 ## Status
 
-None of the three is built; none is on main (checked 2026-11-01 at
-`fe4f36fb`). The incident's fourth fault, the moved-head death, is fixed
-on main `ee585427` and reaches the cluster with the next roll.
+All three landed on code main 2026-11-01 as `576b8afb`: the merge-shaped
+sync with the pre-pull line-bound refusal and the gate's own bound check
+(fix 1, register fault 18), the deadlock question that states when no
+reply can change the card (fix 2), and the stop that offers its decision,
+Extend, Overrule, Close (fix 3, `5dc22e59`). The successor card and the
+two face faults rode with the same merge. The incident's fourth fault,
+the moved-head death, is fixed on main `ee585427`. Nothing here is rolled
+to the cluster yet.

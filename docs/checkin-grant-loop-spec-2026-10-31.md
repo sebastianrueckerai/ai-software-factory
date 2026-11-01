@@ -26,3 +26,16 @@ Fix 1 alone stops the observed loop. Fix 2 removes the manufactured denials. Fix
 No change to the budget rules themselves, no change to gate order, no new columns. The card is small: one guard, one branch, one routing field, each with its pinned test. go test -race ./... green.
 
 File when intake reopens, cheap rung. Order of parked filings: phase-2 refile (closed #1383's objective), PlanFilingFact fix, human-not-member card, then this.
+
+## Status
+
+All three landed on code main 2026-11-01, so the filing line above is
+moot. The loop guard and the instruction-bearing grant came with
+[stuck-card-faults-spec-2026-11-01.md](stuck-card-faults-spec-2026-11-01.md)
+(`576b8afb`: the deadlock question; `5dc22e59`: the stop offers Extend,
+Overrule, Close, and the grant carries its instruction). The red-checks
+fix landed earlier the same night in another shape (`e076b80a`): the
+queue withdraws a head whose checks were red at its merge, runs the
+checks again, and a head still red after its re-runs leaves the queue.
+No human denial is manufactured per cycle. Nothing is rolled to the
+cluster yet.

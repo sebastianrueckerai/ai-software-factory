@@ -121,11 +121,12 @@ starts from main's tip and carries the patch. Tonight changes nothing in
 that design. It adds the evidence that the gate-side check is what must
 catch it, because the branch-side CI cannot.
 
-### 3. The answer that changed nothing started an attempt. Grant-loop fix 1, spec written.
+### 3. The answer that changed nothing started an attempt. Grant-loop fix 1, landed.
 
-Status: spec written
-([checkin-grant-loop-spec-2026-10-31.md](checkin-grant-loop-spec-2026-10-31.md),
-fix 1; the same guard is fix 2 of the stuck-card spec), awaiting the word.
+Status: the fix landed on code main 2026-11-01 (`576b8afb`), built as
+fix 2 of [stuck-card-faults-spec-2026-11-01.md](stuck-card-faults-spec-2026-11-01.md):
+an answer that finds the head and the card's limits unchanged gets the
+deadlock question, which names the exits instead of repeating the stop.
 
 Tonight: the answer's verify failed on the moved head, the loop bought a
 session anyway, the session died in 14 seconds on the same share stop, and
