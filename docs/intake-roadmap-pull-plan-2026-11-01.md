@@ -1,6 +1,6 @@
 # The intake switch becomes the roadmap pull
 
-Written 2026-11-01. Status: plan, awaiting Sebastian's OK. Nothing is built.
+Written 2026-11-01. Status: built the same day, spec driven in a worktree.
 
 ## The decision
 
