@@ -8,7 +8,10 @@ retired, and the plan or spec that built it keeps the record. Gone on
 2026-11-01: faults 7 to 11 (the criteria card's brief, its chat answer and
 its draft state, attach_analysis, the file read's ranges, all on code main),
 the compaction fold with thinking off (code 34b778bd, infra c53d5bb, the
-served-window follow 91ec3b8a) and the board's month meter (13d47231).
+served-window follow 91ec3b8a), the board's month meter (13d47231) and
+fault 13, the resumed card that died on a moved head (code ee585427, the
+fix salvaged from #1408's branch by hand: the branch's flat copy of main
+made its pull unmergeable, so 7b59efeb was rebased onto main directly).
 
 ## 1. The check-in's policy stop preempts the approval card
 
@@ -121,21 +124,6 @@ ran under a grant of three, then the session cap closed the card, €3.54 of
 Fix direction: file phase 2, the digest and the ask reads. Until it lands,
 a big card needs a trimmed read set, the cheap rung, or the spec-on-card
 shape that saved #1383.
-
-## 13. A reply that resumes a card dies on a moved head
-
-Status: fix in flight. Card #1408 carries it (pull open, funded 07:58 UTC
-on 2026-11-01), and main has none of it as of 6812942d. Found 2026-10-31 on
-card #1381: the reply to the check-in wall re-entered the gate stage,
-GatePolicy compared the pull request head (4cb359cb, pushed by the fix
-session) with the sha its checks verdict was recorded for (65e9881f) and
-errored head-moved, retryable false, which ended the task. The same error
-on the normal path at 22:29:34 recovered by design (adopt the head, wait
-for checks, ask again). The fix was already pushed and its CI green when
-the card died.
-
-Fix direction: the resume path uses the same head adoption the normal gate
-path has. A moved head adopts and waits, it never fails the task.
 
 ## 14. The chat's answer tool failed twice on plan questions
 
