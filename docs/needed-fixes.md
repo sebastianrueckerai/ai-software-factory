@@ -155,8 +155,16 @@ wakes it, and no stop asks about a cap that no longer binds.
 
 ## 6. The planner dies on a big spec's read set
 
-Status: plan written, awaiting Sebastian's OK
-(planner-read-cut-plan-2026-11-02.md). The cap relief landed 2026-11-01
+Status: code landed (448048b0, 2026-11-02), the tree hand waits. The
+`digest` tool, the planGuide read discipline and the reads finding are on
+code main. No session sees the tool until the policy tree's coder,
+analyzer and planner stanzas list `digest: {}`, a commit on the infra
+side after the roll that carries 448048b0
+(digest-tree-hand-runbook-2026-11-02.md). The fault leaves the list when
+the tree lands and a session sees the tool. The compaction-model probe
+found no model key in opencode 1.18.32's compaction block, so
+compaction stays on the session's own model. Plan:
+planner-read-cut-plan-2026-11-02.md. The cap relief landed 2026-11-01
 on infra main (18e7418: limits.context_tokens goes, premium's window
 pinned at its real 128000), and the judgment the fault now rests on: the
 window is a ceiling, not a cure — the deaths were flow deaths, reads
