@@ -71,7 +71,8 @@ wakes every cap wait, and a refusal that the version in force already lifted
 asks nothing. The month alarm files a cap card at each cap it reaches and
 closes the card a raise lifted, and the stop's question says that the card
 resumes on its own and when. The missing scripted door into the chat left
-the same day with the chat door build (docs/chat-door-design-2026-11-02.md,
+the same day with the chat door build, on code main as 44c60082 and riding
+the next roll (docs/chat-door-design-2026-11-02.md,
 docs/plans/2026-11-02-chat-door.md). A human makes a chat token for one
 project on their own page in the console, for 7, 30 or 90 days, and revokes
 it there. The token acts as that human in the project's chat, approvals
