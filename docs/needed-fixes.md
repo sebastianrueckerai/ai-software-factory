@@ -98,8 +98,8 @@ the gateway that the task row's spent amount never recorded.
 
 ## 4. Generic check-in stops carry no five parts
 
-Status: noted, part of the question-format contract's unfinished tail work
-(question-format-concept-2026-10-17.md). The check-in stops gained most of
+Status: plan written, awaiting Sebastian's OK
+(five-part-stops-plan-2026-11-02.md). The check-in stops gained most of
 the parts on main 2026-11-01: the spend guard's stop carries the findings
 and the last review verdict (b58d8e86), a stop whose answer changed
 nothing is not repeated and names its exits (c1716385), and a stop that
