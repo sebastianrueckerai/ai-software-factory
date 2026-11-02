@@ -114,8 +114,9 @@ deserve the five-part treatment the concept promises.
 
 ## 5. A review refused for money vanishes, and the plan cannot close
 
-Status: plan wanted. Found 2026-11-01 on plan #1345 (incident plan),
-card #1380. Verified unbuilt on main 2026-11-01.
+Status: plan written, awaiting Sebastian's OK
+(refused-review-plan-2026-11-02.md). Found 2026-11-01 on plan #1345
+(incident plan), card #1380. Verified unbuilt on main 2026-11-01.
 
 The integration card's final model review was refused by the spent October
 cap and left no trace a person can see: no session row, no review event, no
