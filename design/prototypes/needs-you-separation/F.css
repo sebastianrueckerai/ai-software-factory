@@ -1,0 +1,11 @@
+/* F, the fix loop's fusion: B's head band marks where a card starts and
+   holds its ref and waiting time; the carousel moves to the card's last
+   row, under a hairline, as one unit at the right, so the arrows come
+   after the case is read; the gap grows from 6 px to 12 px. */
+.lane.five #needs-you .cards > .card.case { --band: 32px; margin-bottom: 12px; padding-top: 0; }
+#needs-you .card.case::before { content: ""; position: absolute; top: 0; left: 3px; right: 0; height: var(--band); background: color-mix(in srgb, var(--need) 14%, var(--bg-card)); border-bottom: 1px solid color-mix(in srgb, var(--need) 40%, transparent); }
+[data-theme=light] #needs-you .card.case::before { background: color-mix(in srgb, var(--need) 22%, var(--bg-card)); border-bottom-color: color-mix(in srgb, var(--need) 60%, transparent); }
+#needs-you .card.case > .case-head { position: relative; min-height: var(--band); align-items: center; color: var(--text-muted); }
+#needs-you .card.case > .case-head .ref { color: var(--need-text); font-weight: 600; }
+#needs-you .card.case > .case-title { margin-top: 6px; }
+#needs-you .card.case > .carousel { grid-row: 99; grid-column: 1 / -1 !important; justify-content: flex-end; margin: 6px 0 0; padding-top: 4px; border-top: 1px solid color-mix(in srgb, var(--need) 35%, var(--line)); }

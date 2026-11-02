@@ -1,0 +1,39 @@
+/* face.css: the Needs-you card's face as phase 5 of the card flow
+   redesign draws it, the same under every treatment. The card is a grid:
+   the head (ref, waiting time) and the carousel share the first row, every
+   other part spans it. The parts keep console.css's class names and its
+   board clamps: ask, why, info, recommendation, then the premade answers
+   with the fund control, the note and Send. Their rules are the drawer's
+   .need ones, without its box. A treatment moves the carousel and draws
+   the separation; it never changes these parts. */
+#needs-you .card.case { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 8px; }
+#needs-you .card.case > * { grid-column: 1 / -1; }
+.case-head { grid-column: 1 / 2 !important; display: flex; align-items: baseline; gap: 8px; margin: 0; font: 11px/1.6 var(--font-mono); color: var(--text-faint); }
+.case-head .ref { font-size: 12px; }
+.carousel { grid-column: 2 / 3 !important; grid-row: 1; display: inline-flex; align-items: center; gap: 2px; }
+.carousel button { width: 24px; height: 24px; padding: 0; font-size: 16px; line-height: 1; }
+.carousel .pos { min-width: 7ch; text-align: center; color: var(--text); font: 11px/1 var(--font-mono); font-variant-numeric: tabular-nums; }
+.case-title { margin: 1px 0 0; color: var(--text-muted); font-size: 12px; line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.parts > p { margin: 4px 0 0; font-size: 12.5px; line-height: 1.45; overflow-wrap: anywhere; }
+.parts .ask { margin: 6px 0 0; color: var(--text); font-size: 14.5px; line-height: 1.35; font-weight: 600; }
+.parts .why, .parts .info { color: var(--text-muted); }
+.parts .recommendation { color: var(--text); }
+.decide { margin: 8px 0 0; }
+.answers { display: grid; gap: 4px; }
+.answers .ans { display: grid; justify-items: start; justify-content: stretch; width: 100%; gap: 1px; height: auto; min-height: 28px; padding: 5px 8px; text-align: left; white-space: normal; border-color: var(--btn-line); }
+.answers .ans b { font-weight: 600; font-size: 13px; }
+.answers .ans span { color: var(--text-muted); font-size: 12px; font-weight: 400; line-height: 1.35; }
+.answers .ans[aria-checked=true] { border-color: var(--need); box-shadow: inset 0 0 0 1px var(--need); }
+.decide .send { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: end; gap: 6px; margin-top: 6px; }
+.decide .send label { display: grid; gap: 2px; margin: 0; font-size: 11.5px; }
+.decide .send input { width: 5.5rem; height: 28px; }
+.decide .send textarea { height: 28px; min-height: 28px; padding: 4px 8px; }
+.decide .send button { height: 28px; }
+#needs-you .card.case .need-foot { margin: 6px 0 0; font: 11px/1.6 var(--font-mono); }
+@media (max-width: 720px) {
+  .carousel button, .answers .ans, .decide .send button, .decide .send input, .decide .send textarea { min-height: 44px; }
+  .carousel button { width: 44px; height: 44px; }
+  .decide .send { grid-template-columns: auto minmax(0, 1fr); }
+  .decide .send button { grid-column: 1 / -1; height: 44px; }
+  .decide .send input, .decide .send textarea { height: 44px; }
+}

@@ -1,0 +1,5 @@
+/* A, spacing: the gap between two cards grows from 6 px to 16 px, past
+   the card's own padding, so the amber bar and the border break where a
+   card ends. The carousel sits at the right of the head row. */
+.lane.five #needs-you .cards > .card { margin-bottom: 16px; }
+.lane.five #needs-you .cards { padding-top: 8px; }

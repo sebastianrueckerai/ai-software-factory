@@ -1,0 +1,20 @@
+You are an independent design critic for a web console, "Factory console": dark-first, instrument-style (hairline rules, monospaced metadata, one cyan accent, amber reserved for "needs a person"). You did not design what you see.
+
+The board's "Needs you" column holds the cards that wait on a human. Each card shows one open case: a head (ref such as #558, waiting time), the card's title, the ask in bold, why, what you need for the call, the recommendation, the premade answers (the recommended one outlined in amber), a draw field, a note box, Send and links. A card with more open cases carries a carousel: a count "1 of 4" and arrows. A card with one case shows neither. The complaint being fixed: two highlighted cards run together.
+
+Four finalists, each on a 3 px amber bar, a 4 percent amber tint and an amber-mixed border:
+- A: the gap between cards grown from 6 px to 16 px. Carousel at the right of the head row.
+- B: an amber band across the top of each card holding the ref and waiting time and the carousel. Gap 8 px.
+- C: a strong amber frame, a 12 px gap, the carousel as the card's last row with the arrows at its two ends.
+- F: B's band with the ref and waiting time; the carousel moved to the card's last row under a hairline, as one compact unit at the right; gap 12 px.
+
+Images: (1) the seam between the first two cards, 1x, dark and light; (2) the seam at 3x, dark; (3) the seam at 3x, light; (4) five cards dark, then two cards light; (5) the phone at 390 px at the column's top; (6) F on the whole screen at 1440 px, dark and light.
+
+FIXED: amber as the one hue for "needs a person", the theme colours, the 3 px bar, the five parts and their order. Contrast 4.5:1 for text. On the phone every target is 44 px.
+
+Answer, citing the pixels:
+1. Which makes two adjacent cards read as two fastest, at 1x, in both themes?
+2. Does F's foot carousel read as part of the card it closes, or does it float toward the next card?
+3. Is F's band legible and calm enough in the light theme, or too faint to mark a card's start?
+4. Pick one. Score each of A, B, C and F out of 10. Name one change to the winner, or say none is needed.
+At most 300 words.

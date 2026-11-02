@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Round 18: the Needs-you cards' separation</title>
+<style>
+:root { color-scheme: dark; --bg: #10151d; --line: #232b38; --text: #dfe7f1; --muted: #93a1b5; --faint: #7c8ba0; --accent: #53d6e2; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.65 system-ui, sans-serif; }
+main { max-width: 76rem; margin: 0 auto; padding: 28px 22px 80px; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+h2 { font-size: 13px; font-variant-caps: all-small-caps; letter-spacing: .08em; color: var(--faint); margin: 34px 0 8px; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+p, li { max-width: 80ch; }
+p { margin: 8px 0; }
+code { font: 12.5px/1.6 ui-monospace, Menlo, Consolas, monospace; color: var(--accent); }
+a { color: var(--accent); }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 12px 0; }
+.four { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 12px 0; align-items: start; }
+.one { margin: 12px 0; }
+figure { margin: 0; }
+figure img { max-width: 100%; border: 1px solid var(--line); display: block; }
+figcaption { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+table { border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+th, td { text-align: left; padding: 4px 14px 4px 0; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 600; }
+.rec { padding: 10px 14px; border: 1px solid var(--line); border-left: 2px solid var(--accent); }
+@media (max-width: 720px) { .pair, .four { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+<h1>Round 18: the Needs-you cards' separation</h1>
+<p>Sebastian's complaint of 1 November 2026: highlighted cards run together. The card flow redesign will show one open case per Needs-you card, with a count of the card's other cases and arrows. This round designs the chrome that face lands in: what parts two cards, and where the count and arrows sit. It is a condensed round built in the lab: the board is the real console's busy board at code commit 1d5d4163, its Needs-you column filled with two, three or five cards of the lab's cases, each in the five parts. No image model ran. Gemini 2.5 Pro and GLM 5V Turbo judged the same sheets. The brief is <a href="brief.md">brief.md</a> and the full account is <a href="notes.md">notes.md</a>.</p>
+
+<div class="rec">
+<p><strong>The recommendation, provisional: F.</strong> Each card opens on an amber band, 32 px at the desk and 46 px on the phone, that holds the ref in the amber text colour and the waiting time, ruled off from the case by an amber hairline. The gap between cards grows from 6 px to 12 px. A card with more than one open case ends on the carousel: under a hairline, at the right, the previous arrow, the count <code>1 of 4</code> and the next arrow, 44 px targets on the phone. A card with one case shows neither. Today's 3 px amber bar, 4 percent tint and amber-mixed border stay under it. The band marks where each card starts, the gap where it ends, and the arrows come after the case is read. Both critics picked F in the compare loop, 9 of 10.</p>
+<p><strong>The runner-up is B:</strong> the same band with the count and arrows at its right, and an 8 px gap. The human sees the count before reading. Both critics scored it 7. The critics disagreed on the runner-up: in the first loop both named C, the strong amber frame, and in the compare loop Gemini scored C level with B.</p>
+<p><strong>What the lab found first:</strong> today's card treatment never renders. Its selector, <code>.lane.five #needs-you &gt; .card</code>, has matched no card since 14 October 2026, when the cards moved into the column's <code>.cards</code> body. The build fixes the selector with the pick.</p>
+<p>The entry is <a href="../../design-decisions.md">C44</a>, provisional, awaiting Sebastian's confirmation.</p>
+</div>
+
+<h2>The seam between two cards, before and after</h2>
+<div class="four">
+<figure><img src="shots/before/dark/seam-1440-n3.png" alt="Before, dark: two plain cards 6 px apart"><figcaption>Before, dark, 1x: plain cards, a faint hairline, 6 px.</figcaption></figure>
+<figure><img src="shots/F/dark/seam-1440-n3.png" alt="F, dark: the foot carousel, a 12 px gap and the next card's amber band"><figcaption>F, dark, 1x: the carousel closes the card, 12 px, the next band opens one.</figcaption></figure>
+<figure><img src="shots/before/light/seam-1440-n3.png" alt="Before, light"><figcaption>Before, light, 1x.</figcaption></figure>
+<figure><img src="shots/F/light/seam-1440-n3.png" alt="F, light"><figcaption>F, light, 1x.</figcaption></figure>
+</div>
+<div class="pair">
+<figure><img src="shots/F/dark/seam-1440-n3-3x.png" alt="F at 3x, dark"><figcaption>F, dark, 3x.</figcaption></figure>
+<figure><img src="shots/F/light/seam-1440-n3-3x.png" alt="F at 3x, light"><figcaption>F, light, 3x.</figcaption></figure>
+</div>
+
+<h2>The column, two, three and five cards</h2>
+<div class="four">
+<figure><img src="shots/before/dark/strip-1440-n5.png" alt="Before, five cards, dark"><figcaption>Before, five cards, dark.</figcaption></figure>
+<figure><img src="shots/F/dark/strip-1440-n5.png" alt="F, five cards, dark"><figcaption>F, five cards, dark.</figcaption></figure>
+<figure><img src="shots/F/light/strip-1440-n3.png" alt="F, three cards, light"><figcaption>F, three cards, light.</figcaption></figure>
+<figure><img src="shots/F/light/strip-1440-n2.png" alt="F, two cards, light"><figcaption>F, two cards, light: #603 has one case and shows no carousel.</figcaption></figure>
+</div>
+
+<h2>The screen and the phone</h2>
+<div class="pair">
+<figure><img src="shots/F/dark/view-1440-n3.png" alt="F on the whole board, dark"><figcaption>F on the board at 1440 px, dark.</figcaption></figure>
+<figure><img src="shots/F/light/view-1440-n3.png" alt="F on the whole board, light"><figcaption>F on the board at 1440 px, light.</figcaption></figure>
+</div>
+<div class="four">
+<figure><img src="shots/F/dark/view-390-n3.png" alt="F on the phone, dark"><figcaption>F on the phone, dark, at the column's top.</figcaption></figure>
+<figure><img src="shots/F/light/view-390-n3.png" alt="F on the phone, light"><figcaption>F on the phone, light.</figcaption></figure>
+<figure><img src="shots/F/dark/seam-390-n3-3x.png" alt="F's seam on the phone at 3x"><figcaption>F's seam on the phone, dark, 3x: the 44 px arrows.</figcaption></figure>
+<figure><img src="shots/before/dark/view-390-n3.png" alt="Before on the phone, dark"><figcaption>Before on the phone, dark.</figcaption></figure>
+</div>
+
+<h2>The candidates</h2>
+<table>
+<tr><th>Treatment</th><th>What it is</th><th>First loop, Gemini / GLM</th><th>Compare, Gemini / GLM</th></tr>
+<tr><td>base</td><td>today's values reaching the cards, gap 6 px</td><td>not enough / not enough</td><td></td></tr>
+<tr><td>A</td><td>base with a 16 px gap, the carousel in the head</td><td>1st / 3rd</td><td>6 / 5</td></tr>
+<tr><td>B</td><td>an amber head band with the ref, the time and the carousel, gap 8 px</td><td>3rd / 1st</td><td>7 / 7</td></tr>
+<tr><td>C</td><td>a strong amber frame, gap 12 px, the carousel as the last row, arrows at the ends</td><td>2nd / 2nd</td><td>7 / 6</td></tr>
+<tr><td>F</td><td>B's band, the carousel at the foot as one unit, gap 12 px</td><td></td><td>9 / 9</td></tr>
+</table>
+<p>Both critics asked in the first loop for the carousel at the foot. Gemini's first ranking put B last on a contrast fault it misread: the band's text measures 7.8:1 and 5.0:1 dark. The claims the director overruled are in <a href="notes.md">notes.md</a>.</p>
+<div class="pair">
+<figure><img src="contact-sheet-strip-n3-dark.jpg" alt="First loop: the column of three in every treatment, dark"><figcaption>First loop: the column of three, dark: before, base, A, B, C.</figcaption></figure>
+<figure><img src="contact-sheet-strip-n3-light.jpg" alt="First loop: the column of three in every treatment, light"><figcaption>The same, light.</figcaption></figure>
+</div>
+<div class="one"><figure><img src="contact-sheet-seam-1x.jpg" alt="First loop: the seam at 1x in every treatment"><figcaption>First loop: the seam at 1x in both themes.</figcaption></figure></div>
+<div class="one"><figure><img src="compare/contact-sheet-seam-1x.jpg" alt="Compare loop: the seam at 1x of A, B, C and F"><figcaption>Compare loop: the seam at 1x of A, B, C and F.</figcaption></figure></div>
+<div class="one"><figure><img src="compare/contact-sheet-phone.jpg" alt="Compare loop: the phone"><figcaption>Compare loop: the phone at the column's top.</figcaption></figure></div>
+
+<h2>The sheets and the answers</h2>
+<p>First loop: <a href="critique-prompt.txt">the prompt</a>, the sheets <a href="contact-sheet-seam-1x.jpg">seam 1x</a>, <a href="contact-sheet-seam-3x-dark.jpg">seam 3x dark</a>, <a href="contact-sheet-seam-3x-light.jpg">seam 3x light</a>, <a href="contact-sheet-strip-n3-dark.jpg">three cards dark</a>, <a href="contact-sheet-strip-n3-light.jpg">three cards light</a>, <a href="contact-sheet-strip-n5-n2.jpg">five and two</a>, <a href="contact-sheet-seam-390.jpg">phone seam</a>, <a href="contact-sheet-phone.jpg">phone</a>, and the answers of <a href="critique/loop1/gemini.json">Gemini</a> and <a href="critique/loop1/glm.json">GLM</a>.</p>
+<p>Compare loop: <a href="critique-compare-prompt.txt">the prompt</a>, the sheets in <a href="compare/">compare/</a>, and the answers of <a href="critique/compare/gemini.json">Gemini</a> and <a href="critique/compare/glm.json">GLM</a>.</p>
+<p>The prototype: <a href="../../prototypes/needs-you-separation/index.html?c=F&amp;n=5">F with five cards</a>. <code>?c=</code> takes before, base, A, B, C or F, <code>?n=</code> 2, 3 or 5, <code>?theme=</code> dark or light. Four critic calls cost $0.12 of the $3 cap.</p>
+</main>
+</body>
+</html>

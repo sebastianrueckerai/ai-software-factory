@@ -1,0 +1,12 @@
+/* B, a head band: each card opens with an amber band across its width
+   that holds the ref, the waiting time and the carousel, ruled off from
+   the case below. The band, not the gap, marks where a card starts. The
+   gap grows from 6 px to 8 px. */
+.lane.five #needs-you .cards > .card.case { --band: 32px; margin-bottom: 8px; padding-top: 0; }
+#needs-you .card.case::before { content: ""; position: absolute; top: 0; left: 3px; right: 0; height: var(--band); background: color-mix(in srgb, var(--need) 14%, var(--bg-card)); border-bottom: 1px solid color-mix(in srgb, var(--need) 40%, transparent); }
+[data-theme=light] #needs-you .card.case::before { background: color-mix(in srgb, var(--need) 22%, var(--bg-card)); border-bottom-color: color-mix(in srgb, var(--need) 60%, transparent); }
+#needs-you .card.case > .case-head, #needs-you .card.case > .carousel { position: relative; min-height: var(--band); align-items: center; }
+#needs-you .card.case > .case-head { color: var(--text-muted); }
+#needs-you .card.case > .case-head .ref { color: var(--need-text); font-weight: 600; }
+#needs-you .card.case > .case-title { margin-top: 6px; }
+@media (max-width: 720px) { .lane.five #needs-you .cards > .card.case { --band: 46px; } }

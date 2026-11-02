@@ -1,0 +1,5 @@
+/* C, a frame and a pager foot: a full amber line round each card, a
+   12 px gap, and the carousel as the card's last row under a hairline,
+   the arrows at its two ends and the count between them. */
+.lane.five #needs-you .cards > .card.case { margin-bottom: 12px; border-color: var(--need-line); }
+#needs-you .card.case > .carousel { grid-row: 99; grid-column: 1 / -1 !important; justify-content: space-between; margin: 8px 0 0; padding-top: 4px; border-top: 1px solid color-mix(in srgb, var(--need) 35%, var(--line)); }
