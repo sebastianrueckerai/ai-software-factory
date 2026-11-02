@@ -2437,6 +2437,30 @@ offers direct, the default, plan and human.
   Forgejo fails, the last list serves for up to 5 minutes, then the console
   answers 503. Since Stage 16 the writers of any project get in and see
   only their projects (5.7).
+- **A second door: the chat token.** A human's own agent, Claude Code for
+  one, reaches the project chat on `/mcp` with a bearer token. A human makes
+  the token in a browser on `/notifications`, under Tokens: the project, a
+  name, a lifetime of 7, 30 or 90 days (the form preselects 30, and a POST
+  without a lifetime is refused) and a Forgejo access token of their own with
+  the three login scopes, `read:user`, `write:repository` and `write:issue`.
+  The console refuses a Forgejo token that is not the human's, and one that
+  Forgejo lets read the admin or the notification API. That check is a
+  heuristic, not a proof of the scopes. The console seals the accepted token
+  like a session's. The bearer is `sfc_` and 32 random bytes in base64url. The
+  page shows it once, with the ready line, and the table keeps only its
+  SHA-256:
+  `claude mcp add --transport http factory-<project> <console URL>/mcp --header "Authorization: Bearer <token>"`.
+  On every request the console hashes the bearer. An unknown, expired or
+  revoked token gets 401 with one message for all three. A token whose project
+  is gone gets 401. A human who no longer writes the project gets 403. Then the
+  request runs as a session of the human, with the sealed Forgejo token as its
+  access token and no refresh token. That session is never refreshed, and it
+  is not the bot's `fixed` session, so every access check, approver rule and
+  Forgejo write works as it does in the browser, under the human's name. A
+  turn that runs when its token is revoked finishes. The next request is
+  refused. `/mcp` needs no CSRF token, since a browser never sends a bearer on
+  its own, and a cookie on `/mcp` is ignored. No chat tool makes, lists or
+  revokes a token. Only a human in a browser does, and both acts are events.
 - **Who authorises spend.** Resource approval, envelope edits, promotion and
   the merge approve button need a user on the policy's `approvers` list. Other writers see the cards without those buttons, and a POST
   gets 403. Deny, request changes, reject and release stay open to every
@@ -2753,6 +2777,38 @@ Stage 16 the replay drops an assistant turn that claims an action, matched
 as whole words, without a tool call, and the stored Do-it row leaves out
 the proposal's description, so card text is never replayed as the agent's
 own words.
+
+**A token's turns.** A chat token (5.6) drives the same turn path as the
+browser, as the human, through four tools. Each runs on the token's project
+and answers JSON.
+
+| Tool | Does |
+| --- | --- |
+| `chat_send` `{message, conversation?}` | Sends a turn and waits for its end, for at most 4 minutes. Answers the conversation id, the reply, the tools called with one-line results, the proposals, the applied lines, a stop text in `error`, and `ended`. A message that joins a running turn answers `ended: false`. |
+| `chat_read` `{conversation?, after?}` | Reads the store, at most 40 rows per call, oldest first, each with its source and, on a proposal, `proposals: [{id, state}]`. `after` is the last id. |
+| `chat_confirm` `{proposal}` | Presses Do it on a pending proposal of the human in this project. Answers the shape of `chat_send`. |
+| `chat_threads` `{}` | Lists the human's conversations of the project: id, title, last message time, unread or not. |
+
+Without a conversation, `chat_send` uses the token's own side thread, made at
+first use under the token's name. The thread never becomes the human's current
+conversation, so the browser stays where it was. If the human deletes it, the
+token is free, and its next turn makes a fresh side thread. A token reaches
+every conversation of its human in the project and no other human's. Nothing a
+token does marks a thread seen, `chat_read` included, so the human's thread
+list shows the token's conversation unread until the human opens it. When the
+4-minute wait ends first, the tool answers with what it has and the turn goes
+on detached. Its rest lands as rows, a failure included, and `chat_read` gets
+them. A pressed proposal's follow-up turn stops on the human's Stop, in the
+browser as well.
+
+Every event the console records under a token's session carries the token's id
+and name in its detail, and every chat row a token's turn writes carries the
+token's name. The actor stays the human's login. The stamp sits at three
+seams, so no call site can miss it: the events write, the chat row write and
+the card fund and extend writes. The thread shows a human message that came
+through a token with a dashed avatar and the token's name (C42, provisional).
+Rows that factoryd writes on its own path afterwards, such as the workflow's
+merge, carry no stamp.
 
 **Threat model**. The new surface is the agent's context: an
 agent's or an outsider's text reaches the project agent through the read
