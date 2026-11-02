@@ -2816,7 +2816,7 @@ stamp, the `chat_token_made` and `chat_token_revoked` events included, and every
 token's name. The actor stays the human's login. The stamp sits at three
 seams, so no call site can miss it: the events write, the chat row write and
 the card fund and extend writes. The thread shows a human message that came
-through a token with a dashed avatar and the token's name (C42, provisional).
+through a token with a dashed avatar and the token's name (C43, provisional).
 Rows that factoryd writes on its own path afterwards, such as the workflow's
 merge, carry no stamp.
 
