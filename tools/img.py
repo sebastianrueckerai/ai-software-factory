@@ -212,7 +212,7 @@ def cmd_montage(a):
     tiles = []
     for p in a.images:
         im = Image.open(p).convert("RGB")
-        im.thumbnail((cell, cell))
+        im.thumbnail((cell, a.height or cell))
         tiles.append((Path(p).stem, im))
     rows = [tiles[i:i + cols] for i in range(0, len(tiles), cols)]
     pad, lab = 12, 34
@@ -308,6 +308,7 @@ def main():
     m.add_argument("--labels", nargs="*")
     m.add_argument("--cols", type=int, default=4)
     m.add_argument("--cell", type=int, default=480)
+    m.add_argument("--height", type=int, help="the tile's height bound, by default --cell")
     m.add_argument("--out", required=True)
     m.set_defaults(f=cmd_montage)
     s = sp.add_parser("sheet")
