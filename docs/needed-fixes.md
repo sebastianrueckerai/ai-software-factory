@@ -169,15 +169,31 @@ every 4xx as "The model could not be reached", so the call read as a failed
 tool. The 4xx now names its refusal. Watch the next plan-question ask
 before closing this.
 
-## 6. A red-main revert card does not jump the queue
+## 6. An ended card's issue stays open, and both red-main remedies can land
 
-Status: the queue policy is unbuilt. The #1333 revert itself merged by hand
-(pull 1332, 2026-11-01 02:42). Found 2026-10-31 on card #1333: "Revert
-6b368fd: main red since 2026-10-30T03:30:07Z, no fix landed" sat open more
-than a day while ten-plus pulls merged after it. Either main was red and
-the merges rode a broken base, or the card was stale and nothing closed it.
+Status: plan written, awaiting Sebastian's OK
+(docs/red-main-revert-plan-2026-11-02.md). Found 2026-10-31 on card #1333
+("Revert 6b368fd: main red since 2026-10-30T03:30:07Z, no fix landed"),
+filed as "a red-main revert card does not jump the queue". The check on
+2026-11-02 shows that the queue did its job: the revert merged on its own
+at 2026-10-30 05:34 UTC, 4 minutes after its filing, and all 47 push runs
+of main after it to 2026-11-01 03:00 ended green. The card looked stuck
+because its issue never closed.
 
-Fix direction: a revert card for red main blocks the queue or jumps it.
+Two faults stand. The issue of an ended card stays open on three paths:
+a card that factoryd filed around its own pull request and that ends done
+(#1157, #1333), a card that ends closed while its issue has open
+dependencies, which Forgejo refuses to close with 412 (10 plan-dropped
+cards), and a closed plan (all 15 in the code repository). Both remedies
+of a red main can land: on 2026-10-20 the fix-forward card #1154 and the
+revert #1157 merged 2 seconds apart, and the revert put three stray log
+files back on main.
+
+Fix direction: a red main gets one automatic remedy at a time, the
+revert's filing ends the fix-forward card, a human decides when the
+remedy merges and main stays red, a green main ends the remedy that did
+not merge, and every card that ends done with a merged pull request or
+ends closed, and every closed plan, closes its issue.
 
 ## 7. No scripted door into the chat
 
