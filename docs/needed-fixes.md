@@ -103,11 +103,15 @@ Extend takes any live card, and its raise stands: it lives in columns the
 workflow's usage record never writes, which the workflow reads before each
 cap check. A card's agent time follows its size, half for a small card and
 one and a half for a large one. Four faults found on cards #1473 and #1474
-left the same day on code main. The first two are live since the roll of
-code 321baaa7 at 19:37 UTC, and the other two ride the next roll. The check-in share
+left the same day on code main. The fixes up to code 321baaa7 are live
+since its roll at 19:37 UTC, and the later ones ride the next roll. The
+check-in share
 stop told the human that Go on grants one more share and starts the
 session again. With the card's pull request open, the answer re-verifies
 the head and buys nothing, and the question now says so (code fdf4d793).
+That fix held only in its test: the question's facts carried the pull
+request at a budget stop alone, and #1414 asked the old text with pull
+request 1485 open. The facts now carry it at every stop (code 8b4b5525).
 A main CI run that Forgejo left blocked held main's CI lane unseen.
 Forgejo's zombie sweep failed a job whose runner had died and never freed
 the jobs that need it, and the roller read only the newest run, which
