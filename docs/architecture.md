@@ -2447,8 +2447,10 @@ offers direct, the default, plan and human.
   no chat token." in place of the form. The console refuses a Forgejo token
   that is not the human's, and one that Forgejo lets read the admin or the
   notification API. It also proves `write:issue` and `write:repository` with
-  POSTs on the chosen project's repository that cannot decode. Status 403
-  means a scope is missing, and the refusal names it. Live Forgejo 17.0.1
+  POSTs on the chosen project's repository whose body cannot decode, so
+  Forgejo files nothing. Status 422 means the scope is held, and 403 means it
+  is missing, which the refusal names. A 2xx or any other answer refuses the
+  token. Live Forgejo 17.0.1
   statuses get checked after the build. The console seals the accepted token
   like a session's. The bearer is `sfc_` and 32 random bytes in base64url. The
   page shows it once, with the ready line, and the table keeps only its

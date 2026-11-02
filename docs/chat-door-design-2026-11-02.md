@@ -122,9 +122,11 @@ they make a chat token:
 
 The console sees only the login, not the scopes. So it probes the token.
 It proves `write:issue` and `write:repository` with two POSTs on the
-chosen project's repository that cannot decode. Status 403 means the
-scope is missing, and the refusal names it. Any other status means the
-scope is held. It also refuses a token that reads the admin API or the
+chosen project's repository whose body cannot decode, so Forgejo files
+nothing. Status 422 means the scope is held. Status 403 means it is
+missing, and the refusal names it. A 2xx is refused with a request to
+check the project for a stray issue or pull request, and any other
+answer refuses the token. It also refuses a token that reads the admin API or the
 notification API. The form names the three scopes to pick. Live Forgejo
 17.0.1 statuses get checked after the build.
 
