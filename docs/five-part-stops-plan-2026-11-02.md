@@ -1,7 +1,7 @@
 # The five-part stops: every generic stop carries its numbers and a grounded recommendation
 
-Written 2026-11-02. Status: plan, awaiting Sebastian's OK. Nothing changed.
-This is fault 4 of docs/needed-fixes.md.
+Written 2026-11-02. Status: built on code main the same day (21ee41a2).
+It was fault 4 of docs/needed-fixes.md, which left the list with it.
 
 ## What happened
 
