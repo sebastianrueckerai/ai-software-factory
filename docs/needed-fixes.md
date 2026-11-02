@@ -75,8 +75,8 @@ the same day with the chat door build (docs/chat-door-design-2026-11-02.md,
 docs/plans/2026-11-02-chat-door.md). A human makes a chat token for one
 project on their own page in the console, for 7, 30 or 90 days, and revokes
 it there. The token acts as that human in the project's chat, approvals
-included, through the console's /mcp endpoint and its four tools:
-chat_send, chat_read, chat_confirm and chat_threads. The human's own
+included, through the console's /mcp endpoint and its five tools:
+chat_send, chat_read, chat_confirm, chat_threads and chat_fund. The human's own
 Forgejo token stands behind it, sealed, so a merge approval stays a review
 under the approver's own Forgejo name, and every event and chat row the
 token causes names it. Three faults that waited on a roll left when roll

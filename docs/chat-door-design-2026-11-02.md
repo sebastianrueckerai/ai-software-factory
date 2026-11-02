@@ -120,10 +120,16 @@ they make a chat token:
    `console_sessions` seals its tokens (`internal/console/session_store.go:52`).
    It never leaves factoryd.
 
-The console sees only the login, not the scopes. So it also refuses a
-Forgejo token that reaches more than the three scopes: one read of the
-admin API and one read under a scope outside the three must both be
-refused by Forgejo. The form names the three scopes to pick.
+The console sees only the login, not the scopes. So it probes the token.
+It proves `write:issue` and `write:repository` with two POSTs on the
+chosen project's repository that cannot decode. Status 403 means the
+scope is missing, and the refusal names it. Any other status means the
+scope is held. It also refuses a token that reads the admin API or the
+notification API. The form names the three scopes to pick. Live Forgejo
+17.0.1 statuses get checked after the build.
+
+A human who writes no project sees "You write no project, so you can make
+no chat token." in place of the form.
 
 A request on a chat token then runs on a session with the human's login,
 the Forgejo token as its access token, no refresh token, and the chat
@@ -207,7 +213,9 @@ had two rivals:
   other human's. The tools take no `owner`, so the console's `owner=`
   door (`internal/console/threads.go:341-391`) stays closed to tokens.
 - The token's own conversation never becomes the human's current
-  conversation, so the human's browser stays where it was. The store's
+  conversation, so the human's browser stays where it was. A token's
+  first side thread first pins the human's current thread, so the new
+  thread never takes the human's current number. The store's
   `NewConversation` makes the new thread current and reuses an empty
   current one (`internal/factoryd/chat.go:167-170`), so the token's
   thread gets a store call of its own that does neither.
@@ -219,7 +227,7 @@ had two rivals:
   raise any proposal and press it, so a bound to the token's own threads
   would stop nothing.
 
-### The four tools
+### The five tools
 
 Each tool runs on the token's project. Each answers JSON.
 
@@ -232,9 +240,15 @@ Each tool runs on the token's project. Each answers JSON.
    the project agent called with their one-line results, the proposals
    (id, what it does, expiry), the applied lines, a budget stop or an
    error, and whether the turn ended. A message sent while a turn runs
-   queues as it does in the console.
-2. **`chat_read`** `{conversation?, after?}` answers the last 40 messages
-   of a conversation, or those after a message id. Each message carries
+   queues as it does in the console. When the chat's budget stops the
+   turn, the budget answer names the action. For an approver it names
+   `chat_fund` with the suggested amount, after which the thread goes on
+   by itself and `chat_read` reads it. For a writer it says that an
+   approver of the project funds the chat.
+2. **`chat_read`** `{conversation?, after?}` answers
+   `{"messages": [...], "more": bool}`. It holds at most 40 rows and about
+   60 KB per call, stops at a whole message, and pages on with `after` set
+   to the last id. `more` says that rows remain. Each message carries
    its id, role, text, time, its source (the console or a token's name)
    and, on a proposal, its state. It never marks the thread seen and never
    opens a conversation. So it reads the store directly, not through the
@@ -246,6 +260,11 @@ Each tool runs on the token's project. Each answers JSON.
    judges the human, as it does for the button.
 4. **`chat_threads`** `{}` lists the human's conversations of the project:
    id, title, time of the last message, unread or not.
+5. **`chat_fund`** `{eur?}` presses the browser's Fund and go on through
+   the same function and the same approver check. The amount is in whole
+   euros. When `eur` is omitted, the suggested amount applies. On a chat
+   that is not stopped, it raises the budget when given `eur` and refuses
+   without one.
 
 The turn underneath does not change. The token's turn gets the project
 agent's tools, its confirm list at the project's autonomy level and its
@@ -274,8 +293,10 @@ lands as rows, a failure included, and `chat_read` gets it.
 - `chat_messages` gets a column that names the token, empty for a console
   message. Every row a token's turn writes carries it. The console shows
   the token's name on a human message that came through it.
-- Every event the console records under a token's session carries the
-  token's id and name in its detail. The actor stays the human's login.
+- Every event the console records under a token's session carries
+  `"token": {"id","name"}` and `"project"` in its detail, the same shape
+  as the stamp. This holds for `chat_token_made` and `chat_token_revoked`
+  too. The actor stays the human's login.
   The console builds events in eleven places, some outside `record`
   (`internal/console/actions.go:231`), among them the autonomy and pool
   changes (`internal/console/autonomy.go:85`, `253`, `583`,
@@ -346,6 +367,9 @@ the code:
 - A token's turn keeps a failure as a row, so a turn that outlasts the
   4-minute wait leaves nothing unseen.
 - A revoke stops the next request, not a running turn.
+- Decision 2's "fund the chat" became the fifth tool, because a spent chat
+  cannot run the turn that would call its own fund tool.
+- A pressed proposal enters the stop gate before it waits for its turn.
 - The token's label in the thread and the Tokens section go through a
   condensed design round, with a provisional pick so the build does not
   wait.
