@@ -147,7 +147,7 @@ flags: finding_confirmed_twice(f1..f4), money_ask_hides_findings, answer_changed
 
 Loops fold: consecutive steps with the same kind, outcome and finding set collapse into one block with a count. Flags are named patterns computed in code, listed in 5.4. A second tool, `card_step`, returns one step in full: the session's steps, the gate's full result, the check-in's transcript, the ask's five parts and its answer. A third, `board_digest`, writes one line per live card with its status, gate, age in that state, slot, queue reason and flags, then the queue with reasons, the slots held, each open plan's state, and the caps with their headroom.
 
-The digest is the one context every rung starts from. The check-in's statement includes the card's digest. The factory agent's wake includes the board digest and the case's card digest. The human's background part is the digest in prose. The chat's `card` tool returns it, so "is something wrong with #1410" is one tool call. A later live monitor reads the same flags, so the digest is built once and read by four consumers.
+The digest is the one context every rung starts from. The check-in's statement includes the card's digest. The factory agent's wake includes the board digest and the case's card digest. The human's background part is the digest in prose. The chat's `card` tool returns it, so "is something wrong with #1410" is one tool call. A later live monitor reads the same flags, so the digest is built once and read by four consumers. The card digest is not the `digest(path, ask)` file tool of the session menu (fault 3 of the register, on code main since 448048b0). In code the names are `CardDigest`, `card_step` and `board_digest`, never `digest` alone.
 
 ### 5.4 The monitor: every wait the AI owns has a clock
 
@@ -175,7 +175,7 @@ The clocks replace the stale sweep's blind spots. The stale sweep looked at thre
 
 ### 5.5 Actions: what each rung may do
 
-The action set is one list in code. Every action is a function that code runs, with its bounds from policy. A model picks an action by name and arguments. The human's buttons are the same functions. The chat's tools are the same functions. This is what makes rung 2 able to do everything a human can (goal 7), and what ends the exits that do not exit (S18, S38).
+The action set is one list in code. Every action is a function that code runs, with its bounds from policy. A model picks an action by name and arguments. The human's buttons are the same functions. The chat's tools are the same functions. The chat's answer tool and the human's send resolve a case by its id, whatever its kind, with one argument shape. A plan question and a stop are answered by the same call, so the fork between the answer and the plan tools that refused the chat twice on 2026-10-31 (fault 4) is gone. This is what makes rung 2 able to do everything a human can (goal 7), and what ends the exits that do not exit (S18, S38).
 
 | Action | Rung 0 | Rung 1 | Rung 2 | Human | Today |
 |---|---|---|---|---|---|
@@ -205,10 +205,11 @@ The action set is one list in code. Every action is a function that code runs, w
 
 Every extension and every grant any rung makes draws from the escalation pool of 5.7, a preallocated amount per project and month in policy with three parts: sessions, agent time and money. Rung 0 and rung 1 draw up to a per-card draw bound, also in policy, over the card's whole life, not per case. Rung 2 draws up to the pool. Nothing below the human extends or funds outside the pool (Sebastian, 2026-11-02: every extension and grant comes from a preallocated pool, never blank). When the per-card defaults turn out to open too many cases, the cure is a higher default per size, measured by the cases-per-card figure of section 7, not a looser pool.
 
-Two rules live in the action functions, not in any prompt, and hold for every rung and the human's buttons:
+Three rules live in the action functions, not in any prompt, and hold for every rung and the human's buttons:
 
 - Every action has an `applies` predicate on the case's facts. Fund applies while a money sub-ask is open. Approve applies while a pull request is open with green checks. Extend applies while the allowance has room. The buttons a human sees, the actions a rung may pick and the chat's tool list are the actions whose predicate holds. No generic "Go on" survives.
 - Extend and fund refuse when the last extension bought nothing: no new commit since the previous grant and no new fact on the case (the head, the finding set and the checks verdict unchanged). The rung that asked for it must hand up. This stops the #1345 loop in code instead of after the fact, and `grant_bought_nothing` is then the record of a refusal, not of a loss.
+- An approval request opens only on a green head. A head still red after the checks stage's return cap is a cap case, not a request: rung 0 re-runs the checks once per red head, then rung 1 reads the log and picks the next session, whose note carries the checks log. Today `headGreen` sends a red head back to the agent until the cap, then opens the request with its red checks, which a human can only deny (#1381, 2026-10-31). The queue's withdrawal of a head whose checks went red at its merge stays. This is the grant-loop spec's second fix, which that build reached at the queue and not at the approval stage.
 
 ### 5.6 The resolvers of rung 0
 
@@ -217,10 +218,10 @@ Rung 0 is a table keyed by case kind and facts. Each row is one rule that needs 
 | Case | Resolver |
 |---|---|
 | a cap of any kind, a pull request open, checks green, the last review approved the head | re-verify the head and route to approval. Never ask for a session. |
-| a cap, a pull request open, checks red with the checks log | hand to rung 1 with the log in the facts |
+| a cap, a pull request open, checks red with the checks log | hand to rung 1 with the log in the facts. No approval request opens. |
 | check-in share spent | the kind goes. Rung 1 is paid from the judgment budget (5.7), so no card stops for its own check-in money, and the guard that fabricates the stop before judgment goes (S21). |
 | day, month or project cap | the clocked wait of `cap-wait`, as on main |
-| budget headroom below the opening's cost | a money sub-ask on the case, no session opened (fault 2) |
+| budget headroom below the opening's cost | a money sub-ask on the case, no session opened (fault 2). The floor that produces this trip runs at every opening, `RunSession` and `reportSession`, and every face shows the enforced money, budget minus spent minus holds. Both are built by the companion plan before phase 2. The ask that fires as the money ask before an attempt is this row. |
 | a failed dependency outside a plan | retry the dependency once as a replacement: a successor from main's tip with the failed card's brief, its findings and its branch's patch when one exists, taking over its dependents in one transaction as `ReplaceFailedCard` does for plan cards. One replacement per failed card, by a deterministic id. Only for retryable ends (a session error, a gate timeout, a pod failure, a head that kept moving), never for a terminal end (a forbidden class, a cleared alert, a closed issue). Then rung 1 on the dependency's case. The dependents' slots free (S6, S9, S12). |
 | a failed dependency inside a plan | the impasse replan, as built, and the dependents' slots free |
 | a closed dependency | the dependent's case goes to rung 2 with the closer's reason, not to the human |
@@ -257,7 +258,7 @@ Judgment and work have separate budgets. The card's budget pays sessions and gat
 
 ### 5.8 The human face: one decision at a time, per card
 
-Each Needs you card shows one open case at a time, as a carousel: the case, a count of the card's other open cases, arrows to move between them (Sebastian, 2026-11-02). The column keeps one row per card, so the board's overview stays. The reader is someone who dropped in on a project they forgot about and does not remember how the factory works inside, so every part is written for that reader. Each case renders the five parts from its record:
+Each Needs you card shows one open case at a time, as a carousel: the case, a count of the card's other open cases, arrows to move between them (Sebastian, 2026-11-02). The column keeps one row per card, so the board's overview stays. Each plan question is a case of kind plan question, keyed by its text as phase 1 keys every ask, and the confirmation is a case of kind plan confirmation. The carousel shows one, and the forms post one answer per question index as they do today. This reverses the presentation half of issue #506, "Every plan answer in one turn (roadmap 179)": the planner still asks all its questions in one turn, and the human reads and answers them one at a time. The plan card's face shows the five parts of one case and nothing raw. The revision's text, the summary and the hold-outs sit behind `card_step` and the drawer, and the brief writer's prose keeps the approval brief's bounds of 600 and 4000 characters. A question's text is bounded at its writer by the companion plan. The reader is someone who dropped in on a project they forgot about and does not remember how the factory works inside, so every part is written for that reader. Each case renders the five parts from its record:
 
 1. **The ask.** The problem line with the numbers. Never the money unless money is the only matter.
 2. **Why.** The kind's template filled from the facts, then the last rung's finding in one or two sentences.
@@ -265,7 +266,7 @@ Each Needs you card shows one open case at a time, as a carousel: the case, a co
 4. **Recommendation.** Rung 2's recommended action, its grounds in plain words, and its name as the source. Empty when no rung had grounds.
 5. **Premade answers.** One button per action the human may take on this case, each with its effect in one line, the recommended one first. Beside them the one fund control of 5.7 and a note box. One send applies the decision, the draw and the note together. Free text in the note goes with the typed decision, never as the decision.
 
-The brief writer agent, which today writes a brief per card in Needs you, reads the case and writes the prose of parts 3 and 4 for that reader. The five-part contract of 2026-10-17 stands unchanged. The card separation on the face is a design round of its own, as the needs-you analysis recorded.
+The brief writer agent, which today writes a brief per card in Needs you, reads the case and writes the prose of parts 3 and 4 for that reader. The five-part contract of 2026-10-17 stands unchanged. The card separation on the face is a design round of its own, run by the companion plan before phase 5 with the carousel's count and arrows among the round's fixed parts, so phase 5 lands inside the chrome the round picked.
 
 ### 5.9 Full auto takes the first shot
 
@@ -349,6 +350,8 @@ Each phase ships on its own and leaves the factory better than before it. The or
 4. **Rung 2 on every case and the first shot.** The factory agent wakes on every case that passes rung 1, with the board digest and the full action set, at every autonomy level, acting or proposing by level. The planner's recommended answers. Live value: a human reads only the human-only kinds and the cases beyond the pool, each with a recommended option preselected.
 5. **The human face and the replay fixtures.** The per-card carousel, the five parts from the case written for a cold reader, the brief writer on the case, the fund control and the note beside the decision buttons with one send. The 20 incidents as replay fixtures in the test suite. The metrics from the cases. The configuration constructions of 5.11.
 
+Beside the phases, [the companion plan](plans/2026-11-02-card-flow-companion.md) carries what no phase builds: the floor at every session opening and the enforced money on every face (fault 2), the plan question's bound at its writer and the plan card's cap (complaint 4), the Needs-you cards' separation round (complaint 9), the catch-all refusals that name their error (fault 4), and the runner's docker volume (fault 8), which is outside the card flow.
+
 Phases 1 and 2 need no model change and no prompt change. Phase 3 changes the check-in's statement and answer shape. Phase 4 changes the factory agent's wake. Phase 5 changes the console.
 
 Later, after the five phases and a live batch:
@@ -365,5 +368,5 @@ Later, after the five phases and a live batch:
 - The migration of open escalations, alerts and `question_asked` events into cases, and the heal pass's handover to the monitor.
 - The order of the resolver table's rows and the tie rule when two match.
 - The judgment budget's default cap and the per-card count of rung 1 runs.
-- The test fixtures' format and which of the 20 incidents become the first fixtures. #1347, #1410, #1345 and #1451 are the four this document names.
+- The test fixtures' format and which of the 20 incidents become the first fixtures. #1347, #1410, #1345, #1451 and #1381, the red head after the checks cap, are the five this document names.
 - The agent context map's pages for the check-in and the factory agent, regenerated after phases 3 and 4.
