@@ -71,8 +71,8 @@ wakes every cap wait, and a refusal that the version in force already lifted
 asks nothing. The month alarm files a cap card at each cap it reaches and
 closes the card a raise lifted, and the stop's question says that the card
 resumes on its own and when. The missing scripted door into the chat left
-the same day with the chat door build, on code main as 44c60082 and riding
-the next roll (docs/chat-door-design-2026-11-02.md,
+the same day with the chat door build, live with the roll of 321baaa at
+19:38 UTC (docs/chat-door-design-2026-11-02.md,
 docs/plans/2026-11-02-chat-door.md). A human makes a chat token for one
 project on their own page in the console, for 7, 30 or 90 days, and revokes
 it there. The token acts as that human in the project's chat, approvals
@@ -80,7 +80,9 @@ included, through the console's /mcp endpoint and its five tools:
 chat_send, chat_read, chat_confirm, chat_threads and chat_fund. The human's own
 Forgejo token stands behind it, sealed, so a merge approval stays a review
 under the approver's own Forgejo name, and every event and chat row the
-token causes names it. Three faults that waited on a roll left when roll
+token causes names it. Since 8ff57da9, chat_send waits 50 seconds, inside
+Claude Code's 60-second tool timeout, and chat_read gets the rest. Three
+faults that waited on a roll left when roll
 c78869b went live on 2026-11-02 at 02:19Z. A queue sweep no longer starts
 a half-filed card, and a failed card with a live card waiting on it goes
 back to its plan's planner once (code c78869b2,
@@ -134,7 +136,20 @@ the card's diff, and the check-in that followed ran out its 5 minutes
 with no decision. A plan now files its cards with no stamp, so a card's
 first session starts at main's head as it is then (code 687c032f). The
 cards #1474, #1475 and #1476 lost their stale stamps in the database, and
-#1474 went on at e4431843.
+#1474 went on at e4431843. A check-in share stop with its pull request
+open never granted the share its own question promised. Its answer
+verified the head again instead, dropped the session's own push for the
+stale head, and spent one of the card's three head holds each time, so
+card #1441 asked again after every answer and could only close into a
+successor. The answer now grants the share, the card goes on from the
+head its session pushed, and the repeat guard compares the share and the
+raised sessions (code 6bd8bf0f, change ids checkin-answer, verified-head,
+conflict-fact and stopped-parent). A merge conflict now reaches the next
+session as a fact, and a stopped session that pushed becomes the next
+one's parent. A check-in gets 90 seconds for each call it may make, at
+most 30 minutes, and a start check-in ends by its session's deadline.
+Until that roll, the policy holds checkin_time at 10 minutes (infra
+12c7c9c).
 
 ## 1. The check-in's policy stop preempts the approval card
 

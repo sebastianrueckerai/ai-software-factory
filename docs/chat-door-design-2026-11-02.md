@@ -1,7 +1,7 @@
 # A chat door for a human's own agent: design
 
-Written 2026-11-02. Status: built on code main the same day (44c60082),
-live proof pending. It answers fault 7 of
+Written 2026-11-02. Status: built and live the same day (roll of
+321baaa, 19:38 UTC), live proof passed. It answers fault 7 of
 [needed-fixes.md](needed-fixes.md), "No scripted door into the chat". The
 plan is [plans/2026-11-02-chat-door.md](plans/2026-11-02-chat-door.md).
 Code paths are relative to `ai-software-factory-code`, line numbers from
