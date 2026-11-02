@@ -14,7 +14,7 @@ The bound: the sidecar removes the volumes no container uses, last, when all els
 
 All reads were read-only. Times are UTC. The figures in GiB are bytes over 1,073,741,824.
 
-SigNoz keeps its metrics in ClickHouse. ClickHouse sat at 2.68 to 2.82 GiB of its 3 GiB memory limit (`system.asynchronous_metrics`, `CGroupMemoryUsed`) and refused most queries with `MEMORY_LIMIT_EXCEEDED`, so each query below ran in a loop until it went through (up to 86 tries). At 21:40:02 the kubelet restarted ClickHouse after it missed its liveness probe while those retried queries ran. This is fault 9 of [needed-fixes.md](needed-fixes.md). The helper:
+SigNoz keeps its metrics in ClickHouse. ClickHouse sat at 2.68 to 2.82 GiB of its 3 GiB memory limit (`system.asynchronous_metrics`, `CGroupMemoryUsed`) and refused most queries with `MEMORY_LIMIT_EXCEEDED`, so each query below ran in a loop until it went through (up to 86 tries). At 21:40:02 the kubelet restarted ClickHouse after it missed its liveness probe while those retried queries ran. This is fault 10 of [needed-fixes.md](needed-fixes.md). The helper:
 
 ```sh
 ch() { kubectl -n platform exec chi-signoz-clickhouse-cluster-0-0-0 -c clickhouse -- \
