@@ -4,9 +4,9 @@ The run of [the brief](brief.md) in the condensed form. Three candidates per par
 
 ## The recommendation: F, provisional
 
-**The label.** A row a chat token sent keeps the human as its author. Its avatar becomes a dashed cyan ring around the human's initial, and its who line reads `sebastian via claude-laptop`, with "via" and the name in the muted grey. A row the browser sent keeps the filled disc and shows nothing new. The agent's replies carry no label. A name too long for the line ends in an ellipsis, and the row's tooltip holds it whole.
+**The label.** A row a chat token sent keeps the human as its author. Its avatar becomes a dashed cyan ring around the human's initial, and its who line reads `sebastian via claude-laptop`, with "via" and the name in the muted grey. A row the browser sent keeps the filled disc and shows nothing new. The agent's replies carry no label. A name too long for the line ends in an ellipsis, and the row's tooltip holds it whole. The dashed ring already marks the compaction summary row of C14, a dashed cyan ring around a faint `≡`. Three things tell the two apart: the token's ring holds the human's initial in cyan where the summary's holds `≡` in grey, the who line starts with the human's cyan name and "via" where the summary's reads "summary" in grey, and the token's text stands at full strength where the summary's is muted and smaller. Both rows say "not typed here by the human", so the shared ring fits, but it is a reuse Sebastian should see.
 
-**The Tokens section.** The answer to the form shows the block at the top of the page, above Connections, on a raised panel with a 2 px cyan rule at its left and the mark "shown once". The `claude mcp add` line sits in a dark line behind a `$` prompt with a Copy button. The bearer sits under "bearer, for a script" with its own Copy button. A press puts the value on the clipboard and the button reads "Copied". Where the browser refuses the clipboard, the press selects the text instead. A click on either value also selects it whole. The token list keeps its six columns and names the project as Level per project does, by its repository only when the human no longer reads it. A lamp beside the last use is lit for a token in use and unlit for one never used or expired. The form folds behind "Make a chat token" once a token exists and stands open while there is none. On the phone each stacked token row names its fields: project, created, expires, last used.
+**The Tokens section.** The answer to the form shows the block at the top of the page, above Connections, on a raised panel with a 2 px cyan rule at its left and the mark "shown once". The `claude mcp add` line sits in a dark line behind a `$` prompt with a Copy button. The bearer sits under "bearer, for a script" with its own Copy button. A press puts the value on the clipboard and the button reads "Copied" for 2 s, said aloud through its live label. Where the browser refuses the clipboard, the press selects the text and the button reads "Selected" for 2 s. A click on either value also selects it whole. The token list keeps its six columns and names the project as Level per project does, by its repository only when the human no longer reads it. At the desk a name or project longer than 24 characters ends in an ellipsis with the whole in its tooltip. On the phone both wrap. A lamp beside the last use is lit for a token in use and unlit for one never used or expired. The form folds behind "Make a chat token" once a token exists and stands open while there is none. On the phone each stacked token row names its fields: project, created, expires, last used.
 
 Both critics put the dashed avatar and the command panel first in the first loop, and both picked F in the compare loop.
 
@@ -73,11 +73,12 @@ Every claim below was checked against the shots at 1x, and the ring at 8x magnif
 
 ## Fixes found on the way
 
-The lab and the page had seven faults that this round fixed beside the pick, because every candidate stood on them.
+The lab and the page had eight faults that this round fixed beside the pick, because every candidate stood on them.
 
 - The lab's structural check was red at 9f0444c2. It counted every stacked row of the Notifications page on the phone and expected five, and the Tokens section added a sixth. It now counts the rows of the two messenger tables.
 - The lab answered 404 to every POST of the Notifications page, because the console mounts those routes at its start, before the lab set its messengers. The lab now starts the console again after that, so the made state is the real answer to the real form.
-- The Notifications page showed no destinations in the top bar. It now shows C23's bar with Notifications in cyan, as the other secondary pages do.
+- The Notifications page showed no destinations in the top bar. For a human who writes the factory it now shows C23's bar with Notifications in cyan, as the board's bar does. A human who does not write the factory sees no factory-level destinations there, as on their board, because each of those pages refuses them.
+- "Level per project" sat on the rule of the table above it, and so would the Tokens section. The page's sections now stand 26 px apart. This changes the rhythm of C19's page.
 - Every select in the light theme lost its chevron, because a light rule reset the whole background. The rule now sets the colour only.
 - The page's tables broke names and dates over two or three lines at 1440 px, for example `ai-software-factory-code` as four lines. C19's reference sets them on one line. Cells now keep one line above 900 px.
 - The token form's Name field had no type, so it took no field style and showed as a grey box in the dark theme. It is a text field now. The caption and the block's words lost their semicolons.
@@ -87,6 +88,13 @@ The lab and the page had seven faults that this round fixed beside the pick, bec
 
 Eight critic calls at $0.03 each by `tools/img.py`'s estimate: $0.24 of the $3 cap. No image generation. The real figures sit in the fal and Z.ai dashboards. The round took one session on 2 November 2026.
 
+## What worked
+
+- Building the candidates in the real templates over a lab scenario. The made state was the real answer to the real form, so the shots showed where the block lands on each screen, which no image could.
+- Shooting the "before" first. It showed five of the eight faults fixed on the way before any candidate was built.
+- One first loop over all three candidates, then a compare loop of the fusion against the runners-up. Both critics' asks in the first loop pointed at the same fusion, and the compare loop confirmed it with scores.
+- Checking each claim at 1x, and at 8x of the 1x pixels for the ring. Twelve claims were overruled or found already met, among them two that misread the pixels.
+
 ## Evidence
 
-[shots/](shots/) holds every shot by candidate and theme: `before` is 9f0444c2's markup over the same lab scenario, then A, B, C and F. The sheets the critics judged are the `sheet-*.png` files and the files in [compare/](compare/). The lab's structural check passed on the base markup after the check's own fix, and on the built pick: the lab's full run of 361 shots, then the check again on the final build after the row header's fix and the project's name.
+[shots/](shots/) holds every shot by candidate and theme: `before` is 9f0444c2's markup over the same lab scenario, then A, B, C and F. The sheets the critics judged are the `sheet-*.png` files and the files in [compare/](compare/). [sheets.sh](sheets.sh) builds them again from the shots, byte for byte, with `shots/F-judged` holding the pick as the critics saw it. [long.js](long.js) shoots a long token name at 960 px and 390 px into `shots/long-name`. The lab's structural check passed on the base markup after the check's own fix, and on the built pick: the lab's full run of 361 shots, then the check again on the final build after the row header's fix and the project's name.

@@ -1,5 +1,5 @@
 diff --git a/internal/console/notifications.go b/internal/console/notifications.go
-index c1ee05b4..5b86a40a 100644
+index c1ee05b4..a3d9a9ad 100644
 --- a/internal/console/notifications.go
 +++ b/internal/console/notifications.go
 @@ -87,7 +87,7 @@ func (c *Console) notificationsData(r *http.Request) (data map[string]any, statu
@@ -7,7 +7,7 @@ index c1ee05b4..5b86a40a 100644
  		}
  	}
 -	return map[string]any{"User": s.user, "CSRF": s.csrf, "Links": links,
-+	return map[string]any{"User": s.user, "CSRF": s.csrf, "Factory": true, "Links": links,
++	return map[string]any{"User": s.user, "CSRF": s.csrf, "Factory": c.factoryWriter(r), "Links": links,
  		"Projects": rows, "Levels": notifyLevels, "Code": r.URL.Query().Get("code"),
  		"TelegramName": m.TelegramName, "Discord": m.Discord != nil,
  		"ChatTokens": c.chatTokensOn(), "Tokens": tokens, "Lives": []string{"7", "30", "90"}, "Now": time.Now()}, 0, ""
@@ -59,7 +59,7 @@ index c6a29dd4..f92b4d6e 100644
          if (row.dataset.joined) fresh.dataset.joined = row.dataset.joined;
          row.replaceWith(fresh);
 diff --git a/internal/console/static/console.css b/internal/console/static/console.css
-index 527438ff..52021720 100644
+index 527438ff..765bec0c 100644
 --- a/internal/console/static/console.css
 +++ b/internal/console/static/console.css
 @@ -102,7 +102,7 @@ form.htmx-request button::after { content: ""; display: inline-block; width: .8r
@@ -79,15 +79,17 @@ index 527438ff..52021720 100644
  tr.line td:first-child { padding-left: 1.5rem; color: var(--text-muted); }
  caption { text-align: left; color: var(--text-muted); font: 600 12.5px var(--font-ui); padding: 4px 0; }
  code { white-space: pre-wrap; word-break: break-word; font-size: .93em; }
-@@ -1268,6 +1269,7 @@ button.skip { height: 28px; padding: 0 12px; font-size: 13px; color: var(--text)
+@@ -1268,6 +1269,9 @@ button.skip { height: 28px; padding: 0 12px; font-size: 13px; color: var(--text)
     for needs-you, an unlit socket for off and not connected */
  .notify th[scope=row] { color: var(--text); font: 400 12px var(--font-mono); white-space: normal; }
  .notify td.act { width: 100%; text-align: right; }
 +@media (min-width: 900px) { .notify th[scope=row], .notify td:not(.act) { white-space: nowrap; } }
++/* a token's name and project cut at 24 characters on the desk, the whole in the tooltip; the phone wraps them (C43) */
++.notify .cut { display: inline-block; max-width: 24ch; overflow: hidden; text-overflow: ellipsis; vertical-align: top; }
  .notify td.act form.inline { white-space: nowrap; }
  .notify .dim { color: var(--text-muted); }
  .notify .addr { color: var(--text-faint); }
-@@ -1416,3 +1418,33 @@ summary.strip .cell[data-tip]:hover::after, summary.strip .cell[data-tip]:focus-
+@@ -1416,3 +1420,34 @@ summary.strip .cell[data-tip]:hover::after, summary.strip .cell[data-tip]:focus-
  /* the input's drag seam lights the composer's top rule, the divider's
     own way of saying it drags */
  form.composer:has(> .growbar:hover), form.composer:has(> .growbar:focus-visible) { border-top-color: var(--accent); }
@@ -102,8 +104,8 @@ index 527438ff..52021720 100644
 +   the form folds once a token exists */
 +.notify + .notify { margin-top: 26px; }
 +.notify.once { margin: 12px 0 0; padding: 10px 14px 12px; border: 1px solid var(--line-strong); border-left: 2px solid var(--accent); background: var(--bg-raised); }
-+.notify.once h3 { display: flex; align-items: baseline; gap: 10px; margin: 0 0 4px; }
-+.once-w { color: var(--accent); font: 11.5px var(--font-mono); font-variant-caps: all-small-caps; letter-spacing: .06em; }
++.notify.once h3 { margin: 0 0 4px; overflow-wrap: anywhere; }
++.once-w { margin-left: 10px; color: var(--accent); white-space: nowrap; font: 11.5px var(--font-mono); font-variant-caps: all-small-caps; letter-spacing: .06em; }
 +.once-l { margin: 0 0 8px; color: var(--text-muted); font-size: 12.5px; }
 +.once-k { margin: 10px 0 0; color: var(--text-muted); font: 11.5px var(--font-mono); font-variant-caps: all-small-caps; letter-spacing: .06em; }
 +.cline { display: flex; gap: 8px; align-items: flex-start; margin: 6px 0 0; padding: 6px 6px 6px 10px; border: 1px solid var(--line); border-radius: 2px; background: var(--bg); }
@@ -117,31 +119,41 @@ index 527438ff..52021720 100644
 +.mint form button { margin-top: 12px; }
 +@media (max-width: 899px) {
 +  .notify td[data-l]::before { content: attr(data-l) " "; color: var(--text-faint); }
++  .notify .cut { display: inline; max-width: none; overflow-wrap: anywhere; }
 +  .cline button { height: 44px; }
-+  .mint > summary { display: flex; align-items: center; min-height: 44px; }
++  .mint > summary { min-height: 44px; padding: 13px 0; }
 +  .mint input, .mint select, .mint form button { width: 100%; max-width: none; height: 44px; }
 +}
 diff --git a/internal/console/static/console.js b/internal/console/static/console.js
-index e8544eeb..e0375b14 100644
+index e8544eeb..cd3ec9ca 100644
 --- a/internal/console/static/console.js
 +++ b/internal/console/static/console.js
-@@ -1733,3 +1733,14 @@ document.addEventListener("keydown", function (e) {
+@@ -1733,3 +1733,23 @@ document.addEventListener("keydown", function (e) {
      if (new URL(a.href, location.href).pathname === path) a.classList.add("open");
    });
  })();
 +// a Copy button copies the text of the element it names, the shown-once
-+// chat token and its line (C43); where the clipboard refuses, it selects
-+// the text for the human's own copy
++// chat token and its line (C43), and says so for 2 s through its live
++// label; where the clipboard refuses, it selects the text for the human's
++// own copy and says that
 +document.addEventListener("click", function (e) {
 +  var b = e.target.closest && e.target.closest("[data-copy]");
 +  if (!b) return;
 +  var el = document.getElementById(b.dataset.copy);
-+  var pick = function () { window.getSelection().selectAllChildren(el); };
++  var say = function (word) {
++    b.textContent = word;
++    clearTimeout(b.copyBack);
++    b.copyBack = setTimeout(function () { b.textContent = "Copy"; }, 2000);
++  };
++  var pick = function () {
++    window.getSelection().selectAllChildren(el);
++    say("Selected");
++  };
 +  if (!navigator.clipboard) return pick();
-+  navigator.clipboard.writeText(el.textContent).then(function () { b.textContent = "Copied"; }, pick);
++  navigator.clipboard.writeText(el.textContent).then(function () { say("Copied"); }, pick);
 +});
 diff --git a/internal/console/templates/notifications.html b/internal/console/templates/notifications.html
-index ce4aae4a..586f049f 100644
+index ce4aae4a..87d1255b 100644
 --- a/internal/console/templates/notifications.html
 +++ b/internal/console/templates/notifications.html
 @@ -2,11 +2,12 @@
@@ -156,9 +168,9 @@ index ce4aae4a..586f049f 100644
 +{{with .Shown}}<section class="notify once" aria-labelledby="shown">
 +<h3 id="shown">Chat token {{.Name}} <span class="once-w">shown once</span></h3>
 +<p class="once-l">Run the line in your terminal. The console keeps neither the line nor the bearer, so copy them now.</p>
-+<div class="cline"><span class="ps" aria-hidden="true">$</span><code id="made-line" class="sel">{{.Line}}</code><button type="button" data-copy="made-line">Copy</button></div>
++<div class="cline"><span class="ps" aria-hidden="true">$</span><code id="made-line" class="sel">{{.Line}}</code><button type="button" aria-live="polite" data-copy="made-line">Copy</button></div>
 +<p class="once-k">bearer, for a script</p>
-+<div class="cline"><code id="made-bearer" class="sel">{{.Bearer}}</code><button type="button" data-copy="made-bearer">Copy</button></div>
++<div class="cline"><code id="made-bearer" class="sel">{{.Bearer}}</code><button type="button" aria-live="polite" data-copy="made-bearer">Copy</button></div>
  </section>{{end}}
  
  {{$csrf := .CSRF}}{{$code := .Code}}{{$tg := ""}}{{range .Links}}{{if eq .Venue "telegram"}}{{$tg = .Address}}{{end}}{{end}}{{$dc := ""}}{{range .Links}}{{if eq .Venue "discord"}}{{$dc = .Address}}{{end}}{{end}}
@@ -174,7 +186,7 @@ index ce4aae4a..586f049f 100644
 -<td>{{.Created.Format "2006-01-02"}}</td>
 -<td>{{if .Expires.Before $now}}<span class="dim">expired</span>{{else}}{{.Expires.Format "2006-01-02"}}{{end}}</td>
 -<td>{{if .LastUsed.IsZero}}<span class="dim">never</span>{{else}}{{.LastUsed.Format "2006-01-02 15:04"}}{{end}}</td>
-+{{range .Tokens}}<tr><th scope="row">{{.Name}}</th><td data-l="project">{{$r := .Repository}}{{$p := $r}}{{range $.Projects}}{{if eq .Repository $r}}{{$p = .Name}}{{end}}{{end}}{{$p}}</td>
++{{range .Tokens}}<tr><th scope="row"><span class="cut" title="{{.Name}}">{{.Name}}</span></th><td data-l="project">{{$r := .Repository}}{{$p := $r}}{{range $.Projects}}{{if eq .Repository $r}}{{$p = .Name}}{{end}}{{end}}<span class="cut" title="{{$r}}">{{$p}}</span></td>
 +<td data-l="created">{{.Created.Format "2006-01-02"}}</td>
 +<td data-l="expires">{{if .Expires.Before $now}}<span class="dim">expired</span>{{else}}{{.Expires.Format "2006-01-02"}}{{end}}</td>
 +<td data-l="last used">{{if .LastUsed.IsZero}}<i class="lamp" aria-hidden="true"></i><span class="dim">never</span>{{else}}<i class="lamp{{if not (.Expires.Before $now)}} on{{end}}" aria-hidden="true"></i>{{.LastUsed.Format "2006-01-02 15:04"}}{{end}}</td>
