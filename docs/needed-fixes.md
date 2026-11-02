@@ -9,7 +9,8 @@ it keeps the record. Renumbered on 2026-11-02 to close the gaps the
 departures left: 12 became 7, 14 became 8, 15 became 9, 16 became 10,
 17 became 11. Renumbered again the same day when fault 4 left: 5 to 15
 became 4 to 14, when fault 2 left: 3 to 14 became 2 to 13, and twice when
-fault 3 left: 4 to 13 became 3 to 12, then 4 to 12 became 3 to 11. Older
+fault 3 left: 4 to 13 became 3 to 12, then 4 to 12 became 3 to 11, and
+when faults 6, 9, 10 and 11 left: 7 and 8 became 6 and 7. Older
 documents cite the numbering of their day, and the old
 numbers 7 to 11, 13 and 18 to 20 in them name faults that have left. Gone
 on 2026-11-01: the criteria-card family (the criteria card's brief, its
@@ -69,14 +70,32 @@ no longer binds or the UTC month turns, or sooner on an answer. A policy load
 wakes every cap wait, and a refusal that the version in force already lifted
 asks nothing. The month alarm files a cap card at each cap it reaches and
 closes the card a raise lifted, and the stop's question says that the card
-resumes on its own and when.
+resumes on its own and when. The missing scripted door into the chat left
+the same day with the chat door build (docs/chat-door-design-2026-11-02.md,
+docs/plans/2026-11-02-chat-door.md). A human makes a chat token for one
+project on their own page in the console, for 7, 30 or 90 days, and revokes
+it there. The token acts as that human in the project's chat, approvals
+included, through the console's /mcp endpoint and its four tools:
+chat_send, chat_read, chat_confirm and chat_threads. The human's own
+Forgejo token stands behind it, sealed, so a merge approval stays a review
+under the approver's own Forgejo name, and every event and chat row the
+token causes names it. Three faults that waited on a roll left when roll
+c78869b went live on 2026-11-02 at 02:19Z. A queue sweep no longer starts
+a half-filed card, and a failed card with a live card waiting on it goes
+back to its plan's planner once (code c78869b2,
+docs/half-filed-card-impasse-2026-11-02.md). A wake turn no longer keeps a
+human's messages unread (code 120a12d9). A listening turn takes a message
+from any place in the line, and a message or wake note that another turn
+read starts no turn. A failed turn puts the rows it read back for one quiet
+retry, and each wake turn runs on its own goroutine, one per project at a
+time.
 
 ## 1. The check-in's policy stop preempts the approval card
 
 Status: plan written, awaiting Sebastian's OK
 (checkin-policy-approval-plan-2026-10-31.md). Found 2026-10-31 on card
-#1347. Verified unbuilt on main 2026-11-01: no change id
-checkin-policy-verification anywhere.
+#1347. Verified unbuilt on main 2026-11-01, and again on code main
+0bbfe484 on 2026-11-02: no change id checkin-policy-verification anywhere.
 
 A supervising agent stops a card with a bare "how should it go on?"
 question one step before the card's own flow would show the proper approval
@@ -90,7 +109,7 @@ open, go to the checks that end in the approval card instead of stopping.
 Status: plan written, awaiting Sebastian's OK
 (docs/plans/2026-11-02-unpayable-sessions.md). Found 2026-10-31 on card
 #1345; four openings burned about €0.53 and filed nothing. Re-verified
-unbuilt on main a0e2803e: the session floor (SessionFunded, every session's
+unbuilt on code main 0bbfe484 (2026-11-02): the session floor (SessionFunded, every session's
 start since 6c579a24 of 2026-10-16) predates the fault and did not stop the
 four openings, and nothing since changes what a grant buys. The dig found
 why: the plan loop opens sessions with no floor at all, and the floor that
@@ -109,12 +128,13 @@ the gateway that the task row's spent amount never recorded.
 
 ## 3. The planner dies on a big spec's read set
 
-Status: code landed (448048b0, 2026-11-02), the tree hand waits. The
+Status: code landed (448048b0, 2026-11-02) and is live since roll c78869b
+(2026-11-02 02:19Z). The tree hand waits on Sebastian. The
 `digest` tool, the planGuide read discipline and the reads finding are on
 code main. No session sees the tool until the policy tree's coder,
 analyzer and planner stanzas list `digest: {}`, a commit on the infra
-side after the roll that carries 448048b0
-(digest-tree-hand-runbook-2026-11-02.md). The fault leaves the list when
+side (digest-tree-hand-runbook-2026-11-02.md). Infra main 2b59f75 does not
+carry it yet. The fault leaves the list when
 the tree lands and a session sees the tool. The compaction-model probe
 found no model key in opencode 1.18.32's compaction block, so
 compaction stays on the session's own model. Plan:
@@ -141,8 +161,9 @@ shape that saved #1383.
 
 ## 4. The chat's answer tool failed twice on plan questions
 
-Status: a fix landed on code main 2026-11-01 (05cd9e12), and whether it was
-this failure is not proven. Found 2026-10-31 on card #1383 at 21:20. The
+Status: a fix landed on code main 2026-11-01 (05cd9e12) and is live since
+roll 280a34a (2026-11-01 13:47Z). Whether it was this failure is not
+proven. Found 2026-10-31 on card #1383 at 21:20. The
 chat worked around it by posting the answers as issue comments, which the
 planner reads.
 
@@ -182,29 +203,11 @@ merge goes to a human, and main's green ends every remedy that did not
 merge. Every done card but a plan, and every closed plan, closes its
 issue, its dependencies on open issues dropped first.
 
-## 6. No scripted door into the chat
-
-Status: plan written, awaiting Sebastian's OK
-(docs/chat-door-design-2026-11-02.md, docs/plans/2026-11-02-chat-door.md).
-Found 2026-10-31: the console's OAuth2 login works
-end to end with curl (PKCE, grant, callback), and the trust gate then 403s
-factory-admin, which is not a writer of the code repository. That is
-correct by design (task 54), but it means no agent, script or CI can file a
-chat turn or read the thread without a writer's session.
-
-Fix direction, by Sebastian's four decisions of 2026-11-02: a chat token
-that a human makes in the console for one project. It acts as that human,
-with all their rights in the chat, approvals included, and every row it
-causes names the token. It reaches the chat only (send, read, Do it),
-through an MCP endpoint on the console. The human's own Forgejo access
-token stands behind it, sealed in factoryd, because a merge approval is a
-review under the approver's own Forgejo name.
-
-## 7. A rename that changes the policy tree cannot land before its roll
+## 6. A rename that changes the policy tree cannot land before its roll
 
 Status: candidate only. The loader still rejects an unknown tool name
-outright (policy.go:267). Found 2026-10-31: the ask tool's rename merged
-into the code main (5a07d16c) and the infra tree (82ab246) while the
+outright (policy.go:279 on code main 0bbfe484). Found 2026-10-31: the ask
+tool's rename merged into the code main (5a07d16c) and the infra tree (82ab246) while the
 running factoryd knew only escalate_to_human, so the tree's tip sat
 unloadable and the roller held the rename's roll on the open plans
 #1344/#1345, whose cards needed the spend the month cap had stopped. A
@@ -214,81 +217,15 @@ Fix direction: the config loader accepts the union of the old and the new
 name across a rename, or the roll that carries a rename commits the tree's
 rename with it, so the tree never names a tool no factoryd knows.
 
-
-## 8. The size gate moves a card's budget with no event
+## 7. The size gate moves a card's budget with no event
 
 Status: candidate only. Found 2026-11-02 while digging fault 2 on card
 #1345: the task's budget read 5.60 EUR after its only fund event (+0.60 at
 00:06) and 7.60 by the evening's end, the +2.00 written by the size gate's
-budget writer (SetTaskSizeBudget, store.go:1358) with no card_funded or
-other event, so the evening's true headroom had to be reconstructed from
+budget writer (SetTaskSizeBudget, store.go:1430 on code main 0bbfe484)
+with no card_funded or other event, so the evening's true headroom had to be reconstructed from
 the ledger. A budget that moves silently leaves no line a person or a dig
 can read.
 
 Fix direction: the size gate's budget move records an event, as the fund
 and raise paths do.
-
-## 9. A queue sweep started a half-filed card
-
-Status: the fix landed on code main 2026-11-02 (c78869b2) and rides the
-next factoryd roll. Found 2026-11-01 at 20:16 on card #1451 (task
-t-3bfcd4cd4e2a): the plan filer writes a card's row queued with no issue,
-files the Forgejo issue, then links it, about a second end to end. The
-heal pass's sweep listed the row inside that window and started it, and
-EnsureIssue, the workflow's first activity, terminal-failed the card for
-having no linked issue. The only such failure the events table holds.
-
-The fix: the queue list skips rows with no issue and the work bound
-declines them without failing, so a half-made card holds no slot until
-its issue is filed and the next sweep starts it. No new status and no
-board column: the card was never shown half made, only started half
-made. EnsureIssue stays as the tripwire for a card that lost its issue
-for good.
-
-## 10. A failed card froze every card that waited on it
-
-Status: the fix landed on code main 2026-11-02 (c78869b2) and rides the
-next factoryd roll; the first sweep after the roll unsticks the live
-board (#1452, #1453, #1454). Found 2026-11-01: a dependency counts as
-met only when its card is done, or ended closed. A failed card is
-neither, so #1452, waiting on the failed #1451, sat queued forever, with
-#1453 behind it and #1454, #1414 and #1441 behind that. Nothing wakes a
-queued dependent, no alert fired, and the retry the dependency code
-waits for is not built.
-
-The fix: when a card fails with a card still live waiting on it, at its
-end and in a sweep each minute, factoryd sends it back to its plan's
-planner through the existing replan, once per card (an "impasse" marker
-on its timeline). The waiting cards of the plan wait on the plan, the
-planner files its next revision, and the dead work is replanned without
-asking first. A plan that can take no replan, closed or mid revert,
-refuses, and the refusal lands as a comment on the failed card's issue
-naming the state and the fitting action.
-
-## 11. A wake turn kept a human's messages unread
-
-Status: the fix landed on code main 2026-11-02 (120a12d9) and rides the
-next factoryd roll. Found 2026-11-02: Sebastian saw the chat stop reading
-new messages while a timer the agent set was due, and the code confirmed
-it.
-
-A wake (a timer, a watched card, an ask or the roadmap pull) stores its
-note queued behind the thread's turn in flight. A message sent after it
-parked behind the wake's place. The turn in flight took a joining message
-only from the head of the line, so it never read that message, and the
-human waited first for the wake turn, then for a turn of their own. Three
-faults sat on the same path:
-
-- A queued message that another turn had already read still started its
-  own model turn, which answered it a second time.
-- A turn that failed after reading joined messages left them marked read,
-  and nothing answered them.
-- The Waker ran each wake turn inside its pass, so a wake turn minutes
-  long held the wakes and timers of every other project.
-
-The fix: a listening turn takes a message from any place in the line.
-Landing a queued row says whether this caller landed it, and a message or
-a wake note that another turn read starts no turn. A failed turn puts the
-rows it read back to the queue, and one quiet retry turn answers them. A
-failed retry starts no further one. Each wake turn runs on its own
-goroutine, one per project at a time.
