@@ -113,9 +113,9 @@ as reason, StartFailed). RunPlan already turns `end.start` into an
 escalation (plan.go:2364), the plan loop counts it as no attempt
 (plan.go:1910, the day-cap first-call pattern; the StartFailed branch at
 plan.go:1933 sets the ask) and escalates the refusal text; the agent loop
-maps the same outcome to its ask (workflow.go:2236). A day-cap refusal keeps
-the automatic day wait: the loops branch on DayCapped, as the agent loop
-does at workflow.go:1865. The agent loop's pre-dispatch check
+maps the same outcome to its ask (workflow.go:2236). A refusal at the day,
+the month or a project's month cap keeps the automatic cap wait: the loops
+branch on CapDecision, as the agent loop does at workflow.go:1865. The agent loop's pre-dispatch check
 (workflow.go:1864) stays; the new guard is its race catcher. The report and
 holdout sessions get the same refusal: a task that cannot pay its report
 says so, and the escalation names the Fund action.
@@ -227,7 +227,7 @@ Hand-derived, the handover's two first:
   card on it (ReadOpening is factory-wide, newest 20 on the alias). The
   refusal names the measure and offers Fund; the alternative is the burned
   opening.
-- The ask swap (B) must not fire on the day cap — the DayCapped branch
+- The ask swap (B) must not fire on a cap — the CapDecision branch
   keeps the automatic wait — and rides a version marker for replay.
 - The enforced left can shock the eye: a card mid-flight shows less left
   than the settled row did. That is the point; the meter and the caps stop

@@ -2018,11 +2018,19 @@ month: the ledger's rows since the 1st, standing lines left out, plus
 every outstanding hold, read under the same advisory lock as the task and
 day headroom. Model calls, paid tools and commissioned servers take the
 smallest of the three headrooms, and a call that finds the month spent is
-refused with `refused_month_cap`. The task then parks: its session ends as
-an escalation, and the card says the cap is reached and that only a human
-raises it, by a commit. factoryd raises a `month_cap` alert once a month at
-50, 80 and 100 percent, and at 100 percent files an issue in the infra
-repository's human lane that links the cap's line in `policy.yaml`. The
+refused with `refused_month_cap`. The task then waits on its card, as it
+does at the day cap. The card says the cap is reached, that a commit raises
+it, and that the card resumes on its own. The wait ends at the first of three
+things: an answer, a check that finds the session floor funded under the cap
+in force, and the turn of the UTC month. The check runs every hour. A policy
+load wakes every waiting card, and its check then runs 30 seconds later, when
+the gateway enforces the new version. Before a card asks, it runs the check
+once: a refusal that a raise already lifted asks nothing. A project's month
+cap waits the same way. factoryd raises a `month_cap` alert once a month at
+50 and 80 percent, and at 100 percent once for each cap the month reaches.
+The 100 percent alert files an issue in the infra repository's human lane
+that links the cap's line in `policy.yaml`. A raise above that issue's cap
+closes it, and so does the end of its month. The
 key is required: a version without it reads 0, which stops all spend, so a
 missing value fails closed. Proven live with a window at 18 EUR against
 September's 18.26: a planted task parked at spend 0 with the card, and the
