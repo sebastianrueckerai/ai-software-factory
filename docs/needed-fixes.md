@@ -150,17 +150,26 @@ watch factoryd uses, or re-read the month line when a refusal would fire.
 
 ## 7. The planner dies on a big spec's read set
 
-Status: the cap relief landed 2026-11-01 on infra main (18e7418:
-limits.context_tokens goes, premium's window pinned at its real 128000).
-The structural fix, phase 2's digest and ask reads, is still unfiled since
-#1383 closed. Found 2026-10-31 on card #1383: three planner sessions in a
-row ended without filing a plan, each after reading 20+ files against the
-98K context max, twice on "opencode serve: context canceled". Six sessions
-ran under a grant of three, then the session cap closed the card, €3.54 of
-€5.00 sunk.
+Status: plan written, awaiting Sebastian's OK
+(planner-read-cut-plan-2026-11-02.md). The cap relief landed 2026-11-01
+on infra main (18e7418: limits.context_tokens goes, premium's window
+pinned at its real 128000), and the judgment the fault now rests on: the
+window is a ceiling, not a cure — the deaths were flow deaths, reads
+feeding compactions feeding the wall clock, and the chat's digest of
+798ea748 never reaches a session. Found 2026-10-31 on card #1383: three
+planner sessions in a row ended without filing a plan, each after
+reading 20+ files against the 98K context max, twice on "opencode
+serve: context canceled". Six sessions ran under a grant of three, then
+the session cap closed the card, €3.54 of €5.00 sunk.
 
-Fix direction: file phase 2, the digest and the ask reads. Until it lands,
-a big card needs a trimmed read set, the cheap rung, or the spec-on-card
+Fix direction: the session-side cut — a `digest(path, ask)` tool on the
+factory-tools menu (one Small call through the chat's Digest wrapper,
+the answer bounded, the file's bytes never enter the premium context;
+its listing in the policy tree's three class stanzas is a human hand on
+the infra side, code rolled first), the planGuide read discipline that
+maps before reading and digests the big files, and the readsFinding
+pointing the retry at digests instead of re-reads. Until it lands, a
+big card needs a trimmed read set, the cheap rung, or the spec-on-card
 shape that saved #1383.
 
 ## 8. The chat's answer tool failed twice on plan questions
