@@ -88,7 +88,7 @@ unbuilt on main a0e2803e: the session floor (SessionFunded, every session's
 start since 6c579a24 of 2026-10-16) predates the fault and did not stop the
 four openings, and nothing since changes what a grant buys. The dig found
 why: the plan loop opens sessions with no floor at all, and the floor that
-ran read figures the gateway's holds and the frozen month cap had already
+ran read figures the gateway's holds had already
 spent — the plan puts the floor at every opening and the enforced task
 money on every surface.
 
@@ -135,23 +135,30 @@ money must be named on the approval card and must hold the merge; and the
 plan close must tell an empty verdict table (a plumbing failure, ask again
 or re-run the review) from verdict rows that say unmet (a real gap).
 
-## 6. A raised month cap takes effect only on a roll, which the spent cap blocks
+## 6. A raised month cap does not end a card's month-cap wait
 
-Status: plan wanted. Found 2026-11-01 on the gateway of the live cluster.
-Re-verified unbuilt on main a0e2803e: the gateway's per-call holds read
-policy on a 30-second TTL (currentPolicy, since be62e0ac of 2026-09-28),
-but the refusal that night came from LiteLLM's proxy-wide max_budget
-(server.go:1026 maps its 429 to refused_month_cap), a value no gateway
-re-read reaches; only a restart moved it.
+Status: plan written, awaiting Sebastian's OK
+(docs/plans/2026-11-02-cap-waits-resume.md). Found 2026-11-01. Verified
+unbuilt on main 21ee41a2: CapRefusal.until (monthcap.go:48) still gives a
+month's cap no end of its own.
 
-The cap raise to €600 landed in policy version 974 at 23:35 and factoryd's
-own loader activated it within seconds, but the enforcing gateway kept
-refusing calls against the €544 of version 971 it loaded at boot. Only a
-pod restart applies it, and a restart comes only with a roll, and the roll
-is held while a plan is open on main, and the plan's cards need the money
-the raise would free. The loop closes only through the six-hour production
-hold ask. Fix direction: the enforcing gateway must follow the same policy
-watch factoryd uses, or re-read the month line when a refusal would fire.
+The enforcement moved with the raise. The gateway refused 20 calls with
+refused_month_cap from 23:19 to 23:31 on 2026-10-31, all from its own hold
+under policy version 971 (month_eur 544). Version 972 (month_eur 600)
+activated at 23:31:02, and from 23:32 every call was allowed. LiteLLM's
+proxy-wide max_budget played no part: it last refused a call on
+2026-10-15. An earlier text of this entry blamed a gateway or proxy that
+kept the old cap until a restart. The audit rows show neither.
+
+The cards did not move. A month-cap stop waits for an answer only, while a
+day-cap stop resumes on its own. #1352 asked "Raise the cap to let it
+finish?" at 23:22 and waited until the chat agent answered at 00:11, 40
+minutes after the raise. #1353's session ended at 23:51, after the raise,
+and factoryd still asked to raise the cap, from a refusal of 23:28. The
+question itself says "This card resumes once the cap moves", which the
+workflow does not do. Fix direction: a month or project cap wait ends on its
+own when the cap no longer binds or the UTC month turns, a policy load
+wakes it, and no stop asks about a cap that no longer binds.
 
 ## 7. The planner dies on a big spec's read set
 

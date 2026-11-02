@@ -73,11 +73,11 @@ Four gaps, each verified on main:
    floor with the premium alias (all 26 sessions premium, so the row's
    model_alias was never empty) and a need of at least the frontier floor,
    0.60 EUR in the policy of that night. It passed because its free read was
-   richer than the enforcer's: fault 6's frozen month cap had the gateway
-   enforcing version 971's €544 while the floor read the current version,
-   and gap 3's in-flight money kept the row's figures high. The sessions then
-   died on the gateway's refusals. Fault 6's fix removes the skew; this plan
-   closes the coverage and the figures.
+   richer than the enforcer's: gap 3's in-flight money kept the row's
+   figures high. The month cap played no part: the gateway and the floor
+   both read month_eur 544, and the card's refusal at 19:17 was
+   refused_budget with €53.30 of the month free. The sessions then died on
+   the gateway's refusals. This plan closes the coverage and the figures.
 
 ## The fix
 
@@ -212,8 +212,6 @@ Hand-derived, the handover's two first:
 
 ## Out of scope
 
-- Fault 6's frozen month cap — its own register entry; its fix removes the
-  policy skew that let a passed floor die on a 402.
 - The sweep's conservative booking (an expired hold books in full; the
   finish settle trues it down). Conservative direction, by design.
 - The event-less budget write: the size gate moved this card's budget 5.60
