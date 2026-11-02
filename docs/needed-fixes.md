@@ -246,7 +246,7 @@ can read.
 Fix direction: the size gate's budget move records an event, as the fund
 and raise paths do.
 
-## 12. A queue sweep started a half-filed card
+## 13. A queue sweep started a half-filed card
 
 Status: the fix landed on code main 2026-11-02 (c78869b2) and rides the
 next factoryd roll. Found 2026-11-01 at 20:16 on card #1451 (task
@@ -263,7 +263,7 @@ board column: the card was never shown half made, only started half
 made. EnsureIssue stays as the tripwire for a card that lost its issue
 for good.
 
-## 13. A failed card froze every card that waited on it
+## 14. A failed card froze every card that waited on it
 
 Status: the fix landed on code main 2026-11-02 (c78869b2) and rides the
 next factoryd roll; the first sweep after the roll unsticks the live
@@ -282,3 +282,31 @@ planner files its next revision, and the dead work is replanned without
 asking first. A plan that can take no replan, closed or mid revert,
 refuses, and the refusal lands as a comment on the failed card's issue
 naming the state and the fitting action.
+
+## 15. A wake turn kept a human's messages unread
+
+Status: the fix landed on code main 2026-11-02 (120a12d9) and rides the
+next factoryd roll. Found 2026-11-02: Sebastian saw the chat stop reading
+new messages while a timer the agent set was due, and the code confirmed
+it.
+
+A wake (a timer, a watched card, an ask or the roadmap pull) stores its
+note queued behind the thread's turn in flight. A message sent after it
+parked behind the wake's place. The turn in flight took a joining message
+only from the head of the line, so it never read that message, and the
+human waited first for the wake turn, then for a turn of their own. Three
+faults sat on the same path:
+
+- A queued message that another turn had already read still started its
+  own model turn, which answered it a second time.
+- A turn that failed after reading joined messages left them marked read,
+  and nothing answered them.
+- The Waker ran each wake turn inside its pass, so a wake turn minutes
+  long held the wakes and timers of every other project.
+
+The fix: a listening turn takes a message from any place in the line.
+Landing a queued row says whether this caller landed it, and a message or
+a wake note that another turn read starts no turn. A failed turn puts the
+rows it read back to the queue, and one quiet retry turn answers them. A
+failed retry starts no further one. Each wake turn runs on its own
+goroutine, one per project at a time.
