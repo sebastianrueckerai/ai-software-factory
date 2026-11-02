@@ -8,7 +8,7 @@ The facts come from the card-flow map of 2026-11-02 ([card-flow-2026-11-02/READM
 
 The factory splits work into cards a cheap model can finish, lets stronger models translate intent into plans, and runs each card through sessions, gates and a merge. When a card stops going smoothly, a ladder of steps takes over. Today that ladder has two faults the live run showed on every night: the step that stops a card is usually a deterministic guard that asks a human before any AI looked, and each step up the ladder throws away what the step below knew. The human then reads "the card has spent €x of its €y share, may it go on?" about a card whose real state is "the review refused twice for the same four concerns, and a main sync broke the compile".
 
-The target: one record per problem that every step appends to and nothing strips, a ladder ordered by how much each step can see and do, a mechanical sweep that gives every wait a clock, a tool that shows a card's whole life in a few lines, and a human face that carries the whole chain as one decision with premade options. The guiding thought at every rung is the same: get the needed work done and unblock the board. Ending a failing card is a last option, because it moves the problem onto the cards behind it.
+The target: one record per problem that every step appends to and nothing strips, a ladder ordered by how much each step can see and do, a mechanical sweep that gives every wait the AI owns a clock, a tool that shows a card's whole life in a few lines, and a human face that carries the whole chain as one decision with premade options. The guiding thought at every rung is the same: get the needed work done and unblock the board. Ending a failing card is a last option, because it moves the problem onto the cards behind it.
 
 ## 2. Where we are today
 
@@ -43,10 +43,11 @@ Goals:
 1. No problem reaches a human before AI judged it with the full picture, except the kinds a human alone can decide: direction, a policy class, access the factory lacks, money beyond the pool.
 2. A problem gains context as it climbs. Every step's reads, findings and actions stay on the record and reach the next step and the human.
 3. Every rung has every action the problem can need, bounded by policy, with the autonomy level deciding act or propose.
-4. Every wait has a clock. Nothing waits silent and nothing holds a resource while it waits for a person.
-5. A human gets one decision at a time: a headline that names the problem, a summary of the case, the background in plain words, premade options with their effects, a recommendation with its source.
+4. Every wait the AI owns has a clock. Nothing the AI owns waits silent, and nothing holds a resource while it waits for a person.
+5. A human gets one decision at a time per card: a headline that names the problem, a summary of the case, the background in plain words for a reader who dropped in cold, the trade-offs of each option, a recommendation with its grounds.
 6. Everything that can be decided mechanically is decided in code, with no model call.
 7. Every action a human can take on the board, the factory can take through the product, so no fix needs SQL, a script or a hand commit.
+8. Funding is mechanical. Every grant and every raise draws from a preallocated pool, travels as a typed call, never as parsed text, and can ride beside any other action on a card.
 
 Non-goals:
 
@@ -56,7 +57,7 @@ Non-goals:
 
 Anti-goals, which would make this a failure even if it worked:
 
-- A rung that resolves a problem by ending the card. "Close" is an option the human sees, never a rung's default.
+- A rung that resolves a problem by ending the card with nothing in its place. Ending a card is fine when the rung replaces it: a successor in a new form, a child sent back to its planner, a plan cancelled and restarted in a shape that can succeed (Sebastian, 2026-11-02). "Close" with nothing in its place is an option the human sees, never a rung's default.
 - A longer prompt for any agent. Every guarantee here is a record, a rule, a tool or a clock.
 - A monitor that runs a model every minute. The sweep is mechanical, and a model runs only on a case.
 - A human face that grows a sixth part. The five parts of the question format stay, filled from the case.
@@ -74,7 +75,7 @@ flowchart TD
   r2 -->|"resolved, or acted at full auto"| act2["action recorded, card moves"]
   r2 -->|"the human's by nature, or beyond the pool"| r3["rung 3: the human.<br/>One decision, five parts rendered from the whole chain"]
   r3 --> act3["the answer runs as a typed action"]
-  mon["monitor, every minute, mechanical:<br/>flags from every live card's digest, clocks on every wait"] -.-> case
+  mon["monitor, mechanical: on every board event,<br/>a minute sweep as the fallback.<br/>Flags from every live card's digest,<br/>clocks on every wait no event ends"] -.-> case
   classDef human fill:#fde7c8,stroke:#d9822b,color:#000
   class r3 human
 ```
@@ -112,13 +113,15 @@ The ladder is one function in code that every trip calls. No stop calls `awaitHu
 | Rung | Who | Sees | May do | Runs when |
 |---|---|---|---|---|
 | 0 | code | the case facts | the resolver table of 5.5 | always, first |
-| 1 | the check-in, big alias | the card's digest, the plan and the sibling cards, the repository, the gates, the transcripts | the card actions within the card's allowance (5.5) | the case kind is not on the human-only list and rung 0 did not resolve it |
-| 2 | the factory agent, premium | the board digest, every card's digest, the plan, the pool, the queue, the slots | every board action, bounded by the autonomy level and the pool | rung 1 handed up, or the case kind is board-level, or a clock expired on a case at the human |
+| 1 | the check-in, big alias | the card's digest, the plan and the sibling cards, the repository, the gates, the transcripts | the card actions, every extension and grant drawn from the escalation pool within the per-card draw bound (5.5) | the case kind is not on the human-only list and rung 0 did not resolve it |
+| 2 | the factory agent, premium | the board digest, every card's digest, the plan, the pool, the queue, the slots | every board action, bounded by the autonomy level and the pool | rung 1 handed up, or the case kind is board-level |
 | 3 | the human | the whole case | every action, and the ones the human alone holds | rung 2 handed up, or the autonomy level makes rung 2 propose |
 
-What each rung receives is built by code from the case: a problem statement from the kind's template, the facts, the digest skeleton, and the earlier steps. Depth comes by tool. Each rung answers in structured form: a decision from the typed action set, a `reason_kind` from a closed enum, findings verdicts by id with evidence, a handover note, a recommendation with grounds. No free text where a model chooses (incident pattern P9).
+What each rung receives is built by code from the case: a problem statement from the kind's template, the facts, the digest skeleton, and the earlier steps. Depth comes by tool. Each rung answers in structured form: a decision from the typed action set, a `reason_kind` from a closed enum, findings verdicts by id with evidence, a handover note, a recommendation with grounds, an optional funding draw. The answer is a forced tool call against a JSON schema whose choice fields are enums, and code validates it before anything runs. No free text where a model chooses (incident pattern P9). A library that makes such answers type-safe at the call is a later step, named in section 9.
 
-The human-only kinds skip rungs 1 and 2 for the decision but not for the analysis: a plan confirmation, a policy class the merge gate marks human, access the factory lacks, a goal conflict the check-in names, money beyond the pool. Rung 2 still runs on them once and attaches its analysis and its recommended option, so the human never reads a bare template. This keeps the decision of 2026-10-17 (every ask gets one model attempt) and extends it to every autonomy level, which section 8 asks.
+The human-only kinds skip rungs 1 and 2 for the decision but not for the analysis: a plan confirmation, a policy class the merge gate marks human, access the factory lacks, a goal conflict the check-in names, money beyond the pool. Rung 2 still runs on them once and attaches its analysis and its recommended option, so the human never reads a bare template.
+
+Whether the rungs run below full auto is one policy field per project, `judgment`, with the values `always` and `autonomous_and_above`. The default is `always`, my call for projects below full auto, which Sebastian does not run (his decision of 2026-11-02: configurable and easy to change, and my call for the rest). This replaces the rule of 2026-10-17 that the ask attempt runs only at autonomous and full auto.
 
 A rung's step ends in one of three ways: resolved (an action ran and the card moved), handed up (with its findings and its recommended action), or withdrawn (the card moved on and the case is moot). "Ask the same question again" is not an ending. A rung that cannot resolve and has nothing new to add hands up with "no new facts", and the record shows it.
 
@@ -146,15 +149,15 @@ Loops fold: consecutive steps with the same kind, outcome and finding set collap
 
 The digest is the one context every rung starts from. The check-in's statement includes the card's digest. The factory agent's wake includes the board digest and the case's card digest. The human's background part is the digest in prose. The chat's `card` tool returns it, so "is something wrong with #1410" is one tool call. A later live monitor reads the same flags, so the digest is built once and read by four consumers.
 
-### 5.4 The monitor: every wait has a clock
+### 5.4 The monitor: every wait the AI owns has a clock
 
-A sweep of its own, every minute, on its own goroutine with a watchdog that alarms when a pass runs past its bound (S26 ends here: the heal pass, the stale sweep, the criteria pass and the impasse pass each get their own goroutine too). The sweep computes the flags of every live card from its digest. A flag that is new for its card and state key opens a case of kind `monitor flag` with the flag's name. The case runs the ladder. No model runs in the sweep.
+The monitor is driven by board events first and by a clock second (Sebastian, 2026-11-02). It reads the event stream behind a cursor, as the waker and the poker do. Every event on a card (a status move, a session end, a gate result, a `dep_ended`, a funding event, an answer, a policy load) recomputes that card's flags and moves its open cases at once, so a case never waits a minute for a fact that already landed. A minute sweep on its own goroutine, with a watchdog that alarms when a pass runs past its bound, is the fallback for the waits no event ends: a queued card nothing frees, a provider backoff, a run that neither moves nor answers, a rung that did not answer (S26 ends here: the heal pass, the stale sweep, the criteria pass and the impasse pass each get their own goroutine too). A flag that is new for its card and state key opens a case of kind `monitor flag` with the flag's name. The case runs the ladder. No model runs in the monitor.
 
 The flags, each a few lines of code:
 
 | Flag | Fires when |
 |---|---|
-| `wait_over_bound` | a wait of any kind passed its bound in policy. Human waits get three bounds: reminder, re-read by rung 2, and escalation to the notify list or the project owner. |
+| `wait_over_bound` | a wait the AI owns passed its bound in policy: a queued card, a dependency wait, a gate, a merge retry, a provider backoff, a run that neither moves nor answers, a rung that did not answer. A wait at the human has no clock for now (Sebastian, 2026-11-02). |
 | `answer_changed_nothing` | a human answer on a case was followed by a trip on the same state key |
 | `grant_bought_nothing` | a grant or a fund was followed by a session that ended without a push or a new commit |
 | `finding_confirmed_twice` | the same finding id was confirmed by two check-ins |
@@ -168,7 +171,7 @@ The flags, each a few lines of code:
 | `issue_open_after_end` | a card ended and its issue, alerts or cases stay open |
 | `budget_moved_no_event` | a task's budget differs from the sum of its funding events |
 
-The clocks replace the stale sweep's blind spots. The stale sweep looked at three statuses and never at a live wait. The monitor looks at every live card and reads the wait's bound from policy. A wait that passes its reminder bound re-pokes the inbox. A wait that passes its re-read bound wakes rung 2 on the case with the digest, which may act within its level or re-ask with what changed. A wait that passes its escalation bound pokes the notify list, or the project owner when the list is empty (S2's "nobody is told" ends).
+The clocks replace the stale sweep's blind spots. The stale sweep looked at three statuses and never at a live wait. The monitor looks at every live card and reads each wait's bound from policy. A wait that passes its bound opens a case at the rung above the wait's owner with the wait's facts, so the AI misses nothing that stalls on its side. A wait at the human gets no reminder, no re-read and no second addressee for now: Sebastian decided on 2026-11-02 that the orange cards are hard to miss when he is there and must not page him when he is away. The three human bounds (reminder, re-read by rung 2, escalation to the notify list) are a later step, and the construction takes them as three more rows in the bounds table.
 
 ### 5.5 Actions: what each rung may do
 
@@ -182,10 +185,11 @@ The action set is one list in code. Every action is a function that code runs, w
 | re-verify the head, no session | yes, when the review approved the head | yes | yes | yes | built as a branch |
 | route to the approval card | yes, when a pull request is open and the matter is a policy class | yes | yes | no | planned (fault 1) |
 | confirm, drop or remark a finding, with evidence | no | yes | yes | yes (Overrule with a reason) | built for rung 1, S18 for the human |
-| extend: sessions, agent time, lines, within the card's allowance | yes, when the head is one green check from merge | yes | yes | yes | console only, 11-02 |
-| extend beyond the allowance, within the pool | no | no | yes | yes | no |
-| fund within the pool and `raise_max_eur` | no | no | yes | yes | chat tool, bounded |
-| fund beyond the pool | no | no | no | yes | yes |
+| extend: sessions, agent time, lines, drawn from the escalation pool within the per-card draw bound | yes, when the head is one green check from merge | yes | yes | yes | console only, 11-02 |
+| extend past the per-card draw bound, within the pool | no | no | yes | yes | no |
+| fund from the pool, within the card's ceiling | no | yes, within the per-card draw bound | yes | yes | chat tool, bounded |
+| raise a card's ceiling, drawn from the pool | no | no | yes | yes | no |
+| fund or raise past the pool | no | no | no | yes | yes |
 | successor from main's tip | yes, on a push over the line bound | yes | yes | yes | built |
 | retry a failed card, any kind | yes, once, on a failed dependency | yes | yes | yes | plan cards only (S6) |
 | remove or set a dependency edge | no | no | yes | yes | console and chat |
@@ -193,12 +197,13 @@ The action set is one list in code. Every action is a function that code runs, w
 | replan a child or a card | yes, when the check-in cut it | yes, hand to the planner | yes | yes | built |
 | re-run checks | yes, once per red head | yes | yes | yes | factory pull requests only |
 | approve a merge within the merge rule | no | no | yes | yes | built |
-| close, end the card | no | no | yes, proposes below full auto | yes | built |
+| replace: end the card and file it anew in a new form, or cancel a plan and restart it in a new shape | no | yes, as a replan to the planner | yes | yes | replan and successor built, the plan restart new |
+| close, end the card with nothing in its place | no | no | yes, proposes below full auto | yes | built |
 | withdraw a case the card outgrew | yes | yes | yes | no | `WithdrawQuestion` |
 | file a card for a root cause outside this card | no | no | yes | yes | chat `new_card` |
 | raise a cap, change policy | no | no | no | yes, by commit | yes |
 
-The card's allowance, new in policy, is what rungs 0 and 1 may add on their own over the card's whole life, not per case: two sessions, half of the agent time, lines up to the size's bound, within the card's budget. Rung 2's bound is the pool and `raise_max_eur` as decided on 2026-10-20. Section 8 asks whether rung 1 gets an allowance at all.
+Every extension and every grant any rung makes draws from the escalation pool of 5.7, a preallocated amount per project and month in policy with three parts: sessions, agent time and money. Rung 0 and rung 1 draw up to a per-card draw bound, also in policy, over the card's whole life, not per case. Rung 2 draws up to the pool. Nothing below the human extends or funds outside the pool (Sebastian, 2026-11-02: every extension and grant comes from a preallocated pool, never blank). When the per-card defaults turn out to open too many cases, the cure is a higher default per size, measured by the cases-per-card figure of section 7, not a looser pool.
 
 Two rules live in the action functions, not in any prompt, and hold for every rung and the human's buttons:
 
@@ -225,32 +230,42 @@ Rung 0 is a table keyed by case kind and facts. Each row is one rule that needs 
 | a trip on a card whose state moved past the case | withdraw |
 | a resumed card whose head moved | adopt the head (built) |
 | a finished pod after a roll | read its log from the consumed line and take its result (decided 2026-11-02) |
-| a wait past its reminder bound | poke again with the digest |
-| a wait past its re-read bound | wake rung 2 on the case |
-| a wait past its escalation bound | poke the notify list, or the project owner |
+| a wait the AI owns past its bound | a case at the rung above the wait's owner, with the wait's facts and the digest |
 | a review refused for money or a provider | hold the merge, mark the review not run, re-run it when money returns (built in part, 11-02) |
 | a card ended with its issue, alerts or cases open | close them (built on main for issues) |
 | an approval wait or a dependency wait | free the work slot and leave the merge queue (S1, S15). The card re-takes a slot when it resumes, over the bound as parked cards do today. An approved card re-enters the queue at its head, merges main into its branch again and runs the checks again, as a head change does today. Merge order inside a plan's group is unchanged, because a group's cards wait on their dependencies, not on the queue. |
 
-### 5.7 Money never replaces the problem
+### 5.7 Funding is mechanical and stands beside every decision
 
-A case has one problem and may have one money sub-ask. The board shows the problem as the headline. The money sub-ask renders under it with its own button. A press on the money button funds and delivers the answer in one step, or the button does not exist (incident I3: a press labelled with money that moved no money). A case whose only matter is money (a card at its budget with a green head and no findings) says what the money buys in the problem line: "#1410 is one green check from merge and 0.49 EUR short of its last session".
+A case has one problem and may carry one money fact: the amount the next step needs and what it buys. The board shows the problem as the headline, never the money, and the money fact renders under it. A case whose only matter is money (a card at its budget with a green head and no findings) says what the money buys in the problem line: "#1410 is one green check from merge and 0.49 EUR short of its last session".
 
-Rung 2 pays within the pool and `raise_max_eur`. Below those bounds no human reads a money ask. A refused model call anywhere (review, check-in, planner) is a case of its own kind, not a silent skip, and a card whose review was refused cannot merge until the review ran (incident I13).
+Funding is never a decision parsed from text. It is one typed call, `fund`, with an amount and a target, and it may ride beside any other action. A case resolution has three parts, sent together as one typed record: the decision action with its arguments, an optional funding draw, and an optional note. A human answers a question and raises the card's money in one send. Rung 2 fixes a dependency edge, hands the card a note and funds its next session in one step. Rung 1 hands over with a note and draws one session from the pool. The face holds one fund control beside the decision buttons, not a field per kind, and one send applies all three parts (incident I3, a press labelled with money that moved no money, cannot happen: the label is the call).
+
+The money has one hierarchy of preallocated maxima, each in policy, each a hard bound on everything below it:
+
+| Level | Bound | Who raises it |
+|---|---|---|
+| the factory's month cap | the whole factory | a human, by commit |
+| a project's month cap | one project | a human, by commit |
+| the escalation pool | the extensions and grants of all rungs in a project per month: sessions, agent time, money | a human, by commit. It replaces the discretionary pool and `raise_max_eur` of 2026-10-20. |
+| the per-card draw bound | what rungs 0 and 1 may draw for one card over its life | a human, by commit |
+| a card's ceiling | the most one card may cost, by size | rung 2 or a human for one card, and the raise draws from the pool |
+
+The last row is what makes a per-card figure safe to pick: 7 EUR or 8 EUR per card is arbitrary, so a rung or a human may raise one card's ceiling where the work needs it, and because the raise draws from the pool, the project's month stays bounded (Sebastian, 2026-11-02: fund what makes sense, always within preallocated maxima, with a way to raise a limit in one place without losing cost control across all cards). A refused model call anywhere (review, check-in, planner) is a case of its own kind, not a silent skip, and a card whose review was refused cannot merge until the review ran (incident I13).
 
 Judgment and work have separate budgets. The card's budget pays sessions and gates. Rung 1 and rung 2 model calls are paid from the project's monthly judgment budget, which is the chat's monthly task today with its cap raised to cover the check-ins. The check-in share of 10 percent per card goes, and with it the guard that stops a card for its own check-in money (S21). What bounds a rung instead: the call cap of 20 and the time bound of 5 minutes per conversation, both built, and a per-card count of rung 1 runs from policy, six by default. A judgment budget that is spent opens one factory-level money case for the human, and until it is funded every case goes to the human with its facts and its digest and no model step, marked "not judged, judgment budget spent". That is the one path where a human reads an unjudged case, and the face says so.
 
-### 5.8 The human face: one decision at a time
+### 5.8 The human face: one decision at a time, per card
 
-The Needs you column becomes a queue of decisions, one open case per row, ordered by how many cards each unblocks (the number of dependents and queue positions behind it), then by age. The human sees one case at a time in the login-screen style the needs-you analysis asked for: the case, a count of the rest, arrows to move. Each case renders the five parts from its record:
+Each Needs you card shows one open case at a time, as a carousel: the case, a count of the card's other open cases, arrows to move between them (Sebastian, 2026-11-02). The column keeps one row per card, so the board's overview stays. The reader is someone who dropped in on a project they forgot about and does not remember how the factory works inside, so every part is written for that reader. Each case renders the five parts from its record:
 
 1. **The ask.** The problem line with the numbers. Never the money unless money is the only matter.
 2. **Why.** The kind's template filled from the facts, then the last rung's finding in one or two sentences.
-3. **What you need for the call.** The digest in prose: what the card did, what each rung found and tried, the state of the work, what each option does, the time of the last processed answer.
-4. **Recommendation.** Rung 2's recommended action with its grounds and its name as the source. Empty when no rung had grounds.
-5. **Premade answers.** One button per action the human may take on this case, each with its effect in one line, the recommended one first. Free text stays open and goes to rung 2 as an instruction, not to the issue as a comment.
+3. **What you need for the call.** The digest in prose, in plain words: what the card set out to do, what it did, what each rung found and tried, the state of the work now, and the trade-off of each option: what it costs, what it risks, what it unblocks. The time of the last processed answer.
+4. **Recommendation.** Rung 2's recommended action, its grounds in plain words, and its name as the source. Empty when no rung had grounds.
+5. **Premade answers.** One button per action the human may take on this case, each with its effect in one line, the recommended one first. Beside them the one fund control of 5.7 and a note box. One send applies the decision, the draw and the note together. Free text in the note goes with the typed decision, never as the decision.
 
-The brief writer agent, which today writes a brief per card in Needs you, reads the case and writes the prose of part 3 for a reader who has no knowledge of the factory. The five-part contract of 2026-10-17 stands unchanged. The card separation on the face is a design round of its own, as the needs-you analysis recorded.
+The brief writer agent, which today writes a brief per card in Needs you, reads the case and writes the prose of parts 3 and 4 for that reader. The five-part contract of 2026-10-17 stands unchanged. The card separation on the face is a design round of its own, as the needs-you analysis recorded.
 
 ### 5.9 Full auto takes the first shot
 
@@ -282,7 +297,7 @@ A workflow started before a fix rolled keeps its code by design (S35). The case 
 
 The case is a Postgres record driven by factoryd code outside the workflow. The workflow stays the driver of the card's own run: sessions, gates, the merge. At every point where it calls `awaitHuman` or `awaitApproval` today, it calls `awaitCase` under a version gate: it opens the case through the ladder function and waits for one signal, `case_resolved`, which carries the action and its arguments. The ladder, the rungs and the clocks run outside the run, so a case moves while the run sleeps and survives a run that cannot replay.
 
-The case's waits are rows, not Temporal timers: each open case has a `next_wake_at` and the rung that owns the next move. The monitor sweep reads the due rows every minute, runs rung 0 in place, and starts rung 1 as an activity on the card's queue or rung 2 as a wake turn with the case id as the wake key. A step row is marked in progress while a rung works and carries its bound, so a rung that dies leaves a step the sweep expires and hands up with "the rung did not answer".
+The case's waits are rows, not Temporal timers: each open case names the rung that owns the next move, the events that end its wait, and a `next_wake_at` as the fallback for a wait no event ends. An event on the case's card moves it through the monitor's cursor at once. The minute sweep reads the due rows. Either path runs rung 0 in place, and starts rung 1 as an activity on the card's queue or rung 2 as a wake turn with the case id as the wake key. A step row is marked in progress while a rung works and carries its bound, so a rung that dies leaves a step the sweep expires and hands up with "the rung did not answer".
 
 Actions reach their target by two paths. An action on the case's own card goes to the run as the `case_resolved` signal or, while the run works, as a column the run reads at its loop top and after every wait, which is how the 2026-11-02 raises already reach a running card. An action on another card or on the board runs as the factoryd function the console's buttons call today. Both paths record the action as a step on the case and an event on the card.
 
@@ -304,39 +319,49 @@ The 20 incidents and the 39 stuck points become replay fixtures, as the ladder r
 
 The metrics page gains four figures from the case records: cases per card, the share resolved at each rung, the median time a case waits at the human, and the money spent on sessions after a case opened against the money the case's resolution cost. The validation brief of 2026-10-17 ([escalation-ladder-validation-2026-10-17.md](escalation-ladder-validation-2026-10-17.md)) runs again after the first live batch on the new ladder.
 
-## 8. Decisions for Sebastian
+## 8. Decisions (Sebastian, 2026-11-02)
 
-Each decision changes what gets built. The recommendation comes first in each.
+The six questions of the first draft, answered, and the four points he added. Each names where the document carries it.
 
-1. **The AI rungs at every autonomy level.** Recommended: rungs 0 to 2 run on every case at every level, and the level decides whether rung 2 acts or proposes. Today the ask attempt runs only at autonomous and full auto (decision of 2026-10-17), so a human at assisted reads a bare template. The cost is one premium turn per case at every level, from the chat's monthly budget. The alternative keeps the 2026-10-17 rule and leaves assisted and manual projects without analysis.
+| Decision | Where |
+|---|---|
+| The AI rungs below full auto: he runs full auto only. The switch is a policy field, easy to change, and the default below full auto is my call: `always`. | 5.2 |
+| The check-in may extend a card, but every extension and grant draws from a preallocated pool. No blank allowance. When today's per-card figures open too many cases, raise the per-card defaults, in addition to the pool. | 5.5, 5.7 |
+| Money for every rung: fund what makes sense, always within preallocated maxima. A per-card figure is arbitrary (7 or 8 EUR), so one card's ceiling can be raised in place, and the raise draws from the pool, so cost control across all cards stands. | 5.7 |
+| No clocks on a wait at the human for now. He does not want to be paged when away, and the orange cards are hard to miss when he is there. Clocks and alarms for the AI are fine where needed, but where a board event can trigger the next step, the event comes first and the clock is the fallback. | 5.4, 5.6, 5.12 |
+| One decision at a time per card, as a carousel. Each with the context a reader needs who dropped in cold and does not remember how the factory works, focused on the trade-offs, with an explained recommendation. | 5.8 |
+| Funding is its own mechanical thing: a typed call, never parsed from text, allowed beside any other action. A human or an agent answers, adds a note and raises the money in one send. | 5.7, 5.8 |
+| Where a model chooses between A, B and C, a typed-output library that gives type safety at the call is worth a look, as a later step. He named needle and Jev as candidates. | 5.2, 9 |
+| A rung may end a card when it replaces it: a plan cancelled and restarted when its shape cannot succeed, a card killed and filed anew in a new form. Only an end with nothing in its place stays the human's. | 3, 5.5 |
 
-2. **Rung 1's allowance.** Recommended: the check-in may extend a card on its own within a per-card allowance from policy (one session, a quarter of the agent time, lines to the size bound, inside the card's budget), and may re-verify, route to approval, hand over, retry and close into a successor. Everything else goes to rung 2. The alternative is the "hard" version Sebastian leaned to on 2026-11-01: the check-in attaches findings only and never holds a control-flow action, and rung 2 takes every action. The hard version costs one premium turn on every case that needs any action and makes rung 1 a reader. The recommended version keeps rung 1 cheap and bounded by numbers, not by its prompt.
+Open:
 
-3. **Rung 2's money.** Recommended: keep the pool and `raise_max_eur` as the bounds of 2026-10-20, and add one rule: when the head is green and the last review approved it, rung 2 may fund the one session that finishes the card up to `task_max_eur`, recorded as a funding event with the grounds. Without it, a card one green check from merge still asks a human for 0.49 EUR. The alternative keeps every raise above `raise_max_eur` with the human. A second, open since 2026-10-20 and 2026-11-01: should full auto merge migrations? This document leaves the risk-class table as it is and asks.
-
-4. **The clocks.** Recommended bounds for a wait at the human: a reminder at 4 hours, a re-read by rung 2 at 24 hours, escalation to the notify list at 48 hours, and the project owner when the list is empty. For a queued card: a reason at once and a case at 24 hours. For a dependency wait: a case at once on a failed dependency. All in policy. The numbers change nothing in the construction, so a different set is a config change.
-
-5. **One decision at a time, across the column.** Recommended: Needs you becomes one queue of decisions over all cards, ordered by what each unblocks. The alternative is one case at a time per card with every card still shown. The column-wide queue means a human with twelve open cases sees one and a count, and may lose the overview the board gave. The board's other columns stay as they are, so the overview is one click away.
-
-6. **The scope of the first build.** Recommended: one plan in five phases (section 9), built in order, each phase live before the next. The alternative builds phases 1 and 2 and waits for a live batch before 3 to 5. The risk of the full plan is three weeks without a live check. The risk of the half plan is that rung 1 and 2 stay as they are while the case record already exists, and the human still reads what they read today for those weeks.
+- The scope of the first build. My recommendation stands: one plan in five phases (section 9), each live before the next. The alternative builds phases 1 and 2, then waits for a live batch.
+- Should full auto merge migrations? Open since 2026-10-20 and 2026-11-01. The risk-class table stays as it is until he decides.
 
 ## 9. Build order
 
 Each phase ships on its own and leaves the factory better than before it. The order stops the bleeding first.
 
 1. **The case record and the digest.** The `cases` and `case_steps` tables, the builder of the digest with its flags, `card_step` and `board_digest` as tools for the chat, the check-in and the factory agent. The board, the inbox and the brief read the case. The four old records become derived views. No routing changes yet. Live value: "is something wrong with #X" answers in one call, and every ask carries its whole history.
-2. **The ladder in code with rung 0 and the clocks.** Every trip opens a case through one function, and `awaitCase` replaces the two waits under a version gate. The resolver table of 5.6. The monitor with its flags and clocks on its own goroutine, the other sweeps on their own. Slots freed on waits. The records the flags read, written in the same phase: the queue reason on every refused admission, the funding event of the size gate, the "not run" marker on a refused gate. The money sub-ask. The durable repeat guard. Live value: no wait without a clock, no silent queue, no money ask that hides a problem, half of the 39 stuck points gone.
-3. **Rung 1 on the case.** The check-in reads the digest, the plan and the siblings, answers in structured form, picks from the typed action set within its allowance, writes its step. The share guard's fabricated stop goes. Live value: the "needs one more go" cards end, because a cap opens a case that rung 1 judges with the full card.
+2. **The ladder in code with rung 0, the clocks and the pool.** Every trip opens a case through one function, and `awaitCase` replaces the two waits under a version gate. The resolver table of 5.6. The monitor with its flags and clocks on every wait the AI owns, on its own goroutine, the other sweeps on their own. Slots freed on waits. The records the flags read, written in the same phase: the queue reason on every refused admission, the funding event of the size gate, the "not run" marker on a refused gate. The escalation pool and the per-card draw bound in policy, the `fund` call as one typed action that rides beside any resolution, the money fact on the case. The durable repeat guard. Live value: no wait the AI owns without a clock, no silent queue, no money ask that hides a problem, half of the 39 stuck points gone.
+3. **Rung 1 on the case.** The check-in reads the digest, the plan and the siblings, answers as a forced tool call against the schema, picks from the typed action set and draws from the pool within the per-card bound, writes its step. The share guard's fabricated stop goes. Live value: the "needs one more go" cards end, because a cap opens a case that rung 1 judges with the full card.
 4. **Rung 2 on every case and the first shot.** The factory agent wakes on every case that passes rung 1, with the board digest and the full action set, at every autonomy level, acting or proposing by level. The planner's recommended answers. Live value: a human reads only the human-only kinds and the cases beyond the pool, each with a recommended option preselected.
-5. **The human face and the replay fixtures.** The decision queue, the five parts from the case, the brief writer on the case, the money button that pays and delivers. The 20 incidents as replay fixtures in the test suite. The metrics from the cases. The configuration constructions of 5.11.
+5. **The human face and the replay fixtures.** The per-card carousel, the five parts from the case written for a cold reader, the brief writer on the case, the fund control and the note beside the decision buttons with one send. The 20 incidents as replay fixtures in the test suite. The metrics from the cases. The configuration constructions of 5.11.
 
 Phases 1 and 2 need no model change and no prompt change. Phase 3 changes the check-in's statement and answer shape. Phase 4 changes the factory agent's wake. Phase 5 changes the console.
+
+Later, after the five phases and a live batch:
+
+- The clocks on a wait at the human: a reminder, a re-read by rung 2, escalation to the notify list. Three rows in the bounds table, no new construction.
+- A typed-output library for every place a model chooses between options, so the schema is enforced at the call and not only by the validator behind it. Sebastian named needle and Jev as candidates on 2026-11-02. The builder checks what each is, measures it against the forced tool call of phase 3, and picks or drops it.
 
 ## 10. Left to the builder
 
 - The exact enum of case kinds and of `reason_kind`, derived from every `awaitHuman` call site and every stop template in question.go.
 - The digest's line format and the fold rule's exact key.
-- The flag thresholds' defaults in policy, with the values of section 8 decision 4 as the first draft.
+- The flag thresholds' defaults in policy for the waits the AI owns.
+- The escalation pool's default size per month and the per-card draw bound's defaults per size.
 - The migration of open escalations, alerts and `question_asked` events into cases, and the heal pass's handover to the monitor.
 - The order of the resolver table's rows and the tie rule when two match.
 - The judgment budget's default cap and the per-card count of rung 1 runs.
