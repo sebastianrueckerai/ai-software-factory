@@ -22,7 +22,7 @@ Read off the templates in `internal/console/templates/` on 2026-10-13 (code comm
 - Line 2: the state, on an In progress card the stage from the session (planning, building, verifying) with its own dot; the time in the current stage (C8; the total age lives in the drawer); n/n checks; spend / budget with "⚠ near its budget" at 80 percent; gate text and its age.
 - Activity line, monospace: the newest event in one line, or the escalation's question, with "answer on the issue" link when waiting; stale words ("nothing for 40 min").
 - GitHub PR state line, when exported in pull request mode.
-- Chips: fine states (retrying, held, on the provider, stale); model alias; blocked by n (names on hover); from plan #n (a child's plan as artifact); waiting on #n. No lane badge, no waiting-on-author state (225).
+- Chips: fine states (retrying, held, on the provider, stale); model alias; blocked by n (names on hover); from plan #n · name (a child's plan as artifact, its short name beside the number, C40), and #n · name on the plan's own card; waiting on #n. No lane badge, no waiting-on-author state (225).
 - Transitions: Retry; Close (with confirm) on a card waiting on a human, or failed without an issue. No Start plan, no lane moves (225).
 - More fold: the objective (clamped to four lines); the agent's summary; the plan's cards; PR link; timeline link; summary edit form (Save summary); accent select form (Set accent).
 - Stale ring on the card.
@@ -60,7 +60,7 @@ The four secondary pages follow the readout grammar of C24: a small-caps section
 - Resources: per project the envelope figures line (task block, this month's use, standing block, standing now, the project's file link or the envelope_default note) and a table (task, resource and purpose, type, IPv4, lease end or standing, EUR/h, cost so far, state, Promote with its note and Release); at the foot the cluster's jobs table (name, kind, namespace, schedule, last run, last ok, suspended).
 - Settings, per project (`?project=`): settings list (repository, objects, agents, merge rule, notify, namespaces, quota, environments, Forgejo state, GitHub export with Remove and Sync latest, tokens); Export to GitHub form (remote, login, token, mode); gateway YAML details; New project as a quiet foot link.
 - Policy: the version figures line (version, commit, loaded, in force since); the config directory note and edit link; per process a stages table (stage, findings go to, enabled, when); projects table; policy.yaml.
-- Alerts is not a page: the board's escalation card carries the verdict buttons, the chat's alerts tool answers for them, and the supervisor's action and diagnosis ride the alert text.
+- Alerts is not a page: the escalation card asks no verdict, the project agent judges an escalation with the chat's alerts tool, and the supervisor's action and diagnosis ride the alert text (C41).
 - Metrics, per project (`/projects/{name}/metrics`): the window control 7 · 28 · 90 days in the URL (28 the default), five sections (Delivery, Stability, Cost, Autonomy, The factory itself), one row per figure: name · value · signed move against the previous window · the last 7 weeks as a monochrome server-rendered SVG spark (trace faint, endpoint dot in text ink); model mix as a long value row without a spark (C30).
 - Timeline: the card face, the gates table, the steps table.
 - New task: project, title, description, track (direct or plan, direct the default), priority, size, File the issue (225).

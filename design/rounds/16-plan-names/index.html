@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Round 16: the plan's name on its cards</title>
+<style>
+:root { color-scheme: dark; --bg: #10151d; --line: #232b38; --text: #dfe7f1; --muted: #93a1b5; --faint: #7c8ba0; --accent: #53d6e2; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.65 system-ui, sans-serif; }
+main { max-width: 68rem; margin: 0 auto; padding: 28px 22px 80px; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+h2 { font-size: 13px; font-variant-caps: all-small-caps; letter-spacing: .08em; color: var(--faint); margin: 34px 0 8px; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+p { margin: 8px 0; max-width: 78ch; }
+code { font: 12.5px/1.6 ui-monospace, Menlo, Consolas, monospace; color: var(--accent); }
+a { color: var(--accent); }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 12px 0; }
+figure { margin: 0; }
+figure img { max-width: 100%; border: 1px solid var(--line); display: block; }
+figcaption { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Round 16: the plan's name on its cards</h1>
+<p>Sebastian asked for every plan to carry a short name beside its number, so a glance at the board shows which cards belong to which plan. The plan chip that already exists carries the name, so no new chip, colour or class was added. This is a build in the lab, not an image round: the shots are the console itself, served over the lab's fakes. The pick is Sebastian's, against these shots. The entry is <a href="../../design-decisions.md">C40</a>. The same build removes the verdict survey from the escalation card (<a href="../../design-decisions.md">C41</a>).</p>
+<p>Before is the base commit with the same lab cards and no names. After is the build. The crops are magnified 2x and cut from the same region where the layout allows. Otherwise they show the same element.</p>
+
+<h2>The board at 1440, dark</h2>
+<div class="pair">
+<figure><img src="board/board-dark-1440-before.png" alt="The board before: plan chips show the card's plan key"><figcaption>Before: the child's chip reads <code>from plan #531 · drawer-send</code>, the card's key. The plan's Done row has no chip.</figcaption></figure>
+<figure><img src="board/board-dark-1440-after.png" alt="The board after: plan chips show the plan's name"><figcaption>After: <code>from plan #531 · card chips</code> on #617, #533 and #606, and <code>#531 · card chips</code> on the plan's Done row.</figcaption></figure>
+</div>
+
+<h2>The board at 1440, light</h2>
+<div class="pair">
+<figure><img src="board/board-light-1440-before.png" alt="The board before, light theme"><figcaption>Before.</figcaption></figure>
+<figure><img src="board/board-light-1440-after.png" alt="The board after, light theme"><figcaption>After.</figcaption></figure>
+</div>
+
+<h2>A child card's chip</h2>
+<div class="pair">
+<figure><img src="crops/child-chip-dark-1440-before.png" alt="Child chip before, dark"><figcaption>Before, dark, 1440.</figcaption></figure>
+<figure><img src="crops/child-chip-dark-1440-after.png" alt="Child chip after, dark"><figcaption>After, dark, 1440. In the narrow Queued and In progress columns the chip wraps to two lines, as it did with the key.</figcaption></figure>
+<figure><img src="crops/child-chip-light-1440-before.png" alt="Child chip before, light"><figcaption>Before, light, 1440.</figcaption></figure>
+<figure><img src="crops/child-chip-light-1440-after.png" alt="Child chip after, light"><figcaption>After, light, 1440.</figcaption></figure>
+<figure><img src="crops/child-chip-dark-390-before.png" alt="Child chip before, phone"><figcaption>Before, dark, 390.</figcaption></figure>
+<figure><img src="crops/child-chip-dark-390-after.png" alt="Child chip after, phone"><figcaption>After, dark, 390: one line.</figcaption></figure>
+</div>
+
+<h2>The plan's Done row</h2>
+<div class="pair">
+<figure><img src="crops/done-plan-row-dark-1440-before.png" alt="Done plan row before, dark"><figcaption>Before, dark: the plan's row has no chip.</figcaption></figure>
+<figure><img src="crops/done-plan-row-dark-1440-after.png" alt="Done plan row after, dark"><figcaption>After, dark: <code>#531 · card chips</code> under the counts.</figcaption></figure>
+<figure><img src="crops/done-plan-row-light-1440-before.png" alt="Done plan row before, light"><figcaption>Before, light.</figcaption></figure>
+<figure><img src="crops/done-plan-row-light-1440-after.png" alt="Done plan row after, light"><figcaption>After, light.</figcaption></figure>
+</div>
+
+<h2>A live plan card</h2>
+<div class="pair">
+<figure><img src="crops/parent-card-dark-1440-before.png" alt="Live plan card before"><figcaption>Before, dark.</figcaption></figure>
+<figure><img src="crops/parent-card-dark-1440-after.png" alt="Live plan card after"><figcaption>After, dark: <code>#537 · quota guard</code>.</figcaption></figure>
+</div>
+
+<h2>The plan approval's header</h2>
+<div class="pair">
+<figure><img src="crops/approval-header-light-1440-before.png" alt="Approval header before"><figcaption>Before, light: <code>Plan #558, revision 1</code>.</figcaption></figure>
+<figure><img src="crops/approval-header-light-1440-after.png" alt="Approval header after"><figcaption>After, light: <code>Plan #558 · activity feed, revision 1</code>.</figcaption></figure>
+</div>
+
+<h2>The drawer's Plan row</h2>
+<div class="pair">
+<figure><img src="crops/drawer-plan-row-dark-1440-after.png" alt="Drawer plan row, dark"><figcaption>After, dark: <code>#531 · card chips · drawer-polish</code>, the number linked, the key in monospace. It replaces the collapsed "The plan" section on a child card.</figcaption></figure>
+<figure><img src="crops/drawer-plan-row-light-1440-after.png" alt="Drawer plan row, light"><figcaption>After, light.</figcaption></figure>
+</div>
+
+<h2>The escalation card without the verdict survey (C41)</h2>
+<div class="pair">
+<figure><img src="crops/needs-you-card-dark-1440-before.png" alt="Escalation card before, with the verdict survey"><figcaption>Before: "Was this escalation a real problem?" with "real problem" and "noise".</figcaption></figure>
+<figure><img src="crops/needs-you-card-dark-1440-after.png" alt="Escalation card after, without the survey"><figcaption>After: the card ends at "Close with note".</figcaption></figure>
+</div>
+
+<h2>The phone</h2>
+<figure><img src="board/phone-dark-390-after.png" alt="The phone screen after" style="max-width:24rem"><figcaption>After, dark, 390.</figcaption></figure>
+</main>
+</body>
+</html>

@@ -312,3 +312,29 @@ The reasoning a model streams beside its text (the wire's reasoning_content) fol
 Compaction no longer counts rows alone. The gateway serves each model's context window, and the chat compacts when a thread's context passes 80 percent of it; the worker sets each model's session limit at 75 percent of the served window under the 200 K trust cap, on opencode's own compaction. A model that serves no window degrades as before: the chat bounds by rows, the worker keeps the trust cap. The `limits.context_tokens` knob is gone; `/compact` still runs by hand.
 
 The build is 48fcdbc4 on main of the code repository.
+
+## C40. Every card names its plan: a short name beside the number (2026-11-02, Sebastian's request, the layout provisional)
+
+Sebastian asked for every plan to carry a short name that says what it does, fixes or enables, so a glance at the board shows which cards belong to which plan. The layout below is the director's call. It stays provisional until Sebastian picks against the lab shots in [rounds/16-plan-names/](rounds/16-plan-names/index.html).
+
+The name. A plan gets its name when its first revision files. The small model proposes one from the issue title, the spec's outcome and the plan's summary. Code checks it: 3 to 24 characters after normalising, one line, no control or format characters, unique among the project's open plans with case ignored. A long answer brings one more ask for a shorter name, and a taken one brings an ask that lists the taken names, three asks at most. When the model fails, the name is a slug of the issue title, with a number suffix only on a clash. Naming never holds up or fails a filing. A plan keeps its first name through later revisions. The plans that were open when this landed get their names at the next start, from their newest revision.
+
+Where it shows. The existing plan chip carries the name, with no new chip, colour or class, so C11's face grammar stands.
+
+- A child card's chip: `from plan #558 · fix prod latency`. The name takes the slot that held the card's plan key, and the key moves to the drawer.
+- The plan's own card, live or as its compact row in Done: `#558 · fix prod latency`.
+- The plan approval's header: `Plan #558 · fix prod latency, revision 2`.
+- The drawer's Overview: one Plan row, `#558 · fix prod latency · key`, the number linked to the issue and the key in monospace. The collapsed "The plan" section no longer repeats it on a child card.
+- The find box (C13): a plain word finds the name. `plan:558` narrows to plan 558's cards, the plan's own card included, and never matches a name that only contains 558. `plan:latency` narrows by a part of the name, case ignored. An empty `plan:` matches nothing.
+
+An unnamed plan reads as before, `from plan #558`, with no separator left hanging. In the narrow Queued and In progress columns at 1440 px the child chip wraps to two lines, as it did with the key. On the phone at 390 px it fits on one line.
+
+The build is 993192f8 on main of the code repository.
+
+## C41. The verdict survey leaves the cards, the project agent's judgment stays (2026-11-02, Sebastian)
+
+Amends C24's line "its verdict buttons live on the board's escalation card, `POST /alerts/{id}/verdict` and the chat's alerts tool stay". Sebastian asked to remove the "Was this escalation a real problem?" question with its "real problem" and "noise" buttons from the escalation card and the drawer.
+
+No card, drawer, route or access entry asks a human for an escalation verdict any more. `POST /alerts/{id}/verdict` is gone. The project agent judges an escalation with the chat's `alert_verdict` tool: it decides alone at the autonomous level, and a human confirms its proposal below that. The machine verdicts stay as they were: the supervisor's action, the screening answer and the task's outcome. An escalation nobody judged still ends `unjudged` with its task. The human intervention count, `alert_verdict_click`, counts only a verdict a human confirmed, not one the agent decided alone. Old `alert_verdict` events still render on the activity lines.
+
+The build is 993192f8 on main of the code repository.

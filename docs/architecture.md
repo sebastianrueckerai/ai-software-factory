@@ -1072,7 +1072,17 @@ to 5 choices each, which the member answers before acceptance (5.7).
 `ValidatePlan` refuses a plan that breaks the shape, and the findings go
 back to the planner. factoryd, not the model, adds the edges that put the
 foundation first and the integration last. Each valid answer is a row in
-`plan_revisions`. Since roadmap 225 no person accepts a plan. A revision
+`plan_revisions`. Since 2026-11-02 a plan carries a short name beside its
+number. When its first revision files, factoryd asks the small model for
+one from the issue title, the spec's outcome and the summary. Code keeps
+the name to 3 to 24 characters on one line, unique among the project's
+open plans regardless of case. It asks again for a shorter or untaken
+name, three asks at most, and else takes a slug of the title, a number
+suffix only on a clash, so a model error never fails the filing. The plan keeps
+its first name through later revisions. At each start factoryd names the
+open plans that filed without one, from their newest revision. The
+console shows the name beside the number (C40). Since roadmap 225 no
+person accepts a plan. A revision
 that asks no question files its cards in the same step: one task row and
 one bot issue per card in topological order, queued on the direct track at
 main's head, with the Forgejo dependencies and rows in `task_deps`,
@@ -5194,7 +5204,7 @@ bounds and detectors can be tuned from data:
 |---|---|---|
 | `gate_bound` | a gate activity runs past its bound (6.6) | the gate supervisor's action: `wait` is noise, the rest real. A short gate's row stays open |
 | `supervisor_trip` | a session detector trips | `continue` is noise, any other action real, resolved by `supervisor` |
-| `escalation` | an agent or a supervisor escalates | one click by an approver on the console answer, "real problem" or "noise". Since Stage 9 `unjudged`, set by factoryd, when the task ends without a click |
+| `escalation` | an agent or a supervisor escalates | the project agent's `alert_verdict` tool, real or noise, decided alone at the autonomous level or confirmed by a human in the chat. `unjudged`, set by factoryd, when the task ends without a verdict. Until 2026-11-02 the escalation card also asked an approver, "real problem" or "noise"; that survey left the cards |
 | `info_request` | an agent asks the poster (7), Task 66 | `unjudged`, set by factoryd when the task ends without a verdict (Stage 9) |
 | `alert` | a SigNoz alert files an issue, Task 70 | real when the task's pull request merges, noise when a human closes the issue without a merge. On a human-lane issue, a writer's close is real and the label `noise` makes it noise (Stage 9). Since 2026-10-21 `unjudged`, set by factoryd, when the agent task ends any other way, for example failed |
 | `config_rejected` | a configuration commit is refused, or ten reads in a row fail (5.3), Stage 9 | real, set when a valid commit loads |
@@ -5225,8 +5235,8 @@ task: `factory.task.outcome{project,state,model_alias,attempts,merge_rule}`
 and `factory.task.cost{model_alias,outcome}` in EUR on every ending path,
 `factory.review.verdict{verdict,strict_improvement,round}` where the
 review's answer is recorded, and `factory.human.intervention{kind}` for an
-approve, a change request, a rejection, an alert verdict click, an
-escalation answer, a poster's answer and extra time. Reviews and answers
+approve, a change request, a rejection, a human's alert verdict in the
+chat, an escalation answer, a poster's answer and extra time. Reviews and answers
 count from the webhook events, so those made directly in Forgejo count
 too; only a merge made directly in Forgejo stays uncounted. A daily pass,
 at boot and every 24 hours, sets a revert mark, `tasks.reverted_at`, on a
@@ -5486,7 +5496,7 @@ works `factory` and `demo-app`.
 | Status line | The project screen's top line: the project's state, cards working, cards that need you, spend against the monthly cap and the GitHub mirror's state, each a link to its page (5.7) |
 | Bound | The seconds a gate activity may run before it raises a `gate_bound` alert |
 | Gate supervisor | The supervisor model called when one of the six long gates passes its bound. It chooses wait, retry, cancel or escalate |
-| Alert verdict | Whether an alert was a real problem or noise, set by the supervisor's action, a human's click or the task's outcome |
+| Alert verdict | Whether an alert was a real problem or noise, set by the supervisor's action, the project agent's judgment or the task's outcome |
 | Poster information | An issue author's answer to an information request, carried in the brief as untrusted information, never as authority |
 | Configuration tree | The directory `factory/` in the infra repository: `policy.yaml`, `projects/<name>.yaml`, `processes/<name>.yaml` and `templates/<name>/`, read by factoryd, with the commit as the version |
 | Pin | The configuration version a task started under; its caps and bounds come from it |
