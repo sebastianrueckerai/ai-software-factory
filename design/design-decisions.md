@@ -338,3 +338,13 @@ Amends C24's line "its verdict buttons live on the board's escalation card, `POS
 No card, drawer, route or access entry asks a human for an escalation verdict any more. `POST /alerts/{id}/verdict` is gone. The project agent judges an escalation with the chat's `alert_verdict` tool: it decides alone at the autonomous level, and a human confirms its proposal below that. The machine verdicts stay as they were: the supervisor's action, the screening answer and the task's outcome. An escalation nobody judged still ends `unjudged` with its task. The human intervention count, `alert_verdict_click`, counts only a verdict a human confirmed, not one the agent decided alone. Old `alert_verdict` events still render on the activity lines.
 
 The build is 993192f8 on main of the code repository.
+
+## C42. A press answers on the board alone: no confirmation line above the board or in a drawer (2026-11-02, Sebastian)
+
+Sebastian asked to remove the green line above the board, such as "Approved pull request #1479; factoryd merges it.", and every line like it. The board's cards and columns show what an action did. A second report puts the same fact in two places. Where an action's result does not show, the card has to show it, not a line beside the board.
+
+No press shows a confirmation. A button on a card or in the drawer answers with no content, and the board renders again. The card's place and state are the answer, as C31 describes. This covers every button of a card and of the drawer, among them approve, deny, an answer, fund, close, retry, replan, a plan's answers and hold-outs, the summary and the accent, Deploy now and a routine's acts. A steer and a routine act from the drawer answer the drawer's tab again, with no line above it. A steer's own message shows in the Chat tab, a GitHub token in it masked. Filing a task from New task leads to the board without the "Filed issue" line. The card shows once factoryd picks up the issue.
+
+A refusal still shows its sentence in the flash, and a refused or lost press still returns the card to its column. The project agent's tools keep their result sentences, because the agent reads them.
+
+The build is b76459d9 on main of the code repository.
