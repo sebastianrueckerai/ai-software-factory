@@ -192,8 +192,8 @@ files back on main.
 Fix direction: a red main gets one automatic remedy at a time, the
 revert's filing ends the fix-forward card, a human decides when the
 remedy merges and main stays red, a green main ends the remedy that did
-not merge, and every card that ends done with a merged pull request or
-ends closed, and every closed plan, closes its issue.
+not merge, and every card that ends done or closed, and every closed
+plan, closes its issue.
 
 ## 7. No scripted door into the chat
 

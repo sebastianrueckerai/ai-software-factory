@@ -121,6 +121,13 @@ revert".
 The 2026-10-20 incident cannot happen under A1: the revert's filing at
 01:01 would have closed the fix-forward card #1154.
 
+"Merged" in A1 and A3 means that the card's pull request merged on the
+forge, read with PullRequestState, not only the card's status. A person can
+merge a remedy's pull request on the forge. The card's status then reads
+in-review until its workflow takes the merge, so a status check alone files
+a revert beside a merged fix, or closes a merged revert with a false
+comment.
+
 ### A2. A remedy that merged while main stays red goes to a human
 
 When a remedy of the pause merged and main's newest push run is red at a
@@ -135,7 +142,9 @@ commit changes nothing: the merge's run has not started yet.
 endPauseCard also ends the pause's revert card while the revert is
 stoppable, with the comment "factoryd: main's push run N at SHA is green
 (link): main is green without this revert. Closing this issue." A revert
-that merged made main green itself and stays as it is.
+that merged made main green itself and stays as it is. endPauseCard ends
+the two cards each on its own and joins their errors, so an error on the
+fix-forward card does not keep the revert from its end.
 
 The card ends by its lane's path:
 
@@ -153,15 +162,20 @@ no woken card takes its turn before the cards of the pause end.
 ### B1. Finish closes the issue of a card whose pull request merged
 
 In finish (activities.go:2532) the condition becomes
-`final == "closed" || final == "done" && merged`. The comment of a done
-end: "factoryd: pull request #N merged; this card ends with it."
+`final == "closed" || final == "done" && t.Track != policy.TrackPlan`. The
+comment of a done end: "factoryd: pull request #N merged; this card ends
+with it." A done end without a merge names its reason in place of the pull
+request: "factoryd: <reason>; this card ends with it."
 
 - For an agent card, the merge's "Closes #N" closed the issue already.
   closeTaskIssue reads it closed and writes nothing.
 - For a card that waits for its chain in merged, issueClosed leaves the
   card as it is.
-- A done card without a pull request, a plan among them, keeps its issue
-  open.
+- A plan card (Track plan) ends done each time a revision files its cards,
+  and keeps its issue open. B3 closes it.
+- A card that its plan's acceptance command ends done with no pull request
+  (workflow.go:2095) closes its issue. Under `final == "done" && merged`
+  it would keep the issue open. The live store holds none today.
 
 ### B2. closeIssueAsFactory drops the open dependencies before the close
 
@@ -213,6 +227,14 @@ has run.
 
 Each expected value comes from the case, not from a run.
 
+The fakes need three extensions. prForgejo (activities_test.go:48) holds one
+issueOff flag for every issue and needs a state per issue. planForgejo
+(plan_test.go:740) lists dependencies as numbers only and needs each
+dependency's state. TestPlanCloseCheckClosesAndGaps builds its Runner
+without a Forgejo (verdict_test.go:768) and needs a planForgejo. closePlan
+skips its close for a Runner without a Forgejo, as commentOnce does
+(gates.go:882).
+
 | Test file | Case | Expected |
 |---|---|---|
 | mainfix | The bound passes, the fix-forward card stoppable | The revert is filed. The fix-forward card's issue gets "the revert #N replaces this card" and closes. |
@@ -224,10 +246,14 @@ Each expected value comes from the case, not from a run.
 | mainfix | A green run with a stoppable agent-lane revert | The revert's issue gets the comment and closes. |
 | mainfix | A green run with a stoppable human-lane revert | The revert's pull request closes as the bot. |
 | mainfix | A green run after the revert merged | The revert card stays as it is. |
+| mainfix | A green run, the revert in-review and its pull request merged on the forge | The revert card stays as it is. |
+| mainfix | The bound passes, the fix-forward card in-review and its pull request merged on the forge | No revert is filed. |
+| mainfix | A green run, the fix-forward card's close refused | The revert's issue closes all the same. endPauseCard answers the joined error. |
 | mainfix | A green run with both cards live | endPauseCard's writes come before the signals to the queue heads. |
 | finish | A done end after the merge of a revert card, its issue open | The issue gets "pull request #N merged; this card ends with it." and closes. |
 | finish | A done end of an agent card whose issue the merge closed | No write to the issue. |
 | finish | A done plan without a pull request | The issue stays open. |
+| finish | A done end on an acceptance reason, no pull request, its issue open | The issue gets "<reason>; this card ends with it." and closes. |
 | escalation | An issue with dependencies on open #A and closed #B | A DELETE of #A, no DELETE of #B, then the PATCH to closed. |
 | verdict | closePlan with the plan's issue open | The issue closes with the comment, then plan_closed is recorded. |
 | verdict | closePlan with the plan's issue closed | One comment, no close, then plan_closed. |
