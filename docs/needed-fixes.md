@@ -197,14 +197,21 @@ plan, closes its issue.
 
 ## 7. No scripted door into the chat
 
-Status: candidate only. Found 2026-10-31: the console's OAuth2 login works
+Status: plan written, awaiting Sebastian's OK
+(docs/chat-door-design-2026-11-02.md, docs/plans/2026-11-02-chat-door.md).
+Found 2026-10-31: the console's OAuth2 login works
 end to end with curl (PKCE, grant, callback), and the trust gate then 403s
 factory-admin, which is not a writer of the code repository. That is
 correct by design (task 54), but it means no agent, script or CI can file a
 chat turn or read the thread without a writer's session.
 
-Fix direction: a service identity with read-only access to the project, or
-a scoped chat API token.
+Fix direction, by Sebastian's four decisions of 2026-11-02: a chat token
+that a human makes in the console for one project. It acts as that human,
+with all their rights in the chat, approvals included, and every row it
+causes names the token. It reaches the chat only (send, read, Do it),
+through an MCP endpoint on the console. The human's own Forgejo access
+token stands behind it, sealed in factoryd, because a merge approval is a
+review under the approver's own Forgejo name.
 
 ## 8. A rename that changes the policy tree cannot land before its roll
 
