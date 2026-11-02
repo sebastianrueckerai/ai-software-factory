@@ -292,17 +292,20 @@ and raise paths do.
 
 ## 8. The runner's docker volume passes its 50Gi limit
 
-Status: candidate; the measurement and the bound are task 9 of
-docs/plans/2026-11-02-card-flow-companion.md. Found 2026-11-02 on card
-#1473. At 14:43:34 the
-kubelet evicted the trusted runner's pod, up since 2026-10-28: "Usage of
-EmptyDir volume "docker-data" exceeds the limit "50Gi"". Main's run 2316
-(2b9841c6) had run its test and its three image jobs from 14:20 to 14:38,
-and run 2317's test job (b76459d9) started at 14:39 and died with the pod.
-The docker-prune sidecar prunes from 30 GiB (dind.prune.maxGiB), and the
-chart counts at most 13.3 GiB per run, so the volume should stay under
-44 GiB. The new pod held 11.8 GiB at 17:20 during a test job. What filled
-the old volume past 50 GiB is not measured. Each eviction kills the job it
+Status: measured; the bound is the infra hand in
+docs/runner-volume-measurement-2026-11.md: the prune sidecar runs `docker
+volume prune -af` last, only when the volume is still over maxGiB after
+its other prunes, because main's test job keeps its Go caches in the named
+volumes ci-go-build and ci-go-mod that nothing trimmed. The infra commit
+is Sebastian's. Found 2026-11-02 on card #1473. At 14:43:34 the kubelet
+evicted the trusted runner's pod, up since 2026-10-28: "Usage of EmptyDir
+volume "docker-data" exceeds the limit "50Gi"". Main's run 2316 (2b9841c6)
+had run its test and its three image jobs from 14:20 to 14:38, and run
+2317's test job (b76459d9) started at 14:39 and died with the pod. The
+docker-prune sidecar prunes from 30 GiB (dind.prune.maxGiB), and the chart
+counts at most 13.3 GiB per run, so the volume should stay under 44 GiB.
+The new pod held 11.8 GiB at 17:20 during a test job. What filled the old
+volume past 50 GiB was not measured then. Each eviction kills the job it
 runs, and before code 321baaa7 rolls, such a job's run stalls main's CI
 lane until a person re-runs it.
 
@@ -323,3 +326,31 @@ code 1484c506.
 Fix direction: read the check-in's own record of the five stops, find
 what it reads for five minutes, and bound its reads, so a frontier card
 with a large diff still gets a decision.
+
+## 10. SigNoz's ClickHouse sits at its memory limit
+
+Status: candidate only. Found 2026-11-02 while measuring fault 8. SigNoz's
+ClickHouse (chi-signoz-clickhouse-cluster-0-0-0 in namespace platform) has
+a 3Gi memory limit and held 2.68 to 2.82 GiB of it from 21:30 UTC
+(`kubectl -n platform exec chi-signoz-clickhouse-cluster-0-0-0 -c
+clickhouse -- clickhouse-client -q "SELECT metric, value FROM
+system.asynchronous_metrics WHERE metric IN ('CGroupMemoryTotal',
+'CGroupMemoryUsed')"`). The server stops queries at 2.70 GiB, so most of
+them fail: "(total) memory limit exceeded: would use 1.79 GiB (attempt to
+allocate chunk of 8.25 MiB), current RSS: 2.88 GiB, maximum: 2.70 GiB.
+OvercommitTracker decision: Query was selected to stop by
+OvercommitTracker ... (MEMORY_LIMIT_EXCEEDED)". Even a count over
+system.processes failed so. A query over five days of one series went
+through on its 86th try. At 21:40:02 the kubelet killed the server for
+missing its liveness probe (/ping, a 1 second timeout, ten misses in a
+row), while those retried queries ran (`kubectl -n platform get events
+--field-selector
+involvedObject.name=chi-signoz-clickhouse-cluster-0-0-0`). That was its
+fifth restart in eight days, and sf-0's kernel log (`talosctl -n 10.0.1.10
+dmesg`) holds a memory cgroup kill of clickhouse-serv on 2026-10-30 at
+2.97 GB resident. SigNoz's own pages and alerts query the same server:
+whether they fail too is not checked.
+
+Fix direction: measure first what holds the memory (the caches, the
+merges, the buffer tables), then raise the limit or bound the query memory
+settings, so that a query fails before the server misses its probe.
