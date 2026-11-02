@@ -153,7 +153,12 @@ open, go to the checks that end in the approval card instead of stopping.
 ## 2. Sessions open that the task budget cannot pay for
 
 Status: plan written, awaiting Sebastian's OK
-(docs/plans/2026-11-02-unpayable-sessions.md). Found 2026-10-31 on card
+(docs/plans/2026-11-02-unpayable-sessions.md). Its parts A, C and D, the
+floor at every opening, the enforced money on every face and the console's
+alias skip, are tasks 2 to 4 of docs/plans/2026-11-02-card-flow-companion.md,
+which builds them beside the card flow redesign. Its part B, the ask that
+fires as the money ask before an attempt, is the redesign's rung 0 row,
+phase 2. Found 2026-10-31 on card
 #1345; four openings burned about €0.53 and filed nothing. Re-verified
 unbuilt on code main 0bbfe484 (2026-11-02): the session floor (SessionFunded, every session's
 start since 6c579a24 of 2026-10-16) predates the fault and did not stop the
@@ -175,7 +180,11 @@ the gateway that the task row's spent amount never recorded.
 ## 3. The planner dies on a big spec's read set
 
 Status: code landed (448048b0, 2026-11-02) and is live since roll c78869b
-(2026-11-02 02:19Z). The tree hand waits on Sebastian. The
+(2026-11-02 02:19Z). The tree hand waits on Sebastian. The card flow
+redesign's card digest (its section 5.3) shares the word: in code the names
+are CardDigest, card_step and board_digest, never `digest` alone, and
+docs/plans/2026-11-02-card-flow-companion.md puts that sentence in the
+redesign. The
 `digest` tool, the planGuide read discipline and the reads finding are on
 code main. No session sees the tool until the policy tree's coder,
 analyzer and planner stanzas list `digest: {}`, a commit on the infra
@@ -207,17 +216,22 @@ shape that saved #1383.
 
 ## 4. The chat's answer tool failed twice on plan questions
 
-Status: a fix landed on code main 2026-11-01 (05cd9e12) and is live since
-roll 280a34a (2026-11-01 13:47Z). Whether it was this failure is not
-proven. Found 2026-10-31 on card #1383 at 21:20. The
-chat worked around it by posting the answers as issue comments, which the
-planner reads.
-
-What the fix changed: a chat tool with no parameters marshalled
-"properties: null", which the model rejects with a 4xx, and the chat read
-every 4xx as "The model could not be reached", so the call read as a failed
-tool. The 4xx now names its refusal. Watch the next plan-question ask
-before closing this.
+Status: plan written, awaiting Sebastian's OK (task 8 of
+docs/plans/2026-11-02-card-flow-companion.md). The 4xx fix of 05cd9e12
+(2026-11-01, live since roll 280a34a) was not this fault. The chat rows of
+2026-10-31 hold the four answer calls on #1383. At 21:10:42 the tool
+refused with "A plan's question is answered with its revision (revision),
+from the plan tool." At 21:19:49 with "an answer of 1 to 1000 characters
+is required". Both named the state and the action. At 21:19:56 and
+21:20:02 the catch-all refused with "The answers could not be recorded;
+see the factoryd log." The error went to a log that is gone, and at
+21:20:10 the chat posted the answers as comment 25297 instead. The fault
+is the catch-all: five refusals in internal/console (one answer, the
+answers, the decision, the grant, the analysis) name neither the state
+nor an action. The fix makes each carry its error and the next step. The
+redesign's phase 2 ends the fork between the answer and the plan tools:
+one typed answer resolves a case of any kind. Found 2026-10-31 on card
+#1383 at 21:20.
 
 ## 5. An ended card's issue stays open, and both red-main remedies can land
 
@@ -278,7 +292,9 @@ and raise paths do.
 
 ## 8. The runner's docker volume passes its 50Gi limit
 
-Status: candidate only. Found 2026-11-02 on card #1473. At 14:43:34 the
+Status: candidate; the measurement and the bound are task 9 of
+docs/plans/2026-11-02-card-flow-companion.md. Found 2026-11-02 on card
+#1473. At 14:43:34 the
 kubelet evicted the trusted runner's pod, up since 2026-10-28: "Usage of
 EmptyDir volume "docker-data" exceeds the limit "50Gi"". Main's run 2316
 (2b9841c6) had run its test and its three image jobs from 14:20 to 14:38,
