@@ -88,7 +88,20 @@ human's messages unread (code 120a12d9). A listening turn takes a message
 from any place in the line, and a message or wake note that another turn
 read starts no turn. A failed turn puts the rows it read back for one quiet
 retry, and each wake turn runs on its own goroutine, one per project at a
-time.
+time. Six faults found on card #1472 left the same day on code main
+(2623b2ec and 2b9841c6) and ride the next factoryd roll. The chat agent's
+analysis reaches an ask whose row carries its why: since that row gained
+the why on 21 October the tool had refused 33 analyses. A deploy keeps a
+session whose pod finished while factoryd was away: the next factoryd
+reads its result instead of starting the session over, as it did for
+#1472 and #1452 at 10:54. A check-in conversation ends after
+limits.checkin_time (5 minutes by default) as at its call cap, the card
+asking a human. The agent-time stop says the agent time is used up, no
+longer the session cap, and names the minutes a grant buys. The console's
+Extend takes any live card, and its raise stands: it lives in columns the
+workflow's usage record never writes, which the workflow reads before each
+cap check. A card's agent time follows its size, half for a small card and
+one and a half for a large one.
 
 ## 1. The check-in's policy stop preempts the approval card
 
