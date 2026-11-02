@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Round 17: the chat token's label and the Tokens section</title>
+<style>
+:root { color-scheme: dark; --bg: #10151d; --line: #232b38; --text: #dfe7f1; --muted: #93a1b5; --faint: #7c8ba0; --accent: #53d6e2; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.65 system-ui, sans-serif; }
+main { max-width: 72rem; margin: 0 auto; padding: 28px 22px 80px; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+h2 { font-size: 13px; font-variant-caps: all-small-caps; letter-spacing: .08em; color: var(--faint); margin: 34px 0 8px; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+p, li { max-width: 80ch; }
+p { margin: 8px 0; }
+code { font: 12.5px/1.6 ui-monospace, Menlo, Consolas, monospace; color: var(--accent); }
+a { color: var(--accent); }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 12px 0; }
+.three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 12px 0; }
+.one { margin: 12px 0; }
+figure { margin: 0; }
+figure img { max-width: 100%; border: 1px solid var(--line); display: block; }
+figcaption { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+table { border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+th, td { text-align: left; padding: 4px 14px 4px 0; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 600; }
+.rec { padding: 10px 14px; border: 1px solid var(--line); border-left: 2px solid var(--accent); }
+</style>
+</head>
+<body>
+<main>
+<h1>Round 17: the chat token's label and the Tokens section</h1>
+<p>A human makes a chat token on their Notifications page, and their own Claude Code then speaks in one project's chat as that human. This round designs two parts: the label on a human message that came through a token, and the Tokens section with the block that shows the new token once. It is a condensed round built in the lab: the shots are the real console over the lab's <code>tokens</code> scenario, with two tokens (<code>claude-laptop</code> used, <code>nightly-ci</code> never) and a thread in which <code>claude-laptop</code> and the browser both speak. No image model ran. Gemini 2.5 Pro and GLM 5V Turbo judged the same sheets. The brief is <a href="brief.md">brief.md</a> and the full account is <a href="notes.md">notes.md</a>.</p>
+
+<div class="rec">
+<p><strong>The recommendation, provisional: F for both parts.</strong> A token's message keeps the human as its author: the avatar becomes a dashed cyan ring around the initial, and the who line reads <code>sebastian via claude-laptop</code> in the muted grey. The answer to the token form shows the block once, at the top of the page: a raised panel with a 2 px cyan rule and the mark "shown once", the <code>claude mcp add</code> line behind a <code>$</code> prompt with a Copy button, and the bearer with its own Copy button. A lamp beside the last use is lit for a token in use. The form folds once a token exists. Both critics picked F for both parts in the compare loop.</p>
+<p><strong>The runner-up is A for both parts:</strong> the label as words only, with the filled disc, and the block with boxes that select whole on a click instead of Copy buttons, the form as one row of fields. In the first loop the critics disagreed on the Tokens section's runner-up: Gemini named A, GLM named B. In the compare loop both scored A above B.</p>
+<p>The entry is <a href="../../design-decisions.md">C43</a>, provisional, awaiting Sebastian's confirmation.</p>
+</div>
+
+<h2>The label, before and after</h2>
+<div class="pair">
+<figure><img src="shots/before/dark/crop-label-1440.png" alt="The thread before: token messages look like browser messages"><figcaption>Before, dark, 1x: the two token messages and the browser's look the same.</figcaption></figure>
+<figure><img src="shots/F/dark/crop-label-1440.png" alt="The thread with F: dashed avatar and via claude-laptop on the token messages"><figcaption>F, dark, 1x: the dashed ring and <code>via claude-laptop</code> on the token's two messages, the filled disc on the browser's.</figcaption></figure>
+<figure><img src="shots/before/light/crop-label-1440.png" alt="The thread before, light"><figcaption>Before, light, 1x.</figcaption></figure>
+<figure><img src="shots/F/light/crop-label-1440.png" alt="The thread with F, light"><figcaption>F, light, 1x.</figcaption></figure>
+</div>
+<div class="pair">
+<figure><img src="shots/F/dark/crop-label-1440-3x.png" alt="F at 3x, dark"><figcaption>F, dark, 3x.</figcaption></figure>
+<figure><img src="shots/F/light/crop-label-1440-3x.png" alt="F at 3x, light"><figcaption>F, light, 3x.</figcaption></figure>
+</div>
+<div class="three">
+<figure><img src="shots/F/dark/thread-390.png" alt="F on the phone, dark"><figcaption>F on the phone, dark, 390 px.</figcaption></figure>
+<figure><img src="shots/F/light/thread-390.png" alt="F on the phone, light"><figcaption>F on the phone, light, 390 px.</figcaption></figure>
+<figure><img src="shots/F/dark/thread-1440.png" alt="F in the whole chat at 1440"><figcaption>F in the chat at full screen, 1440 px.</figcaption></figure>
+</div>
+
+<h2>The Tokens section, before and after</h2>
+<div class="pair">
+<figure><img src="shots/before/dark/made-landing-1440.png" alt="Before: the answer to the form at 1440"><figcaption>Before, dark: the answer to the form. The bearer and the line are bare text, the tables break names and dates over lines, the top bar has no destinations.</figcaption></figure>
+<figure><img src="shots/F/dark/made-landing-1440.png" alt="F: the answer to the form at 1440"><figcaption>F, dark: the block on the first screen, Copy beside each value, the bar's destinations with Notifications in cyan.</figcaption></figure>
+</div>
+<div class="one"><figure><img src="shots/F/light/crop-shown-1440.png" alt="F's block, light"><figcaption>F's block, light, 1x.</figcaption></figure></div>
+<div class="one"><figure><img src="shots/F/dark/crop-shown-1440-3x.png" alt="F's block, dark, 3x"><figcaption>F's block, dark, 3x.</figcaption></figure></div>
+<div class="pair">
+<figure><img src="shots/before/light/crop-tokens-1440.png" alt="Before: the token list, light"><figcaption>Before, light: the list and the open form.</figcaption></figure>
+<figure><img src="shots/F/light/crop-tokens-1440.png" alt="F: the token list, light"><figcaption>F, light: the lamps on the last use, the form folded behind "Make a chat token".</figcaption></figure>
+</div>
+<div class="three">
+<figure><img src="shots/before/dark/made-landing-390.png" alt="Before on the phone after the answer"><figcaption>Before, the phone's first screen after the answer.</figcaption></figure>
+<figure><img src="shots/F/dark/made-landing-390.png" alt="F on the phone after the answer, dark"><figcaption>F, dark: the block fills the first screen, Copy at 44 px.</figcaption></figure>
+<figure><img src="shots/F/light/made-390.png" alt="F's whole page on the phone, light"><figcaption>F, light, the whole page: each stacked token row names its fields.</figcaption></figure>
+</div>
+
+<h2>The candidates</h2>
+<p>Three per part, kept as patches against the base commit: <a href="cand/A.patch">A</a>, <a href="cand/B.patch">B</a>, <a href="cand/C.patch">C</a>, and the pick <a href="cand/F.patch">F</a>. F is C with the first loop's changes: "via" from A, the 2 px cyan rule from A on the block, the bearer under its own label, the field names on the phone, a guard for a refused clipboard.</p>
+<table>
+<thead><tr><th>Part</th><th>Candidate</th><th>What it is</th></tr></thead>
+<tbody>
+<tr><td>Label</td><td>A</td><td><code>via claude-laptop</code> in muted grey after the name</td></tr>
+<tr><td>Label</td><td>B</td><td>the token's name as a bordered chip after the name</td></tr>
+<tr><td>Label</td><td>C</td><td>the avatar as a dashed ring, and <code>· claude-laptop</code> after the name</td></tr>
+<tr><td>Tokens</td><td>A</td><td>the block on top, values in boxes that select whole, a lamp on the last use, the form in one row</td></tr>
+<tr><td>Tokens</td><td>B</td><td>the block inside the table under the new row, the answer scrolled to it, a lamp before the name, the form as label-beside-field rows</td></tr>
+<tr><td>Tokens</td><td>C</td><td>the block on top as a command panel with Copy buttons, a lamp on the last use, the form folded once a token exists</td></tr>
+</tbody>
+</table>
+<div class="one"><figure><img src="sheet-label-dark-1x.png" alt="The label candidates, dark, 1x"><figcaption>The label's sheet, dark, 1x.</figcaption></figure></div>
+<div class="one"><figure><img src="sheet-label-light-3x.png" alt="The label candidates, light, 3x"><figcaption>The label's sheet, light, 3x. The 3x dark sheet and the 1x light sheet: <a href="sheet-label-dark-3x.png">dark 3x</a>, <a href="sheet-label-light-1x.png">light 1x</a>, the phone: <a href="sheet-label-390.png">390</a>.</figcaption></figure></div>
+<div class="one"><figure><img src="sheet-landing-1440-dark.png" alt="The answer to the form at 1440, each candidate"><figcaption>The first screen after the answer at 1440, each candidate. B lands on its block inside the table.</figcaption></figure></div>
+<div class="one"><figure><img src="sheet-shown-dark-1440.png" alt="The shown-once block of each candidate, dark"><figcaption>The block of each candidate, dark. Light: <a href="sheet-shown-light-1440.png">sheet</a>. The lists: <a href="sheet-tokens-dark-1440.png">dark</a>, <a href="sheet-tokens-light-1440.png">light</a>. The phone: <a href="sheet-landing-390.png">first screens</a>, <a href="sheet-page-390-dark.png">whole pages</a>.</figcaption></figure></div>
+
+<h2>What the critics said</h2>
+<p>The first loop ranked all three per part. Both put C first for both parts.</p>
+<table>
+<thead><tr><th>Part</th><th>Gemini</th><th>GLM</th></tr></thead>
+<tbody>
+<tr><td>Label</td><td>C, A, B</td><td>C, A, B</td></tr>
+<tr><td>Tokens</td><td>C, A, B</td><td>C, B, A</td></tr>
+</tbody>
+</table>
+<p>The compare loop scored F against the runners-up. Both picked F for both parts.</p>
+<table>
+<thead><tr><th>Part</th><th>Candidate</th><th>Gemini score</th><th>GLM score</th></tr></thead>
+<tbody>
+<tr><td>Label</td><td>F</td><td>9</td><td>7</td></tr>
+<tr><td>Label</td><td>A</td><td>6</td><td>6</td></tr>
+<tr><td>Tokens</td><td>F</td><td>9</td><td>9</td></tr>
+<tr><td>Tokens</td><td>A</td><td>6</td><td>7</td></tr>
+<tr><td>Tokens</td><td>B</td><td>3</td><td>5</td></tr>
+</tbody>
+</table>
+<p>The answers of the first loop: <a href="critique/loop1/label-gemini.json">label Gemini</a>, <a href="critique/loop1/label-glm.json">label GLM</a>, <a href="critique/loop1/tokens-gemini.json">tokens Gemini</a>, <a href="critique/loop1/tokens-glm.json">tokens GLM</a>. The compare loop: <a href="critique/compare/label-gemini.json">label Gemini</a>, <a href="critique/compare/label-glm.json">label GLM</a>, <a href="critique/compare/tokens-gemini.json">tokens Gemini</a>, <a href="critique/compare/tokens-glm.json">tokens GLM</a>. The compare sheets are in <a href="compare/">compare/</a>.</p>
+<p>The director checked twelve claims against the pixels and overruled them or found them already met, among them amber for "shown once", a 4 to 8 px rule on the block, and the claim that the dashed ring blurs into a solid one at 1x. <a href="notes.md">notes.md</a> lists each with its reason.</p>
+
+<h2>Fixes found on the way</h2>
+<p>The lab's structural check was red at the base commit, the lab answered 404 to the page's forms, the page showed no destinations in the top bar, light selects lost their chevron, the page's tables broke names and dates over lines, the Name field had no field style, and a row header drew a darker rule than its row. The build fixes all seven. <a href="notes.md">notes.md</a> has the detail.</p>
+
+<h2>Cost</h2>
+<p>Eight critic calls, about $0.24 of the $3 cap. No image generation.</p>
+</main>
+</body>
+</html>

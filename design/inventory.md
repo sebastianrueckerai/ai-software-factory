@@ -48,7 +48,7 @@ Read off the templates in `internal/console/templates/` on 2026-10-13 (code comm
 ### Chat panel
 
 - Title; "project agent · project"; New conversation; old conversations select.
-- Log: start line; your messages (image attachments as thumbnails, each a link to the full image); agent replies (markdown); asks, the newest unanswered one with an answer row of choices that sends at once (C26); tool calls as collapsed blocks (name, arguments, result's first line, duration); proposals (title, list of changes, details, Do it, Skip); applied lines with undo; refused lines, a refused apply followed by the agent's corrected proposal (C28); expired; error; streaming cursor.
+- Log: start line; your messages (image attachments as thumbnails, each a link to the full image, and a message a chat token sent with a dashed avatar ring and "via" and the token's name in the who line, C43); agent replies (markdown); asks, the newest unanswered one with an answer row of choices that sends at once (C26); tool calls as collapsed blocks (name, arguments, result's first line, duration); proposals (title, list of changes, details, Do it, Skip); applied lines with undo; refused lines, a refused apply followed by the agent's corrected proposal (C28); expired; error; streaming cursor.
 - "This is your own conversation" line. Pending images from paste and drop as chips above the box (picture, name img1, × removes, nothing uploads until Send; C27). Textarea (Enter sends, Shift+Enter breaks, / focuses). Send. The queue of waiting messages, each editable and removable.
 - Narrow screens: Board and Chat tabs, the Chat tab with an open-proposals count.
 
@@ -72,6 +72,8 @@ The four secondary pages follow the readout grammar of C24: a small-caps section
 - Connect Discord: a link to the OAuth start, when Discord is configured.
 - Connections list: one row per live link (venue, address), Disconnect per row.
 - Level per project: a table (project, Now, Set). Now shows the member's own word or "default: <word>". Set is a select of off / needs-you / all with Save, one per row.
+- Chat tokens (C43): a table (name, project, created, expires, last used with its lamp, Revoke per row), "No chat token." when there is none. The form folds behind "Make a chat token" once a token exists: project, name, lifetime of 7, 30 or 90 days, Forgejo token, Make chat token.
+- The shown-once block after a token is made, above Connections: the token's name, "shown once", the `claude mcp add` line with Copy, the bearer with Copy.
 
 ## The routines (C16)
 

@@ -1,0 +1,22 @@
+You are an independent design critic for a web console, "Factory console": a dark-first instrument-style UI. Its secondary pages follow one readout grammar: section labels, hairline rules, rows on the page ground, monospaced figures, an 8 px square lamp on every state (lit cyan for a live state, unlit outline for an off one), one cyan accent, amber reserved for "needs you". You did not design what you see.
+
+THE PART UNDER REVIEW: the "Chat tokens" section of the human's Notifications page. A chat token lets the human's own Claude Code talk to one project's chat as them. The section lists the human's tokens (name, project, created, expires, last used, Revoke) and holds the form that makes one (project, name, lifetime, Forgejo token). The answer to the form shows a block ONCE: the `claude mcp add ...` line to run in a terminal, and the bare bearer (for a script). The console never shows either again. The human must copy it now.
+
+Candidates (the real console in a lab with two tokens: claude-laptop used, nightly-ci never used; the made state is the answer after making "desk-claude"):
+- BEFORE: today's console.
+- A: the block at the top of the page as a raised panel with a cyan left rule, the two values in boxes that select whole on one click; a lamp on "last used"; the form as one row of fields.
+- B: the block opens INSIDE the table under the new token's row (the row carries a cyan left rule), and the answer scrolls the browser to it; a lamp before each name; the form as label-beside-field rows under "Make a chat token".
+- C: the block at the top as a command panel: each value in a dark line with a "$" or "#" prompt and its own Copy button; a lamp on "last used"; the form folded behind "Make a chat token" once a token exists.
+
+Images: (1) what the desk shows at 1440 px right after the answer lands (the first screen), dark; (2) the made state at 1440 px, dark, cropped to the block; (3) the same crop, light; (4) what the phone shows at 390 px right after the answer lands (the first screen), dark and light; (5) the token list and form at 1440, dark; (6) the same, light; (7) the whole page on the phone, dark. Each sheet labels its tiles.
+
+FIXED: the page's other sections, the theme colours (no new colour), the lamp's meaning. Contrast floor 4.5:1 text, 3:1 for a state fill, both themes. Phone: one column, 44 px targets, no horizontal scroll.
+
+Answer, citing the pixels:
+1. Right after making a token, which block does a human see at once, on the desk and on the phone, and which says most clearly "copy this now, it will not come back"?
+2. Which copy mechanism is faster and safer: a box that selects whole on a click, or a Copy button?
+3. Do the lamps read right (lit = a used, live token; unlit = never used or expired)? Is the table readable?
+4. Which form arrangement fits the page best?
+5. Any craft fault: contrast, alignment, overflow, crowding.
+6. Rank A, B and C. Name the winner, the runner-up, and the one change you would make to the winner.
+Be concise: at most 400 words.

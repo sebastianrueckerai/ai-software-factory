@@ -1,0 +1,19 @@
+You are an independent design critic for a web console, "Factory console": dark-first, instrument-style. Its secondary pages follow one readout grammar: section labels, hairline rules, rows on the page ground, monospaced figures, an 8 px square lamp on every state (lit cyan live, unlit outline off), one cyan accent, amber reserved for "needs you". You did not design what you see.
+
+The part: the "Chat tokens" section of the human's Notifications page. After the human makes a token, the page shows ONCE the `claude mcp add ...` line to run in a terminal and the bare bearer for a script; the console never shows either again.
+
+Three finalists of a first loop:
+- A: the block at the top as a raised panel with a 2 px cyan left rule; the two values in boxes that select whole on one click; the form as one row of fields.
+- B: the block opens inside the token table under the new token's row, and the answer scrolls the browser to it; the form as label-beside-field rows.
+- F: the first loop's winner with the critics' changes: the block at the top with the 2 px cyan left rule and a "shown once" mark; the line with a "$" prompt and a Copy button, the bearer under "bearer, for a script" with its own Copy button (a refused clipboard selects the text instead); the form folded behind "Make a chat token" once a token exists; on the phone each stacked token row names its fields (project, created, expires, last used).
+
+Images: (1) the desk at 1440 px right after the answer lands, dark; (2) the phone right after the answer lands, dark and light; (3) the block of A and F at 1440, light; (4) the page with two tokens on the phone, dark.
+
+FIXED: the page's other sections, the colours, contrast 4.5:1, phone with 44 px targets and no horizontal scroll.
+
+Answer, citing the pixels:
+1. Which makes "copy this now, it will not come back" clearest, at the desk and on the phone?
+2. Is anything in F wrong or worse than in A or B?
+3. Do the phone's stacked token rows read well in F?
+4. Pick one. Score each out of 10. Name one change to the winner, or say none is needed.
+At most 300 words.

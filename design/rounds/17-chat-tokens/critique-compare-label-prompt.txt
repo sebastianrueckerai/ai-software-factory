@@ -1,0 +1,18 @@
+You are an independent design critic for a web console, "Factory console": dark-first, instrument-style (monospaced who lines, hairline rules, one cyan accent, amber reserved for "needs you"). You did not design what you see.
+
+A human can make a "chat token" so their own local Claude Code speaks in the project chat as that human. The thread must show that a human message came through a token, and which one. Each crop shows: a message through the token "claude-laptop", the agent's reply, a second message through "claude-laptop", the reply, then a message the human typed in the browser (no token).
+
+Two finalists:
+- A: the who line reads "sebastian via claude-laptop", "via" and the name in the muted grey. The avatar stays the filled cyan disc.
+- F: the avatar of a token message becomes a dashed cyan ring with the initial (the human at a remove), and the who line reads "sebastian via claude-laptop" in the same muted grey. A browser message keeps the filled disc.
+
+Images: (1) both at 1x, dark and light; (2) both at 3x; (3) the phone at 390 px.
+
+FIXED: the row grammar, the colours, contrast 4.5:1 for text, the phone with no horizontal scroll.
+
+Answer, citing the pixels:
+1. Which lets a human scanning a long thread find the token messages faster, and does F's dashed ring read as "the human at a remove" or as something else (an error, a placeholder, the agent)?
+2. Does F's ring hold at 1x in both themes, or does it blur into a solid ring?
+3. Is either one too loud next to the human's own name?
+4. Pick one. Score each out of 10. Name one change to the winner, or say none is needed.
+At most 250 words.

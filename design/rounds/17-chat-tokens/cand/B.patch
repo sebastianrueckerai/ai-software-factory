@@ -1,0 +1,191 @@
+diff --git a/internal/console/chat_tokens.go b/internal/console/chat_tokens.go
+index 2915842f..18d279fd 100644
+--- a/internal/console/chat_tokens.go
++++ b/internal/console/chat_tokens.go
+@@ -73,6 +73,7 @@ func (c *Console) checkForgejoToken(ctx context.Context, login, tok string) erro
+ // shownOnce is the block the answer to a made token renders: the bearer
+ // and the line that adds the door to Claude Code. Nothing stores it.
+ type shownOnce struct {
++	ID                 int64
+ 	Name, Bearer, Line string
+ }
+ 
+@@ -139,7 +140,7 @@ func (c *Console) makeChatToken(w http.ResponseWriter, r *http.Request) {
+ 		map[string]any{"token": row.ID, "name": name, "project": repository})
+ 	line := fmt.Sprintf("claude mcp add --transport http factory-%s %s/mcp --header \"Authorization: Bearer %s\"",
+ 		p.Name, strings.TrimSuffix(c.cfg.PublicURL, "/"), bearer)
+-	data["Shown"] = &shownOnce{Name: name, Bearer: bearer, Line: line}
++	data["Shown"] = &shownOnce{ID: row.ID, Name: name, Bearer: bearer, Line: line}
+ 	data["Tokens"] = append([]factoryd.ChatToken{row}, data["Tokens"].([]factoryd.ChatToken)...)
+ 	w.Header().Set("Cache-Control", "no-store")
+ 	c.render(w, "notifications.html", data)
+diff --git a/internal/console/notifications.go b/internal/console/notifications.go
+index c1ee05b4..5b86a40a 100644
+--- a/internal/console/notifications.go
++++ b/internal/console/notifications.go
+@@ -87,7 +87,7 @@ func (c *Console) notificationsData(r *http.Request) (data map[string]any, statu
+ 			return nil, http.StatusInternalServerError, "cannot read the chat tokens"
+ 		}
+ 	}
+-	return map[string]any{"User": s.user, "CSRF": s.csrf, "Links": links,
++	return map[string]any{"User": s.user, "CSRF": s.csrf, "Factory": true, "Links": links,
+ 		"Projects": rows, "Levels": notifyLevels, "Code": r.URL.Query().Get("code"),
+ 		"TelegramName": m.TelegramName, "Discord": m.Discord != nil,
+ 		"ChatTokens": c.chatTokensOn(), "Tokens": tokens, "Lives": []string{"7", "30", "90"}, "Now": time.Now()}, 0, ""
+diff --git a/internal/console/static/chat.js b/internal/console/static/chat.js
+index c6a29dd4..60a5111b 100644
+--- a/internal/console/static/chat.js
++++ b/internal/console/static/chat.js
+@@ -55,10 +55,10 @@ var chatView = (function () {
+   // a turn: a 22 px avatar at the left (the agent a cyan ring with a dot,
+   // the member a filled circle with their initial), the name and the time
+   // on one line above the text, the text at the full width
+-  function whoHTML(name, at) {
+-    return "<p class=\"who\"><span class=\"name\">" + esc(name) + "</span> <time>" + stamp(at) + "</time></p>";
++  function whoHTML(name, at, via) {
++    return "<p class=\"who\"><span class=\"name\">" + esc(name) + "</span>" + (via || "") + " <time>" + stamp(at) + "</time></p>";
+   }
+-  function userHTML(login, text, at, queued, images, docs) {
++  function userHTML(login, text, at, queued, images, docs, token) {
+     // the row's images: their own names as thumbnails, the optimistic
+     // object URLs until the read carries the stored ids; its documents:
+     // link chips of file name and size, the same object URLs until then
+@@ -70,7 +70,7 @@ var chatView = (function () {
+       var href = d.url ? d.url : base + "/attachments/" + d.id;
+       return "<a class=\"chip\" href=\"" + esc(href) + "\" target=\"_blank\" rel=\"noopener\">" + esc(d.fileName || d.file_name) + " · " + sizeHTML(d.bytes) + "</a>";
+     }).join("");
+-    return "<div class=\"msg you\"><span class=\"av\" aria-hidden=\"true\">" + esc(String(login).charAt(0).toUpperCase()) + "</span>" + whoHTML(login, at) +
++    return "<div class=\"msg you\"><span class=\"av\" aria-hidden=\"true\">" + esc(String(login).charAt(0).toUpperCase()) + "</span>" + whoHTML(login, at, token ? " <span class=\"chip tok\" title=\"" + esc("sent by the chat token " + token) + "\">" + esc(token) + "</span>" : "") +
+       "<p class=\"said\">" + esc(text) + "</p>" + (thumbs ? "<div class=\"chat-thumbs\">" + thumbs + "</div>" : "") +
+       (chips ? "<div class=\"chat-chips\">" + chips + "</div>" : "") +
+       (queued ? queuedHTML : "") + "</div>";
+@@ -235,7 +235,7 @@ var chatView = (function () {
+         }
+         var ims = [], docs = [];
+         (m.attachments || []).forEach(function (a) { (/^image\//.test(a.content_type) ? ims : docs).push(a); });
+-        out.push(userHTML(login, m.content, m.at, m.queued, ims, docs));
++        out.push(userHTML(login, m.content, m.at, m.queued, ims, docs, m.token));
+         return;
+       }
+       var dst = wake ? wake.parts : parts;
+@@ -987,7 +987,7 @@ var chatView = (function () {
+         (m.attachments || []).forEach(function (a) { a.url = a.url || base + "/attachments/" + a.id; (/^image\//.test(a.content_type) ? ims : docs).push(a); });
+         if (!ims.length && !docs.length) return;
+         var t = document.createElement("template");
+-        t.innerHTML = chatView.userHTML(login, m.content, m.at, !!row.dataset.joined, ims, docs);
++        t.innerHTML = chatView.userHTML(login, m.content, m.at, !!row.dataset.joined, ims, docs, m.token);
+         var fresh = t.content.firstElementChild;
+         if (row.dataset.joined) fresh.dataset.joined = row.dataset.joined;
+         row.replaceWith(fresh);
+diff --git a/internal/console/static/console.css b/internal/console/static/console.css
+index 527438ff..9a688023 100644
+--- a/internal/console/static/console.css
++++ b/internal/console/static/console.css
+@@ -102,7 +102,7 @@ form.htmx-request button::after { content: ""; display: inline-block; width: .8r
+ @keyframes spin { to { transform: rotate(360deg); } }
+ /* fields: a line, the page's colour, a cyan ring when focused */
+ input[type=text], input[type=number], input[type=password], textarea, select { width: 100%; max-width: 48rem; padding: 6px 8px; border: 1px solid var(--btn-line); border-radius: 2px; background: var(--bg); color: var(--text); font-size: 13px; line-height: 1.45; }
+-[data-theme=light] input[type=text], [data-theme=light] input[type=number], [data-theme=light] input[type=password], [data-theme=light] textarea, [data-theme=light] select { background: var(--bg-card); }
++[data-theme=light] input[type=text], [data-theme=light] input[type=number], [data-theme=light] input[type=password], [data-theme=light] textarea, [data-theme=light] select { background-color: var(--bg-card); }
+ input[type=number] { width: 10rem; }
+ input[type=password] { max-width: 24rem; }
+ textarea { resize: vertical; }
+@@ -1268,6 +1268,7 @@ button.skip { height: 28px; padding: 0 12px; font-size: 13px; color: var(--text)
+    for needs-you, an unlit socket for off and not connected */
+ .notify th[scope=row] { color: var(--text); font: 400 12px var(--font-mono); white-space: normal; }
+ .notify td.act { width: 100%; text-align: right; }
++@media (min-width: 900px) { .notify th[scope=row], .notify td:not(.act) { white-space: nowrap; } }
+ .notify td.act form.inline { white-space: nowrap; }
+ .notify .dim { color: var(--text-muted); }
+ .notify .addr { color: var(--text-faint); }
+@@ -1416,3 +1417,27 @@ summary.strip .cell[data-tip]:hover::after, summary.strip .cell[data-tip]:focus-
+ /* the input's drag seam lights the composer's top rule, the divider's
+    own way of saying it drags */
+ form.composer:has(> .growbar:hover), form.composer:has(> .growbar:focus-visible) { border-top-color: var(--accent); }
++/* a human row a chat token sent: the token's name as a chip after the human's (round 17) */
++.msg .who .chip.tok { display: inline-block; min-width: 0; max-width: 24ch; overflow: hidden; height: 18px; line-height: 16px; text-overflow: ellipsis; align-self: center; }
++.msg .who time { flex: none; }
++/* the Tokens section (round 17): the shown-once block opens under the new
++   token's row, which carries C14's cyan rule, and the answer lands on it;
++   a lamp before each name, lit while a used token lives; the form as
++   label-beside-field rows */
++.notify tr.new > th { box-shadow: inset 2px 0 0 var(--accent); padding-left: 8px; }
++.notify tr.new > *, .notify tr.once-row > td { background: var(--bg-raised); }
++.notify tr.new > * { border-bottom: 0; }
++.notify tr.once-row > td { padding: 0 10px 12px 8px; box-shadow: inset 2px 0 0 var(--accent); white-space: normal; }
++.once-l { margin: 0 0 6px; color: var(--text-muted); font: 12.5px var(--font-ui); }
++.once-k { margin: 8px 0 3px; color: var(--text-faint); font: 11.5px var(--font-mono); font-variant-caps: all-small-caps; letter-spacing: .06em; }
++code.sel { display: block; padding: 5px 8px; border: 1px solid var(--line); border-radius: 2px; background: var(--bg); color: var(--text); font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; user-select: all; cursor: text; }
++.mint { display: grid; grid-template-columns: max-content minmax(0, 24rem); gap: 8px 14px; align-items: center; margin: 18px 0 0; }
++.mint h4 { grid-column: 1 / -1; margin: 0 0 2px; color: var(--text-muted); font: 600 12.5px var(--font-ui); font-variant-caps: all-small-caps; letter-spacing: .07em; }
++.mint label { margin: 0; text-align: right; }
++.mint input { height: 28px; }
++@media (max-width: 899px) {
++  .notify tr.once-row > td { padding: 0 8px 12px; }
++  .mint { grid-template-columns: minmax(0, 1fr); gap: 4px; }
++  .mint label { margin-top: 6px; text-align: left; }
++  .mint input, .mint select, .mint button { width: 100%; max-width: none; height: 44px; }
++}
+diff --git a/internal/console/templates/notifications.html b/internal/console/templates/notifications.html
+index ce4aae4a..95f91e49 100644
+--- a/internal/console/templates/notifications.html
++++ b/internal/console/templates/notifications.html
+@@ -2,13 +2,6 @@
+ <div class="page">
+ <h2>Notifications</h2>
+ 
+-{{with .Shown}}<section class="notify" aria-labelledby="shown">
+-<h3 id="shown">Chat token {{.Name}}</h3>
+-<p>The bearer and the line below appear once. Copy them now; the console keeps neither.</p>
+-<p><code>{{.Bearer}}</code></p>
+-<p><code>{{.Line}}</code></p>
+-</section>{{end}}
+-
+ {{$csrf := .CSRF}}{{$code := .Code}}{{$tg := ""}}{{range .Links}}{{if eq .Venue "telegram"}}{{$tg = .Address}}{{end}}{{end}}{{$dc := ""}}{{range .Links}}{{if eq .Venue "discord"}}{{$dc = .Address}}{{end}}{{end}}
+ <section class="notify" aria-labelledby="connections">
+ <h3 id="connections">Connections</h3>
+@@ -49,28 +42,34 @@
+ </tbody>
+ </table>
+ </section>
+-{{if .ChatTokens}}{{$now := .Now}}
++{{if .ChatTokens}}{{$now := .Now}}{{$shown := .Shown}}
+ <section class="notify" aria-labelledby="tokens">
+ <h3 id="tokens">Chat tokens</h3>
+ <table>
+-<caption>A chat token lets your own Claude Code talk to one project's chat as you. Make a Forgejo token with only read:user, write:repository and write:issue, and paste it here; the console seals it.</caption>
++<caption>A chat token lets your own Claude Code talk to one project's chat as you. It needs a Forgejo token of yours with only read:user, write:repository and write:issue. The console seals that token.</caption>
+ <thead><tr><th scope="col">Name</th><th scope="col">Project</th><th scope="col">Created</th><th scope="col">Expires</th><th scope="col">Last used</th><th scope="col">Act</th></tr></thead>
+ <tbody>
+-{{range .Tokens}}<tr><th scope="row">{{.Name}}</th><td>{{.Repository}}</td>
++{{range .Tokens}}{{$new := and $shown (eq .ID $shown.ID)}}<tr{{if $new}} id="made" class="new"{{end}}><th scope="row"><i class="lamp{{if and (not .LastUsed.IsZero) (not (.Expires.Before $now))}} on{{end}}" aria-hidden="true"></i>{{.Name}}</th><td>{{.Repository}}</td>
+ <td>{{.Created.Format "2006-01-02"}}</td>
+ <td>{{if .Expires.Before $now}}<span class="dim">expired</span>{{else}}{{.Expires.Format "2006-01-02"}}{{end}}</td>
+ <td>{{if .LastUsed.IsZero}}<span class="dim">never</span>{{else}}{{.LastUsed.Format "2006-01-02 15:04"}}{{end}}</td>
+ <td class="act"><form method="post" action="/notifications/tokens/revoke" class="inline"><input type="hidden" name="csrf" value="{{$csrf}}"><input type="hidden" name="id" value="{{.ID}}"><button type="submit">Revoke</button></form></td></tr>
+-{{else}}<tr><td colspan="6">No chat token.</td></tr>{{end}}
++{{if $new}}<tr class="once-row"><td colspan="6"><div class="once" role="group" aria-labelledby="shown">
++<p id="shown" class="once-l">Shown once, here only. Copy the line now: the console keeps neither the line nor the bearer.</p>
++<p class="once-k">Claude Code</p><code class="sel">{{$shown.Line}}</code>
++<p class="once-k">bearer, for a script</p><code class="sel">{{$shown.Bearer}}</code>
++</div></td></tr>
++{{end}}{{else}}<tr><td colspan="6"><span class="dim">No chat token.</span></td></tr>{{end}}
+ </tbody>
+ </table>
+-<form method="post" action="/notifications/tokens">
++<form method="post" action="/notifications/tokens#made" class="mint" aria-labelledby="mint">
++<h4 id="mint">Make a chat token</h4>
+ <input type="hidden" name="csrf" value="{{$csrf}}">
+-<p><label for="token-project">Project</label> <select id="token-project" name="project">{{range .Projects}}{{if .Writes}}<option value="{{.Repository}}">{{.Name}}</option>{{end}}{{end}}</select></p>
+-<p><label for="token-name">Name</label> <input id="token-name" name="name" maxlength="64" required></p>
+-<p><label for="token-life">Lifetime</label> <select id="token-life" name="life">{{range .Lives}}<option value="{{.}}"{{if eq . "30"}} selected{{end}}>{{.}} days</option>{{end}}</select></p>
+-<p><label for="token-forgejo">Forgejo token</label> <input id="token-forgejo" name="forgejo" type="password" autocomplete="off" required></p>
+-<button type="submit">Make chat token</button>
++<label for="token-project">Project</label><div><select id="token-project" name="project">{{range .Projects}}{{if .Writes}}<option value="{{.Repository}}">{{.Name}}</option>{{end}}{{end}}</select></div>
++<label for="token-name">Name</label><div><input id="token-name" name="name" type="text" maxlength="64" required></div>
++<label for="token-life">Lifetime</label><div><select id="token-life" name="life">{{range .Lives}}<option value="{{.}}"{{if eq . "30"}} selected{{end}}>{{.}} days</option>{{end}}</select></div>
++<label for="token-forgejo">Forgejo token</label><div><input id="token-forgejo" name="forgejo" type="password" autocomplete="off" required></div>
++<span></span><div><button type="submit">Make chat token</button></div>
+ </form>
+ </section>{{end}}
+ </div>

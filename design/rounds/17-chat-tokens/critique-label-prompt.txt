@@ -1,0 +1,22 @@
+You are an independent design critic for a web console, "Factory console": a dark-first instrument-style UI (monospaced who lines, hairline rules, one cyan accent, amber reserved for "needs you"). You did not design what you see.
+
+THE PART UNDER REVIEW. A human can make a "chat token" so their own local Claude Code speaks in the project chat as that human. Every chat message such a token sends is stored with the token's name. The thread must show that a human message came through a token, and which token. Messages the human typed in the browser show nothing new. The agent's replies carry no label.
+
+The screenshots are crops of the real console's thread. Each crop shows, top to bottom: a human message sent through the token "claude-laptop", the agent's reply, a second message through "claude-laptop", the agent's reply, and a message the human "sebastian" typed in the browser (no token).
+
+Candidates:
+- BEFORE: today's console. Token messages look exactly like browser messages.
+- A: words in the who line, "sebastian via claude-laptop", the "via" phrase in the muted grey.
+- B: the token's name as a small bordered chip after the human's name.
+- C: the avatar becomes a dashed cyan ring with the initial (the human at a remove), and the who line reads "sebastian · claude-laptop".
+
+Images: (1) the dark theme at 1x, (2) the light theme at 1x, (3) the dark theme at 3x zoom, (4) the light theme at 3x zoom, (5) the phone at 390 px, dark and light. Each sheet labels its tiles.
+
+FIXED, do not propose changing: the chat row's grammar (22 px avatar, who line of name and time in monospace, text at full width), the theme colours, no new colour. Contrast floor 4.5:1 for text in both themes. On the phone: no horizontal scroll, a token name of up to 64 characters must not break the row.
+
+Answer these, citing what you see in the pixels:
+1. Scanning the thread, which candidate lets you find the token messages fastest, and which makes it clearest that the message came from the human's own agent through a token, not from the human typing?
+2. Which keeps the token quieter than the human's own name, so the author stays the human?
+3. Any craft fault: contrast, alignment, baseline, the chip's or avatar's rendering at 1x, crowding on the phone?
+4. Rank A, B and C. Name the winner, the runner-up, and the one change you would make to the winner.
+Be concise: at most 350 words.
