@@ -8,8 +8,8 @@ faults are renumbered to stay contiguous, and the plan or spec that built
 it keeps the record. Renumbered on 2026-11-02 to close the gaps the
 departures left: 12 became 7, 14 became 8, 15 became 9, 16 became 10,
 17 became 11. Renumbered again the same day when fault 4 left: 5 to 15
-became 4 to 14, when fault 2 left: 3 to 14 became 2 to 13, and when fault
-3 left: 4 to 13 became 3 to 12. Older
+became 4 to 14, when fault 2 left: 3 to 14 became 2 to 13, and twice when
+fault 3 left: 4 to 13 became 3 to 12, then 4 to 12 became 3 to 11. Older
 documents cite the numbering of their day, and the old
 numbers 7 to 11, 13 and 18 to 20 in them name faults that have left. Gone
 on 2026-11-01: the criteria-card family (the criteria card's brief, its
@@ -61,7 +61,15 @@ card holds while a criterion has no verdict row, and the press runs the
 review again first. The plan close files a criteria-never-judged ask apart
 from the gap ask for criteria unmet. That ask offers waive, confirm and deny
 but no review: the gateway takes no hold of a finished card, so who pays for
-that review is a later plan's.
+that review is a later plan's. The raised month cap that did not end a card's
+month-cap wait left the same day (code 0bbfe484,
+docs/plans/2026-11-02-cap-waits-resume.md). A stop at the month cap or a
+project's month cap now waits as a day-cap stop does. It resumes once the cap
+no longer binds or the UTC month turns, or sooner on an answer. A policy load
+wakes every cap wait, and a refusal that the version in force already lifted
+asks nothing. The month alarm files a cap card at each cap it reaches and
+closes the card a raise lifted, and the stop's question says that the card
+resumes on its own and when.
 
 ## 1. The check-in's policy stop preempts the approval card
 
@@ -99,32 +107,7 @@ when it cannot cover it, the ask asks for money, not a session. A smaller
 sibling to verify: a session that dies mid-call left about €0.40 spent in
 the gateway that the task row's spent amount never recorded.
 
-## 3. A raised month cap does not end a card's month-cap wait
-
-Status: plan written, awaiting Sebastian's OK
-(docs/plans/2026-11-02-cap-waits-resume.md). Found 2026-11-01. Verified
-unbuilt on main 21ee41a2: CapRefusal.until (monthcap.go:48) still gives a
-month's cap no end of its own.
-
-The enforcement moved with the raise. The gateway refused 20 calls with
-refused_month_cap from 23:19 to 23:31 on 2026-10-31, all from its own hold
-under policy version 971 (month_eur 544). Version 972 (month_eur 600)
-activated at 23:31:02, and from 23:32 every call was allowed. LiteLLM's
-proxy-wide max_budget played no part: it last refused a call on
-2026-10-15. An earlier text of this entry blamed a gateway or proxy that
-kept the old cap until a restart. The audit rows show neither.
-
-The cards did not move. A month-cap stop waits for an answer only, while a
-day-cap stop resumes on its own. #1352 asked "Raise the cap to let it
-finish?" at 23:22 and waited until the chat agent answered at 00:11, 40
-minutes after the raise. #1353's session ended at 23:51, after the raise,
-and factoryd still asked to raise the cap, from a refusal of 23:28. The
-question itself says "This card resumes once the cap moves", which the
-workflow does not do. Fix direction: a month or project cap wait ends on its
-own when the cap no longer binds or the UTC month turns, a policy load
-wakes it, and no stop asks about a cap that no longer binds.
-
-## 4. The planner dies on a big spec's read set
+## 3. The planner dies on a big spec's read set
 
 Status: code landed (448048b0, 2026-11-02), the tree hand waits. The
 `digest` tool, the planGuide read discipline and the reads finding are on
@@ -156,7 +139,7 @@ pointing the retry at digests instead of re-reads. Until it lands, a
 big card needs a trimmed read set, the cheap rung, or the spec-on-card
 shape that saved #1383.
 
-## 5. The chat's answer tool failed twice on plan questions
+## 4. The chat's answer tool failed twice on plan questions
 
 Status: a fix landed on code main 2026-11-01 (05cd9e12), and whether it was
 this failure is not proven. Found 2026-10-31 on card #1383 at 21:20. The
@@ -169,7 +152,7 @@ every 4xx as "The model could not be reached", so the call read as a failed
 tool. The 4xx now names its refusal. Watch the next plan-question ask
 before closing this.
 
-## 6. An ended card's issue stays open, and both red-main remedies can land
+## 5. An ended card's issue stays open, and both red-main remedies can land
 
 Status: plan written, awaiting Sebastian's OK
 (docs/red-main-revert-plan-2026-11-02.md). Found 2026-10-31 on card #1333
@@ -195,7 +178,7 @@ remedy merges and main stays red, a green main ends the remedy that did
 not merge, and every card that ends done or closed, and every closed
 plan, closes its issue.
 
-## 7. No scripted door into the chat
+## 6. No scripted door into the chat
 
 Status: plan written, awaiting Sebastian's OK
 (docs/chat-door-design-2026-11-02.md, docs/plans/2026-11-02-chat-door.md).
@@ -213,7 +196,7 @@ through an MCP endpoint on the console. The human's own Forgejo access
 token stands behind it, sealed in factoryd, because a merge approval is a
 review under the approver's own Forgejo name.
 
-## 8. A rename that changes the policy tree cannot land before its roll
+## 7. A rename that changes the policy tree cannot land before its roll
 
 Status: candidate only. The loader still rejects an unknown tool name
 outright (policy.go:267). Found 2026-10-31: the ask tool's rename merged
@@ -228,7 +211,7 @@ name across a rename, or the roll that carries a rename commits the tree's
 rename with it, so the tree never names a tool no factoryd knows.
 
 
-## 9. The size gate moves a card's budget with no event
+## 8. The size gate moves a card's budget with no event
 
 Status: candidate only. Found 2026-11-02 while digging fault 2 on card
 #1345: the task's budget read 5.60 EUR after its only fund event (+0.60 at
@@ -241,7 +224,7 @@ can read.
 Fix direction: the size gate's budget move records an event, as the fund
 and raise paths do.
 
-## 10. A queue sweep started a half-filed card
+## 9. A queue sweep started a half-filed card
 
 Status: the fix landed on code main 2026-11-02 (c78869b2) and rides the
 next factoryd roll. Found 2026-11-01 at 20:16 on card #1451 (task
@@ -258,7 +241,7 @@ board column: the card was never shown half made, only started half
 made. EnsureIssue stays as the tripwire for a card that lost its issue
 for good.
 
-## 11. A failed card froze every card that waited on it
+## 10. A failed card froze every card that waited on it
 
 Status: the fix landed on code main 2026-11-02 (c78869b2) and rides the
 next factoryd roll; the first sweep after the roll unsticks the live
@@ -278,7 +261,7 @@ asking first. A plan that can take no replan, closed or mid revert,
 refuses, and the refusal lands as a comment on the failed card's issue
 naming the state and the fitting action.
 
-## 12. A wake turn kept a human's messages unread
+## 11. A wake turn kept a human's messages unread
 
 Status: the fix landed on code main 2026-11-02 (120a12d9) and rides the
 next factoryd roll. Found 2026-11-02: Sebastian saw the chat stop reading

@@ -1,6 +1,29 @@
 # Cap stops: the card resumes when the cap moves or the month turns
 
-Written 2026-11-02. Status: plan, awaiting Sebastian's OK. Nothing changed.
+Written 2026-11-02. Status: built on code main the same day as 0bbfe484,
+merging cd098356 and b057e905 (CapResume, the turns and the reasons),
+aa971e88 and b5265064 (the workflow's waits under "cap-wait"), 7cf86dc9 (the
+loader's wake), 41c510ae and b4af8c1a (the month alarm), 0eff21c5 and
+95455ece (the question) and b4ce26c6 (a test). The build departs from the
+text below in ten points. The check before an ask skips the ask only when
+the refusal came before the version in force took hold at the gateway, its
+activation plus `PolicyTTL`. Otherwise a floor that funds while the gateway
+or LiteLLM's backstop refuses would start sessions with no wait between
+them. `CapResume` takes a `CapCheck` and also returns `Settles`, the time the
+version in force takes hold, and the wait checks again then. A wait drains
+the policy signal where the cap was last read: before the check before an
+ask, before the floor's read, and at a restored wait's start. A check whose
+`Settles` already passed by the workflow's clock checks again 10 seconds
+later. The plan track runs the same check before an ask. The events reader is
+`capWaitOf`, and `RunState` keeps its recorded JSON keys `DayCap` and
+`DayCapUntil` for the fields `Cap` and `CapUntil`. The question promises that
+the card resumes on its own only for a reason of the new run. An old run's
+question says that the card waits for an answer. The loader's wake reuses two
+existing store reads. The month alarm counts a refusal toward the cap in
+force only from the version's activation plus `PolicyTTL`, and it closes a
+cap card once the cap in force is above the card's cap, whatever the spend,
+and a card whose month ended. Tests 8 and 12 run the old branch under a
+pinned version, not a recorded history.
 This is fault 6 of docs/needed-fixes.md. Code references are to the code
 repository's main at 21ee41a2. The incident figures come from the live
 cluster's database, read 2026-11-02.
