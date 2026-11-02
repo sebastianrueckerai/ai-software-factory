@@ -8,7 +8,8 @@ faults are renumbered to stay contiguous, and the plan or spec that built
 it keeps the record. Renumbered on 2026-11-02 to close the gaps the
 departures left: 12 became 7, 14 became 8, 15 became 9, 16 became 10,
 17 became 11. Renumbered again the same day when fault 4 left: 5 to 15
-became 4 to 14, and when fault 2 left: 3 to 14 became 2 to 13. Older
+became 4 to 14, when fault 2 left: 3 to 14 became 2 to 13, and when fault
+3 left: 4 to 13 became 3 to 12. Older
 documents cite the numbering of their day, and the old
 numbers 7 to 11, 13 and 18 to 20 in them name faults that have left. Gone
 on 2026-11-01: the criteria-card family (the criteria card's brief, its
@@ -52,7 +53,15 @@ a decision field, confirm or revise, set by the card's Confirm and Request
 changes and by the chat's answer tool and held by database checks. Only a
 confirm fixes the spec and the criteria. The file tool says a stored plan is
 the session's answer and whether the human's confirmation still waits on its
-cards.
+cards. The review refused for money that vanished, and the plan that could
+not close, left the same day (code a62ef21d to 0310f028,
+docs/refused-review-plan-2026-11-02.md). The merge ask names a review that
+did not run, with what lifts its refusal. The merge of a plan's integration
+card holds while a criterion has no verdict row, and the press runs the
+review again first. The plan close files a criteria-never-judged ask apart
+from the gap ask for criteria unmet. That ask offers waive, confirm and deny
+but no review: the gateway takes no hold of a finished card, so who pays for
+that review is a later plan's.
 
 ## 1. The check-in's policy stop preempts the approval card
 
@@ -90,25 +99,7 @@ when it cannot cover it, the ask asks for money, not a session. A smaller
 sibling to verify: a session that dies mid-call left about €0.40 spent in
 the gateway that the task row's spent amount never recorded.
 
-## 3. A review refused for money vanishes, and the plan cannot close
-
-Status: plan written, awaiting Sebastian's OK
-(refused-review-plan-2026-11-02.md). Found 2026-11-01 on plan #1345
-(incident plan), card #1380. Verified unbuilt on main 2026-11-01.
-
-The integration card's final model review was refused by the spent October
-cap and left no trace a person can see: no session row, no review event, no
-note on the approval card. The approval ask named only "risk class normal:
-a human decides the merge", and the merge went through with no model review
-at all. The hidden half: that review is also the only writer of the plan's
-criteria verdict rows. With none written, the plan can never close, and the
-close check files a gap ask that reads as "criteria not met" when the truth
-is "criteria never judged". Fix direction: a review that does not run for
-money must be named on the approval card and must hold the merge; and the
-plan close must tell an empty verdict table (a plumbing failure, ask again
-or re-run the review) from verdict rows that say unmet (a real gap).
-
-## 4. A raised month cap does not end a card's month-cap wait
+## 3. A raised month cap does not end a card's month-cap wait
 
 Status: plan written, awaiting Sebastian's OK
 (docs/plans/2026-11-02-cap-waits-resume.md). Found 2026-11-01. Verified
@@ -133,7 +124,7 @@ workflow does not do. Fix direction: a month or project cap wait ends on its
 own when the cap no longer binds or the UTC month turns, a policy load
 wakes it, and no stop asks about a cap that no longer binds.
 
-## 5. The planner dies on a big spec's read set
+## 4. The planner dies on a big spec's read set
 
 Status: code landed (448048b0, 2026-11-02), the tree hand waits. The
 `digest` tool, the planGuide read discipline and the reads finding are on
@@ -165,7 +156,7 @@ pointing the retry at digests instead of re-reads. Until it lands, a
 big card needs a trimmed read set, the cheap rung, or the spec-on-card
 shape that saved #1383.
 
-## 6. The chat's answer tool failed twice on plan questions
+## 5. The chat's answer tool failed twice on plan questions
 
 Status: a fix landed on code main 2026-11-01 (05cd9e12), and whether it was
 this failure is not proven. Found 2026-10-31 on card #1383 at 21:20. The
@@ -178,7 +169,7 @@ every 4xx as "The model could not be reached", so the call read as a failed
 tool. The 4xx now names its refusal. Watch the next plan-question ask
 before closing this.
 
-## 7. A red-main revert card does not jump the queue
+## 6. A red-main revert card does not jump the queue
 
 Status: the queue policy is unbuilt. The #1333 revert itself merged by hand
 (pull 1332, 2026-11-01 02:42). Found 2026-10-31 on card #1333: "Revert
@@ -188,7 +179,7 @@ the merges rode a broken base, or the card was stale and nothing closed it.
 
 Fix direction: a revert card for red main blocks the queue or jumps it.
 
-## 8. No scripted door into the chat
+## 7. No scripted door into the chat
 
 Status: candidate only. Found 2026-10-31: the console's OAuth2 login works
 end to end with curl (PKCE, grant, callback), and the trust gate then 403s
@@ -199,7 +190,7 @@ chat turn or read the thread without a writer's session.
 Fix direction: a service identity with read-only access to the project, or
 a scoped chat API token.
 
-## 9. A rename that changes the policy tree cannot land before its roll
+## 8. A rename that changes the policy tree cannot land before its roll
 
 Status: candidate only. The loader still rejects an unknown tool name
 outright (policy.go:267). Found 2026-10-31: the ask tool's rename merged
@@ -214,7 +205,7 @@ name across a rename, or the roll that carries a rename commits the tree's
 rename with it, so the tree never names a tool no factoryd knows.
 
 
-## 10. The size gate moves a card's budget with no event
+## 9. The size gate moves a card's budget with no event
 
 Status: candidate only. Found 2026-11-02 while digging fault 2 on card
 #1345: the task's budget read 5.60 EUR after its only fund event (+0.60 at
@@ -227,7 +218,7 @@ can read.
 Fix direction: the size gate's budget move records an event, as the fund
 and raise paths do.
 
-## 11. A queue sweep started a half-filed card
+## 10. A queue sweep started a half-filed card
 
 Status: the fix landed on code main 2026-11-02 (c78869b2) and rides the
 next factoryd roll. Found 2026-11-01 at 20:16 on card #1451 (task
@@ -244,7 +235,7 @@ board column: the card was never shown half made, only started half
 made. EnsureIssue stays as the tripwire for a card that lost its issue
 for good.
 
-## 12. A failed card froze every card that waited on it
+## 11. A failed card froze every card that waited on it
 
 Status: the fix landed on code main 2026-11-02 (c78869b2) and rides the
 next factoryd roll; the first sweep after the roll unsticks the live
@@ -264,7 +255,7 @@ asking first. A plan that can take no replan, closed or mid revert,
 refuses, and the refusal lands as a comment on the failed card's issue
 naming the state and the fitting action.
 
-## 13. A wake turn kept a human's messages unread
+## 12. A wake turn kept a human's messages unread
 
 Status: the fix landed on code main 2026-11-02 (120a12d9) and rides the
 next factoryd roll. Found 2026-11-02: Sebastian saw the chat stop reading

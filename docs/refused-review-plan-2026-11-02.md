@@ -1,8 +1,22 @@
 # The refused review and the plan that cannot close
 
-Written 2026-11-02. Status: plan, awaiting Sebastian's OK. Nothing changed.
+Written 2026-11-02. Status: landed on code main 2026-11-02 (a62ef21d to 0310f028), fix 5
+without its rerun.
 
-Fault 5 of docs/needed-fixes.md.
+Fault 5 of docs/needed-fixes.md at its writing, fault 3 when it landed.
+
+As built, three things differ from the text below:
+
+- The press decides the merge request, so after a re-run review that does
+  not run again no ask is still open. The workflow calls the same hold the
+  merge guard runs (HoldMerge), which opens the ask again naming the note.
+- The rerun of fix 5 is not built. It billed the integration card, which
+  is done by the time the ask exists, and the gateway takes no hold of a
+  task that is neither running nor in review. The criteria_rerun ask offers
+  waive, confirm and deny. Who pays for that review is a later plan's.
+- The approval kind check gains criteria_rerun in a migration, and an
+  integration card's review the card cannot pay for names the budget as
+  the remedy, since approving its merge holds.
 
 ## What happened
 
