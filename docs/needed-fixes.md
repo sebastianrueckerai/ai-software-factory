@@ -309,3 +309,17 @@ lane until a person re-runs it.
 Fix direction: measure the volume over back-to-back main runs (the pod's
 k8s.pod.filesystem.usage in SigNoz against each job's times), find what
 grows past the prune's reach, and bound it.
+
+## 9. The check-in runs out of its 5 minutes with no decision
+
+Status: candidate only. Found 2026-11-02 on card #1474. The check-in
+stopped the card five times between 19:51 and 22:13 UTC, each time with
+"The check-in gave no answer within its 5 minutes" and the reason that
+it spent its time on evidence. Every stop went to a person. Two review
+rounds on pull request 1488 each started a fix session that stopped the
+same way. The card was finished by hand: its pull request merged at
+code 1484c506.
+
+Fix direction: read the check-in's own record of the five stops, find
+what it reads for five minutes, and bound its reads, so a frontier card
+with a large diff still gets a decision.
