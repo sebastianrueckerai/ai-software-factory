@@ -568,8 +568,9 @@ the policy file.
 6. A stall gets one re-run and then a human card, for every repository.
 7. One slider, four positions. Full auto means the AI merges. The merge
    gate decides by who wrote the change. The high class merges at full auto
-   on the AI's verdict with the audit as a required pass. Reverses rulings
-   76, 77 and 109 for that case only.
+   on the AI's verdict with the audit as a required pass. For that case
+   only, this reverses the rule that no agent code reaches main without a
+   human's approval.
 8. The human sees only exceptions the AI cannot handle, and money. The
    project agent funds cards from a discretionary pool the human sets once.
 9. `alert_verdict` and `write_doc` leave the confirm set at full auto.
