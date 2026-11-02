@@ -81,11 +81,16 @@ plan carries the details.
 
 ## 3. Sessions open that the task budget cannot pay for
 
-Status: plan wanted. Found 2026-10-31 on card #1345; four openings burned
-about €0.53 and filed nothing. Re-verified unbuilt on main a0e2803e: the
-session floor (SessionFunded, every session's start since 6c579a24 of
-2026-10-16) predates the fault and did not stop the four openings, and
-nothing since changes what a grant buys.
+Status: plan written, awaiting Sebastian's OK
+(docs/plans/2026-11-02-unpayable-sessions.md). Found 2026-10-31 on card
+#1345; four openings burned about €0.53 and filed nothing. Re-verified
+unbuilt on main a0e2803e: the session floor (SessionFunded, every session's
+start since 6c579a24 of 2026-10-16) predates the fault and did not stop the
+four openings, and nothing since changes what a grant buys. The dig found
+why: the plan loop opens sessions with no floor at all, and the floor that
+ran read figures the gateway's holds and the frozen month cap had already
+spent — the plan puts the floor at every opening and the enforced task
+money on every surface.
 
 The factory grants and opens planner sessions without checking that the
 task's remaining budget covers a whole session opening. With €0.03 to €0.44
@@ -220,3 +225,16 @@ Fix direction: the config loader accepts the union of the old and the new
 name across a rename, or the roll that carries a rename commits the tree's
 rename with it, so the tree never names a tool no factoryd knows.
 
+
+## 12. The size gate moves a card's budget with no event
+
+Status: candidate only. Found 2026-11-02 while digging fault 3 on card
+#1345: the task's budget read 5.60 EUR after its only fund event (+0.60 at
+00:06) and 7.60 by the evening's end, the +2.00 written by the size gate's
+budget writer (SetTaskSizeBudget, store.go:1358) with no card_funded or
+other event, so the evening's true headroom had to be reconstructed from
+the ledger. A budget that moves silently leaves no line a person or a dig
+can read.
+
+Fix direction: the size gate's budget move records an event, as the fund
+and raise paths do.
