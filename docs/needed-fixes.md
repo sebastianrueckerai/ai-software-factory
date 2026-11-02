@@ -102,7 +102,19 @@ longer the session cap, and names the minutes a grant buys. The console's
 Extend takes any live card, and its raise stands: it lives in columns the
 workflow's usage record never writes, which the workflow reads before each
 cap check. A card's agent time follows its size, half for a small card and
-one and a half for a large one.
+one and a half for a large one. Two faults found on card #1473 left the
+same day on code main and ride the next factoryd roll. The check-in share
+stop told the human that Go on grants one more share and starts the
+session again. With the card's pull request open, the answer re-verifies
+the head and buys nothing, and the question now says so (code fdf4d793).
+A main CI run that Forgejo left blocked held main's CI lane unseen.
+Forgejo's zombie sweep failed a job whose runner had died and never freed
+the jobs that need it, and the roller read only the newest run, which
+waited. Main's run 2317 held the lane for 2 h 22 min, and the merged #1453
+and #1473 waited behind it until a person re-ran it. A main run blocked
+with a red job for five minutes now pauses the queue, its failed jobs
+re-run once, and a second stall files the human re-run card (code
+321baaa7).
 
 ## 1. The check-in's policy stop preempts the approval card
 
@@ -243,3 +255,21 @@ can read.
 
 Fix direction: the size gate's budget move records an event, as the fund
 and raise paths do.
+
+## 8. The runner's docker volume passes its 50Gi limit
+
+Status: candidate only. Found 2026-11-02 on card #1473. At 14:43:34 the
+kubelet evicted the trusted runner's pod, up since 2026-10-28: "Usage of
+EmptyDir volume "docker-data" exceeds the limit "50Gi"". Main's run 2316
+(2b9841c6) had run its test and its three image jobs from 14:20 to 14:38,
+and run 2317's test job (b76459d9) started at 14:39 and died with the pod.
+The docker-prune sidecar prunes from 30 GiB (dind.prune.maxGiB), and the
+chart counts at most 13.3 GiB per run, so the volume should stay under
+44 GiB. The new pod held 11.8 GiB at 17:20 during a test job. What filled
+the old volume past 50 GiB is not measured. Each eviction kills the job it
+runs, and before code 321baaa7 rolls, such a job's run stalls main's CI
+lane until a person re-runs it.
+
+Fix direction: measure the volume over back-to-back main runs (the pod's
+k8s.pod.filesystem.usage in SigNoz against each job's times), find what
+grows past the prune's reach, and bound it.
