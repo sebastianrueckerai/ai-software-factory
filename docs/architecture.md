@@ -2790,7 +2790,7 @@ and answers JSON.
 
 | Tool | Does |
 | --- | --- |
-| `chat_send` `{message, conversation?}` | Sends a turn and waits for its end, for at most 4 minutes. Answers the conversation id, the reply, the tools called with one-line results, the proposals, the applied lines, a stop text in `error`, and `ended`. A message that joins a running turn answers `ended: false`. When the chat's budget stops the turn, the budget answer names the action: for an approver, `chat_fund` with the suggested amount, after which the thread goes on by itself and `chat_read` reads it, and for a writer, that an approver of the project funds the chat. |
+| `chat_send` `{message, conversation?}` | Sends a turn and waits for its end, for at most 50 seconds, inside Claude Code's default 60-second MCP tool timeout. Answers the conversation id, the reply, the tools called with one-line results, the proposals, the applied lines, a stop text in `error`, and `ended`. A message that joins a running turn answers `ended: false`. When the chat's budget stops the turn, the budget answer names the action: for an approver, `chat_fund` with the suggested amount, after which the thread goes on by itself and `chat_read` reads it, and for a writer, that an approver of the project funds the chat. |
 | `chat_read` `{conversation?, after?}` | Reads the store and answers `{"messages": [...], "more": bool}`. It holds at most 40 rows and about 60 KB per call, oldest first, stops at a whole message, and pages on with `after` set to the last id. Each row carries its source and, on a proposal, `proposals: [{id, state}]`. |
 | `chat_confirm` `{proposal}` | Presses Do it on a pending proposal of the human in this project. Answers the shape of `chat_send`. |
 | `chat_threads` `{}` | Lists the human's conversations of the project: id, title, last message time, unread or not. |
@@ -2804,7 +2804,7 @@ token is free, and its next turn makes a fresh side thread. A token reaches
 every conversation of its human in the project and no other human's. Nothing a
 token does marks a thread seen, `chat_read` included, so the human's thread
 list shows the token's conversation unread until the human opens it. When the
-4-minute wait ends first, the tool answers with what it has and the turn goes
+50-second wait ends first, the tool answers with what it has and the turn goes
 on detached. Its rest lands as rows, a failure included, and `chat_read` gets
 them. A pressed proposal's follow-up turn stops on the human's Stop, in the
 browser as well. A pressed proposal enters the stop gate before it waits for

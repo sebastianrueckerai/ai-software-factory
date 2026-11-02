@@ -238,8 +238,9 @@ Each tool runs on the token's project. Each answers JSON.
    `POST /projects/{name}/chat` does (`chatPost`,
    `internal/console/chat.go:607`). Without a conversation it uses the
    token's own conversation, which it makes at first use with the token's
-   name as its title. The tool waits for the turn to end, for at most 4
-   minutes. It answers with the conversation's id, the reply, the tools
+   name as its title. The tool waits for the turn to end, for at most 50
+   seconds. Claude Code cuts a tool call at 60 seconds by default, as the
+   live proof measured, and `MCP_TOOL_TIMEOUT` raises that. It answers with the conversation's id, the reply, the tools
    the project agent called with their one-line results, the proposals
    (id, what it does, expiry), the applied lines, a budget stop or an
    error, and whether the turn ended. A message sent while a turn runs
@@ -368,7 +369,7 @@ the code:
 - The token's own conversation never moves the human's browser, and
   nothing a token does marks a thread seen.
 - A token's turn keeps a failure as a row, so a turn that outlasts the
-  4-minute wait leaves nothing unseen.
+  50-second wait leaves nothing unseen.
 - A revoke stops the next request, not a running turn.
 - Decision 2's "fund the chat" became the fifth tool, because a spent chat
   cannot run the turn that would call its own fund tool.
