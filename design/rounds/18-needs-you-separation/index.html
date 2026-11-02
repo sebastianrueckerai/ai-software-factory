@@ -34,7 +34,7 @@ th { color: var(--muted); font-weight: 600; }
 <p>Sebastian's complaint of 1 November 2026: highlighted cards run together. The card flow redesign will show one open case per Needs-you card, with a count of the card's other cases and arrows. This round designs the chrome that face lands in: what parts two cards, and where the count and arrows sit. It is a condensed round built in the lab: the board is the real console's busy board at code commit 1d5d4163, its Needs-you column filled with two, three or five cards of the lab's cases, each in the five parts. No image model ran. Gemini 2.5 Pro and GLM 5V Turbo judged the same sheets. The brief is <a href="brief.md">brief.md</a> and the full account is <a href="notes.md">notes.md</a>.</p>
 
 <div class="rec">
-<p><strong>The recommendation, provisional: F.</strong> Each card opens on an amber band, 32 px at the desk and 46 px on the phone, that holds the ref in the amber text colour and the waiting time, ruled off from the case by an amber hairline. The gap between cards grows from 6 px to 12 px. A card with more than one open case ends on the carousel: under a hairline, at the right, the previous arrow, the count <code>1 of 4</code> and the next arrow, 44 px targets on the phone. A card with one case shows neither. Today's 3 px amber bar, 4 percent tint and amber-mixed border stay under it. The band marks where each card starts, the gap where it ends, and the arrows come after the case is read. Both critics picked F in the compare loop, 9 of 10.</p>
+<p><strong>The recommendation, provisional: F.</strong> Each card opens on an amber band behind its head row, ruled off from the case by an amber hairline. The band is the row's own background, 32 px at the least at both widths, and grows when a title wraps. In phase 5 it holds the ref in the amber text colour and the waiting time. The gap between cards grows from 6 px to 12 px. A card with more than one open case ends on the carousel: under a hairline, at the right, the previous arrow, the count <code>1 of 4</code> and the next arrow, 44 px targets on the phone. A card with one case shows neither. Today's 3 px amber bar, 4 percent tint and amber-mixed border stay under it. The band marks where each card starts, the gap where it ends, and the arrows come after the case is read. Both critics picked F in the compare loop, 9 of 10.</p>
 <p><strong>The runner-up is B:</strong> the same band with the count and arrows at its right, and an 8 px gap. The human sees the count before reading. Both critics scored it 7. The critics disagreed on the runner-up: in the first loop both named C, the strong amber frame, and in the compare loop Gemini scored C level with B.</p>
 <p><strong>What the lab found first:</strong> today's card treatment never renders. Its selector, <code>.lane.five #needs-you &gt; .card</code>, has matched no card since 14 October 2026, when the cards moved into the column's <code>.cards</code> body. The build fixes the selector with the pick.</p>
 <p>The entry is <a href="../../design-decisions.md">C44</a>, provisional, awaiting Sebastian's confirmation.</p>
@@ -72,6 +72,19 @@ th { color: var(--muted); font-weight: 600; }
 <figure><img src="shots/before/dark/view-390-n3.png" alt="Before on the phone, dark"><figcaption>Before on the phone, dark.</figcaption></figure>
 </div>
 
+<h2>Two of today's cards under F</h2>
+<p>The build lands before phase 5's face, so the band must hold today's head rows too: <code>.need-top</code> on an approval, the face's first line on an escalation. These are the lab's busy cards as the console renders them and under F, shot by <a href="today.js">today.js</a> without a critic. Its check found every text box of the head row inside the band in both themes at 1440 and 390: the escalation's band 52 px at 1440 with its title over two lines, the approval's 56 px with its chips and time over two. The approval's headline is 16 px under F.</p>
+<div class="four">
+<figure><img src="shots/today/before/dark/approval-1440.png" alt="Today's approval card as the console renders it, dark"><figcaption>Approval #607 today, dark, 1440.</figcaption></figure>
+<figure><img src="shots/today/F/dark/approval-1440.png" alt="The approval card under F, dark"><figcaption>Under F: the band grows to hold the wrapped head.</figcaption></figure>
+<figure><img src="shots/today/before/light/escalation-1440.png" alt="Today's escalation card as the console renders it, light"><figcaption>Escalation #603 today, light, 1440.</figcaption></figure>
+<figure><img src="shots/today/F/light/escalation-1440.png" alt="The escalation card under F, light"><figcaption>Under F: the two-line title inside the band.</figcaption></figure>
+</div>
+<div class="pair">
+<figure><img src="shots/today/F/dark/approval-head-390-3x.png" alt="The approval's head under F on the phone at 3x"><figcaption>The approval's head under F, dark, 390 px, 3x.</figcaption></figure>
+<figure><img src="shots/today/F/light/escalation-head-1440-3x.png" alt="The escalation's head under F at 3x"><figcaption>The escalation's head under F, light, 1440 px, 3x.</figcaption></figure>
+</div>
+
 <h2>The candidates</h2>
 <table>
 <tr><th>Treatment</th><th>What it is</th><th>First loop, Gemini / GLM</th><th>Compare, Gemini / GLM</th></tr>
@@ -81,7 +94,7 @@ th { color: var(--muted); font-weight: 600; }
 <tr><td>C</td><td>a strong amber frame, gap 12 px, the carousel as the last row, arrows at the ends</td><td>2nd / 2nd</td><td>7 / 6</td></tr>
 <tr><td>F</td><td>B's band, the carousel at the foot as one unit, gap 12 px</td><td></td><td>9 / 9</td></tr>
 </table>
-<p>Both critics asked in the first loop for the carousel at the foot. Gemini's first ranking put B last on a contrast fault it misread: the band's text measures 7.8:1 and 5.0:1 dark. The claims the director overruled are in <a href="notes.md">notes.md</a>.</p>
+<p>F's shots on this page are the pick after the fix round, whose band follows the head row. The critics judged <code>shots/F-judged</code>, whose band was a fixed 32 px and looks the same. Both critics asked in the first loop for the carousel at the foot. Gemini's first ranking put B last on a contrast fault it misread: the band's text measures 7.8:1 and 5.0:1 dark. The claims the director overruled are in <a href="notes.md">notes.md</a>.</p>
 <div class="pair">
 <figure><img src="contact-sheet-strip-n3-dark.jpg" alt="First loop: the column of three in every treatment, dark"><figcaption>First loop: the column of three, dark: before, base, A, B, C.</figcaption></figure>
 <figure><img src="contact-sheet-strip-n3-light.jpg" alt="First loop: the column of three in every treatment, light"><figcaption>The same, light.</figcaption></figure>

@@ -1,6 +1,8 @@
 /* base.css: console.css's Needs-you card treatment (its lines 213 to 215)
    as meant. Their selector, #needs-you > .card, has matched no card since
    the cards moved into the column's .cards body on 2026-10-14, so today
-   the column's cards are plain cards. Here the same values reach them. */
+   the column's cards are plain cards and an approval's headline is 14 px.
+   Here the same values reach them, the 16 px headline with them. */
 .lane.five #needs-you .cards > .card { background: color-mix(in srgb, var(--need) 4%, var(--bg-card)); border-color: color-mix(in srgb, var(--need) 38%, var(--line)); box-shadow: inset 3px 0 0 var(--need); padding-left: 14px; }
 [data-theme=light] .lane.five #needs-you .cards > .card { background: var(--bg-card); border-color: color-mix(in srgb, var(--need) 55%, var(--line)); }
+.lane.five #needs-you .cards > .card h4 { font-size: 16px; line-height: 1.3; }

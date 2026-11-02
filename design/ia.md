@@ -59,7 +59,7 @@ Each is a decision with the primary action first:
 - **Escalation.** The question is the headline, the choice buttons under it, "Or in your words" as a disclosure that opens the text box (the text box is open when there are no choices). Answer, or "Grant one session with this answer" when capped. The verdict buttons for approvers stay, small, at the end.
 - **Human task.** The compact face with Close.
 
-Every item stands in the card chrome of C44 (provisional): the 3 px amber bar, the 4 percent tint and the amber-mixed border, an amber band across the top with the ref and the waiting time, and 12 px to the next item, so two items never read as one. An item with more than one open case ends on its carousel, under a hairline at the right: previous, the count `1 of 4`, next, 44 px targets on the phone. An item with one case shows neither.
+Every item stands in the card chrome of C44 (provisional): the 3 px amber bar, the 4 percent tint and the amber-mixed border, an amber band behind the head row whose height follows that row, 32 px at the least, and 12 px to the next item, so two items never read as one. An item with more than one open case ends on its carousel, under a hairline at the right: previous, the count `1 of 4`, next, 44 px targets on the phone. An item with one case shows neither.
 
 ## The drawer
 
