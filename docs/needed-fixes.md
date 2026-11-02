@@ -238,3 +238,40 @@ can read.
 
 Fix direction: the size gate's budget move records an event, as the fund
 and raise paths do.
+
+## 12. A queue sweep started a half-filed card
+
+Status: the fix landed on code main 2026-11-02 (c78869b2) and rides the
+next factoryd roll. Found 2026-11-01 at 20:16 on card #1451 (task
+t-3bfcd4cd4e2a): the plan filer writes a card's row queued with no issue,
+files the Forgejo issue, then links it, about a second end to end. The
+heal pass's sweep listed the row inside that window and started it, and
+EnsureIssue, the workflow's first activity, terminal-failed the card for
+having no linked issue. The only such failure the events table holds.
+
+The fix: the queue list skips rows with no issue and the work bound
+declines them without failing, so a half-made card holds no slot until
+its issue is filed and the next sweep starts it. No new status and no
+board column: the card was never shown half made, only started half
+made. EnsureIssue stays as the tripwire for a card that lost its issue
+for good.
+
+## 13. A failed card froze every card that waited on it
+
+Status: the fix landed on code main 2026-11-02 (c78869b2) and rides the
+next factoryd roll; the first sweep after the roll unsticks the live
+board (#1452, #1453, #1454). Found 2026-11-01: a dependency counts as
+met only when its card is done, or ended closed. A failed card is
+neither, so #1452, waiting on the failed #1451, sat queued forever, with
+#1453 behind it and #1454, #1414 and #1441 behind that. Nothing wakes a
+queued dependent, no alert fired, and the retry the dependency code
+waits for is not built.
+
+The fix: when a card fails with a card still live waiting on it, at its
+end and in a sweep each minute, factoryd sends it back to its plan's
+planner through the existing replan, once per card (an "impasse" marker
+on its timeline). The waiting cards of the plan wait on the plan, the
+planner files its next revision, and the dead work is replanned without
+asking first. A plan that can take no replan, closed or mid revert,
+refuses, and the refusal lands as a comment on the failed card's issue
+naming the state and the fitting action.
