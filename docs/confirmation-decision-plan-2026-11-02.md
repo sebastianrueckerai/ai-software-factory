@@ -3,9 +3,11 @@
 It was fault 2 of docs/needed-fixes.md, which left the list with it.
 Written 2026-11-02. Status: built on code
 main the same day, as 42812078 (the decision field, the card, the chat, the
-file tool) and dc2b4fd0 (the final review's fixes), landed in ed3d5f40. The
-fix list below states the design as built: the review changed items 1, 2,
-4, 5 and 7.
+file tool) and dc2b4fd0 (the final review's fixes), landed in ed3d5f40,
+then 2531bae7 (a batch answer never overwrites one that landed after its
+check, and open hold-outs refuse a confirmation by name). The fix list
+below states the design as built: the review changed items 1, 2, 4, 5
+and 7.
 
 ## What happened
 

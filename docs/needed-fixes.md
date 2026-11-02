@@ -47,7 +47,7 @@ the month cap names the month's spend and cap, the budget stop recommends
 the raise when the card holds a pull request, and the plain check-in stop
 shows the card's spend against its session cap. The flavoured confirmation
 that never filed left the same day with the file tool that said filed (code
-ed3d5f40, docs/confirmation-decision-plan-2026-11-02.md): the confirmation is
+ed3d5f40 and 2531bae7, docs/confirmation-decision-plan-2026-11-02.md): the confirmation is
 a decision field, confirm or revise, set by the card's Confirm and Request
 changes and by the chat's answer tool and held by database checks. Only a
 confirm fixes the spec and the criteria. The file tool says a stored plan is
