@@ -4,7 +4,7 @@ The run of [the brief](brief.md) in the condensed form. Three candidates were bu
 
 ## The recommendation: F, provisional
 
-**The separation.** Each Needs-you card opens on an amber band across its width that holds the card's head row, ruled off from the case by an amber hairline. The band sits behind the card's head row: the case's head in phase 5, with the ref in the amber text colour and the waiting time in the muted grey. On today's cards it is `.need-top` on an approval, the `h4` on a plan's approval, and the face's first line on an escalation or a human card. The band is that row's own background, so its height follows the row. It is 32 px at the least, at both widths, with no fixed height, so a title that wraps grows the band and never has the band cut through it. The band is the amber mixed 14 percent into the card ground in the dark theme and 22 percent in the light one. The gap between two cards grows from 6 px to 12 px. Today's treatment stays under it: the 3 px amber bar, the 4 percent tint, the amber-mixed border and 14 px left padding, with a selector that reaches the cards.
+**The separation.** Each Needs-you card opens on an amber band across its width that holds the card's head row, ruled off from the case by an amber hairline. The band sits behind the card's head row: the case's head in phase 5, with the ref in the amber text colour and the waiting time in the muted grey. On today's cards it is `.need-top` on an approval, the `h4` on a plan's approval, and the face's first line on an escalation or a human card. The band is that row's own background, so its height follows the row. It is 32 px at the least, at both widths, with no fixed height, so a title that wraps grows the band and never has the band cut through it. The band is the amber mixed 14 percent into the card ground in the dark theme and 22 percent in the light one: it mixes `--need` into `--bg-card` as the baseline's tint does, so it adds no new token. The gap between two cards grows from 6 px to 12 px. Today's treatment stays under it: the 3 px amber bar, the 4 percent tint in the dark theme, the amber-mixed border and 14 px left padding, with a selector that reaches the cards.
 
 **The count and the arrows.** A card with more than one open case ends on the carousel: under a hairline, at the right, one unit of the previous arrow, the count "1 of 4" in mono and the next arrow. The arrows are 24 px at the desk and 44 px on the phone. A card with one case shows neither, and ends on its links.
 
@@ -59,6 +59,8 @@ A, B, C and F on six sheets ([prompt](critique-compare-prompt.txt)): the seam at
 | F | 9 | 9 |
 
 Both picked F. Both read F's foot carousel as part of the card it closes, and F's light band as legible and calm. Gemini asked for no change. GLM asked for 2 px more air above the foot's hairline.
+
+The compare loop leaned toward F: questions 2 and 3 of its prompt asked about F alone, and only F had a sheet of the whole screen ([sheets.sh](sheets.sh)). This is a limit of the method, for Sebastian to weigh with the pick.
 
 ## What the director overruled
 
@@ -121,4 +123,4 @@ The shots showed one fault, now fixed: the approval's waiting time is `.need-top
 
 ## Evidence
 
-[shots/](shots/) holds every shot by treatment and theme, for N of 2, 3 and 5: at 1440 `view-1440-n3` the screen, `col-1440-nN` the column as seen, `strip-1440-nN` the whole column, `seam-1440-nN` and `seam-1440-nN-3x` the seam. At 390 `col-390-nN` the whole column, `view-390-nN` the screen at the column's top, `seam-390-nN` and `seam-390-nN-3x` the seam. `shots/F-judged` is F as the critics saw it, `shots/F` the pick after the fix round, and `shots/today` today's two cards. [sheets.sh](sheets.sh) builds the sheets again (`first`, then `compare`). [capture.js](../../prototypes/needs-you-separation/capture.js) takes the board from the lab again.
+[shots/](shots/) holds every shot by treatment and theme, for N of 2, 3 and 5: at 1440 `view-1440-n3` the screen, `col-1440-nN` the column as seen, `strip-1440-nN` the whole column, `seam-1440-nN` and `seam-1440-nN-3x` the seam. At 390 `col-390-nN` the whole column, `view-390-nN` the screen at the column's top, `seam-390-nN` and `seam-390-nN-3x` the seam. The seam shots of N 2 and 5 are byte copies of N 3's, because the seam sits between the first two cards whatever the count. `shots/F-judged` is F as the critics saw it, `shots/F` the pick after the fix round, and `shots/today` today's two cards. [sheets.sh](sheets.sh) builds the sheets again (`first`, then `compare`). [capture.js](../../prototypes/needs-you-separation/capture.js) takes the board from the lab again.

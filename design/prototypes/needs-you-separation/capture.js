@@ -9,7 +9,8 @@ const path = require("path");
 const { chromium } = require("playwright");
 
 const base = process.env.BASE || "http://127.0.0.1:8090";
-const labDir = process.env.CONSOLE_LAB_DIR || "/tmp/claude-1000/console-lab";
+const labDir = process.env.CONSOLE_LAB_DIR;
+if (!labDir) throw new Error("set CONSOLE_LAB_DIR to the lab's directory, the one that holds cookie.txt");
 const [name, value] = fs.readFileSync(path.join(labDir, "cookie.txt"), "utf8").trim().split(/=(.*)/s);
 
 (async () => {

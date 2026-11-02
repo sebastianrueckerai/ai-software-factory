@@ -183,8 +183,7 @@ Status: code landed (448048b0, 2026-11-02) and is live since roll c78869b
 (2026-11-02 02:19Z). The tree hand waits on Sebastian. The card flow
 redesign's card digest (its section 5.3) shares the word: in code the names
 are CardDigest, card_step and board_digest, never `digest` alone, and
-docs/plans/2026-11-02-card-flow-companion.md puts that sentence in the
-redesign. The
+the redesign's section 5.3 carries that sentence. The
 `digest` tool, the planGuide read discipline and the reads finding are on
 code main. No session sees the tool until the policy tree's coder,
 analyzer and planner stanzas list `digest: {}`, a commit on the infra
@@ -309,9 +308,11 @@ volume past 50 GiB was not measured then. Each eviction kills the job it
 runs, and before code 321baaa7 rolls, such a job's run stalls main's CI
 lane until a person re-runs it.
 
-Fix direction: measure the volume over back-to-back main runs (the pod's
-k8s.pod.filesystem.usage in SigNoz against each job's times), find what
-grows past the prune's reach, and bound it.
+Fix direction: the bound, by the infra hand in
+docs/runner-volume-measurement-2026-11.md. The prune sidecar runs `docker
+volume prune -af` last, only when the volume is still over maxGiB after
+its other prunes. The fault leaves the list when a runner pod lives past
+five days with no eviction and a low point under 30 GiB.
 
 ## 9. The check-in runs out of its 5 minutes with no decision
 
@@ -346,8 +347,10 @@ missing its liveness probe (/ping, a 1 second timeout, ten misses in a
 row), while those retried queries ran (`kubectl -n platform get events
 --field-selector
 involvedObject.name=chi-signoz-clickhouse-cluster-0-0-0`). That was its
-fifth restart in eight days, and sf-0's kernel log (`talosctl -n 10.0.1.10
-dmesg`) holds a memory cgroup kill of clickhouse-serv on 2026-10-30 at
+fifth restart in eight days, and sf-0's kernel log
+(`TALOSCONFIG=~/repos/ai-software-factory-infra/talos/talosconfig talosctl
+-e <API endpoint> -n 10.0.1.10 dmesg`) holds a memory cgroup kill of
+clickhouse-serv on 2026-10-30 at
 2.97 GB resident. SigNoz's own pages and alerts query the same server:
 whether they fail too is not checked.
 

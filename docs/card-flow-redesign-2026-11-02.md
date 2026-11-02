@@ -218,7 +218,7 @@ Rung 0 is a table keyed by case kind and facts. Each row is one rule that needs 
 | Case | Resolver |
 |---|---|
 | a cap of any kind, a pull request open, checks green, the last review approved the head | re-verify the head and route to approval. Never ask for a session. |
-| a cap, a pull request open, checks red with the checks log | hand to rung 1 with the log in the facts. No approval request opens. |
+| a cap, a pull request open, checks red with the checks log | re-run the checks once on this head, and still red, hand to rung 1 with the log in the facts. No approval request opens. |
 | check-in share spent | the kind goes. Rung 1 is paid from the judgment budget (5.7), so no card stops for its own check-in money, and the guard that fabricates the stop before judgment goes (S21). |
 | day, month or project cap | the clocked wait of `cap-wait`, as on main |
 | budget headroom below the opening's cost | a money sub-ask on the case, no session opened (fault 2). The floor that produces this trip runs at every opening, `RunSession` and `reportSession`, and every face shows the enforced money, budget minus spent minus holds. Both are built by the companion plan before phase 2. The ask that fires as the money ask before an attempt is this row. |
@@ -258,7 +258,7 @@ Judgment and work have separate budgets. The card's budget pays sessions and gat
 
 ### 5.8 The human face: one decision at a time, per card
 
-Each Needs you card shows one open case at a time, as a carousel: the case, a count of the card's other open cases, arrows to move between them (Sebastian, 2026-11-02). The column keeps one row per card, so the board's overview stays. Each plan question is a case of kind plan question, keyed by its text as phase 1 keys every ask, and the confirmation is a case of kind plan confirmation. The carousel shows one, and the forms post one answer per question index as they do today. This reverses the presentation half of issue #506, "Every plan answer in one turn (roadmap 179)": the planner still asks all its questions in one turn, and the human reads and answers them one at a time. The plan card's face shows the five parts of one case and nothing raw. The revision's text, the summary and the hold-outs sit behind `card_step` and the drawer, and the brief writer's prose keeps the approval brief's bounds of 600 and 4000 characters. A question's text is bounded at its writer by the companion plan. The reader is someone who dropped in on a project they forgot about and does not remember how the factory works inside, so every part is written for that reader. Each case renders the five parts from its record:
+Each Needs you card shows one open case at a time, as a carousel: the case, a count of the card's other open cases, arrows to move between them (Sebastian, 2026-11-02). The column keeps one row per card, so the board's overview stays. Each plan question is a case of kind plan question, keyed by its text as phase 1 keys every ask, and the confirmation is a case of kind plan confirmation. The carousel shows one, and the forms post one answer per question index as they do today, and each answer resolves its question's case. This reverses the presentation half of issue #506, "Every plan answer in one turn (roadmap 179)": the planner still asks all its questions in one turn, and the human reads and answers them one at a time. The plan card's face shows the five parts of one case and nothing raw. The revision's text, the summary and the hold-outs sit behind `card_step` and the drawer, and the brief writer's prose keeps the approval brief's bounds of 600 and 4000 characters. A question's text is bounded at its writer by the companion plan. The reader is someone who dropped in on a project they forgot about and does not remember how the factory works inside, so every part is written for that reader. Each case renders the five parts from its record:
 
 1. **The ask.** The problem line with the numbers. Never the money unless money is the only matter.
 2. **Why.** The kind's template filled from the facts, then the last rung's finding in one or two sentences.
@@ -266,13 +266,13 @@ Each Needs you card shows one open case at a time, as a carousel: the case, a co
 4. **Recommendation.** Rung 2's recommended action, its grounds in plain words, and its name as the source. Empty when no rung had grounds.
 5. **Premade answers.** One button per action the human may take on this case, each with its effect in one line, the recommended one first. Beside them the one fund control of 5.7 and a note box. One send applies the decision, the draw and the note together. Free text in the note goes with the typed decision, never as the decision.
 
-The brief writer agent, which today writes a brief per card in Needs you, reads the case and writes the prose of parts 3 and 4 for that reader. The five-part contract of 2026-10-17 stands unchanged. The card separation on the face is a design round of its own, run by the companion plan before phase 5 with the carousel's count and arrows among the round's fixed parts, so phase 5 lands inside the chrome the round picked.
+The brief writer agent, which today writes a brief per card in Needs you, reads the case and writes the prose of parts 3 and 4 for that reader. The five-part contract of 2026-10-17 stands unchanged. The card separation on the face is a design round of its own, run by the companion plan before phase 5 with the carousel's count and arrows among the round's fixed parts, so phase 5 lands inside the chrome the round picked: C44 (provisional) in [design-decisions.md](../design/design-decisions.md).
 
 ### 5.9 Full auto takes the first shot
 
 At full auto, rung 2's recommended action runs when the action is within its bounds, and the case records it as resolved by the factory agent. When the action is beyond its bounds, the case goes to the human with the recommended action preselected, and the human confirms or picks another. At autonomous, the same for everything but merges. At assisted and manual, rung 2 proposes, and the proposal is the preselected option. The recommendation stops being display only (S25, complaint 2).
 
-The planner's questions join this: the planner files its own recommended answer with grounds for each question, and the confirmation form shows it preselected. This changes `PlanQuestion`, which has no field for one.
+The planner's questions join this: the planner files its own recommended answer with grounds for each question, and each question's case shows the planner's recommended answer preselected. This changes `PlanQuestion`, which has no field for one.
 
 ### 5.10 Splitting for the cheap model
 

@@ -4,7 +4,7 @@ On 2026-11-02 at 14:43:34 UTC the kubelet evicted the trusted Forgejo runner's p
 
 ## The finding
 
-Main's test job keeps its Go build cache and module cache in two named docker volumes, `ci-go-build` and `ci-go-mod` (the code repository's `.forgejo/workflows/ci.yml` and `nightly.yml`). The prune sidecar removes build cache, containers, networks and images. The only volume it removes is the state of a buildkitd a cancelled image job left. Go drops a cache entry only once it has gone five days unused, and the evicted pod lived 4.9 days. So the caches grow with each main run and nothing takes them away. On the evicted pod, the low point the prune could not pass rose by 0.25 to 0.28 GiB a run. On its successor, the caches hold 0.36 GiB a test job.
+Main's test job keeps its Go build cache and module cache in two named docker volumes, `ci-go-build` and `ci-go-mod` (the code repository's `.forgejo/workflows/ci.yml` and `nightly.yml`). The prune sidecar removes build cache, containers, networks and images. The only volume it removes is the state of a buildkitd a cancelled image job left. Go drops a build cache entry only once it has gone five days unused, and the evicted pod lived 4.9 days. Go never trims the module cache, 226 MB here. So the caches grow with each main run and nothing takes them away. On the evicted pod, the low point the prune could not pass rose by 0.25 to 0.28 GiB a run. On its successor, the caches hold 0.36 GiB a test job.
 
 Once what the prune could not reach held more than 30 GiB, the prune ran each minute and freed nothing. The low point of the volume rose to 33.35 GiB in the night and 36.12 GiB before run 2316. Run 2316 added 11.14 GiB to that, inside the chart's 13.3 GiB per run, and run 2317's test job took the volume past 50 GiB.
 
@@ -33,7 +33,7 @@ The series, found with `ch "SELECT metric_name, fingerprint, JSONExtractString(l
 The run and job times come from Forgejo's API, read with the `controller` credential in `~/.git-credentials`: read-only GETs, and the value is never printed. The helpers fetch the pages, keep each run or task once, and keep the `ci.yml` and `nightly.yml` workflows:
 
 ```sh
-fj() { curl -s -u "$(sed -n 's#^https://\(.*\)@git\.aisoftwarefactory\.world$#\1#p' ~/.git-credentials)" \
+fj() { curl -s -u "$(sed -n 's#^https://\(controller:[^@]*\)@git\.aisoftwarefactory\.world$#\1#p' ~/.git-credentials)" \
   "https://git.aisoftwarefactory.world/api/v1/repos/sf/ai-software-factory-code/actions/$1"; }
 runs() { for p in $(seq 1 14); do fj "runs?limit=50&page=$p"; done |
   jq -s -c '[.[].workflow_runs[]] | unique_by(.id)[] | select(.workflow_id == "ci.yml" or .workflow_id == "nightly.yml")'; }
@@ -64,9 +64,12 @@ Message:          Usage of EmptyDir volume "docker-data" exceeds the limit "50Gi
 
 This is the evicted pod. It started on 2026-10-28 at 16:20:34 and died on 2026-11-02 at 14:43:34, after 4 days and 22 hours.
 
-`kubectl -n forgejo get events --field-selector reason=Evicted` printed `No resources found in forgejo namespace.`: the events had expired. SigNoz keeps them as logs:
+`kubectl -n forgejo get events --field-selector reason=Evicted` printed `No resources found in forgejo namespace.`: the events had expired. SigNoz keeps them as logs. The first query lists the log resources of the runner's pods. The evicted pod's own events sit under the row on sf-2 with an empty `k8s.object.fieldpath`, and the second query reads them by that row's fingerprint:
 
 ```sh
+ch "SELECT fingerprint, any(labels) FROM signoz_logs.logs_v2_resource WHERE seen_at_ts_bucket_start >= 1793491200 AND labels LIKE '%forgejo-runner-6f89cff589%' GROUP BY fingerprint"
+# k8s.cluster.name=sf;k8s.node.name=sf-2;hash=16827873046991454806  {"k8s.cluster.name":"sf","k8s.node.name":"sf-2",...,"k8s.object.fieldpath":"","k8s.object.kind":"Pod","k8s.object.name":"forgejo-runner-6f89cff589-g85km",...}
+# and nine rows more: the evicted pod's three containers, its successor and the successor's four containers, the ReplicaSet
 ch "SELECT toDateTime(intDiv(timestamp,1000000000)), body, attributes_string['k8s.event.reason'] FROM signoz_logs.logs_v2 WHERE ts_bucket_start >= 1793577600 AND resource_fingerprint LIKE '%hash=16827873046991454806'"
 # 2026-11-02 14:43:32  Usage of EmptyDir volume "docker-data" exceeds the limit "50Gi".  Evicted
 ```
@@ -253,7 +256,7 @@ In the test job's checkout, login and image build steps the caches are unused to
 
 ### When to commit
 
-The edit changes the sidecar's command, which sits in the pod template. Flux's next sync then rolls the runner pod: the job in flight dies and the new pod starts with an empty volume. Push between main runs: the Actions page of `sf/ai-software-factory-code` shows no `ci.yml` run in progress, or `kubectl -n forgejo exec <runner pod> -c dind -- docker ps --filter name=FORGEJO-ACTIONS-TASK- -q` prints nothing.
+The edit changes the sidecar's command, which sits in the pod template. Flux's next sync then rolls the runner pod: the job in flight dies and the new pod starts with an empty volume. Push between main runs: the Actions page of `sf/ai-software-factory-code` shows no `ci.yml` or `nightly.yml` run in progress (both run on this runner and mount the caches), or `kubectl -n forgejo exec <runner pod> -c dind -- docker ps --filter name=FORGEJO-ACTIONS-TASK- -q` prints nothing.
 
 ### The infra commit (sf/ai-software-factory-infra)
 

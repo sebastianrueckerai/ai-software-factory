@@ -14,7 +14,7 @@ Sebastian's complaint of 1 November 2026: highlighted cards run together. Two ca
 - Amber as the one hue for "needs a person".
 - The contrast floor: 4.5:1 for text, 3:1 for a fill or line that carries a state, in both themes.
 - The phone rule: at 390 px one column, every target 44 px, no horizontal scroll.
-- The card's treatment of today as the baseline: the 3 px amber bar at the left, the 4 percent amber tint, the border mixed 38 percent toward amber (55 percent in the light theme), 14 px left padding (`console.css` lines 213 to 215).
+- The card's treatment of today as the baseline: the 3 px amber bar at the left, the 4 percent amber tint in the dark theme (the light card ground is plain `--bg-card`), the border mixed 38 percent toward amber (55 percent in the light theme), 14 px left padding (`console.css` lines 213 to 215).
 - The five-part face of 5.8 in its order: the ask, why, what you need for the call, the recommendation, the premade answers with the one fund control, a note box and one Send. The board's clamps of today hold: the ask at three lines, why and the info at two, the recommendation at three.
 - The carousel's count and arrows of 5.8. Every candidate places them. A card with one open case shows neither.
 
