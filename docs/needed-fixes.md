@@ -102,9 +102,9 @@ longer the session cap, and names the minutes a grant buys. The console's
 Extend takes any live card, and its raise stands: it lives in columns the
 workflow's usage record never writes, which the workflow reads before each
 cap check. A card's agent time follows its size, half for a small card and
-one and a half for a large one. Three faults found on card #1473 left the
-same day on code main. The first two are live since the roll of code
-321baaa7 at 19:37 UTC, and the third rides the next roll. The check-in share
+one and a half for a large one. Four faults found on cards #1473 and #1474
+left the same day on code main. The first two are live since the roll of
+code 321baaa7 at 19:37 UTC, and the other two ride the next roll. The check-in share
 stop told the human that Go on grants one more share and starts the
 session again. With the card's pull request open, the answer re-verifies
 the head and buys nothing, and the question now says so (code fdf4d793).
@@ -121,7 +121,16 @@ the newest run, which waited behind it. Main's runs 2323 to 2327, five
 direct pushes, went green from 18:23 to 19:37 UTC. #1473 stayed merged and
 #1474 queued behind it until the roll's run 2332 went green at 19:44, 1 h
 21 min after the first of them. The chain now keeps a green row with the
-newest run whose verdict is green (code e4431843).
+newest run whose verdict is green (code e4431843). A plan stamped every
+card with main's head at filing, and a card that waited on its
+dependencies started at that stamp hours later. #1474 started at
+70725856, 71 commits behind main and without #1473. Its agent moved the
+checkout to main, the size check counted main's 12,219 changed lines as
+the card's diff, and the check-in that followed ran out its 5 minutes
+with no decision. A plan now files its cards with no stamp, so a card's
+first session starts at main's head as it is then (code 687c032f). The
+cards #1474, #1475 and #1476 lost their stale stamps in the database, and
+#1474 went on at e4431843.
 
 ## 1. The check-in's policy stop preempts the approval card
 
