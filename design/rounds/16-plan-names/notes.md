@@ -4,7 +4,7 @@ Sebastian asked on 2026-11-02 for every plan to carry a short, telling name besi
 
 ## Form
 
-This round is a lab build, not an image round. The question was where an existing chip's text goes, which a screenshot of the real console answers better than a generated image. No image model ran and no critic ran, because there was no generated output to judge. The cost was nothing beyond the build. The pick is Sebastian's, against the shots on [the round page](index.html).
+This round is a lab build, not an image round. The question was where an existing chip's text goes, which a screenshot of the real console answers better than a generated image. No image model ran and no critic ran, because there was no generated output to judge. The cost was nothing beyond the build.
 
 ## What was built
 
@@ -20,6 +20,10 @@ This round is a lab build, not an image round. The question was where an existin
 The colour match works: the cyan chips on #617, #533 and #606 pair with the cyan chip on #531's Done row at a glance. In the narrow Queued and In progress columns at 1440 px the child chip wraps to two lines. It wrapped the same way with the key. On the phone at 390 px it fits on one line.
 
 If the wrap matters, the runner-up is a shorter child chip, `plan #531 · card chips` or `#531 · card chips`, the same text as the plan's own chip. That would change C11's chip copy, so it is Sebastian's call.
+
+## The pick: C40
+
+Sebastian confirmed the build as shown on 2026-11-02: "The design looks good, I am fine with it." The child chip stays `from plan #531 · card chips`, the wrap at 1440 px included, and the runner-up is out. Recorded as C40 in [design-decisions.md](../../design-decisions.md).
 
 ## Evidence
 

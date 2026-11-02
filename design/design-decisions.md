@@ -313,9 +313,9 @@ Compaction no longer counts rows alone. The gateway serves each model's context 
 
 The build is 48fcdbc4 on main of the code repository.
 
-## C40. Every card names its plan: a short name beside the number (2026-11-02, Sebastian's request, the layout provisional)
+## C40. Every card names its plan: a short name beside the number (2026-11-02, Sebastian)
 
-Sebastian asked for every plan to carry a short name that says what it does, fixes or enables, so a glance at the board shows which cards belong to which plan. The layout below is the director's call. It stays provisional until Sebastian picks against the lab shots in [rounds/16-plan-names/](rounds/16-plan-names/index.html).
+Sebastian asked for every plan to carry a short name that says what it does, fixes or enables, so a glance at the board shows which cards belong to which plan. The layout below is the director's call, shown in the lab shots of [rounds/16-plan-names/](rounds/16-plan-names/index.html). Sebastian confirmed it on 2026-11-02 ("The design looks good, I am fine with it."), the wrap at 1440 px included.
 
 The name. A plan gets its name when its first revision files. The small model proposes one from the issue title, the spec's outcome and the plan's summary. Code checks it: 3 to 24 characters after normalising, one line, no control or format characters, unique among the project's open plans with case ignored. A long answer brings one more ask for a shorter name, and a taken one brings an ask that lists the taken names, three asks at most. When the model fails, the name is a slug of the issue title, with a number suffix only on a clash. Naming never holds up or fails a filing. A plan keeps its first name through later revisions. The plans that were open when this landed get their names at the next start, from their newest revision.
 
