@@ -154,8 +154,11 @@ before closing this.
 
 ## 5. An ended card's issue stays open, and both red-main remedies can land
 
-Status: plan written, awaiting Sebastian's OK
-(docs/red-main-revert-plan-2026-11-02.md). Found 2026-10-31 on card #1333
+Status: the fix landed on code main 2026-11-02 (fcec3a73 to 1d89308a,
+docs/red-main-revert-plan-2026-11-02.md) and rides the next factoryd roll,
+which waits on Deploy now while plans #1344 and #1399 are open on main. At
+that roll a migration hands the 27 issues that stand open to the heal pass.
+The entry leaves once they read closed. Found 2026-10-31 on card #1333
 ("Revert 6b368fd: main red since 2026-10-30T03:30:07Z, no fix landed"),
 filed as "a red-main revert card does not jump the queue". The check on
 2026-11-02 shows that the queue did its job: the revert merged on its own
@@ -172,11 +175,12 @@ of a red main can land: on 2026-10-20 the fix-forward card #1154 and the
 revert #1157 merged 2 seconds apart, and the revert put three stray log
 files back on main.
 
-Fix direction: a red main gets one automatic remedy at a time, the
-revert's filing ends the fix-forward card, a human decides when the
-remedy merges and main stays red, a green main ends the remedy that did
-not merge, and every card that ends done or closed, and every closed
-plan, closes its issue.
+The fix: a red main gets one automatic remedy at a time. The revert's
+filing ends the fix-forward card, and the merge gate holds a revert while
+the fix merges or once no pause names it. A red that outlives the remedy's
+merge goes to a human, and main's green ends every remedy that did not
+merge. Every done card but a plan, and every closed plan, closes its
+issue, its dependencies on open issues dropped first.
 
 ## 6. No scripted door into the chat
 

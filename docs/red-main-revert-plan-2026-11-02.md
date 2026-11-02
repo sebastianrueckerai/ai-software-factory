@@ -1,10 +1,39 @@
 # The red-main revert card: why it looked stuck, and the fix
 
-Written 2026-11-02. Status: planned, awaiting Sebastian's OK. It is fault 6
-of docs/needed-fixes.md on 2026-11-02, "An ended card's issue stays open,
-and both red-main remedies can land". The handover of 2026-11-01 calls it
-fault 9, its number before the renumbering. Code references are to code
-main 70725856.
+Written 2026-11-02. Status: built on code main 2026-11-02 (fcec3a73 to
+1d89308a). The migration of B4 runs at the next factoryd roll, which waits
+on Deploy now while plans #1344 and #1399 are open on main. It is fault 5
+of docs/needed-fixes.md since fault 3 left, fault 6 when written, "An ended
+card's issue stays open, and both red-main remedies can land". It leaves
+the list once that roll ran and the 27 issues of B4 read closed. The
+handover of 2026-11-01 calls it fault 9, its number before the
+renumbering. Code references are to code main 70725856.
+
+As built, these things differ from the text below:
+
+- The merge gate refuses a revert while its fix-forward card merges, not
+  only once it merged. It also refuses a revert that no standing pause
+  names. Main's green ends the pause before the revert ends, and a revert
+  in a merge retry, or one whose end failed, would otherwise revert a
+  commit on a green main. endPauseCard leaves a revert whose merge runs,
+  and the merge gate holds it.
+- The still-red card has its own source, still-red. endPauseCard and
+  revert() treat it as they treat the re-run card. It waits for a run of
+  the remedy's merge commit, so a red pushed by hand before that run files
+  nothing. It closes the failed or working fix-forward card it replaces.
+- revert() reads the fix-forward card again before it ends it. A later
+  poll ends the card too, when the first close failed before its record.
+- Finish closes a merged card's issue at the merge. It does not close it
+  again when the chain covers the card, so an issue a person reopened
+  stays open.
+- closeIssueAsFactory reads a 404 on the dependencies as none: a
+  repository can switch issue dependencies off. It drops a dependency on
+  another repository's issue in that repository's name.
+- closePlan has no guard for a Runner without a Forgejo. The test runners
+  get a Forgejo instead.
+- The migration's plan closes carry no comment: each plan's issue heard
+  why already.
+- A failed plan that closePlan closes ends closed through issueClosed.
 
 ## Verdict
 
