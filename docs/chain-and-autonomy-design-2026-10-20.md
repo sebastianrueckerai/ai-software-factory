@@ -136,9 +136,12 @@ A template project sets nothing: its staging and promote jobs are the tail.
 
 The poller stays as built for recording: every minute, per served
 repository, the newest push runs on the default branch, one carry row per
-pull request a run carried, one head row with the AND verdict, refresh of
-concluded runs, the stall watch and the red watch (chainpoll.go `record`,
-`headVerdict`, `watch`). Three changes:
+pull request a run carried, one head row with the AND verdict, one green row
+with the newest run whose verdict is green, refresh of concluded runs, the
+stall watch and the red watch (chainpoll.go `record`, `headVerdict`,
+`watch`). The green row exists because a run no pull request rides is in no
+carry row, and the head row moves on to the next run while it waits. Without
+it, such a run's green covered nothing. Three changes:
 
 - The merge-to-run mapping uses the card's own merge commit. The merge queue
   records `tasks.merge_commit` at merge (gates.go:1432). A run carries every
@@ -163,9 +166,10 @@ its required status arrives does not cover anything yet. The poller reads
 the combined status of a commit only when the project names `requires`.
 
 Coverage is one SQL predicate, `deployLive` (console_store.go:57), used by
-the reconciler, the board and the drawer. A card is live when a green row
-sits at or after the run that carried its merge commit, or it has no pull
-request, or no chain names it and it finished before recording began.
+the reconciler, the board and the drawer. A card is live when a row with a
+green verdict sits at or after the run that carried its merge commit, or it
+has no pull request, or no chain names it and it finished before recording
+began.
 
 ### 6.3 The card after merge
 

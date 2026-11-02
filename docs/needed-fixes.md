@@ -102,8 +102,9 @@ longer the session cap, and names the minutes a grant buys. The console's
 Extend takes any live card, and its raise stands: it lives in columns the
 workflow's usage record never writes, which the workflow reads before each
 cap check. A card's agent time follows its size, half for a small card and
-one and a half for a large one. Two faults found on card #1473 left the
-same day on code main and ride the next factoryd roll. The check-in share
+one and a half for a large one. Three faults found on card #1473 left the
+same day on code main. The first two are live since the roll of code
+321baaa7 at 19:37 UTC, and the third rides the next roll. The check-in share
 stop told the human that Go on grants one more share and starts the
 session again. With the card's pull request open, the answer re-verifies
 the head and buys nothing, and the question now says so (code fdf4d793).
@@ -114,7 +115,13 @@ waited. Main's run 2317 held the lane for 2 h 22 min, and the merged #1453
 and #1473 waited behind it until a person re-ran it. A main run blocked
 with a red job for five minutes now pauses the queue, its failed jobs
 re-run once, and a second stall files the human re-run card (code
-321baaa7).
+321baaa7). A merged card waited for green main runs it never saw. A main
+run no pull request rides is in no carry row, and the head row holds only
+the newest run, which waited behind it. Main's runs 2323 to 2327, five
+direct pushes, went green from 18:23 to 19:37 UTC. #1473 stayed merged and
+#1474 queued behind it until the roll's run 2332 went green at 19:44, 1 h
+21 min after the first of them. The chain now keeps a green row with the
+newest run whose verdict is green (code e4431843).
 
 ## 1. The check-in's policy stop preempts the approval card
 
