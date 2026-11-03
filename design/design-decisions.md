@@ -349,6 +349,8 @@ A refusal still shows its sentence in the flash, and a refused or lost press sti
 
 The build is b76459d9 on main of the code repository.
 
+A press that moves nothing keeps its card dimmed and locked until the board its answer asks for lands, not just until the answer (Sebastian, 2026-11-03: "Clicking waive on one criterion should visibly end at least that question in some way, like greying it out. I also dont know if my clicks worked."). That board renders even while a field on the board holds typed text, since hx-preserve keeps the text; the stream's own swaps still wait. A met or waived criterion on a criteria card reads ended: its legend in the muted grey at normal weight, its box dashed, its form gone. A criterion's text wraps inside the card, a long file::test name included. The build is eaff9edc on main of the code repository.
+
 ## C43. A token's message carries a dashed avatar and its name, and the Tokens section shows its secret once, on top, with Copy (2026-11-02, the director, provisional)
 
 From round 17 ([design/rounds/17-chat-tokens/](rounds/17-chat-tokens/index.html)), three candidates per part built in the lab, two critics in a first loop and a compare loop. This entry is provisional, awaiting Sebastian's confirmation. The runner-up is A for both parts: the label as words only, and the block with boxes that select whole instead of Copy buttons, the form in one row.
