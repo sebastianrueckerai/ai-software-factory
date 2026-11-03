@@ -800,7 +800,8 @@ and behind each stands its Alibaba twin, `qwen3.8-max` and `qwen3.8-flash`,
 for the plan's quota limit. The twins are paid per token, so a class's spend
 is modelled while the z.ai model answers and real while the twin does.
 Sebastian removed every fallback on the morning of 2026-11-01 and gave these
-two classes their twins back the same day: premium alone has none. `small`
+two classes their twins back the same day. Premium falls back to `big`
+since 2026-11-03 (below). `small`
 is the start rung and serves the coder and
 the cheap calls. `big` serves the stronger rung, the review, the supervisor,
 the audit, the check-in and the operator, so the stronger-model retry and
@@ -817,16 +818,22 @@ Responses API (`openai/responses/`), since the chat completions API refuses
 entry for that route, so the release pins Sol's per-token rates in
 `model_info` for the price book, and LiteLLM bills from its own entry. The GLM plan is a flat fee, so its
 spend in the ledger is modelled. Premium is paid per token, so its spend is
-real money, and `budget.premium_month_eur` caps it apart (5.4). Three steps
-run on it: the planner's session, through the planner class's
-`session_model`, the chat, through `chat.model`, and the coder
-review, through `review_model`. The check-in names `checkin_model: big`, since
-without it the check-in would read the review's alias. Nothing stands in for
-premium (Sebastian, 2026-11-01): a call OpenAI fails is retried twice and then
-fails, and a call the premium cap cannot fit is refused (5.4), so the meter
-shows what Sol alone costs. The class is a development stopgap: to remove it,
-delete the cap, point the three steps back at `big` and delete the alias and
-the `litellm-openai` secret. The key is `OPENAI_API_TOKEN` in
+real money, and `budget.premium_month_eur` caps it apart (5.4). One step
+runs on it: a member's own chat turn, through `chat.model` (Sebastian,
+2026-11-03). A turn an MCP client asks for on a chat token runs on
+`chat.mcp_model` and a turn the chat starts itself, a wake or a fund's
+resume, on `chat.wake_model`, both `big`. The planner's session, through the
+planner class's `session_model`, and the coder review, through
+`review_model`, run on `big`, each a key away from premium. The check-in
+names `checkin_model: big`, since without it the check-in would read the
+review's alias. No premium call stops (Sebastian, 2026-11-03). A call OpenAI
+fails, its credits spent or the API down, is retried twice and then answered
+by `big`, and the audit row names the deployment that answered. A call the
+premium cap cannot fit runs on `big` (5.4), and the audit row's reason says
+so. Either way SigNoz's alert Premium served by another model files a card
+for a person on the infrastructure repository. The class is a development
+stopgap: to remove it, delete the cap, point `chat.model` back at `big` and
+delete the alias, its fallback, the alert and the `litellm-openai` secret. The key is `OPENAI_API_TOKEN` in
 `.env.tools`. Without one the secret holds an empty key and every premium call
 fails.
 
@@ -2053,9 +2060,10 @@ the `premium` class in the UTC calendar month: its ledger rows since the 1st
 (an agent's ref `premium`, factoryd's `<purpose>/premium`) plus its outstanding
 holds, read under the same advisory lock. A premium call takes the smallest of
 its headrooms. If the premium headroom is the smallest and cannot fit the
-call's whole output, the refusal is `refused_premium_cap` and the call ends
-there: nothing stands in for premium, so the meter shows what Sol alone
-costs. A premium call never runs
+call's whole output, the gateway serves the call on `big` instead, under the
+ref of `big`, and the audit row's reason names the premium cap and "served
+on big". If `big` cannot fit it either, the refusal is `big`'s and its
+reason names both. A premium call never runs
 with an output limit the premium cap cut short, since a reasoning model at
 maximum effort can spend a short limit before it answers. The audit row gives the reason. The console's status strip and
 its Spend panel show the month's premium spend against the cap while the key
@@ -2846,8 +2854,10 @@ artifacts. Humans and the project agent may message a running agent. The
 gates judge the result.
 
 **Spend.** The agent's calls go through the gateway under the project's
-identity with the ledger ref `operator`, on the alias `chat.model` names
-(`big` by default) (5.4).
+identity with the ledger ref `operator`, on the alias of the turn's
+origin: `chat.model` for a member's own turn, `chat.mcp_model` for an MCP
+client's and `chat.wake_model` for a wake's. `chat.model` is `big` by
+default, and an absent `chat.mcp_model` or `chat.wake_model` reads it (5.4).
 The project file's `chat.monthly_eur` caps them, and the status line's
 spend figure includes them. The design booked them to the project outside
 any task. The build books them to the project's chat task of the month
@@ -4659,8 +4669,8 @@ sizing task, as it has one screening task.
   else the ref's newest of any task (the gateway's own first hold stays a
   token a byte), on the ref's mean output over its newest 100 settled
   calls for all but the last call. A premium call whose worst case the
-  premium month cannot hold makes no call and names the premium cap in the
-  note, since the gateway refuses it. With no
+  premium month cannot hold is priced on `big`, where the gateway serves
+  it. With no
   settled call on the ref it prices a token a byte and the whole limit.
   The note names the calls, the estimate and the headroom, and what the
   approval card offers: read the diff, then Approve the merge or Deny it.
@@ -5419,7 +5429,7 @@ since Stage 6, but neither has run under load.
 | Untrusted text | One sanitiser: into the brief for outsiders' text only, hidden comments stripped outside code blocks; out to Forgejo, hidden comments stripped, mentions and closing keywords neutralised, off-list links defanged; agent commits squashed under a sanitised subject | Built (Task 89) |
 | Answer chain for questions | `questions: [self, model:<tier>, human]` per stage (queue item B), on top of the message call | Not built, waits for Sebastian's scoping |
 | Rolls | The code repository rolls through a roll task: a digest pull request from factoryd, a card, the bot's merge, a row per image. Infra changes stay human commits. The merge waits for a session gap, and new sessions wait while it does | Built |
-| Model routing | Two LiteLLM classes, `small` and `big`, each its z.ai model with its Alibaba twin behind it for the plan's quota limit (2026-11-01), `premium` OpenAI's Sol alone with no twin; a failed model hands the call to the twin after two retries if its class has one, else the call fails, and the answering deployment sits in the audit row | Built |
+| Model routing | Two LiteLLM classes, `small` and `big`, each its z.ai model with its Alibaba twin behind it for the plan's quota limit (2026-11-01), `premium` OpenAI's Sol with `big` behind it (2026-11-03); a failed model hands the call to its fallback after two retries, and the answering deployment sits in the audit row | Built |
 | Capability classes | `coder`, `analyzer` with a report session mode for the screening stage and the sizing step, and `planner` with a plan session mode. The release is the roll task, no class | Built |
 | Task analytics | Four task metrics, a revert mark and four panels, no report task | Built |
 | SPIRE and OPA | No need appeared in Stage 9 | Deferred |
@@ -5608,4 +5618,4 @@ works `factory` and `demo-app`.
 | Protected files | Manifests, lockfiles, agent instruction files, `CODEOWNERS` and top-level dot files, which rank `high` in the policy gate |
 | Stricter wins | The rule that a project file may only tighten the policy's defaults and caps |
 | Month cap | `budget.month_eur`: the variable spend of every project and the factory in one UTC month; a task that meets it parks at a human card |
-| Premium cap | `budget.premium_month_eur`: the spend on the pay-per-token `premium` class in one UTC month; a premium call past it is refused |
+| Premium cap | `budget.premium_month_eur`: the spend on the pay-per-token `premium` class in one UTC month; a premium call past it runs on `big` |
