@@ -1,14 +1,19 @@
 # Where a session's time goes: long commands, false stalls and the check share
 
-Written 2026-11-03. Status: Sebastian's OK the same day. Phase 1 landed
-as code 30d3b75b, phase 2 as 6542ed2f, phase 3 as code 29b0d335 and the
-ts-go template's mode as infra 975abae. The code goes live with the next
-roll; the selection script and the template work at once. The one-off `factoryd metrics session-time` command of
-phase 2 is not built: the panel fills from the roll on, and the week
-before it is measured in "What the S3 objects say". The code project's
-own classes (`go test`, `make test`, `pg-test.sh` beside the check script)
-go into its project file after the roll, since a factoryd from before it
-refuses the `commands` block. A builder's read of the first draft found the pull-request CI
+Written 2026-11-03. Status: Sebastian's OK the same day, and all three
+phases live. Phase 1 landed as code 30d3b75b, phase 2 as 6542ed2f, phase
+3 as code 29b0d335 and the ts-go template's mode as infra 975abae. The
+roll of 2026-11-03 at 11:09 UTC took the code live, and the code
+project's classes (`check_changed`, `check_static`, `check` with `make
+test`, and `go_test`) went into its project file as infra e8dcd41. The
+first session on the new build ran `bash check changed` once for 83 s,
+opened and closed 100 tool calls with no `no_progress` trip, and wrote
+its `session_time` row: check share 5.7 % and command share 18.2 % of 24
+minutes. Its pull request's test job ran the base's selection, tested
+the one package the change reached, and took 70 s. The one-off `factoryd
+metrics session-time` command of phase 2 is not built: the panel fills
+from the roll on, and the week before it is measured in "What the S3
+objects say". A builder's read of the first draft found the pull-request CI
 already selecting packages, the sandbox's flags as the real lever, and
 an acceptance hole, all folded in below. The plan holds for the factory
 and every project it runs, not for the code repository alone: each
