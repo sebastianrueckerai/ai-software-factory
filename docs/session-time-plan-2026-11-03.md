@@ -1,8 +1,9 @@
 # Where a session's time goes: long commands, false stalls and the check share
 
 Written 2026-11-03. Status: Sebastian's OK the same day. Phase 1 landed
-as code 30d3b75b, phase 2 as 6542ed2f; both go live with the next roll.
-Phase 3 is next. The one-off `factoryd metrics session-time` command of
+as code 30d3b75b, phase 2 as 6542ed2f, phase 3 as code 29b0d335 and the
+ts-go template's mode as infra 975abae. The code goes live with the next
+roll; the selection script and the template work at once. The one-off `factoryd metrics session-time` command of
 phase 2 is not built: the panel fills from the roll on, and the week
 before it is measured in "What the S3 objects say". The code project's
 own classes (`go test`, `make test`, `pg-test.sh` beside the check script)
@@ -328,10 +329,11 @@ test imports included, from one `go list -test -deps` pass. `pr.yml`
 calls the script, and `bash check changed` calls it. One rule, two
 callers.
 
-A pull request can edit the script, as it can edit any test. Main's run
-(`ci.yml`) and the nightly run the whole suite with `-race` whatever the
-script says, and a red main pauses the queue and files the fix card. That
-is the guard, and it stands today.
+A pull request can edit the script, as it can edit any test, so `pr.yml`
+runs the base's copy (`git show "$base:scripts/affected-packages.sh"`): a
+pull request's edit of the rule does not pick its own tests, and a base
+without the script runs the whole suite. Main's run (`ci.yml`) and the
+nightly run the whole suite with `-race` whatever the script says.
 
 ### The mode
 
@@ -343,16 +345,25 @@ is the guard, and it stands today.
 - `bash check` stays the full run with `-race`, for the session that
   changed `go.mod` or wants the whole proof, and for the acceptance items
   that name it.
-- The `ts-go` template's `check` gains the same mode with its own
-  selection: `npm test` when `web/` changed, the Go packages as above.
-  The template's `pr.yml` keeps running the full `bash check`.
+- The script reads the work tree, untracked files included, so a
+  sandbox's uncommitted work counts, and a CI checkout's work tree is its
+  HEAD.
+- The `ts-go` template's `check` gains the same mode, with a copy of the
+  script in the template: the web checks and build run in both modes,
+  since the Go tests serve the built `web/dist`, and the Go tests take the
+  script's selection without `-race`. The template's `pr.yml` keeps
+  running the full `bash check`.
 
 ### The base
 
-The worker exports `FACTORY_BASE`, the card's merge base with main, the
-same commit the checkpoint's `card_diff` compares with. A session's start
-commit is the task branch's head after the first session and after a
-merge of main (`activities.go:1124-1135`), so it is not the base.
+`bash check changed` takes the merge base of `HEAD` and `origin/HEAD`, the
+same commit the checkpoint's `card_diff` compares with: the worker's
+clone carries `origin/HEAD` as main at the clone, and the checkpoint
+takes the merge base of that commit and the session's start. A session's
+start commit is the task branch's head after the first session and after
+a merge of main (`activities.go:1124-1135`), so it is not the base. A
+clone without `origin/HEAD` gets a refusal that names
+`git remote set-head origin --auto`. No worker change and no variable.
 
 ### Acceptance
 
@@ -363,14 +374,17 @@ nothing would close its card as done on it (`workflow.go:2181-2187`).
 The scan stops taking `changed` as an argument of the full check: an item
 "bash check" needs a run without the mode, an item "bash check changed"
 takes the mode. One table in `acceptance.go` names the modes that are
-not arguments.
+not arguments, `static` among them: a green `bash check static` ran no
+test and satisfied "bash check" the same way.
 
 ### The guide
 
-One sentence replaces the check paragraph of `guideEnd`: "Before you end,
-run `bash check changed`, the checks of what you changed, in the
-foreground with a timeout of 600000 ms. CI runs the full `bash check`
-with the race detector on your pull request's main." The wrap-up line
+One sentence replaces the check sentence of `guideEnd`: "If the
+repository has a check file at its root, run bash check changed in the
+foreground with a timeout of 600000 ms: the repository's checks of what
+you changed, where CI runs all of them." The condition stays, since the
+infrastructure repository has no check file, and "all of them" holds for
+a template project, whose pull-request job runs the full check. The wrap-up line
 (`limits.go:17`) names the same mode. The background-and-wait paragraph
 goes, with its 590-second wait. Phase 1 makes a long foreground call
 safe. `agent-worker wait` stays for the rare job that needs it,
@@ -399,8 +413,6 @@ decision the measurement informs.
   file selects everything, and `pr.yml`'s step is the one call.
 - `check` itself: `bash check changed` on a throwaway change runs the
   selection without `-race`, `bash check` runs everything with it.
-- The worker: `FACTORY_BASE` is in the session's environment and equals
-  the card's merge base (`main_test.go` beside the push tests).
 - `acceptance_test.go`: "bash check changed" is no hit for "bash check",
   and a hit for itself.
 - `opencode_test.go`: the guide's golden text.
@@ -421,10 +433,9 @@ acceptance and guide changes ride one. Phase 2 follows at its own pace.
    a file in the project repository, read by a pass like the Imager's.
    The project file is my call unless he wants the declaration to travel
    with the code.
-2. **One selection script shared with `pr.yml`, or a copy.** Shared is my
-   call: one rule, and main's full `-race` run guards it. A copy keeps the
-   pull-request job's rule out of a pull request's reach, at the price of
-   two rules that drift.
+2. **One selection script shared with `pr.yml`, or a copy.** Settled
+   without a trade: one script, and `pr.yml` runs the base's copy, so the
+   rule stays out of a pull request's reach.
 3. **Phase 3's shape.** This plan keeps one prompt line and a script mode.
    The stronger form has the worker run `bash check changed` itself after
    the agent ends and send a failure back into the session. That needs
