@@ -1695,7 +1695,14 @@ schemas built into the binary: a stale copy in `factory/schema/` exits 0
 with a warning that names the directory, and a foreign file exits 1. When
 factoryd's schemas differ from infra main's copies, the bot opens one infra
 pull request "Schema copies for <id>" from its fork, as a roll does, cuts
-its branch fresh each time and closes an older one naming the new. An
+its branch fresh each time and closes an older one naming the new. The
+copies name the code commit they come from in `factory/schema/commit`, and
+factoryd knows its own from `FACTORY_COMMIT`, which a roll of its image
+writes beside the digest. It writes over copies its commit holds in the code
+repository's history and leaves copies from a newer commit or another line,
+as during a roll still out: a build that drops a key writes the key out,
+which a comparison of keys alone could not tell from a newer build's key.
+Copies without the file predate it and count as older. An
 approver merges it like a project file. The lane's first
 version wrote with the projects token, which cannot reach infra.
 Live in Stage 17 (09:01Z): after roll #486 factoryd opened infra
