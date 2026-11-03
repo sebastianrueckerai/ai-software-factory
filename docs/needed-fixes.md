@@ -267,7 +267,10 @@ rename with it, so the tree never names a tool no factoryd knows.
 
 ## 5. The size gate moves a card's budget with no event
 
-Status: candidate only. Found 2026-11-02 while digging the unpayable sessions (gone 2026-11-03) on card
+Status: code landed on code main 2026-11-03 (84c154da): the size gate's
+budget move writes a `card_funded` row with `by: size gate`, under the
+card's row lock. The entry leaves once it reads live; the factory was down
+at the merge. Found 2026-11-02 while digging the unpayable sessions (gone 2026-11-03) on card
 #1345: the task's budget read 5.60 EUR after its only fund event (+0.60 at
 00:06) and 7.60 by the evening's end, the +2.00 written by the size gate's
 budget writer (SetTaskSizeBudget, store.go:1430 on code main 0bbfe484)
