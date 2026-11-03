@@ -10,7 +10,8 @@ departures left: 12 became 7, 14 became 8, 15 became 9, 16 became 10,
 17 became 11. Renumbered again the same day when fault 4 left: 5 to 15
 became 4 to 14, when fault 2 left: 3 to 14 became 2 to 13, and twice when
 fault 3 left: 4 to 13 became 3 to 12, then 4 to 12 became 3 to 11, and
-when faults 6, 9, 10 and 11 left: 7 and 8 became 6 and 7. Older
+when faults 6, 9, 10 and 11 left: 7 and 8 became 6 and 7, and on
+2026-11-03 when faults 2 and 4 left: 3 became 2, 5 to 10 became 3 to 8. Older
 documents cite the numbering of their day, and the old
 numbers 7 to 11, 13 and 18 to 20 in them name faults that have left. Gone
 on 2026-11-01: the criteria-card family (the criteria card's brief, its
@@ -149,7 +150,19 @@ session as a fact, and a stopped session that pushed becomes the next
 one's parent. A check-in gets 90 seconds for each call it may make, at
 most 30 minutes, and a start check-in ends by its session's deadline.
 Until that roll, the policy holds checkin_time at 10 minutes (infra
-12c7c9c).
+12c7c9c). Gone on 2026-11-03, on code main at 3b904433 and riding the
+next factoryd roll (docs/plans/2026-11-02-card-flow-companion.md): the
+sessions that opened on a budget that could not pay for them, and the
+chat's answer tool that failed twice. Every session opening now runs the
+budget floor, so a card short of an opening's cost gets a money ask and no
+dead session, the console's floor covers a card with no alias yet, and
+every money figure a human or an agent decides on nets the gateway's
+holds, so the ask, the face and the floor agree and the first raise funds
+the session. The ask that fires as the money ask before an attempt stays
+with the card flow redesign's phase 2. The answer tool's two failures were
+the refusal "The answers could not be recorded; see the factoryd log",
+which hid its error; it and four siblings name the error and the next
+step.
 
 ## 1. The check-in's policy stop preempts the approval card
 
@@ -165,34 +178,7 @@ hours with nothing to decide from. The fix: close the agent's reason words
 to a fixed set, and when the reason is a policy class and a pull request is
 open, go to the checks that end in the approval card instead of stopping.
 
-## 2. Sessions open that the task budget cannot pay for
-
-Status: plan written, awaiting Sebastian's OK
-(docs/plans/2026-11-02-unpayable-sessions.md). Its parts A, C and D, the
-floor at every opening, the enforced money on every face and the console's
-alias skip, are tasks 2 to 4 of docs/plans/2026-11-02-card-flow-companion.md,
-which builds them beside the card flow redesign. Its part B, the ask that
-fires as the money ask before an attempt, is the redesign's rung 0 row,
-phase 2. Found 2026-10-31 on card
-#1345; four openings burned about €0.53 and filed nothing. Re-verified
-unbuilt on code main 0bbfe484 (2026-11-02): the session floor (SessionFunded, every session's
-start since 6c579a24 of 2026-10-16) predates the fault and did not stop the
-four openings, and nothing since changes what a grant buys. The dig found
-why: the plan loop opens sessions with no floor at all, and the floor that
-ran read figures the gateway's holds had already
-spent — the plan puts the floor at every opening and the enforced task
-money on every surface.
-
-The factory grants and opens planner sessions without checking that the
-task's remaining budget covers a whole session opening. With €0.03 to €0.44
-left, each session opened, spent what was left mid-call and died on a 402.
-Every grant comment bought another dead opening. Fix direction: before a
-session opens, compare the task's free headroom with the opening's cost;
-when it cannot cover it, the ask asks for money, not a session. A smaller
-sibling to verify: a session that dies mid-call left about €0.40 spent in
-the gateway that the task row's spent amount never recorded.
-
-## 3. The planner dies on a big spec's read set
+## 2. The planner dies on a big spec's read set
 
 Status: code landed (448048b0, 2026-11-02) and is live since roll c78869b
 (2026-11-02 02:19Z). The tree hand waits on Sebastian. The card flow
@@ -228,26 +214,7 @@ pointing the retry at digests instead of re-reads. Until it lands, a
 big card needs a trimmed read set, the cheap rung, or the spec-on-card
 shape that saved #1383.
 
-## 4. The chat's answer tool failed twice on plan questions
-
-Status: plan written, awaiting Sebastian's OK (task 8 of
-docs/plans/2026-11-02-card-flow-companion.md). The 4xx fix of 05cd9e12
-(2026-11-01, live since roll 280a34a) was not this fault. The chat rows of
-2026-10-31 hold the four answer calls on #1383. At 21:10:42 the tool
-refused with "A plan's question is answered with its revision (revision),
-from the plan tool." At 21:19:49 with "an answer of 1 to 1000 characters
-is required". Both named the state and the action. At 21:19:56 and
-21:20:02 the catch-all refused with "The answers could not be recorded;
-see the factoryd log." The error went to a log that is gone, and at
-21:20:10 the chat posted the answers as comment 25297 instead. The fault
-is the catch-all: five refusals in internal/console (one answer, the
-answers, the decision, the grant, the analysis) name neither the state
-nor an action. The fix makes each carry its error and the next step. The
-redesign's phase 2 ends the fork between the answer and the plan tools:
-one typed answer resolves a case of any kind. Found 2026-10-31 on card
-#1383 at 21:20.
-
-## 5. An ended card's issue stays open, and both red-main remedies can land
+## 3. An ended card's issue stays open, and both red-main remedies can land
 
 Status: the fix landed on code main 2026-11-02 (fcec3a73 to 1d89308a,
 docs/red-main-revert-plan-2026-11-02.md) and rides the next factoryd roll,
@@ -277,7 +244,7 @@ merge goes to a human, and main's green ends every remedy that did not
 merge. Every done card but a plan, and every closed plan, closes its
 issue, its dependencies on open issues dropped first.
 
-## 6. A rename that changes the policy tree cannot land before its roll
+## 4. A rename that changes the policy tree cannot land before its roll
 
 Status: candidate only. The loader still rejects an unknown tool name
 outright (policy.go:279 on code main 0bbfe484). Found 2026-10-31: the ask
@@ -291,9 +258,9 @@ Fix direction: the config loader accepts the union of the old and the new
 name across a rename, or the roll that carries a rename commits the tree's
 rename with it, so the tree never names a tool no factoryd knows.
 
-## 7. The size gate moves a card's budget with no event
+## 5. The size gate moves a card's budget with no event
 
-Status: candidate only. Found 2026-11-02 while digging fault 2 on card
+Status: candidate only. Found 2026-11-02 while digging the unpayable sessions (gone 2026-11-03) on card
 #1345: the task's budget read 5.60 EUR after its only fund event (+0.60 at
 00:06) and 7.60 by the evening's end, the +2.00 written by the size gate's
 budget writer (SetTaskSizeBudget, store.go:1430 on code main 0bbfe484)
@@ -304,7 +271,7 @@ can read.
 Fix direction: the size gate's budget move records an event, as the fund
 and raise paths do.
 
-## 8. The runner's docker volume passes its 50Gi limit
+## 6. The runner's docker volume passes its 50Gi limit
 
 Status: measured; the bound is the infra hand in
 docs/runner-volume-measurement-2026-11.md: the prune sidecar runs `docker
@@ -329,7 +296,7 @@ volume prune -af` last, only when the volume is still over maxGiB after
 its other prunes. The fault leaves the list when a runner pod lives past
 five days with no eviction and a low point under 30 GiB.
 
-## 9. The check-in runs out of its 5 minutes with no decision
+## 7. The check-in runs out of its 5 minutes with no decision
 
 Status: candidate only. Found 2026-11-02 on card #1474. The check-in
 stopped the card five times between 19:51 and 22:13 UTC, each time with
@@ -343,9 +310,9 @@ Fix direction: read the check-in's own record of the five stops, find
 what it reads for five minutes, and bound its reads, so a frontier card
 with a large diff still gets a decision.
 
-## 10. SigNoz's ClickHouse sits at its memory limit
+## 8. SigNoz's ClickHouse sits at its memory limit
 
-Status: candidate only. Found 2026-11-02 while measuring fault 8. SigNoz's
+Status: candidate only. Found 2026-11-02 while measuring fault 6. SigNoz's
 ClickHouse (chi-signoz-clickhouse-cluster-0-0-0 in namespace platform) has
 a 3Gi memory limit and held 2.68 to 2.82 GiB of it from 21:30 UTC
 (`kubectl -n platform exec chi-signoz-clickhouse-cluster-0-0-0 -c

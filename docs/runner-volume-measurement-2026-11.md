@@ -1,6 +1,6 @@
 # The runner's docker volume past 50Gi: measured, and the bound (2026-11-02)
 
-On 2026-11-02 at 14:43:34 UTC the kubelet evicted the trusted Forgejo runner's pod: its `docker-data` volume had passed its 50Gi `sizeLimit`. This is fault 8 of [needed-fixes.md](needed-fixes.md). This page measures what filled the volume, picks the bound that holds it, and gives the infra commit that sets the bound. That commit is Sebastian's: the infra repository sits outside every agent credential.
+On 2026-11-02 at 14:43:34 UTC the kubelet evicted the trusted Forgejo runner's pod: its `docker-data` volume had passed its 50Gi `sizeLimit`. This is fault 6 of [needed-fixes.md](needed-fixes.md). This page measures what filled the volume, picks the bound that holds it, and gives the infra commit that sets the bound. That commit is Sebastian's: the infra repository sits outside every agent credential.
 
 ## The finding
 
@@ -14,7 +14,7 @@ The bound: the sidecar removes the volumes no container uses, last, when all els
 
 All reads were read-only. Times are UTC. The figures in GiB are bytes over 1,073,741,824.
 
-SigNoz keeps its metrics in ClickHouse. ClickHouse sat at 2.68 to 2.82 GiB of its 3 GiB memory limit (`system.asynchronous_metrics`, `CGroupMemoryUsed`) and refused most queries with `MEMORY_LIMIT_EXCEEDED`, so each query below ran in a loop until it went through (up to 86 tries). At 21:40:02 the kubelet restarted ClickHouse after it missed its liveness probe while those retried queries ran. This is fault 10 of [needed-fixes.md](needed-fixes.md). The helper:
+SigNoz keeps its metrics in ClickHouse. ClickHouse sat at 2.68 to 2.82 GiB of its 3 GiB memory limit (`system.asynchronous_metrics`, `CGroupMemoryUsed`) and refused most queries with `MEMORY_LIMIT_EXCEEDED`, so each query below ran in a loop until it went through (up to 86 tries). At 21:40:02 the kubelet restarted ClickHouse after it missed its liveness probe while those retried queries ran. This is fault 8 of [needed-fixes.md](needed-fixes.md). The helper:
 
 ```sh
 ch() { kubectl -n platform exec chi-signoz-clickhouse-cluster-0-0-0 -c clickhouse -- \

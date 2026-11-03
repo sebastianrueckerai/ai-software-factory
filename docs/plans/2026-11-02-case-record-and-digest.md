@@ -23,6 +23,7 @@ Written 2026-11-02. Status: not built. Phase 1 of five in [card-flow-redesign-20
 - The name `digest` is taken by the file digest tool (`policy.ToolDigest`, `internal/factoryd/digest.go`). This phase's names are `CardDigest`, `card_step`, `board_digest`. Never `digest` alone.
 - Tests: `make test` runs `go test -race -p 1 ./...` under a throwaway Postgres. `bash check static` runs vet, gofmt and gosec. Both green before every commit. Postgres tests use `schematest.DSN(t, name)` and skip without `FACTORYD_TEST_DATABASE_URL`.
 - Commit messages state what changed and why, with no ruling number and no ledger path.
+- The companion plan landed `Task.HeldEUR`, `EnforcedSpent()` and `Left()` on main (code 3b904433). `CaseMoney.SpentEUR` reads `t.EnforcedSpent()` and `CardDigest.HoldsEUR` reads `t.HeldEUR`, not figures of their own.
 
 ## Review Focus
 
