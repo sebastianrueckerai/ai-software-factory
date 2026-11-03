@@ -11,7 +11,8 @@ departures left: 12 became 7, 14 became 8, 15 became 9, 16 became 10,
 became 4 to 14, when fault 2 left: 3 to 14 became 2 to 13, and twice when
 fault 3 left: 4 to 13 became 3 to 12, then 4 to 12 became 3 to 11, and
 when faults 6, 9, 10 and 11 left: 7 and 8 became 6 and 7, and on
-2026-11-03 when faults 2 and 4 left: 3 became 2, 5 to 10 became 3 to 8. Older
+2026-11-03 when faults 2 and 4 left: 3 became 2, 5 to 10 became 3 to 8,
+and later that day when fault 7 left: 8 to 10 became 7 to 9. Older
 documents cite the numbering of their day, and the old
 numbers 7 to 11, 13 and 18 to 20 in them name faults that have left. Gone
 on 2026-11-01: the criteria-card family (the criteria card's brief, its
@@ -162,7 +163,13 @@ the session. The ask that fires as the money ask before an attempt stays
 with the card flow redesign's phase 2. The answer tool's two failures were
 the refusal "The answers could not be recorded; see the factoryd log",
 which hid its error; it and four siblings name the error and the next
-step.
+step. The check-in that ran out of its time with no decision left the same
+day (code 684702eb and 711da383, live with the roll at 05:38 UTC): its
+answer call keeps twice the longest call so far, at least 90 seconds and
+at most half the cap, no evidence call starts that cannot end before the
+answer is due, the check-in reads when its answer is due, and read_file,
+grep and transcript_search no longer waste calls on a miss. Its first run
+on the roll, on #1476, decided in six and a half minutes.
 
 ## 1. The check-in's policy stop preempts the approval card
 
@@ -296,37 +303,7 @@ volume prune -af` last, only when the volume is still over maxGiB after
 its other prunes. The fault leaves the list when a runner pod lives past
 five days with no eviction and a low point under 30 GiB.
 
-## 7. The check-in runs out of its 5 minutes with no decision
-
-Status: fixed on code main (711da383), live at the next roll. The first
-fix (684702eb) is live and was not enough. Found 2026-11-02 on card #1474. The check-in
-stopped the card five times between 19:51 and 22:13 UTC, each time with
-"The check-in gave no answer within its 5 minutes" and the reason that
-it spent its time on evidence. Every stop went to a person. Two review
-rounds on pull request 1488 each started a fix session that stopped the
-same way. The card was finished by hand: its pull request merged at
-code 1484c506.
-
-The check-in kept its tool-less answer call for the call cap alone. Its
-calls took 21 to 45 seconds each, mostly hidden reasoning, so the 5- or
-10-minute cap always came before the 20th call. The cap cut the call in
-flight and asked a person. #1475 stopped the same way twice, with 10
-minutes. The answer call now also comes once the time cap's reserve for
-it begins: the longest call so far, at least 90 seconds, at most half
-the cap. The check-in reads when its answer is due. Three tools wasted
-calls and are fixed too: read_file now takes the path grep prints, and
-grep and transcript_search say a miss instead of answering nothing.
-
-On 2026-11-03 the check-in of #1476 stopped the same way on the live
-first fix. Its calls took 73 to 95 seconds. It started one more evidence
-call at 03:06 with no room, the reserve cut that call, and the answer
-call ran 105 seconds, past the 10-minute cap. Since that roll, answer
-calls ran up to 1.6 times the longest evidence call. The reserve is now
-twice the longest call so far, still at least 90 seconds and at most half
-the cap. An evidence call starts only if a call as long as the longest so
-far ends before the answer is due.
-
-## 8. SigNoz's ClickHouse sits at its memory limit
+## 7. SigNoz's ClickHouse sits at its memory limit
 
 Status: candidate only. Found 2026-11-02 while measuring fault 6. SigNoz's
 ClickHouse (chi-signoz-clickhouse-cluster-0-0-0 in namespace platform) has
@@ -356,7 +333,7 @@ Fix direction: measure first what holds the memory (the caches, the
 merges, the buffer tables), then raise the limit or bound the query memory
 settings, so that a query fails before the server misses its probe.
 
-## 9. The gate check-in can read the agent's push token
+## 8. The gate check-in can read the agent's push token
 
 Status: candidate only. Found 2026-11-03 in the check-in records of
 #1474 (session s-ccd83748614e) and #1475 (session s-c787e5a4277c). The
@@ -366,7 +343,7 @@ The check-in is a judge, and only its prompt says it never edits.
 Fix direction: run the check-in's commands without the token in their
 environment or on their file system, so no tool of a judge can write.
 
-## 10. The agent context map's loop pages are not byte-stable across runs
+## 9. The agent context map's loop pages are not byte-stable across runs
 
 Status: candidate only. Found 2026-11-03 while regenerating `docs/agents`
 after the card digest landed (code main 17376fb1). The map's own page,
