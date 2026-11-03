@@ -1,7 +1,13 @@
 # Where a session's time goes: long commands, false stalls and the check share
 
-Written 2026-11-03. Status: plan, awaiting Sebastian's OK. Nothing is
-built. A builder's read of the first draft found the pull-request CI
+Written 2026-11-03. Status: Sebastian's OK the same day. Phase 1 landed
+as code 30d3b75b, phase 2 as 6542ed2f; both go live with the next roll.
+Phase 3 is next. The one-off `factoryd metrics session-time` command of
+phase 2 is not built: the panel fills from the roll on, and the week
+before it is measured in "What the S3 objects say". The code project's
+own classes (`go test`, `make test`, `pg-test.sh` beside the check script)
+go into its project file after the roll, since a factoryd from before it
+refuses the `commands` block. A builder's read of the first draft found the pull-request CI
 already selecting packages, the sandbox's flags as the real lever, and
 an acceptance hole, all folded in below. The plan holds for the factory
 and every project it runs, not for the code repository alone: each
