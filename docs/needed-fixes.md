@@ -298,8 +298,8 @@ five days with no eviction and a low point under 30 GiB.
 
 ## 7. The check-in runs out of its 5 minutes with no decision
 
-Status: fixed on code main (684702eb), live at the next roll. Found
-2026-11-02 on card #1474. The check-in
+Status: fixed on code main (711da383), live at the next roll. The first
+fix (684702eb) is live and was not enough. Found 2026-11-02 on card #1474. The check-in
 stopped the card five times between 19:51 and 22:13 UTC, each time with
 "The check-in gave no answer within its 5 minutes" and the reason that
 it spent its time on evidence. Every stop went to a person. Two review
@@ -316,6 +316,15 @@ it begins: the longest call so far, at least 90 seconds, at most half
 the cap. The check-in reads when its answer is due. Three tools wasted
 calls and are fixed too: read_file now takes the path grep prints, and
 grep and transcript_search say a miss instead of answering nothing.
+
+On 2026-11-03 the check-in of #1476 stopped the same way on the live
+first fix. Its calls took 73 to 95 seconds. It started one more evidence
+call at 03:06 with no room, the reserve cut that call, and the answer
+call ran 105 seconds, past the 10-minute cap. Since that roll, answer
+calls ran up to 1.6 times the longest evidence call. The reserve is now
+twice the longest call so far, still at least 90 seconds and at most half
+the cap. An evidence call starts only if a call as long as the longest so
+far ends before the answer is due.
 
 ## 8. SigNoz's ClickHouse sits at its memory limit
 
