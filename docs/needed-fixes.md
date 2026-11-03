@@ -298,7 +298,8 @@ five days with no eviction and a low point under 30 GiB.
 
 ## 7. The check-in runs out of its 5 minutes with no decision
 
-Status: candidate only. Found 2026-11-02 on card #1474. The check-in
+Status: fixed on code main (684702eb), live at the next roll. Found
+2026-11-02 on card #1474. The check-in
 stopped the card five times between 19:51 and 22:13 UTC, each time with
 "The check-in gave no answer within its 5 minutes" and the reason that
 it spent its time on evidence. Every stop went to a person. Two review
@@ -306,9 +307,15 @@ rounds on pull request 1488 each started a fix session that stopped the
 same way. The card was finished by hand: its pull request merged at
 code 1484c506.
 
-Fix direction: read the check-in's own record of the five stops, find
-what it reads for five minutes, and bound its reads, so a frontier card
-with a large diff still gets a decision.
+The check-in kept its tool-less answer call for the call cap alone. Its
+calls took 21 to 45 seconds each, mostly hidden reasoning, so the 5- or
+10-minute cap always came before the 20th call. The cap cut the call in
+flight and asked a person. #1475 stopped the same way twice, with 10
+minutes. The answer call now also comes once the time cap's reserve for
+it begins: the longest call so far, at least 90 seconds, at most half
+the cap. The check-in reads when its answer is due. Three tools wasted
+calls and are fixed too: read_file now takes the path grep prints, and
+grep and transcript_search say a miss instead of answering nothing.
 
 ## 8. SigNoz's ClickHouse sits at its memory limit
 
@@ -339,3 +346,13 @@ whether they fail too is not checked.
 Fix direction: measure first what holds the memory (the caches, the
 merges, the buffer tables), then raise the limit or bound the query memory
 settings, so that a query fails before the server misses its probe.
+
+## 9. The gate check-in can read the agent's push token
+
+Status: candidate only. Found 2026-11-03 in the check-in records of
+#1474 (session s-ccd83748614e) and #1475 (session s-c787e5a4277c). The
+gate check-in's run tool read $TOKEN_FILE and called Forgejo with it.
+The check-in is a judge, and only its prompt says it never edits.
+
+Fix direction: run the check-in's commands without the token in their
+environment or on their file system, so no tool of a judge can write.
