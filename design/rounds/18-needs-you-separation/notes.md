@@ -2,7 +2,7 @@
 
 The run of [the brief](brief.md) in the condensed form. Three candidates were built over the lab's busy board in [design/prototypes/needs-you-separation/](../../prototypes/needs-you-separation/), on a byte copy of `console.css` at code commit 1d5d4163. [shoot.js](shoot.js) shot each in both themes at 1440 px and 390 px with two, three and five cards, the seam between the first two cards at 1x and 3x. Two critics judged the same sheets in a first loop and in a compare loop. No image model ran. The round page is [index.html](index.html).
 
-## The recommendation: F, provisional
+## The recommendation: F, confirmed
 
 **The separation.** Each Needs-you card opens on an amber band across its width that holds the card's head row, ruled off from the case by an amber hairline. The band sits behind the card's head row: the case's head in phase 5, with the ref in the amber text colour and the waiting time in the muted grey. On today's cards it is `.need-top` on an approval, the `h4` on a plan's approval, and the face's first line on an escalation or a human card. The band is that row's own background, so its height follows the row. It is 32 px at the least, at both widths, with no fixed height, so a title that wraps grows the band and never has the band cut through it. The band is the amber mixed 14 percent into the card ground in the dark theme and 22 percent in the light one: it mixes `--need` into `--bg-card` as the baseline's tint does, so it adds no new token. The gap between two cards grows from 6 px to 12 px. Today's treatment stays under it: the 3 px amber bar, the 4 percent tint in the dark theme, the amber-mixed border and 14 px left padding, with a selector that reaches the cards.
 
@@ -12,7 +12,7 @@ Why F. The band marks where every card starts, so in a column of five the eye ju
 
 **The runner-up is B**: the same band with the carousel at the band's right and an 8 px gap. It answers the placement question the other way: the human sees "1 of 4" before reading. Both critics scored B 7 in the compare loop. The critics disagreed on the runner-up: in the first loop both named C, and in the compare loop Gemini scored C level with B at 7 and GLM scored C 6. Gemini's first-loop winner was A.
 
-This pick is provisional, awaiting Sebastian's confirmation. It is C44 in [design-decisions.md](../../design-decisions.md).
+Sebastian confirmed F on 2026-11-03. It is C44 in [design-decisions.md](../../design-decisions.md).
 
 ## What the lab found first
 

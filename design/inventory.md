@@ -34,7 +34,7 @@ Read off the templates in `internal/console/templates/` on 2026-10-13 (code comm
 - A plan's open question: the same item as an escalation, on the planning card, with its choice buttons and own-answer field. No Accept plan, no Request changes, no Reject: a plan with no open question files its children and closes by itself (225). The plan's summary and its cards table live in the planning card's drawer.
 - Escalation: the card face; the reason; choice buttons; own answer textarea; Answer or "Grant one session with this answer" (capped); on a capped card, for its owner, the Fund form (card 641, roadmap 210): an amount in EUR, a reason, Fund; verdict buttons "real problem / false alarm" for approvers.
 - Human task: a card face of kind human, with Close.
-- Every Needs-you card (C44, provisional): the amber band behind the head row, 32 px at the least. With more than one open case, the carousel at the foot: previous, the count "n of m", next.
+- Every Needs-you card (C44): the amber band behind the head row, 32 px at the least. With more than one open case, the carousel at the foot: previous, the count "n of m", next.
 
 ### Drawer
 
