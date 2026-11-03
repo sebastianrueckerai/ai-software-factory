@@ -121,12 +121,10 @@ prompt. So:
   names the mode.
 - What counts as "a check" for the metric is one declaration per project
   in its policy file, with a default that needs no declaration at all.
-- The threshold that asks for a faster suite is a comparison in code, not
-  a weekly conversation.
 
 ## The plan in one view
 
-Four phases, each shippable alone, in this order:
+Three phases, each shippable alone, in this order:
 
 1. **An open call counts as activity, up to a bound.** Stops the false
    stalls and the check-ins they start. One new event kind on the harness
@@ -141,12 +139,9 @@ Four phases, each shippable alone, in this order:
    guide names the mode and drops the background dance. Main's CI stays
    the full `-race` gate, and acceptance stops taking the changed run for
    the full one.
-4. **The check-time card.** A daily pass compares each project's check
-   share and its full check's median with the project's thresholds and
-   files one human card while they are crossed. Revamping the tests
-   becomes regular work the factory asks for by number.
-
-Phase 3 can run beside phase 2. Phase 4 needs phase 2.
+Phase 3 can run beside phase 2. The metric is the end of this plan:
+Sebastian reads it and decides. A card the metric raises, not the clock,
+is a later plan of its own, once the metric has run for a few weeks.
 
 ## Phase 1: an open call counts as activity, up to a bound
 
@@ -387,8 +382,8 @@ A card that touches `internal/factoryd` selects most of the suite: 610
 of the 872 non-merge commits since 2026-10-20 touch it, and its selection
 holds about 90 % of the test lines. For those cards the saving is the
 flags, not the selection. Whether the changed run then fits the
-10-minute cap is phase 2's measurement, and phase 4's card asks for the
-suite's own cuts when it does not.
+10-minute cap is phase 2's measurement, and the suite's own cuts are a
+decision the measurement informs.
 
 ### Tests
 
@@ -404,49 +399,18 @@ suite's own cuts when it does not.
   and a hit for itself.
 - `opencode_test.go`: the guide's golden text.
 
-## Phase 4: the check-time card
-
-A daily pass in factoryd, beside the passes that file the factory's own
-cards, reads each project's `session_time` rows of the last four weeks
-and compares two figures with the project's thresholds:
-
-```yaml
-commands:
-  budget: {check_share: 0.2, check_median_s: 300}
-```
-
-Defaults when absent: a check share of 20 % and a median full check of
-5 minutes. While a figure is above its threshold, the pass files one
-human card, "Cut the check time of <project>", with the four weeks'
-figures, the median and the three longest check runs, and the `go test
--json` timings the card's session measures first. One card per project at
-a time: an open card of the same title holds the pass, and the card's
-close ends it. A project with a slow but necessary suite raises its own
-line.
-
-The comparison is deterministic, so it runs in code, as the design
-principle asks. No routine kind and no agent conversation decides it.
-
-### Tests
-
-- `checktime_test.go`: rows above the share file one card, rows above the
-  median file one card, an open card holds a second, rows under both file
-  none, the thresholds come from the project file and default without it.
-- `policy`: the `budget` block parses and refuses a share outside (0, 1].
-
 ## Order and the roll
 
 Phase 1 goes first and alone: it is the bleeding. Its roll changes the
 supervisor, the adapter and the policy schema, so the infra repository's
 `supervisor:` block and the schema copies follow in the same hour. Phase
 3's script and template changes land without a roll, and its worker,
-acceptance and guide changes ride one. Phase 2 and 4 follow at their own
-pace.
+acceptance and guide changes ride one. Phase 2 follows at its own pace.
 
 ## Decisions that are Sebastian's
 
-1. **Where the command classes and the thresholds live.** This plan puts
-   them in the policy tree's project file, because the policy is
+1. **Where the command classes live.** This plan puts them in the policy
+   tree's project file, because the policy is
    schema-checked, shown in the console and read live. The alternative is
    a file in the project repository, read by a pass like the Imager's.
    The project file is my call unless he wants the declaration to travel
@@ -463,4 +427,3 @@ pace.
    line.
 4. **The bound.** 900 s for `open_call`. A higher bound costs minutes on a
    hung tool, a lower one trips a check the tool cap is still killing.
-5. **The thresholds of phase 4.** 20 % check share and a 5-minute median.
