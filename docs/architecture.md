@@ -1967,7 +1967,11 @@ existing `gateway-factoryd` token with `X-Factory-Task` and
 `X-Factory-Purpose` (`review`, `supervisor` or `gate-supervisor`). The
 gateway admits exactly the class's `review_model` or `supervisor_model` for
 that purpose, on a task that is running or in review, and holds, clamps,
-books and audits the call like an agent's. The hold and ledger ref is
+books and audits the call like an agent's. A brief also runs on a task
+waiting on a person. A brief or a review also runs on a done task, a plan
+at rest whose criteria card or delta round asks: its hold reopens the
+task's final settlement, and the settle pass books the call once the hold
+is gone. The hold and ledger ref is
 `<purpose>/<alias>`, the audit row's `kind` names the purpose, and the
 LiteLLM key sits in the task's own factoryd slot, so it neither retires nor
 shares the session's key. That slot carried the defect "Key is blocked":
