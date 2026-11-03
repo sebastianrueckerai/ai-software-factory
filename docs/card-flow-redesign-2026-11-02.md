@@ -1,6 +1,6 @@
 # The card flow redesigned: one case record, a ladder of knowledge, and a factory that unblocks its own board
 
-Design, 2026-11-02. This document is for one decision: how the factory should handle a card that stops going smoothly, so that the board unblocks itself, every problem is judged by AI with the full picture before a human sees it, and a human who does see it gets one decision with everything needed to make it. Section 2 describes today. Sections 4 to 6 describe the target. Section 8 holds the decisions only Sebastian can make. Nothing here is built until he says go.
+Design, 2026-11-02. This document is for one decision: how the factory should handle a card that stops going smoothly, so that the board unblocks itself, every problem is judged by AI with the full picture before a human sees it, and a human who does see it gets one decision with everything needed to make it. Section 2 describes today. Sections 4 to 6 describe the target. Section 8 holds the decisions Sebastian made on 2026-11-02. He approved the design the same day. Phase 1 is built on code main `17376fb1` (2026-11-03): [plans/2026-11-02-case-record-and-digest.md](plans/2026-11-02-case-record-and-digest.md). Phases 2 to 5 wait for their plans.
 
 The facts come from the card-flow map of 2026-11-02 ([card-flow-2026-11-02/README.md](../card-flow-2026-11-02/README.md), 39 stuck points), the incident register of the live run of 2026-10-30 to 2026-11-02 ([card-flow-2026-11-02/incidents.md](../card-flow-2026-11-02/incidents.md), 20 incidents), the needs-you analysis ([needs-you-analysis-2026-11-01.md](../needs-you-analysis-2026-11-01.md)) and the fault register ([needed-fixes.md](needed-fixes.md)). The ladder redesign of 2026-10-15 ([escalation-ladder-redesign-2026-10-15.md](escalation-ladder-redesign-2026-10-15.md)) and the main agent concept of 2026-10-17 ([main-agent-concept-2026-10-17.md](main-agent-concept-2026-10-17.md)) are the two designs this one builds on and in part replaces. Where it reverses a recorded decision, it says so.
 
@@ -130,22 +130,20 @@ A rung's step ends in one of three ways: resolved (an action ran and the card mo
 A deterministic builder, no model, reads a card's rows (status events, sessions, check-in records, gate results, cases and their steps, answers, funding events, dependency edges, plan revisions) and writes a skeleton: one line per step with the time offset, the actor, the outcome and the cost.
 
 ```text
-#1410  plan #1344 · budget 5.00, spent 4.92, holds 0.00 · slot held · in-review, approval
- +0:00  filed by the planner, revision 2, depends on #1402 (done)
- +0:41  session 1 small  → pushed a1b2c3d, 0.41 EUR, 23 calls
- +0:58  review          → concerns, findings f1 f2 f3 f4
- +1:02  check-in gate   → confirmed f1 f2 f3 f4, handover
- +1:05  session 2 small → pushed d4e5f6a, 0.52 EUR     ┐
- +1:30  review          → concerns, findings f1 f2 f3 f4 │ ×2, same findings, same head family
- +1:33  check-in gate   → confirmed f1 f2 f3 f4, handover ┘
- +2:10  spend guard     → stop: check-in share spent, asked money      ⚑ money_ask_hides_findings
- +9:40  human           → Fund 2.00 "fix the four round-3 items", session 4
- +9:41  session 4 small → no push, main sync broke the compile          ⚑ session_no_push
- +9:55  spend guard     → stop: share spent, asked money again          ⚑ answer_changed_nothing
-flags: finding_confirmed_twice(f1..f4), money_ask_hides_findings, answer_changed_nothing, wait_over_bound(human, 7h30)
+#1410 · plan #1344 session-metrics · budget 5.00 spent 4.92 holds 0.00 EUR · slot held · in-review, approval
+   1 +0:00   filed by planner       → revision 2, depends on #1402 (done)
+   2 +0:41   session 1 small        → pushed a1b2c3d, 0.41 EUR, 23 calls
+   3 +0:58   review                 → concerns, findings 3f2a1c9b0e44 7d1e0aa2c4f1
+   4 +1:02   checkin gate           → confirmed 3f2a1c9b0e44 7d1e0aa2c4f1, handover
+   5 +2:10   ask                    → session_cap: Card 1410 asks: grant one more session?
+   6 +9:40   answer by sebastian    → Grant one session
+   7 +9:41   session 4 small        → no push ×2
+flags: grant_bought_nothing(session 4), money_ask_hides_findings, session_no_push(session 4), slot_held_by_wait(approval)
 ```
 
-Loops fold: consecutive steps with the same kind, outcome and finding set collapse into one block with a count. Flags are named patterns computed in code, listed in 5.4. A second tool, `card_step`, returns one step in full: the session's steps, the gate's full result, the check-in's transcript, the ask's five parts and its answer. A third, `board_digest`, writes one line per live card with its status, gate, age in that state, slot, queue reason and flags, then the queue with reasons, the slots held, each open plan's state, and the caps with their headroom.
+This is the built render of phase 1 (the test fixture of `carddigest_test.go`). Each line starts with its step number, which `card_step` takes, so a reader can ask for the depth of any line. Findings are named by the first 12 hex characters of a hash of their text, because the review's findings carry no ids.
+
+Loops fold: consecutive steps with the same kind, actor (without the session's attempt number) and outcome collapse into one line with a count. The folded line keeps the first step's number. Flags are named patterns computed in code, listed in 5.4. A second tool, `card_step`, returns one step in full: the session's steps, the gate's full result, the check-in's transcript, the ask's five parts and its answer. A third, `board_digest`, writes one line per live card with its status, gate, age in that state, slot, queue reason and flags, then the queue with reasons, the slots held, each open plan's state, and the caps with their headroom.
 
 The digest is the one context every rung starts from. The check-in's statement includes the card's digest. The factory agent's wake includes the board digest and the case's card digest. The human's background part is the digest in prose. The chat's `card` tool returns it, so "is something wrong with #1410" is one tool call. A later live monitor reads the same flags, so the digest is built once and read by four consumers. The card digest is not the `digest(path, ask)` file tool of the session menu (fault 3 of the register, on code main since 448048b0). In code the names are `CardDigest`, `card_step` and `board_digest`, never `digest` alone.
 
@@ -344,7 +342,7 @@ Open:
 
 Each phase ships on its own and leaves the factory better than before it. The order stops the bleeding first.
 
-1. **The case record and the digest.** The `cases` and `case_steps` tables, the builder of the digest with its flags, `card_step` and `board_digest` as tools for the chat, the check-in and the factory agent. The board, the inbox and the brief read the case. The four old records become derived views. No routing changes yet. Live value: "is something wrong with #X" answers in one call, and every ask carries its whole history.
+1. **The case record and the digest.** The `cases` and `case_steps` tables, the builder of the digest with its flags, `card_step` and `board_digest` as tools for the chat, the check-in and the factory agent. The drawer and the brief writer read the case and the digest, and a heal pass opens a case for every ask and every pending merge request older than the table. The four old records (the escalation row, the alert, the `question_asked` event, the approval row) keep being written until phase 2 replaces the waits, and become derived views then. The board face and the inbox change in phase 5. No routing changes yet. Live value: "is something wrong with #X" answers in one call, and every ask carries its whole history.
 2. **The ladder in code with rung 0, the clocks and the pool.** Every trip opens a case through one function, and `awaitCase` replaces the two waits under a version gate. The resolver table of 5.6. The monitor with its flags and clocks on every wait the AI owns, on its own goroutine, the other sweeps on their own. Slots freed on waits. The records the flags read, written in the same phase: the queue reason on every refused admission, the funding event of the size gate, the "not run" marker on a refused gate. The escalation pool and the per-card draw bound in policy, the `fund` call as one typed action that rides beside any resolution, the money fact on the case. The durable repeat guard. Live value: no wait the AI owns without a clock, no silent queue, no money ask that hides a problem, half of the 39 stuck points gone.
 3. **Rung 1 on the case.** The check-in reads the digest, the plan and the siblings, answers as a forced tool call against the schema, picks from the typed action set and draws from the pool within the per-card bound, writes its step. The share guard's fabricated stop goes. Live value: the "needs one more go" cards end, because a cap opens a case that rung 1 judges with the full card.
 4. **Rung 2 on every case and the first shot.** The factory agent wakes on every case that passes rung 1, with the board digest and the full action set, at every autonomy level, acting or proposing by level. The planner's recommended answers. Live value: a human reads only the human-only kinds and the cases beyond the pool, each with a recommended option preselected.

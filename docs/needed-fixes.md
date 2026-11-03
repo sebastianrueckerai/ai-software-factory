@@ -356,3 +356,21 @@ The check-in is a judge, and only its prompt says it never edits.
 
 Fix direction: run the check-in's commands without the token in their
 environment or on their file system, so no tool of a judge can write.
+
+## 10. The agent context map's loop pages are not byte-stable across runs
+
+Status: candidate only. Found 2026-11-03 while regenerating `docs/agents`
+after the card digest landed (code main 17376fb1). The map's own page,
+agent-context-map.md, says the same code SHA, policy tree and pinned
+harness produce the same pages byte for byte. They do not: every loop-mode
+page records the random working directory opencode was given
+(`/tmp/agentdoc-loop-<n>`, internal/factoryd/agentdocloop.go:477 on code
+main) and the day's date, which opencode writes into its own prompt from
+its clock. Two regenerations of one commit differ in those bytes, so a
+diff of the pages cannot tell a code change from a rerun.
+
+Fix direction: a fixed working directory under the output path, and a
+fixed clock handed to the recorded run (an environment variable or a flag
+the harness honours; if opencode reads only the system clock, the capture
+masks the date line as it masks the directory). The claim in
+agent-context-map.md stands only once both are fixed.
