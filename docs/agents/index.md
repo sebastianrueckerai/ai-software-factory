@@ -4,8 +4,8 @@ One page per agent: the first model request verbatim, every part pinned to the b
 
 ## The self-check
 
-- code SHA `4f021ca832af5fbaef1593b613874b4435e34153`; every permalink points there.
-- policy `bca247a3f3b6`, the tree the captures read.
+- code SHA `8beeba06bc8d2f4db619fe766b467a1300f1a4d4`; every permalink points there.
+- policy `19cb0da28dc5`, the tree the captures read.
 - harness `opencode 1.18.32`, the pinned opencode the loop captures drove.
 - unlabelled spans: 0 — the tool exits non-zero on any unlabelled byte, so an index that shipped means none.
 - 22 pages. Regenerate: `go run ./cmd/agentdoc -out docs/agents -policy <factory tree> -opencode <pinned binary>`; no LLM runs.
@@ -16,26 +16,26 @@ Fixture ids: `agentdoc-fixture` (coding, screening, sizing, planner, holdout-aud
 
 | agent | family | job | model | purpose | runs | tools | request bytes |
 |---|---|---|---|---|---|---|---|
-| [coding](coding.md) | A | Implements the card: reads repo, edits, commits in sandbox | `small` | `session` | agent-worker, the opencode loop in a gVisor pod | 28 | 49071 |
+| [coding](coding.md) | A | Implements the card: reads repo, edits, commits in sandbox | `small` | `session` | agent-worker, the opencode loop in a gVisor pod | 28 | 49069 |
 | [screening](screening.md) | A | Reads an issue pre-code, answers clear/suspect JSON | `big` | `session` | agent-worker, report mode | 16 | 44986 |
 | [sizing](sizing.md) | A | Sizes a card small/medium/large before first session | `small` | `session` | agent-worker, report mode | 16 | 44847 |
-| [planner](planner.md) | A | Reads repo, files a plan via the file_plan MCP tool | `premium` | `session` | agent-worker, report mode | 16 | 43887 |
-| [holdout-audit](holdout-audit.md) | A | Judges one hold-out criterion, files file_verdict | `small` | `session` | agent-worker, report mode | 28 | 48175 |
+| [planner](planner.md) | A | Reads repo, files a plan via the file_plan MCP tool | `premium` | `session` | agent-worker, report mode | 16 | 44096 |
+| [holdout-audit](holdout-audit.md) | A | Judges one hold-out criterion, files file_verdict | `small` | `session` | agent-worker, report mode | 28 | 48173 |
 | [message-responder](message-responder.md) | A | Answers POST /message pushes mid-session | `small` | `session` | agent-worker, the session's next turn in the sandbox | 28 | 50004 |
 | [opencode-subagents](opencode-subagents.md) | A | opencode-internal task and explore delegation | `—` | `config` | inside opencode, under the session config's agent block | 0 | — |
-| [checkin](checkin.md) | B | Decides continue, message, handover, human or replan on a session trip | `big` | `checkin` | factoryd, in-process loop, tools executed in the sandbox | 7 | 9020 |
-| [model-review](model-review.md) | B | Reviews a diff for one criterion or one behaviour | `premium` | `review` | factoryd direct | 0 | 4713 |
-| [security-audit](security-audit.md) | B | Audits changes against the security checklist | `big` | `audit` | factoryd direct | 0 | 2641 |
-| [gate-supervisor](gate-supervisor.md) | B | Decides approve or escalate at the gates | `big` | `gate-supervisor` | factoryd direct | 0 | 2117 |
-| [review-criteria](review-criteria.md) | B | Drafts the review criteria text | `premium` | `review` | factoryd direct | 0 | 2459 |
-| [review-behaviours](review-behaviours.md) | B | Drafts the review behaviours text | `premium` | `review` | factoryd direct | 0 | 1419 |
-| [delta-planner](delta-planner.md) | B | Plans delta work between reviews | `premium` | `review` | factoryd direct | 0 | 1704 |
-| [holdout-proposer](holdout-proposer.md) | B | Proposes hold-out criteria | `premium` | `review` | factoryd direct | 0 | 1402 |
-| [holdout-redrafter](holdout-redrafter.md) | B | Rewrites a dropped hold-out criterion | `premium` | `review` | factoryd direct | 0 | 709 |
-| [answer-screener](answer-screener.md) | B | Screens a late answer of the issue author | `premium` | `review` | factoryd direct | 0 | 1244 |
-| [brief-writer](brief-writer.md) | B | Writes the human approval brief | `big` | `brief` | factoryd direct | 0 | 2152 |
+| [checkin](checkin.md) | B | Decides continue, message, handover, human or replan on a session trip | `big` | `checkin` | factoryd, in-process loop, tools executed in the sandbox | 8 | 9497 |
+| [model-review](model-review.md) | B | Reviews a diff for one criterion or one behaviour | `premium` | `review` | factoryd direct | 0 | 4734 |
+| [security-audit](security-audit.md) | B | Audits changes against the security checklist | `big` | `audit` | factoryd direct | 0 | 2662 |
+| [gate-supervisor](gate-supervisor.md) | B | Decides approve or escalate at the gates | `big` | `gate-supervisor` | factoryd direct | 0 | 2138 |
+| [review-criteria](review-criteria.md) | B | Drafts the review criteria text | `premium` | `review` | factoryd direct | 0 | 2480 |
+| [review-behaviours](review-behaviours.md) | B | Drafts the review behaviours text | `premium` | `review` | factoryd direct | 0 | 1440 |
+| [delta-planner](delta-planner.md) | B | Plans delta work between reviews | `premium` | `review` | factoryd direct | 0 | 1725 |
+| [holdout-proposer](holdout-proposer.md) | B | Proposes hold-out criteria | `premium` | `review` | factoryd direct | 0 | 1423 |
+| [holdout-redrafter](holdout-redrafter.md) | B | Rewrites a dropped hold-out criterion | `premium` | `review` | factoryd direct | 0 | 730 |
+| [answer-screener](answer-screener.md) | B | Screens a late answer of the issue author | `premium` | `review` | factoryd direct | 0 | 1265 |
+| [brief-writer](brief-writer.md) | B | Writes the human approval brief | `big` | `brief` | factoryd direct | 0 | 2454 |
 | [title](title.md) | B | Names a chat thread from its first message | `small` | `title` | the console's naming call, a factoryd direct client | 0 | 348 |
-| [project-agent](project-agent.md) | B | The always-on repo chat agent; also answers escalations | `premium` | `operator` | console, own tool loop | 52 | 23975 |
+| [project-agent](project-agent.md) | B | The always-on repo chat agent; also answers escalations | `premium` | `operator` | console, own tool loop | 57 | 26405 |
 | [compact](compact.md) | B | Summarises a chat thread's older turns | `small` | `compact` | console | 0 | 921 |
 | [vision](vision.md) | B | Describes an image the human attached | `vision` | `vision` | console | 0 | 315 |
 
@@ -103,6 +103,7 @@ Blocks several agents carry byte for byte, by content hash:
 | block | bytes | carried by |
 |---|---|---|
 | `013651f42d38` · `gateway.Server.toolServer` | 259 | [coding](coding.md) — tool factory-tools_manual; [screening](screening.md) — tool factory-tools_manual; [sizing](sizing.md) — tool factory-tools_manual; [planner](planner.md) — tool factory-tools_manual; [holdout-audit](holdout-audit.md) — tool factory-tools_manual; [message-responder](message-responder.md) — tool factory-tools_manual |
+| `013abd8cfd2f` · `factoryd.chatInputLead` | 20 | [model-review](model-review.md) — the input heading; [security-audit](security-audit.md) — the input heading; [gate-supervisor](gate-supervisor.md) — the input heading; [review-criteria](review-criteria.md) — the input heading; [review-behaviours](review-behaviours.md) — the input heading; [delta-planner](delta-planner.md) — the input heading; [holdout-proposer](holdout-proposer.md) — the input heading; [holdout-redrafter](holdout-redrafter.md) — the input heading; [answer-screener](answer-screener.md) — the input heading; [brief-writer](brief-writer.md) — the input heading |
 | `060879eeeae2` · `gateway.Server.toolServer` | 594 | [coding](coding.md) — tool factory-tools_replicate_predict; [holdout-audit](holdout-audit.md) — tool factory-tools_replicate_predict; [message-responder](message-responder.md) — tool factory-tools_replicate_predict |
 | `06325398a0c9` · `opencode 1.18.32` | 1293 | [coding](coding.md) — tool webfetch; [screening](screening.md) — tool webfetch; [sizing](sizing.md) — tool webfetch; [planner](planner.md) — tool webfetch; [holdout-audit](holdout-audit.md) — tool webfetch; [message-responder](message-responder.md) — tool webfetch |
 | `06c79377dbb1` · `gateway.Server.toolServer` | 722 | [coding](coding.md) — tool factory-tools_request_info; [screening](screening.md) — tool factory-tools_request_info; [sizing](sizing.md) — tool factory-tools_request_info; [holdout-audit](holdout-audit.md) — tool factory-tools_request_info; [message-responder](message-responder.md) — tool factory-tools_request_info |
