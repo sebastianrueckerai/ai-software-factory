@@ -132,7 +132,7 @@ Sebastian decided these on 2026-11-03.
 **Interfaces:**
 - Produces: `const inboxRefusal = "The inbox is the factory's thread: answer with its buttons, and write in a thread of your own."` in `internal/console/chat.go`, answered with status 409 by `say` and as the tool error by `chat_send`.
 - Produces: `mcpThread.Inbox bool` with JSON name `inbox`.
-- Produces: `const wakeAskRefusal = "The inbox takes buttons only: give choices, or record what you found with attach_analysis."`
+- Produces: `const inboxAskRefusal = "The inbox takes buttons only: give choices, or record what you found with attach_analysis."`
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -148,13 +148,13 @@ In `internal/console/answer_test.go`:
 - `TestChatAnswerPressesAPokeChoiceInTheInbox`: a poke row with the choices Retry and Leave it, pressed through `/chat/answer`, saves the choice row and runs the turn.
 
 In `internal/console/wake_test.go`:
-- `TestWakeAskNeedsChoices`: in a wake turn, `ask` without choices answers `wakeAskRefusal` and writes no ask row. With choices it writes the row as today.
+- `TestInboxAskNeedsChoices`: in a turn whose thread is the inbox, whatever started it, `ask` without choices answers `inboxAskRefusal` and writes no ask row. A wake in an ordinary thread keeps the old choices refusal. With choices it writes the row as today.
 
 Move the two existing tests: `TestChatNamesNoInboxOrCardThread` keeps its card-thread half and expects 409 for the inbox half. `TestChatRefusesTheWakeOverAnOlderHumanLine` seeds the older line with `AddChatMessage` instead of `chatPost`.
 
 - [ ] **Step 2: Run the tests to see them fail**
 
-Run: `go test -race -run 'TestChatInboxRefusesATypedMessage|TestCardAnswerInWordsLandsInAnOwnThread|TestMCPChatSendRefusesTheInbox|TestChatAnswerPresses|TestWakeAskNeedsChoices' ./internal/console/`
+Run: `go test -race -run 'TestChatInboxRefusesATypedMessage|TestCardAnswerInWordsLandsInAnOwnThread|TestMCPChatSendRefusesTheInbox|TestChatAnswerPresses|TestInboxAskNeedsChoices' ./internal/console/`
 Expected: FAIL, the refusals and the new paths do not exist.
 
 - [ ] **Step 3: Implement**
@@ -162,7 +162,7 @@ Expected: FAIL, the refusals and the new paths do not exist.
 - In `say`, before `EnsureChatTask` (`chat.go:737`): read the thread, and when `th.Inbox` refuse 409 with `inboxRefusal`. This one guard covers `chatPost`, `chat_send`, `/compact` and the `owner` path.
 - In `answerInChatTurn` (`wake.go:104`): when the current thread is the inbox, call `NewConversation` and use the thread it returns.
 - In `chatAnswer` (`answer.go:47-49`): widen the lookup from `Proposal != ""` to any `MessageAsk` row and any `MessagePoke` row with choices, and route them to `chatAskPress`. An empty token takes the existing `ErrNoProposal` branch, which saves the choice row and runs the turn.
-- In `askMember` (`answer.go:252`): when `t.a.wake` and no choices, refuse with `wakeAskRefusal`.
+- In `askMember` (`answer.go:252`): when the turn's thread is the inbox and the call carries no choices, refuse with `inboxAskRefusal`.
 - `mcpThread` gains `Inbox bool \`json:"inbox"\``. The `chat_send` description says that the inbox refuses a message.
 - Reword `chat_tools.go:2079` to "a choice in their inbox or a reply in a thread of their own answers it" and `:1589` so a wake turn is told to give choices.
 
