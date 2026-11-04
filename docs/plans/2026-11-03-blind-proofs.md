@@ -2724,7 +2724,7 @@ Departures the code forces:
 	ArtifactCut bool   // the card shows the artifact's first maxCardArtifact bytes
 	Human       bool   // Met and Not met are offered: a human criterion on a merge card
 const maxCardArtifact = 8 << 10
-// approvalCard gains Unsettled []string: a merge card's criteria with no verdict, which hold its Approve
+// approvalCard gains Unsettled []string: a merge card's human criteria with no verdict, which hold its Approve (gate criteria without a row go to the workflow's own rerun on the press)
 ```
 
 - The template `{{define "criteria-rows"}}`, the CSS `pre.artifact`, the lab scene `"human"` (`humanScene`) and the check `criteriaHuman(browser, fails)`.
