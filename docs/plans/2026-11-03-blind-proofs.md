@@ -21,7 +21,7 @@ Written 2026-11-03. Status: planned, not built. Phase 1 of four in [blind-proofs
 - Every new store method goes on the `Store` interface (`internal/factoryd/store.go:306`) and gets a stub on `fakeStore` (`store_test.go:44`) and every other fake the compiler names. This phase adds none: the gate writes through `PutCriteriaVerdicts`.
 - Text a person reads follows the writing guide (`internal/writingguide/writing-guide.md`): short words, British spelling. A human is a human, never a member or an operator.
 - Tests run against the throwaway Postgres container `sf-pg-blind` on `127.0.0.1:55432` (`docker run -d --name sf-pg-blind -e POSTGRES_PASSWORD=postgres -p 127.0.0.1:55432:5432 postgres:17` when it is not running): `export URL='postgres://postgres:postgres@127.0.0.1:55432/postgres?sslmode=disable' FACTORYD_TEST_DATABASE_URL=$URL GATEWAY_TEST_DATABASE_URL=$URL`, then `go test -race -p 1 ./...`. `scripts/pg-test.sh` needs local Postgres 17 binaries, which this machine lacks. The whole suite and `bash check static` (vet, gofmt, gosec) are green before every commit of Go code; Task 3, which changes none, runs `bash check static`.
-- Commit messages state what changed and why, with no ruling number and no ledger path, and end with the line `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- Commit messages state what changed and why, with no ruling number and no ledger path, and end with the line `Co-Authored-By: Claude Code <noreply@anthropic.com>`.
 - Comments: minimal, no change narration. A comment only for what the code cannot say.
 - The two regular expressions `criterionTestField` and `criterionInvariantField` stay this phase: the planner's fields change in Phase 2. `RecordHumanCriteria` stays. No `judgement` verdict source this phase: it comes in Phase 3.
 
@@ -3070,7 +3070,7 @@ Expected: FAIL to compile (`ProofsAtMain` undefined).
     - otherwise it reads main's head with `BranchHeadSHA(prBase)` and opens `reproSandbox`;
     - it runs at `branchRef(prBase)` and that head, through `runProofs`: each cited invariant's suite, each cited criterion's stored or opened unflagged proof as `storedProof`; a `*proofsEnded` keeps the outcomes it holds, the unreached reading no report;
     - it records the line, and a start failure is the start-failed line and `ProofsAtMain{}`, so the card goes on;
-    - every outcome passed is `Met`, with `Reason "proofs met at <head[:7]>: <ids joined ", ">"`; otherwise the one finding names the criteria not met, by `textutil.AndList`.
+    - every outcome passed is `Met`, with `Reason "proofs met at <head[:7]>: <ids joined ", ">"`. Otherwise the one finding names the criteria not met, by `textutil.AndList`.
 
     It records no event and writes no row.
   - `cardCriteria`: a card the plan holds gives its items' criterion ids, unique, in the plan's order. Any other plan card gives the `criteria` of the newest `delta_card` line on the plan's timeline whose key is its own.
@@ -3096,12 +3096,12 @@ item texts word for word and never fired, while card #1504 spent five
 sessions on work main already held. Now a plan card's session that ends
 without a push runs the proofs of the criteria the card cites at main's
 head: every one passed closes the card done with the criteria and the
-head; otherwise the next session hears which criteria are not met, by id
+head. Otherwise the next session hears which criteria are not met, by id
 alone. The run opens no proof, and the integration card closes through the
 gate alone. Under the new change id the session end no longer reads the
-acceptance commands; a run from before keeps that close.
+acceptance commands, and a run from before keeps that close.
 
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+Co-Authored-By: Claude Code <noreply@anthropic.com>"
 ```
 
 - [ ] **Step 6: The infra schema.** In the code worktree: `go run ./cmd/factoryd schema --out ~/repos/ai-software-factory-infra/.worktrees/blind-proofs/factory/schema --commit "$(git rev-parse HEAD)"`, then `go run ./cmd/factoryd config check ~/repos/ai-software-factory-infra/.worktrees/blind-proofs/factory`. Expected: `schemas written to …`, then the `: ok, ` line with no warning. Commit in the infra worktree: `policy: the bounds schema takes ProofsAtMain, a plan card's proofs run at main` with the `Co-Authored-By` line. At the phase close it lands with the code.
