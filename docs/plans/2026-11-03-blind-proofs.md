@@ -2981,6 +2981,7 @@ Departures the code forces:
 - **The integration card closes through the gate alone.** `ProofsAtMain` runs on the plan's other cards; for the integration card it answers `ProofsAtMain{}` with no pod and no line. It writes no row on any card.
 - **A delta card's cited criteria** are on the plan's timeline, not in a revision: its `delta_card` line names them by the card's key.
 - The new close lives in its own file, `proofsatmain.go`, so the drain step deletes the old close without touching it.
+- **The version's comment** (`versionBlindProofs` in workflow.go) gains this task's clause: under the version, a plan card's session that ends without a push closes on its proofs at main.
 
 **Files:**
 - Create: `internal/factoryd/proofsatmain.go`, `internal/factoryd/proofsatmain_test.go`
