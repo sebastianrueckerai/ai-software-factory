@@ -3,8 +3,17 @@
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 Written 2026-11-03. Status: Sebastian's OK the same day, in the chat that
-designed it. The code tasks run in the code repository on the branch
-`inbox-split`. The docs task runs here.
+designed it. Landed 2026-11-04 as code ecce4ee2 on GitHub main, the merge
+of the branch's 16 commits with main 90fec28b; Forgejo gets the push when
+the factory is back on. The code goes live with the next roll. The
+builds departed from the text below in four places, each a ruling of the
+session: a migration with a check constraint replaced Task 2's runtime
+fallback; the ask and merge refusals key on the thread being the inbox,
+not on the wake flag; the inbox tool's first page holds every open ask
+and `before` pages only the other rows; the merge sentence at merge rule
+human is "A human approves merges here." The final review added one
+rule: an unbound ask settles only on a row that answers it, a human's
+words or a pressed choice.
 
 **Goal:** A human plans in several threads at once while the inbox stays the
 agent's own thread, every card that would reach a human wakes the agent
