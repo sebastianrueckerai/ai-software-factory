@@ -1,6 +1,6 @@
 # Blind proofs: one blind try per criterion, then the blindfold comes off
 
-Written 2026-11-03. Status: planned, not built. It replaces the runner concept of
+Written 2026-11-03. Status: built. The four phases are on code main e48c3516 and infra main e804fe3. It replaces the runner concept of
 [proof-runner-concept-2026-11-03.md](proof-runner-concept-2026-11-03.md), whose
 runner contract it keeps, and it takes the blind idea of
 [spec-intake-concept-2026-10-16.md](spec-intake-concept-2026-10-16.md) piece 6 as

@@ -178,7 +178,7 @@
 <article class="card" id="clip-plan">
 <div class="media"><video class="loop" muted loop playsinline preload="none" poster="assets/diagram-plan.png" aria-label="How a plan becomes cards, then the console: the plan card waits in Needs you, opens like any card, and on accept its four cards land." width="1600" height="900"><source src="assets/clips/clip-plan.mp4" type="video/mp4"></video></div>
 <h3>A plan asks, then files its cards</h3>
-<p>A big request becomes a plan card. The planner lists its cards in build order and asks what it cannot decide. Once you answer, the cards land, each criterion naming its test before the code exists.</p>
+<p>A big request becomes a plan card. The planner lists its cards in build order and asks what it cannot decide. Once you answer, the cards land, and a separate session writes each criterion's test before the feature exists.</p>
 <p class="more"><a href="evidence.html#3-it-plans-before-it-builds">the file · the test · the run</a> · <a href="https://github.com/sebastianrueckerai/ai-software-factory/blob/master/docs/spec-driven.md">how the spec-driven process works</a></p>
 </article>
 <article class="card" id="clip-ladder">
@@ -316,7 +316,7 @@
 </ul>
 <div class="limits">
 <h3>The risk that stays</h3>
-<p>The model can write code that is wrong on purpose, and that code can pass the checks. The review, the hold-out tests and the audit make that hard, not impossible. <a href="https://github.com/sebastianrueckerai/ai-software-factory/blob/master/docs/threat-model.md">The threat model</a> names every hole we know.</p>
+<p>The model can write code that is wrong on purpose, and that code can pass the checks. The review, the blind tests and the audit make that hard, not impossible. <a href="https://github.com/sebastianrueckerai/ai-software-factory/blob/master/docs/threat-model.md">The threat model</a> names every hole we know.</p>
 </div>
 </section>
 
@@ -612,7 +612,7 @@
 <summary>The gates</summary>
 <div class="body">
 <p>Nine kinds of stage. Four of them stay in every process, and a process file cannot remove them. A deleted or weakened test is a finding. A review that gives no verdict is a finding on the reviewer's card.</p>
-<p>A separate session writes hold-out tests that no sandbox can see. When a hold-out fails, an audit names the defective side: the test, the code or the spec.</p>
+<p>A separate session writes each criterion's test, and no builder sees it until the gate has run it once. A test that fails then opens to the builder, with its code and its output.</p>
 <p class="cap"><a href="evidence.html#4-nothing-merges-unproven">the file · the test · the run</a></p>
 </div>
 </details>
@@ -714,7 +714,7 @@
 </tr>
 <tr>
 <th scope="row">The gates run the tests the criteria name, and a file cannot lower the floor</th>
-<td><b class="v yes">Yes</b>. The criteria gate runs each named test and requires it green. Four stages stay in every process.</td>
+<td><b class="v yes">Yes</b>. The criteria gate runs each criterion's test, written blind, and requires it green. Four stages stay in every process.</td>
 <td><b class="v part">Partial</b>. Rulesets require checks. No criteria name tests.</td>
 <td><b class="v no">No</b>. Bugbot's review advises. No named-test gate.</td>
 <td><b class="v no">No</b>. Devin Review comments. Merge gating is your branch protection.</td>

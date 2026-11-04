@@ -83,7 +83,7 @@ Closed products were read from their documentation only, so their security cells
 
 | Product | Cell | Source |
 |---|---|---|
-| This factory | Yes. The criteria gate runs each named test and requires it green. Four stages stay in every process. | [evidence.md](evidence.md#3-it-plans-before-it-builds) |
+| This factory | Yes. The criteria gate runs each criterion's test, written blind, and requires it green. Four stages stay in every process. | [evidence.md](evidence.md#3-it-plans-before-it-builds) |
 | GitHub Copilot cloud agent | Partial. Rulesets require checks. No criteria name tests. | [docs.github.com](https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations) |
 | Cursor cloud agents | No. Bugbot's review advises. No named-test gate. | [cursor.com](https://cursor.com/docs/bugbot) |
 | Devin | No. Devin Review comments. Merge gating is your branch protection. | [docs.devin.ai](https://docs.devin.ai/work-with-devin/devin-review) |

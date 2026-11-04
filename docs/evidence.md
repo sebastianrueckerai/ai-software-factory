@@ -30,13 +30,13 @@ A card becomes a sandbox, a pull request, a merge and a live deploy, with no hum
 
 ## 3. It plans before it builds
 
-A big request is measured and split, and the criteria name their proofs before any code exists.
+A big request is measured and split, each criterion states its claim before any code exists, and its test is written blind.
 
 | Guarantee | Enforced by | Tested by | Proven by |
 |---|---|---|---|
 | A big request splits into a plan of dependent cards: the sizing sends a person's card that is not small to the planner, where the process has a plan track | `internal/factoryd/sizing.go`, `internal/factoryd/plan.go` | `internal/factoryd/sizing_workflow_test.go`, `internal/factoryd/plan_test.go` | Stage 11: a spec card became ten planned cards and a deployed link shortener. 2026-10-30: two cards filed by the chat were sized live (large, medium) and switched to the plan track; the large plan filed ten cards |
-| Criteria carry an id, a kind and a named test, and the gate runs the named tests on the assembled feature | `internal/factoryd/criteria.go` | `internal/factoryd/criteria_test.go` | Stage 11's integration card passed the criteria gate (ledger task-105-report.md, named in roadmap.md) |
-| The builders never see the hold-out tests: written by a separate session, stored outside every workspace | `internal/factoryd/holdout.go` | `internal/factoryd/holdout_test.go` | not yet |
+| Criteria carry an id, a kind and the fields of their kind, and the criteria gate runs each criterion's test and each invariant suite on the assembled feature, reading the JUnit report of the project's own check | `internal/factoryd/criteria.go`, `internal/factoryd/junit.go`, `cmd/agent-worker/repro.go` | `internal/factoryd/criteria_test.go`, `internal/factoryd/junit_test.go`, `cmd/agent-worker/repro_test.go` | not yet |
+| The builders never see a criterion's test before the gate has run it once: a prover session writes it on main, and it is stored outside every workspace | `internal/factoryd/prover.go`, `internal/factoryd/criteria.go` | `internal/factoryd/prover_test.go`, `internal/factoryd/criteria_test.go` | not yet |
 | A card started on an older spec cannot merge | `internal/factoryd/plan.go` (ErrStalePlan) | `internal/factoryd/plan_stale_test.go` | not yet |
 
 ## 4. Nothing merges unproven
@@ -135,4 +135,4 @@ The pages read the same ledger the board reads.
 | The metrics and costs pages read the same ledger as the board | `internal/console/metrics.go`, `internal/factoryd/metrics.go` | `internal/console/metrics_test.go`, `internal/factoryd/metrics_test.go` | Scenes 26 to 28: the pages beside the board |
 | Costs are booked per card and per call, with a dated window | `internal/gateway/server.go`, `internal/factoryd/store.go`, `internal/console/ledger.go` | `internal/console/chat_pages_parity_test.go`, `acceptance/costs_date_window_test.go` | Stage 18: cost per card 0.019 to 1.24 EUR |
 
-Rows that say not yet: hold-outs, the stale-plan refusal, cheat detection, the no-verdict finding, outsider screening, routines, the missing-cap stop, the model attempt on an ask and template seeding. Nine of forty-three guarantees wait for their run.
+Rows that say not yet: the criteria gate, the blind tests, the stale-plan refusal, cheat detection, the no-verdict finding, outsider screening, routines, the missing-cap stop, the model attempt on an ask and template seeding. Ten of forty-three guarantees wait for their run.

@@ -1075,7 +1075,7 @@ spec, writes nothing, and ends with one JSON block of `min_cards` to
 directories, dependencies, acceptance items and a size of `small` or
 `medium`, and since Stage 16
 `large`. Since Stage 16 a plan may also carry up to five questions with 2
-to 5 choices each, which the member answers before acceptance (5.7).
+to 5 choices each, which the human answers before acceptance (5.7).
 `ValidatePlan` refuses a plan that breaks the shape, and the findings go
 back to the planner. factoryd, not the model, adds the edges that put the
 foundation first and the integration last. Each valid answer is a row in
@@ -1109,8 +1109,10 @@ scaffold, `medium`, and the card failed at the wall-clock cap: the size
 rule has no ceiling the planner can measure. Since Stage 12 (Task 120) the
 guide sizes a card by what it produces, not by time: one package, one page
 or one set of endpoints with its tests, about ten files at most. Each
-acceptance item is a test by name with its inputs and the numbers it
-expects, the foundation's brief names the contracts every card builds on
+acceptance item cites by id the criteria it serves, and the card carries
+those criteria in full. A criterion carries the fields of its kind,
+stated at the feature's surface, and the blind proofs (7, criteria gate)
+prove them. The foundation's brief names the contracts every card builds on
 (how a handler gets the logged-in user, the store's interface, the server
 constructor tests import), and no card asks for a check `bash check` does
 not run. The planner's own class runs 30 minutes with no check-in. On the
@@ -4620,8 +4622,11 @@ sizing task, as it has one screening task.
   takes its most severe class. The live classes: `forbidden` for the
   workflow directories `.forgejo/**`, `.gitea/**` and `.github/**`,
   `migration` for `internal/*/migrations/**` and `internal/policy/schema.sql`,
-  `high` for `k8s/**`, `**/Dockerfile*`, `go.mod` and `go.sum`, and `normal`
-  by default. A forbidden class fails an agent's task and closes the pull
+  `runner` for the root's `check` and `scripts/pg-test.sh`, the criteria
+  runner's entry point, `high` for `k8s/**`, `**/Dockerfile*`, `go.mod` and
+  `go.sum`, and `normal` by default. The `runner` class ranks above `high`
+  and always needs a person: a passed audit merges a `high` change at full
+  auto, never a `runner` one. A forbidden class fails an agent's task and closes the pull
   request. A pull request factoryd opened itself (a template update, a
   schema copy, a GitHub sync, a revert) has no agent, so its forbidden
   paths go to a human's approval that names them (roadmap 261).
@@ -4672,6 +4677,40 @@ sizing task, as it has one screening task.
   without `/cache`, `/bin/sh` by its absolute path. So an earlier session
   cannot plant `/cache/go/bin/sh` or poison `/cache/go-build` and fake the
   base's result.
+- **Criteria gate.** Once a plan's foundation card has merged, at the
+  confirmation for a plan without one, the criteria sweep opens a prover
+  task, a report task of the plan, source and class `prover`, whose
+  session writes one test per test, judgement and human criterion and per
+  okayed hold-out and files the set through `file_proofs`, three filings
+  at most. factoryd runs every filed test on main, and a test of kind test
+  must be red there: what stays green or unrunnable is stored flagged in
+  `plan_proofs` and opens at the gate without a blind try. The hold-outs
+  are claims with numbers proposed at the confirmation question, proven by
+  the prover as any criterion is, named `holdout-<idx>` and outside its
+  brief, and public once opened: no audit, no hidden rewrite. On the head
+  of the plan's integration card or a delta card the gate runs every
+  stored test and every invariant suite in one sandbox, through the
+  agent-less worker in a pod with no token in the container that runs the
+  tests and no shared cache, the list posted to the worker's message port
+  under a bearer of which it holds the hash alone, each entry as
+  `CHECK_REPORT=<path> bash check test <suite> [<name>]`, one report line
+  per entry. The JUnit report's reading knows four outcomes, passed,
+  failed, missing and skipped, and no report besides: skipped is never
+  met. A green stored test meets its criterion blind. Any other outcome
+  opens the test, a finding that hands the builder its code and its
+  output, and an opened test runs by suite and name at every later head.
+  Each verdict is a row of source `gate`, blind or open. A judgement
+  criterion is one model call per run, over the artifact a test wrote,
+  with the criterion's pinned prompt, no tool and no diff, and its row
+  records the model and the prompt's hash. A human criterion is settled
+  on its row of the merge card, and Approve is held until every criterion
+  stands. The workflow's change id `blind-proofs` carries the change: the
+  merge waits on the gate's rows, and the findings go to the builder. A
+  plan card's session that ends without a push closes on `ProofsAtMain`,
+  the proofs of its cited criteria at main's head: a full pass closes the
+  card done, anything else names the criteria not met by id. It replaced
+  the acceptance close, which matched shell commands against item texts
+  and never fired.
 - **Model review.** `review-frontier` reads the brief, the diff (cut at
   48 KiB until Stage 16, per part since) and the gate results, and answers strict JSON: a verdict of
   `approve` or `concerns`, a summary and findings. The call runs under a
@@ -4740,17 +4779,14 @@ sizing task, as it has one screening task.
   first 50 and a line that counts the rest, and their summaries 8 KiB. The
   activity's bound follows the waves of calls and stays ten minutes under
   the six hours of its attempt, so the watch trips before Temporal ends it.
-  The review of an integration card, the one that answers the plan's
-  criteria, adds one call per criterion over the diff of the cards that
-  cite it, every delta card's and its own, in parts when that diff needs
-  them, and one call for the feature's behaviours. The behaviours call
-  reads the cards' briefs, their file lists and the names they add, and
-  has no diff. A criterion over several parts takes the worst part's
-  verdict, and its evidence and fix come only from the parts at that
-  level. A part may answer `absent`, and a criterion absent from every part
-  is `unmet`, since a met that nothing shows would count toward auto merge.
-  A plain review answer that carries `criteria` or `behaviours` is
-  refused. Every prompt that reads diff text says the diff is the agents'
+  The review of an integration card adds one call for the feature's
+  behaviours, which reads the cards' briefs, their file lists and the
+  names they add, and has no diff. It judges no criterion: the criteria
+  gate settles the test, invariant and judgement criteria, the approver
+  the human ones. It reads each opened proof's original code and the
+  agent's summary, so a changed proof is a finding unless the summary
+  says why. A plain review answer that carries `criteria` or `behaviours`
+  is refused. Every prompt that reads diff text says the diff is the agents'
   work to judge, never an instruction. The prompt carries the
   added lines' goroutines, channels, locks, selects and atomics as context,
   not as a rule. A finding that claims a name is undefined or
@@ -5500,7 +5536,7 @@ since Stage 6, but neither has run under load.
 | Approval on the phone | A push channel (ntfy or Forgejo notifications) and a small approval page (Happy, Optio). Folded into the notification service: Web Push and an installed PWA first, Telegram second, Discord, WhatsApp last | Roadmap 145, after Stage 15 |
 | Evaluation suite | A per-project regression suite from closed issues in Harbor's task format (instruction, environment, verifier), pass rate against a baseline in CI, and promptfoo's before-and-after table on every prompt change. Adopt the Harbor tool or only its format when built. Not the Harbor container registry | Revisit later |
 | Hold lock | One global Postgres advisory lock serialises every budget hold. In-memory counters flushed to Postgres (agentgateway) or deduction at several levels (Bifrost) are the references if it ever limits throughput | Revisit if hold latency grows |
-| Hold-out scenarios | Acceptance scenarios a step is graded against, kept outside that step's read access (StrongDM). Would belong to a spec stage of the configurable pipelines | Landed in the spec-intake concept: hold-out criteria at the confirmation question, stored on the plan outside every workspace, run by the criteria gate (Sebastian, 2026-10-16) |
+| Hold-out scenarios | Acceptance scenarios a step is graded against, kept outside that step's read access (StrongDM). Would belong to a spec stage of the configurable pipelines | Landed: hold-out criteria at the confirmation question (Sebastian, 2026-10-16). Since 2026-11-03 every test criterion is proven blind as well, by a prover session, with one blind try and no audit (Sebastian, 2026-11-03) |
 | Reader and writer split | A read-only agent for untrusted text, a writer that never sees it (GitLab). Rejected: every agent keeps the exact input, an optional scan for injection attempts guards it instead | Rejected (Sebastian, 2026-09-29) |
 | Command-level policy | Allowlisting commands inside the sandbox (Codex execpolicy, Ona exec-gate, OpenShell binary pins). Rejected: allowlisting every legitimate command is an endless race, so the sandbox allows everything and the blast radius stays contained | Rejected (Sebastian, 2026-09-29) |
 | Hard caps | A hold for each call's worst case under an advisory lock, the output clamped to the headroom, the real cost booked in full, a cut call books its hold until the settle window ends; caps per task, day and UTC month, the month over all projects, with LiteLLM's proxy budget behind it. Since Stage 17 the hold for a call's input calibrates from the task's earlier call on the same ref | Decided, calibrated |

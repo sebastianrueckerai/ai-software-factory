@@ -378,3 +378,15 @@ The carousel. A card with more than one open case ends on its carousel: the last
 Not taken: the gap alone at 16 px (A, the start of a card stayed unmarked), the carousel in the band (B, the runner-up, its 44 px arrows crowd the band on the phone and come before the case is read), a frame in the full `--need-line` with the arrows at the two ends of the foot (C, loud beside Send, the split arrows read as two loose controls), and the selector fixed with nothing else (base, its border measures 2.6:1 dark and 1.6:1 light against the column).
 
 The band's text measures 7.8:1 dark and 5.6:1 light for the ref, 5.0:1 and 6.6:1 for the waiting time. The 3 px bar measures 2.0:1 against the card in the light theme, under the 3:1 of a line that carries a state. The column's head carries the state too, so the bar stays as it is. The cost was $0.12 of a $3 cap, four critic calls.
+
+## C45. Each criterion is a row on the merge card of a plan's integration card, and a human settles the human ones (2026-11-03, Sebastian)
+
+Amends C42's criteria card: its rows stand on the merge card of a plan's integration or delta card too. From Sebastian's decision of 2026-11-03, human criteria are settled one row each on the Needs you card, before the merge.
+
+Each row, in plan order, is a `fieldset.question` with the legend `<id> (<kind>): <verdict>`. A gate row's met carries ` (blind)` or ` (open)`, and a judgement row carries the model's reason. A human row shows its claim and the artifact as `pre.artifact`, wrapping, at most 16em high, the first 8 KiB with a line that says so, under `<name> at <head>`, or the line `Evidence: <evidence>`, and the presses Met, Not met and Waive. Every other open row shows Waive. A met or waived row reads ended, as C42 says. Approve is gone until every criterion has a verdict, and a line names the open ones.
+
+The drawer heads an opened proof `<criterion>: <path>, changed|unchanged|not in the pull request`, with the original and, when changed, the repository's version beside it in `pre.proof`, at most 24em high. C44's band and carousel stay.
+
+No design round judged the look, and the rows reuse C42's markup.
+
+The build is 14393e5c on main of the code repository.

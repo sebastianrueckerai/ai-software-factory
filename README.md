@@ -11,7 +11,7 @@ The landing page, with a three-minute film and a short clip per feature, is in [
 ## How a card runs
 
 1. **Roadmap:** linked Markdown in your repository.
-2. **Spec:** each criterion names its test before the code exists. You confirm the spec.
+2. **Spec:** each criterion states its claim and its numbers before the code exists. You confirm the spec, and a separate session writes the tests.
 3. **Cards:** the planner files them in dependency order.
 4. **Sandbox:** the agent works in a throwaway gVisor pod with no credentials and no internet.
 5. **Pull request:** the factory pushes, not the agent.
@@ -38,7 +38,7 @@ The reference cluster runs on three Hetzner Cloud servers with S3 storage. On it
 - the factory fixed five of its own open defects;
 - one spec card became ten planned cards and a deployed link shortener.
 
-[docs/evidence.md](docs/evidence.md) lists every guarantee with the code that holds it, the test that exercises it and the run that shows it. Nine of the 43 guarantees still wait for a recorded run.
+[docs/evidence.md](docs/evidence.md) lists every guarantee with the code that holds it, the test that exercises it and the run that shows it. Ten of the 43 guarantees still wait for a recorded run.
 
 ## Run it
 
@@ -55,7 +55,7 @@ Everything you configure is a file in your repository: the process, the prompts 
 
 ## Known limits
 
-The hosted model APIs see diffs and briefs. The Go module proxy is a covert channel of a few hundred bytes per request. gVisor is not a microVM. The model can write code that passes the checks, and the review, the hold-out tests and the audit make that hard, not impossible.
+The hosted model APIs see diffs and briefs. The Go module proxy is a covert channel of a few hundred bytes per request. gVisor is not a microVM. The model can write code that passes the checks, and the review, the blind tests and the audit make that hard, not impossible.
 
 ## Licence
 
