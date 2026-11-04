@@ -3417,7 +3417,10 @@ undo, fund, the card door, and every choice button, which posts to
 `/chat/answer` since the typed path is closed. An `ask` from a turn in
 the inbox must carry choices. An unbound ask stands until a row answers
 it, a human's words or a pressed choice, since a poke or a wake's row
-answers nothing. A database check,
+answers nothing. A poke with choices, the failed card's Retry or Leave
+it, settles the same way, by a press or by its card moving on, never by
+the seen marker that settles an inform (Sebastian, 2026-11-04:
+out-of-date buttons vanish, a live one stays). A database check,
 `chat_conversations_inbox_never_current`, forbids an inbox that is
 current, and a read of the inbox never makes it current, so a human
 lands on a thread of their own and opens the inbox from the switcher.
