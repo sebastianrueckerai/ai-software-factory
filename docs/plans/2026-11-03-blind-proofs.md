@@ -1930,7 +1930,7 @@ func TestCardDigestFlagsAProofTheDryRunFlagged(t *testing.T)
 // → Flags holds {prover_refused_thrice, door} and {prover_refused_thrice, holdout-4}; one with "flagged": [] → neither.
 
 func TestCardDigestNamesTheProversSession(t *testing.T)
-// the rig as the prover's task (Source prover): session_start and session_end of s-p with "model": "factory/big", "role": "prover", outcome reported, no attempt
+// the rig as the prover's task (Source prover): session_start and session_end of s-p with "model": "big", "role": "prover", outcome reported, no attempt
 // → the session step's Actor "prover big"; a session line without a role keeps "0 big".
 
 // boarddigest_test.go
@@ -2507,7 +2507,7 @@ func TestJudgeCallsTheModelWithThePromptAndTheArtifactAlone(t *testing.T)
 //   "```json\n{\"verdict\":\"met\",\"reason\":\"the page names every size\"}\n```", the store's spend since the call 0.04
 // → one chat: purpose review, model big, system prompt == readsCalm.Prompt + "\n\n" + judgementAnswer, input == {"artifact":"reads_calm.html","content":"<main><h1>Sizes</h1></main>"}, no tools;
 //   row {reads_calm met "the page names every size (model big, prompt 6b2355d78a19)", Kind judgement};
-//   detail {"criterion": "reads_calm", "artifact": "reads_calm.html", "model": "factory/big", "prompt_hash": "6b2355d78a19", "verdict": "met", "reason": "the page names every size", "cost": 0.04}.
+//   detail {"criterion": "reads_calm", "artifact": "reads_calm.html", "model": "big", "prompt_hash": "6b2355d78a19", "verdict": "met", "reason": "the page names every size", "cost": 0.04}.
 // promptHash(readsCalm.Prompt) == "6b2355d78a19" (printf '%s' "$prompt" | sha256sum).
 
 func TestJudgeWithoutAVerdictWritesNoRow(t *testing.T)
@@ -3191,8 +3191,8 @@ func TestCardDigestShowsTheBlindTryAndTheOpening(t *testing.T)
 // TestCardDigestReadsEveryShapeOfTheGatesLine stands: a line without states reads "1 met, 1 unmet".
 
 func TestCardDigestShowsTheJudgementTheProofsAtMainAndTheHumansNotMet(t *testing.T)
-// a judgement line {criterion reads_calm, artifact reads_calm.html, model factory/big, prompt_hash 6b2355d78a19, verdict met, reason "the page names every panel's proof", cost 0.04}
-//   → {judgement, big, "met: the page names every panel's proof", CostEUR 0.04}; CardStep "criterion reads_calm, artifact reads_calm.html\nmodel factory/big, prompt 6b2355d78a19, cost 0.04 EUR\nreason: the page names every panel's proof\n";
+// a judgement line {criterion reads_calm, artifact reads_calm.html, model big, prompt_hash 6b2355d78a19, verdict met, reason "the page names every panel's proof", cost 0.04}
+//   → {judgement, big, "met: the page names every panel's proof", CostEUR 0.04}; CardStep "criterion reads_calm, artifact reads_calm.html\nmodel big, prompt 6b2355d78a19, cost 0.04 EUR\nreason: the page names every panel's proof\n";
 // a proofs_at_main line {"head": "29b0d33aa", "criteria": nine entries passed} → {proofs, runner, "at main 29b0d33: 9 of 9 met"}, its commit "29b0d33aa"; CardStep holds "main at 29b0d33aa\n" and "size_bound passed\n";
 // event criterion_decided by sebastian {approval 31, criterion pages_ok, verb not_met, reason "The help page has no links yet."} → {criteria, sebastian, "pages_ok not met"},
 //   CardStep holds "reason: The help page has no links yet.";
