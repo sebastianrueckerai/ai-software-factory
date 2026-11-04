@@ -1975,7 +1975,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ## Phase 3: the gate, the opening, the human and the model
 
-Written 2026-11-04. Phase 3 of four in [blind-proofs-plan-2026-11-03.md](../blind-proofs-plan-2026-11-03.md), section "The fix", with the design sections "The life of a blind proof" (steps 5 to 7 and the paragraph after them), "What a failure of a mechanical test does", "The human's check", "The model's check", and the rows of "What the lifecycle tool sees" for the gate run, a proof that opens, the verdict rows, the judgement call, a human settling a row, the proofs run at main, the close on proofs, the board digest's blind count and the flags `opened_proof_red_twice`, `opened_proof_changed` and `criterion_unproven`. Code references are to the worktree after Task 6; Phase 2 is planned and not built, so these tasks build on the interfaces Tasks 7 to 12 state. Grep for the symbol before trusting a line number.
+Written 2026-11-04. Phase 3 of four in [blind-proofs-plan-2026-11-03.md](../blind-proofs-plan-2026-11-03.md), section "The fix", with the design sections "The life of a blind proof" (steps 5 to 7 and the paragraph after them), "What a failure of a mechanical test does", "The human's check", "The model's check", and the rows of "What the lifecycle tool sees" for the gate run, a proof that opens, the verdict rows, the judgement call, a human settling a row, the proofs run at main, the close on proofs, the board digest's blind count and the flags `opened_proof_red_twice`, `opened_proof_changed` and `criterion_unproven`. Phase 2 is built at the code branch head (Tasks 7 to 12 and their fix wave), and code references are to that tree: a name or signature these tasks consume is the tree's. Grep for the symbol before trusting a line number.
 
 **Goal:** The gate makes one blind try per stored proof and opens every one that is not green to the builder, with its code and output; opened proofs run from the repository after that; a model judges each judgement criterion's artifact; the human settles each human criterion on the Needs you card; a plan card whose session ends without a push closes on its proofs at main; the workflow merges on the gate's verdicts; the digests show every step.
 
@@ -1985,7 +1985,9 @@ Written 2026-11-04. Phase 3 of four in [blind-proofs-plan-2026-11-03.md](../blin
 
 ### Phase 3 constraints
 
-- The Global Constraints and the Phase 2 constraints bind every task, the base being the branch head after Task 12. New migrations sort after Task 11's `20261115110000_prover_report.sql`.
+- The Global Constraints and the Phase 2 constraints bind every task, the base being the branch head after Task 12 and the Phase 2 fix wave. New migrations sort after Task 11's `20261115110000_prover_report.sql`.
+- Task 16 is two tasks, each with its own brief and commit: Task 16a (factoryd and the console's presses, route and chat tool) and Task 16b (the template's rows, the CSS and the lab).
+- Task 18 deletes nothing. The acceptance close by shell words stays for a run from before: under `versionBlindProofs` its close branch, its `capped` read and the session end's acceptance read are off, and `SessionResult.Acceptance`, `acceptance.go`, `EventAcceptancePassed` and the console's acceptance close stay. Phase 4's drain step deletes them once no run from before is open.
 - Workflow code (`workflow.go`, `workflow_stages.go`, `plan.go`'s loops) changes in Tasks 17 and 18 alone, under one change id, `"blind-proofs"` (`versionBlindProofs`), read once at the run's start into `taskRun.blindProofs` as `versionCriteriaGate` and `versionAdjudicated` are. A run from before keeps every old path. Every other task changes activities, the store, the worker and the console.
 - Blind by construction: before a stored proof's blind try at the gate, no code and no output tail of it, and no claim of a stored hold-out, reaches a builder, a brief, a brief push, a comment, a finding, an event detail, a review input, a digest or the console. After the try, the opened proof's code and output are what the builder gets. The proofs at main (Task 18) open nothing and name the criteria alone.
 - The console's criteria rows follow C42 in `design/design-decisions.md` (a met or waived row reads ended: legend muted, box dashed by its class `settled`, form gone; text wraps inside the card, a long name included) and leave C44's band and carousel as they are. The console lab gets a scene for the human rows.
@@ -1993,11 +1995,11 @@ Written 2026-11-04. Phase 3 of four in [blind-proofs-plan-2026-11-03.md](../blin
 
 ### Review Focus, Phase 3
 
-1. A retry of the gate's activity, or a factoryd restart, after a proof opened. Expected: the proof opens once, one `proof_opened` event per card, and the builder still gets the test: the next run finds it missing at its path, and every later session's clone holds it (Task 14). Pinned in Task 13 (`TestGateCriteriaOpensAProofOnce`) and Task 14.
+1. A retry of the gate's activity, or a factoryd restart, after a proof opened. Expected: the proof opens once, one `proof_opened` event per card and head, also after a stop between the event and the row, and the builder still gets the test: the next run finds it missing at its path and names the path with the code, and every later session's clone holds it (Task 14). Pinned in Task 13 (`TestGateCriteriaOpensAProofOnce`) and Task 14.
 2. A stored proof or a stored hold-out reaching a surface before its blind try, or a blind proof's output reaching the builder through the proofs at main. Expected: none of its code, output or claim in a finding, the comment, an event detail, the brief push, the review input or a digest; the proofs at main name criteria alone. Pinned in Tasks 13, 14 and 18.
 3. An opened proof the builder deleted or rewrote. Expected: a deleted one is a finding naming its path; a rewrite marks the gate line's entry `changed`, reaches the review with the original, shows in the drawer beside the repository's version and raises `opened_proof_changed`. Pinned in Tasks 13, 14 and 19.
-4. Two presses on one human row, a press on a stale board, or a press after the merge request was decided. Expected: a Met or a Waive on a row that stands met is refused with "Criterion pages_ok is met already; reload the board.", a press on a decided request is refused as `pendingRequest` refuses today, and Approve stays refused while a row has no verdict. Pinned in Task 16.
-5. A workflow that started before the deploy. Expected: it keeps the review's rejudge, the gate's findings on the card, `AutoMerge` on the review's rows and no proofs at main. Pinned in Task 17 and Task 18 (the old-version tests).
+4. Two presses on one human row, a press on a stale board, or a press after the merge request was decided. Expected: a Met or a Waive on a row that stands met is refused with "Criterion pages_ok is met already; reload the board.", a press on a decided request is refused as `pendingRequest` refuses today, and Approve stays refused while a row has no verdict. Pinned in Task 16a.
+5. A workflow that started before the deploy. Expected: it keeps the review's rejudge, the gate's findings on the card, `AutoMerge` on the review's rows, `holdMerge`'s old words and re-file, the acceptance close and no proofs at main. The review stops writing criteria rows for every run (Task 15 is activity code), so an old run's merge held on a judgement criterion ends in a human's waiver or decision; a press on it loops to `HoldMerge` until a waiver, an accepted cost. The switch-on checklist gets the line: before Phase 3 deploys, no run from before holds a merge waiting on a judgement criterion. Pinned in Task 17 and Task 18 (the old-version tests).
 
 ---
 
@@ -2006,31 +2008,34 @@ Written 2026-11-04. Phase 3 of four in [blind-proofs-plan-2026-11-03.md](../blin
 Departures the code forces:
 - **The delta card is this task's.** The workflow calls `GateCriteria` at every card's approval (`approval`, `versionCriteriaGate`) and the activity skips every card but the integration card, so running it on a delta card (a plan card whose key the newest revision does not hold) is an activity change. The rows land on the integration card (`integrationCard`), where `reviewCriteriaStep` puts the review's and the plan close reads them.
 - **The findings are built here and routed in Task 17.** Today `approval` appends the gate's findings to the human's card.
-- **The gate keeps each run's output.** It calls Task 10's `proofRuns`, not `runProofs`, because an opening hands the check's output to the builder.
-- **The gate reads each opened proof at the head** through `r.forgejo.FileAt`: an absent path makes no run and a finding that names it; a file that differs from the original marks the entry `changed`, which Tasks 14 and 19 read.
-- **`plan_proofs` gains `opened_head` and `opened_output`**, from which Task 14 writes an opened proof into later sessions' clones.
-- A stored proof that stays green stays stored and runs blind again at every later head. A stored hold-out stays out of every surface while it is green, on the line's `"holdouts"` as in Phase 2. One that opens is named by its own id, its claim public.
-- The opening is written before its event: a retry after the write opens nothing twice (`OpenPlanProof` answers false) and records no second event.
+- **The gate keeps each run's output.** `runProofs` (gates.go) returns the runs beside the outcomes, and the gate reads each run's output from the runs, because an opening hands the check's output to the builder. `runProofs` stays the one place of the ended-pod rule: `TestGateCriteriaKeepsTheRunsOfAPodThatEndedEarly` stands as it is.
+- **The gate reads each opened proof at the head** through `r.forgejo.FileAt`: an absent path makes no run and a finding that names the path and carries the code, public once opened (a brief push that fails is only logged, so the clone may lack it); a file that differs from the original marks the entry `changed`, which Tasks 14 and 19 read.
+- **No new column.** `OpenPlanProof` sets the state `opened` alone. The `proof_opened` event carries the head and the output, which the digests read, and Task 14 writes an opened proof into later sessions' clones from its `code`.
+- A stored proof that stays green stays stored and runs blind again at every later head. A stored hold-out stays out of every surface while it is green, on the line's `"holdouts"` by `holdoutEntry(idx)` as in Phase 2. One that opens is named by its own id, its claim public.
+- A test criterion with no stored proof at the gate because it came after the prover's store stays the Phase 2 fix wave's unmet row with the finding "Criterion <id> has no stored proof: the prover filed before it was added." It never opens: the human settles it by a waiver or a delta card.
+- The `proof_opened` event is recorded idempotently, keyed by criterion and head through `hasEvent`, before `OpenPlanProof` and whatever it answers. A factoryd that stops between the event and the row runs the blind try again on the retry, the row still stored, records no second event and writes the row; a retry after both finds the proof opened and opens nothing.
 
 **Files:**
-- Create: `internal/schema/migrations/factoryd/20261116100000_proof_opened.sql`
 - Modify: `internal/factoryd/criteria.go` (Task 10's `criterionRun`, `gateRuns`, `GateCriteria`; Task 4's `gateProof`, `criteriaReport`, `criterionLine`, `gateRows`, `criteriaComment`)
-- Modify: `internal/factoryd/holdout.go` (`PlanProof`; the PG methods `PlanProofs` and `OpenPlanProof`)
+- Modify: `internal/factoryd/gates.go` (`runProofs`; `criteriaUnmet`'s comment and its delta card's words)
+- Modify: `internal/factoryd/holdout.go` (the PG method `OpenPlanProof`)
 - Modify: `internal/factoryd/store.go` (the interface), `store_test.go` (`fakeStore`, `TestPGStoreProofs`)
-- Modify: `internal/factoryd/events.go`
-- Test: `criteria_test.go`, `runner_test.go` (`forgejoHub` serves raw files)
+- Modify: `internal/factoryd/events.go` (`EventProofOpened`, `hasEvent`), `internal/factoryd/verdict.go` (`hasEvent`'s caller)
+- Test: `criteria_test.go`, `runner_test.go` (`forgejoHub` serves raw files), `events_test.go`, `gates_test.go` (`TestGateCriteriaNameTheGateNotAReproduction`)
 
 **Interfaces:**
-- Consumes: Task 2's `proofOutcome` and the `proof*` words; Task 4's `proofResult`, `holdoutEntry`, `holdoutDryVerdict`, `shortenEvidence`; Task 7's `criterionNames`; Task 9's `PlanProof`, `ProofStored`, `ProofOpened`, `ProofOriginHoldout`, the flags; Task 10's `proofRuns`, `storedProof`, `gateRuns`, `criterionRun`; `integrationCard`, `roleOf`, `andList`, `errForgejoNotFound`.
+- Consumes: Task 2's `proofOutcome` and the `proof*` words; `proofResult(run, ok, runErr, name)`, `runProofs(ctx, t, repo, ref, commit, at, entries) (map[string]proofOutcome, error)` and `proofsEnded`, all in gates.go; Task 4's `holdoutEntry`, `holdoutDryVerdict`, `shortenEvidence`; Task 7's `criterionNames`; Task 9's `PlanProof`, `ProofStored`, `ProofOpened`, `ProofOriginHoldout`, the flags; Task 10's `storedProof`, `criterionRun` (fields `id, kind, suite, name, file, held` and the fix wave's `late`; its method `proof()`), `gateRuns(p, proofs) (runs []criterionRun, holdouts []PlanProof)`; Task 4's `criteriaReport(runs, outcomes map[string]proofOutcome) (findings, lines []string, proofs []gateProof)` and `criteriaComment(commit string, met int, lines []string)`, both rewritten below; `(tl *Timeline) hasEvent(ctx, taskID, event) bool` (events.go), `criteriaUnmet(rv Review) string` (gates.go); `integrationCard`, `roleOf`, `textutil.AndList`, `errForgejoNotFound`.
 - Produces:
 
 ```go
-// holdout.go: PlanProof gains
-	OpenedHead   string `json:"opened_head"`   // the head whose blind try opened it
-	OpenedOutput string `json:"opened_output"` // what the builder got as its output, at most maxProofMessage
-
 // Store
-OpenPlanProof(ctx context.Context, id string, idx int, head, output string) (bool, error) // stored → opened, once; false when the row was not stored
+OpenPlanProof(ctx context.Context, id string, idx int) (bool, error) // stored → opened, once; false when the row was not stored
+
+// gates.go: runProofs answers the runs beside the outcomes; its one caller is GateCriteria
+func (r *Runner) runProofs(ctx context.Context, t Task, repo Repo, ref, commit, at string, entries []harness.Proof) (runs map[string]harness.ProofRun, outcomes map[string]proofOutcome, err error)
+
+// events.go: hasEvent gains match, the detail values the event's line must hold; nil matches any line of the event
+func (tl *Timeline) hasEvent(ctx context.Context, taskID, event string, match map[string]string) bool
 
 // events.go
 // EventProofOpened records a stored proof that the gate's blind try did
@@ -2052,16 +2057,19 @@ type criterionRun struct {
 	suite, name string
 	file        *harness.ProofFile // a stored proof's file
 	held        string
-	proof       *PlanProof         // the row the run proves; nil for an invariant and a held run
+	late        bool               // the Phase 2 fix wave's: held for a proof the store left out, a finding too
+	stored      *PlanProof         // the row the run proves; nil for an invariant and a held run
 }
-// state is proofBlind for a stored proof, proofOpen for an opened one, "" else.
+// proof() keeps its name and its body: the run's entry in the runner's list.
+// state is proofBlind for a stored proof, proofOpen for an opened one, "" else, by stored.State.
 func (c criterionRun) state() string
 // label is "criterion <id>", or "hold-out <ID>" for a hold-out.
 func (c criterionRun) label() string
 
 // gateRuns is Task 10's with the hold-outs as runs after the criteria, in
 // idx order: a stored proof runs blind with its file, a flagged stored one
-// makes no run and opens, an opened one runs by suite and name.
+// makes no run and opens, an opened one runs by suite and name; a test
+// criterion without a stored or opened row is held as the fix wave holds it.
 func gateRuns(p Plan, proofs []PlanProof) []criterionRun
 
 // gateProof gains
@@ -2075,7 +2083,7 @@ type gateResult struct {
 	outcome proofOutcome
 	output  string // the check's output tail
 	absent  bool   // an opened proof whose path holds no file at the head: no run
-	changed bool
+	changed bool   // an opened proof whose file at the head is not its code
 }
 
 // openedProof is a proof this run opens.
@@ -2102,15 +2110,9 @@ func criteriaComment(commit string, met, of int, lines []string) string
 ```
 
 - The `gate_criteria` line gains `"opened": [ids]`, the proofs this run opened, by the criterion's id or the hold-out's own.
+- `criteriaUnmet`'s doc comment drops "which the gate never runs on a delta card", and its delta card's case reads "the auto merge does not read the criteria gate's verdicts on a delta card, and a person decides this merge" (the gate runs there now).
 
-- [ ] **Step 1: The store and the migration.** In `TestPGStoreProofs` add: a stored row idx 1 of t-ho, `OpenPlanProof(t-ho, 1, "c1", "Failed\nwant 3, got 2")` → true, and `PlanProofs` reads it `State opened, OpenedHead "c1", OpenedOutput "Failed\nwant 3, got 2"`; again → false; on a filed row → false, the row as it was. Run `go test -race -p 1 ./internal/factoryd/ -run TestPGStoreProofs`. Expected: FAIL to compile. The migration:
-
-```sql
--- an opened proof keeps the head of its blind try and what the builder got as its output
-ALTER TABLE plan_proofs ADD COLUMN opened_head text NOT NULL DEFAULT '', ADD COLUMN opened_output text NOT NULL DEFAULT '';
-```
-
-`OpenPlanProof` is `UPDATE plan_proofs SET state = 'opened', opened_head = $3, opened_output = $4 WHERE task_id = $1 AND idx = $2 AND state = 'stored'`, true on one row. `fakeStore` gets the same rule.
+- [ ] **Step 1: The store.** No migration: `plan_proofs_state_check` holds `opened` since Task 9. In `TestPGStoreProofs` add: a stored row idx 1 of t-ho, `OpenPlanProof(t-ho, 1)` → true, and `PlanProofs` reads it `State opened`; again → false; on a filed row → false, the row as it was. Run `go test -race -p 1 ./internal/factoryd/ -run TestPGStoreProofs`. Expected: FAIL to compile. `OpenPlanProof` is `UPDATE plan_proofs SET state = 'opened' WHERE task_id = $1 AND idx = $2 AND state = 'stored'`, true on one row. `fakeStore` gets the same rule, and a field `openErr` its stub answers once, for the retry test of Step 2.
 
 - [ ] **Step 2: Write the failing gate tests** in `criteria_test.go`. `forgejoHub` gains `files map[string]string`, keyed `"<ref>:<path>"`, served on `GET .../raw/<path>?ref=<ref>`, an unlisted key answering 404. The fixture `blindPlan()`: the integration card t1 (key integ) of plan1, criteria in this order:
   - `size_bound {test, Claim "A size over the bound is refused", Inputs "POST /api/sizes with 3.75 against a bound of 3.5", Expected "400 and no row in the store"}`;
@@ -2120,7 +2122,7 @@ ALTER TABLE plan_proofs ADD COLUMN opened_head text NOT NULL DEFAULT '', ADD COL
 
   Its rows:
   - size_bound idx 1, stored: `{Suite proofs/size_bound, Name TestSizeBound, Path proofs/size_bound/size_bound_test.go, Code sizeBoundCode}`, with `sizeBoundCode = "package size_bound\n\nfunc TestSizeBound(t *testing.T) {}\n"`;
-  - group_open idx 2, opened: `{Suite ./acceptance, Name TestGroupOpen, Path acceptance/group_open_test.go, Code "package acceptance // group_open v1", OpenedHead "7f00aa1"}`;
+  - group_open idx 2, opened: `{Suite ./acceptance, Name TestGroupOpen, Path acceptance/group_open_test.go, Code "package acceptance // group_open v1"}`;
   - door idx 3, stored, Flag "green on main": `{Suite proofs/door, Name TestDoor, Path proofs/door/door_test.go, Code "package door // flagged"}`;
   - hold-out key_log idx 4, stored: `{Claim "Every key turn lands in the log", Inputs "three turns of key 7", Expected "three log rows", Suite proofs/key_log, Name TestKeyLog, Path proofs/key_log/key_log_test.go, Code "package key_log"}`;
   - hold-out lock_log idx 5, stored: `{Claim "Each lock turn lands", Inputs "one turn", Expected "one row", Suite proofs/lock_log, Name TestLockLog, Path proofs/lock_log/lock_log_test.go, Code "package lock_log"}`.
@@ -2131,8 +2133,8 @@ ALTER TABLE plan_proofs ADD COLUMN opened_head text NOT NULL DEFAULT '', ADD COL
 func TestGateRunsOpenAndHoldTheProofs(t *testing.T)   // Task 10's TestGateRunsTakeTheSuiteAndHoldTheTests, rewritten
 // gateRuns(blindPlan's plan, its rows), in order:
 //   size_bound {suite ./proofs/size_bound, name TestSizeBound, file {proofs/size_bound/size_bound_test.go, sizeBoundCode}, state blind};
-//   group_open {./acceptance TestGroupOpen, file nil, state open}; door {proof idx 3, file set, state blind};
-//   no_proof {held "criterion no_proof: no stored proof yet"}; all_green {suite ./..., state ""};
+//   group_open {./acceptance TestGroupOpen, file nil, state open}; door {stored idx 3, file set, state blind};
+//   no_proof {held "Criterion no_proof has no stored proof: the prover filed before it was added.", late true} (the plan holds stored rows); all_green {suite ./..., state ""};
 //   holdout-4 {./proofs/key_log TestKeyLog, file set, label "hold-out key_log"}; holdout-5 {label "hold-out lock_log"}. judged makes none.
 
 func TestOpenedFindingCarriesTheCriterionTheCodeAndTheOutput(t *testing.T)
@@ -2153,33 +2155,47 @@ func TestGateCriteriaOpensTheBlindProofsThatAreNotGreen(t *testing.T)
 //   {group_open, Report wrap(`<testcase name="TestGroupOpen"></testcase>`)}, {all_green, Report wrap(`<testcase name="TestA"></testcase>`)},
 //   {holdout-4, Exit 1, Report wrap(`<testcase name="TestKeyLog"><failure message="Failed">--- FAIL: TestKeyLog (0.00s)</failure></testcase>`)},
 //   {holdout-5, Report wrap(`<testcase name="TestLockLog"></testcase>`)})
-// → the Secret's list: [size_bound (file), group_open (no file), all_green, holdout-4 (file), holdout-5 (file)]; door is not in it.
-// res.Findings == [openedFinding of size_bound (failed, sizeBoundMsg), of door (flagged), of key_log (failed, "Failed\n--- FAIL: TestKeyLog (0.00s)")], each at "c1".
+// → the posted list (proofsWorker(t, r).lists): [size_bound (file), group_open (no file), all_green, holdout-4 (file), holdout-5 (file)]; door is not in it.
+// res.Findings == [openedFinding of size_bound (failed, sizeBoundMsg), of door (flagged), "Criterion no_proof has no stored proof: the prover filed before it was added.",
+//   openedFinding of key_log (failed, "Failed\n--- FAIL: TestKeyLog (0.00s)")], the openings each at "c1".
 // rows on t1, Source gate: size_bound unmet "blind: criterion size_bound: TestSizeBound in ./proofs/size_bound failed: Failed === RUN TestSizeBound size_bound_test.go:12: want 3.75, got 3.5 --- FAIL: TestSizeBound (0.00s)";
 //   group_open met "open: criterion group_open: TestGroupOpen in ./acceptance passed";
 //   door unmet "blind: criterion door: its proof was flagged green on main by its dry run, so it had no blind try";
-//   no_proof unmet "criterion no_proof: no stored proof yet"; all_green met "criterion all_green: suite ./... passed (1 passed, 0 skipped)"; no row for judged, key_log or lock_log.
-// PlanProofs: idx 1 opened {OpenedHead c1, OpenedOutput sizeBoundMsg}, idx 3 opened {c1, ""}, idx 4 opened {c1, "Failed\n--- FAIL: TestKeyLog (0.00s)"}, idx 5 stored.
+//   no_proof unmet "Criterion no_proof has no stored proof: the prover filed before it was added."; all_green met "criterion all_green: suite ./... passed (1 passed, 0 skipped)"; no row for judged, key_log or lock_log.
+// PlanProofs: idx 1, 3 and 4 opened, idx 5 stored; no_proof has no row and opens nothing.
 // events on t1 and on plan1, three each, kind proof_opened: {criterion size_bound, head c1, outcome failed, message sizeBoundMsg, path proofs/size_bound/size_bound_test.go,
-//   suite ./proofs/size_bound, name TestSizeBound, code sizeBoundCode}, {criterion door, outcome flagged, message "green on main", ...},
-//   {criterion key_log, outcome failed, ..., holdout "Every key turn lands in the log: three turns of key 7: three log rows"}.
-// the line: "opened" ["size_bound", "door", "key_log"]; "holdouts" [{"id": "lock_log", "verdict": "green"}]; "proofs" entries
+//   suite ./proofs/size_bound, name TestSizeBound, code sizeBoundCode}, {criterion door, head c1, outcome flagged, message "green on main", ...},
+//   {criterion key_log, head c1, outcome failed, message "Failed\n--- FAIL: TestKeyLog (0.00s)", ..., holdout "Every key turn lands in the log: three turns of key 7: three log rows"}.
+// the line: "opened" ["size_bound", "door", "key_log"]; "holdouts" [{"id": "holdout-5", "verdict": "green"}]; "proofs" entries
 //   size_bound {state blind, outcome failed, met false, path ...}, group_open {state open, met true, changed true, path acceptance/group_open_test.go},
 //   door {state blind, outcome ""}, no_proof {}, all_green {met true}, key_log {holdout true, state blind, outcome failed}.
 // the comment holds "factoryd criteria gate on c1: 2 of 5 criteria met (judgement and human criteria ride the review and the approval)." and
 //   "hold-out key_log: TestKeyLog in ./proofs/key_log failed: Failed --- FAIL: TestKeyLog (0.00s)";
-//   neither it, nor any row's evidence, nor any finding holds "lock_log", "TestLockLog" or "Each lock turn".
+//   neither it, nor the line, nor any row's evidence, nor any finding holds "lock_log", "TestLockLog" or "Each lock turn".
 
 func TestGateCriteriaRunsAnOpenProofFromTheTree(t *testing.T)
 // the plan with group_open alone (opened, as above).
-// hub.files empty → no pod (nothing to run); res.Findings == ["criterion group_open: its open proof is not at acceptance/group_open_test.go in c1: commit it there"];
-//   row unmet "open: " + that finding; the entry {state open, outcome "", path ...}.
+// hub.files empty → no pod (nothing to run); res.Findings == ["criterion group_open: its open proof is not at acceptance/group_open_test.go in c1: commit the test below there.\n" +
+//   "TestGroupOpen in ./acceptance:\n```\npackage acceptance // group_open v1\n```"];
+//   the run's line "criterion group_open: its open proof is not at acceptance/group_open_test.go in c1" is the comment's line, and the row reads unmet "open: " + that line;
+//   the entry {state open, outcome "", path ...}.
 // hub.files holds it as written ("package acceptance // group_open v1") and the run fails `--- FAIL: TestGroupOpen (0.00s)` →
 //   res.Findings == ["criterion group_open: TestGroupOpen in ./acceptance failed: Failed --- FAIL: TestGroupOpen (0.00s)"]; the entry's changed false; no proof_opened event.
 
 func TestGateCriteriaOpensAProofOnce(t *testing.T)
-// size_bound stored, red at c1; GateCriteria twice on c1 (no raw file at c1) → after the second, PlanProofs idx 1 opened at c1,
-//   one proof_opened on t1 and one on plan1; the second run's finding is "criterion size_bound: its open proof is not at proofs/size_bound/size_bound_test.go in c1: commit it there".
+// size_bound stored, red at c1; GateCriteria twice on c1 (no raw file at c1) → after the second, PlanProofs idx 1 opened,
+//   one proof_opened on t1 and one on plan1; the second run's finding is "criterion size_bound: its open proof is not at proofs/size_bound/size_bound_test.go in c1: commit the test below there.\n" +
+//   "TestSizeBound in ./proofs/size_bound:\n```\n" + sizeBoundCode + "```".
+// A stop between the event and the row: fakeStore.openErr fails the first OpenPlanProof, so the first run returns that error after its events;
+//   the second on c1 runs size_bound blind again (its row still stored), records no second proof_opened on t1 or on plan1, and the row reads opened.
+
+// events_test.go
+func TestHasEventMatchesTheDetail(t *testing.T)
+// t1's timeline holds the event proof_opened {criterion size_bound, head c1} → hasEvent(t1, proof_opened, {criterion size_bound, head c1}) true,
+//   {criterion size_bound, head c2} false, {criterion door, head c1} false, nil true; hasEvent(t1, plan_closed, nil) false.
+
+// gates_test.go: TestGateCriteriaNameTheGateNotAReproduction's delta card reads
+//   "the auto merge does not read the criteria gate's verdicts on a delta card, and a person decides this merge".
 
 func TestGateCriteriaRunsOnADeltaCard(t *testing.T)
 // plan1's cards integ (integration, task t-int) and sizes (feature); the gated task t1 has key delta1, which the plan does not hold; size_bound stored, passed
@@ -2192,29 +2208,32 @@ func TestGateCriteriaRunsOnADeltaCard(t *testing.T)
 
 - [ ] **Step 3: Run the tests to verify they fail**
 
-Run: `go test -race -p 1 ./internal/factoryd/ -run 'TestPGStoreProofs|TestGateRuns|TestOpenedFinding|TestGateCriteria|TestCriteriaReport' -v`
+Run: `go test -race -p 1 ./internal/factoryd/ -run 'TestPGStoreProofs|TestGateRuns|TestOpenedFinding|TestGateCriteria|TestCriteriaReport|TestHasEvent' -v`
 Expected: FAIL to compile (`openedFinding`, `OpenPlanProof` undefined).
 
 - [ ] **Step 4: Implement.**
-  - `gateRuns` per Interfaces. A flagged stored proof is a run with its row, state blind, which makes no entry.
+  - `gateRuns` per Interfaces. A flagged stored proof is a run with its row, state blind, which makes no entry. A test criterion without a stored or opened row is held as Phase 2 holds it, `late` when the plan holds stored rows; it never opens.
+  - `runProofs` returns the `runs` it read from `proofRuns` beside the outcomes, also with a `*proofsEnded`; its body is otherwise as it is.
   - `GateCriteria`:
     - runs on a card whose role is integration or whose key the plan's cards do not hold; else the skip line and `Skipped: "not the plan's integration card or a delta card"`;
     - writes its rows on `integrationCard(ctx, r.store, t.Parent, p)`, and its line, comment and events on the gated card;
     - reads each open run's file with `proofAtHead` at the commit, so `absent` or `changed`; a read error other than `errForgejoNotFound` returns, and the activity runs again;
-    - runs every run that is not held, flagged or absent through one `proofRuns`, and fills `results[id]` with `proofResult(run, ok, runErr, name)` and `run.Output`.
+    - runs every run that is not held, flagged or absent through one `runProofs` and fills `results[id]` as `gateResult{outcome: outcomes[id], output: runs[id].Output}`; a `*proofsEnded` passes as today when no hold-out went unreached.
   - `criteriaReport`, per run in order:
-    - a held run: its line, an unmet row, no finding;
+    - a held run: its line, an unmet row; a `late` one also its line as a finding (Phase 2), and never an opening;
     - an invariant: Task 4's line and finding;
     - a blind run passed: met;
     - a blind run of any other outcome, or a flagged one: an `openedProof`, its finding `openedFinding`, its line `criterionLine` (for a flagged one, the label and the flagged clause);
-    - an open run absent: the finding of the test above;
+    - an open run absent: its line `criterion <id>: its open proof is not at <path> in <head[:7]>`, its finding that line + `: commit the test below there.\n<name> in <suite>:` and the code fenced as `openedFinding` fences it;
     - an open run red: Task 4's line as the finding.
 
-    The hold-outs: a blind hold-out that passed is no line, no entry and no finding, only a `"holdouts"` verdict on the line; one that opens, and an opened one, is an entry with `Holdout`, its `ID` the row's own id. `met` counts the criteria's entries with `Met`.
-  - `gateRows` sets each entry's evidence to `<state>: <line>` when it has a state, and gives no row to a `Holdout` entry.
+    The hold-outs: a blind hold-out that passed is no line, no entry and no finding, only a `"holdouts"` verdict on the line by `holdoutEntry(idx)`; one that opens, and an opened one, is an entry with `Holdout`, its `ID` the row's own id. `met` counts the criteria's entries with `Met`.
+  - `gateRows` writes rows for the entries of kind test and invariant alone, no `Holdout` entry among them, each one's evidence `<state>: <line>` when it has a state. Task 15's judgement rows come from `judge`, Task 16a's human rows from the human.
+  - `hasEvent` per Interfaces; `verdict.go`'s caller passes nil.
+  - `criteriaUnmet` per the line under Interfaces.
   - The order of writes:
     1. the rows (`PutCriteriaVerdicts`);
-    2. per opened proof, `OpenPlanProof(t.Parent, idx, commit, output)`; when it answers true, `recordEvent(EventProofOpened)` on the card and on the plan;
+    2. per opened proof: `recordEvent(EventProofOpened)` on the card unless `hasEvent(card, EventProofOpened, {"criterion": id, "head": commit})`, the same on the plan, then `OpenPlanProof(t.Parent, idx)`, whatever it answers;
     3. the comment (`criteriaComment(commit, met, len(p.Criteria) minus the judgement and human criteria, lines)`);
     4. the line.
 
@@ -2225,16 +2244,17 @@ Expected: FAIL to compile (`openedFinding`, `OpenPlanProof` undefined).
 - [ ] **Step 6: Commit**
 
 ```bash
-git add internal/schema internal/factoryd
+git add internal/factoryd
 git commit -m "criteria gate: one blind try per stored proof, and a proof that is not green opens to the builder
 
 A stored proof's first run at the gate is blind. Green settles its
 criterion with a gate row that says blind; any other outcome opens the
-proof: its state turns opened, a proof_opened event records it on the card
-and the plan, and the finding carries the criterion, the test's code and
-its output. An opened proof then runs from the repository, and a missing
-one is a finding that names its path. The gate also runs on a delta card,
-and its rows land on the integration card, where the plan's rows stand.
+proof: a proof_opened event records it with the head and the output on the
+card and the plan, once per head, and its state turns opened; the finding
+carries the criterion, the test's code and its output. An opened proof
+then runs from the repository, and a missing one is a finding that names
+its path and carries its code. The gate also runs on a delta card, and its
+rows land on the integration card, where the plan's rows stand.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
@@ -2246,7 +2266,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 Departures the code forces:
 - **The clone carries the test.** A session's findings ride one environment string cut at 128 KiB from the oldest (`envFit.list`, `maxEnvString`), and the next session's check-in may drop a finding it judges done. So the opened proofs reach every session of the integration or delta card as files: the brief push (`harness.BriefPush`, up to 4 MiB, delivered before the conversation) carries them, and the worker writes each one into the clone at its path where the path holds no file. The worker's push stages the tree whole (`add -A`), so the test lands at its path with the session's push. The brief names them.
 - **The review reads the agent's summary.** The review input holds none today; `Task.AgentSummary` is the session's last text.
-- **The drawer reads the head's file as the human**, through the console's raw read (`chat_reads.go`).
+- **The drawer reads the head's file as the human**, through `c.as(ctx, act.s, ...)` on Forgejo's raw file route, as the chat's file read does (`chat_reads.go`, `(*turn).fileText`), which needs a chat turn.
+- **The drawer is `face == false`.** `approvalCard` sets no `IDSuffix`: its drawer caller sets it after the call returns (`board.go`), so the drawer is the call with `face` false.
 
 **Files:**
 - Modify: `internal/harness/types.go` (`BriefPush`, `TaskBrief`)
@@ -2257,7 +2278,7 @@ Departures the code forces:
 - Test: `runner_test.go`, `opencode_test.go`, `gates_test.go`, `internal/console/approval_card_test.go`
 
 **Interfaces:**
-- Consumes: Task 1's `harness.ProofFile` and `writeRegular`; Task 9's `PlanProof`; Task 13's `proofAtHead`, `proofOpen`; console `PlanProofs` (Task 9).
+- Consumes: Task 1's `harness.ProofFile` and `writeRegular`; Task 9's `PlanProof`; Task 13's `proofAtHead`; console `PlanProofs` (Task 9); `approvalCard(ctx, a, act, tasks, csrf, approver, face bool)`, `c.as(ctx, s, method, path, payload, want, out)` (oauth.go); `textutil.AndList`.
 - Produces:
 
 ```go
@@ -2354,10 +2375,10 @@ Expected: FAIL to compile (`BriefPush` has no field `Proofs`).
 
 - [ ] **Step 3: Implement.**
   - `landProofs` first checks every path through `os.OpenRoot` (a path that leaves the tree refuses the push), then writes each one whose `Lstat` finds nothing with `writeRegular`. `/brief` calls it after `landPrior` and sets `in.Landed`. `main.go` sets `s.brief.Proofs = push.Landed` beside `Handover` and `Prior`.
-  - `RunSession` sets `s.proofs` from `openedProofs` (`ProofFile{Path, Content: Code}`), a read error the session's error; both `pushBrief` callers pass `s.proofs`.
-  - `briefText` writes the section of Interfaces, the paths by `andList`.
-  - `ModelReview`, for a card `openedProofs` names, adds `OpenedProofs` (each `Changed` by `proofAtHead` at the commit: absent or different) and `AgentSummary: t.AgentSummary` to the first part's input, and appends `reviewOpenedProofs` to that call's prompt.
-  - The console: `approvalCard` fills `Opened` for a merge request in the drawer (`IDSuffix != ""`) of a plan card that is the integration card or a delta card. It reads the repository's version through the raw read as the human at `Merge.HeadSHA`. The template renders the heading `<h5><criterion>: <path>, changed|unchanged|not in the pull request</h5>`, then the original's `pre`, and the repository's `pre` when changed. The CSS gives `pre.proof` `white-space: pre-wrap; overflow-wrap: anywhere; max-height: 24em; overflow: auto`.
+  - `RunSession` sets `s.proofs` from `openedProofs`, each file written from the row's `code` (`ProofFile{Path, Content: Code}`), a read error the session's error; both `pushBrief` callers pass `s.proofs`.
+  - `briefText` writes the section of Interfaces, the paths by `textutil.AndList`.
+  - `ModelReview`, for a card `openedProofs` names, adds `OpenedProofs` (each `Changed` when `proofAtHead` at the commit finds no file at its path, or one that is not its `Code`) and `AgentSummary: t.AgentSummary` to the first part's input, and appends `reviewOpenedProofs` to that call's prompt.
+  - The console: `approvalCard` fills `Opened` for a merge request when `face == false` (the drawer's call) and the request's task is a plan card that is the integration card or a delta card. It reads the repository's version as the human with `c.as(ctx, act.s, http.MethodGet, "/api/v1/repos/<owner>/<name>/raw/<path>?ref=<Merge.HeadSHA>", nil, http.StatusOK, &raw)`, the path's segments escaped as `fileText` escapes them; a 404 is "not in the pull request", and `Changed` compares the file with the row's `Code`. The template renders the heading `<h5><criterion>: <path>, changed|unchanged|not in the pull request</h5>`, then the original's `pre`, and the repository's `pre` when changed. The CSS gives `pre.proof` `white-space: pre-wrap; overflow-wrap: anywhere; max-height: 24em; overflow: auto`.
 
 - [ ] **Step 4: Run the tests to verify they pass.** The Step 2 command, then the whole suite and `bash check static`. Expected: PASS, static clean.
 
@@ -2382,24 +2403,26 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ### Task 15: The judgement call, and the review leaves every criterion to its check
 
 Departures the code forces and the spec settles:
-- **The review's per-criterion calls go.** The spec's "The model's check" says so, and a judgement criterion's model reads an artifact, never the diff. Once this task's call judges the judgement criteria and Task 16's rows settle the human ones, `planCalls` keeps the behaviours call alone. `gateJudged` becomes every kind but human. `Review.Criteria` stays: a run from before Task 17's version reads it in `AutoMerge`.
-- **An artifact proof that wrote no artifact opens**, as a red test does: the finding names the proof and its missing artifact and carries the code and the output, and it gets no row. Without the code the builder cannot see why no artifact came.
-- **The cost of the call** is the task's spend booked since it began: `TaskSpendSince` (`chat.go`) joins the `Store` interface.
-- Task 13's runs gain the judgement and human criteria's proofs. Each artifact is stored as an object the console reads (Task 16).
+- **The review's per-criterion calls go.** The spec's "The model's check" says so, and a judgement criterion's model reads an artifact, never the diff. Once this task's call judges the judgement criteria and Task 16a's presses settle the human ones, `planCalls` keeps the behaviours call alone. `gateJudged` becomes every kind but human. `Review.Criteria` stays: a run from before Task 17's version reads it in `AutoMerge`.
+- **An artifact proof that wrote no artifact opens**, as a red test does, with the outcome word `no artifact` (`proofNoArtifact`): the finding names the proof and its missing artifact and carries the code and the output, and it gets no row. Without the code the builder cannot see why no artifact came.
+- **The cost of the call** is the task's spend booked since it began: `TaskSpendSince`, today a method of `*PGStore` alone (`chat.go`), joins the `Store` interface.
+- **The planner's delta dues stay.** `reviewCriteriaStep` filed one for an unmet criterion the review judged too large for the card. With no per-criterion verdict left, it reads the gate's standing rows instead: a due for each criterion whose standing row is unmet and that no card of the newest revision cites in an acceptance item. The review runs before the gate in a round, so the rows it reads are the gate's latest.
+- Task 13's runs gain the judgement and human criteria's proofs. Each artifact is stored as an object the console reads (Task 16b).
 
 **Files:**
 - Create: `internal/factoryd/judgement.go`, `internal/factoryd/judgement_test.go`
 - Create: `internal/schema/migrations/factoryd/20261116110000_judgement_source.sql`
 - Modify: `internal/schema/kinds_test.go` (nothing new: the `^CriteriaSource[A-Z]` loop takes the constant)
 - Modify: `internal/factoryd/verdict.go` (`CriteriaSourceJudgement`, `sourceRank`, `gateJudged`, `planCalls`, `readPlanCalls`, `normalizeCriteria`, `reviewCriteriaStep`, `reviewBehavioursPrompt`; delete `reviewCriterionPrompt`, `criterionInput`, `parseCriterionAnswer`, `combineCriterion`, `criterionRank`, `absentEvidence`)
-- Modify: `internal/factoryd/criteria.go` (`gateRuns`, `criteriaReport`, `GateCriteria`, `criteriaComment`)
+- Modify: `internal/factoryd/criteria.go` (`proofNoArtifact`, `openedProof`, `gateRuns`, `criteriaReport`, `GateCriteria`, `criteriaComment`)
+- Modify: `internal/factoryd/events.go` (`EventProofOpened`'s outcome words)
 - Modify: `internal/factoryd/gates.go` (`ModelReview`'s plan calls)
 - Modify: `internal/factoryd/store.go`, `store_test.go` (`TaskSpendSince` on the interface and the fakes)
 - Modify: `internal/factoryd/agentdoc.go` (`review-criteria` becomes `judgement`), `agentdoc_test.go`, `cmd/agentdoc/registry.go`, `cmd/agentdoc/blurbs.md`, `cmd/agentdoc/master.mmd`
 - Test: `verdict_test.go`, `criteria_test.go`, `gates_test.go`
 
 **Interfaces:**
-- Consumes: Task 13's runs, `openedProof`, `openedFinding`, `gateResult`, `results`; Task 9's `PlanProof.Artifact`; `decodeAnswer`, `r.supervisor.Chat`, `r.callModel`, `aliasOf`.
+- Consumes: Task 13's runs, `openedProof`, `openedFinding`, `gateResult`, `results`, `gateRows`; Task 9's `PlanProof.Artifact`; `decodeAnswer`, `r.supervisor.Chat`, `r.callModel`, `aliasOf`; `(s *PGStore) TaskSpendSince` (chat.go); the review's calls as they are, `planCalls(p, objective, cards, mine, limit int) (calls []reviewCall, of []int)` and `readPlanCalls(p, calls, of, results) ([]CriterionVerdict, []string, string)` (verdict.go, called in gates.go's `ModelReview`), both rewritten below; `reviewCriteriaStep(ctx, t, repo, p, revision, round, rv)`, `StandingRow`, `PutPlanCatches`, `CatchDelta`, `FinderReview`.
 - Produces:
 
 ```go
@@ -2411,7 +2434,10 @@ func gateJudged(kind string) bool
 func planCalls(p Plan, objective string, cards []featureCard, mine featureCard) []reviewCall // the behaviours call alone
 func readPlanCalls(results []callResult) (behaviours []string, note string)
 
-// criteria.go: gateProof gains
+// criteria.go
+proofNoArtifact = "no artifact" // a judgement or human proof's run that wrote no artifact under its name
+// openedProof.outcome: a proof* word, proofNoArtifact, or "flagged"
+// gateProof gains
 	Artifact string `json:"artifact,omitempty"` // a judgement or human proof's artifact, by name, when its run wrote it
 // gateResult gains
 	artifacts map[string][]byte // the run's files under CHECK_ARTIFACTS
@@ -2442,6 +2468,7 @@ TaskSpendSince(ctx context.Context, id string, since time.Time) (float64, error)
 ```
 
 - The timeline line `judgement`, on the gated card: `{"criterion", "artifact", "model", "prompt_hash", "verdict" ("met", "unmet" or "" with no verdict), "reason", "cost"}`.
+- `EventProofOpened`'s contract: `"outcome"` is a proof* word, `"no artifact"`, or `"flagged"`.
 
 - [ ] **Step 1: The source.** Run `go test -race -p 1 ./internal/schema/ -run TestKindChecksAccept` after adding the constant. Expected: FAIL on `judgement`. The migration:
 
@@ -2467,6 +2494,13 @@ func TestPlanCallsMakeTheBehavioursCallAlone(t *testing.T)   // replaces TestPla
 // Delete TestReviewPromptsLeaveTheGatesKindsToTheGate, TestNormalizeCriteria's criterion rows and every test of the deleted functions;
 // TestReviewCriteriaStepFilesDuesAndFindings keeps its behaviours half.
 
+func TestReviewCriteriaStepFilesDuesFromTheGatesRows(t *testing.T)
+// seedVerdictPlan(t, "t-plan", "t-int", "in-review"); p := criteriaPlan() with c3 of kind judgement and the foundation card's Acceptance [{Criterion: "c1", Text: "a link is stored"}];
+// rows on t-int: c1 gate unmet, c3 judgement unmet, none for c2 (human); rv {Verdict approve, Criteria [{c3 unmet, Fix planner}]}
+// → reviewCriteriaStep(ctx, t-int, Repo{}, p, 1, 2, &rv) files one delta due, Finder review, Detail "c3 at integration round 2" (c1 is the foundation card's, c2 has no row);
+//   rv.Criteria nil, rv.Findings empty, and no row of source review on t-int.
+// c3's judgement row met, or an approver's waiver over its unmet row → no due.
+
 // judgement_test.go
 func TestJudgeCallsTheModelWithThePromptAndTheArtifactAlone(t *testing.T)
 // judge(t1, readsCalm, GateArtifact{reads_calm, reads_calm.html, c1, "<main><h1>Sizes</h1></main>"}), the model answering
@@ -2483,7 +2517,7 @@ func TestJudgeWithoutAVerdictWritesNoRow(t *testing.T)
 func TestGateCriteriaJudgesTheArtifacts(t *testing.T)
 // blindPlan's plan with readsCalm and pagesOK added, their rows above, hub.files and the other runs as in TestGateCriteriaOpensTheBlindProofsThatAreNotGreen; the pod's runs reads_calm {Report TestReadsCalm passed, Artifacts {"reads_calm.html": "<main><h1>Sizes</h1></main>"}},
 //   pages_ok {Report TestPagesOK passed, Artifacts {"pages_ok.txt": "sizes: 3 rows\ndoors: 2 rows"}}
-// → the Secret's list holds both with their files; objects ArtifactKey("t1", "reads_calm") and ("t1", "pages_ok") hold the GateArtifact JSON, Head c1;
+// → the posted list (proofsWorker(t, r).lists) holds both with their files; objects ArtifactKey("t1", "reads_calm") and ("t1", "pages_ok") hold the GateArtifact JSON, Head c1;
 //   one chat; rows: reads_calm judgement met, none of any source for pages_ok; the line's entries reads_calm {kind judgement, state blind, artifact reads_calm.html, met false},
 //   pages_ok {kind human, artifact pages_ok.txt}; a judgement line on t1; both rows stay stored.
 // The judgement answers unmet "the page shows two sizes" → row unmet, and res.Findings holds "criterion reads_calm: the judgement over reads_calm.html at c1 is unmet: the page shows two sizes".
@@ -2491,7 +2525,8 @@ func TestGateCriteriaJudgesTheArtifacts(t *testing.T)
 
 func TestGateCriteriaOpensAProofThatWroteNoArtifact(t *testing.T)
 // reads_calm's run {Exit 1, Output "panic: no page\n", Report wrap(`<testcase name="TestReadsCalm"><failure message="Failed">panic: no page</failure></testcase>`)}, no artifact
-// → no chat, no row for reads_calm; idx 6 opened; the finding starts "criterion reads_calm: its blind proof wrote no artifact reads_calm.html at c1; it is open now. Commit the test below at proofs/reads_calm/reads_calm_test.go"
+// → no chat, no row for reads_calm; idx 6 opened; its proof_opened event on t1 has outcome "no artifact", message "Failed\npanic: no page"; the line's "opened" holds reads_calm;
+//   the finding starts "criterion reads_calm: its blind proof wrote no artifact reads_calm.html at c1; it is open now. Commit the test below at proofs/reads_calm/reads_calm_test.go"
 //   and holds "The criterion: The sizes page reads calm. The artifact shows: the sizes page with three sizes.", "package reads_calm" and "Failed\npanic: no page".
 // An artifact holding a NUL byte → no chat, no row, the finding "criterion reads_calm: its artifact reads_calm.html is not text: no verdict"; idx 6 stays stored.
 
@@ -2501,15 +2536,16 @@ func TestGateCriteriaOpensAProofThatWroteNoArtifact(t *testing.T)
 
 - [ ] **Step 3: Run the tests to verify they fail**
 
-Run: `go test -race -p 1 ./internal/schema/ ./internal/factoryd/ -run 'TestKindChecksAccept|TestStandingRow|TestPlanCalls|TestJudge|TestGateCriteria|TestAgentDoc' -v`
+Run: `go test -race -p 1 ./internal/schema/ ./internal/factoryd/ -run 'TestKindChecksAccept|TestStandingRow|TestPlanCalls|TestReviewCriteriaStep|TestJudge|TestGateCriteria|TestAgentDoc' -v`
 Expected: FAIL to compile (`judge`, `CriteriaSourceJudgement` undefined).
 
 - [ ] **Step 4: Implement.**
   - `gateRuns` gives a judgement or human criterion with a stored or opened row a run as for a test criterion; without one, no run.
-  - `criteriaReport`: such a run is no row of the gate.
+  - `criteriaReport`: such a run's entry carries its kind, so `gateRows` (Task 13: test and invariant entries alone) gives it no row; the judgement rows come from `judge`, the human rows from the human (Task 16a).
     - An artifact under `proof.Artifact` in the run's `Artifacts` goes to `GateArtifact{criterion, name, head, content}`.
     - A content with a NUL byte is the not-text finding.
-    - No artifact: a blind run opens, its why "its blind proof wrote no artifact <name> at <head>", and its text "The criterion: <claim>. The artifact shows: <inputs>."; an open run's finding is "criterion <id>: its open proof wrote no artifact <name> at <head>".
+    - No artifact: a blind run opens with outcome `proofNoArtifact` whatever its report says, its why "its blind proof wrote no artifact <name> at <head>", and its text "The criterion: <claim>. The artifact shows: <inputs>."; an open run's finding is "criterion <id>: its open proof wrote no artifact <name> at <head>".
+  - `EventProofOpened`'s comment names the outcome words of Interfaces.
   - `GateCriteria` calls `judgeArtifacts` with the report's artifacts after its rows and before its comment; the comment's met count adds the judgement rows met.
   - `judgeArtifacts`, per artifact: `Put` the JSON at `ArtifactKey(home, id)`. For a judgement criterion, `judge`; a row goes through `PutCriteriaVerdicts(home, CriteriaSourceJudgement, FactoryDecider, ...)`, the detail to `r.record(t.ID, "judgement", ...)`, and an unmet row adds the finding of Step 2.
   - `judge`:
@@ -2517,7 +2553,7 @@ Expected: FAIL to compile (`judge`, `CriteriaSourceJudgement` undefined).
     - `r.supervisor.Chat(ctx, t.ID, alias, policy.PurposeReview, the supervisor timeout, c.Prompt+"\n\n"+judgementAnswer, {"artifact", "content"})`;
     - the answer goes through `decodeAnswer`; the cost is `TaskSpendSince(t.ID, before)`.
   - `criteriaComment`'s note reads `(human criteria ride the approval)`, and its count leaves out the human criteria alone.
-  - The review: `planCalls` and `readPlanCalls` per Interfaces. `reviewCriteriaStep` stores no rows, files no finding and no planner due, and keeps the behaviours' comment and catches. `normalizeCriteria` keeps the behaviours alone and is renamed `normalizeBehaviours`. `reviewBehavioursPrompt` gets the sentence of Step 2. The deleted symbols go.
+  - The review: `planCalls` and `readPlanCalls` per Interfaces, and their calls in `ModelReview` with them. `reviewCriteriaStep` stores no rows, files no finding, sets `rv.Criteria` nil, and keeps the behaviours' comment and catches. Its planner delta dues stay, read from the gate's standing rows: it reads the integration card's rows (`CriteriaVerdicts`) and files, through `PutPlanCatches(t.Parent, revision, CatchDelta, FinderReview, ...)`, a due `<criterion> at <t.PlanKey> round <round>` for each criterion whose `StandingRow` is unmet and that no card of `p` (the newest revision) cites in an acceptance item. `normalizeCriteria` keeps the behaviours alone and is renamed `normalizeBehaviours`. `reviewBehavioursPrompt` gets the sentence of Step 2. The deleted symbols go.
   - agentdoc: `agentDocCriterion` becomes `agentDocJudgement`, which calls `judge` on `readsCalm` with a fixture artifact. The registry row is `{ID: "judgement", Job: "Judges a judgement criterion's artifact with its pinned prompt", Runs: "factoryd direct"}`. The blurb draft reads "judgement: Reads the artifact a blind test wrote and answers met or unmet with the criterion's pinned prompt. It never sees the diff." In `master.mmd`, `review-criteria` becomes `judgement` in the verification subgraph, its edge `judgement --> gate-supervisor`.
 
 - [ ] **Step 5: Run the tests to verify they pass.** The Step 3 command, then the whole suite and `bash check static`. Expected: PASS, static clean.
@@ -2541,59 +2577,159 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 16: The human rows on the Needs you card
+### Task 16a: The human's presses on the criterion rows
 
 Departures the code forces:
 - **Not met is a change request.** It sends the merge back to the builder through `doDeny`'s `request_changes`, with the words `criterion <id> not met: <the human's words>`. That path is the one that already reaches a waiting card's next session, so no workflow change is needed.
-- **One route decides a row**, `POST /approvals/{id}/criterion` with a verb, and it replaces `POST /approvals/{id}/waive`. The criteria gap card and the merge card share its rows, and Waive on the gap card posts there too. The `criterion_decided` detail's key `verdict` becomes `verb`, as the grant's and the denial's already are.
-- **The chat's `answer_criteria` gains `met` and `not_met`**, on the human's word as its waive is: every console write is a tool.
+- **One route decides a row**, `POST /approvals/{id}/criterion` with a verb, and it replaces `POST /approvals/{id}/waive`. The criteria gap card's Waive posts there too: this task changes its form's action and gives its button `name="verb" value="waived"`, and Task 16b moves the rows of both cards into one template. The `criterion_decided` detail's key `verdict` becomes `verb`, as the grant's and the denial's already are.
+- **A press answers 303 with no body (C42)**, as `decideButton` answers every press. The success sentences are `doDecide`'s answers, which the chat's `answer_criteria` returns, and the tests read them there.
+- **The chat's `answer_criteria` gains `met` and `not_met`**, on the human's word as its waive is: every console write is a tool. `t.mergeRequest` answers a refusal when the card has no pending merge request, so the tool falls to the criteria request on that refusal.
 - **The approval card's brief** (`brief.go`) gets the criteria rows of a plan card's merge request, or it would tell the human to approve while a row is open.
+- `holdMerge` is not this task's: its words for a human's row come with Task 17's version.
 
 **Files:**
-- Modify: `internal/factoryd/verdict.go` (delete `RecordHumanCriteria`; `DecideCriterion` refuses a second met), `internal/factoryd/events.go` (`EventCriterionDecided`'s contract), `internal/factoryd/gates.go` (`holdMerge`), `internal/factoryd/brief.go` (`ask`, `briefFacts`)
-- Modify: `internal/console/approvals.go`, `actions.go` (`doApprove`, `doWaive` becomes `doDecide`), `console.go` (routes; `RecordHumanCriteria` goes), `access.go`, `chat_tools.go` (`answer_criteria`), `templates/board.html`, `static/console.css`
+- Modify: `internal/factoryd/verdict.go` (delete `RecordHumanCriteria`; `DecideCriterion` refuses a second met), `internal/factoryd/events.go` (`EventCriterionDecided`'s contract), `internal/factoryd/brief.go` (`ask`, `briefFacts`)
+- Modify: `internal/console/approvals.go` (`criterionRow.Artifact`, `planRows`, `decideCriterion` in place of `waive`), `internal/console/actions.go` (`doApprove`; `doWaive` becomes `doDecide`), `internal/console/console.go` (the route; `RecordHumanCriteria` goes from the config), `internal/console/access.go`, `internal/console/chat_tools.go` (`answer_criteria`), `internal/console/templates/board.html` (the gap card's Waive form)
 - Modify: `cmd/factoryd/main.go` (the `RecordHumanCriteria` wiring goes)
-- Modify: `internal/console/lab_test.go` (`humanScene`), `scripts/console-lab/check.js` (`criteriaHuman`)
-- Test: `internal/console/verdict_card_test.go`, `internal/factoryd/verdict_test.go`, `brief_test.go`, `gates_test.go`
+- Test: `internal/console/verdict_card_test.go`, `internal/console/chat_criteria_test.go`, `internal/console/wake_test.go` (its `RecordHumanCriteria` fake and the counts on it go), `internal/factoryd/verdict_test.go`, `internal/factoryd/brief_test.go`
 
 **Interfaces:**
-- Consumes: Task 15's `ArtifactKey`, `GateArtifact`; Task 5's `StandingRow`; `DecideCriterion(ctx, store, id, cid, verdict, by, reason)` as it is (met on a human criterion, `ErrNotHuman` for met on any other kind, `ErrCriterionMet`); `doDeny`.
+- Consumes: Task 15's `ArtifactKey`, `GateArtifact`; Task 5's `StandingRow`; `DecideCriterion(ctx, store, id, cid, verdict, by, reason)` as it is (met on a human criterion, `ErrNotHuman` for met on any other kind, `ErrCriterionMet` for a waiver on a met row); `doDeny(ctx, a, id, action, note)`, which denies a criteria request outright; `pendingRequest`; `decideButton(w, r, decision)` (approvals.go), which drops the decision's answer and answers 303 (204 to htmx); `t.mergeRequest(in)`, a refusal when none pends, and `t.criteriaRequest(in)` (chat_tools.go); `c.cfg.Timelines`; the existing `criterionRow{PlanCriterion; Verdict, Evidence}` (approvals.go), whose `Evidence` is the standing row's.
 - Produces:
 
 ```go
-// internal/console/approvals.go
-type criterionRow struct {
-	factoryd.PlanCriterion
-	Verdict, Evidence string
-	Word              string // "blind" or "open" for a met gate row, from its evidence
-	Artifact          *factoryd.GateArtifact
-	ArtifactCut       bool // the card shows its first maxCardArtifact bytes
-	Human             bool // Met and Not met are offered: a human criterion on a merge card
-}
-const maxCardArtifact = 8 << 10
+// internal/console/approvals.go: criterionRow gains
+	Artifact *factoryd.GateArtifact // a human criterion's artifact as the gate's newest run wrote it; nil without one
 // planRows are plan card t's plan's criteria with their standing rows on its integration card, and the ids with none;
 // ok false when t is not the plan's integration card or a delta card.
 func (c *Console) planRows(ctx context.Context, t factoryd.Task) (rows []criterionRow, open []string, ok bool, err error)
-// approvalCard gains Unsettled []string: a merge card's criteria with no verdict, which hold its Approve
 func (c *Console) doDecide(ctx context.Context, a actor, id int64, cid, verb, reason string) (string, error)
+// decideCriterion answers POST /approvals/{id}/criterion: doDecide with the form's criterion, verb and reason, through decideButton.
+func (c *Console) decideCriterion(w http.ResponseWriter, r *http.Request)
 
 // internal/factoryd/events.go: EventCriterionDecided's detail
-// {"approval", "criteria", "verb"} for a grant (granted), a denial (denied) or a confirmation (met),
+// {"approval", "criteria", "verb"} for a grant (granted) or a confirmation (met), {"approval", "verb"} for a denial (denied),
 // or {"approval", "criterion", "verb", "reason"} for one row: met, not_met or waived.
 ```
 
-The press texts:
+The press texts, `doDecide`'s answers:
 - Met: the row's evidence is `<words> (<seen>)`, or `met (<seen>)` with no words, `<seen>` being `<artifact name> at <head[:7]>` or `the criterion's evidence`. It answers "Criterion pages_ok met."
 - Not met: words required. It records the event, then `doDeny(ctx, a, id, "request_changes", "criterion <id> not met: <words>")`, and answers "Criterion pages_ok is not met; the card goes back to its agent with your words."
 - Waive: words required, on any row. It answers "Criterion pages_ok waived."
-- A refusal: "a one-line reason of up to 2000 characters is required for Not met and Waive"; "Criterion <id> is met already; reload the board."; and Met on a non-human row, "Only a human criterion is yours to mark met; waive it instead."
+- A refusal: "a one-line reason of up to 2000 characters is required for Not met and Waive"; "Criterion <id> is met already; reload the board."; Met or Not met on a criterion that is not human, "Criterion <id> is the gate's to judge."; Met or Not met on a criteria or criteria_rerun request, and any verb on a merge request whose card `planRows` does not answer, "This card has no criterion rows."
 - Approve on a merge card with an open row: "Criteria pages_ok and page_links have no verdict yet: settle each row on the card first." (one: "Criterion pages_ok has no verdict yet: settle its row on the card first.").
 
-- [ ] **Step 1: Write the failing tests.** `humanRig(r)`:
+- [ ] **Step 1: Write the failing tests.** `humanRig(r)` in `verdict_card_test.go`, which Task 16b's tests and lab scene read too:
   - the plan t-plan holds criteria `size_bound` (test), `reads_calm` (judgement), `all_green` (invariant), `pages_ok` (human, Claim "The pages read well", Evidence "Open /sizes and /doors at 390 px") and `page_links` (human, Claim "Every page links home", Evidence "the links on /help");
-  - its integration card t-int (#5) is in review with merge request 31 (PR 12, HeadSHA "8e3a1b0c");
+  - its integration card t-int (#5) is in review with merge request 31 (PR 12, HeadSHA "8e3a1b0c"), and its feature card t-sizes (#6, key sizes) with merge request 32 (PR 13);
   - the rows on t-int: size_bound gate met "blind: criterion size_bound: TestSizeBound in ./proofs/size_bound passed", reads_calm judgement met "the page names every size (model big, prompt 6b2355d78a19)", all_green gate unmet "criterion all_green: suite ./... failed: Failed boom";
   - the object `ArtifactKey("t-int", "pages_ok")` holds `{pages_ok, pages_ok.txt, 8e3a1b0c, "sizes: 3 rows\ndoors: 2 rows"}`.
+
+```go
+// verdict_card_test.go
+func TestTheHumanRowsPresses(t *testing.T)
+// doDecide(a, 31, "pages_ok", "met", "") → "Criterion pages_ok met."; DecideCriterion(t-plan, pages_ok, met, <user>, "met (pages_ok.txt at 8e3a1b0)");
+//   the event on t-int {approval 31, criterion pages_ok, verb met, reason "met (pages_ok.txt at 8e3a1b0)"}.
+// (page_links, met, "All four pages link home.") → "Criterion page_links met.", the reason "All four pages link home. (the criterion's evidence)".
+// (page_links, not_met, "The help page has no links yet.") → "Criterion page_links is not met; the card goes back to its agent with your words."; no DecideCriterion call;
+//   the event {verb not_met, reason "The help page has no links yet."}; the pull request's review REQUEST_CHANGES and the request denied, both with "criterion page_links not met: The help page has no links yet.".
+// (all_green, waived, "CI covers it.") → "Criterion all_green waived."; DecideCriterion(..., waived, ..., "CI covers it.").
+// Refusals, 409 unless named: (all_green, met, "") and (all_green, not_met, "It is red on main.") → "Criterion all_green is the gate's to judge.";
+//   (pages_ok, not_met, "") → 400 "a one-line reason of up to 2000 characters is required for Not met and Waive";
+//   a second met on pages_ok after its row stands → "Criterion pages_ok is met already; reload the board.";
+//   doDecide(a, 32, "pages_ok", "waived", "x") on the feature card's merge request → "This card has no criterion rows.".
+// POST /approvals/31/criterion {criterion pages_ok, verb met, reason ""} → 303 with no body, and pages_ok's row on t-int then stands met, source approver.
+// POST /approvals/31/approve while pages_ok and page_links have no row → 409 "Criteria pages_ok and page_links have no verdict yet: settle each row on the card first.", no signal;
+//   with both rows met → the press signals the merge, and no human criterion row is written by it.
+
+// TestCriteriaGapWaiveAndGrant and TestCriteriaGapWaiveOfAMetOneRefuses post to /approvals/30/criterion with verb waived (303 as before); their event's key is verb.
+//   doDecide(a, 30, "c2", "met", "") and (c2, not_met, "x") there → 409 "This card has no criterion rows.", the request still pending.
+// Delete the tests of RecordHumanCriteria and the merge approval's "verb": "met" event; wake_test.go's RecordHumanCriteria fake and its counts go.
+
+// internal/console/chat_criteria_test.go
+func TestChatDecidesAHumanRowOnTheHumansWord(t *testing.T)
+// newChatRig with humanRig(r), the human's line "pages_ok reads well, page_links does not: the help page has no links yet" →
+//   answer_criteria {task_id t-int, action met, criterion pages_ok} answers "Criterion pages_ok met.";
+//   {t-int, not_met, page_links, reason "The help page has no links yet."} answers "Criterion page_links is not met; the card goes back to its agent with your words.";
+//   {t-int, waive, all_green, reason "CI covers it."} takes merge request 31 and answers "Criterion all_green waived.".
+// TestChatWaivesACriterionOnTheHumansWord stands, a plan with no pending merge request waiving on its criteria request; its event detail reads verb waived.
+
+// internal/factoryd/verdict_test.go: TestDecideCriterion keeps met on a human criterion and ErrNotHuman for met on a test criterion;
+//   ErrCriterionMet now answers a met as well as a waiver on a criterion that stands met.
+// internal/factoryd/brief_test.go
+func TestTheMergeBriefCarriesThePlansRows(t *testing.T)
+// a merge request of t-int → facts "criteria" == [{size_bound test ... met}, ..., {pages_ok human "The pages read well" open}], and "buttons" ==
+//   "Settle each criterion row first: Met or Not met on a human criterion, Waive on any row. Approve opens once every criterion has a verdict, then merges the pull request into main; Deny refuses it with the human's reason."
+```
+
+- [ ] **Step 2: Run the tests to verify they fail**
+
+Run: `go test -race -p 1 ./internal/factoryd/ ./internal/console/ -run 'TestTheHumanRows|TestCriteriaGap|TestChatDecides|TestChatWaives|TestDecideCriterion|TestTheMergeBrief' -v`
+Expected: FAIL to compile (`doDecide`, `planRows` undefined).
+
+- [ ] **Step 3: Implement.**
+  - `planRows` reads the task's plan's newest revision, its integration card (`PlanCards`, the role), that card's rows (each criterion's by `StandingRow`) and each human criterion's artifact (`c.cfg.Timelines.Get(ArtifactKey(...))`, an absent object no artifact).
+  - `doDecide`:
+    - takes a pending request (`pendingRequest`): of kind criteria or criteria_rerun (plan `q.TaskID`), where Met and Not met refuse "This card has no criterion rows."; or a merge whose task `planRows` answers (plan the task's parent); any other refuses "This card has no criterion rows.";
+    - checks the verb (`met`, `not_met`, `waived`) and the reason; Met and Not met on a criterion that is not human refuse "Criterion <id> is the gate's to judge.", as does `ErrNotHuman`;
+    - maps the other errors of `DecideCriterion` as `doWaive` did;
+    - records the event on `q.TaskID`.
+
+    `doApprove` refuses a merge of such a card while `open` is not empty, before its Forgejo review.
+  - `decideCriterion` replaces `waive`: `c.decideButton(w, r, ...)` over `c.doDecide(ctx, a, id, r.PostFormValue("criterion"), r.PostFormValue("verb"), r.PostFormValue("reason"))`. The route `POST /approvals/{id}/criterion` replaces `/waive` in `console.go`, its access entry `{need: approver, scope: scApproval, what: "decide a criterion"}` in `access.go`. The gap card's form posts to it, its Waive button `name="verb" value="waived"`.
+  - `DecideCriterion` refuses a met on a criterion that stands met with `ErrCriterionMet`, as it refuses a waiver there.
+  - The approval press stops recording human criteria: `RecordHumanCriteria`, its config field, its wiring and its tests go.
+  - `BriefWriter.ask` reads the rows for a merge request of a plan card, and `briefFacts` gives it the `criteria` fact and the buttons sentence of Step 1.
+  - `answer_criteria`: the action enum is `waive`, `grant`, `confirm`, `met`, `not_met`. `met`, `not_met` and `waive` take `t.mergeRequest(in)`; its refusal (the card has no pending merge request) falls to `t.criteriaRequest(in)`, whose error answers. `waive` is the verb `waived`. Its `about` reads "Decide a plan's criteria on the human's word: waive, grant, confirm, or for a human criterion on the integration card's merge, met or not_met."
+
+- [ ] **Step 4: Run the tests to verify they pass.** The Step 2 command, then the whole suite and `bash check static`. Expected: PASS, static clean.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add internal/factoryd internal/console cmd/factoryd
+git commit -m "console: a human settles each human criterion with Met, Not met or Waive
+
+The merge approval marked every human criterion met when it was pressed.
+Now one route decides one criterion row: Met on a human criterion records
+the human's words with the artifact they saw, Not met sends the card back
+to its agent with those words, and Waive takes any row. Approve stays
+refused while a criterion has no verdict, the chat's answer_criteria takes
+the same verbs on the human's word, and the approval card's brief names
+the rows.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+---
+
+### Task 16b: The criteria rows on the merge card
+
+Departures the code forces:
+- **The criterion's evidence is `.PlanCriterion.Evidence`.** `criterionRow.Evidence` is the standing row's and shadows the criterion's field, so the template names the embedded one.
+- The gap card and the merge card share one template for their rows, so both follow C42.
+
+**Files:**
+- Modify: `internal/console/approvals.go` (`criterionRow.Word`, `ArtifactCut`, `Human`; `maxCardArtifact`; `planRows` fills them; `approvalCard.Unsettled`, and `Criteria` for a merge request), `internal/console/templates/board.html`, `internal/console/static/console.css`
+- Modify: `internal/console/lab_test.go` (`humanScene`), `scripts/console-lab/check.js` (`criteriaHuman`)
+- Test: `internal/console/verdict_card_test.go`
+
+**Interfaces:**
+- Consumes: Task 16a's `criterionRow`, `planRows`, `humanRig`, the route `POST /approvals/{id}/criterion` and its verbs `met`, `not_met`, `waived`; Task 15's `GateArtifact`; `labScenes` (lab_test.go), `criteriaWaive` and `main` (check.js).
+- Produces:
+
+```go
+// internal/console/approvals.go: criterionRow gains
+	Word        string // "blind" or "open" for a met gate row, from its evidence
+	ArtifactCut bool   // the card shows the artifact's first maxCardArtifact bytes
+	Human       bool   // Met and Not met are offered: a human criterion on a merge card
+const maxCardArtifact = 8 << 10
+// approvalCard gains Unsettled []string: a merge card's criteria with no verdict, which hold its Approve
+```
+
+- The template `{{define "criteria-rows"}}`, the CSS `pre.artifact`, the lab scene `"human"` (`humanScene`) and the check `criteriaHuman(browser, fails)`.
+
+- [ ] **Step 1: Write the failing test** on `humanRig`.
 
 ```go
 // verdict_card_test.go
@@ -2607,33 +2743,9 @@ func TestTheMergeCardHoldsARowPerCriterion(t *testing.T)
 //     `<pre class="artifact">sizes: 3 rows` + "\n" + `doors: 2 rows</pre>`, and the buttons "Met: criterion pages_ok of t-int", "Not met: criterion pages_ok of t-int", "Waive criterion pages_ok of t-int";
 //   `<legend>page_links (human): open</legend>` and `<p class="meta">Evidence: the links on /help</p>`, no pre;
 //   no Approve button, and `<p class="meta">Approve opens once every criterion has a verdict: pages_ok and page_links.</p>`;
-//   no "yours to judge at this merge". A feature card's merge card holds no fieldset.question.
+//   no "yours to judge at this merge". The feature card t-sizes's merge card holds no fieldset.question.
 // An artifact of 9000 bytes → the pre holds its first 8192 and the line "the first 8 KiB of 9 KiB".
-
-func TestTheHumanRowsPresses(t *testing.T)
-// POST /approvals/31/criterion {criterion pages_ok, verb met, reason ""} → DecideCriterion(t-plan, pages_ok, met, <user>, "met (pages_ok.txt at 8e3a1b0)");
-//   the event on t-int {approval 31, criterion pages_ok, verb met, reason "met (pages_ok.txt at 8e3a1b0)"}; the answer "Criterion pages_ok met.".
-// {page_links, met, "All four pages link home."} → reason "All four pages link home. (the criterion's evidence)".
-// {page_links, not_met, "The help page has no links yet."} → no DecideCriterion call; the event {verb not_met, reason "The help page has no links yet."};
-//   the pull request's review REQUEST_CHANGES and the request denied, both with "criterion page_links not met: The help page has no links yet.".
-// {all_green, waived, "CI covers it."} → DecideCriterion(..., waived, ..., "CI covers it."); {all_green, met, ""} → 409 "Only a human criterion is yours to mark met; waive it instead.".
-// {pages_ok, not_met, ""} → 400 "a one-line reason of up to 2000 characters is required for Not met and Waive"; a second met on pages_ok after the row stands → 409 "Criterion pages_ok is met already; reload the board.".
-// POST /approvals/31/approve while pages_ok and page_links have no row → 409 "Criteria pages_ok and page_links have no verdict yet: settle each row on the card first.", no signal;
-//   with both rows met → the Approve shows and the press signals the merge, and no human criterion row is written by it.
-
-// TestCriteriaGapWaiveAndGrant and TestCriteriaGapWaiveOfAMetOneRefuses post to /approvals/30/criterion with verb waived; their event's key is verb.
-// Delete the tests of RecordHumanCriteria and the merge approval's "verb": "met" event.
-
-// internal/factoryd/verdict_test.go: TestDecideCriterion keeps met on a human criterion and ErrNotHuman for met on a test criterion;
-//   ErrCriterionMet now answers a met as well as a waiver on a criterion that stands met.
-// internal/factoryd/gates_test.go
-func TestHoldMergeNamesTheHumanRows(t *testing.T)
-// never [pages_ok (human), page_links (human)] → the refusal "the merge is held: the human criteria pages_ok and page_links have no verdict: settle each row on the approval card",
-//   and the comment holds no "runs the model review again".
-// internal/factoryd/brief_test.go
-func TestTheMergeBriefCarriesThePlansRows(t *testing.T)
-// a merge request of t-int → facts "criteria" == [{size_bound test ... met}, ..., {pages_ok human "The pages read well" open}], and "buttons" ==
-//   "Settle each criterion row first: Met or Not met on a human criterion, Waive on any row. Approve opens once every criterion has a verdict, then merges the pull request into main; Deny refuses it with the human's reason."
+// TestCriteriaGapWaiveAndGrant's gap card renders through the same rows, as it reads today.
 ```
 
 - [ ] **Step 2: The lab scene and check.**
@@ -2647,46 +2759,34 @@ func TestTheMergeBriefCarriesThePlansRows(t *testing.T)
 
   `main` calls it after `criteriaWaive`.
 
-- [ ] **Step 3: Run the tests to verify they fail**
+- [ ] **Step 3: Run the test to verify it fails**
 
-Run: `go test -race -p 1 ./internal/factoryd/ ./internal/console/ -run 'TestTheMergeCard|TestTheHumanRows|TestCriteriaGap|TestDecideCriterion|TestHoldMergeNames|TestTheMergeBrief' -v`
-Expected: FAIL.
+Run: `go test -race -p 1 ./internal/console/ -run 'TestTheMergeCard|TestCriteriaGap' -v`
+Expected: FAIL (the merge card holds no `fieldset.question`).
 
 - [ ] **Step 4: Implement.**
-  - `planRows` reads the task's plan's newest revision, its integration card (`PlanCards`, the role), that card's rows and each human criterion's artifact (`c.cfg.Timelines.Get(ArtifactKey(...))`). The approval card fills `Criteria` and `Unsettled` for a merge request whose task it answers.
+  - `planRows` also fills `Word`, `ArtifactCut` and `Human`. The approval card fills `Criteria` and `Unsettled` for a merge request whose task `planRows` answers.
   - The template's rows become `{{define "criteria-rows"}}`, used by the gap card and the merge card.
     - The form posts to `/approvals/{id}/criterion` with one `reason` input (no `required`) and its buttons `name="verb"`: `met` and `not_met` on a `Human` row, `waived` on every row that stands neither met nor waived.
     - A gate row's legend adds ` (blind)` or ` (open)` from `Word`.
-    - The artifact renders as `<pre class="artifact">`, its caption `<p class="meta"><name> at <head[:7]></p>`; a human row without one shows `<p class="meta">Evidence: <evidence></p>`.
+    - The artifact renders as `<pre class="artifact">`, its caption `<p class="meta"><name> at <head[:7]></p>`; a human row without one shows `<p class="meta">Evidence: {{.PlanCriterion.Evidence}}</p>`.
     - The merge card's Approve renders only when `Unsettled` is empty, else the meta line of Step 1.
-    - The line "yours to judge at this merge" goes.
+    - The merge brief's line "yours to judge at this merge" goes.
     - The CSS gives `pre.artifact` `white-space: pre-wrap; overflow-wrap: anywhere; max-height: 16em; overflow: auto`.
-  - `doDecide`:
-    - takes a pending request of kind criteria or criteria_rerun (plan `q.TaskID`), or a merge of a plan card `planRows` answers (plan the task's parent);
-    - checks the verb and the reason, and maps the errors as `doWaive` did, plus `ErrNotHuman`;
-    - records the event on `q.TaskID`.
-
-    `doApprove` refuses a merge of such a card while `open` is not empty, before its Forgejo review.
-  - `DecideCriterion` refuses a met on a criterion that stands met with `ErrCriterionMet`, as it refuses a waiver there.
-  - The approval press stops recording human criteria: `RecordHumanCriteria`, its config field, its wiring and its tests go.
-  - `holdMerge` names the human criteria when every never-judged one is human, in the words of Step 1.
-  - `BriefWriter.ask` reads the rows for a merge request of a plan card, and `briefFacts` gives it the `criteria` fact and the buttons sentence of Step 1.
-  - `answer_criteria`: the action enum is `waive`, `grant`, `confirm`, `met`, `not_met`, and `met`, `not_met` and `waive` take `t.mergeRequest(in)` when the card has one pending, else `t.criteriaRequest(in)`. Its `about` reads "Decide a plan's criteria on the human's word: waive, grant, confirm, or for a human criterion on the integration card's merge, met or not_met."
 
 - [ ] **Step 5: Run the tests to verify they pass**, then the whole suite, `bash check static`, and the lab: `CONSOLE_LAB=1 go test ./internal/console/ -run TestLab &` with `node scripts/console-lab/check.js`. Expected: PASS, static clean, the check's `fails` empty.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add internal/factoryd internal/console cmd/factoryd scripts/console-lab
-git commit -m "console: each criterion is a row on the integration card's merge card, and a human settles the human ones
+git add internal/console scripts/console-lab
+git commit -m "console: each criterion is a row on the integration card's merge card
 
-The merge approval marked every human criterion met when it was pressed.
-Now each criterion stands as a row on the Needs you card: the gate's with
-blind or open, the model's reason, the suite's count, and each human
-criterion with its artifact or its evidence and three presses, Met, Not met
-and Waive. Not met sends the card back to its agent with the human's
-words. Approve opens once every criterion has a verdict.
+Each criterion now stands as a row on the Needs you card, in the criteria
+card's markup: the gate's with blind or open, the model's reason, the
+suite's count, and each human criterion with its artifact or its evidence
+and its presses, Met, Not met and Waive. A met or waived row reads ended,
+and Approve shows once every criterion has a verdict.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
@@ -2699,18 +2799,24 @@ Departures the code forces:
 - **The gate's findings go to the builder.** Today `approval` (`workflow_stages.go`) appends `CriteriaResult.Findings` to the human's card. Under the new version they go back to the agent through `onFindings`, as a stage's findings do, and onto the card once the session cap leaves the agent no session.
 - **The workflow-built reviews need no `GateLeft`.** Under the new version `AutoMerge` reads the gate's standing rows from `GateResults.Criteria` for a plan card the gate ran on, and never the review's criteria, so the `Review{Note: "model review failed: ..."}` paths (`runStage`'s review, `rejudge`) need no field. `GateLeft` stays for the why line of a run from before.
 - **A held merge needs the kinds.** `UnjudgedCriteria` answers ids, and a run from before replays its recorded `[]string`. So the new path calls a new activity, `Unjudged`.
+- **The held merge's words follow the version.** `holdMerge`'s mixed case says "no model review judged" a human criterion, and `askHeldMerge` re-files the ask with the review's note. `HoldMerge` gains `blindProofs bool`, true for a run under `versionBlindProofs`: human ids read "<ids> are yours to settle on this card", gate ids "the criteria gate has not settled <ids>; approving again runs it again", no review note is read and nothing is re-filed to a model review. A run from before passes false and keeps the old words and the old re-file, as does an activity scheduled before the deploy, whose missing argument decodes as false. `merge`'s own guard passes false: on the new path the press's `regate` and `AutoMerge`'s stand hold first, so its hold is a run from before's.
+- **`regate`'s stand has a reader.** The merge arguments carry no `GateResults`, so `regate` returns the gate's new `Stand`: its caller keeps it in `g.Criteria` for a later press and the merge retry, and runs `AutoMerge` again on it, whose `met` rides the press's merge arguments.
+- **`regate`'s findings take the cap rule.** They go through `onFindings` as `approval`'s do: back to the agent, or at the cap onto a new merge ask, since the press decided the old one.
+- **Proofs that land after the gate ran.** Nothing reruns the gate from `storeProofs`. A press on the held merge runs it again through `regate` for every criterion of the gate's kinds that has no row; the Phase 2 gate's ask while the plan's prover may still store a proof (`proofsNotStored`) names the answer that runs it again.
+- **A run from before keeps `rejudge` and the review's path.** The review stops writing criteria rows for every run (Task 15 is activity code), so an old run's merge held on a judgement criterion ends in a human's waiver or decision: a press on it loops to `HoldMerge` until a waiver, an accepted cost. The switch-on checklist gets the line: before Phase 3 deploys, no run from before holds a merge waiting on a judgement criterion.
+- **The comments that name the audit go.** Phase 2 deleted the audit and moved the hold-outs' dry runs to the prover, so `requestPlanOptions`' budget, three workflow comments and one reason describe work no run does; this task is the one that may touch `workflow.go`.
 - The delta card's gate run is Task 13's (an activity change).
 
 **Files:**
-- Modify: `internal/factoryd/workflow.go` (`versionBlindProofs`, `taskRun.blindProofs`, its `GetVersion`, `awaitApproval`'s press, `regate` beside `rejudge`, the activity names)
+- Modify: `internal/factoryd/workflow.go` (`versionBlindProofs`, `taskRun.blindProofs`, its `GetVersion`, `awaitApproval`'s press, `regate` beside `rejudge`, `HoldMerge`'s argument in `rejudge`, the activity names, `requestPlanOptions`, `holdoutOptions`' comment, the `verdict.requested` comment, the hold-out settlement's reason)
 - Modify: `internal/factoryd/workflow_stages.go` (`approval`)
-- Modify: `internal/factoryd/gates.go` (`GateResults.Criteria`, `CriteriaStand`, `AutoMerge`, `Unjudged`, `holdMerge`'s gate words)
+- Modify: `internal/factoryd/gates.go` (`GateResults.Criteria`, `CriteriaStand`, `AutoMerge`, `Unjudged`, `HoldMerge`, `holdMerge`, `merge`'s call of it)
 - Modify: `internal/factoryd/criteria.go` (`CriteriaResult.Stand`)
 - Modify: `internal/factoryd/activities.go` (registration), `internal/factoryd/gatewatch.go` (`defaultBoundActivities`)
 - Test: `workflow_gates_test.go`, `gates_test.go`, `criteria_test.go`
 
 **Interfaces:**
-- Consumes: Task 13's `GateCriteria`; Task 15's `gateJudged`; `openCriteria`, `neverJudged`, `unjudgedCriteria`, `onFindings`, `t.criteria`, `HoldMerge`.
+- Consumes: Task 13's `GateCriteria`; Task 15's `gateJudged`; `openCriteria`, `neverJudged`, `unjudgedCriteria`; `onFindings(s policy.Stage, g GateResults, findings []string, capped, card *[]string) (verdict, bool)` (workflow_stages.go); `t.criteria(out *CriteriaResult, commit string) (verdict, bool, error)`; `rejudge(commit, g, approver) (v verdict, stop, held bool)`, `t.mergeArgs(commit, approver string, met []string)`, `ActivityRequestApproval` with `ApprovalInput` (workflow.go); `HoldMerge(ctx, taskID, pr, commit, approver) error`, `holdMerge(ctx, t, repo, pr, commit, approver, never []PlanCriterion) MergeResult` and `askHeldMerge` (gates.go); `rejudgeHarness(t, never [][]string, reviews ...Review)`, a function of `workflow_gates_test.go`, and `gateHarness.mergeMet`; `textutil.AndList`, `textutil.Plural`.
 - Produces:
 
 ```go
@@ -2740,20 +2846,31 @@ type Unjudged struct {
 	Human []string `json:",omitempty"`
 }
 func (r *Runner) Unjudged(ctx context.Context, taskID string) (Unjudged, error)
+// HoldMerge gains blindProofs, and holdMerge with it
+func (r *Runner) HoldMerge(ctx context.Context, taskID string, pr int64, commit, approver string, blindProofs bool) error
+func (r *Runner) holdMerge(ctx context.Context, t Task, repo Repo, pr int64, commit, approver string, never []PlanCriterion, blindProofs bool) MergeResult
 
 // criteria.go: CriteriaResult gains
 	Stand *CriteriaStand `json:",omitempty"` // the plan's criteria after this run's rows; nil when the gate skipped
 
 // workflow.go
-// regate is rejudge from versionBlindProofs on: the gate again for its never-judged criteria, the hold for a human's.
-func (t *taskRun) regate(commit string, g *GateResults, approver string) (v verdict, stop, held bool)
+// regate is rejudge from versionBlindProofs on: the gate again for its never-judged criteria, the hold for a human's;
+// stand is the gate's stand after its run again, nil when it did not run.
+func (t *taskRun) regate(commit string, g GateResults, approver string) (v verdict, stop, held bool, stand *CriteriaStand)
 ```
 
 `AutoMerge`'s proof switch, in order, with `g.Criteria` set:
 - `case len(g.Criteria.Open) == 0`: met `the plan's criteria all stand met or waived: <ids joined ", ">`, in place of `criteriaProve(rv.Criteria)`;
-- the cases of an unproven change name `the plan's criteria <andList(Open)> do not stand met or waived` where they named `criteriaUnmet(rv)`.
+- the cases of an unproven change name `the plan's criteria <textutil.AndList(Open)> do not stand met or waived` where they named `criteriaUnmet(rv)`.
 
 With `g.Criteria` nil every case reads as today.
+
+`holdMerge` with `blindProofs` true, `never` split by `gateJudged`, the ids by `textutil.AndList`:
+- the refusal: `the merge is held: <Plural(n, "criterion was", "criteria were")> never judged: ` and then `the criteria gate has not settled <gate ids>; approving again runs it again`, `<human ids> are yours to settle on this card` ("is" for one id), or both joined by `, and `;
+- the comment: `factoryd: <refusal>`, and with gate ids `\n\nApproving it again runs the criteria gate again on <commit>.`;
+- no `lastReviewNote` read and no `askHeldMerge`.
+
+With `blindProofs` false every word reads as today.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -2769,6 +2886,14 @@ func TestUnjudgedSplitsTheGatesFromTheHumans(t *testing.T)
 // the integration card of a plan with size_bound (test), reads_calm (judgement), pages_ok (human), all_green (invariant), rows for all_green alone
 // → Unjudged{Gate: [size_bound, reads_calm], Human: [pages_ok]}; a feature card → Unjudged{}.
 
+func TestHoldMergeUnderBlindProofsNamesWhoSettles(t *testing.T)
+// holdMerge(..., "c1", "sebastian", never [pages_ok (human), page_links (human)], true) → the refusal
+//   "the merge is held: 2 criteria were never judged: pages_ok and page_links are yours to settle on this card";
+// never [size_bound (test)] → "the merge is held: 1 criterion was never judged: the criteria gate has not settled size_bound; approving again runs it again",
+//   and the comment holds "Approving it again runs the criteria gate again on c1.";
+// never [size_bound (test), pages_ok (human)] → "the merge is held: 2 criteria were never judged: the criteria gate has not settled size_bound; approving again runs it again, and pages_ok is yours to settle on this card".
+// In each, no comment holds "model review", and the store holds no new merge request (askHeldMerge files none). TestUnjudgedCriteriaAndHoldMerge stands with false.
+
 // criteria_test.go: TestGateCriteriaOpensTheBlindProofsThatAreNotGreen's result has Stand {IDs [size_bound, group_open, door, no_proof, all_green, judged],
 //   Open [size_bound, door, no_proof, judged]}; a skipped run has none.
 
@@ -2781,19 +2906,25 @@ func TestWorkflowGateFindingsRideTheCardAtTheCap(t *testing.T)
 func TestWorkflowAutoMergesOnTheGatesRows(t *testing.T)
 // merge rule auto, the review approve strict, g.criteria [{Stand {IDs [size_bound]}}] → merged by auto, g.mergeMet[0] holds "the plan's criteria all stand met or waived: size_bound", no approval request.
 func TestWorkflowPressRunsTheGateAgainForItsCriteria(t *testing.T)
-// the regate harness: Unjudged [{Gate [size_bound]}, {}]; a press → steps after "approval c1": "criteria c1", then "merge"; no ModelReview call after the approval; no HoldMerge.
+// rejudgeHarness(t, nil, []Unjudged{{Gate: [size_bound]}, {}}); g.criteria [{Stand {IDs [size_bound], Open [size_bound]}}, {Stand {IDs [size_bound]}}];
+//   a press → steps after "approval c1": "criteria c1", then "merge"; no ModelReview call after the approval; no HoldMerge;
+//   g.mergeMet[0] holds "the plan's criteria all stand met or waived: size_bound".
+func TestWorkflowPressSendsTheGatesFindingsBack(t *testing.T)
+// Unjudged [{Gate [size_bound]}, {}], g.criteria [{}, {Findings [opened]}]; sessions pushed s1 c1, pushed s2 c2; a press after an hour
+//   → the second session's Findings hold opened; no merge after the press; steps after "approval c1": "criteria c1", then the second session.
+// MaxSessions 1 → no second session, no merge; approvals[1].WhyHuman holds opened, and the card waits on that ask.
 func TestWorkflowPressHoldsForAHumanRow(t *testing.T)
-// Unjudged {Human [pages_ok]} → HoldMerge called once with c1 and the approver, no ModelReview, no merge, the card waiting.
+// Unjudged {Human [pages_ok]} → HoldMerge called once, holds ["9 c1 sebastian blind"]; no ModelReview, no merge, the card waiting.
 func TestWorkflowBeforeBlindProofsKeepsTheOldPaths(t *testing.T)
 // env.OnGetVersion("blind-proofs", DefaultVersion, versionBlindProofs).Return(DefaultVersion): TestWorkflowCriteriaFindingsRideTheApprovalCard's run as it is,
-// and rejudgeHarness's press runs the review (its earlier test stands); GateResults.Criteria of every ModelReview call nil.
+// and rejudgeHarness's press runs the review (its earlier test stands), its HoldMerge's blindProofs false; GateResults.Criteria of every ModelReview call nil; g.mergeMet[0] nil.
 ```
 
-`rejudgeHarness` gains `unjudgedKinds []Unjudged` (in order, the last repeating) mocked on `ActivityUnjudged`. Its four tests of today (`TestWorkflowPressReviewsAnUnjudgedCardBeforeItsMerge` and the three after it) pin the version to `DefaultVersion`.
+`rejudgeHarness` gains a parameter `kinds []Unjudged` after `never` (in order, the last repeating), mocked on `ActivityUnjudged`, and its `HoldMerge` mock takes `blindProofs`: `holds` records `"<pr> <commit> <approver>"`, with ` blind` appended when it is true. Its four tests of today (`TestWorkflowPressReviewsAnUnjudgedCardBeforeItsMerge` and the three after it) pass nil kinds and pin the version to `DefaultVersion`; their `holds` read as today.
 
 - [ ] **Step 2: Run the tests to verify they fail**
 
-Run: `go test -race -p 1 ./internal/factoryd/ -run 'TestAutoMergeReadsTheGatesStand|TestUnjudged|TestGateCriteriaOpens|TestWorkflowGateFindings|TestWorkflowAutoMergesOnTheGates|TestWorkflowPress|TestWorkflowBefore|TestWorkflowCriteria' -v`
+Run: `go test -race -p 1 ./internal/factoryd/ -run 'TestAutoMergeReadsTheGatesStand|TestUnjudged|TestHoldMerge|TestGateCriteriaOpens|TestWorkflowGateFindings|TestWorkflowAutoMergesOnTheGates|TestWorkflowPress|TestWorkflowBefore|TestWorkflowCriteria' -v`
 Expected: FAIL.
 
 - [ ] **Step 3: Implement.**
@@ -2803,13 +2934,20 @@ Expected: FAIL.
     - sets `g.Criteria = res.Stand`;
     - sends `res.Findings` through `t.onFindings(policy.Stage{Name: "criteria", OnFindings: policy.FindingsAgent}, g, res.Findings, &capped, &card)`, returning its verdict when it stops;
     - and before the version appends them to `card` as today.
-  - `awaitApproval`'s press calls `regate` when `t.blindProofs >= versionBlindProofs`, else `rejudge` as today. `regate`:
+  - `awaitApproval`'s press calls `regate` when `t.blindProofs >= versionBlindProofs`, else `rejudge` as today, whose `ActivityHoldMerge` call passes false. `regate`:
     1. calls `ActivityUnjudged`; a failed read leaves the merge guard to decide, as `rejudge`'s does;
-    2. when `Gate` is not empty, runs `t.criteria(&res, commit)`; its findings stop with `verdict{findings, reason: "the criteria gate run again at the approval has findings"}`, and its `Stand` replaces `g.Criteria`;
-    3. calls `ActivityHoldMerge` and answers held when `Human` is not empty, or when the gate's rerun left a criterion without a row (one more `ActivityUnjudged` read);
+    2. when `Gate` is not empty, runs `t.criteria(&res, commit)`, `stand` its `Stand`, and sends `res.Findings` through `t.onFindings(policy.Stage{Name: "criteria", OnFindings: policy.FindingsAgent}, g, res.Findings, &capped, &card)` on its own `capped` and `card`: a stop answers its verdict, stop; at the cap it files the merge ask again, `ActivityRequestApproval` with `ApprovalInput{PR: t.pr, Commit: commit, Gates: g, Review: the newest of t.reviews, WhyHuman: capped then card}`, `g.Criteria` being `stand`, and answers held;
+    3. calls `ActivityHoldMerge(t.taskID, t.pr.Number, commit, approver, true)` and answers held when `Human` is not empty, or when the gate's rerun left a criterion without a row (one more `ActivityUnjudged` read);
     4. otherwise lets the merge go.
-  - `holdMerge`'s gate words become ", the criteria gate gave none", and its comment says "Approving it again runs the criteria gate again on <commit>."
+
+    `awaitApproval` keeps a `stand` that is not nil in `g.Criteria`. Its merge passes, when `g.Criteria` is set, the `met` of `AutoMerge(g, last, t.source)` (`last` the newest of `t.reviews`, or `Review{}`) in `t.mergeArgs(commit, approver, met)`, and nil as today when it is not.
+  - `HoldMerge` passes its `blindProofs` to `holdMerge`, which reads it per the rules above; `merge`'s guard passes false.
   - `AutoMerge` per the rules above.
+  - The comments that name the audit, in `workflow.go`:
+    - `requestPlanOptions` (around line 3643): the comment reads "requestPlanOptions: asking for a plan also proposes its hold-outs, one review model call; it heartbeats while the call runs.", and the budget drops the second call and the two dry runs: `budget := policy.ReviewParts*policy.MaxSupervisorTimeout + 10*time.Minute`;
+    - `holdoutOptions` (around line 3659): the comment reads "holdoutOptions: SettleHoldouts, which only a history that recorded hold-out reds calls, settles at once: it runs no audit and no dry run.";
+    - `verdict.requested` (around line 1567): the comment reads `requested: the findings are a writer's change request, or the hold-out settlement's of a run from before; by is that writer, "" for the settlement's`;
+    - the criteria loop's reason (around line 3801) `"a real gap the audit found"` becomes `"the hold-out settlement has findings"`.
 
 - [ ] **Step 4: Run the tests to verify they pass.** The Step 2 command, then the whole suite and `bash check static`. Expected: PASS, static clean.
 
@@ -2823,9 +2961,11 @@ Under the new change id blind-proofs the criteria gate reports how the
 plan's criteria stand, and the auto merge proves an integration card on
 those rows instead of the review's; the gate's findings, an opened proof
 among them, go back to the agent as a stage's do, to the card at the cap;
-and a press whose missing rows are the gate's runs the gate again, while
-one that waits on a human's row holds the merge. A run from before keeps
-its paths.
+and a press whose missing rows are the gate's runs the gate again, its
+findings going the same way, while one that waits on a human's row holds
+the merge and names the human. A run from before keeps its paths. The
+plan request's budget and the workflow's comments no longer count on the
+audit.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
@@ -2837,25 +2977,24 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 Departures the code forces:
 - **Its own activity, under Task 17's version.** The session's activity ends at its agent time (`sessionOptions`), too close for a runner pod's minutes. So `ProofsAtMain` is an activity of its own with `reproOptions()`, which the lifecycle calls after the session's result, under `versionBlindProofs`.
 - **The new activity needs a bound key**, `"ProofsAtMain"` in `policy.BoundActivities` and `policy.DefaultBounds` (900, as the gate's): a pod's run passes the default 120 s. That changes the configuration tree's schema, an infra commit.
-- **The acceptance close goes without a version.** It never fired (the spec's account), so no history holds a `SessionResult.Acceptance`, and the field, its branch and the `capped` read of it go.
-- **`CloseCardDone` goes, with the console's acceptance close.** It read the `acceptance_passed` rows this task deletes, and the session end now closes the card itself. The pieces are `doCloseAcceptance`, `acceptanceEvidence`, `acceptanceCloseForm`, the route and its access entry, the template's form, the board's offer, `Config.CloseCardDone`, its wiring and `acceptance_close_test.go`.
+- **The acceptance close stays for a run from before, and this task deletes nothing.** That no history holds a `SessionResult.Acceptance` is not checked against the live histories. So under `versionBlindProofs` the close branch and the `capped` read skip `res.Acceptance`, and the session end skips its acceptance read, told by a new `SessionInput.BlindProofs`: a new run records no `acceptance_passed` event, and the console offers no close on one. `SessionResult.Acceptance`, `acceptance.go`, `CloseCardDone`, `EventAcceptancePassed` and the console's acceptance close stay. Phase 4's drain step deletes them, with their console pieces and the lab scene, once no run from before is open (a Temporal query at the switch-on); it keeps `sessionTranscript`, which the session's time rows read.
+- **The integration card closes through the gate alone.** `ProofsAtMain` runs on the plan's other cards; for the integration card it answers `ProofsAtMain{}` with no pod and no line. It writes no row on any card.
 - **A delta card's cited criteria** are on the plan's timeline, not in a revision: its `delta_card` line names them by the card's key.
-- `acceptance.go` keeps `sessionTranscript` (the session's time rows read it) and holds the new close.
+- The new close lives in its own file, `proofsatmain.go`, so the drain step deletes the old close without touching it.
 
 **Files:**
-- Modify: `internal/factoryd/acceptance.go` (all of it), `acceptance_test.go` (all of it)
-- Modify: `internal/factoryd/activities.go` (the session end; registration), `internal/factoryd/workflow.go` (`SessionResult.Acceptance`, the lifecycle's close, `ActivityProofsAtMain`), `internal/factoryd/events.go` (`EventAcceptancePassed` goes), `internal/factoryd/gatewatch.go` (`ActivityProofsAtMain: GateSession`)
+- Create: `internal/factoryd/proofsatmain.go`, `internal/factoryd/proofsatmain_test.go`
+- Modify: `internal/factoryd/activities.go` (registration; the session end's acceptance read under `in.BlindProofs`), `internal/factoryd/workflow.go` (`SessionInput.BlindProofs`, the lifecycle's call, the close branch and the `capped` read under the version, `ActivityProofsAtMain`), `internal/factoryd/gatewatch.go` (`ActivityProofsAtMain: GateSession`)
 - Modify: `internal/policy/policy.go` (`BoundActivities`, `DefaultBounds`)
-- Modify: `internal/console/actions.go`, `board.go`, `buttons.go`, `console.go`, `access.go`, `templates/board.html`; delete `internal/console/acceptance_close_test.go`; `cmd/factoryd/main.go`
 - Modify, infra: `factory/schema/`
-- Test: `acceptance_test.go`, `workflow_test.go`
+- Test: `proofsatmain_test.go`, `acceptance_test.go`, `workflow_test.go`
 
 **Interfaces:**
-- Consumes: Task 10's `proofRuns`, `storedProof`; Task 4's `proofResult`; Task 9's `PlanProofs`; Task 17's `versionBlindProofs`; `reproSandbox`, `branchRef`, `BranchHeadSHA`, `andList`, `filedPlan`, the plan's timeline object.
+- Consumes: Task 13's `runProofs(ctx, t, repo, ref, commit, at, entries) (runs, outcomes, err)` and `proofsEnded` (gates.go); Task 10's `storedProof`; Task 9's `PlanProofs`; Task 17's `versionBlindProofs`, `t.blindProofs`; `reproSandbox`, `branchRef`, `BranchHeadSHA`, `prBase`, `textutil.AndList`, `filedPlan`, `roleOf`, the plan's timeline object; the session end's `planAcceptance` and `sessionAcceptance` read (activities.go), `SessionInput`, `SessionResult.Acceptance`; `proofsWorker(t, r).lists`.
 - Produces:
 
 ```go
-// acceptance.go
+// proofsatmain.go
 // ProofsAtMain is the proofs of a plan card's cited criteria run at main's head after a session ended without a push.
 type ProofsAtMain struct {
 	Head     string   `json:",omitempty"`
@@ -2869,19 +3008,21 @@ func (r *Runner) cardCriteria(ctx context.Context, t Task, p Plan) ([]string, er
 
 // workflow.go
 ActivityProofsAtMain = "ProofsAtMain"
+// SessionInput gains
+	BlindProofs bool `json:",omitempty"` // the run is under versionBlindProofs: the session end reads no acceptance command
 ```
 
 - The timeline line `proofs_at_main`, on the card: `{"head", "criteria": [{"id", "outcome"}]}`, the outcome a `proof*` word, `"no proof"` or `"flagged"`, never a message; or `{"head", "start_failed"}`.
 
-- [ ] **Step 1: Write the failing tests** in `acceptance_test.go`, replacing every test there. The fixture is the feature card t1 (key sizes) of plan1. Its acceptance items cite size_bound, group_open and all_green, and another card's item cites door. The rows: size_bound stored, door stored, group_open with none. `hub.mainHead` is "29b0d33aa".
+- [ ] **Step 1: Write the failing tests** in `proofsatmain_test.go`. The fixture is the feature card t1 (key sizes) of plan1. Its acceptance items cite size_bound, group_open and all_green, and another card's item cites door. The rows: size_bound stored, door stored, group_open with none. `hub.mainHead` is "29b0d33aa".
 
 ```go
 func TestProofsAtMainClosesOnAFullPass(t *testing.T)
 // group_open dropped from the items; the pod: size_bound passed, all_green passed
 // → {Head "29b0d33aa", Met true, Reason "proofs met at 29b0d33: size_bound, all_green"}; the fetch env PR_REF "refs/heads/main", REPO_SHA "29b0d33aa";
-//   the Secret's list [{size_bound ./proofs/size_bound TestSizeBound File} {all_green ./...}], no door;
+//   the posted list (proofsWorker(t, r).lists) [{size_bound ./proofs/size_bound TestSizeBound File} {all_green ./...}], no door;
 //   the line proofs_at_main {"head": "29b0d33aa", "criteria": [{"id": "size_bound", "outcome": "passed"}, {"id": "all_green", "outcome": "passed"}]};
-//   idx 1 still stored; no proof_opened event.
+//   idx 1 still stored; no proof_opened event; no verdict row on any card.
 
 func TestProofsAtMainNamesOnlyTheCriteriaNotMet(t *testing.T)
 // size_bound fails with "--- FAIL: TestSizeBound (0.00s)\n    want 400, got 404", all_green passes
@@ -2890,7 +3031,7 @@ func TestProofsAtMainNamesOnlyTheCriteriaNotMet(t *testing.T)
 //   idx 1 still stored, no event. One not met → "the proof of size_bound is not met at main 29b0d33". A flagged size_bound → no run for it, outcome "flagged".
 
 func TestProofsAtMainOfACardThatCitesNothing(t *testing.T)
-// the foundation card (no cited criterion), and a task no plan filed → {}, no pod, no line.
+// the foundation card (no cited criterion), the integration card (its items cite size_bound: it closes through the gate alone), and a task no plan filed → {}, no pod, no line.
 
 func TestProofsAtMainOfADeltaCard(t *testing.T)
 // t1's key delta1, the plan's timeline line delta_card {"key": "delta1", "criteria": ["size_bound"]}, size_bound passed → Met, Reason "proofs met at 29b0d33: size_bound".
@@ -2898,39 +3039,47 @@ func TestProofsAtMainOfADeltaCard(t *testing.T)
 func TestProofsAtMainThatCannotStart(t *testing.T)
 // the pod never starts → {} and err nil; the line {"head": "29b0d33aa", "start_failed": ...}.
 
+// acceptance_test.go
+func TestRunSessionUnderBlindProofsReadsNoAcceptance(t *testing.T)
+// TestRunSessionCarriesAnAcceptanceGreenHome's session with SessionInput.BlindProofs true → res.Acceptance nil, no acceptance_passed event.
+// TestWorkflowClosesOnAnAcceptanceGreen pins "blind-proofs" to DefaultVersion and stands; the other tests there stand as they are.
+
 // workflow_test.go
 func TestWorkflowClosesOnItsProofsAtMain(t *testing.T)
-// a plan card's run (source plan): session s1 no push; ProofsAtMain mocked {Met, Reason "proofs met at 29b0d33: size_bound"} → final done with that reason, one ProofsAtMain call "t1", one session.
+// a plan card's run (source plan): session s1 no push; ProofsAtMain mocked {Met, Reason "proofs met at 29b0d33: size_bound"} → final done with that reason, one ProofsAtMain call "t1", one session;
+//   s1's SessionInput has BlindProofs true.
+func TestWorkflowUnderBlindProofsTakesNoAcceptanceClose(t *testing.T)
+// s1 no push with Acceptance {Command "bash check", Exit 0, Session "s1"}, ProofsAtMain {} → no close on it: one ProofsAtMain call, the card runs s2.
 func TestWorkflowCarriesTheProofsNotMetToTheNextSession(t *testing.T)
 // ProofsAtMain {Findings ["the proof of size_bound is not met at main 29b0d33"]}, then s2 pushed → s2's Findings hold that line.
 func TestWorkflowRunsNoProofsAtMainOffAPlanCardOrAfterAPush(t *testing.T)
 // a direct card's no-push session, and a plan card's pushed session → no ProofsAtMain call.
 func TestWorkflowBeforeBlindProofsRunsNoProofsAtMain(t *testing.T)
-// the version pinned to DefaultVersion → no ProofsAtMain call; the card runs its next session.
+// the version pinned to DefaultVersion → no ProofsAtMain call, s1's SessionInput without BlindProofs; the card runs its next session.
 ```
 
 - [ ] **Step 2: Run the tests to verify they fail**
 
-Run: `go test -race -p 1 ./internal/factoryd/ ./internal/policy/ -run 'TestProofsAtMain|TestWorkflowClosesOnItsProofs|TestWorkflowCarriesTheProofs|TestWorkflowRunsNoProofs|TestWorkflowBeforeBlindProofsRunsNo' -v`
+Run: `go test -race -p 1 ./internal/factoryd/ ./internal/policy/ -run 'TestProofsAtMain|TestRunSessionUnderBlindProofs|TestWorkflowClosesOn|TestWorkflowUnderBlindProofs|TestWorkflowCarriesTheProofs|TestWorkflowRunsNoProofs|TestWorkflowBeforeBlindProofsRunsNo' -v`
 Expected: FAIL to compile (`ProofsAtMain` undefined).
 
 - [ ] **Step 3: Implement.**
   - `ProofsAtMain`:
-    - a task no plan filed, or a card that cites nothing, is `ProofsAtMain{}`;
+    - a task no plan filed, the plan's integration card, or a card that cites nothing, is `ProofsAtMain{}`;
     - otherwise it reads main's head with `BranchHeadSHA(prBase)` and opens `reproSandbox`;
-    - it runs at `branchRef(prBase)` and that head: each cited invariant's suite, each cited criterion's stored or opened unflagged proof as `storedProof`;
+    - it runs at `branchRef(prBase)` and that head, through `runProofs`: each cited invariant's suite, each cited criterion's stored or opened unflagged proof as `storedProof`; a `*proofsEnded` keeps the outcomes it holds, the unreached reading no report;
     - it records the line, and a start failure is the start-failed line and `ProofsAtMain{}`, so the card goes on;
-    - every outcome passed is `Met`, with `Reason "proofs met at <head[:7]>: <ids joined ", ">"`; otherwise the one finding names the criteria not met, by `andList`.
+    - every outcome passed is `Met`, with `Reason "proofs met at <head[:7]>: <ids joined ", ">"`; otherwise the one finding names the criteria not met, by `textutil.AndList`.
 
     It records no event and writes no row.
   - `cardCriteria`: a card the plan holds gives its items' criterion ids, unique, in the plan's order. Any other plan card gives the `criteria` of the newest `delta_card` line on the plan's timeline whose key is its own.
-  - The lifecycle: after the session's `own` findings are set, before `if capped`, the run calls `ActivityProofsAtMain` with `reproOptions()` when `t.blindProofs >= versionBlindProofs`, `t.source == SourcePlan` and `res.Outcome == OutcomeNoPush`.
+  - The lifecycle: the session's input sets `BlindProofs: t.blindProofs >= versionBlindProofs`. After the session's `own` findings are set, before `if capped`, the run calls `ActivityProofsAtMain` with `reproOptions()` when `t.blindProofs >= versionBlindProofs`, `t.source == SourcePlan` and `res.Outcome == OutcomeNoPush`.
     - `Met` is `t.finish("done", Reason)`.
     - `Findings` are appended to `own`.
     - An error is logged, and the card goes on.
 
-    The `res.Acceptance` branch and its read in `capped` go.
-  - Delete `AcceptanceHit`, `AcceptanceEvidence`, `acceptanceReason`, `CloseCardDone`, `planAcceptance`, `sessionAcceptance`, `acceptanceHit`, `runsAcceptance`, `acceptanceModes`, `firstWord`, `shellWords`, `addsOperator`, `EventAcceptancePassed`, `SessionResult.Acceptance` and the console's acceptance close (the pieces named above), and let the compiler name every other reader.
+    The `res.Acceptance` branch and the `res.Acceptance == nil` term of `capped` apply only when `t.blindProofs < versionBlindProofs`.
+  - The session end in `RunSession` reads its plan's acceptance (`planAcceptance`, `sessionAcceptance`) only when `in.BlindProofs` is false.
   - `policy.go`: `"ProofsAtMain"` joins `BoundActivities`, and `DefaultBounds` gets `"ProofsAtMain": 900`.
 
 - [ ] **Step 4: Run the tests to verify they pass.** The Step 2 command, then the whole suite and `bash check static`. Expected: PASS, static clean.
@@ -2938,8 +3087,8 @@ Expected: FAIL to compile (`ProofsAtMain` undefined).
 - [ ] **Step 5: Commit the code**
 
 ```bash
-git add internal cmd
-git commit -m "plan cards close on their proofs at main, and the acceptance close by shell words goes
+git add internal/factoryd internal/policy
+git commit -m "plan cards close on their proofs at main, and new runs leave the acceptance close by shell words
 
 The acceptance close matched a session's shell commands against the card's
 item texts word for word and never fired, while card #1504 spent five
@@ -2947,8 +3096,9 @@ sessions on work main already held. Now a plan card's session that ends
 without a push runs the proofs of the criteria the card cites at main's
 head: every one passed closes the card done with the criteria and the
 head; otherwise the next session hears which criteria are not met, by id
-alone. The run opens no proof. The console's close on acceptance
-evidence goes with the rows it read.
+alone. The run opens no proof, and the integration card closes through the
+gate alone. Under the new change id the session end no longer reads the
+acceptance commands; a run from before keeps that close.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
@@ -2961,8 +3111,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 Departures the code forces:
 - **A human's met and waived render through their rows.** The approver's row already turns into a `criteria` step by the human (`criteriaSteps`), so a `criterion_decided` event with verb met or waived would be a second step for one press. Only `not_met`, which writes no row, renders from its event, as a `criteria` step.
-- **The flags read private fields.** `DigestStep.state` holds one word, and the gate's flags need each entry of a run. So the proofs step keeps its head and its entries in two private fields.
-- `criterion_unproven` needs the plan's criteria, which `readCard` reads for the plan's integration card. The same read feeds the blind count.
+- **The flags read private fields.** `DigestStep.state` holds one word, and the gate's flags need each entry of a run. So the proofs step keeps its entries in a private field, `gate`, beside the head it already holds in `commit` (set for every timeline line, `gate_criteria` among them, and read by `headFindings`); a `proofs_at_main` step sets `commit` from its line's `head`.
+- `criterion_unproven` needs the plan's criteria, which `readCard` reads for the plan's integration card. The same read feeds the blind count. It goes before `readCard`'s return for a task off the plan track, since an integration card is not the plan task.
 
 **Files:**
 - Modify: `internal/factoryd/carddigest.go` (`DigestStep`, `cardRows`, `readCard`, `cardDigest`, `DigestHead`, `eventSteps`, `criteriaSteps`)
@@ -2973,13 +3123,12 @@ Departures the code forces:
 - Test: `carddigest_test.go`, `carddigest_detail_test.go`, `boarddigest_test.go`
 
 **Interfaces:**
-- Consumes: Task 13's `gateProof` fields, `EventProofOpened` and its contract, the line's `"opened"`; Task 15's `judgement` line; Task 18's `proofs_at_main` line; Task 16's `criterion_decided` contract; Task 12's `digestFlags` and `cardRows`.
+- Consumes: Task 13's `gateProof` fields, `EventProofOpened` and its contract, the line's `"opened"`; Task 15's `judgement` line and the outcome word `no artifact`; Task 18's `proofs_at_main` line; Task 16a's `criterion_decided` contract; Task 12's `digestFlags` and `cardRows`; `DigestStep.commit` (carddigest.go); `newDigestRig(change func(*Task))` (carddigest_test.go), which builds card t1410 with no plan.
 - Produces:
 
 ```go
-// carddigest.go: DigestStep gains
-	head  string      // a proofs step's head
-	gate  []gateProof // a gate run's entries
+// carddigest.go: DigestStep gains (its commit holds a proofs step's head)
+	gate []gateProof // a gate run's entries
 // cardRows gains
 	criteria []PlanCriterion // the plan's criteria when the task is its integration card; nil else
 // DigestHead gains
@@ -2997,9 +3146,9 @@ func digestFlags(t Task, steps []DigestStep, cases []Case, deps []Dependency, bu
 ```
 
 The steps:
-- `proof_opened`: Kind `opened`, Actor `gate`, Outcome `<criterion>: <word> at <head[:7]>`, then `: <failureLine(message)>` when it is not empty. The word is `red` for failed, `missing`, `skipped`, `no report`, or `flagged`, whose message is the flag.
+- `proof_opened`: Kind `opened`, Actor `gate`, Outcome `<criterion>: <word> at <head[:7]>`, then `: <failureLine(message)>` when it is not empty. The word is `red` for failed, `missing`, `skipped`, `no report`, `no artifact`, or `flagged`, whose message is the flag.
 - `judgement` line: Kind `judgement`, Actor `aliasOf(model)`, Outcome `<verdict or "no verdict">: <digestText(reason)>`, its `CostEUR` the line's cost.
-- `proofs_at_main` line: Kind `proofs`, Actor `runner`, Outcome `at main <head[:7]>: <k> of <n> met`, or `at main <head[:7]>: the sandbox did not start: <digestText>`.
+- `proofs_at_main` line: Kind `proofs`, Actor `runner`, its `commit` the line's `head`, Outcome `at main <head[:7]>: <k> of <n> met`, or `at main <head[:7]>: the sandbox did not start: <digestText>`.
 - The gate's `proofs` step, for a line whose entries carry a state, joins these parts with ", ":
   - `blind <m> met <o> opened` over the entries of kind test with state blind, hold-outs left out, those not met being the opened ones, a zero term left out;
   - `open <m> met <u> unmet`, the same way;
@@ -3017,14 +3166,15 @@ The `card_step` details:
 - a `criteria` step from an event: the event's fields, as any event's.
 
 The flags:
-- `opened_proof_red_twice`: per entry id, the distinct heads of `proofs` steps where it has state open and is not met; two or more, detail the id.
+- `opened_proof_red_twice`: per entry id, the distinct `commit`s of `proofs` steps where it has state open and is not met; two or more, detail the id.
 - `opened_proof_changed`: the newest `proofs` step with entries, each entry `Changed`, detail `<id> <path>`.
 - `criterion_unproven`: `unproven`, the plan's criteria no row holds when the card is the plan's integration card at the approval gate (`t.Gate == GateApproval`), one per id.
 
 - [ ] **Step 1: Write the failing tests**
 
 ```go
-// carddigest_test.go, newDigestRig(nil) as the integration card t1 of plan1 (blindPlan's plan, plus pages_ok human)
+// carddigest_test.go: newDigestRig(func(c *Task) { c.Source, c.Parent, c.PlanKey = SourcePlan, "plan1", "integ" }), card t1410 the integration card of plan1,
+//   and plan1's revision seeded with store.AddPlanRevision: blindPlan's plan plus pages_ok (human)
 func TestCardDigestShowsTheBlindTryAndTheOpening(t *testing.T)
 // minute 30 gate_criteria {"commit": "8e3a1b0c9d", "proofs": six test entries state blind met, two state blind unmet (size_bound, door),
 //   group_open {state open, met, changed, path acceptance/group_open_test.go}, all_green invariant met; "opened": ["size_bound", "door"]}
@@ -3035,13 +3185,15 @@ func TestCardDigestShowsTheBlindTryAndTheOpening(t *testing.T)
 //   the criteria step's outcome holds "group_open met (open)" and "t_a met (blind)" and "size_bound unmet";
 //   the opened step's CardStep holds "size_bound opened at 8e3a1b0c9d: failed\nTestSizeBound in ./proofs/size_bound at proofs/size_bound/size_bound_test.go\ncode:\n  package size_bound\n"
 //   and "output:\n  Failed\n  === RUN   TestSizeBound\n";
-//   the proofs step's CardStep holds "group_open met (open) changed: criterion group_open: TestGroupOpen in ./acceptance passed".
+//   the proofs step's CardStep holds "group_open met (open) changed: criterion group_open: TestGroupOpen in ./acceptance passed";
+//   the proofs step's commit is "8e3a1b0c9d".
+// A proof_opened event {criterion reads_calm, head 8e3a1b0c9d, outcome no artifact, message "Failed\npanic: no page", ...} → Outcome "reads_calm: no artifact at 8e3a1b0: panic: no page".
 // TestCardDigestReadsEveryShapeOfTheGatesLine stands: a line without states reads "1 met, 1 unmet".
 
 func TestCardDigestShowsTheJudgementTheProofsAtMainAndTheHumansNotMet(t *testing.T)
 // a judgement line {criterion reads_calm, artifact reads_calm.html, model factory/big, prompt_hash 6b2355d78a19, verdict met, reason "the page names every panel's proof", cost 0.04}
 //   → {judgement, big, "met: the page names every panel's proof", CostEUR 0.04}; CardStep "criterion reads_calm, artifact reads_calm.html\nmodel factory/big, prompt 6b2355d78a19, cost 0.04 EUR\nreason: the page names every panel's proof\n";
-// a proofs_at_main line {"head": "29b0d33aa", "criteria": nine entries passed} → {proofs, runner, "at main 29b0d33: 9 of 9 met"}; CardStep holds "main at 29b0d33aa\n" and "size_bound passed\n";
+// a proofs_at_main line {"head": "29b0d33aa", "criteria": nine entries passed} → {proofs, runner, "at main 29b0d33: 9 of 9 met"}, its commit "29b0d33aa"; CardStep holds "main at 29b0d33aa\n" and "size_bound passed\n";
 // event criterion_decided by sebastian {approval 31, criterion pages_ok, verb not_met, reason "The help page has no links yet."} → {criteria, sebastian, "pages_ok not met"},
 //   CardStep holds "reason: The help page has no links yet.";
 // an approver row {pages_ok met "met (pages_ok.txt at 8e3a1b0)", DecidedBy sebastian} and its event (verb met) → one criteria step by sebastian, "pages_ok met".
@@ -3051,7 +3203,8 @@ func TestCardDigestFlagsTheOpenedProofs(t *testing.T)
 // the newest gate line's group_open changed → {opened_proof_changed, "group_open acceptance/group_open_test.go"}; an older line's changed and a newer unchanged → none.
 
 func TestCardDigestFlagsACriterionNoRowHolds(t *testing.T)
-// t1 in review at the approval gate, rows for all but pages_ok → {criterion_unproven, pages_ok}; t1 in review at the review gate → none; a feature card at the approval → none.
+// t1410 in review at the approval gate, rows for all but pages_ok → {criterion_unproven, pages_ok}; t1410 in review at the review gate → none;
+//   a rig whose change func makes t1410 the feature card sizes of plan1, at the approval → none.
 
 // boarddigest_test.go
 func TestBoardDigestCountsTheBlindRows(t *testing.T)
@@ -3066,11 +3219,11 @@ Expected: FAIL.
 
 - [ ] **Step 3: Implement.**
   - `timelineLine` gains `Criterion`, `Artifact`, `PromptHash`, `Reason` and `Head` (string), `Cost` (float64), `Criteria` and `Opened` (json.RawMessage).
-  - `timelineSteps` gets the cases `judgement` and `proofs_at_main`. `proofsStep` sets `head` and `gate`, and writes the new rule when any entry has a state.
+  - `timelineSteps` gets the cases `judgement` and `proofs_at_main`, the latter's `commit` its line's `head`. `proofsStep` sets `gate`, and writes the new rule when any entry has a state.
   - `eventSteps` gets `case EventProofOpened: s = openedStep(s, e)`, and `case EventCriterionDecided:` for verb `not_met` alone. Every other verb is `continue`.
   - `criteriaSteps` adds the word.
   - `CardStep` gets `case s.Kind == "opened"` (the event's fields in the order above), `case s.Kind == "judgement"` and the `proofs_at_main` detail (a `proofs` step by `runner`). `criteriaDetail` is taken only for a step with no event.
-  - `readCard`, for a plan card that is its plan's integration card, sets `criteria` (`planOfStore`, a read error the digest's error). `cardDigest` passes `unproven` (the ids of `neverJudged(Plan{Criteria: rows.criteria}, rows.verdicts)` when `t.Gate == GateApproval`). The head's `Blind` counts the criteria whose standing row is a met gate row opening `blind: `, and `Criteria` is their number.
+  - `readCard`, for a plan card that is its plan's integration card, sets `criteria` (`planOfStore`, a read error the digest's error), before its return for a task off the plan track. `cardDigest` passes `unproven` (the ids of `neverJudged(Plan{Criteria: rows.criteria}, rows.verdicts)` when `t.Gate == GateApproval`). The head's `Blind` counts the criteria whose standing row is a met gate row opening `blind: `, and `Criteria` is their number.
   - `boardCard` copies `Blind` and `Criteria`. `Render` writes `blind <b> of <n>` after the slot when `Criteria > 0`.
 
 - [ ] **Step 4: Run the tests to verify they pass.** The Step 2 command, then the whole suite and `bash check static`. Expected: PASS, static clean.
@@ -3697,3 +3850,51 @@ git -C ~/repos/ai-software-factory-code worktree remove /tmp/claude-1000/agentdo
 ```
 
 Expected: the push succeeds, and `git worktree list` in both repositories no longer shows the two worktrees.
+
+### Task 25: The drain of the acceptance close
+
+Runs last, and only once no workflow run from before Phase 3's deploy is open: Task 18 kept every old path under `versionBlindProofs` for those runs. If the query in Step 1 shows an open run, this task waits for it to end and lands alone later. Phase 3's switch-on line (no run from before holds a merge waiting on a judgement criterion) is the same drain seen from the human's side.
+
+**Files:**
+- Delete: `internal/factoryd/acceptance.go`, `internal/factoryd/acceptance_test.go`, `internal/console/acceptance_close_test.go`
+- Modify: `internal/factoryd/workflow.go` (the `versionBlindProofs` read and the branches it guards; `SessionResult.Acceptance`; the `capped` read of it), `internal/factoryd/workflow_stages.go` (the gate findings to the human's card, `AutoMerge` on the review's rows), `internal/factoryd/activities.go` (`SessionInput.BlindProofs` and the session end's acceptance read), `internal/factoryd/gates.go` (`HoldMerge`'s `blindProofs` argument and the old words, the model re-file), `internal/factoryd/events.go` (`EventAcceptancePassed`), `internal/factoryd/carddigest*.go` (the read of that event), `internal/console/actions.go` (around 1828 and 1863), `internal/console/board.go` (around 524, 948, 2034), `internal/console/buttons.go` (around 23), `internal/console/console.go` (around 256 and 546), `internal/console/access.go` (around 125), `internal/console/templates/board.html` (around 138), `internal/console/lab_test.go` (the acceptance scene), `scripts/console-lab/check.js` (the same scene), `cmd/factoryd/main.go` (around 602), the old-version tests pinned to `DefaultVersion` in `workflow_gates_test.go` and Task 18's workflow test
+- Modify in the infra repository: `factory/schema/*` if a bound key or a policy field goes
+
+**Interfaces:**
+- Consumes: Task 17's `versionBlindProofs`, Task 18's `SessionInput.BlindProofs` and `HoldMerge`'s `blindProofs`
+- Produces: one path. `workflow.GetVersion(ctx, "blind-proofs", 1, 1)` stays as the version read with its minimum raised to its maximum, so a history that holds the marker replays and none without it can start.
+
+- [ ] **Step 1: No run from before is open.**
+
+Run the Temporal CLI against the factory's namespace, the way the infra repository's runbooks reach the cluster, with the deploy time of Phase 3's code (`git -C ~/repos/ai-software-factory-code log -1 --format=%cI <Phase 3 merge commit>`):
+
+```bash
+temporal workflow list --query 'ExecutionStatus="Running" AND StartTime < "<deploy time>"'
+```
+
+Expected: no rows. One or more rows: stop here, this task waits.
+
+- [ ] **Step 2: Delete the old paths.** Every branch `taskRun.blindProofs == false` guards goes, with the field; `versionBlindProofs`'s read keeps the change id with both bounds at the new version. `SessionResult.Acceptance`, `SessionInput.BlindProofs`, the session end's acceptance read, `HoldMerge`'s `blindProofs` argument with the old words and the model re-file, `acceptance.go` and its test, `EventAcceptancePassed` and the digests' read of it, the console's acceptance close (its action, its button, its route, its access rule, its template lines, its test and its lab scene) and factoryd's wiring of it go. The old-version tests go; the new-version tests lose their version pin.
+
+- [ ] **Step 3: Suite and static.**
+
+```bash
+cd ~/repos/ai-software-factory-code/.worktrees/blind-proofs
+go test -race -p 1 ./... 2>&1 | grep -E '^(ok|FAIL|---)' ; bash check static
+grep -rn "Acceptance\|acceptance_passed\|blindProofs\|BlindProofs" internal cmd --include='*.go' | grep -v '_test.go' | grep -vi 'acceptance item\|acceptance items'
+```
+
+Expected: every package ok, static exit 0, and the grep finds no line (the plan's acceptance items keep their name and are excluded).
+
+- [ ] **Step 4: Commit.**
+
+```bash
+git add -A internal cmd
+git commit -m "drain: the acceptance close and the paths of runs from before the blind proofs go
+
+No open run started before the blind proofs' deploy, so the version read
+keeps its marker with one path: the gate's rows merge, the proofs at main
+close a plan card, and the human's rows settle on the merge card.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
