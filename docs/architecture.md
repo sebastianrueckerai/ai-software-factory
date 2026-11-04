@@ -2766,6 +2766,7 @@ the month only (roadmap 158).
 | `attach_analysis` (2026-10-18) | record what a wake turn found inside an ask | none |
 | `chat_search` (2026-10-18) | read every thread of the project | none |
 | `watch_card`, `unwatch_card`, `set_timer` (2026-10-18) | the thread's own watches and timers | none |
+| `inbox` (2026-11-03) | read the factory's thread: open asks first, then the newest rows, by word and by page | none |
 
 `answer` and `steer` confirm by default, because the text the
 agent reads from cards and events is untrusted and could ask for either. A
@@ -3332,6 +3333,7 @@ caused: events `via: chat` wake nobody.
 | An ask is filed | `question_asked`, from any source but the chat itself | autonomous and full auto |
 | A watched card moves | a state change of a card a thread watches | assisted and above |
 | A timer comes due | the thread's one-shot wake row | every level |
+| A merge approval row opens | `approval_requested` of kind `merge` | autonomous and full auto |
 
 The caps limit wake turns and drop nothing. Every event still lands in
 the log and pokes the inbox, whatever the caps do, and the Waker moves
@@ -3360,6 +3362,28 @@ and the ask row rewritten, the attempt named as the source. Money,
 direction and policy class stay the human's, the concept's boundary
 table, and first answer wins from wherever it lands.
 
+**The merge attempt** (Sebastian, 2026-11-03). A pull request that
+misses an auto-merge condition writes an approval row, and until
+2026-11-03 it reached a human with no agent turn, since
+`approval_requested` was a poke kind and not a wake kind. Now a merge
+row joins the asks in one wake turn at autonomous and full auto, keyed
+`approval:<task>:<approval>` so every row of a card wakes once, and plan
+and criteria rows only move the cursor. The turn's text names the row,
+`#N: merge of PR #X, <class> risk`, with `, checks red` when the checks
+were red at open. At merge rule `auto`, when the woken login is an
+approver, the text closes with "A merge you find safe takes
+approve_merge, a wrong one deny_merge, and the rest goes to a human with
+attach_analysis." Otherwise it closes with "A human approves merges
+here.", and the code refuses `approve_merge` and `deny_merge` from a
+turn in the inbox at merge rule `human`, naming `attach_analysis`, so no
+proposal doubles the row's own Approve button. The agent never approves
+a GitHub sync's pull request: `doApprove` refuses an agent's approval of
+a task whose source is the sync, at every merge rule. For the attempt
+the `card` read's merge line names the review's verdict, the
+strict-improvement word, the head's first seven characters and the red
+jobs, or `checks red at open, green since` when a re-run on the head
+passed.
+
 Every needs-you card gets a thread, the card door. Code writes the first
 message from the ask record, the five parts plus the attempt's analysis
 if one ran, with no model call, one thread per card: a later ask on the
@@ -3377,6 +3401,33 @@ owner. The digest of active threads holds the working set, and
 excerpts capped at 100 bytes, a thread's newest 500 rows scanned. A
 thread's marker controls, rename, seen, clear, archive and delete, stay
 its owner's.
+
+**The inbox split** (Sebastian, 2026-11-03). The inbox was both the
+human's default thread and the Waker's venue, so a human who planned in
+it made every wake turn queue behind the planning turn, and the next
+typed message behind the wake turn. Since 2026-11-03 the inbox is the
+factory's thread. `say`, the one door every typed message takes, from
+the page, `chat_send`, `/compact` and the `owner` field, refuses a
+message to any inbox with 409, "The inbox is the factory's thread:
+answer with its buttons, and write in a thread of your own." A card
+answer in words lands in the human's own thread. The inbox's rows keep
+every button: the five-part ask, the inline answer, a proposal's Do it,
+undo, fund, the card door, and every choice button, which posts to
+`/chat/answer` since the typed path is closed. An `ask` from a turn in
+the inbox must carry choices. A database check,
+`chat_conversations_inbox_never_current`, forbids an inbox that is
+current, and a read of the inbox never makes it current, so a human
+lands on a thread of their own and opens the inbox from the switcher.
+The page shows no input box there: a note, "The factory's thread. Answer
+with its buttons, and write in a thread of your own.", with a New thread
+control, and the head's hint says the thread speaks uninvited. Every
+thread reads the inbox through the tool `inbox {query?, before?}`: its
+first page lists every open ask, then the newest 20 other rows, `before`
+pages the other rows by id, `query` filters by word, and the window is
+the newest 500 rows. It reads the turn member's own inbox when that
+member is a poke recipient, else the venue member's, names whose it
+read, and creates nothing. Timers and watches stay as built and die with
+their thread.
 
 The timers, both the agent's own and stored on the thread that set them.
 A watch, `watch_card` ended by `unwatch_card`, wakes the watching thread
@@ -5299,7 +5350,7 @@ bounds and detectors can be tuned from data:
 |---|---|---|
 | `gate_bound` | a gate activity runs past its bound (6.6) | the gate supervisor's action: `wait` is noise, the rest real. A short gate's row stays open |
 | `supervisor_trip` | a session detector trips | `continue` is noise, any other action real, resolved by `supervisor` |
-| `escalation` | an agent or a supervisor escalates | the project agent's `alert_verdict` tool, real or noise, decided alone at the autonomous level or confirmed by a human in the chat. `unjudged`, set by factoryd, when the task ends without a verdict. Until 2026-11-02 the escalation card also asked an approver, "real problem" or "noise"; that survey left the cards |
+| `escalation` | an agent or a supervisor escalates | the project agent's `alert_verdict` tool: real, noise, or since 2026-11-03 `same_cause` with the first card named, which closes the second card with the comment "Same cause as #N." and records `same_as` on its row; decided alone at full auto or confirmed by a human in the chat. `unjudged`, set by factoryd, when the task ends without a verdict. Until 2026-11-02 the escalation card also asked an approver, "real problem" or "noise"; that survey left the cards |
 | `info_request` | an agent asks the poster (7), Task 66 | `unjudged`, set by factoryd when the task ends without a verdict (Stage 9) |
 | `alert` | a SigNoz alert files an issue, Task 70 | real when the task's pull request merges, noise when a human closes the issue without a merge. On a human-lane issue, a writer's close is real and the label `noise` makes it noise (Stage 9). Since 2026-10-21 `unjudged`, set by factoryd, when the agent task ends any other way, for example failed |
 | `config_rejected` | a configuration commit is refused, or ten reads in a row fail (5.3), Stage 9 | real, set when a valid commit loads |
@@ -5582,6 +5633,7 @@ works `factory` and `demo-app`.
 | Lease | The expiry every commissioned resource and build VM carries. The collector deletes the resource at the last tick before it ends |
 | Principal | The name an SSH certificate is valid for. A commissioned server accepts only its own, `resource-<row id>` |
 | Project | A repository the factory builds software for, with its settings in a file of the infra repository, its own Forgejo organisation, namespaces and quota. The factory's own repositories are projects on `human`, their objects from the seed |
+| Inbox | A member's thread where the factory speaks: the Poker's rows and the Waker's turns. Since 2026-11-03 it refuses typed messages and keeps its buttons, is never the current thread, and the tool `inbox` reads it from any thread (5.7) |
 | Project agent | The chat's agent on the project screen: a tool-calling loop inside factoryd that acts as the human through the console's own actions, one event whatever the input, and runs no code. The tools that need a human's OK are the `chat.confirm` setting (5.7) |
 | Project screen | The human's tool, one per project: status line, board, chat and card drawer, each with one job (5.7) |
 | Merge rule | A project's setting, `auto` or `human`: whether a qualifying change merges without a card |
@@ -5591,7 +5643,7 @@ works `factory` and `demo-app`.
 | Status line | The project screen's top line: the project's state, cards working, cards that need you, spend against the monthly cap and the GitHub mirror's state, each a link to its page (5.7) |
 | Bound | The seconds a gate activity may run before it raises a `gate_bound` alert |
 | Gate supervisor | The supervisor model called when one of the six long gates passes its bound. It chooses wait, retry, cancel or escalate |
-| Alert verdict | Whether an alert was a real problem or noise, set by the supervisor's action, the project agent's judgment or the task's outcome |
+| Alert verdict | Whether an alert was a real problem, noise or the same cause as another card, set by the supervisor's action, the project agent's judgment or the task's outcome |
 | Poster information | An issue author's answer to an information request, carried in the brief as untrusted information, never as authority |
 | Configuration tree | The directory `factory/` in the infra repository: `policy.yaml`, `projects/<name>.yaml`, `processes/<name>.yaml` and `templates/<name>/`, read by factoryd, with the commit as the version |
 | Pin | The configuration version a task started under; its caps and bounds come from it |
