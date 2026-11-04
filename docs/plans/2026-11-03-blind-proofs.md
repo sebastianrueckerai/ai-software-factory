@@ -2012,7 +2012,7 @@ Departures the code forces:
 - **The gate reads each opened proof at the head** through `r.forgejo.FileAt`: an absent path makes no run and a finding that names the path and carries the code, public once opened (a brief push that fails is only logged, so the clone may lack it); a file that differs from the original marks the entry `changed`, which Tasks 14 and 19 read.
 - **No new column.** `OpenPlanProof` sets the state `opened` alone. The `proof_opened` event carries the head and the output, which the digests read, and Task 14 writes an opened proof into later sessions' clones from its `code`.
 - A stored proof that stays green stays stored and runs blind again at every later head. A stored hold-out stays out of every surface while it is green, on the line's `"holdouts"` by `holdoutEntry(idx)` as in Phase 2. One that opens is named by its own id, its claim public.
-- A test criterion with no stored proof at the gate because it came after the prover's store stays the Phase 2 fix wave's unmet row with the finding "Criterion <id> has no stored proof: the prover filed before it was added." It never opens: the human settles it by a waiver or a delta card.
+- A test criterion with no stored proof at the gate because it came after the prover's store stays the Phase 2 fix wave's unmet row with the finding "Criterion <id> has no stored proof: the prover filed before a later revision added it." It never opens: the human settles it by a waiver or a delta card.
 - The `proof_opened` event is recorded idempotently, keyed by criterion and head through `hasEvent`, before `OpenPlanProof` and whatever it answers. A factoryd that stops between the event and the row runs the blind try again on the retry, the row still stored, records no second event and writes the row; a retry after both finds the proof opened and opens nothing.
 
 **Files:**
@@ -2134,7 +2134,7 @@ func TestGateRunsOpenAndHoldTheProofs(t *testing.T)   // Task 10's TestGateRunsT
 // gateRuns(blindPlan's plan, its rows), in order:
 //   size_bound {suite ./proofs/size_bound, name TestSizeBound, file {proofs/size_bound/size_bound_test.go, sizeBoundCode}, state blind};
 //   group_open {./acceptance TestGroupOpen, file nil, state open}; door {stored idx 3, file set, state blind};
-//   no_proof {held "Criterion no_proof has no stored proof: the prover filed before it was added.", late true} (the plan holds stored rows); all_green {suite ./..., state ""};
+//   no_proof {held "Criterion no_proof has no stored proof: the prover filed before a later revision added it.", late true} (the plan holds stored rows); all_green {suite ./..., state ""};
 //   holdout-4 {./proofs/key_log TestKeyLog, file set, label "hold-out key_log"}; holdout-5 {label "hold-out lock_log"}. judged makes none.
 
 func TestOpenedFindingCarriesTheCriterionTheCodeAndTheOutput(t *testing.T)
@@ -2156,12 +2156,12 @@ func TestGateCriteriaOpensTheBlindProofsThatAreNotGreen(t *testing.T)
 //   {holdout-4, Exit 1, Report wrap(`<testcase name="TestKeyLog"><failure message="Failed">--- FAIL: TestKeyLog (0.00s)</failure></testcase>`)},
 //   {holdout-5, Report wrap(`<testcase name="TestLockLog"></testcase>`)})
 // → the posted list (proofsWorker(t, r).lists): [size_bound (file), group_open (no file), all_green, holdout-4 (file), holdout-5 (file)]; door is not in it.
-// res.Findings == [openedFinding of size_bound (failed, sizeBoundMsg), of door (flagged), "Criterion no_proof has no stored proof: the prover filed before it was added.",
+// res.Findings == [openedFinding of size_bound (failed, sizeBoundMsg), of door (flagged), "Criterion no_proof has no stored proof: the prover filed before a later revision added it.",
 //   openedFinding of key_log (failed, "Failed\n--- FAIL: TestKeyLog (0.00s)")], the openings each at "c1".
 // rows on t1, Source gate: size_bound unmet "blind: criterion size_bound: TestSizeBound in ./proofs/size_bound failed: Failed === RUN TestSizeBound size_bound_test.go:12: want 3.75, got 3.5 --- FAIL: TestSizeBound (0.00s)";
 //   group_open met "open: criterion group_open: TestGroupOpen in ./acceptance passed";
 //   door unmet "blind: criterion door: its proof was flagged green on main by its dry run, so it had no blind try";
-//   no_proof unmet "Criterion no_proof has no stored proof: the prover filed before it was added."; all_green met "criterion all_green: suite ./... passed (1 passed, 0 skipped)"; no row for judged, key_log or lock_log.
+//   no_proof unmet "Criterion no_proof has no stored proof: the prover filed before a later revision added it."; all_green met "criterion all_green: suite ./... passed (1 passed, 0 skipped)"; no row for judged, key_log or lock_log.
 // PlanProofs: idx 1, 3 and 4 opened, idx 5 stored; no_proof has no row and opens nothing.
 // events on t1 and on plan1, three each, kind proof_opened: {criterion size_bound, head c1, outcome failed, message sizeBoundMsg, path proofs/size_bound/size_bound_test.go,
 //   suite ./proofs/size_bound, name TestSizeBound, code sizeBoundCode}, {criterion door, head c1, outcome flagged, message "green on main", ...},
