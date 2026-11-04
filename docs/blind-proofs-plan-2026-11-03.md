@@ -284,9 +284,11 @@ evidence links regenerated.
 
 The runner concept's sections 3.3 to 3.5, with `CHECK_ARTIFACTS` added.
 
-- `cmd/agent-worker/repro.go`: a proofs mode beside the repro mode. `PROOFS`
-  carries the JSON list, each entry `{id, suite, name, file: {path, content}}`.
-  The worker writes the file, runs `bash check test` through `exec` with
+- `cmd/agent-worker/repro.go`: a proofs mode beside the repro mode. factoryd
+  posts the JSON list, each entry `{id, suite, name, file: {path, content}}`,
+  to the worker's message port once the pod runs, so no proof code sits in
+  the pod's environment or in a file at rest. The worker writes each entry's
+  file for that entry's run alone, runs `bash check test` through `exec` with
   `CHECK_REPORT` and `CHECK_ARTIFACTS` set, and returns per entry exit, tail,
   report bytes and artifacts. `maxReproOutput` keeps its value, its marker
   comment goes.
