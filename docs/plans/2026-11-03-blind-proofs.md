@@ -3838,7 +3838,7 @@ Expected: nothing.
 ```bash
 cd ~/repos/ai-software-factory/.worktrees/blind-proofs-docs
 git add -A docs/agents
-git commit -m "agents: the map follows code main <sha8>; the prover and the judgement call join, the hold-out audit, its redrafter and the review's criterion call leave
+git commit -m "agents: the map follows code main <sha8>. The prover and the judgement call join, the hold-out audit, its redrafter and the review's criterion call leave
 
 The planner's page states the criteria by the fields of their kind, the
 behaviours review says it reads no diff for criteria, and the judgement
