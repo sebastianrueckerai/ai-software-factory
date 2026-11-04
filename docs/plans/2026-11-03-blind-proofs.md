@@ -3428,7 +3428,7 @@ AGENTS.md names the mode and says where the criteria's proofs come from
 and when they reach the agent; the spec skeleton states criteria by the
 fields of their kind.
 
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+Co-Authored-By: Claude Code <noreply@anthropic.com>"
 ```
 
 ---
@@ -3533,7 +3533,7 @@ it, else go run builds the version Dockerfile.sandbox pins. The image
 build reads the store's copy, which main CI uploads after the merge:
 unverified until the factory runs again.
 
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+Co-Authored-By: Claude Code <noreply@anthropic.com>"
 ```
 
 ---
@@ -3594,7 +3594,7 @@ the four outcomes, the gate's rows blind and open, the opening, the one
 judgement call per criterion, the human rows on the merge card, the
 proofs at main after a session without a push, and the prover's filing.
 
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+Co-Authored-By: Claude Code <noreply@anthropic.com>"
 ```
 
 **The phase close** comes here: the code and infra `blind-proofs` branches merge into main and are pushed to `github`, as Phases 1 to 3 closed. Tasks 23 and 24 read those mains.
@@ -3753,7 +3753,7 @@ close on proofs at main. The criteria and blind-test rows of the evidence
 wait for a live run. C45 records the criteria rows on the merge card.
 Evidence follows code main <sha8> and infra <sha7>.
 
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+Co-Authored-By: Claude Code <noreply@anthropic.com>"
 cd ~/repos/ai-software-factory
 untracked=$(for f in docs/blind-proofs-plan-2026-11-03.md docs/proof-runner-concept-2026-11-03.md; do git ls-files --error-unmatch "$f" >/dev/null 2>&1 || echo "$f"; done)
 for f in $untracked; do git show blind-proofs-docs:"$f" | diff - "$f"; done
@@ -3844,7 +3844,7 @@ The planner's page states the criteria by the fields of their kind, the
 behaviours review says it reads no diff for criteria, and the judgement
 page shows a judgement criterion's pinned prompt over its artifact.
 
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+Co-Authored-By: Claude Code <noreply@anthropic.com>"
 cd ~/repos/ai-software-factory && git merge --ff-only blind-proofs-docs && git push origin master
 git worktree remove .worktrees/blind-proofs-docs && git branch -d blind-proofs-docs
 git -C ~/repos/ai-software-factory-code worktree remove /tmp/claude-1000/agentdoc-code && git -C ~/repos/ai-software-factory-code worktree prune
@@ -3897,5 +3897,5 @@ No open run started before the blind proofs' deploy, so the version read
 keeps its marker with one path: the gate's rows merge, the proofs at main
 close a plan card, and the human's rows settle on the merge card.
 
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+Co-Authored-By: Claude Code <noreply@anthropic.com>"
 ```
