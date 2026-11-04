@@ -2139,7 +2139,7 @@ func TestGateRunsOpenAndHoldTheProofs(t *testing.T)   // Task 10's TestGateRunsT
 
 func TestOpenedFindingCarriesTheCriterionTheCodeAndTheOutput(t *testing.T)
 // openedFinding({run size_bound, outcome failed, output sizeBoundMsg, text "The criterion: A size over the bound is refused. Inputs: POST /api/sizes with 3.75 against a bound of 3.5. Expected: 400 and no row in the store."}, "c1") ==
-//   "criterion size_bound: its blind proof ran red at c1; it is open now. Commit the test below at proofs/size_bound/size_bound_test.go and make it pass: " +
+//   "criterion size_bound: its blind proof ran red at c1. It is open now. Commit the test below at proofs/size_bound/size_bound_test.go and make it pass: " +
 //   "fix the implementation, or the test where it is wrong, or raise the question on the card when the criterion cannot hold.\n" +
 //   "The criterion: A size over the bound is refused. Inputs: POST /api/sizes with 3.75 against a bound of 3.5. Expected: 400 and no row in the store.\n" +
 //   "TestSizeBound in ./proofs/size_bound:\n```\npackage size_bound\n\nfunc TestSizeBound(t *testing.T) {}\n```\n" +
@@ -2526,7 +2526,7 @@ func TestGateCriteriaJudgesTheArtifacts(t *testing.T)
 func TestGateCriteriaOpensAProofThatWroteNoArtifact(t *testing.T)
 // reads_calm's run {Exit 1, Output "panic: no page\n", Report wrap(`<testcase name="TestReadsCalm"><failure message="Failed">panic: no page</failure></testcase>`)}, no artifact
 // → no chat, no row for reads_calm; idx 6 opened; its proof_opened event on t1 has outcome "no artifact", message "Failed\npanic: no page"; the line's "opened" holds reads_calm;
-//   the finding starts "criterion reads_calm: its blind proof wrote no artifact reads_calm.html at c1; it is open now. Commit the test below at proofs/reads_calm/reads_calm_test.go"
+//   the finding starts "criterion reads_calm: its blind proof wrote no artifact reads_calm.html at c1. It is open now. Commit the test below at proofs/reads_calm/reads_calm_test.go"
 //   and holds "The criterion: The sizes page reads calm. The artifact shows: the sizes page with three sizes.", "package reads_calm" and "Failed\npanic: no page".
 // An artifact holding a NUL byte → no chat, no row, the finding "criterion reads_calm: its artifact reads_calm.html is not text: no verdict"; idx 6 stays stored.
 
@@ -2899,7 +2899,7 @@ func TestHoldMergeUnderBlindProofsNamesWhoSettles(t *testing.T)
 
 // workflow_gates_test.go
 func TestWorkflowGateFindingsGoBackToTheAgent(t *testing.T)
-// g.criteria [{Findings [opened]}, {}], opened := "criterion size_bound: its blind proof ran red at c1; it is open now."; sessions pushed s1 c1, pushed s2 c2; checks green; approve after an hour
+// g.criteria [{Findings [opened]}, {}], opened := "criterion size_bound: its blind proof ran red at c1. It is open now."; sessions pushed s1 c1, pushed s2 c2; checks green; approve after an hour
 // → the second session's Findings hold opened; approvals[0].WhyHuman holds no opened; steps "criteria c1", then the second session, "criteria c2", "approval c2".
 func TestWorkflowGateFindingsRideTheCardAtTheCap(t *testing.T)
 // MaxSessions 1, the same findings → no second session; approvals[0].WhyHuman holds opened.
