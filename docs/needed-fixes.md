@@ -224,10 +224,11 @@ shape that saved #1383.
 ## 3. An ended card's issue stays open, and both red-main remedies can land
 
 Status: the fix landed on code main 2026-11-02 (fcec3a73 to 1d89308a,
-docs/red-main-revert-plan-2026-11-02.md) and rides the next factoryd roll,
-which waits on Deploy now while plans #1344 and #1399 are open on main. At
-that roll a migration hands the 27 issues that stand open to the heal pass.
-The entry leaves once they read closed. Found 2026-10-31 on card #1333
+docs/red-main-revert-plan-2026-11-02.md) and rolled on 2026-11-04, the
+factory's first roll of the day at 07:56. The issues still read open: 49
+stood open on ended cards that evening against the 27 the migration hands
+to the heal pass, and no close landed after the roll. The heal's close
+path needs a look before this entry leaves. Found 2026-10-31 on card #1333
 ("Revert 6b368fd: main red since 2026-10-30T03:30:07Z, no fix landed"),
 filed as "a red-main revert card does not jump the queue". The check on
 2026-11-02 shows that the queue did its job: the revert merged on its own
