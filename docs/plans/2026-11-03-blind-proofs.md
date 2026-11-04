@@ -2614,7 +2614,7 @@ func (c *Console) decideCriterion(w http.ResponseWriter, r *http.Request)
 
 The press texts, `doDecide`'s answers:
 - Met: the row's evidence is `<words> (<seen>)`, or `met (<seen>)` with no words, `<seen>` being `<artifact name> at <head[:7]>` or `the criterion's evidence`. It answers "Criterion pages_ok met."
-- Not met: words required. It records the event, then `doDeny(ctx, a, id, "request_changes", "criterion <id> not met: <words>")`, and answers "Criterion pages_ok is not met; the card goes back to its agent with your words."
+- Not met: words required. It records the event, then `doDeny(ctx, a, id, "request_changes", "criterion <id> not met: <words>")`, and answers "Criterion pages_ok is not met. The card goes back to its agent with your words."
 - Waive: words required, on any row. It answers "Criterion pages_ok waived."
 - A refusal: "a one-line reason of up to 2000 characters is required for Not met and Waive"; "Criterion <id> is met already. Reload the board."; Met or Not met on a criterion that is not human, "Criterion <id> is the gate's to judge."; Met or Not met on a criteria or criteria_rerun request, and any verb on a merge request whose card `planRows` does not answer, "This card has no criterion rows."
 - Approve on a merge card with an open row: "Criteria pages_ok and page_links have no verdict yet: settle each row on the card first." (one: "Criterion pages_ok has no verdict yet: settle its row on the card first.").
@@ -2631,7 +2631,7 @@ func TestTheHumanRowsPresses(t *testing.T)
 // doDecide(a, 31, "pages_ok", "met", "") → "Criterion pages_ok met."; DecideCriterion(t-plan, pages_ok, met, <user>, "met (pages_ok.txt at 8e3a1b0)");
 //   the event on t-int {approval 31, criterion pages_ok, verb met, reason "met (pages_ok.txt at 8e3a1b0)"}.
 // (page_links, met, "All four pages link home.") → "Criterion page_links met.", the reason "All four pages link home. (the criterion's evidence)".
-// (page_links, not_met, "The help page has no links yet.") → "Criterion page_links is not met; the card goes back to its agent with your words."; no DecideCriterion call;
+// (page_links, not_met, "The help page has no links yet.") → "Criterion page_links is not met. The card goes back to its agent with your words."; no DecideCriterion call;
 //   the event {verb not_met, reason "The help page has no links yet."}; the pull request's review REQUEST_CHANGES and the request denied, both with "criterion page_links not met: The help page has no links yet.".
 // (all_green, waived, "CI covers it.") → "Criterion all_green waived."; DecideCriterion(..., waived, ..., "CI covers it.").
 // Refusals, 409 unless named: (all_green, met, "") and (all_green, not_met, "It is red on main.") → "Criterion all_green is the gate's to judge.";
@@ -2650,7 +2650,7 @@ func TestTheHumanRowsPresses(t *testing.T)
 func TestChatDecidesAHumanRowOnTheHumansWord(t *testing.T)
 // newChatRig with humanRig(r), the human's line "pages_ok reads well, page_links does not: the help page has no links yet" →
 //   answer_criteria {task_id t-int, action met, criterion pages_ok} answers "Criterion pages_ok met.";
-//   {t-int, not_met, page_links, reason "The help page has no links yet."} answers "Criterion page_links is not met; the card goes back to its agent with your words.";
+//   {t-int, not_met, page_links, reason "The help page has no links yet."} answers "Criterion page_links is not met. The card goes back to its agent with your words.";
 //   {t-int, waive, all_green, reason "CI covers it."} takes merge request 31 and answers "Criterion all_green waived.".
 // TestChatWaivesACriterionOnTheHumansWord stands, a plan with no pending merge request waiving on its criteria request; its event detail reads verb waived.
 
