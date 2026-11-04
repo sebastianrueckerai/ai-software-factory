@@ -3399,7 +3399,7 @@ Then write `proofs/trivial/trivial_test.go` (package `trivial`: `func TestTrivia
 | `CHECK_REPORT=$R/w2.xml bash check test ./web/src/proofs/trivial.test.ts TrivialFails` | 1 | `Outcome:failed`, the message holding `3.75` |
 | `CHECK_REPORT=$R/w3.xml bash check test web` (reader with no name) | 1 | `Outcome:failed`; the report holds a case of `src/App.test.tsx` |
 | `CHECK_REPORT=$R/w4.xml bash check test web/src/proofs/trivial.test.ts NoSuch` | any | `{Outcome:missing Message:}` |
-| `CHECK_REPORT=$R/w5.xml bash check test web/src/proofs/nothere.test.ts NoSuch` | non-zero | `{Outcome:no report Message:check test wrote an empty report}` |
+| `CHECK_REPORT=$R/w5.xml bash check test web/src/proofs/nothere.test.ts NoSuch` | non-zero | `{Outcome:missing Message:}`: vitest 4.1.11 writes an empty `testsuites` shell when no file matches, so the runner ran and the case is absent |
 | `bash check test ./...` | non-zero within seconds | none: the `CHECK_REPORT` line, and no npm or go output |
 
 Then the binary path. Download the release into its own directory, check it against the release's checksum, and put the binary first on `PATH`:
