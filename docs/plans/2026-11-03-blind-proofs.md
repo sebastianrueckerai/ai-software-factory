@@ -2659,7 +2659,7 @@ func TestChatDecidesAHumanRowOnTheHumansWord(t *testing.T)
 // internal/factoryd/brief_test.go
 func TestTheMergeBriefCarriesThePlansRows(t *testing.T)
 // a merge request of t-int → facts "criteria" == [{size_bound test ... met}, ..., {pages_ok human "The pages read well" open}], and "buttons" ==
-//   "Settle each criterion row first: Met or Not met on a human criterion, Waive on any row. Approve opens once every criterion has a verdict, then merges the pull request into main; Deny refuses it with the human's reason."
+//   "Settle each human criterion row first: Met or Not met on a human criterion, Waive on any row. Approve opens once every human criterion has a verdict, then merges the pull request into main; Deny refuses it with the human's reason."
 ```
 
 - [ ] **Step 2: Run the tests to verify they fail**
@@ -2742,7 +2742,7 @@ func TestTheMergeCardHoldsARowPerCriterion(t *testing.T)
 //   `<legend>pages_ok (human): open</legend>`, `<p class="meta">The pages read well</p>`, `<p class="meta">pages_ok.txt at 8e3a1b0</p>`,
 //     `<pre class="artifact">sizes: 3 rows` + "\n" + `doors: 2 rows</pre>`, and the buttons "Met: criterion pages_ok of t-int", "Not met: criterion pages_ok of t-int", "Waive criterion pages_ok of t-int";
 //   `<legend>page_links (human): open</legend>` and `<p class="meta">Evidence: the links on /help</p>`, no pre;
-//   no Approve button, and `<p class="meta">Approve opens once every criterion has a verdict: pages_ok and page_links.</p>`;
+//   no Approve button, and `<p class="meta">Approve opens once every human criterion has a verdict: pages_ok and page_links.</p>`;
 //   no "yours to judge at this merge". The feature card t-sizes's merge card holds no fieldset.question.
 // An artifact of 9000 bytes → the pre holds its first 8192 and the line "the first 8 KiB of 9 KiB".
 // TestCriteriaGapWaiveAndGrant's gap card renders through the same rows, as it reads today.
@@ -3564,7 +3564,7 @@ Departure the code forces: Phases 1 to 3 changed no page of `docs/manual/`. The 
 - [ ] **Step 2: The other passages.**
   - `ModelReview`: the sentences from "The review of an integration card" to "carries `criteria` or `behaviours` is refused" become: the review of an integration card or a delta card adds one call for the feature's behaviours, which reads the cards' briefs, their file lists and the names they add, and no diff; it judges no criterion, since `GateCriteria` settles the test, invariant and judgement criteria and the approver the human ones; it reads each opened proof's original code and the agent's summary. The keys a plain answer may not carry are the ones `parseReview` refuses at the branch head: grep it.
   - `AutoMerge`: a third proof beside the two of today: from change id `blind-proofs`, a plan's integration or delta card whose criteria all stand met or waived on `GateResults.Criteria`.
-  - The approval paragraph: "the console posts no review and meets no human criterion" becomes "the console posts no review". Add a sentence: a merge card of a plan's integration or delta card holds a row per criterion, and Approve opens once every row stands (`console.md`).
+  - The approval paragraph: "the console posts no review and meets no human criterion" becomes "the console posts no review". Add a sentence: a merge card of a plan's integration or delta card holds a row per criterion, and Approve opens once every human row stands (`console.md`).
   - The plan section's "(`CARD_ROLE`; the integration card's adds the `acceptance/` tests)" says what `featureGuide` says at the branch head.
   - A paragraph in the plan section on the prover: a report task of source `prover` and class `prover`, opened once by the criteria sweep once the plan's foundation card merged (at confirmation for a plan without one). It writes one test per test, judgement and human criterion and okayed hold-out on main, and files them through `file_proofs`, three filings at most, the last standing. factoryd dry-runs the filing on main, and the rows go into `plan_proofs`, flagged when a test was green or unrunnable there. A hold-out is a claim with numbers and no code, shown as `holdout-<idx>` outside the prover's brief.
   - `policy.md`: the mode `report` runs "the screening, the sizing and the prover". The "reproduction, criteria or hold-out sandbox" sentence names the sandboxes that escalate at step `image pin` at the branch head: grep `stepImagePin`.
