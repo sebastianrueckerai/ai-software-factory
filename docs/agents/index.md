@@ -4,7 +4,7 @@ One page per agent: the first model request verbatim, every part pinned to the b
 
 ## The self-check
 
-- code SHA `e48c3516f59d47b72708ea33bc31eb61bfdfcdcf`; every permalink points there.
+- code SHA `4f03a25c76341b85a571e3d370b3d7c70691cb8a`; every permalink points there.
 - policy `d245f5c998fe`, the tree the captures read.
 - harness `opencode 1.18.32`, the pinned opencode the loop captures drove.
 - unlabelled spans: 0 — the tool exits non-zero on any unlabelled byte, so an index that shipped means none.
@@ -18,10 +18,10 @@ Fixture ids: `agentdoc-fixture` (coding, screening, sizing, planner, prover, mes
 |---|---|---|---|---|---|---|---|
 | [coding](coding.md) | A | Implements the card: reads repo, edits, commits in sandbox | `small` | `session` | agent-worker, the opencode loop in a gVisor pod | 27 | 47739 |
 | [screening](screening.md) | A | Reads an issue pre-code, answers clear/suspect JSON | `big` | `session` | agent-worker, report mode | 16 | 44986 |
-| [sizing](sizing.md) | A | Sizes a card small/medium/large before first session | `small` | `session` | agent-worker, report mode | 16 | 44847 |
+| [sizing](sizing.md) | A | Sizes a card small/medium/large before first session | `small` | `session` | agent-worker, report mode | 16 | 44845 |
 | [planner](planner.md) | A | Reads repo, files a plan via the file_plan MCP tool | `premium` | `session` | agent-worker, report mode | 16 | 44404 |
-| [prover](prover.md) | A | Writes one blind test per criterion on main, files them via file_proofs | `big` | `session` | agent-worker, report mode | 12 | 38883 |
-| [message-responder](message-responder.md) | A | Answers POST /message pushes mid-session | `small` | `session` | agent-worker, the session's next turn in the sandbox | 27 | 48672 |
+| [prover](prover.md) | A | Writes one blind test per criterion on main, files them via file_proofs | `big` | `session` | agent-worker, report mode | 12 | 38881 |
+| [message-responder](message-responder.md) | A | Answers POST /message pushes mid-session | `small` | `session` | agent-worker, the session's next turn in the sandbox | 27 | 48670 |
 | [opencode-subagents](opencode-subagents.md) | A | opencode-internal task and explore delegation | `—` | `config` | inside opencode, under the session config's agent block | 0 | — |
 | [checkin](checkin.md) | B | Decides continue, message, handover, human or replan on a session trip | `big` | `checkin` | factoryd, in-process loop, tools executed in the sandbox | 8 | 9497 |
 | [model-review](model-review.md) | B | Reviews a diff part against the card's objective | `big` | `review` | factoryd direct | 0 | 4730 |
