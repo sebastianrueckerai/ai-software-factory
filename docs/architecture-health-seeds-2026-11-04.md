@@ -1,6 +1,6 @@
 # Architecture health: seeds from the software factory talk
 
-Written 2026-11-04. Status: seeds, neither planned nor built. The source is Dex Horthy's ten-minute talk "State of the Software Factory" (October 2026) and the discussion of it on 2026-11-04. Section 1 holds the claim and its evidence. Section 2 holds the position Sebastian took. Section 3 holds the six seeds, each a candidate factory part. Section 5 holds the decisions the seeds need.
+Written 2026-11-04. Status: seeds, neither planned nor built. The source is Dex Horthy's ten-minute talk "State of the Software Factory" (October 2026) and the discussion of it on 2026-11-04. Section 1 holds the claim and its evidence, and names every problem the evidence raises with the sketch that answers it or the reason it is left alone. Section 2 holds the position Sebastian took. Section 3 holds the six seeds, each a candidate factory part. Section 5 holds the decisions the seeds need.
 
 ## 1. The claim and the evidence
 
@@ -18,6 +18,25 @@ What the benchmark measures: the bare model. The agent starts in an empty worksp
 What the strict number is worth: a noise analysis of the leaderboard found about 10 of 196 checkpoints in play and about half of all strict passes at checkpoint 1. The move from 14.8% to 16.3% is three checkpoints in single runs. The erosion and verbosity trends are the finding that holds.
 
 The training argument: reinforcement learning rewards a passing test, and maintainability has no fast oracle at training time, so a model learns to be correct now and corrosive later. The argument proves that a model will not keep code clean by default. The factory runs at inference, where a slow oracle costs minutes, not a training run. A duplication count, a complexity trend, a mutation score and a second reader are all affordable there.
+
+### 1.1 Every problem the evidence names, and its sketch
+
+Each problem, with the sketch that answers it or the reason it stays as it is:
+
+- **Verbosity and complexity rise with each extension of existing code.** The per-merge count of 3.3 sees it on the diff, the trend sees it over months, and a trip files the review of 3.4, which files the refactor cards.
+- **Agent code is twice as verbose from the first checkpoint, before any iteration.** The same count of 3.3 runs on the first card's diff, and the template's anti-slop rules push back inside the build, which is the one place the paper says prompting and rules still improve the result.
+- **Prompting does not stop the erosion.** No seed adds a prompt rule. A program counts (3.3), a reader reads (3.1), a critic compares (3.5). This is the factory's standing principle: no rule in a prompt that a tool or a deterministic step can carry.
+- **Messy code accumulates over time (Anthropic).** The first problem, plus 3.6, so the accumulation has a readable history and the review of 3.4 can tell a drift from a decision.
+- **Incidents per merge rise (Faros).** The incident rate per merge joins the trend of 3.3 as a second line, fed by the telemetry loop's incidents, and trips the same review. Post-deploy verification by intent stays the item [architecture.md](architecture.md) marks for later.
+- **Merges with no review (Faros).** Not a problem here but the position of section 2: a program and a reader instead of a human on every diff, and the human on exception.
+- **Half a million lines in twelve weeks and no time on debt (Yegge).** Lines added per merge join the trend of 3.3 as a third line. The review of 3.4 files debt cards under the project's month cap, so debt work is scheduled, not hoped for.
+- **Agents added a hundred gates until nothing moved (Yegge).** Left as it is. Policy lives outside the model, the process is data changed by a reviewed commit, and AGENTS.md sits under the risk rules. No agent of this factory can add a gate.
+- **The strict rate is noise.** 3.2 leads with erosion and verbosity, and its on/off comparison runs several campaigns per arm or claims no difference.
+- **No fast oracle for maintainability at training time.** Slow oracles at inference: the count of 3.3 and the reader of 3.1. A mutation score is the roadmap's mutation testing item and not a seed here.
+- **Behaviour tests pass while the code erodes.** 3.3.
+- **An architecture explanation is true at its level while the modules fill with duplicates.** 3.3 for the layer below the explanation, 3.5 for the explanation itself.
+- **A builder describing its own work describes its intent.** 3.1.
+- **Reading every pull request fails for human teams too.** The position of section 2. A diff reaches a human only as a Needs you row, on exception.
 
 ## 2. The position: three instruments, no human reads every pull request
 
@@ -43,15 +62,19 @@ One caveat shapes the first seed. The explanation must come from the code, not f
 
 A reader session gets the repository as checked out and nothing else: no spec, no card, no plan, no builder transcript, no factory records. It writes one artifact: the shape (monolith, services, events), the boundaries and the contracts between them, the data flow, where the complexity sits, and what it could not explain. It is the blind idea of [blind-proofs-plan-2026-11-03.md](blind-proofs-plan-2026-11-03.md), a session the builder never meets, applied to reading instead of testing. The artifact rule of [proof-runner-concept-2026-11-03.md](proof-runner-concept-2026-11-03.md) holds: a judging model reads an artifact, never the diff.
 
+Two things the sketch settles. The repository carries its own prose, the README and AGENTS.md, and that prose is a claim, not code. The reader reads source and tests, and the template names the documentation paths it skips. A repository larger than a context is read the way every step reads here, a small default context with read and search tools that fetch depth. The view has a fixed shape, one section per question above, so two runs compare and the readers of 3.4 and 3.5 find each answer in the same place.
+
 It is a whole-repository read on a stronger model, so by the cost rule of [layers.md](layers.md) section 2 it never runs per card. Candidates for when it runs: at a plan's close, when the integration card merges, and at the audit of 3.4. Its readers are 3.4 and 3.5.
 
 ### 3.2 The SlopCodeBench run
 
 Run the benchmark's pinned v1.0 catalogue, 36 problems and 196 checkpoints, through the factory, and put the number on [evidence.md](evidence.md). Each problem is a project registered from a template, each checkpoint a card through the gates, and the benchmark's own harness scores the result: strict, isolated and core pass rates, erosion, verbosity and cost. This answers the open question of the talk with a measurement nobody has published.
 
-Two runs give more than one. The same catalogue with the structural gate of 3.3 on and off measures the gate's effect, which is the experiment the benchmark's authors have not run.
+How a checkpoint maps onto the factory: each checkpoint's text is the spec of one spec-track card, the planner splits it as it splits any spec, and the next checkpoint's card starts from the merged work. The benchmark hides its tests and gives a CLI contract, so the factory's proofs come from the contract, the way the blind proofs plan intends, and the hidden tests are a hold-out nobody in the factory sees.
 
-What the run must say about itself: one campaign cannot tell three checkpoints from noise, so the erosion and verbosity numbers lead and the strict rate follows. Dex's single-model campaigns cost $178 to $1,550 each in model calls, and the factory's gates add their own calls on top.
+Two runs give more than one. The same catalogue with the structural gate of 3.3 on and off measures the gate's effect, which is the experiment the benchmark's authors have not run. By the noise analysis, telling a three-checkpoint difference from noise takes 2 to 11 campaigns per arm, so the comparison either runs that many or reports the erosion and verbosity numbers only and claims nothing about the strict rate.
+
+What the run must say about itself: one campaign cannot tell three checkpoints from noise, so the erosion and verbosity numbers lead and the strict rate follows. Dex's single-model campaigns cost $178 to $1,550 each in model calls, and the factory's gates add their own calls on top, so the budget decision is per arm, not per run.
 
 ### 3.3 The slop detector and the structural metrics
 
@@ -61,6 +84,10 @@ The metrics, taken from the benchmark so the numbers compare: duplication share,
 
 Tools per language go in the template. For TypeScript, Dillon Mulroy's anti-slop Oxlint rules, copied into the repository as the author intends. For Go, a duplication tool and a complexity tool next to the check script's linters.
 
+The measurement itself reuses the benchmark's open metric code, so the factory's numbers and the leaderboard's compare without argument. The anti-slop rules and the language tools push back on the agent inside the build. The benchmark's code measures the result.
+
+Two more lines join the trend, because the evidence names them: incidents per merge, fed by the telemetry loop, and lines added per merge. A trip on any line files the same review card. A mutation score stays the roadmap's mutation testing item.
+
 Decision needed: whether the per-merge number only files the audit card or also blocks the merge above a threshold. Start with filing.
 
 ### 3.4 The rolling architecture review, triggered by merges or by a metric
@@ -69,9 +96,11 @@ The review exists on paper as the audit routine of [routines.md](routines.md), "
 
 The review's inputs: the blind read of 3.1, the decided architecture of 3.6, the trend of 3.3 and the merges since the last run. Its outputs: findings as cards, and an amendment to the decision log where the shape changed on purpose.
 
+The findings are refactor and debt cards, filed by the agent like any audit finding, under the project's month cap. The human sees them on the board and approves none of them one by one. The cap bounds what debt work costs in a month, which is the bound Yegge's factory lacked.
+
 ### 3.5 The adversarial round: the claim against the code
 
-A critic gets two artifacts, the builder's claim and the blind read. The claim is what the factory already holds: the plan's architecture statement, the pull request description, the integration card's summary. The critic names each disagreement: a boundary the claim has and the code does not, a dependency the code has and the claim omits, a module the claim calls one thing and the code treats as another. Each disagreement becomes a row for the human or a finding in the audit card. The principle is the one of [design/process.md](../design/process.md): the model that wrote a thing is never its only judge.
+A critic gets two artifacts, the builder's claim and the blind read. The claim is what the factory already holds: the plan's architecture statement, the pull request description, the integration card's summary. The critic names each disagreement: a boundary the claim has and the code does not, a dependency the code has and the claim omits, a module the claim calls one thing and the code treats as another. The critic sorts each disagreement into one of two kinds. A drift, where the code left the decided shape, becomes a row for the human. A claim error, where the claim misdescribes code that is in its decided shape, becomes a finding in the audit card and a correction of the claim. There is no third kind, so the critic has no bucket for taste. The principle is the one of [design/process.md](../design/process.md): the model that wrote a thing is never its only judge.
 
 ### 3.6 The decision log: intent next to the change
 
@@ -90,7 +119,7 @@ The seeds do not remove the stronger-model review at the gate. They put a progra
 
 ## 5. Decisions the seeds need
 
-1. The budget and the model for the SlopCodeBench run, and whether to run it twice for the gate's effect.
+1. The budget and the model for the SlopCodeBench run, whether to run the gate on and off, and how many campaigns per arm.
 2. Whether the per-merge structural number files the audit card only, or also blocks a merge above a threshold.
 3. Where the decision log lives: in the project's repository, or in the factory's records so the blind read stays blind.
 4. When the blind read runs: at a plan's close, at the audit, or both.
