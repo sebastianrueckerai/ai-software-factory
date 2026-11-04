@@ -3378,11 +3378,12 @@ here.", and the code refuses `approve_merge` and `deny_merge` from a
 turn in the inbox at merge rule `human`, naming `attach_analysis`, so no
 proposal doubles the row's own Approve button. The agent never approves
 a GitHub sync's pull request: `doApprove` refuses an agent's approval of
-a task whose source is the sync, at every merge rule. For the attempt
-the `card` read's merge line names the review's verdict, the
-strict-improvement word, the head's first seven characters and the red
-jobs, or `checks red at open, green since` when a re-run on the head
-passed.
+a task whose source is the sync, at every merge rule. The wake's line
+for such a row says so, `a human approves`, so the turn attaches its
+analysis instead. For the attempt the `card` read's merge line names the
+review's verdict, the strict-improvement word, the head's first seven
+characters and the red jobs, or `checks red at open, green since` when a
+re-run on the head passed.
 
 Every needs-you card gets a thread, the card door. Code writes the first
 message from the ask record, the five parts plus the attempt's analysis
@@ -3414,7 +3415,9 @@ answer in words lands in the human's own thread. The inbox's rows keep
 every button: the five-part ask, the inline answer, a proposal's Do it,
 undo, fund, the card door, and every choice button, which posts to
 `/chat/answer` since the typed path is closed. An `ask` from a turn in
-the inbox must carry choices. A database check,
+the inbox must carry choices. An unbound ask stands until a row answers
+it, a human's words or a pressed choice, since a poke or a wake's row
+answers nothing. A database check,
 `chat_conversations_inbox_never_current`, forbids an inbox that is
 current, and a read of the inbox never makes it current, so a human
 lands on a thread of their own and opens the inbox from the switcher.
