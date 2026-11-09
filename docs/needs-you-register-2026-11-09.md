@@ -107,7 +107,7 @@ Twice on the same card: at 18:58 the review's answer was empty (`model review an
 
 ## 25. A schema migration's merge waits for a human's approval (#1585, PR #1604)
 
-The receipt card's pull request adds the table `merge_receipts`, so the policy gate reads risk class **migration**, requires_approval: "A human approves the merge." The model review approved at 19:30 (the migration as described, first write stands) and CI was green at 19:40. The rail is deliberate: a human reads the SQL before it runs on the factory's own database. Who decided: see below, after the five minutes rung 2 gets first. Verdict: **by design**, and decision 7 asks whether it still fits the rule: rung 2 has the SQL, the review and the policy gate's facts, which is what a human reads too.
+The receipt card's pull request adds the table `merge_receipts`, so the policy gate reads risk class **migration**, requires_approval: "A human approves the merge." The model review approved at 19:30 (the migration as described, first write stands) and CI was green at 19:40. The rail is deliberate: a human reads the SQL before it runs on the factory's own database. Who decided: the factory agent, on rung 2, at 19:45, two minutes after the approval request opened ("sebastian approved PR #1604 ... via chat"), and factory-merge merged it at once. So the policy's "a human approves" is met by rung 2 acting as Sebastian, and the factory approved its own schema migration with no human reading the SQL. Verdict: **works** on rung 2, **by design** at the policy. Decision 7 asks whether that is wanted.
 
 ## Decisions this register asks of Sebastian
 
@@ -117,4 +117,4 @@ The receipt card's pull request adds the table `merge_receipts`, so the policy g
 4. Entry 12: merge pull request #1582, then set the routine `weekly-bump` to `files: agent` in the infra project file, so the bump runs as an agent card whole.
 5. Entry 20: how long the factory's own deploy may hold on an open plan when many plans run at once.
 6. Entry 21: merge the bump's pull request #1598 with its image build red once its tests are green, or wait for #1603.
-7. Entry 25: does rung 2 approve a schema migration on the factory's own project from the SQL, the review and the policy gate's facts, or does a migration stay a human's read?
+7. Entry 25: rung 2 approved a schema migration on the factory's own project (PR #1604) from the SQL, the review and the policy gate's facts, two minutes after the request. Does a migration stay with rung 2, or does the risk class `migration` need a human's read that rung 2 cannot give?
