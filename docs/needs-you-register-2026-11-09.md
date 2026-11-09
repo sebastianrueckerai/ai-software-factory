@@ -101,6 +101,14 @@ Entry 8's shape, four times today: 10:22 (#1544, 0.03 EUR free), 17:42 and 18:18
 
 At 19:09 #1572's check-in stopped on "the check-in's share of the budget is spent", with 0.45 EUR of check-in spend against a 0.20 EUR share. Claude replied at 19:14 to start the attempt. The reply grants one more share (0.40 in all), still under the 0.45 spent, so session 4 met the same check at its start (`checkinBlock`, before any model call) and ended within a minute with zero model calls; the stop came back at 19:29 with `grant_bought_nothing` and `money_ask_hides_findings` beside it. Who decided: the factory agent at 19:32, with an extend of one more share (case 159), so session 5 runs on 0.15 EUR of check-in headroom. What full auto should do: a grant that cannot cover the spend is no grant; the face offers "one more share (€0.20)" against a spend it cannot reach. Why it did not: the grant is one base share by construction (`TaskUsage.ExtraCheckinShare`). Verdict: **bug**. Phase 3's #1563 removes the share stop, so no new card. Until it lands: when the spent figure is more than one share over, reply and extend one share.
 
+## 24. A review's answer did not parse, and the review counted as not run (#1565, PR #1600)
+
+Twice on the same card: at 18:58 the review's answer was empty (`model review answer invalid (EOF)`), at 19:38 it was cut inside its summary at the output bound (`unexpected EOF`, the JSON began `{"verdict": "approve", "summary": ...`). `parseReview` makes an answer that does not parse a note, never a failure, so the review counts as not run, `review_refused_not_run` flags it, and the case reaches the factory agent with nothing to do but note. Who decided: the factory agent, with a note at 19:39, and the card waits for its next head for a review. What full auto should do: the step corrects itself: one more call with the parse error and the bounds in the input, the note only after a second failure. Verdict: **bug**, card #1606.
+
+## 25. A schema migration's merge waits for a human's approval (#1585, PR #1604)
+
+The receipt card's pull request adds the table `merge_receipts`, so the policy gate reads risk class **migration**, requires_approval: "A human approves the merge." The model review approved at 19:30 (the migration as described, first write stands) and CI was green at 19:40. The rail is deliberate: a human reads the SQL before it runs on the factory's own database. Who decided: see below, after the five minutes rung 2 gets first. Verdict: **by design**, and decision 7 asks whether it still fits the rule: rung 2 has the SQL, the review and the policy gate's facts, which is what a human reads too.
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
@@ -109,3 +117,4 @@ At 19:09 #1572's check-in stopped on "the check-in's share of the budget is spen
 4. Entry 12: merge pull request #1582, then set the routine `weekly-bump` to `files: agent` in the infra project file, so the bump runs as an agent card whole.
 5. Entry 20: how long the factory's own deploy may hold on an open plan when many plans run at once.
 6. Entry 21: merge the bump's pull request #1598 with its image build red once its tests are green, or wait for #1603.
+7. Entry 25: does rung 2 approve a schema migration on the factory's own project from the SQL, the review and the policy gate's facts, or does a migration stay a human's read?
