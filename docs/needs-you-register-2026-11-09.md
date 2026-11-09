@@ -129,6 +129,10 @@ At 20:02 rung 2 answered the pace stop with "reverify": "the four fixes are comm
 
 Rung 2 approved PR #1612 at 20:16. At 20:27, right after the queue's turn merged main into the branch, Forgejo refused the merge with `status 405: Please try again later`, which it answers while its own conflict check on the new head runs. factoryd read the refusal as "the pull request no longer merges into main" and bought a session (20:28) for the agent to merge a main that was already merged; the pull request read `mergeable: true` throughout. Who decided: factoryd, rung 0, wrongly. What full auto should do: wait for Forgejo's check and merge again; a conflict is a head Forgejo reports as not mergeable. Verdict: **bug**, card #1614.
 
+## 31. The bump's image build stalls: three Dockerfiles built at once on one build VM (#1574, PR #1598)
+
+Once the store held the new bases, `pr / image-build` got past its old failure and built all three Dockerfiles in one build VM at once. Dockerfile.runner's warm-up step (build, vet, compile every test) reached internal/doclinks at 386 s and then printed nothing for over 1000 s, on two heads; on main the same step runs alone in its own job and takes 111 s. Three parallel builds share one small VM, and the runner's compile of internal/factoryd's tests is the one that starves. Who decided: nobody yet, the job runs on. What full auto should do: build the changed Dockerfiles one at a time, or one VM each as ci.yml does. Verdict: **bug** in the pull-request job's shape, first seen because no earlier pull request changed all three Dockerfiles with a store that could serve them; card #1619.
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
