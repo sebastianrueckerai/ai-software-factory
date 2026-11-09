@@ -89,6 +89,10 @@ At 16:49 roll #1576 failed: `pr / test` killed after 15m56s, its log silent afte
 
 Since 16:55 the roller writes "plan #1546 is open on main: no roll until no plan is open on main" and "the factory's Kustomization is suspended". The show_doc plan merged its first card (#1562) and its two others are not in, so item 336's group hold keeps production at c8c4b521 until the plan is whole or a human presses Deploy now after the 6-hour ask (due about 22:55). Meanwhile the merges of #1554, #1555 and #1562 wait, and the false flag of #1555 keeps firing on the live code. Who decided: nobody yet. Verdict: **by design**, first live run of the hold. The decision it raises: with seven plans in flight on the factory's own project, a plan is nearly always open on main, so the factory's own deploy lags main by hours. Candidates: a shorter ask for the factory's own project, or the hold only for a plan whose merged part changes what a human sees.
 
+## 21. The bump's pull request cannot pass its own image build (#1574, PR #1598)
+
+At 19:05 the card's check-in stopped with "access the factory lacks": the bump is pushed (PR #1598), and `pr / image-build` fails at `load metadata` for the store's copy of the new golang base, because the store gets a new upstream-images.txt line from main's upstream job after the merge. The routine's brief describes a pull-request build from the upstreams that does not exist, and the untrusted pull-request job holds no registry write credential by design. The test job is red too (`TestUpstreamImagesPinEachImageByDigest` on Dockerfile.sandbox, `TestFactoryStackIsTheFactoryImage`), which the card's next session fixes. Who decided: the factory agent resumed the card at 19:07 for session 4. What full auto should do: the store holds a pull request's new lines before its build runs. Verdict: **by design** gap, card #1603 (factoryd copies the pull request's new lines into the store, trusted side). Until it lands, a bump pull request reaches the human with its tests green and its image build red, and the human merges it on that evidence or waits for #1603.
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
@@ -96,3 +100,4 @@ Since 16:55 the roller writes "plan #1546 is open on main: no roll until no plan
 3. Entry 10: a Job-failed alert card closes when its CronJob completes after the failure.
 4. Entry 12: merge pull request #1582, then set the routine `weekly-bump` to `files: agent` in the infra project file, so the bump runs as an agent card whole.
 5. Entry 20: how long the factory's own deploy may hold on an open plan when many plans run at once.
+6. Entry 21: merge the bump's pull request #1598 with its image build red once its tests are green, or wait for #1603.
