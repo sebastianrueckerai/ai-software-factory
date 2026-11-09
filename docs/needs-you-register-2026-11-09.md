@@ -81,6 +81,10 @@ At 16:43:39 the roll card #1576 stopped: "The gate supervisor stopped WaitChecks
 
 Session 2 of #1556 ran from 16:22 to 16:47, wrote `internal/policy/manual.go` (206 lines) with its tests, and its three pushes at the end were rejected with "rejected or expired credentials". The pod ended with the work in it. Who decided: Claude, by a reply that starts a new attempt with "push first". What full auto should do: a session's push credential outlives the session's agent-time cap, and the work survives the session (card #1580). Verdict: **bug**, cause to find in the worker's push path and the credential's life. The third push-path loss of the day after #1540 and #1471.
 
+## 19. A roll failed on a test job that ran the whole suite for a k8s-only diff (#1576)
+
+At 16:49 roll #1576 failed: `pr / test` killed after 15m56s, its log silent after the first package at 16:34. The roll's diff is k8s/*.yaml, and the package selection runs the whole suite for any non-Go change, cold, on the untrusted runner, beside the day's other pull requests. Main's own test run on the same code had passed. Who decided: nobody. The roll card is failed, the board offers it no Retry (a roll is no work card), and the merges of #1554 and #1555 wait for the next roll. What full auto should do: a roll's pull request tests what its diff reaches, and a roll whose job was killed without output runs once more before it fails, as a lost runner does. Verdict: **bug**, card for the selection filed (the k8s-only rule), the re-run of a killed job open.
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
