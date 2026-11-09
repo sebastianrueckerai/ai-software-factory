@@ -53,9 +53,21 @@ Five "Job failed" and "Premium served by another model" alerts on a project with
 
 Three sessions today (#1542 sessions 1 and 2, #1543 session 2). `bash check changed` runs with `-p 2` and fits. Verdict: **bug**, card #1570 (the sandbox bounds every `go test` as `bash check` does).
 
-## 12. The weekly bump files a human card (#1551)
+## 12. The weekly bump's hand-over to the factory loses its work at the push (#1540, #1471)
 
-The routine `weekly-bump` has `files: human`. The chat's comment "Have the factory do it" asks for an agent card. Why it did not: the sandbox has no egress to the image registries, so `crane digest` fails on the first line, and the infra half has no agents. Verdict: **by design**, decision open: an egress rule for the registries in the infra tree, then `files: agent` for the code half.
+The routine `weekly-bump` files a human card with the choice "Have the factory do it". Sebastian pressed it on #1540 at about 09:05. The agent did the bump in one session: 15 files, +96/-96, `bash check changed` green. The push was refused: `refusing to push: .forgejo/ differs from the base`. The bump edits the `BUILDKIT` pin in `.forgejo/workflows/ci.yml`, and the push rule (`cmd/agent-worker/main.go`, `WorkflowDirs`) lets no agent change a workflow file. Session 2 redid the work and was OOMKilled. Run 2 (#1471, 2026-11-02) was lost at the push too, to a tooling fault. What full auto should do: finish the bump. Why it did not: the push rule is right, and the pin sits in the one place an agent may not write. Verdict: **by design**, with a fix by hand: ci.yml reads the buildkit line from `upstream-images.txt`, which already carries it, so the bump never touches `.forgejo/`. Until then, card #1574 bumps everything outside `.forgejo/` and names the ci.yml line for a human.
+
+## 14. The press "Have the factory do it" on #1551 did nothing
+
+Sebastian pressed it at 10:40:48. The press posted its comment on the issue (as `factory-chat`) and left no event on the card: the timeline holds `card_created` at 10:39:59 and nothing after, and the card stayed a human card. The card was 49 seconds old. factoryd's log of that minute is gone: roll #1552 replaced the pod at 10:57. Verdict: **bug**, cause unknown. To reproduce: press the choice on a routine's human card within a minute of its filing, and read the log.
+
+## 15. The factory agent's `close` on a flag's case ended the card (#1540)
+
+At 10:38:38 the factory agent answered case 54, a `grant_bought_nothing` flag, with `close` and the note "the flag's concern is settled … the replan's 4.36 EUR is now running session 0". `Act` closed the card: the issue closed, the replan's session was lost, and the routine filed #1551 eighty seconds later. A monitor-flag case offers `close` (`monitorActions` in actions.go), and `close` on any case ends the card. The agent read it as "close this case". Verdict: **bug**, card #1575.
+
+## 16. A roll restarted factoryd under a running loop (#1552)
+
+Roll #1552 of c8c4b521 (the merge of #1544) replaced the factoryd pod at 10:57. The restart is by design and keeps every workflow. It cost the log of the morning, which entry 14 needed. Verdict: **works**. A note for the operations residue: the log lives in the pod alone, so a roll ends the record of the hour before it.
 
 ## 13. "Needs a human" is posted before rung 2 had its turn
 
@@ -66,4 +78,4 @@ Every monitor flag posts "factoryd: task … needs a human. … The card goes on
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
 2. Entry 9: a daily list of cards waiting on a human for longer than a bound, in the inbox.
 3. Entry 10: a Job-failed alert card closes when its CronJob completes after the failure.
-4. Entry 12: an egress rule for the registries, so the weekly bump can run as an agent card.
+4. Entry 12: ci.yml reads the buildkit pin from `upstream-images.txt`, a change under `.forgejo/` that a human makes once, so the weekly bump can run as an agent card whole.
