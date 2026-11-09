@@ -6066,3 +6066,14 @@ roadmap item that holds it is named.
   live: a child starting on its dependency's end, since #1297's merge
   (pull request #1300) waits for a human under the code project's merge
   rule.
+
+### 2026-11-04: the roadmap items that landed
+
+- 341, a poke with choices settles when it is answered, not when it is
+  read. A Retry / Leave it poke on a failed card keeps its buttons while
+  their action applies: it settles when a press or a human's words
+  answered it, or when its card moved on (a status change, the task's
+  end, a retry, a close). A poke without choices still settles by the
+  seen marker. Sebastian (2026-11-04): out-of-date buttons and controls
+  vanish, and a button stays while its action applies. Code 362f2238,
+  live on 2026-11-04.
