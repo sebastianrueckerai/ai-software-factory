@@ -1,0 +1,69 @@
+# Needs you on full auto: what stopped, who decided, and why the factory did not
+
+Started 2026-11-09. The rule (Sebastian, 2026-11-09): on full auto the factory agent looks at every stop first and decides whenever it can. A human decides only what the factory cannot. This register records every stop that reached Needs you, who decided it in the end, what full auto should have done, and why it did not. It is the list of what to fix. Each entry carries one of four verdicts:
+
+- **not built**: the step that should decide exists in the design and not in the code. The entry names the phase or card that builds it.
+- **bug**: the step exists and acts wrong. The entry names the card.
+- **by design**: the design sends this stop to a human. The entry says whether that still fits the rule, and names the decision if not.
+- **works**: the factory decided on its own. Kept so the record shows what already holds.
+
+The entries come from the board loop of 2026-11-09 (notes in `session-notes-2026-11-09-board-loop.md`, untracked). The code is main `e3c62276`. Phases refer to [card-flow-redesign-2026-11-02.md](card-flow-redesign-2026-11-02.md) section 9. Phase 3 is plan #1541's round 1 (cards #1559, #1561, #1563, #1566). Phases 4 and 5 are its rounds 2 and 3.
+
+## 1. A plan's questions wait for a human
+
+Nine questions on the revision 1 of plans #1541, #1545, #1547 and #1548. Every question carried a recommended choice. Who decided: Claude, as Sebastian, by a comment on the issue. What full auto should do: take the recommended answer, record it as the factory's, and let a human overrule in the revision. Why it did not: phase 4, the first shot (design 5.9, "the planner's recommended answers"), is not built. The planner already marks the recommendation, so the first shot is one rule at the plan's filing. Verdict: **not built**, phase 4.
+
+## 2. A plan's confirmation waits for a human
+
+Six plans, #1541 and #1545 to #1549. Who decided: Claude, as `controller`, through the console. What full auto should do: the design says a human confirms the spec and the criteria ([spec-driven.md](spec-driven.md): "the human confirms, never writes"), at every autonomy level. Sebastian's rule of today says the factory decides whenever it can. These two conflict. Candidate: at full auto, a plan whose questions are all answered confirms itself after a wait (one hour, say), and a human's Request changes within that hour wins. Verdict: **by design**, decision open: does the confirmation stay human at full auto?
+
+## 3. A plan's hold-out candidates wait for an okay or a drop
+
+Seven candidates on five plans. Each was sound, and all were okayed. Who decided: Claude, as `controller`. What full auto should do: okay the candidates by default, since a wrong one costs the builder one session with the test in hand ([spec-driven.md](spec-driven.md), the limits). Why it did not: the drop is the human's by design, and the confirmation refuses until every candidate is decided. Verdict: **by design**, the same decision as entry 2.
+
+## 4. `grant_bought_nothing` on a planner's session
+
+Seen on #1540, #1541, #1543, #1545, #1547 and #1548. A human's answer counts as a grant, the planner's next session files a revision and pushes nothing, and the flag fires. Who decided: the factory agent, on rung 2, within a minute each time. What full auto should do: not raise the flag. Why it did not: the rule in `carddigest_flags.go` tests the session for `pushed` and has no sibling for a filed revision. Verdict: **bug**, card #1555.
+
+## 5. Agent time used up after two OOMKilled sessions (#1542)
+
+Both sessions ran a bare `go test -race ./...` and the 4 GiB sandbox killed the worker. The face said "Use Extend on the board". Who decided: Claude closed the card and refiled it as #1554 with `bash check changed` named. What full auto should do: rung 1 reads the digest, sees two sessions killed on the same command, and restarts with the test command named. Why it did not: rung 1 is not built (phase 3), and the sandbox lets a bare `go test` exceed its memory. Verdict: **not built**, phase 3 (#1561), plus the sandbox card for the trap (see entry 11).
+
+## 6. The check-in hit its own 10-minute cap (#1543)
+
+The check-in, the step that judges a stop, ran out of time and the card went to a human with "Reply on this issue to start a new attempt". The stop's label was `spend_above_policy`, a money word on a time cap. Who decided: Claude, by a reply. What full auto should do: a check-in that fails is the factory's own failure and goes to rung 2, never to a human. Why it did not: phase 3 rebuilds the check-in as a forced tool call on the case, with the digest instead of the whole transcript, and the cap's misnaming is a wording bug in the stop template. Verdict: **not built**, phase 3 (#1559, #1561). The label is a small bug to fix with #1559.
+
+## 7. Agent time used up, and rung 2 bought the wrong thing (#1543)
+
+At 15:55:49 the factory agent extended the card by one session. The cap that tripped was agent time, so the card stopped again at once. The monitor flagged `answer_changed_nothing`, the agent raised the ceiling at 15:56:42, and at 15:57:43 it replanned the card, which turned a 20-line fix into a plan. Who decided: the factory agent, in three tries. What full auto should do: the first action fits the trip fact, agent time at a time cap, as the Grant button already does since phase 2a. Why it did not: rung 2 chooses from the whole action set and the trip fact does not bind the fitting one. Verdict: **bug** in rung 2's choice. Check after phase 3's forced call (#1559) whether the trip fact reaches rung 2's schema. If not, a card.
+
+## 8. The review refused for money (#1544)
+
+The review was refused with 0.03 EUR of headroom. The factory agent funded 2.00 EUR from the pool at 10:24, the review ran, the card merged. Verdict: **works**.
+
+## 9. A card waited on a human for 27 days (#568)
+
+A Stage 19 verification card from 2026-10-13 sat in Needs you until Claude closed it. What full auto should do: a daily sweep lists every card waiting on a human for longer than a bound. Why it did not: Sebastian ruled no clocks on a wait at the human (design decisions of 2026-11-02), and the stale-card poke of [routines.md](routines.md) is a candidate routine with no file entry. Verdict: **by design**, decision open: a daily list of long human waits in the inbox is not a clock and would have caught this.
+
+## 10. Alert cards on the infra project (#235, #239, #240, #241, #250)
+
+Five "Job failed" and "Premium served by another model" alerts on a project with no agents. Each job's CronJob completed on its next run. Who decided: Claude closed each with a note. What full auto should do: a "Job failed" alert whose CronJob completes after the failure closes its card with that fact. Why it did not: the alert rule labelled `event` keeps its card until a person closes it (ruled 2026-10-28, after a backup card closed itself on SigNoz's resolve). The job's later success is a different and deterministic signal from SigNoz's resolve. Verdict: **by design**, decision open: a closer on the CronJob's next completion for Job-failed alerts.
+
+## 11. A bare `go test -race ./...` kills the sandbox
+
+Three sessions today (#1542 sessions 1 and 2, #1543 session 2). `bash check changed` runs with `-p 2` and fits. Verdict: **bug**, card #1570 (the sandbox bounds every `go test` as `bash check` does).
+
+## 12. The weekly bump files a human card (#1551)
+
+The routine `weekly-bump` has `files: human`. The chat's comment "Have the factory do it" asks for an agent card. Why it did not: the sandbox has no egress to the image registries, so `crane digest` fails on the first line, and the infra half has no agents. Verdict: **by design**, decision open: an egress rule for the registries in the infra tree, then `files: agent` for the code half.
+
+## 13. "Needs a human" is posted before rung 2 had its turn
+
+Every monitor flag posts "factoryd: task … needs a human. … The card goes on meanwhile. Answer case N in the project chat" on the issue, and a minute later the factory agent answers it on rung 2. The human reads a call for help that was already answered. What full auto should do: post the face only when rung 2 declined or the kind is the human's. Verdict: **not built**, phase 4 (rung 2 on every case before the human).
+
+## Decisions this register asks of Sebastian
+
+1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
+2. Entry 9: a daily list of cards waiting on a human for longer than a bound, in the inbox.
+3. Entry 10: a Job-failed alert card closes when its CronJob completes after the failure.
+4. Entry 12: an egress rule for the registries, so the weekly bump can run as an agent card.
