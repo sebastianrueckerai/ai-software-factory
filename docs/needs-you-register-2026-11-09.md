@@ -85,9 +85,14 @@ Session 2 of #1556 ran from 16:22 to 16:47, wrote `internal/policy/manual.go` (2
 
 At 16:49 roll #1576 failed: `pr / test` killed after 15m56s, its log silent after the first package at 16:34. The roll's diff is k8s/*.yaml, and the package selection runs the whole suite for any non-Go change, cold, on the untrusted runner, beside the day's other pull requests. Main's own test run on the same code had passed. Who decided: nobody. The roll card is failed, the board offers it no Retry (a roll is no work card), and the merges of #1554 and #1555 wait for the next roll. What full auto should do: a roll's pull request tests what its diff reaches, and a roll whose job was killed without output runs once more before it fails, as a lost runner does. Verdict: **bug**, card for the selection filed (the k8s-only rule), the re-run of a killed job open.
 
+## 20. The factory's own deploy holds while a plan is open on main (the group hold)
+
+Since 16:55 the roller writes "plan #1546 is open on main: no roll until no plan is open on main" and "the factory's Kustomization is suspended". The show_doc plan merged its first card (#1562) and its two others are not in, so item 336's group hold keeps production at c8c4b521 until the plan is whole or a human presses Deploy now after the 6-hour ask (due about 22:55). Meanwhile the merges of #1554, #1555 and #1562 wait, and the false flag of #1555 keeps firing on the live code. Who decided: nobody yet. Verdict: **by design**, first live run of the hold. The decision it raises: with seven plans in flight on the factory's own project, a plan is nearly always open on main, so the factory's own deploy lags main by hours. Candidates: a shorter ask for the factory's own project, or the hold only for a plan whose merged part changes what a human sees.
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
 2. Entry 9: a daily list of cards waiting on a human for longer than a bound, in the inbox.
 3. Entry 10: a Job-failed alert card closes when its CronJob completes after the failure.
 4. Entry 12: merge pull request #1582, then set the routine `weekly-bump` to `files: agent` in the infra project file, so the bump runs as an agent card whole.
+5. Entry 20: how long the factory's own deploy may hold on an open plan when many plans run at once.
