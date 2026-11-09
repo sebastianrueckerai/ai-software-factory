@@ -125,6 +125,10 @@ Main's `notRunRow` (workflow_stages.go:776) reads `if !t.waitsOutOfQueue() { ret
 
 At 20:02 rung 2 answered the pace stop with "reverify": "the four fixes are committed and pushed, PR #1598's head reads 711108a2 (two commits past a6056e2f)". The two commits past a6056e2f are factoryd's own ("run the checks again", "Merge branch 'main'"), and run 2494 had failed the test job on 711108a2 at 19:51 with the four findings. Claude posted the correction at 20:04 and the next session pushed e12aef67 at 20:13 with two of the four fixes (the snapshot and the digest), not the node version in sandbox.go:42 and toolpark.go:60. What full auto should do: the case digest names the head's commits with their authors and the last check results, so a "fixes are pushed" reading is a lookup, not a guess. Verdict: **bug** in the facts rung 2 reads, a candidate for the digest (design 5.1).
 
+## 30. A merge refused with "Please try again later" was read as a conflict (#1583, PR #1612)
+
+Rung 2 approved PR #1612 at 20:16. At 20:27, right after the queue's turn merged main into the branch, Forgejo refused the merge with `status 405: Please try again later`, which it answers while its own conflict check on the new head runs. factoryd read the refusal as "the pull request no longer merges into main" and bought a session (20:28) for the agent to merge a main that was already merged; the pull request read `mergeable: true` throughout. Who decided: factoryd, rung 0, wrongly. What full auto should do: wait for Forgejo's check and merge again; a conflict is a head Forgejo reports as not mergeable. Verdict: **bug**, card #1614.
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
