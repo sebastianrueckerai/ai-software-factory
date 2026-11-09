@@ -55,7 +55,7 @@ Three sessions today (#1542 sessions 1 and 2, #1543 session 2). `bash check chan
 
 ## 12. The weekly bump's hand-over to the factory loses its work at the push (#1540, #1471)
 
-The routine `weekly-bump` files a human card with the choice "Have the factory do it". Sebastian pressed it on #1540 at about 09:05. The agent did the bump in one session: 15 files, +96/-96, `bash check changed` green. The push was refused: `refusing to push: .forgejo/ differs from the base`. The bump edits the `BUILDKIT` pin in `.forgejo/workflows/ci.yml`, and the push rule (`cmd/agent-worker/main.go`, `WorkflowDirs`) lets no agent change a workflow file. Session 2 redid the work and was OOMKilled. Run 2 (#1471, 2026-11-02) was lost at the push too, to a tooling fault. What full auto should do: finish the bump. Why it did not: the push rule is right, and the pin sits in the one place an agent may not write. Verdict: **by design**, with a fix by hand: ci.yml reads the buildkit line from `upstream-images.txt`, which already carries it, so the bump never touches `.forgejo/`. Until then, card #1574 bumps everything outside `.forgejo/` and names the ci.yml line for a human.
+The routine `weekly-bump` files a human card with the choice "Have the factory do it". Sebastian pressed it on #1540 at about 09:05. The agent did the bump in one session: 15 files, +96/-96, `bash check changed` green. The push was refused: `refusing to push: .forgejo/ differs from the base`. The bump edits the `BUILDKIT` pin in `.forgejo/workflows/ci.yml`, and the push rule (`cmd/agent-worker/main.go`, `WorkflowDirs`) lets no agent change a workflow file. Session 2 redid the work and was OOMKilled. Run 2 (#1471, 2026-11-02) was lost at the push too, to a tooling fault. What full auto should do: finish the bump. Why it did not: the push rule is right, and the pin sits in the one place an agent may not write. Verdict: **by design**, with a fix by hand: ci.yml reads the buildkit line from `upstream-images.txt`, which already carries it, so the bump never touches `.forgejo/`. Pull request #1582 makes that change (Sebastian's go, 2026-11-09). Until it merges, card #1574 bumps everything outside `.forgejo/` and names the ci.yml line for a human. Two cards follow from the loss itself: #1580 (plan), the worker pushes its branch at every check-in so a dead session loses no work, and #1581, a write under a workflow directory tells the session at once that the push will refuse it.
 
 ## 14. The press "Have the factory do it" on #1551 did nothing
 
@@ -73,9 +73,17 @@ Roll #1552 of c8c4b521 (the merge of #1544) replaced the factoryd pod at 10:57. 
 
 Every monitor flag posts "factoryd: task … needs a human. … The card goes on meanwhile. Answer case N in the project chat" on the issue, and a minute later the factory agent answers it on rung 2. The human reads a call for help that was already answered. What full auto should do: post the face only when rung 2 declined or the kind is the human's. Verdict: **not built**, phase 4 (rung 2 on every case before the human).
 
+## 17. A roll's checks wait asks a human at 10 minutes while the test job runs (#1576)
+
+At 16:43:39 the roll card #1576 stopped: "The gate supervisor stopped WaitChecks (attempt 1) past its bound of 10m0s: a roll task makes no model call: its gate trip goes to a human." Five of the pull request's six jobs were green and `pr / test` still ran, as it does for longer than 10 minutes on a change that reaches factoryd. Who decided: Claude, by a reply that restarts the same wait. What full auto should do: wait as long as CI's own bound. Verdict: **bug**, card #1578.
+
+## 18. A session's pushes were rejected at its end, and the work was lost (#1556)
+
+Session 2 of #1556 ran from 16:22 to 16:47, wrote `internal/policy/manual.go` (206 lines) with its tests, and its three pushes at the end were rejected with "rejected or expired credentials". The pod ended with the work in it. Who decided: Claude, by a reply that starts a new attempt with "push first". What full auto should do: a session's push credential outlives the session's agent-time cap, and the work survives the session (card #1580). Verdict: **bug**, cause to find in the worker's push path and the credential's life. The third push-path loss of the day after #1540 and #1471.
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
 2. Entry 9: a daily list of cards waiting on a human for longer than a bound, in the inbox.
 3. Entry 10: a Job-failed alert card closes when its CronJob completes after the failure.
-4. Entry 12: ci.yml reads the buildkit pin from `upstream-images.txt`, a change under `.forgejo/` that a human makes once, so the weekly bump can run as an agent card whole.
+4. Entry 12: merge pull request #1582, then set the routine `weekly-bump` to `files: agent` in the infra project file, so the bump runs as an agent card whole.
