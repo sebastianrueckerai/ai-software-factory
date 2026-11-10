@@ -162,7 +162,7 @@ Plan #1548's four cards are done and its three proofs stored, yet "the criteria 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
 2. Entry 9: a daily list of cards waiting on a human for longer than a bound, in the inbox.
 3. Entry 10: a Job-failed alert card closes when its CronJob completes after the failure.
-4. Entry 12: merge pull request #1582, then set the routine `weekly-bump` to `files: agent` in the infra project file, so the bump runs as an agent card whole.
+4. Entry 12: done on 2026-11-10: Sebastian ruled that the controller merges the workflow pull requests it opens (#1582 and #1643 merged 10:00); the routine `weekly-bump` moves to `files: agent` in the infra project file, so the bump runs as an agent card whole.
 5. Entry 20: how long the factory's own deploy may hold on an open plan when many plans run at once.
 6. Entry 21: merge the bump's pull request #1598 with its image build red once its tests are green, or wait for #1603.
 7. Entry 25: rung 2 approved a schema migration on the factory's own project (PR #1604) from the SQL, the review and the policy gate's facts, two minutes after the request. Does a migration stay with rung 2, or does the risk class `migration` need a human's read that rung 2 cannot give?
