@@ -133,6 +133,30 @@ Rung 2 approved PR #1612 at 20:16. At 20:27, right after the queue's turn merged
 
 Once the store held the new bases, `pr / image-build` got past its old failure and built all three Dockerfiles in one build VM at once. Dockerfile.runner's warm-up step (build, vet, compile every test) reached internal/doclinks at 386 s and then printed nothing for over 1000 s, on two heads; on main the same step runs alone in its own job and takes 111 s. Three parallel builds share one small VM, and the runner's compile of internal/factoryd's tests is the one that starves. Who decided: nobody yet, the job runs on. What full auto should do: build the changed Dockerfiles one at a time, or one VM each as ci.yml does. Verdict: **bug** in the pull-request job's shape, first seen because no earlier pull request changed all three Dockerfiles with a store that could serve them; card #1619.
 
+## 32. The night of 2026-11-09 to 10: fourteen stops reached the board and waited up to seventeen hours
+
+The loop's session ended at about 21:40 UTC on the 9th; at 09:22 UTC on the 10th the Needs-you column held fourteen items. Rung 2 had kept deciding through the night (approvals, denials, funds, notes until 02:25), so what waited was what rung 2 does not take: plan confirmations (#1603 revision 2, #1545 revision 4, #1605 revision 1), merge calls after the session cap (#1574, #1590, #1599, #1587), two merges whose review returned no verdict or no second condition (#1632, #1638), two criteria requests on closed plans (#1543, #1548), the group hold's six-hour ask (#1626), a card whose fix lives under .forgejo/ (#1619), and a session grant (#1569). Claude as controller, 09:25 to 09:40: confirmed the three plans (their cards filed), confirmed #1543's criteria (the plan closed), approved #1632 and #1638 (merged 09:27), returned #1590, #1599 and #1587 to their agents with the review's findings as the mandate and one session each (3.00, 2.00 and a 3.00 fund), granted #1569 its session with the three red spots named, and opened the pull request for #1619 by hand. Verdict: **by design** for the confirmations and merge calls (register decisions 1 and 2 stand: a nightly list and a plan that confirms itself would have cleared this column by 02:00), **works** for everything rung 2 took.
+
+## 33. A review that answers no verdict leaves a human as the only judge (#1632, PR #1637; #1587, PR #1631)
+
+PR #1637 (a pure move of the push rules, checks green) reached the board because the model review's answer had text after its JSON (entry 24's shape, the third time in a day), so the merge rule's first condition was never met and "a human is the only judge of this merge". PR #1631's review did not run at all: the card had 0.00 EUR free (entry 22's shape). Who decided: Claude, from the diff's file list and the review's own unparsed text (approve, strict improvement true). Verdict: **bug**, cards #1606 and #1605 cover both.
+
+## 34. A card whose fix lives under .forgejo/ stops at the push rule (#1619)
+
+The card for the pull-request image build's parallel stall needs a change to .forgejo/workflows/pr.yml; the worker refuses the push by construction and the check-in stopped the card at session 2 with its tested diff lost: "only a human can apply it or re-scope the card". Who decided: Claude as controller, by making the change on the fork and opening the pull request, as for #1582. What full auto should do: a card whose files are all under a workflow directory is a human's card from the start (intake reads the paths; the card's face says so and asks the human for the pull request), and the agent's session is never bought. Verdict: **by design** at the push rule, **bug** at intake, which sized and bought two sessions for a card it could not land.
+
+## 35. The group hold's six-hour ask (#1626)
+
+At 22:55 the hold asked: "Production of ai-software-factory-code has waited 6 hours: plans ... are open on main. Wait, deploy anyway, or replan?" The factory agent attached an analysis at 22:56 and left the decision; production stays at the 10:57 roll of the 9th while main carries a day of merges. Who decided: nobody by 09:40 on the 10th. Verdict: **by design**, decision 5's live case; Sebastian decides it.
+
+## 36. The day's spend cap was reached at about 23:00 (#1603 and others)
+
+Several cards' faces at 23:00 read "the day cap is reached: the card resumes on its own once the day's free headroom funds a session, at the latest when the UTC day turns". The gateway refused the planner's spend with `refused_day_cap: free headroom 0.000003 EUR`. The cards resumed at 00:00 UTC as the face said. Who decided: nobody needed to. Verdict: **works**, a rail that did its job; whether `budget.day_eur` fits a day with twenty live cards is a policy question for Sebastian (decision 8).
+
+## 37. The criteria of a closed plan were never judged (#1548, approval 1115; #1543, approval 1108)
+
+Plan #1548's four cards are done and its three proofs stored, yet "the criteria gate never judged any of its four criteria" and the request offers only Waive per criterion or Deny, no Confirm (the Confirm appeared on #1543's request, whose cards were also done). Who decided: for #1543 Claude confirmed; for #1548 nobody yet. What full auto should do: a plan whose cards are all merged and whose proofs are stored has its criteria judged by the gate, not by a human waiving them one by one. Verdict: **bug**, no card yet.
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
@@ -142,3 +166,4 @@ Once the store held the new bases, `pr / image-build` got past its old failure a
 5. Entry 20: how long the factory's own deploy may hold on an open plan when many plans run at once.
 6. Entry 21: merge the bump's pull request #1598 with its image build red once its tests are green, or wait for #1603.
 7. Entry 25: rung 2 approved a schema migration on the factory's own project (PR #1604) from the SQL, the review and the policy gate's facts, two minutes after the request. Does a migration stay with rung 2, or does the risk class `migration` need a human's read that rung 2 cannot give?
+8. Entry 36: the size of `budget.day_eur` for a day with twenty live cards, and whether the planners' spend counts against it.
