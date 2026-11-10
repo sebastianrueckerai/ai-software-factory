@@ -177,6 +177,14 @@ The pull-request job's format step is `test -z "$(gofmt -l .)"`: it fails withou
 
 Six sessions and 4.5 hours of agent time bought the card's policy half (the `waits.checks` key, the 50m default, PartsBound) and left the review's six findings untouched: the sessions surveyed, the check-in took its full ten minutes twice, and the last session (10:27) reached the card's wall-clock cap during the check-in with no work in progress. Rung 2 left the session-cap merge call. Who decided: Claude at 10:45, closing the pull request with the reason and refiling the remainder as a fresh card that starts from the branch. What full auto should do: the check-in reads the review's findings and the diff and sends a session that surveys past them to the handover with the first finding as its one job (phase 3's rung 1, #1561); the wall clock does not count the check-in's own ten minutes. Verdict: **by design** at the session cap, **bug** in the ten minutes a check-in takes from the card (entry 6).
 
+## 43. A merge call stays on the board after its head moved (#1574, #1569)
+
+After the human pushes to the branch or merges main into it, the pull request's old merge call stays in Needs you with its old text until the gates on the new head finish (ten to forty minutes), so the board shows a stale call whose Return and Close doors act on a head that no longer exists. Sebastian read #1574's and #1569's stale calls twice this morning. The design's case model (5.12) and face (5.8) make a case supersede itself when its head moves; today the approval row is replaced only by the next request. Who decided: nobody needed to. What full auto should do: a moved head withdraws the merge call at once and the face says "checks run on the new head". Verdict: **bug** in the face, phase 5 (plan #1541 round 3) covers it; until then a stale merge call is read with its head's hash in Details.
+
+## 44. The phase 3 card for the forced tool call burnt two sessions on surveying (#1590, PR #1630)
+
+The card's first session spent its budget without wiring anything; the returned session (09:3x, one session and 3.00 EUR, the review's six findings as the mandate) surveyed for 17 minutes, changed one line, and stopped at the check-in's share. Who decided: Claude at 10:43, closing the pull request with the six items named so plan #1541 replans the card bounded and write-first. What full auto should do: rung 1 reads the review's findings and ends a surveying session at its first trip with the first finding as the next session's one job (phase 3, card #1561, the same shape as entry 42). Verdict: **bug** in the check-in's judgment of a surveying session, in the pipeline (#1561).
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
