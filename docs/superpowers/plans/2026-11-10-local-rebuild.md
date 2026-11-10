@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. This file is the persistent TODO list: tick a box only when its verification passed.
 
-**Goal:** Finish the card-flow redesign and fix every known factory fault by hand, with no agent sessions running, then roll, restart the factory with 4 sessions and a surge of 2, and see how the new card flow works.
+**Goal:** Finish the card-flow redesign and fix every known factory fault by hand, with no agent sessions running, fix the rest of this session's bug log, then roll, restart the factory with 4 sessions and a surge of 2, and see how the new card flow works.
 
 **Architecture:** The factory stops taking work (Phase 0). Every live card's work is assessed and either reused or discarded with a reason. Every task then lands as a controller pull request on the code repository, built from the card brief or design section named in the task, with CI green and an independent review before merge. The factory restarts only after all phases are done.
 
@@ -108,30 +108,28 @@ Each task reuses the branch named in it: fetch it, rebase it on main in a worktr
 ### Task 1.5: The upstream copy (#1654, #1685)
 
 **Spec:** #1654's cut brief (copy logic) and #1685 (wiring); plan #1654 revision 1's four cards are the split. **Reuse:** none (the first try's 776 lines were lost).
-- [ ] 1.5a the line diff and its findings; 1.5b the store-first read and the manifest pull with the bearer dance; 1.5c blobs and the two tags; 1.5d the activity, its two call sites behind change id `upstream-copy`, and main.go's wiring.
-- [ ] Each a pull request with its acceptance tests from the briefs, reviewed and merged in order.
+- [ ] The line diff and its findings, the store-first read and the manifest pull with the bearer dance, the blobs and the two tags, then the activity, its two call sites behind change id `upstream-copy`, and main.go's wiring, with the briefs' acceptance tests.
 
 ### Task 1.6: The pushed branch is the next start (#1609, #1610)
 
 **Spec:** #1609's and #1610's briefs (plan #1580). Depends on Task 1.1.
-- [ ] #1609: `startRef`, the heal's branch head, the pre-check. #1610: the acceptance of a session that dies after its check-in pushed.
-- [ ] Pull request each, review, merge.
+- [ ] #1609: `startRef`, the heal's branch head, the pre-check. #1610: the acceptance of a session that dies after its check-in pushed. Review, merge.
 
 ### Task 1.7: The review's cost block (#1671, #1672)
 
 **Spec:** #1671's and #1672's briefs (plan #1549 round 2). The principle line is in docs/architecture.md since 13:00.
-- [ ] Both as one pull request if under 600 lines, else two.
+- [ ] Build both briefs, review, merge.
 
 ### Task 1.8: CI memory and killed checks (#1682, #1683, #1684)
 
 **Spec:** the three briefs (plan #1657): `GOMAXPROCS=2` in ci.go's runner env, the measurement in the pull request, a check killed by a signal re-runs once.
-- [ ] Three pull requests in order.
+- [ ] Build them in order, review, merge.
 
 ---
 
 ## Phase 2: The factory's faults
 
-One pull request per task. The spec is the card brief, or the register entry where no card exists. Each register-only task first writes its failing test from the entry's "What full auto should do" sentence.
+The spec is the card brief, or the register entry where no card exists. Each register-only task first writes its failing test from the entry's "What full auto should do" sentence.
 
 | Task | Fault | Spec | Card |
 |---|---|---|---|
@@ -152,7 +150,7 @@ One pull request per task. The spec is the card brief, or the register entry whe
 | 2.15 | The agent time cap after OOMKilled sessions, and the check-in's own 10-minute cap on a slow model | register 5, 6 | new |
 | 2.16 | The press "Have the factory do it" acts, or says why not | register 14 | new |
 | 2.17 | The RSA key case in the scrubber's tests | #241 | #241 |
-| 2.18 | The write tools' stream suite, split under the line bound | #603 | #603 |
+| 2.18 | The write tools' stream suite | #603 | #603 |
 
 - [ ] For each row: test first, implement, `bash check changed`, pull request, review, merge, tick the row in the ledger.
 - [ ] Register entries 7, 13, 23 and 29 are answered by Phase 3 (rung 1 and rung 2 on every case, the share guard's removal). Verify each against its entry when Phase 3 is done.
@@ -161,7 +159,7 @@ One pull request per task. The spec is the card brief, or the register entry whe
 
 ## Phase 3: The card-flow redesign (plan #1541's phases 3 to 5)
 
-**Spec:** [docs/card-flow-redesign-2026-11-02.md](../../card-flow-redesign-2026-11-02.md), the sections named per step, and plan #1541 revision 4's card briefs (#1659, #1591, #1561, #1563). Each step stays under about 600 changed lines.
+**Spec:** [docs/card-flow-redesign-2026-11-02.md](../../card-flow-redesign-2026-11-02.md), the sections named per step, and plan #1541 revision 4's card briefs (#1659, #1591, #1561, #1563).
 
 Settle the decisions below before the step that needs them.
 
@@ -215,13 +213,24 @@ The design names more than the outline. Fold each into the step that owns its co
 
 ---
 
-## Phase 4: Roll
+## Phase 4: The rest of this session's bug log
+
+After Phases 1 to 3, fix every fault of this session's bug log that no earlier task fixed. The log is in two files:
+
+- [docs/needs-you-register-2026-11-09.md](../../needs-you-register-2026-11-09.md): the register, 67 entries on 2026-11-10, each with who decided, what full auto should do, and a verdict.
+- `session-notes-2026-11-09-board-loop.md` in the design repository's root (untracked): the board loop's notes, with the doors, the rules learned and the state of each card by the hour.
+
+- [ ] Read every register entry whose verdict says **bug** or **not built**. For each one, find the task that fixed it, or check it against main. Write the result under the entry as one line: "Fixed by <pull request>" or "Still open".
+- [ ] Fix every entry still open, test first, and add its "Fixed by" line.
+- [ ] Read the notes file for faults the register lacks, and add each to the register before fixing it.
+
+## Phase 5: Roll
 
 - [ ] Main is green on every job, the image jobs included.
 - [ ] Roll through factoryd's roller (no plan is open on main after Phase 0), or press Deploy now. Verify on the cluster that factoryd, the gateway, the worker and the ci-runner run main's digests.
 - [ ] Check production for an hour: factoryd's log holds no new error class, the criteria pass runs within its bound, and the console's pages load.
 
-## Phase 5: Restart and observe
+## Phase 6: Restart and observe
 
 - [ ] Settle the model question first: z.ai's glm-5.3 at its speed of that day, or the Alibaba twin (register decision 11).
 - [ ] Set `work_in_progress: 4` and `surge: 2` in the infra project file, and the autonomy level back to full auto.
