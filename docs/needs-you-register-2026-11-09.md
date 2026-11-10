@@ -253,7 +253,7 @@ After the hand refusal of entry 55, factoryd opened plan #1578's criteria gap ag
 
 ## 59. The gate reserve card's merge call: five tests left on the old figures (#1641, PR #1644)
 
-The merge call came at 12:22 with the test job red and no criterion proven. The branch updated two budget tests to the reserve rule and left five that still expect the old figures (the manual table's 36 rows, four budget asks and refusals). The review had failed twice on the slow model (entry 56). Rung 2 did not answer in five minutes. Who decided: Claude, by returning the pull request at 12:28 with the five tests and the rule, code unchanged. Verdict: **works** (the return carries the fix); the agent's own check missed the five because `bash check changed` ran only the tests of the changed files.
+The merge call came at 12:22 with the test job red and no criterion proven. The branch updated two budget tests to the reserve rule and left five that still expect the old figures (the manual table's 36 rows, four budget asks and refusals). The review had failed twice on the slow model (entry 56). Rung 2 did not answer in five minutes. Who decided: Claude, by returning the pull request at 12:28 with the five tests and the rule, code unchanged. Verdict: **works** (the return carries the fix). Why the agent's own run did not catch the five is not checked.
 
 ## Decisions this register asks of Sebastian
 
