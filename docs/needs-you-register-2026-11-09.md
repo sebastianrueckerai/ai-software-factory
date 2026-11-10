@@ -281,7 +281,7 @@ PR #1674 (the check-in's interim push: factoryd fetches the bundle a sandbox shi
 
 The lost end push has a second cause, the same as entry 51. Plan #1580's revision 3 (02:23) listed the merged #1607, the worker's POST /wip with its forced end push, under take_off_main, and group revert #1635 took it off main. The plan's later cards still assume it. Claude opened PR #1679, which reverts that revert. It applies cleanly, and the worker builds, vets and tests green.
 
-What full auto should do: a merge whose review or audit did not run is not approvable by rung 2. It waits for the review to run again or goes to a person. Entry 33 is the same gap from the other side. Verdict: **bug**, in rung 2's approval rule and, through entry 51, in plan #1580's revision 3.
+What full auto should do: a merge whose review or audit did not run is not approvable by rung 2. It waits for the review to run again or goes to a person. Entry 33 is the same gap from the other side. PR #1679 merged at 13:32 (2b881ed4). Until card #1680 lands, Claude told rung 2 in its thread at 13:30 not to approve a merge whose review or audit did not run, and rung 2 confirmed it. Verdict: **bug**, in rung 2's approval rule (card #1680) and, through entry 51, in plan #1580's revision 3.
 
 ## Decisions this register asks of Sebastian
 
