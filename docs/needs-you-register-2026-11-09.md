@@ -209,6 +209,22 @@ The bump moved `OPENCODE_VERSION` in Dockerfile.sandbox from v1.18.32 to v1.19.5
 
 After #1587 was cut at 10:18 on its size bound (1774 lines against 1742), the planner's two sessions ended at 11:04 without a revision: "the planner used its agent time and its automatic second session without filing a plan". The supervisor's 10:18 message had already named the cut (one card lands the branch compiling, then one card per proof). Who decided: Claude, by Extend at 11:45 with that cut as the guidance. What full auto should do: rung 2 extends a planner that stopped for time when the cut is already written on the card, and the planner writes its revision before it refines it. Verdict: **bug** (the stop reached the human column with the answer on the issue) and the same shape as entry 4.
 
+## 51. Confirming a plan revision reverted three merged cards, and Claude confirmed it (#1541, revert #1661)
+
+Plan #1541's revision 4 listed #1566 (resolution queue), #1588 (schema validator) and #1589 (note offered), all merged and green, under `take_off_main`, while its spec and glossary still name the resolution queue as merged and pinned by its replay tests. The planner meant that the done cards leave the round's card list. Claude confirmed the revision at 11:29 without reading the face's line "Takes off main: rung1-schema-validator, rung1-note-offered, case-resolution-queue"; factoryd filed revert card #1661 (PR #1660) and paused the merge queue. Claude held the PR with a request-changes review and closed the card at 11:36; factoryd answered "its cards stay on main". Who decided: Claude, wrongly at the confirm, then rightly at the hold. What full auto should do: the judge refuses a take-off that the revision's own text contradicts, and the confirm names the revert on its button. Verdict: **bug** in the plan's shape and the confirm's face, and a reading error of Claude's; card #1663.
+
+## 52. The chat's month budget ran out, and rung 2 went silent (10 November)
+
+The project chat's November budget of 50 EUR was spent by about 11:00 on the 10th. Rung 2, the factory agent, answers stops through the chat, so from then on no case was answered (cases 297 to 308), and every stop reached Needs you. The status line read "chat budget spent", the only sign. Who decided: Claude, by raising the chat's budget by 10 EUR at 11:39, which resumed the stopped turns. What full auto should do: a spent chat budget is a human issue on the day it happens, since it turns off the ladder's rung 2. Plan #1541's revision 4 makes the same budget pay the check-in and rung 1 too, so once it lands, a spent chat budget would stop those rungs as well. Verdict: **by design** (a budget stops), and the sizing is decision 10.
+
+## 53. The board's Extend cannot raise a planner's agent time, and the failed extend blocked Go on (#1547)
+
+The planner's time stop at 11:04 said "Use Extend on the board". The board's Extend form has sessions, lines and EUR, and no agent time. Claude's Extend at 11:29 started nothing, was flagged `answer_changed_nothing`, and the stop's Go on was then refused as "the last draw at 11:29 UTC bought nothing". Only the chat's extend carries minutes. Who decided: Claude, by asking the chat once its budget was raised. Verdict: **bug**; card #1664.
+
+## 54. PR #1598 merged: the bump is on main (#1574)
+
+After the plugin fix (entry 49) and the cx33 build VM (entry 31), all six checks were green on d6046b57 at 11:39, the image build in about ten minutes. The factory merged main into the branch at 11:39 (20d0533e, main's #1617 and #1656 only), and Claude merged that head at 11:41 on Sebastian's instruction to check and merge #1598. The red image build that the agent, the review and rung 2 called "structural, clears after merge" had three causes, none of them structural: the store lacked the new bases (fixed by hand on the 9th, card #1654 for good), the plugin lagged opencode, and the build VM was too small. Verdict: **works** now; entries 21, 26, 31 and 49 hold the faults.
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
@@ -220,3 +236,4 @@ After #1587 was cut at 10:18 on its size bound (1774 lines against 1742), the pl
 7. Entry 25: rung 2 approved a schema migration on the factory's own project (PR #1604) from the SQL, the review and the policy gate's facts, two minutes after the request. Does a migration stay with rung 2, or does the risk class `migration` need a human's read that rung 2 cannot give?
 8. Entry 36: the size of `budget.day_eur` for a day with twenty live cards, and whether the planners' spend counts against it.
 9. The month cap: at 11:40 on the 10th the board read 437.27 of 600.00 EUR this month (73 percent) and 41.27 of 50.00 EUR premium. At the month's average of 44 EUR a day, the 163 EUR left last until about the 14th, and every card stops then. Raise `budget.month_eur` in the infra repository's factory/policy.yaml, or keep it and let the board slow down.
+10. Entry 52: the chat's monthly budget (`chat.monthly_eur`, 50 EUR) ran out on the 10th, about 5 EUR a day. Claude raised November's by 10 EUR. Raise the policy value, knowing that plan #1541's revision 4 makes the same budget pay the check-in and rung 1, or keep it and let stops reach the human column when it runs out.
