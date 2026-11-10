@@ -283,6 +283,10 @@ The lost end push has a second cause, the same as entry 51. Plan #1580's revisio
 
 What full auto should do: a merge whose review or audit did not run is not approvable by rung 2. It waits for the review to run again or goes to a person. Entry 33 is the same gap from the other side. PR #1679 merged at 13:32 (2b881ed4). Until card #1680 lands, Claude told rung 2 in its thread at 13:30 not to approve a merge whose review or audit did not run, and rung 2 confirmed it. Verdict: **bug**, in rung 2's approval rule (card #1680) and, through entry 51, in plan #1580's revision 3.
 
+## 66. spend_no_push counts a card's whole life, so a funded card's next session trips at once (#1654)
+
+After the cut and a fund of 1.50 EUR at 13:41, #1654's next session ran 12 commands, and the supervisor's spend_no_push detector tripped at 13:55: "3.90 of the card's 6.50 EUR are spent (60 percent, the line is 60) and no work is pushed". 3.54 EUR of that was spent before the session started, by sessions whose work was lost (entry 47). The detector judges the card's lifetime spend against the session's push, so any new session on a card past 55 percent trips within minutes, and a fund moves the line only by its own share. The supervisor chose replan, and the card now runs as a plan cutting its remaining work. Who decided: the supervisor. What full auto should do: spend_no_push weighs the session's own spend since its start, or the spend since the last push. Verdict: **bug**.
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
