@@ -169,6 +169,14 @@ Every red image build of PR #1598 (runs 2481 to 2534, and the sequential run at 
 
 Claude's infra pull request #251 set the weekly bump routine to `files: agent` without a `skill`; the loader refused the tree at 9b0b8d1a ("an agent routine names its skill") and kept version 1019 current, as designed. Who decided: factoryd, rung 0, rightly. Verdict: **works**; the fix follows in infra.
 
+## 41. A silent format check kept a card red for five sessions (#1569, PR #1617)
+
+The pull-request job's format step is `test -z "$(gofmt -l .)"`: it fails without naming a file. Two files on the branch were not gofmt-formatted (Go 1.26's doc-comment rules turn `''` into `”` and realign a struct literal), and nobody, agent, review or rung 2, could see which, so the merge call of 10:1x named a wrong cause ("typographic quotes in store.go doc comments") and five sessions ran out before the two-line fix. Who decided: Claude, by formatting the two files on the branch (06de14a6) and by pull request #1650, which makes the step print the files. Verdict: **bug** in pr.yml, fixed by #1650.
+
+## 42. The checks-wait card ran out of time without touching its findings (#1578, PR #1625)
+
+Six sessions and 4.5 hours of agent time bought the card's policy half (the `waits.checks` key, the 50m default, PartsBound) and left the review's six findings untouched: the sessions surveyed, the check-in took its full ten minutes twice, and the last session (10:27) reached the card's wall-clock cap during the check-in with no work in progress. Rung 2 left the session-cap merge call. Who decided: Claude at 10:45, closing the pull request with the reason and refiling the remainder as a fresh card that starts from the branch. What full auto should do: the check-in reads the review's findings and the diff and sends a session that surveys past them to the handover with the first finding as its one job (phase 3's rung 1, #1561); the wall clock does not count the check-in's own ten minutes. Verdict: **by design** at the session cap, **bug** in the ten minutes a check-in takes from the card (entry 6).
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
