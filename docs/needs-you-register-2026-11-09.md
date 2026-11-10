@@ -245,7 +245,7 @@ The answers are as long as yesterday's, so the provider is slower, not the facto
 
 ## 57. The intake refused a plan in its log only, and a duplicate followed (#1667, #1668)
 
-Claude filed plan #1667 at 11:58, two minutes before closing #1547. The intake refused it as a second card for roadmap item 66 ("card t-dac528c87acc already builds roadmap item 66"), in factoryd's log only, once a minute. The issue stayed open with no comment and no card, and the project agent, finding no card, filed #1668 at 12:03 for the same work, with a body that said the branch compiles and that dropped the five proof cards. Who decided: Claude, by correcting #1668's body through the chat's card edit (verified word for word at 12:12) and closing #1667 as its duplicate. What full auto should do: a refused issue says why on the issue, once. Verdict: **bug**; card filed.
+Claude filed plan #1667 at 11:58, two minutes before closing #1547. The intake refused it as a second card for roadmap item 66 ("card t-dac528c87acc already builds roadmap item 66"), in factoryd's log only, once a minute. The issue stayed open with no comment and no card, and the project agent, finding no card, filed #1668 at 12:03 for the same work, with a body that said the branch compiles and that dropped the five proof cards. Who decided: Claude, by correcting #1668's body through the chat's card edit (verified word for word at 12:12) and closing #1667 as its duplicate. What full auto should do: a refused issue says why on the issue, once. Verdict: **bug**; card #1669.
 
 ## Decisions this register asks of Sebastian
 
