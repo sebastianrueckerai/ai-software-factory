@@ -255,6 +255,26 @@ After the hand refusal of entry 55, factoryd opened plan #1578's criteria gap ag
 
 The merge call came at 12:22 with the test job red and no criterion proven. The branch updated two budget tests to the reserve rule and left five that still expect the old figures (the manual table's 36 rows, four budget asks and refusals). The review had failed twice on the slow model (entry 56). Rung 2 did not answer in five minutes. Who decided: Claude, by returning the pull request at 12:28 with the five tests and the rule, code unchanged. Verdict: **works** (the return carries the fix). Why the agent's own run did not catch the five is not checked.
 
+## 60. The checks-wait stop's Keep waiting does nothing (#1652, #1633)
+
+The stop's face says "Keep waiting re-runs the gate's checks now". The console maps the button to the action `note`, which records the answer and leaves the card stopped. On #1652 at 12:42 every check of PR #1670 was green, and the press changed nothing. Rung 2's `resume` worked on #1633 at 13:00. On #1652 it was refused at the card's agent-time cap, although a checks wait spends no agent time. Who decided: Claude, through rung 2. Verdict: **bug**; card #1677.
+
+## 61. #1652 merged by a person over the review's one concern (PR #1670)
+
+The review found build items 1 and 2 well built and the change a strict improvement. Its one concern was the brief's third item, the criteria gate paid from #1605's gate reserve, which needs #1641 first. The card was at its agent-time cap, so a grant would have bought a session for work that waits on another card. Who decided: Claude, on Sebastian's "look at #1652": the third item went to card #1676, and Claude approved and merged PR #1670 at 12:50; factoryd closed the card as merged. Verdict: **works**. The register's entry 37 is fixed on main for a cut card's successor.
+
+## 62. Two merge calls blamed a timeout for red checks that were five stale tests each (#1642 PR #1655, #1641 PR #1644)
+
+#1642's merge call said "the ./... race suite times out after 10 minutes, so checks are red across five runs". The pull request's test job failed after 8m42s on five console tests that still expected the old refusal wording. The 10-minute timeout was the criteria prover's own suite run in the sandbox, not CI. #1641 had the same shape with five budget tests. One of #1642's five, TestErrorsShowNoInternals, guards the rule that plan #1545 replaced ("the details go to the log"). Who decided: Claude, by returning both with the five tests each and the rule, code unchanged. What full auto should do: the merge call names the failing tests of the red job, read from the job's log, and keeps the prover's timeout apart. Verdict: **bug** in the merge call's diagnosis.
+
+## 63. A closed card holds its roadmap item for good, so a refile is refused (#1667, #1675)
+
+The intake's roadmap rule (store.go) lets any card that cites a roadmap item hold it, "open or done", until the item leaves the roadmap. A person's refile of a closed plan with its `Roadmap:` line was refused twice: #1667 (roadmap 66) and #1675 (roadmap 342). Both landed only after the line was replaced by a plain source line, which drops the roadmap link. Who decided: Claude and rung 2, by that edit. Verdict: **bug**; added to card #1669.
+
+## 64. The checks wait's bound raised to 40 minutes in the policy (infra PR #257)
+
+The checks wait's bound was the code default of 600 s. Pull-request image builds now wait up to 12 minutes for a build VM and build for about 10, so #1652 and #1633 stopped at the 20-minute cap with every check green or running. Claude set `bounds: WaitChecks: 2400` in the infra policy at 13:04, under the wait activity's start-to-close of 46 minutes. Card #1665 brings `waits.checks` with the 50-minute default that Sebastian set on plan #1578. Who decided: Claude. Verdict: **by design** (a bound), its value now fits the build.
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
