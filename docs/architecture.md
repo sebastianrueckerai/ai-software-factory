@@ -104,6 +104,11 @@ The fixed principles from the design conversation (see
   last resort: needed at times, but brittle, and such rules accumulate.
   Stage 16's four principles for the project agent (5.7) apply this idea to
   the chat.
+- No agent is asked for a fact that a tool or an injected input can carry.
+  factoryd puts a card's budget, spend, model calls, tokens and state into
+  the session supervisor's and the gate supervisor's inputs from its own
+  store, and the gateway's task_costs tool answers the same figures to a
+  session that asks (roadmap 199).
 
 ## 2. Three ways to build it
 
