@@ -155,7 +155,19 @@ Several cards' faces at 23:00 read "the day cap is reached: the card resumes on 
 
 ## 37. The criteria of a closed plan were never judged (#1548, approval 1115; #1543, approval 1108)
 
-Plan #1548's four cards are done and its three proofs stored, yet "the criteria gate never judged any of its four criteria" and the request offers only Waive per criterion or Deny, no Confirm (the Confirm appeared on #1543's request, whose cards were also done). Who decided: for #1543 Claude confirmed; for #1548 nobody yet. What full auto should do: a plan whose cards are all merged and whose proofs are stored has its criteria judged by the gate, not by a human waiving them one by one. Verdict: **bug**, no card yet.
+Plan #1548's four cards are done and its three proofs stored, yet "the criteria gate never judged any of its four criteria" and the request offers only Waive per criterion or Deny, no Confirm (the Confirm appeared on #1543's request, whose cards were also done). Who decided: for #1543 Claude confirmed; for #1548 Claude at 10:20 on the 10th, by waiving all four with the reason that names the merged work, after the Confirm route refused: "t-3eb921eefcba is closed: a card of the plan is not done or merged". That card is #1624, cut into its successor #1638, which merged; the Delivered rule (internal/console/approvals.go:306) reads the cut card's status and never its successor's, so the face hides Confirm and the route refuses it. What full auto should do: a plan whose cards are all merged or superseded by merged successors, with its proofs stored, has its criteria judged by the gate, and Delivered follows a cut card to its successor. Verdict: **bug**, two faults, no card yet.
+
+## 38. Four sessions could not add two lines, and a human pushed them (#1569, PR #1617)
+
+The cost-block card's pull request failed vet in three rounds on one mechanical fault: `acceptanceStore` lacked the new `TaskCallTotals` method. Sessions 2 to 5 ended OOMKilled or at the check-in's cap without pushing the fix; rung 2 granted twice, Claude once (09:35, value=grant). At 10:20 Claude added the three-line stub and pushed it to the pull request's branch on the factory-agent fork (6f5079bc) as sebastian, under Sebastian's ruling of 10:00 that the human does what the factory cannot. Who decided: Claude. What full auto should do: a fix the review states to the line and the agent cannot land in two sessions is the check-in's to apply, or the push-at-check-in plan (#1580) keeps the first session's work. Verdict: **bug** in the loss shape (entries 11, 23), cards #1570 and #1607 to #1610.
+
+## 39. The pull-request image build never printed a failed build's log (#1574, PR #1598)
+
+Every red image build of PR #1598 (runs 2481 to 2534, and the sequential run at 10:11 on the 10th) ended with `RUN exit status 1` and nothing else: the run step's shell has -e, and `wait` on a failed build ended the step before the script's `case` printed the build log and the FAILED line. Nobody, agent or human, could read why the sandbox or the runner image failed, and the factory agent called the red "an accepted structural failure" for a day on that silence. Who decided: Claude, by pull request #1645 (`rc=0; wait "$pid" || rc=$?`), merged under the ruling of 10:00. Verdict: **bug** in pr.yml, fixed by #1645; the stall of entry 31 (#1643) and the real cause of the 10:11 failure (the sandbox image, log to come) stand apart.
+
+## 40. The config loader refused the routine change (infra #252)
+
+Claude's infra pull request #251 set the weekly bump routine to `files: agent` without a `skill`; the loader refused the tree at 9b0b8d1a ("an agent routine names its skill") and kept version 1019 current, as designed. Who decided: factoryd, rung 0, rightly. Verdict: **works**; the fix follows in infra.
 
 ## Decisions this register asks of Sebastian
 
