@@ -225,6 +225,24 @@ The planner's time stop at 11:04 said "Use Extend on the board". The board's Ext
 
 After the plugin fix (entry 49) and the cx33 build VM (entry 31), all six checks were green on d6046b57 at 11:39, the image build in about ten minutes. The factory merged main into the branch at 11:39 (20d0533e, main's #1617 and #1656 only), and Claude merged that head at 11:41 on Sebastian's instruction to check and merge #1598. The red image build that the agent, the review and rung 2 called "structural, clears after merge" had three causes, none of them structural: the store lacked the new bases (fixed by hand on the 9th, card #1654 for good), the plugin lagged opencode, and the build VM was too small. Verdict: **works** now; entries 21, 26, 31 and 49 hold the faults.
 
+## 55. One plan's delta round starved the criteria pass for an hour, and a one-card plan cannot take a delta card (#1578)
+
+Claude granted plan #1578's gap at 10:44 (approval 1119: one more bounded card, the review's six findings as guidance). The delta round's answers broke the plan rules every time ("0 cards with role foundation; the process wants exactly one", and the delta card may not depend on the integration card): plan #1578 has one card that is its own integration, and `judgeDelta` judges the merged plan with the first round's shape. Each of the round's model calls took about two minutes, so the pass's 4-minute bound cut the second of three attempts, and a failed call stays due. The criteria pass walks the plans in id order and t-8aeae5765579 sorts first, so from 10:44 every pass ended "still running at its bound of 4m", and the close check, round check and delta dues of the seven other open plans failed with `context deadline exceeded`: no plan could close or start its next round, and the production hold could not lift. No console door stops a granted delta: a criterion waives only on a pending request, a done plan does not close, and a done plan's issue close reaches no workflow. Who decided: Claude, by filing the work as card #1665 from PR #1625's branch and writing the six `delta_refused` marks into plan_catches by hand at 11:51, what factoryd's own refusal writes. What full auto should do: the pass runs every plan's checks before any model call, a delta call has its own bound and a timeout counts as a refused attempt, and a delta card is judged as a card. Verdict: **bug**, two of them; card #1666.
+
+## 56. The main model is three to four times slower today, and slowness never reaches the fallback (10 November)
+
+LiteLLM's spend log for zai/glm-5.3, the `big` alias of every agent, review, audit, check-in and planner call:
+
+| hour (UTC) | calls | average s | p90 s | average output tokens |
+|---|---|---|---|---|
+| 9 Nov, 17:00 | 924 | 15.0 | 43.2 | 971 |
+| 10 Nov, 01:00 | 531 | 17.8 | 50.1 | 858 |
+| 10 Nov, 09:00 | 419 | 38.3 | 96.6 | 781 |
+| 10 Nov, 10:00 | 568 | 40.1 | 118.3 | 1016 |
+| 10 Nov, 11:00 | 321 | 59.0 | 178.7 | 1493 |
+
+The answers are as long as yesterday's, so the provider is slower, not the factory's asks. The same work now takes three to four times its time: two planners ran out of their 45 minutes without a plan (#1547 twice, #1646), the delta round of entry 55 took two minutes a call, reviews failed on their deadline (#1641, #1649, #1661), and sessions trip the time-based detectors. LiteLLM's `fallbacks` move a call to the Alibaba twin (qwen3.8-max) only on a failure, never on slowness. Who decided: nobody. What full auto should do: the gateway measures each alias's latency, and an alias slower than a bound for an hour serves from its twin, with the switch on the status line and in the costs. Verdict: **not built**; decision 11.
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
@@ -237,3 +255,4 @@ After the plugin fix (entry 49) and the cx33 build VM (entry 31), all six checks
 8. Entry 36: the size of `budget.day_eur` for a day with twenty live cards, and whether the planners' spend counts against it.
 9. The month cap: at 11:40 on the 10th the board read 437.27 of 600.00 EUR this month (73 percent) and 41.27 of 50.00 EUR premium. At the month's average of 44 EUR a day, the 163 EUR left last until about the 14th, and every card stops then. Raise `budget.month_eur` in the infra repository's factory/policy.yaml, or keep it and let the board slow down.
 10. Entry 52: the chat's monthly budget (`chat.monthly_eur`, 50 EUR) ran out on the 10th, about 5 EUR a day. Claude raised November's by 10 EUR. Raise the policy value, knowing that plan #1541's revision 4 makes the same budget pay the check-in and rung 1, or keep it and let stops reach the human column when it runs out.
+11. Entry 56: z.ai's glm-5.3 answers in about 60 s on average today against 15 to 18 s yesterday. Move the `big` alias to its Alibaba twin (qwen3.8-max, paid per token, in k8s/platform/litellm/helmrelease.yaml of the infra repository) until z.ai recovers, or keep z.ai and accept that planners and sessions run out of time.
