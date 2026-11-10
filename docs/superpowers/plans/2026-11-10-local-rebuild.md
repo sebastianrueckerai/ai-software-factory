@@ -50,31 +50,31 @@ Nothing is discarded before it is assessed. The harvest table goes into the ledg
 
 For each card that is running, in review, waiting or queued, record in the ledger: the card, its branch on `agentfork` with its head SHA, the diff against main (`git diff --shortstat $(git merge-base origin/main <ref>) <ref>`), its checks, its open pull request, what its brief still asks, and one verdict: **reuse in task N**, **redo from the brief in task N**, or **discard** with the reason.
 
-Done on 2026-11-10 at 15:30 for every card but the three running sessions. The table is in the ledger, and every branch with work also sits on the controller fork as `harvest/<card>-t-<id>`.
+Done on 2026-11-10 at 16:00. The table is in the ledger, and every branch with work also sits on the controller fork as `harvest/<card>-t-<id>`.
 
-- [ ] Let the running sessions of #1634, #1659 and #1663 end on their own, then record their final heads. Known branches with reusable work:
+- [x] Let the running sessions of #1634, #1659 and #1663 end on their own, then record their final heads. Known branches with reusable work:
 
 | Branch | Card | Diff at 14:30 |
 |---|---|---|
 | factory/t-10466a2ab8e5 | #1642, PR #1655 | +702/-127, 37 files |
 | factory/t-e2efcfaa95ce | #1641, PR #1644 | +306/-53, 17 files |
-| factory/t-fe2a4750a551 | #1659, PR #1686 | +303/-91 (checkin.go) |
+| factory/t-fe2a4750a551 | #1659, PR #1686 | +306/-91, 2 files (head daa72c2a98) |
 | factory/t-eea3710a4cc4 | PR #1625 (#1665's start) | +85/-28, 10 files |
 | factory/t-5845df1311a1 | #1587, the receipt wiring | +157/-8, 12 files |
-| factory/t-eb25b36553a7 | #1634 | to fetch |
+| factory/t-eb25b36553a7 | #1634, PR #1692 | +661/-121, 9 files (head 47ba51a8f2) |
 | factory/t-b63cb8d5f53c | #1601, an older try of #1642 | +541/-71 (superseded) |
 
 - [x] Fetch every live card's branch (`git fetch agentfork +refs/heads/factory/t-<id>:refs/remotes/agentfork/factory/t-<id>`) and fill the table for all of them.
 
 ### Task 0.3: Close the cards and the plans, with the harvest as the note
 
-Two refusals shape this task. Close refuses a card that an open dependency blocks (register entry 68): remove the card's open dependency edges through the Forgejo API first. Close refuses a done plan (entry 69): a plan's production hold ends only when factoryd records plan_closed, after every criterion is met or waived, so waive each criterion on the plan's criteria request with the plan task as the reason.
+Two refusals shape this task. Close refuses a card that an open dependency blocks (register entry 68): remove the card's open dependency edges through the Forgejo API first. Close refuses a done plan (entry 69). A plan's production hold ends only when factoryd records plan_closed. A plan between rounds gets it when a person closes its issue on Forgejo. A plan without an outline gets it after every criterion is met or waived: waive each criterion on the plan's criteria request, with the plan task as the reason.
 
-- [ ] Close every live card through the console's Close, with the note "moved to the local rebuild plan, task N" (or "discarded: <reason>"). Close closes the card's pull request too; its branch stays on `agentfork` for 30 days. Done for all but #1634, #1659 and #1663, which close when their sessions end.
-- [ ] Close plans #1549, #1541 and #1654. Done for #1654 and #1549 (criteria waived on approval 1135, plan_closed at 15:23). #1541 waits for #1659: then waive its criteria. Plans #1545, #1578, #1603, #1605 and #1657 are closed on Forgejo with their task named. Keep plan #1580 open until Task 1.1 has merged: its interim push holds two security holes, and the production hold keeps them off production until then.
+- [x] Close every live card through the console's Close, with the note "moved to the local rebuild plan, task N" (or "discarded: <reason>"). Close closes the card's pull request too; its branch stays on `agentfork` for 30 days.
+- [x] Close plans #1549, #1541 and #1654. #1549 closed after its criteria were waived (plan_closed at 15:23), and #1541 after its issue was closed (15:52). Plans #1545, #1578, #1603, #1605 and #1657 are closed on Forgejo with their task named. Keep plan #1580 open until Task 1.1 has merged: its interim push holds two security holes, and the production hold keeps them off production until then.
 - [x] Close the old cards the triage of 14:30 found fixed, superseded or obsolete, each with its evidence as the note: #186, #194, #196, #199, #203, #287, #479, #607, #639, #642, #643, #649, #651, #652, #653, #654, #660, #806, #851, #869, #981, #1103, #1149, #1250, #1251, #1441, #1590, #1624, #1640, and the 24 roll cards from #182 to #1259.
 - [x] Close rung 2's asks #1687 and #1688 with a pointer to this plan.
-- [ ] Verify: the board shows no live card except plan #1580, and Needs you is empty.
+- [x] Verify: the board shows no live card except plan #1580, and Needs you is empty. At 16:00 the open issues are #1580, #241 and #603, and no pull request is open.
 
 ---
 
@@ -84,7 +84,7 @@ Each task reuses the branch named in it: fetch it, rebase it on main in a worktr
 
 ### Task 1.1: The interim push, made safe, and its session half (#1634)
 
-**Spec:** #1634's brief (its first part: the four fixes from the review of PR #1674). **Reuse:** #1634's branch if the harvest finds work. Main holds #1633 (wippush.go) and #1679 (the worker's /wip and forced end push).
+**Spec:** #1634's brief (its first part: the four fixes from the review of PR #1674). **Reuse:** factory/t-eb25b36553a7 at 47ba51a8f2 (9 files, +661 -121, PR #1692 closed unreviewed): an independent review reads it against the brief before any of it is kept. Main holds #1633 (wippush.go) and #1679 (the worker's /wip and forced end push).
 **Files:** `internal/factoryd/wippush.go`, `runner.go`, `supervise.go`, `activities.go`, `wippush_test.go`, `supervise_test.go`.
 - [ ] Tests first, from the brief's acceptance: a commit that does not descend from the start is refused, the pushed commit carries `wipIdentity` and `wipMessage`, a body that is not a bundle is refused, `transfer.fsckObjects` rejects a malformed object, an end push after an interim push lands, `checkin_fires_interim_push`, and `wip_push_grants_no_push_credit`.
 - [ ] Implement, `bash check changed`, pull request, review, merge.
