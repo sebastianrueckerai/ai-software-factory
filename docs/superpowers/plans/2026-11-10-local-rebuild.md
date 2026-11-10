@@ -40,16 +40,19 @@ Nothing is discarded before it is assessed. The harvest table goes into the ledg
 
 ### Task 0.1: Stop new work
 
-- [ ] Set the project's autonomy level to manual on the console. Rung 2 then confirms every action and wakes on nothing.
-- [ ] Set `work_in_progress: 1` in the infra project file (`factory/projects/ai-software-factory-code.yaml`). A value of 0 means the default of 5.
-- [ ] Press "Skip once" on the weekly bump routine (Monday 06:00).
-- [ ] Verify: at most one new session starts before Task 0.3 closes the queue (`kubectl get pods -A | grep worker-`); record it in the harvest.
+- [x] Close the project's intake on the console (POST /projects/{name}/intake, intake=closed). It stops the roadmap pull, which refills the queue whenever it holds fewer than `refill_below` cards.
+- [x] Set the project's autonomy level to manual on the console (infra PR #258). Rung 2 then confirms every action and wakes on nothing.
+- [x] Set `merge_rule: human` and `work_in_progress: 1` in the infra project file (infra PR #259, config version 1027). Manual leaves `merge_rule: auto` in place, and under it a pull request whose review approves merges with no human (register entry 70). A `work_in_progress` of 0 means the default of 5.
+- [x] Press "Skip once" on the weekly bump routine (Monday 06:00).
+- [x] Verify: no new session started after 15:17 on 2026-11-10.
 
 ### Task 0.2: Harvest every live card
 
 For each card that is running, in review, waiting or queued, record in the ledger: the card, its branch on `agentfork` with its head SHA, the diff against main (`git diff --shortstat $(git merge-base origin/main <ref>) <ref>`), its checks, its open pull request, what its brief still asks, and one verdict: **reuse in task N**, **redo from the brief in task N**, or **discard** with the reason.
 
-- [ ] Let the running sessions end on their own, then record their final heads. Known branches with reusable work:
+Done on 2026-11-10 at 15:30 for every card but the three running sessions. The table is in the ledger, and every branch with work also sits on the controller fork as `harvest/<card>-t-<id>`.
+
+- [ ] Let the running sessions of #1634, #1659 and #1663 end on their own, then record their final heads. Known branches with reusable work:
 
 | Branch | Card | Diff at 14:30 |
 |---|---|---|
@@ -61,14 +64,16 @@ For each card that is running, in review, waiting or queued, record in the ledge
 | factory/t-eb25b36553a7 | #1634 | to fetch |
 | factory/t-b63cb8d5f53c | #1601, an older try of #1642 | +541/-71 (superseded) |
 
-- [ ] Fetch every live card's branch (`git fetch agentfork +refs/heads/factory/t-<id>:refs/remotes/agentfork/factory/t-<id>`) and fill the table for all of them.
+- [x] Fetch every live card's branch (`git fetch agentfork +refs/heads/factory/t-<id>:refs/remotes/agentfork/factory/t-<id>`) and fill the table for all of them.
 
 ### Task 0.3: Close the cards and the plans, with the harvest as the note
 
-- [ ] Close every live card through the console's Close, with the note "moved to the local rebuild plan, task N" (or "discarded: <reason>"). Close the open pull requests #1644, #1655 and #1686 with the same note; their branches stay on `agentfork`.
-- [ ] Close plans #1549, #1541 and #1654. Factoryd answers "its merged cards stay on main". Keep plan #1580 open until Task 1.1 has merged: its interim push holds two security holes, and the production hold keeps them off production until then.
-- [ ] Close the old cards the triage of 14:30 found fixed, superseded or obsolete, each with its evidence as the note: #186, #194, #196, #199, #203, #287, #479, #607, #639, #642, #643, #649, #651, #652, #653, #654, #660, #806, #851, #869, #981, #1103, #1149, #1250, #1251, #1441, #1590, #1624, #1640, and the 24 roll cards from #182 to #1259.
-- [ ] Close rung 2's asks #1687 and #1688 with a pointer to this plan.
+Two refusals shape this task. Close refuses a card that an open dependency blocks (register entry 68): remove the card's open dependency edges through the Forgejo API first. Close refuses a done plan (entry 69): a plan's production hold ends only when factoryd records plan_closed, after every criterion is met or waived, so waive each criterion on the plan's criteria request with the plan task as the reason.
+
+- [ ] Close every live card through the console's Close, with the note "moved to the local rebuild plan, task N" (or "discarded: <reason>"). Close closes the card's pull request too; its branch stays on `agentfork` for 30 days. Done for all but #1634, #1659 and #1663, which close when their sessions end.
+- [ ] Close plans #1549, #1541 and #1654. Done for #1654 and #1549 (criteria waived on approval 1135, plan_closed at 15:23). #1541 waits for #1659: then waive its criteria. Plans #1545, #1578, #1603, #1605 and #1657 are closed on Forgejo with their task named. Keep plan #1580 open until Task 1.1 has merged: its interim push holds two security holes, and the production hold keeps them off production until then.
+- [x] Close the old cards the triage of 14:30 found fixed, superseded or obsolete, each with its evidence as the note: #186, #194, #196, #199, #203, #287, #479, #607, #639, #642, #643, #649, #651, #652, #653, #654, #660, #806, #851, #869, #981, #1103, #1149, #1250, #1251, #1441, #1590, #1624, #1640, and the 24 roll cards from #182 to #1259.
+- [x] Close rung 2's asks #1687 and #1688 with a pointer to this plan.
 - [ ] Verify: the board shows no live card except plan #1580, and Needs you is empty.
 
 ---
@@ -151,6 +156,9 @@ The spec is the card brief, or the register entry where no card exists. Each reg
 | 2.16 | The press "Have the factory do it" acts, or says why not | register 14 | new |
 | 2.17 | The RSA key case in the scrubber's tests | #241 | #241 |
 | 2.18 | The write tools' stream suite | #603 | #603 |
+| 2.19 | Close removes the card's own dependency edges, and its refusal names Forgejo's reason | register 68 | new |
+| 2.20 | A plan's Close waives its open criteria with the note and records plan_closed | register 69 | new |
+| 2.21 | Manual, assisted and autonomous write `merge_rule: human`; only full auto writes auto | register 70 | new |
 
 - [ ] For each row: test first, implement, `bash check changed`, pull request, review, merge, tick the row in the ledger.
 - [ ] Register entries 7, 13, 23 and 29 are answered by Phase 3 (rung 1 and rung 2 on every case, the share guard's removal). Verify each against its entry when Phase 3 is done.
@@ -217,7 +225,7 @@ The design names more than the outline. Fold each into the step that owns its co
 
 After Phases 1 to 3, fix every fault of this session's bug log that no earlier task fixed. The log is in two files:
 
-- [docs/needs-you-register-2026-11-09.md](../../needs-you-register-2026-11-09.md): the register, 67 entries on 2026-11-10, each with who decided, what full auto should do, and a verdict.
+- [docs/needs-you-register-2026-11-09.md](../../needs-you-register-2026-11-09.md): the register, 70 entries on 2026-11-10, each with who decided, what full auto should do, and a verdict.
 - `session-notes-2026-11-09-board-loop.md` in the design repository's root (untracked): the board loop's notes, with the doors, the rules learned and the state of each card by the hour.
 
 - [ ] Read every register entry whose verdict says **bug** or **not built**. For each one, find the task that fixed it, or check it against main. Write the result under the entry as one line: "Fixed by <pull request>" or "Still open".
@@ -233,6 +241,6 @@ After Phases 1 to 3, fix every fault of this session's bug log that no earlier t
 ## Phase 6: Restart and observe
 
 - [ ] Settle the model question first: z.ai's glm-5.3 at its speed of that day, or the Alibaba twin (register decision 11).
-- [ ] Set `work_in_progress: 4` and `surge: 2` in the infra project file, and the autonomy level back to full auto.
+- [ ] Undo the freeze of Task 0.1: set `work_in_progress: 4` and `surge: 2` in the infra project file, the autonomy level back to full auto (it writes `merge_rule: auto`), and open the intake on the console (intake=open).
 - [ ] File three canary cards of different shapes: a small fix, a plan of two cards (the receipt plan #1668 is the candidate), and one that must stop for a human. Watch each stop pass rung 0, rung 1 and rung 2 before it reaches the face.
 - [ ] Write the observations for Sebastian: per stop, which rung answered, how long it took, what it cost, and how the face read.
