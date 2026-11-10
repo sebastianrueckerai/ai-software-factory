@@ -129,9 +129,9 @@ At 20:02 rung 2 answered the pace stop with "reverify": "the four fixes are comm
 
 Rung 2 approved PR #1612 at 20:16. At 20:27, right after the queue's turn merged main into the branch, Forgejo refused the merge with `status 405: Please try again later`, which it answers while its own conflict check on the new head runs. factoryd read the refusal as "the pull request no longer merges into main" and bought a session (20:28) for the agent to merge a main that was already merged; the pull request read `mergeable: true` throughout. Who decided: factoryd, rung 0, wrongly. What full auto should do: wait for Forgejo's check and merge again; a conflict is a head Forgejo reports as not mergeable. Verdict: **bug**, card #1614.
 
-## 31. The bump's image build stalls: three Dockerfiles built at once on one build VM (#1574, PR #1598)
+## 31. The bump's image build stalls on the build VM (#1574, PR #1598)
 
-Once the store held the new bases, `pr / image-build` got past its old failure and built all three Dockerfiles in one build VM at once. Dockerfile.runner's warm-up step (build, vet, compile every test) reached internal/doclinks at 386 s and then printed nothing for over 1000 s, on two heads; on main the same step runs alone in its own job and takes 111 s. Three parallel builds share one small VM, and the runner's compile of internal/factoryd's tests is the one that starves. Who decided: nobody yet, the job runs on. What full auto should do: build the changed Dockerfiles one at a time, or one VM each as ci.yml does. Verdict: **bug** in the pull-request job's shape, first seen because no earlier pull request changed all three Dockerfiles with a store that could serve them; card #1619.
+Once the store held the new bases, `pr / image-build` got past its old failure and built the Dockerfiles on one throwaway Hetzner cx23 (2 vCPU, 4 GB; `CI_BUILD_VM_TYPE`, default in buildvm.go). Dockerfile.runner's warm-up step (build, vet, compile every test) reached internal/doclinks at about 380 s and then printed nothing: 2762 s with three Dockerfiles at once (run 2519, 46 minutes, stopped at the job's bound), and 1591 s and counting with one at a time (run 2591, after #1643). On main the same step runs on the cluster's buildkitd and takes 111 s; the 4-CPU test pod compiles the module in nine minutes. The sequential build of #1643 did not end the stall, so parallelism was not the cause: the VM is too small for the module. Who decided: nobody, two runs ran to their bound. What full auto should do: a build VM sized for the largest Dockerfile, or a check that fails fast with the step's name when a step prints nothing for ten minutes. Verdict: **bug** in the build VM's size; fixed by the manifest change to cx33 (4 vCPU, 8 GB, 0.0144 EUR an hour against 0.0096), pull request opened 11:20 on the 10th. The one-at-a-time build of #1643 stays: it makes each build's log readable.
 
 ## 32. The night of 2026-11-09 to 10: fourteen stops reached the board and waited up to seventeen hours
 
@@ -185,6 +185,22 @@ After the human pushes to the branch or merges main into it, the pull request's 
 
 The card's first session spent its budget without wiring anything; the returned session (09:3x, one session and 3.00 EUR, the review's six findings as the mandate) surveyed for 17 minutes, changed one line, and stopped at the check-in's share. Who decided: Claude at 10:43, closing the pull request with the six items named so plan #1541 replans the card bounded and write-first. What full auto should do: rung 1 reads the review's findings and ends a surveying session at its first trip with the first finding as the next session's one job (phase 3, card #1561, the same shape as entry 42). Verdict: **bug** in the check-in's judgment of a surveying session, in the pipeline (#1561).
 
+## 45. The test job's `go vet` was killed in the CI pod, and the red check had no retry (#1569, PR #1617)
+
+Run 2596's test job on head 514eaaeb: every package passed and the job still failed, because `go test ./...` runs vet per package and the console package's vet ended with `signal: killed`, the CI pod's 4Gi memory limit (ci.go `ciLimits`). Nothing retried: the check went red, and the merge call of entry 43 stayed on the board with it. The rerun of the same job passed. Who decided: Claude, by rerunning the job. What full auto should do: a check that died by signal, not by a test, reruns itself once before the card's gates read it; and the CI pod's limit fits `go test ./...` of this module (6Gi, or `-p 2`). Verdict: **not built** (no distinction between a failed test and a killed tool) and **bug** (the limit); card filed.
+
+## 46. CI pods queue on ephemeral storage, outside every bound (#1598, #1617, #1644 at 11:05)
+
+At 11:05 three `ci-runner` pods were Pending: "0/3 nodes are available: 3 Insufficient ephemeral-storage". Each CI pod requests 22Gi of ephemeral storage, each sandbox 18Gi, each node has 89 GB, and five sandboxes plus two CI pods filled the three nodes. The surge item (roadmap 342, card #1646) bounds sandboxes only; the CI pods that the same cards cause count nowhere, so a card's checks wait in a queue no face shows, and the checks-wait bound of plan #1578 then charges the card for the wait. Who decided: nobody. What full auto should do: the work bound counts a card's CI pod as part of its slot, or the CI pods' storage request shrinks to what a checkout and a build cache need. Verdict: **not built**; added to #1646.
+
+## 47. Two sessions bought nothing on the copy card, and the size detector counted a diff the session did not write (#1640 → #1654)
+
+Session 1 of #1640 read for 15 minutes without a write (two supervisor messages at 09:47 and 10:00), then hit the check-in's 10-minute cap; Claude's reply of 10:25 named the files to write first. Session 2 tripped the size detector at 10:38 with "diff 10 files +732/-175" while its own progress read "0 files changed 0 times": the diff it was measured by was not the session's work (the branch against a moved main, or a leftover workspace), and it spent to 4.22 of 5.00 EUR without a push. `grant_bought_nothing` closed the card into successor #1654 at 10:59, queued. Who decided: factoryd, rung 0, the successor path. What full auto should do: measure the size detector against the card's own base, and start a successor from a brief that opens with the file list, not the survey. Verdict: **bug** (the size detector's base) and **works** (the successor path); the planner's successor #1654 carries the same brief.
+
+## 48. The gates refused for money on the card that builds the gate reserve (#1641, PR #1644)
+
+The review refused at 10:57 (its 2 calls cost 0.14 EUR, 0.01 EUR free) and the audit at 11:03 (0.10 EUR against 0.09 free), on the card of plan #1605 whose brief is exactly this reserve. The card went on to attempt 3 at 11:09. Who decided: rung 2, cases 292 and 295. Verdict: **by design** until #1641 merges; entry 22's fix is this card.
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
@@ -192,6 +208,6 @@ The card's first session spent its budget without wiring anything; the returned 
 3. Entry 10: a Job-failed alert card closes when its CronJob completes after the failure.
 4. Entry 12: done on 2026-11-10: Sebastian ruled that the controller merges the workflow pull requests it opens (#1582 and #1643 merged 10:00); the routine `weekly-bump` moves to `files: agent` in the infra project file, so the bump runs as an agent card whole.
 5. Entry 20: how long the factory's own deploy may hold on an open plan when many plans run at once.
-6. Entry 21: merge the bump's pull request #1598 with its image build red once its tests are green, or wait for #1603.
+6. Entry 21: done on 2026-11-10: the image build runs on a cx33 build VM (entry 31) and #1598 merges on its own checks; #1603's card #1654 removes the hand copy of the bases.
 7. Entry 25: rung 2 approved a schema migration on the factory's own project (PR #1604) from the SQL, the review and the policy gate's facts, two minutes after the request. Does a migration stay with rung 2, or does the risk class `migration` need a human's read that rung 2 cannot give?
 8. Entry 36: the size of `budget.day_eur` for a day with twenty live cards, and whether the planners' spend counts against it.
