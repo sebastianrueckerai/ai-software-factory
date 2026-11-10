@@ -247,6 +247,14 @@ The answers are as long as yesterday's, so the provider is slower, not the facto
 
 Claude filed plan #1667 at 11:58, two minutes before closing #1547. The intake refused it as a second card for roadmap item 66 ("card t-dac528c87acc already builds roadmap item 66"), in factoryd's log only, once a minute. The issue stayed open with no comment and no card, and the project agent, finding no card, filed #1668 at 12:03 for the same work, with a body that said the branch compiles and that dropped the five proof cards. Who decided: Claude, by correcting #1668's body through the chat's card edit (verified word for word at 12:12) and closing #1667 as its duplicate. What full auto should do: a refused issue says why on the issue, once. Verdict: **bug**; card #1669.
 
+## 58. A plan's criteria request that no press could end (#1578, request 1123)
+
+After the hand refusal of entry 55, factoryd opened plan #1578's criteria gap again (request 1123: "six of seven criteria hold no stored proof"), and Sebastian pasted it at 12:08 to take care of. Claude waived the six open criteria there at 12:10, naming card #1665. The request stayed: the plan's integration card #1599 ended off main, so the close rule wants an approver's row on every criterion, and the seventh, the invariant suite_stays_green, stood met on the suite's gate row. The console refused a waiver on a met criterion, and Confirm shows only when every child card is done. Who decided: Claude, by denying the request at 12:20 (no further card), which cleared it from Needs you; the plan stays done but never closed. What full auto should do: an invariant met by its gate counts for a plan whose integration card ended off main. Verdict: **bug**; card #1673.
+
+## 59. The gate reserve card's merge call: five tests left on the old figures (#1641, PR #1644)
+
+The merge call came at 12:22 with the test job red and no criterion proven. The branch updated two budget tests to the reserve rule and left five that still expect the old figures (the manual table's 36 rows, four budget asks and refusals). The review had failed twice on the slow model (entry 56). Rung 2 did not answer in five minutes. Who decided: Claude, by returning the pull request at 12:28 with the five tests and the rule, code unchanged. Verdict: **works** (the return carries the fix); the agent's own check missed the five because `bash check changed` ran only the tests of the changed files.
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
