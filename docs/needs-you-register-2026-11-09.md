@@ -275,6 +275,14 @@ The intake's roadmap rule (store.go) lets any card that cites a roadmap item hol
 
 The checks wait's bound was the code default of 600 s. Pull-request image builds now wait up to 12 minutes for a build VM and build for about 10, so #1652 and #1633 stopped at the 20-minute cap with every check green or running. Claude set `bounds: WaitChecks: 2400` in the infra policy at 13:04, under the wait activity's start-to-close of 46 minutes. Card #1665 brings `waits.checks` with the 50-minute default that Sebastian set on plan #1578. Who decided: Claude. Verdict: **by design** (a bound), its value now fits the build.
 
+## 65. Rung 2 approved a 611-line merge whose review and audit never ran (#1633, PR #1674)
+
+PR #1674 (the check-in's interim push: factoryd fetches the bundle a sandbox ships, guards it and pushes it) reached the approval gate with its checks green, but the model review (12:37) and the audit (13:06) both died on the gateway's deadline (entry 56). Rung 2 settled the audit's flag as "outage noise" and approved the merge at 13:11 on the merge rule auto; factory-merge merged it at once. The change is a security boundary between the untrusted sandbox and factoryd's push credentials, and no model or person read it before it merged. Who decided: rung 2. Claude had an independent reviewer read the merged diff at 13:20. It found that the interim push force-pushes the commit the sandbox shipped, with the sandbox's own author and message, without checking that it descends from the start (wippush.go:107, :117). The worker's end push builds a commit of its own precisely so that the agent's commits stay out. The push also fetches the body without verifying that it is a bundle, and the first end push after an interim push is refused as a non-fast-forward. Claude checked each claim in the code. None of it is live: production runs a02583e, and plan #1580 stays open on main until its chain ends, so the group hold keeps it out. The fixes lead card #1634's brief (verified word for word at 13:3x).
+
+The lost end push has a second cause, the same as entry 51. Plan #1580's revision 3 (02:23) listed the merged #1607, the worker's POST /wip with its forced end push, under take_off_main, and group revert #1635 took it off main. The plan's later cards still assume it. Claude opened PR #1679, which reverts that revert. It applies cleanly, and the worker builds, vets and tests green.
+
+What full auto should do: a merge whose review or audit did not run is not approvable by rung 2. It waits for the review to run again or goes to a person. Entry 33 is the same gap from the other side. Verdict: **bug**, in rung 2's approval rule and, through entry 51, in plan #1580's revision 3.
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
