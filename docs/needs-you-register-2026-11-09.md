@@ -303,6 +303,198 @@ The console's Close on plan #1549 answered 409 "Card #1549 is done, not a card t
 
 Setting the dial to manual (infra PR #258) changed only the autonomy key. The project file kept `merge_rule: auto` from full auto, and under that rule factory-merge merges a pull request whose review approves, at any autonomy level (gates.go:593). The dial's code says "manual and assisted leave the rule". Who decided: Claude set `merge_rule: human` and `work_in_progress: 1` in infra PR #259. What full auto should do: manual, assisted and autonomous set `merge_rule: human`, and only full auto sets auto. Verdict: **bug**.
 
+## 71. A reply at a time cap granted no agent time, while the face said to reply
+
+A stop at an agent-time cap told the human to reply. The reply recorded the answer and granted no agent time, so the card stayed stopped. Who decided: Claude. What full auto should do: a reply at a time cap grants the agent time its face names. Verdict: **bug**. Tests: TestEveryFaceMatchesWhatAReplyDoes (checkin_failed_test.go:514).
+
+Fixed by #1724
+
+## 72. A failed roll card offered no retry
+
+A roll card that failed offered no way to try the roll again. Who decided: Claude, by a retry built early in the rebuild. What full auto should do: a failed roll on a quiet main retries itself after a back-off, and a human's retry resets the ladder. Verdict: **bug**. Tests: TestAFailedRollOnAQuietMainIsRetriedAfterTheBackoff (rolltask_retry_test.go:80), TestRetryTheRollResetsTheLadderThroughAct (internal/console/rollretry_test.go:95).
+
+Fixed by #1733 and #1758
+
+## 73. A share stop's extend started no session (#1572, 19:32 on 9 November)
+
+On #1572 the share stop's extend started no session. Who decided: Claude. What full auto should do: a share stop does not exist, and the check-in's judgment at a gate moment runs on the chat's task. Verdict: **bug**. The share stop and its extend are gone. Test: TestRunSessionCheckinJudgmentGateMomentRunsOnTheChatTask (runner_checkin_judgment_test.go:46).
+
+Fixed by #1745
+
+## 74. A dead sandbox lost uncommitted work, and the push-now message could not reach it
+
+When a sandbox died, its uncommitted work died with it. The message that asks a sandbox to push now could not reach a dead sandbox. Who decided: Claude. What full auto should do: work survives a dead session. Verdict: **bug**. Test: TestWorkSurvivesTheDeadSession (acceptance/interim_push_test.go:181).
+
+Fixed by #1697 and #1723
+
+## 75. Rung 2's replan of a planner at its time stop was refused as "being replanned"
+
+Rung 2 asked for a replan of a planner that had stopped at its agent time. The refusal said the card was being replanned. Who decided: Claude. What full auto should do: rung 2 extends the planner and passes the cut as guidance. Verdict: **bug**. Test: TestRung2ExtendsAPlannerWithTheCutAsGuidance (rung2_pg_test.go:429).
+
+Fixed by #1708 and #1747
+
+## 76. A check-in call on a reasoning model with a small output limit answered nothing
+
+The check-in call sent an output limit that a reasoning model spent on its thinking, so the call returned no answer. Who decided: Claude. What full auto should do: the check-in posts no output limit. Verdict: **bug**. Test: TestCheckinGatewayPostsNoOutputLimit (checkin_test.go:1341).
+
+Fixed by #1721
+
+## 77. Two pull requests, each green alone, broke main together (#1705, #1703)
+
+Pull-request CI tests a head on its own. #1705 and #1703 each passed alone on 10 November, and together they broke main at f18836bb. The factory's merge queue merges main into a branch before its merge, and a merge by hand or through the API skips the queue. Who decided: Sebastian. Main's protection stays as it is. The queue syncs before every merge, a red main gets its fix-forward card, and hand merges run in local merge trains that test the merged head. A rule that blocks outdated branches would starve the roller (entry 83). #1711 fixed the break itself. Verdict: **by design**. Forgejo 17.0.1 supports block_on_outdated_branch if a later decision wants it.
+
+Still open
+
+## 78. Forgejo kept every waiting run of main's CI, so the roller starved
+
+Forgejo kept each waiting run of main's CI. The backlog held production back on 10 November. Who decided: Claude. What full auto should do: a superseded run's cards take the next run's verdict. Verdict: **bug**. Test: TestASupersededRunsCardsTakeTheNextRunsVerdict (chainpoll_test.go:3048).
+
+Fixed by #1729
+
+## 79. The CI metrics poll read past Forgejo's 1 MiB answer cap
+
+The CI metrics poll asked for more runs than fit in Forgejo's 1 MiB answer cap. Who decided: Claude. What full auto should do: read the runs in pages that fit. Verdict: **bug**. Test: TestCIRunsReadsRunsInPagesThatFitTheAnswerLimit (cimetrics_test.go:272).
+
+Fixed by #1736
+
+## 80. go test's default 10-minute timeout killed the factoryd package in CI
+
+The default 10-minute timeout of go test killed the factoryd package in CI. #1725 raised it in .forgejo/workflows/pr.yml:68. No test pins the line. TestCheckModes (scripts/scripts_test.go:200) tests the check script and not pr.yml. Who decided: Claude. What full auto should do: one test pins the three workflow lines of entries 39, 41 and 80. Verdict: **bug**, part fixed.
+
+Still open
+
+## 81. A CI runner pod that dies mid-job gets no re-run
+
+killedChecks re-runs a job only when its log ends on a kill marker. A pod that the kubelet kills or evicts leaves a log cut after its last package and no marker. On cgroup v2 an out-of-memory kill takes the runner too, so the runner never reports the end. Five test jobs ended so on 10 November and three more on 11 November. Job 18548 of #1694 was a true failure with a FAIL line and "Job failed". Who decided: Claude, by hand, with a re-run. What full auto should do: killedJob searches the log's tail for the runner's closing line. A red job whose tail holds no closing line and no FAIL line was killed, and gets one re-run whose note says that the runner died. A job that dies from the same cause twice still ends red. Verdict: **bug**.
+
+Still open
+
+## 82. Each CI runner pod requests 22Gi, so pods wait for storage
+
+A runner pod requests the sum of its emptyDir limits: 22Gi, and 14Gi for a smoke pod. A node holds about 89.7 GB. #1710 admits only the pods that fit, so the rest wait in Forgejo's queue, and runs of the rebuild waited for long spells. Who decided: Claude. What full auto should do: measure each volume's peak over a week, then set each limit to the peak plus 50 percent, in whole Gi. The measurement starts in wave 0, so the fix lands after the Phase 5 roll. Verdict: **bug**, part fixed.
+
+Still open
+
+## 83. The roller waits for a green test on main's head, so frequent merges hold production back
+
+The roller cuts a roll only while main's head has a green test job. Main's runner has capacity 1 and a run that started as the head runs to its end. While merges land less than about 12 minutes apart, the head's test is never green when the roller looks. Who decided: Claude. What full auto should do: once the roller of #1759 merges, the roll's branch starts at the rolled commit, whose code passed main's test job. A fold cuts the branch again at the newer commit. The head rule goes. A roll whose branch is behind main merges. Verdict: **bug**.
+
+Still open
+
+## 84. factoryd reads Forgejo's "not mergeable" as a conflict and buys an agent session
+
+Forgejo reports a pull request as not mergeable while it checks, and answers a merge call with 405 "Please try again later" in that state. The gate reads that as a conflict and buys an agent session. The case is the factory's normal path, since a merge right after the queue's sync finds Forgejo still checking. Who decided: Claude. What full auto should do: the gate waits for Forgejo's check first, then updates the branch at most once per head. Only then does it call a not-mergeable head a conflict. Verdict: **bug**. #1628 fixed the wait for a pull request that already reads mergeable.
+
+Still open
+
+## 85. Forgejo's public endpoint refused connections three times on 10 November
+
+git fetch and curl got "connection refused" from the public endpoint three times on 10 November, each for under a minute. The cause is not known. Who decided: nobody. What full auto should do: read Forgejo's pod events and the ingress log at those times, then fix the cause or alert on refused connections. Verdict: **bug**.
+
+Still open
+
+## 86. factoryd quotes Forgejo's answer bodies in its errors, and Forgejo echoes a credential in a 401 body
+
+The Forgejo client puts Forgejo's answer body into its error text. Forgejo echoes a credential in a 401 body, as it did for the controller's entry on 10 November in a call outside factoryd. The log goes to SigNoz, and the scrubber holds only the boot secrets. The console's OAuth client prints Forgejo's body too. Who decided: nobody. What full auto should do: doLimit masks the credential its request carried, and the console's OAuth client does the same. Verdict: **bug**.
+
+Still open
+
+## 87. Flaky test TestOverBoundBundleInHandOutlivesThePodsGrace
+
+The test sets the pod's grace to 5.2 s and the margin is a fixed 5 s, so the fake pod must hand over its bundle within 200 ms. Under CI load on 11 November it did not. Who decided: nobody. What full auto should do: events order the test, and the hand-over gets 3 s. Verdict: **bug**.
+
+Still open
+
+## 88. Flaky test TestReconcileReportsWhetherTheScreeningPassed/suspect,_open
+
+The test failed once on an unexpected supervisor call. Reconcile makes no model call, and 3,000 runs under load did not repeat the failure. #1739 made the guard name the stray caller (TestUnexpectedSupervisorNamesTheStray, runner_test.go:6129). Who decided: nobody. What full auto should do: fix the source the guard names when the failure comes back. Verdict: **bug**, part fixed.
+
+Still open
+
+## 89. Three flaky tests, and a chat stop that leaked text after Stop
+
+Three tests flaked, and the chat's stream handed text on after its context ended. Who decided: Claude. What full auto should do: none of it flakes or leaks. Verdict: **bug**. Tests: TestWorkflowChecksFindingsDroppedEndOnTheCard (workflow_gates_test.go:1564), TestOperatorStreamHandsNoTextOnAfterItsContextEnds (operator_test.go:357), TestRunSessionRunsWhenTheProjectReadFails (runner_test.go:4816).
+
+Fixed by #1739 and #1742
+
+## 90. The recorded live histories replayed nothing
+
+The recorded live histories of the workflow replayed nothing. Who decided: Claude. What full auto should do: the replay is strict. Verdict: **bug**. Test: TestReplayOfALiveHistoryIsStrict (workflow_test.go:2715).
+
+Fixed by #1739
+
+## 91. The replay corpus holds no real recording of today's workflow
+
+Most of the 29 recorded histories predate the blind-proofs marker. They pin branches that no live run takes. Who decided: nobody. What full auto should do: in Phase 6, export the histories of three canary cards (a small fix, a plan of two cards and a stop for a human) into the test data. The code repository is public, and a card's history holds the card's text, so the canary cards are written with that in mind. Verdict: **not built**.
+
+Still open
+
+## 92. A face says what a reply does by mirroring the run's branches
+
+A face says what a reply does by copying the run's logic. Task 2.15 found five faces that said the wrong thing. Who decided: Sebastian. A table test drives every face's reply through the real run, and it stays as the guard. The alternative, a wait that hands its own reply effect to its face, changes every awaitHuman site and is size L. Verdict: **by design**. Test: TestEveryFaceMatchesWhatAReplyDoes (checkin_failed_test.go:514).
+
+Still open
+
+## 93. The check-in's moments and the rungs answer in two vocabularies
+
+The check-in's moments answer with continue, message, handover, human, replan and dropped_all. The rungs answer with action names from the one list of the design. Stored timeline rows hold the old values. Who decided: nobody. What full auto should do: the moments' answer schema takes its enum from the one action list, cut by moment, and "human" becomes the hand-up. A migration moves the stored values. It lands after the Phase 5 roll, since it fixes no observed fault. Verdict: **not built**.
+
+Still open
+
+## 94. The failed-roll card's "Retry the roll" did nothing
+
+The button on a failed roll card recorded the press and did not retry. Who decided: Claude. What full auto should do: the press resets the ladder and the roll runs again. Verdict: **bug**. Test: TestRetryTheRollResetsTheLadderThroughAct (internal/console/rollretry_test.go:95).
+
+Fixed by #1758
+
+## 95. The roller stops once enough work waits to roll
+
+From 15:41 on 11 November the roller's one Forgejo compare from the last roll to main answered more than its 1 MiB read limit, about 120 commits, so it filed no roll task. The chain poller, the queue and the holds read the same compare. Who decided: Claude. What full auto should do: #1759 reads commits in pages without file lists and takes the roller's base from the FACTORY_COMMIT pin. It merges after entries 96 and 99, with one test on a real Forgejo 17, a bound of 100 file names on the sync overlap's reads and a bound of 50 commits on the k8s-only check's reads. Production needs the hand roll, since its own roller has the fault. Verdict: **bug**. #1759 is not merged.
+
+Still open
+
+## 96. A PR test job dies when its packages outgrow the runner pod's memory
+
+The kernel kills gVisor's sandbox when the pod's memory cgroup reaches its 5Gi limit. Kernel logs on all three nodes hold dozens of such kills since 18:49 on 10 November. #1760's test pod grew from 1389 MiB to 5119 MiB in 35 seconds and the kernel killed the sandbox. The job's log stops with no failing test, as #1759's four deaths did. Local runs cannot reproduce it, since Linux reclaims page cache at the limit and gVisor cannot. Main's CI runs on the dind runner with warm caches and is not affected. Who decided: Sebastian ruled to fix it now if the measurement confirms the cause. Experiment pull request #1761 is that measurement. What full auto should do: the fix is chosen from its figures. The choices are a lower -p, the test data on a volume that does not count as memory, or a higher limit. Every pull request that touches internal/factoryd fails without it. Verdict: **bug**.
+
+Still open
+
+## 97. A failed human-card write leaves a closed duplicate issue on every retry
+
+When the store fails, FileTask closes the attempt's issue. The close defeats the reuse of an open issue with the same title, and each retry makes a new task id. One filer, EscalateToHumanWith, has no title reuse at all. Who decided: nobody. What full auto should do: after the old records step merges, FileHumanCard reuses an open issue by title and leaves it open when the store fails. Both callers get it. Verdict: **bug**.
+
+Still open
+
+## 98. A CI pod's /cache sits outside every storage bound
+
+/cache is a local-path claim and local-path does not enforce its limit. The pods of 10 November held 8 to 17 GB there against a prune cap of 10 GB. The node-fit check never counts the directory, so a node can fill while every pod fits. Who decided: nobody. What full auto should do: the node-fit check reserves the cap once per project and node, and the prune holds the cap. Verdict: **bug**.
+
+Still open
+
+## 99. The Forgejo test harness runs 15.0.9, production 17.0.1
+
+The harness runs another Forgejo version than production. Entries 84 and 95 rest on Forgejo answers that only production's version proves. The harness runs only by hand with FACTORYD_FORGEJO_TEST=1, since main's CI cannot pull its image. Who decided: nobody. What full auto should do: the harness runs 17.0.1. Verdict: **bug**.
+
+Still open
+
+## 100. A console package test flaked once in task 2.1's local run
+
+A console package test failed once and passed twice on a re-run. The cause is not known. Who decided: nobody. What full auto should do: run the console package under load (four busy loops, GOMAXPROCS=2, -race, -count=50), find the test and fix its cause, as for entries 87 to 89. Verdict: **bug**.
+
+Still open
+
+## 101. Workflow tests start at the wall clock
+
+newWorkflowHarness sets no start time. TestReplyWhileADayCapBindsBeforeTheBudget (face_drive_test.go:517) replies six hours after its start and failed on every run started after about 18:00 UTC, on main too. 19 other tests set their own start time. Who decided: nobody. What full auto should do: the harness sets one fixed start time, and a test that needs another keeps its own. #1760 fixes the one test that failed and is not merged. Verdict: **bug**, part fixed.
+
+Still open
+
+## 102. At full auto the project agent can confirm a plan through the chat's answer tool, past Act's rule
+
+A plan's confirmation runs through the chat's answer tool into AnswerPlan, not through Act. At the autonomous level, and so at full auto, the answer tool is not on the confirm list, so it runs at once with the decider agent. Nothing on that path asks whether the turn is a wake or whether the kind is the human's. The rule that a plan question and a plan confirmation are the human's lives in Act only. Production holds 44 plan answers decided by the agent, 3 of them confirmations, all of 10 November. The rows do not say whether a wake or a human's own chat turn made them. Who decided: the agent, through the chat. What full auto should do: one guard at the plan answer, which every path reaches. An agent's confirmation passes only at full auto and only when the revision takes nothing off main. Below full auto, or on a revision that takes merged work off main, the guard refuses and the refusal names the human's press. Plan questions get the same rule, and Act asks the same guard. Verdict: **bug**.
+
+Still open
+
 ## Decisions this register asks of Sebastian
 
 1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
