@@ -202,6 +202,8 @@ The action set is one list in code. Every action is a function that code runs, w
 
 Every extension and every grant any rung makes draws from the escalation pool of 5.7, a preallocated amount per project and month in policy with three parts: sessions, agent time and money. Rung 0 and rung 1 draw up to a per-card draw bound, also in policy, over the card's whole life, not per case. Rung 2 draws up to the pool. Nothing below the human extends or funds outside the pool (Sebastian, 2026-11-02: every extension and grant comes from a preallocated pool, never blank). When the per-card defaults turn out to open too many cases, the cure is a higher default per size, measured by the cases-per-card figure of section 7, not a looser pool.
 
+At a session cap, a handover needs a session to run in, so it travels with a draw of one session. Only rung 1's answer carries a draw, so rung 1 alone is offered the handover at the cap, and its answer is refused and asked again when it names the handover without the draw. Rung 2 extends and then hands over, or hands up. The human extends: one send carries the decision, its arguments and the fund.
+
 Three rules live in the action functions, not in any prompt, and hold for every rung and the human's buttons:
 
 - Every action has an `applies` predicate on the case's facts. Fund applies while a money sub-ask is open. Approve applies while a pull request is open with green checks. Extend applies while the allowance has room. The buttons a human sees, the actions a rung may pick and the chat's tool list are the actions whose predicate holds. No generic "Go on" survives.
