@@ -23,17 +23,25 @@ Seven candidates on five plans. Each was sound, and all were okayed. Who decided
 
 ## 4. `grant_bought_nothing` on a planner's session
 
+Fixed by #1571 (card #1555)
+
 Seen on #1540, #1541, #1543, #1545, #1547 and #1548. A human's answer counts as a grant, the planner's next session files a revision and pushes nothing, and the flag fires. Who decided: the factory agent, on rung 2, within a minute each time. What full auto should do: not raise the flag. Why it did not: the rule in `carddigest_flags.go` tests the session for `pushed` and has no sibling for a filed revision. Verdict: **bug**, card #1555.
 
 ## 5. Agent time used up after two OOMKilled sessions (#1542)
+
+Fixed by #1595, #1724 (task 2.15), #1744 (step 3.4)
 
 Both sessions ran a bare `go test -race ./...` and the 4 GiB sandbox killed the worker. The face said "Use Extend on the board". Who decided: Claude closed the card and refiled it as #1554 with `bash check changed` named. What full auto should do: rung 1 reads the digest, sees two sessions killed on the same command, and restarts with the test command named. Why it did not: rung 1 is not built (phase 3), and the sandbox lets a bare `go test` exceed its memory. Verdict: **not built**, phase 3 (#1561), plus the sandbox card for the trap (see entry 11).
 
 ## 6. The check-in hit its own 10-minute cap (#1543)
 
+Fixed by #1724 (task 2.15), #1747 (step 3.11)
+
 The check-in, the step that judges a stop, ran out of time and the card went to a human with "Reply on this issue to start a new attempt". The stop's label was `spend_above_policy`, a money word on a time cap. Who decided: Claude, by a reply. What full auto should do: a check-in that fails is the factory's own failure and goes to rung 2, never to a human. Why it did not: phase 3 rebuilds the check-in as a forced tool call on the case, with the digest instead of the whole transcript, and the cap's misnaming is a wording bug in the stop template. Verdict: **not built**, phase 3 (#1559, #1561). The label is a small bug to fix with #1559.
 
 ## 7. Agent time used up, and rung 2 bought the wrong thing (#1543)
+
+Fixed by #1708 (task 2.2), #1747 (step 3.11)
 
 At 15:55:49 the factory agent extended the card by one session. The cap that tripped was agent time, so the card stopped again at once. The monitor flagged `answer_changed_nothing`, the agent raised the ceiling at 15:56:42, and at 15:57:43 it replanned the card, which turned a 20-line fix into a plan. Who decided: the factory agent, in three tries. What full auto should do: the first action fits the trip fact, agent time at a time cap, as the Grant button already does since phase 2a. Why it did not: rung 2 chooses from the whole action set and the trip fact does not bind the fitting one. Verdict: **bug** in rung 2's choice. Check after phase 3's forced call (#1559) whether the trip fact reaches rung 2's schema. If not, a card.
 
@@ -51,17 +59,25 @@ Five "Job failed" and "Premium served by another model" alerts on a project with
 
 ## 11. A bare `go test -race ./...` kills the sandbox
 
+Fixed by #1595 (card #1570)
+
 Three sessions today (#1542 sessions 1 and 2, #1543 session 2). `bash check changed` runs with `-p 2` and fits. Verdict: **bug**, card #1570 (the sandbox bounds every `go test` as `bash check` does).
 
 ## 12. The weekly bump's hand-over to the factory loses its work at the push (#1540, #1471)
+
+Fixed by #1602 (card #1581), in production since 547e4328
 
 The routine `weekly-bump` files a human card with the choice "Have the factory do it". Sebastian pressed it on #1540 at about 09:05. The agent did the bump in one session: 15 files, +96/-96, `bash check changed` green. The push was refused: `refusing to push: .forgejo/ differs from the base`. The bump edits the `BUILDKIT` pin in `.forgejo/workflows/ci.yml`, and the push rule (`cmd/agent-worker/main.go`, `WorkflowDirs`) lets no agent change a workflow file. Session 2 redid the work and was OOMKilled. Run 2 (#1471, 2026-11-02) was lost at the push too, to a tooling fault. What full auto should do: finish the bump. Why it did not: the push rule is right, and the pin sits in the one place an agent may not write. Verdict: **by design**, with a fix by hand: ci.yml reads the buildkit line from `upstream-images.txt`, which already carries it, so the bump never touches `.forgejo/`. Pull request #1582 makes that change (Sebastian's go, 2026-11-09). Until it merges, card #1574 bumps everything outside `.forgejo/` and names the ci.yml line for a human. Two cards follow from the loss itself: #1580 (plan), the worker pushes its branch at every check-in so a dead session loses no work, and #1581, a write under a workflow directory tells the session at once that the push will refuse it.
 
 ## 14. The press "Have the factory do it" on #1551 did nothing
 
+Fixed by #1712 (task 2.16)
+
 Sebastian pressed it at 10:40:48. The press posted its comment on the issue (as `factory-chat`) and left no event on the card: the timeline holds `card_created` at 10:39:59 and nothing after, and the card stayed a human card. The card was 49 seconds old. factoryd's log of that minute is gone: roll #1552 replaced the pod at 10:57. Verdict: **bug**, cause unknown. To reproduce: press the choice on a routine's human card within a minute of its filing, and read the log.
 
 ## 15. The factory agent's `close` on a flag's case ended the card (#1540)
+
+Fixed by #1597 (card #1575)
 
 At 10:38:38 the factory agent answered case 54, a `grant_bought_nothing` flag, with `close` and the note "the flag's concern is settled … the replan's 4.36 EUR is now running session 0". `Act` closed the card: the issue closed, the replan's session was lost, and the routine filed #1551 eighty seconds later. A monitor-flag case offers `close` (`monitorActions` in actions.go), and `close` on any case ends the card. The agent read it as "close this case". Verdict: **bug**, card #1575.
 
@@ -71,17 +87,25 @@ Roll #1552 of c8c4b521 (the merge of #1544) replaced the factoryd pod at 10:57. 
 
 ## 13. "Needs a human" is posted before rung 2 had its turn
 
+Fixed by #1747 (step 3.11)
+
 Every monitor flag posts "factoryd: task … needs a human. … The card goes on meanwhile. Answer case N in the project chat" on the issue, and a minute later the factory agent answers it on rung 2. The human reads a call for help that was already answered. What full auto should do: post the face only when rung 2 declined or the kind is the human's. Verdict: **not built**, phase 4 (rung 2 on every case before the human).
 
 ## 17. A roll's checks wait asks a human at 10 minutes while the test job runs (#1576)
+
+Fixed by #1696 (task 1.4)
 
 At 16:43:39 the roll card #1576 stopped: "The gate supervisor stopped WaitChecks (attempt 1) past its bound of 10m0s: a roll task makes no model call: its gate trip goes to a human." Five of the pull request's six jobs were green and `pr / test` still ran, as it does for longer than 10 minutes on a change that reaches factoryd. Who decided: Claude, by a reply that restarts the same wait. What full auto should do: wait as long as CI's own bound. Verdict: **bug**, card #1578.
 
 ## 18. A session's pushes were rejected at its end, and the work was lost (#1556)
 
+Fixed by #1697 (task 1.1), #1719 (task 2.11), #1723 (task 1.6)
+
 Session 2 of #1556 ran from 16:22 to 16:47, wrote `internal/policy/manual.go` (206 lines) with its tests, and its three pushes at the end were rejected with "rejected or expired credentials". The pod ended with the work in it. Who decided: Claude, by a reply that starts a new attempt with "push first". What full auto should do: a session's push credential outlives the session's agent-time cap, and the work survives the session (card #1580). Verdict: **bug**, cause to find in the worker's push path and the credential's life. The third push-path loss of the day after #1540 and #1471.
 
 ## 19. A roll failed on a test job that ran the whole suite for a k8s-only diff (#1576)
+
+Fixed by #1612 (card #1583), #1700 (task 1.8)
 
 At 16:49 roll #1576 failed: `pr / test` killed after 15m56s, its log silent after the first package at 16:34. The roll's diff is k8s/*.yaml, and the package selection runs the whole suite for any non-Go change, cold, on the untrusted runner, beside the day's other pull requests. Main's own test run on the same code had passed. Who decided: nobody. The roll card is failed, the board offers it no Retry (a roll is no work card), and the merges of #1554 and #1555 wait for the next roll. What full auto should do: a roll's pull request tests what its diff reaches, and a roll whose job was killed without output runs once more before it fails, as a lost runner does. Verdict: **bug**, card for the selection filed (the k8s-only rule), the re-run of a killed job open.
 
@@ -91,17 +115,25 @@ Since 16:55 the roller writes "plan #1546 is open on main: no roll until no plan
 
 ## 21. The bump's pull request cannot pass its own image build (#1574, PR #1598)
 
+Fixed by #1698 (task 1.5)
+
 At 19:05 the card's check-in stopped with "access the factory lacks": the bump is pushed (PR #1598), and `pr / image-build` fails at `load metadata` for the store's copy of the new golang base, because the store gets a new upstream-images.txt line from main's upstream job after the merge. The routine's brief describes a pull-request build from the upstreams that does not exist, and the untrusted pull-request job holds no registry write credential by design. The test job is red too (`TestUpstreamImagesPinEachImageByDigest` on Dockerfile.sandbox, `TestFactoryStackIsTheFactoryImage`), which the card's next session fixes. Who decided: the factory agent resumed the card at 19:07 for session 4. What full auto should do: the store holds a pull request's new lines before its build runs. Verdict: **by design** gap, card #1603 (factoryd copies the pull request's new lines into the store, trusted side). Until it lands, a bump pull request reaches the human with its tests green and its image build red, and the human merges it on that evidence or waits for #1603.
 
 ## 22. The gates refused for money four times in one day (#1544, #1568 twice, #1574)
+
+Fixed by #1694 (task 1.2)
 
 Entry 8's shape, four times today: 10:22 (#1544, 0.03 EUR free), 17:42 and 18:18 (#1568, 0.07 EUR free each time; between the two the factory agent denied merge request 1066 because no review had run), 19:32 (#1574, 0.02 EUR free of 5.00). Each time the factory agent funded 1.00 to 2.00 EUR from the pool within two minutes and the gates ran. Who decided: the factory agent, every time. What full auto should do: never reach the stop. The card's budget pays the sessions and the gates from one pot (design section 8), and the sessions are the only spender that can empty it; a session that spends to the last cents leaves the review and the audit nothing, and a complete diff then waits for a fund, a review round and a second merge request. By construction: the sessions' ceiling is the budget less a reserve for one review call and one audit call. Verdict: **works** on rung 2, **bug** in the budget's shape, card #1605.
 
 ## 23. A share stop's reply granted one share, and the next session stopped at its start (#1572)
 
+Fixed by #1745 (step 3.5) for runs that hold checkin-judgment
+
 At 19:09 #1572's check-in stopped on "the check-in's share of the budget is spent", with 0.45 EUR of check-in spend against a 0.20 EUR share. Claude replied at 19:14 to start the attempt. The reply grants one more share (0.40 in all), still under the 0.45 spent, so session 4 met the same check at its start (`checkinBlock`, before any model call) and ended within a minute with zero model calls; the stop came back at 19:29 with `grant_bought_nothing` and `money_ask_hides_findings` beside it. Who decided: the factory agent at 19:32, with an extend of one more share (case 159), so session 5 runs on 0.15 EUR of check-in headroom. What full auto should do: a grant that cannot cover the spend is no grant; the face offers "one more share (€0.20)" against a spend it cannot reach. Why it did not: the grant is one base share by construction (`TaskUsage.ExtraCheckinShare`). Verdict: **bug**. Phase 3's #1563 removes the share stop, so no new card. Until it lands: when the spent figure is more than one share over, reply and extend one share.
 
 ## 24. A review's answer did not parse, and the review counted as not run (#1565, PR #1600)
+
+Fixed by #1629 (card #1606)
 
 Twice on the same card: at 18:58 the review's answer was empty (`model review answer invalid (EOF)`), at 19:38 it was cut inside its summary at the output bound (`unexpected EOF`, the JSON began `{"verdict": "approve", "summary": ...`). `parseReview` makes an answer that does not parse a note, never a failure, so the review counts as not run, `review_refused_not_run` flags it, and the case reaches the factory agent with nothing to do but note. Who decided: the factory agent, with a note at 19:39, and the card waits for its next head for a review. What full auto should do: the step corrects itself: one more call with the parse error and the bounds in the input, the note only after a second failure. Verdict: **bug**, card #1606.
 
@@ -111,25 +143,37 @@ The receipt card's pull request adds the table `merge_receipts`, so the policy g
 
 ## 26. The bump's merge call reached a human with red checks and no session left (#1574, PR #1598)
 
+Fixed by #1698, #1694
+
 At 19:43 the card's merge approval opened on the board (approval 1082, risk class high): "agent and model review both say merge, but the image-build check failed in all four rounds, so the PR cannot merge as it stands. The card is out of sessions, its granted third session bought nothing, and the audit holds 6 findings for a human." The face offered Return and Close, no Approve: Forgejo refuses a merge with red checks. The factory agent wrote that call for a human and stopped there. Two faults under it. The image build fails because the store lacks the pull request's new base images until main's upstream job runs after the merge (entry 21, card #1603). The test job (run 2494, 19:51) fails on four pin mistakes of the card's own: a 63-digit digest on the kube-scheduler v1.37.2 line, Dockerfile's Debian snapshot left at 20261015T000000Z while the two other Dockerfiles moved to 20261108T000000Z, and node v24.21.0 left in internal/factoryd/sandbox.go:42 and toolpark.go:60 while upstream-files.txt moved to v24.22.2. The agent's own caveat on the pull request says the full `bash check changed` did not fit the remaining budget. Who decided: Claude as controller, 19:56, on Sebastian's "take care of it": returned the pull request with the four fixes named to the line, granted one session and 2.00 EUR, and copied the four base images and the seven files of the pull request's lists into the store by hand with crane and the upstream scripts, the stand-in for #1603, so the image build can pass on the next push. What full auto should do: #1603 for the store, and #1605 for the budget that let the sessions run the card down to 0.02 EUR before its gates and its tests ran. Verdict: **by design** at the merge call (red checks are a human's), **bug** in the two causes, cards #1603 and #1605.
 
 ## 27. A session stopped on a goal conflict between the card's text and five review rounds (#1572)
+
+Fixed by #1768 (the verdict guards and the findings-repeated case)
 
 At 19:54 session 5 stopped with "goal conflict and no agent budget left: round 5 orders the guard at workflow_stages.go:776 reverted to the verified base 7b6e409f while the card mandate says a missing row means fix the workflow, and with sessions at 4 of 4 and the agent push of 971883fd refused on expired credentials only the owner can pick the direction". The card's text (plan #1543's revision) carries a clause with a false premise, and five sessions chose the clause over five unanimous reviews, the check-in gate and the criteria gate. Who decided: the factory agent at 19:56, by a comment ("the owner picks the direction: round 5 wins, revert the guard ... this is the last answer this card gets") and a resume, session 6 started at 19:56. What full auto should do: what rung 2 did, one round earlier: a reviewer's finding repeated three times against a card clause is the card clause's defeat, not a conflict for the owner. Verdict: **works** on rung 2 at the sixth round, and the cost of the five rounds (five sessions, 4.5 hours, four human stops) says the repeat guard of design 5.6 (a finding re-raised thrice ends the attempt) is not in the check-in's hands yet: phase 3, card #1561.
 
 ## 28. Five review rounds, the check-in and rung 2 read a guard's polarity backwards, and the agent was right (#1572, PR #1596)
 
+Fixed by #1731 (built early in this phase) for the review's claims
+
 Main's `notRunRow` (workflow_stages.go:776) reads `if !t.waitsOutOfQueue() { return }`, and `waitsOutOfQueue()` is `queueWaits >= versionQueueWaits && queued()` (queue.go:362). The stages harness runs QueueNone, so `queued()` is false, the guard returns early, and the base writes no audit row: the card's new assertion fails at base, as the agent said in every round. The agent's one-line rewrite, `if t.queueWaits < versionQueueWaits { return }`, is the version gate alone, which the function's own comment names ("the call sits under that gate alone"). Five model reviews, the check-in gate and rung 2 asserted the opposite ("base WRITES the row, your base-fails output cannot exist", 19:32 and 19:56) and forced the revert; the revert head b388c4e3 failed CI at 20:13 with `notRun = []` (TestStagesFailedAuditIsAFinding, run 2502). Who decided: Claude as Sebastian at 20:18, after reading the two functions: one session granted (1.50 EUR) and a change request on the pull request that restores the rewrite with the proof. Cost of the misreading: five sessions, four human stops, 4.5 hours. What full auto should do: a "fails at base" claim is a fact a tool settles, not an argument two models trade: the review's claims (`Claim{Kind, Symbol}`) or the check-in run the named test at base and at head and read the two results. The agent too never pushed the proof it had. Verdict: **bug** in judgment on both sides of the ladder, by construction a tool, candidate for phase 3's rung 1 card #1561 or a card of its own.
 
 ## 29. Rung 2 answered #1574's stop on a wrong fact (#1574, 20:02)
+
+Fixed by #1744 (step 3.4), #1747
 
 At 20:02 rung 2 answered the pace stop with "reverify": "the four fixes are committed and pushed, PR #1598's head reads 711108a2 (two commits past a6056e2f)". The two commits past a6056e2f are factoryd's own ("run the checks again", "Merge branch 'main'"), and run 2494 had failed the test job on 711108a2 at 19:51 with the four findings. Claude posted the correction at 20:04 and the next session pushed e12aef67 at 20:13 with two of the four fixes (the snapshot and the digest), not the node version in sandbox.go:42 and toolpark.go:60. At 20:33 rung 2 granted the next session with a mandate naming the snapshot and the digest again, both already on the branch since e12aef67, and left out the node literal, the one test the 20:32 check run failed; it also called the image build "the accepted structural red" after the store had held the images for half an hour. Claude corrected it on the issue at 20:34. What full auto should do: the case digest names the head's commits with their authors and the last check run's failing tests, so a "fixes are pushed" reading is a lookup, not a guess, and a mandate names what is red now. Verdict: **bug** in the facts rung 2 reads, twice on one card, a candidate for the digest (design 5.1).
 
 ## 30. A merge refused with "Please try again later" was read as a conflict (#1583, PR #1612)
 
+Fixed by #1628 and #1786 (the gate waits out the check, reads the pull request and merges once mergeable)
+
 Rung 2 approved PR #1612 at 20:16. At 20:27, right after the queue's turn merged main into the branch, Forgejo refused the merge with `status 405: Please try again later`, which it answers while its own conflict check on the new head runs. factoryd read the refusal as "the pull request no longer merges into main" and bought a session (20:28) for the agent to merge a main that was already merged; the pull request read `mergeable: true` throughout. Who decided: factoryd, rung 0, wrongly. What full auto should do: wait for Forgejo's check and merge again; a conflict is a head Forgejo reports as not mergeable. Verdict: **bug**, card #1614.
 
 ## 31. The bump's image build ran for forty minutes on the build VM (#1574, PR #1598)
+
+Fixed by #1786 (the code default cx33) and #1796 (the deploy value removed)
 
 Once the store held the new bases, `pr / image-build` got past its old failure and built the Dockerfiles on one throwaway Hetzner cx23 (2 vCPU, 4 GB; `CI_BUILD_VM_TYPE`, default in buildvm.go). Dockerfile.runner's warm-up step (build, vet, compile every test) reached internal/doclinks at about 380 s and then printed nothing for over twenty minutes. With three Dockerfiles at once (run 2519) the job ended at 46 minutes; with one at a time (run 2591, after #1643) the runner image finished at about 40 minutes, five under its 45-minute bound. On main the same step runs on the cluster's buildkitd and takes 111 s. The VM is too small for the module, and the parallel builds only made it worse. Who decided: nobody, the runs went to their bounds. What full auto should do: a build VM sized for the largest Dockerfile. Verdict: **bug** in the build VM's size; fixed by PR #1656 (cx33: 4 vCPU, 8 GB, 0.0144 EUR an hour against 0.0096), merged 11:36 on the 10th and set on the live factoryd by hand at 11:40, because Flux is suspended by the group hold. The one-at-a-time build of #1643 stays: it makes each build's log readable. Run 2591's red came from the sandbox image, entry 49.
 
@@ -139,9 +183,13 @@ The loop's session ended at about 21:40 UTC on the 9th; at 09:22 UTC on the 10th
 
 ## 33. A review that answers no verdict leaves a human as the only judge (#1632, PR #1637; #1587, PR #1631)
 
+Fixed by #1629, #1694, #1705 (task 2.8)
+
 PR #1637 (a pure move of the push rules, checks green) reached the board because the model review's answer had text after its JSON (entry 24's shape, the third time in a day), so the merge rule's first condition was never met and "a human is the only judge of this merge". PR #1631's review did not run at all: the card had 0.00 EUR free (entry 22's shape). Who decided: Claude, from the diff's file list and the review's own unparsed text (approve, strict improvement true). Verdict: **bug**, cards #1606 and #1605 cover both.
 
 ## 34. A card whose fix lives under .forgejo/ stops at the push rule (#1619)
+
+Fixed by #1730 (built early in this phase)
 
 The card for the pull-request image build's parallel stall needs a change to .forgejo/workflows/pr.yml; the worker refuses the push by construction and the check-in stopped the card at session 2 with its tested diff lost: "only a human can apply it or re-scope the card". Who decided: Claude as controller, by making the change on the fork and opening the pull request, as for #1582. What full auto should do: a card whose files are all under a workflow directory is a human's card from the start (intake reads the paths; the card's face says so and asks the human for the pull request), and the agent's session is never bought. Verdict: **by design** at the push rule, **bug** at intake, which sized and bought two sessions for a card it could not land.
 
@@ -155,13 +203,19 @@ Several cards' faces at 23:00 read "the day cap is reached: the card resumes on 
 
 ## 37. The criteria of a closed plan were never judged (#1548, approval 1115; #1543, approval 1108)
 
+Fixed by #1670, #1728 (task 2.6)
+
 Plan #1548's four cards are done and its three proofs stored, yet "the criteria gate never judged any of its four criteria" and the request offers only Waive per criterion or Deny, no Confirm (the Confirm appeared on #1543's request, whose cards were also done). Who decided: for #1543 Claude confirmed; for #1548 Claude at 10:20 on the 10th, by waiving all four with the reason that names the merged work, after the Confirm route refused: "t-3eb921eefcba is closed: a card of the plan is not done or merged". That card is #1624, cut into its successor #1638, which merged; the Delivered rule (internal/console/approvals.go:306) reads the cut card's status and never its successor's, so the face hides Confirm and the route refuses it. What full auto should do: a plan whose cards are all merged or superseded by merged successors, with its proofs stored, has its criteria judged by the gate, and Delivered follows a cut card to its successor. Verdict: **bug**, two faults, card #1652.
 
 ## 38. Four sessions could not add two lines, and a human pushed them (#1569, PR #1617)
 
+Fixed by #1595, #1697, #1723
+
 The cost-block card's pull request failed vet in three rounds on one mechanical fault: `acceptanceStore` lacked the new `TaskCallTotals` method. Sessions 2 to 5 ended OOMKilled or at the check-in's cap without pushing the fix; rung 2 granted twice, Claude once (09:35, value=grant). At 10:20 Claude added the three-line stub and pushed it to the pull request's branch on the factory-agent fork (6f5079bc) as sebastian, under Sebastian's ruling of 10:00 that the human does what the factory cannot. Who decided: Claude. What full auto should do: a fix the review states to the line and the agent cannot land in two sessions is the check-in's to apply, or the push-at-check-in plan (#1580) keeps the first session's work. Verdict: **bug** in the loss shape (entries 11, 23), cards #1570 and #1607 to #1610.
 
 ## 39. The pull-request image build never printed a failed build's log (#1574, PR #1598)
+
+Fixed by #1645 and #1774 (the build log and the pinned workflow lines)
 
 Every red image build of PR #1598 (runs 2481 to 2534, and the sequential run at 10:11 on the 10th) ended with `RUN exit status 1` and nothing else: the run step's shell has -e, and `wait` on a failed build ended the step before the script's `case` printed the build log and the FAILED line. Nobody, agent or human, could read why the sandbox or the runner image failed, and the factory agent called the red "an accepted structural failure" for a day on that silence. Who decided: Claude, by pull request #1645 (`rc=0; wait "$pid" || rc=$?`), merged under the ruling of 10:00. Verdict: **bug** in pr.yml, fixed by #1645; the stall of entry 31 (#1643) and the real cause of the 10:11 failure (the sandbox image, log to come) stand apart.
 
@@ -171,29 +225,43 @@ Claude's infra pull request #251 set the weekly bump routine to `files: agent` w
 
 ## 41. A silent format check kept a card red for five sessions (#1569, PR #1617)
 
+Fixed by #1650, #1774 and #1802 (the format check names the files it fails on, on pull requests and on main)
+
 The pull-request job's format step is `test -z "$(gofmt -l .)"`: it fails without naming a file. Two files on the branch were not gofmt-formatted (Go 1.26's doc-comment rules turn `''` into `”` and realign a struct literal), and nobody, agent, review or rung 2, could see which, so the merge call of 10:1x named a wrong cause ("typographic quotes in store.go doc comments") and five sessions ran out before the two-line fix. Who decided: Claude, by formatting the two files on the branch (06de14a6) and by pull request #1650, which makes the step print the files. Verdict: **bug** in pr.yml, fixed by #1650.
 
 ## 42. The checks-wait card ran out of time without touching its findings (#1578, PR #1625)
+
+Fixed by #1724, #1744, #1745
 
 Six sessions and 4.5 hours of agent time bought the card's policy half (the `waits.checks` key, the 50m default, PartsBound) and left the review's six findings untouched: the sessions surveyed, the check-in took its full ten minutes twice, and the last session (10:27) reached the card's wall-clock cap during the check-in with no work in progress. Rung 2 left the session-cap merge call. Who decided: Claude at 10:45, closing the pull request with the reason and refiling the remainder as a fresh card that starts from the branch. What full auto should do: the check-in reads the review's findings and the diff and sends a session that surveys past them to the handover with the first finding as its one job (phase 3's rung 1, #1561); the wall clock does not count the check-in's own ten minutes. Verdict: **by design** at the session cap, **bug** in the ten minutes a check-in takes from the card (entry 6).
 
 ## 43. A merge call stays on the board after its head moved (#1574, #1569)
 
+Fixed by #1678 (card #1653)
+
 After the human pushes to the branch or merges main into it, the pull request's old merge call stays in Needs you with its old text until the gates on the new head finish (ten to forty minutes), so the board shows a stale call whose Return and Close doors act on a head that no longer exists. Sebastian read #1574's and #1569's stale calls twice this morning. The design's case model (5.12) and face (5.8) make a case supersede itself when its head moves; today the approval row is replaced only by the next request. Who decided: nobody needed to. What full auto should do: a moved head withdraws the merge call at once and the face says "checks run on the new head". Verdict: **bug** in the face, card #1653 (the withdrawal alone; phase 5's face builds on it); until it lands a stale merge call is read with its head's hash in Details.
 
 ## 44. The phase 3 card for the forced tool call burnt two sessions on surveying (#1590, PR #1630)
+
+Fixed by #1744, #1745
 
 The card's first session spent its budget without wiring anything; the returned session (09:3x, one session and 3.00 EUR, the review's six findings as the mandate) surveyed for 17 minutes, changed one line, and stopped at the check-in's share. Who decided: Claude at 10:43, closing the pull request with the six items named so plan #1541 replans the card bounded and write-first. What full auto should do: rung 1 reads the review's findings and ends a surveying session at its first trip with the first finding as the next session's one job (phase 3, card #1561, the same shape as entry 42). Verdict: **bug** in the check-in's judgment of a surveying session, in the pipeline (#1561).
 
 ## 45. The test job's `go vet` was killed in the CI pod, and the red check had no retry (#1569, PR #1617)
 
+Fixed by #1700 and #1786 (the pod bounds and the re-run of a job whose runner died)
+
 Run 2596's test job on head 514eaaeb: every package passed and the job still failed, because `go test ./...` runs vet per package and the console package's vet ended with `signal: killed`, the CI pod's 4Gi memory limit (ci.go `ciLimits`). Nothing retried: the check went red, and the merge call of entry 43 stayed on the board with it. The rerun of the same job passed. Who decided: Claude, by rerunning the job. What full auto should do: a check that died by signal, not by a test, reruns itself once before the card's gates read it; and the CI pod's limit fits `go test ./...` of this module (6Gi, or `-p 2`). Verdict: **not built** (no distinction between a failed test and a killed tool) and **bug** (the limit); card filed.
 
 ## 46. CI pods queue on ephemeral storage, outside every bound (#1598, #1617, #1644 at 11:05)
 
+Fixed by #1710 (task 2.9)
+
 At 11:05 three `ci-runner` pods were Pending: "0/3 nodes are available: 3 Insufficient ephemeral-storage". Each CI pod requests 22Gi of ephemeral storage, each sandbox 18Gi, each node has 89 GB, and five sandboxes plus two CI pods filled the three nodes. The surge item (roadmap 342, card #1646) bounds sandboxes only; the CI pods that the same cards cause count nowhere, so a card's checks wait in a queue no face shows, and the checks-wait bound of plan #1578 then charges the card for the wait. Who decided: nobody. What full auto should do: the work bound counts a card's CI pod as part of its slot, or the CI pods' storage request shrinks to what a checkout and a build cache need. Verdict: **not built**; added to #1646.
 
 ## 47. The copy card lost a whole feature at its line bound, and its successor surveyed (#1640 → #1654)
+
+Fixed by #1719 (task 2.11)
 
 Session 1 of #1640 read for 15 minutes without a write (two supervisor messages at 09:47 and 10:00), then hit the check-in's 10-minute cap. Claude's reply of 10:25 named the files to write first. Session 2 wrote the whole feature: the size detector at 10:38 counted "diff 10 files +732/-175", although its progress line read "0 files changed 0 times". Its push was then refused 176 lines over the card's 600-line bound, it ran out of money (0.10 EUR free), and the work was lost with the session. `grant_bought_nothing` closed the card into successor #1654 at 10:59. #1654's one session surveyed again (repetition at 12:59, no progress at 13:12) and stopped at the check-in's time cap at 13:38. Who decided: Claude, by cutting #1654 at the bound into the copy logic and the wiring (#1685), funding it 1.50 EUR and replying to start the attempt at 13:4x. What full auto should do: a size trip on a card that holds its finished work pushes that work in parts (plan #1580's interim push is the same need), and the progress line counts the files the session wrote. Verdict: **bug** (the work lost at the bound; the progress counter); entry 18 is the same loss at a session's end. Claude's earlier reading of this entry, that the diff was not the session's own, was wrong.
 
@@ -203,13 +271,19 @@ The review refused at 10:57 (its 2 calls cost 0.14 EUR, 0.01 EUR free) and the a
 
 ## 49. The bump raised opencode and left its plugin behind, and only the image build saw it (#1574, PR #1598)
 
+Fixed by #1681
+
 The bump moved `OPENCODE_VERSION` in Dockerfile.sandbox from v1.18.32 to v1.19.5 and left opencode-plugin/package.json and its lockfile at 1.18.32. The sandbox image's version test after `npm ci` failed in run 2591; the test, vet, security and review gates all passed, and the agent, the review and rung 2 called the red image build "structural, clears after merge". Merging would have turned main's image-sandbox job red. Who decided: Claude, by reading the build log, raising the plugin to 1.19.5 with its lockfile (d6046b57) and uploading the matching npm cache to the store with scripts/upstream-files. What full auto should do: a test in the test job that holds the lockfile to the ARG, so the mismatch fails in seconds with both values named. Verdict: **not built**; card filed.
 
 ## 50. A plan's planner ran out of agent time twice without filing a cut (#1547)
 
+Fixed by #1708, #1732, #1747
+
 After #1587 was cut at 10:18 on its size bound (1774 lines against 1742), the planner's two sessions ended at 11:04 without a revision: "the planner used its agent time and its automatic second session without filing a plan". The supervisor's 10:18 message had already named the cut (one card lands the branch compiling, then one card per proof). Who decided: Claude, by Extend at 11:45 with that cut as the guidance. What full auto should do: rung 2 extends a planner that stopped for time when the cut is already written on the card, and the planner writes its revision before it refines it. Verdict: **bug** (the stop reached the human column with the answer on the issue) and the same shape as entry 4. Rung 2's raise of the ceiling at 11:56 bought one more empty session, and the bought-nothing guard then refused every extend (entry 53). Claude closed the plan at 11:58 and refiled its rest as plan #1667, with the cut in its body; factoryd: "its merged cards stay on main". Claude's own fault in this: every chat message Claude sent with curl's `-F` before 12:10 was cut at its first semicolon, so the successor request reached rung 2 as half a sentence, and its first edit of #1668 lost the body's last lines. Claude now sends chat messages with `--form-string`.
 
 ## 51. Confirming a plan revision reverted three merged cards, and Claude confirmed it (#1541, revert #1661)
+
+Fixed by #1702 (task 2.1)
 
 Plan #1541's revision 4 listed #1566 (resolution queue), #1588 (schema validator) and #1589 (note offered), all merged and green, under `take_off_main`, while its spec and glossary still name the resolution queue as merged and pinned by its replay tests. The planner meant that the done cards leave the round's card list. Claude confirmed the revision at 11:29 without reading the face's line "Takes off main: rung1-schema-validator, rung1-note-offered, case-resolution-queue"; factoryd filed revert card #1661 (PR #1660) and paused the merge queue. Claude held the PR with a request-changes review and closed the card at 11:36; factoryd answered "its cards stay on main". Who decided: Claude, wrongly at the confirm, then rightly at the hold. What full auto should do: the judge refuses a take-off that the revision's own text contradicts, and the confirm names the revert on its button. Verdict: **bug** in the plan's shape and the confirm's face, and a reading error of Claude's; card #1663.
 
@@ -219,6 +293,8 @@ The project chat's November budget of 50 EUR was spent by about 11:00 on the 10t
 
 ## 53. The board's Extend cannot raise a planner's agent time, and the failed extend blocked Go on (#1547)
 
+Fixed by #1708 (task 2.2)
+
 The planner's time stop at 11:04 said "Use Extend on the board". The board's Extend form has sessions, lines and EUR, and no agent time. Claude's Extend at 11:29 started nothing, was flagged `answer_changed_nothing`, and the stop's Go on was then refused as "the last draw at 11:29 UTC bought nothing". Only the chat's extend carries minutes. Who decided: Claude, by asking the chat once its budget was raised. Verdict: **bug**; card #1664.
 
 ## 54. PR #1598 merged: the bump is on main (#1574)
@@ -227,9 +303,13 @@ After the plugin fix (entry 49) and the cx33 build VM (entry 31), all six checks
 
 ## 55. One plan's delta round starved the criteria pass for an hour, and a one-card plan cannot take a delta card (#1578)
 
+Fixed by #1704 (tasks 2.3 and 2.5)
+
 Claude granted plan #1578's gap at 10:44 (approval 1119: one more bounded card, the review's six findings as guidance). The delta round's answers broke the plan rules every time ("0 cards with role foundation; the process wants exactly one", and the delta card may not depend on the integration card): plan #1578 has one card that is its own integration, and `judgeDelta` judges the merged plan with the first round's shape. Each of the round's model calls took about two minutes, so the pass's 4-minute bound cut the second of three attempts, and a failed call stays due. The criteria pass walks the plans in id order and t-8aeae5765579 sorts first, so from 10:44 every pass ended "still running at its bound of 4m", and the close check, round check and delta dues of the seven other open plans failed with `context deadline exceeded`: no plan could close or start its next round, and the production hold could not lift. No console door stops a granted delta: a criterion waives only on a pending request, a done plan does not close, and a done plan's issue close reaches no workflow. Who decided: Claude, by filing the work as card #1665 from PR #1625's branch and writing the six `delta_refused` marks into plan_catches by hand at 11:51, what factoryd's own refusal writes. What full auto should do: the pass runs every plan's checks before any model call, a delta call has its own bound and a timeout counts as a refused attempt, and a delta card is judged as a card. Verdict: **bug**, two of them; card #1666. From 11:55:30 the pass ran within its bound again, with no plan check failing (checked to 12:02).
 
 ## 56. The main model is three to four times slower today, and slowness never reaches the fallback (10 November)
+
+Rejected by Sebastian on 2026-11-11: no twin; infra #266 removed them
 
 LiteLLM's spend log for zai/glm-5.3, the `big` alias of every agent, review, audit, check-in and planner call:
 
@@ -245,9 +325,13 @@ The answers are as long as yesterday's, so the provider is slower, not the facto
 
 ## 57. The intake refused a plan in its log only, and a duplicate followed (#1667, #1668)
 
+Fixed by #1706 (task 2.4)
+
 Claude filed plan #1667 at 11:58, two minutes before closing #1547. The intake refused it as a second card for roadmap item 66 ("card t-dac528c87acc already builds roadmap item 66"), in factoryd's log only, once a minute. The issue stayed open with no comment and no card, and the project agent, finding no card, filed #1668 at 12:03 for the same work, with a body that said the branch compiles and that dropped the five proof cards. Who decided: Claude, by correcting #1668's body through the chat's card edit (verified word for word at 12:12) and closing #1667 as its duplicate. What full auto should do: a refused issue says why on the issue, once. Verdict: **bug**; card #1669.
 
 ## 58. A plan's criteria request that no press could end (#1578, request 1123)
+
+Fixed by #1704
 
 After the hand refusal of entry 55, factoryd opened plan #1578's criteria gap again (request 1123: "six of seven criteria hold no stored proof"), and Sebastian pasted it at 12:08 to take care of. Claude waived the six open criteria there at 12:10, naming card #1665. The request stayed: the plan's integration card #1599 ended off main, so the close rule wants an approver's row on every criterion, and the seventh, the invariant suite_stays_green, stood met on the suite's gate row. The console refused a waiver on a met criterion, and Confirm shows only when every child card is done. Who decided: Claude, by denying the request at 12:20 (no further card), which cleared it from Needs you; the plan stays done but never closed. What full auto should do: an invariant met by its gate counts for a plan whose integration card ended off main. Verdict: **bug**; card #1673.
 
@@ -257,6 +341,8 @@ The merge call came at 12:22 with the test job red and no criterion proven. The 
 
 ## 60. The checks-wait stop's Keep waiting does nothing (#1652, #1633)
 
+Fixed by #1707 (task 2.7)
+
 The stop's face says "Keep waiting re-runs the gate's checks now". The console maps the button to the action `note`, which records the answer and leaves the card stopped. On #1652 at 12:42 every check of PR #1670 was green, and the press changed nothing. Rung 2's `resume` worked on #1633 at 13:00. On #1652 it was refused at the card's agent-time cap, although a checks wait spends no agent time. Who decided: Claude, through rung 2. Verdict: **bug**; card #1677.
 
 ## 61. #1652 merged by a person over the review's one concern (PR #1670)
@@ -265,9 +351,13 @@ The review found build items 1 and 2 well built and the change a strict improvem
 
 ## 62. Two merge calls blamed a timeout for red checks that were five stale tests each (#1642 PR #1655, #1641 PR #1644)
 
+Fixed by #1709 (task 2.12)
+
 #1642's merge call said "the ./... race suite times out after 10 minutes, so checks are red across five runs". The pull request's test job failed after 8m42s on five console tests that still expected the old refusal wording. The 10-minute timeout was the criteria prover's own suite run in the sandbox, not CI. #1641 had the same shape with five budget tests. One of #1642's five, TestErrorsShowNoInternals, guards the rule that plan #1545 replaced ("the details go to the log"). Who decided: Claude, by returning both with the five tests each and the rule, code unchanged. What full auto should do: the merge call names the failing tests of the red job, read from the job's log, and keeps the prover's timeout apart. Verdict: **bug** in the merge call's diagnosis.
 
 ## 63. A closed card holds its roadmap item for good, so a refile is refused (#1667, #1675)
+
+Fixed by #1706
 
 The intake's roadmap rule (store.go) lets any card that cites a roadmap item hold it, "open or done", until the item leaves the roadmap. A person's refile of a closed plan with its `Roadmap:` line was refused twice: #1667 (roadmap 66) and #1675 (roadmap 342). Both landed only after the line was replaced by a plain source line, which drops the roadmap link. Who decided: Claude and rung 2, by that edit. Verdict: **bug**; added to card #1669.
 
@@ -277,6 +367,8 @@ The checks wait's bound was the code default of 600 s. Pull-request image builds
 
 ## 65. Rung 2 approved a 611-line merge whose review and audit never ran (#1633, PR #1674)
 
+Fixed by #1705, #1697, #1679
+
 PR #1674 (the check-in's interim push: factoryd fetches the bundle a sandbox ships, guards it and pushes it) reached the approval gate with its checks green, but the model review (12:37) and the audit (13:06) both died on the gateway's deadline (entry 56). Rung 2 settled the audit's flag as "outage noise" and approved the merge at 13:11 on the merge rule auto; factory-merge merged it at once. The change is a security boundary between the untrusted sandbox and factoryd's push credentials, and no model or person read it before it merged. Who decided: rung 2. Claude had an independent reviewer read the merged diff at 13:20. It found that the interim push force-pushes the commit the sandbox shipped, with the sandbox's own author and message, without checking that it descends from the start (wippush.go:107, :117). The worker's end push builds a commit of its own precisely so that the agent's commits stay out. The push also fetches the body without verifying that it is a bundle, and the first end push after an interim push is refused as a non-fast-forward. Claude checked each claim in the code. None of it is live: production runs a02583e, and plan #1580 stays open on main until its chain ends, so the group hold keeps it out. The fixes lead card #1634's brief (verified word for word at 13:3x).
 
 The lost end push has a second cause, the same as entry 51. Plan #1580's revision 3 (02:23) listed the merged #1607, the worker's POST /wip with its forced end push, under take_off_main, and group revert #1635 took it off main. The plan's later cards still assume it. Claude opened PR #1679, which reverts that revert. It applies cleanly, and the worker builds, vets and tests green.
@@ -284,6 +376,8 @@ The lost end push has a second cause, the same as entry 51. Plan #1580's revisio
 What full auto should do: a merge whose review or audit did not run is not approvable by rung 2. It waits for the review to run again or goes to a person. Entry 33 is the same gap from the other side. PR #1679 merged at 13:32 (2b881ed4). Until card #1680 lands, Claude told rung 2 in its thread at 13:30 not to approve a merge whose review or audit did not run, and rung 2 confirmed it. Verdict: **bug**, in rung 2's approval rule (card #1680) and, through entry 51, in plan #1580's revision 3.
 
 ## 66. spend_no_push counts a card's whole life, so a funded card's next session trips at once (#1654)
+
+Fixed by #1714 and #1774 (the supervisor rule and the runner hand-over test)
 
 After the cut and a fund of 1.50 EUR at 13:41, #1654's next session ran 12 commands, and the supervisor's spend_no_push detector tripped at 13:55: "3.90 of the card's 6.50 EUR are spent (60 percent, the line is 60) and no work is pushed". 3.54 EUR of that was spent before the session started, by sessions whose work was lost (entry 47). The detector judges the card's lifetime spend against the session's push, so any new session on a card past 55 percent trips within minutes, and a fund moves the line only by its own share. The supervisor chose replan, and the card now runs as a plan cutting its remaining work. Who decided: the supervisor. What full auto should do: spend_no_push weighs the session's own spend since its start, or the spend since the last push. Verdict: **bug**.
 
@@ -293,13 +387,19 @@ Three merge calls waited at 14:08. #1662's PR #1681 had a model review that appr
 
 ## 68. Close refuses a card that an open dependency blocks, and the refusal points at the log (#1561, #1563, #1591, #1609, #1610, 15:18)
 
+Fixed by #1716 (task 2.19), #1695 (task 1.3)
+
 The console's Close answered 502 "Forgejo refused to close the issue; see the factoryd log" on five queued cards. The log held Forgejo's reason: status 412, "cannot close this issue because it still has open dependencies". Each card depended on an open card or its open plan (#1659, #1634, #1541, #1580), and each stayed queued. Who decided: Claude removed the open dependency edges through the Forgejo API and pressed Close again, and all five closed. What full auto should do: Close removes the card's own dependency edges before it closes the issue, and a refusal names Forgejo's reason. Verdict: **bug**. The refusal's wording is #1642's work (task 1.3 of the local rebuild plan).
 
 ## 69. A done plan has no Close, so its production hold ends only by waiving each criterion (#1549, 15:22)
 
+Fixed by #1718 (task 2.20)
+
 The console's Close on plan #1549 answered 409 "Card #1549 is done, not a card that is not final: the card is final: a new card continues the work." A plan with merged cards holds production until factoryd records plan_closed, and factoryd records it only when every criterion is met or waived. #1549's cards moved to the local rebuild, so Claude waived its ten criteria on its criteria rerun request (approval 1135), one press each, with the plan task as the reason. Factoryd closed the plan at 15:23. The refusal also reads as two sentences glued together. Who decided: Claude. Plan #1541 sat between rounds (its outline held rounds 3 to 5). Closing its issue on Forgejo ended it at 15:51 with "its merged cards stay on main", so only a plan without an outline needs the waivers. What full auto should do: a plan's Close waives its open criteria with the note, records plan_closed and says that its merged cards stay on main. Verdict: **not built**.
 
 ## 70. The autonomy dial's manual level keeps merge_rule auto, so a manual project still merges without a human (15:16)
+
+Fixed by #1701 (task 2.21)
 
 Setting the dial to manual (infra PR #258) changed only the autonomy key. The project file kept `merge_rule: auto` from full auto, and under that rule factory-merge merges a pull request whose review approves, at any autonomy level (gates.go:593). The dial's code says "manual and assisted leave the rule". Who decided: Claude set `merge_rule: human` and `work_in_progress: 1` in infra PR #259. What full auto should do: manual, assisted and autonomous set `merge_rule: human`, and only full auto sets auto. Verdict: **bug**.
 
@@ -494,6 +594,66 @@ Still open
 A plan's confirmation runs through the chat's answer tool into AnswerPlan, not through Act. At the autonomous level, and so at full auto, the answer tool is not on the confirm list, so it runs at once with the decider agent. Nothing on that path asks whether the turn is a wake or whether the kind is the human's. The rule that a plan question and a plan confirmation are the human's lives in Act only. Production holds 44 plan answers decided by the agent, 3 of them confirmations, all of 10 November. The rows do not say whether a wake or a human's own chat turn made them. Who decided: the agent, through the chat. What full auto should do: one guard at the plan answer, which every path reaches. An agent's confirmation passes only at full auto and only when the revision takes nothing off main. Below full auto, or on a revision that takes merged work off main, the guard refuses and the refusal names the human's press. Plan questions get the same rule, and Act asks the same guard. Verdict: **bug**.
 
 Still open
+
+## 103. The kube client never retried the API server's transient 429
+
+On 12 November at 09:09 the console's job listing failed once on the API server's 429 with a Retry-After. Who decided: Claude, in the rebuild. What full auto should do: the client honours Retry-After and retries. Verdict: **bug**. Test: TestKubeCallRetriesThrottle (kube_test.go).
+
+Fixed by #1769
+
+## 104. gVisor pods requested far less memory than they used
+
+The CI and sandbox pods request 1 GiB and 512 MiB against measured p99 of 3.9 and 4.0 GiB, so the scheduler packs nodes into memory pressure and the OOM controller kills pods. Who decided: Sebastian, on 2026-11-12. The requests stay, and Phase 6 counts the OOM controller's kills of CI and sandbox pods daily; a sandbox kill moves the requests to the measured p99 (branch held). Verdict: **by decision**. Measurement: k8s.pod.memory.working_set, 15 October to 12 November.
+
+Still open by decision: the requests stay, the kills are counted daily
+
+## 105. The test Postgres ran out of its container's shared memory
+
+Under go test -race -count=12 the console tests ran the server out of the 64 MB of /dev/shm a container gives. Verdict: **bug**. Tests: the console suite under -count=12, and schematest.Scratch drops each test's database.
+
+Fixed by #1774
+
+## 106. The S3 client never retried a transient failure
+
+On 12 November at 09:30 a brief's read of a card's timeline failed once on a timeout. Verdict: **bug**. Test: TestS3BodyReadFailureAfterCallerContextEndedIsNotRetried and the retry tests beside it.
+
+Fixed by #1772
+
+## 107. A ladder test panicked with "rung 1 panicked: close of closed channel"
+
+The panic came from the test's own fake, which closed a channel on every model call; a monitor flag's own rung 1 made a legitimate second call. Production rung 1 does not run twice on one held case. Verdict: **works** (the record shows the recovery held).
+
+Fixed by #1785
+
+## 108. At full auto the agent's change request at a session cap bought a session past the pool
+
+The workflow took a writer's change request at the cap as the human's answer and drew it on rung 3, which no pool bound refuses. Verdict: **bug**. Tests: the full-pool, room-in-the-pool, person's and mixed-drain tests; replay of devserver-agent-change-request-at-cap.json.
+
+Fixed by #1789
+
+## 109. A plan whose leaf card failed with no dependents waited on it with nothing that ever ended the wait
+
+After "Leave it" on the failed card, the plan's wait had no owner: no case, no clock, and the daily list reads cases only. Verdict: **bug**. Test: the dependency_failed case beside the plan and its face.
+
+Fixed by #1801
+
+## 110. A successor card left its dependents waiting on the old card
+
+Successor filed the successor with the old card's Parent and PlanKey and moved no task_deps edge. Verdict: **bug**. Test: a dependent waits on the successor and starts when it merges.
+
+Fixed by #1801
+
+## 111. The console's "Overrule the review" re-ran the review on the same head
+
+The press mapped to a plain reverify with no finding verdicts, and no test pinned it. Verdict: **bug**. Tests: the drop verdict with the human's reason, the required reason field, and the premade buttons through the answer path.
+
+Fixed by #1801
+
+## 112. A restarted run forgot the deadlock mark, so its first repeat formed no deadlock ask
+
+The mark lived in the run's memory. Verdict: **bug**. Tests: the restored mark keeps its grant; replay of devserver-checkin-priors-repeats.json.
+
+Fixed by #1801
 
 ## Decisions this register asked of Sebastian
 
