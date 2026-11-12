@@ -182,7 +182,7 @@ The action set is one list in code. Every action is a function that code runs, w
 | re-verify the head, no session | yes, when the review approved the head | yes | yes | yes | built as a branch |
 | route to the approval card | yes, when a pull request is open and the matter is a policy class | yes | yes | no | planned (fault 1) |
 | confirm, drop or remark a finding, with evidence | no | yes | yes | yes (Overrule with a reason) | built for rung 1, S18 for the human |
-| extend: sessions, agent time, lines, drawn from the escalation pool within the per-card draw bound | yes, when the head is one green check from merge | yes | yes | yes | console only, 11-02 |
+| extend: sessions, agent time, lines, drawn from the escalation pool within the per-card draw bound | only the audit's own draw at a cap, not through the action list | yes | yes | yes | console only, 11-02 |
 | extend past the per-card draw bound, within the pool | no | no | yes | yes | no |
 | fund from the pool, within the card's ceiling | no | yes, within the per-card draw bound | yes | yes | chat tool, bounded |
 | raise a card's ceiling, drawn from the pool | no | no | yes | yes | no |

@@ -2741,7 +2741,9 @@ writes. Stage 17 added the reads `alerts`, `resources`, `projects` and
 for the factory's writers, and five writes, `split_card` (since
 replaced by `replan`), `github_sync`
 (below), `alert_verdict`, `promote_resource` and `release_resource`
-(roadmap 158). So the chat has 19 reads and 25 writes. The factory pages'
+(roadmap 158). So the chat had 19 reads and 25 writes. `alert_verdict`
+went in the local rebuild of November 2026, with the escalation records,
+so the chat has 24 writes. The factory pages'
 reads and writes check the factory writer inside the shared functions,
 so a page and a tool refuse in the same words. The console's GET routes
 come from one table, and each names its tool or the reason it has none,
@@ -5397,7 +5399,7 @@ bounds and detectors can be tuned from data:
 |---|---|---|
 | `gate_bound` | a gate activity runs past its bound (6.6) | the gate supervisor's action: `wait` is noise, the rest real. A short gate's row stays open |
 | `supervisor_trip` | a session detector trips | `continue` is noise, any other action real, resolved by `supervisor` |
-| `escalation` | an agent or a supervisor escalates | the project agent's `alert_verdict` tool: real, noise, or since 2026-11-03 `same_cause` with the first card named, which closes the second card with the comment "Same cause as #N." and records `same_as` on its row; decided alone at full auto or confirmed by a human in the chat. `unjudged`, set by factoryd, when the task ends without a verdict. Until 2026-11-02 the escalation card also asked an approver, "real problem" or "noise"; that survey left the cards |
+| `escalation` | an agent or a supervisor escalated, until the local rebuild of November 2026 | the project agent's `alert_verdict` tool: real, noise, or since 2026-11-03 `same_cause` with the first card named, which closed the second card with the comment "Same cause as #N." and recorded `same_as` on its row; decided alone at full auto or confirmed by a human in the chat. `unjudged`, set by factoryd, when the task ended without a verdict. Until 2026-11-02 the escalation card also asked an approver, "real problem" or "noise"; that survey left the cards. Since the rebuild an escalation opens a case that the ladder of [the card flow](card-flow-redesign-2026-11-02.md) settles, factoryd writes no `escalation` row, and the tool is gone. The old rows keep their verdicts |
 | `info_request` | an agent asks the poster (7), Task 66 | `unjudged`, set by factoryd when the task ends without a verdict (Stage 9) |
 | `alert` | a SigNoz alert files an issue, Task 70 | real when the task's pull request merges, noise when a human closes the issue without a merge. On a human-lane issue, a writer's close is real and the label `noise` makes it noise (Stage 9). Since 2026-10-21 `unjudged`, set by factoryd, when the agent task ends any other way, for example failed |
 | `config_rejected` | a configuration commit is refused, or ten reads in a row fail (5.3), Stage 9 | real, set when a valid commit loads |

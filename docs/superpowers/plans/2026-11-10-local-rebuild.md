@@ -211,7 +211,7 @@ The design names more than the outline. Fold each into the step that owns its co
 | | Question | Recommendation |
 |---|---|---|
 | D1 | Merge approval, criteria, Deploy now and dependency edges join the one action list of §5.5, or stay outside it as today | Join it, so the face and rung 2 use one list |
-| D2 | Rung 2 runs on premium at every level (§5.2), or on big as today | Big while premium has 85 percent of its month spent; premium after |
+| D2 | Rung 2 runs on premium at every level (§5.2), or on big as today | Decided: rung 2 runs on big at every level |
 | D3 | The 10 contradictions between design and code listed in the ledger (design §5 vs main): the design says code wins where they differ | Confirm per item when its step starts |
 | D4 | The judgment budget is the chat budget: its size (policy 30 EUR, revision 4's code default 10, the 50 EUR spent by the 10th) | One budget key, sized from today's spend: about 5 EUR a day of rung 2 |
 | D5 | Rung 2 may press Deploy now (§5.11), which `chatDeploysAnyway` refuses today | Yes, within the roll-held case only |
@@ -240,7 +240,7 @@ After Phases 1 to 3, fix every fault of this session's bug log that no earlier t
 
 ## Phase 6: Restart and observe
 
-- [ ] Settle the model question first: z.ai's glm-5.3 at its speed of that day, or the Alibaba twin (register decision 11).
+- [ ] The model question is settled: z.ai serves big and small with no twin from another provider, and OpenAI serves premium.
 - [ ] Undo the freeze of Task 0.1: set `work_in_progress: 4` and `surge: 2` in the infra project file, the autonomy level back to full auto (it writes `merge_rule: auto`), and open the intake on the console (intake=open).
 - [ ] File three canary cards of different shapes: a small fix, a plan of two cards (the receipt plan #1668 is the candidate), and one that must stop for a human. Watch each stop pass rung 0, rung 1 and rung 2 before it reaches the face.
 - [ ] Write the observations for Sebastian: per stop, which rung answered, how long it took, what it cost, and how the face read.
