@@ -189,51 +189,12 @@ stays open). The count after the rebuild's Phase 5 roll found 199 ended
 human cards with an issue and every issue closed, so the entry leaves
 with no cause left to fix.
 
-## 1. An ended card's issue stays open, and both red-main remedies can land
+Both faults that remained are fixed, and the register is empty.
 
-Status: the fix landed on code main 2026-11-02 (fcec3a73 to 1d89308a,
-docs/red-main-revert-plan-2026-11-02.md) and rolled on 2026-11-04, the
-factory's first roll of the day at 07:56. The issues still read open: 49
-stood open on ended cards that evening against the 27 the migration hands
-to the heal pass, and no close landed after the roll. The heal's close
-path needs a look before this entry leaves. Found 2026-10-31 on card #1333
-("Revert 6b368fd: main red since 2026-10-30T03:30:07Z, no fix landed"),
-filed as "a red-main revert card does not jump the queue". The check on
-2026-11-02 shows that the queue did its job: the revert merged on its own
-at 2026-10-30 05:34 UTC, 4 minutes after its filing, and all 47 push runs
-of main after it to 2026-11-01 03:00 ended green. The card looked stuck
-because its issue never closed.
-
-Two faults stand. The issue of an ended card stays open on three paths:
-a card that factoryd filed around its own pull request and that ends done
-(#1157, #1333), a card that ends closed while its issue has open
-dependencies, which Forgejo refuses to close with 412 (10 plan-dropped
-cards), and a closed plan (all 15 in the code repository). Both remedies
-of a red main can land: on 2026-10-20 the fix-forward card #1154 and the
-revert #1157 merged 2 seconds apart, and the revert put three stray log
-files back on main.
-
-The fix: a red main gets one automatic remedy at a time. The revert's
-filing ends the fix-forward card, and the merge gate holds a revert while
-the fix merges or once no pause names it. A red that outlives the remedy's
-merge goes to a human, and main's green ends every remedy that did not
-merge. Every done card but a plan, and every closed plan, closes its
-issue, its dependencies on open issues dropped first.
-
-## 2. The agent context map's loop pages are not byte-stable across runs
-
-Status: candidate only. Found 2026-11-03 while regenerating `docs/agents`
-after the card digest landed (code main 17376fb1). The map's own page,
-agent-context-map.md, says the same code SHA, policy tree and pinned
-harness produce the same pages byte for byte. They do not: every loop-mode
-page records the random working directory opencode was given
-(`/tmp/agentdoc-loop-<n>`, internal/factoryd/agentdocloop.go:477 on code
-main) and the day's date, which opencode writes into its own prompt from
-its clock. Two regenerations of one commit differ in those bytes, so a
-diff of the pages cannot tell a code change from a rerun.
-
-Fix direction: a fixed working directory under the output path, and a
-fixed clock handed to the recorded run (an environment variable or a flag
-the harness honours; if opencode reads only the system clock, the capture
-masks the date line as it masks the directory). The claim in
-agent-context-map.md stands only once both are fixed.
+Gone on 2026-11-12: fault 1 of the 2026-11-03 numbering, an ended card's
+issue stays open (the count after the rebuild's Phase 5 roll found 199
+ended human cards with an issue and every issue closed; the close and
+heal paths that fixed it are on code main since the roll of c336498),
+and fault 2, the agent context map's loop pages are not byte-stable
+(code #1783: the capture masks the run's directory and the date, and
+names each loop's model from the policy tree).
