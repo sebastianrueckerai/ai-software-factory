@@ -3138,9 +3138,10 @@ the history and every depth come through a tool. What each part does:
   report session. The card reads "waiting on the provider", and the status
   line counts it as waiting, not working. Since Stage 17 the provider's
   repetition refusal ends a session with its work pushed (6.6).
-- **Rolls in a session gap** (7). A roll merges only when no
-  session runs, and new sessions wait while it does, so a roll no longer
-  stops a running session. The card's chip reads "waiting for a roll".
+- **Rolls in a session gap** (7). A roll merged only when no
+  session ran, and new sessions waited while it did, so a roll no longer
+  stopped a running session. Since sessions survive factoryd's restart, a
+  roll merges at once, and the gap and its hold are gone (7).
 - **The review per part** (7). The model review reads a diff in one call
   when it fits `limits.review_diff_kib`, else per file in up to three parts
   of that size, and each part's call reads the names the other parts add;
@@ -3205,8 +3206,8 @@ table (5.6). What it adds to the chat besides:
   A replan stops the cards it sends back. A running card stops through its
   live session, which ends and cuts the card in place. A card that waits
   takes the replan in `awaitAnswer`, `waitPoster`, `awaitImage` and
-  `awaitApproval`, in the merge queue's turn, right after `Reconcile`,
-  after the roll hold and right before an auto merge. Its screening stays
+  `awaitApproval`, in the merge queue's turn, right after `Reconcile`
+  and right before an auto merge. Its screening stays
   first: no wait takes the replan before a fresh card's screening has
   passed. A final card is queued again, and a done plan is reopened. A
   closed plan, a closing card, a merged direct card or a card that waits
@@ -4490,16 +4491,12 @@ commit folds into the open roll as a second commit and withdraws the
 pending card, so one card covers both. factoryd refuses a branch head it did
 not write, because any agent task's token can push the fork's branches. One
 roll is open per repository, and a failed roll is not retried: the next
-green commit opens the next. Change id `roll`. Since Stage 16
-an approved roll merges only in a session gap. Before the merge factoryd
-writes a `roll_holds` row and polls every 15 s until no session runs, up
-to the longest agent time in force plus 30 minutes, after which it merges
-with a log line. While the hold stands, a code or planner session waits
-before its agent time starts, with the chip "waiting for a roll", and a
-report session is waited for but not held. The hold lasts 5 minutes past
-the merge while Flux applies main, and the wait holds for 3 minutes after
-factoryd starts, when its count of sessions is still empty. The first
-live roll after it waited 0 s. A pod drain and a second replica were
+green commit opens the next. Change id `roll`. From Stage 16 an approved
+roll merged only in a session gap, held by a `roll_holds` row that made new
+sessions wait. Since sessions survive factoryd's restart (RunSession
+reattaches to the session's pod from its `live_sessions` row), an approved
+roll merges at once and no session waits. The gap, the hold and the
+`roll_holds` table are gone. A pod drain and a second replica were
 rejected. From 13:10Z on 2026-09-29
 every roll of the factory went this way, six in the session, each with an
 issue, a pull request, an approval, a merge and roll rows, and a fold was
@@ -5528,7 +5525,7 @@ since Stage 6, but neither has run under load.
 | Message-in | A `Message` call in the adapter contract; opencode as a server in the pod, one port only factoryd reaches, a per-session bearer; the restart as the fallback for a harness without it. First user: the loop nudge, counted from the event stream; since Stage 12 the supervisor's guidance | Built |
 | Untrusted text | One sanitiser: into the brief for outsiders' text only, hidden comments stripped outside code blocks; out to Forgejo, hidden comments stripped, mentions and closing keywords neutralised, off-list links defanged; agent commits squashed under a sanitised subject | Built (Task 89) |
 | Answer chain for questions | `questions: [self, model:<tier>, human]` per stage (queue item B), on top of the message call | Not built, waits for Sebastian's scoping |
-| Rolls | The code repository rolls through a roll task: a digest pull request from factoryd, a card, the bot's merge, a row per image. Infra changes stay human commits. The merge waits for a session gap, and new sessions wait while it does | Built |
+| Rolls | The code repository rolls through a roll task: a digest pull request from factoryd, a card, the bot's merge, a row per image. Infra changes stay human commits. The merge waits for no session gap, since sessions survive factoryd's restart | Built |
 | Model routing | Two LiteLLM classes, `small` and `big`, each its z.ai model with its Alibaba twin behind it for the plan's quota limit (2026-11-01), `premium` OpenAI's Sol with `big` behind it (2026-11-03); a failed model hands the call to its fallback after two retries, and the answering deployment sits in the audit row | Built |
 | Capability classes | `coder`, `analyzer` with a report session mode for the screening stage and the sizing step, and `planner` with a plan session mode. The release is the roll task, no class | Built |
 | Task analytics | Four task metrics, a revert mark and four panels, no report task | Built |
