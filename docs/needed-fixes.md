@@ -184,6 +184,11 @@ memory limit (infra #273 and #277: a 4 GiB limit, and a query fails at
 that could read the agent's push token (code #1768 deleted its run tool).
 Fault 3 became 1, and 9 became 2.
 
+Gone on 2026-11-12: fault 3 of the old numbering (an ended card's issue
+stays open). The count after the rebuild's Phase 5 roll found 199 ended
+human cards with an issue and every issue closed, so the entry leaves
+with no cause left to fix.
+
 ## 1. An ended card's issue stays open, and both red-main remedies can land
 
 Status: the fix landed on code main 2026-11-02 (fcec3a73 to 1d89308a,
