@@ -171,57 +171,20 @@ answer is due, the check-in reads when its answer is due, and read_file,
 grep and transcript_search no longer waste calls on a miss. Its first run
 on the roll, on #1476, decided in six and a half minutes.
 
-## 1. The check-in's policy stop preempts the approval card
+Gone on 2026-11-12, with the rebuild of 10 November: fault 1, the
+check-in's policy stop that preempted the approval card (code #1748 and
+#1755); fault 2, the planner that died on a big read set (infra #270 lists
+digest for the coder, analyzer and planner classes); fault 4, the rename
+that left the policy tree unloadable (code #1720); fault 5, the size gate's
+budget move with no event (a card_funded row since code main 84c154da);
+fault 6, the runner's docker volume past its 50Gi limit (infra #271: the
+prune sidecar removes unused volumes last); fault 7, ClickHouse at its
+memory limit (infra #273 and #277: a 4 GiB limit, and a query fails at
+3.2 GiB before the kernel kills the server); fault 8, the gate check-in
+that could read the agent's push token (code #1768 deleted its run tool).
+Fault 3 became 1, and 9 became 2.
 
-Status: plan written, awaiting Sebastian's OK
-(checkin-policy-approval-plan-2026-10-31.md). Found 2026-10-31 on card
-#1347. Verified unbuilt on main 2026-11-01, and again on code main
-0bbfe484 on 2026-11-02: no change id checkin-policy-verification anywhere.
-
-A supervising agent stops a card with a bare "how should it go on?"
-question one step before the card's own flow would show the proper approval
-card with the brief, the numbers and the Approve button. The card sat 19
-hours with nothing to decide from. The fix: close the agent's reason words
-to a fixed set, and when the reason is a policy class and a pull request is
-open, go to the checks that end in the approval card instead of stopping.
-
-## 2. The planner dies on a big spec's read set
-
-Status: code landed (448048b0, 2026-11-02) and is live since roll c78869b
-(2026-11-02 02:19Z). The tree hand waits on Sebastian. The card flow
-redesign's card digest (its section 5.3) shares the word: in code the names
-are CardDigest, card_step and board_digest, never `digest` alone, and
-the redesign's section 5.3 carries that sentence. The
-`digest` tool, the planGuide read discipline and the reads finding are on
-code main. No session sees the tool until the policy tree's coder,
-analyzer and planner stanzas list `digest: {}`, a commit on the infra
-side (digest-tree-hand-runbook-2026-11-02.md). Infra main 2b59f75 does not
-carry it yet. The fault leaves the list when
-the tree lands and a session sees the tool. The compaction-model probe
-found no model key in opencode 1.18.32's compaction block, so
-compaction stays on the session's own model. Plan:
-planner-read-cut-plan-2026-11-02.md. The cap relief landed 2026-11-01
-on infra main (18e7418: limits.context_tokens goes, premium's window
-pinned at its real 128000), and the judgment the fault now rests on: the
-window is a ceiling, not a cure — the deaths were flow deaths, reads
-feeding compactions feeding the wall clock, and the chat's digest of
-798ea748 never reaches a session. Found 2026-10-31 on card #1383: three
-planner sessions in a row ended without filing a plan, each after
-reading 20+ files against the 98K context max, twice on "opencode
-serve: context canceled". Six sessions ran under a grant of three, then
-the session cap closed the card, €3.54 of €5.00 sunk.
-
-Fix direction: the session-side cut — a `digest(path, ask)` tool on the
-factory-tools menu (one Small call through the chat's Digest wrapper,
-the answer bounded, the file's bytes never enter the premium context;
-its listing in the policy tree's three class stanzas is a human hand on
-the infra side, code rolled first), the planGuide read discipline that
-maps before reading and digests the big files, and the readsFinding
-pointing the retry at digests instead of re-reads. Until it lands, a
-big card needs a trimmed read set, the cheap rung, or the spec-on-card
-shape that saved #1383.
-
-## 3. An ended card's issue stays open, and both red-main remedies can land
+## 1. An ended card's issue stays open, and both red-main remedies can land
 
 Status: the fix landed on code main 2026-11-02 (fcec3a73 to 1d89308a,
 docs/red-main-revert-plan-2026-11-02.md) and rolled on 2026-11-04, the
@@ -252,102 +215,7 @@ merge goes to a human, and main's green ends every remedy that did not
 merge. Every done card but a plan, and every closed plan, closes its
 issue, its dependencies on open issues dropped first.
 
-## 4. A rename that changes the policy tree cannot land before its roll
-
-Status: candidate only. The loader still rejects an unknown tool name
-outright (policy.go:279 on code main 0bbfe484). Found 2026-10-31: the ask
-tool's rename merged into the code main (5a07d16c) and the infra tree (82ab246) while the
-running factoryd knew only escalate_to_human, so the tree's tip sat
-unloadable and the roller held the rename's roll on the open plans
-#1344/#1345, whose cards needed the spend the month cap had stopped. A
-three-way deadlock. Only the manual name revert (infra bed2930) broke it.
-
-Fix direction: the config loader accepts the union of the old and the new
-name across a rename, or the roll that carries a rename commits the tree's
-rename with it, so the tree never names a tool no factoryd knows.
-
-## 5. The size gate moves a card's budget with no event
-
-Status: code landed on code main 2026-11-03 (84c154da): the size gate's
-budget move writes a `card_funded` row with `by: size gate`, under the
-card's row lock. The entry leaves once it reads live; the factory was down
-at the merge. Found 2026-11-02 while digging the unpayable sessions (gone 2026-11-03) on card
-#1345: the task's budget read 5.60 EUR after its only fund event (+0.60 at
-00:06) and 7.60 by the evening's end, the +2.00 written by the size gate's
-budget writer (SetTaskSizeBudget, store.go:1430 on code main 0bbfe484)
-with no card_funded or other event, so the evening's true headroom had to be reconstructed from
-the ledger. A budget that moves silently leaves no line a person or a dig
-can read.
-
-Fix direction: the size gate's budget move records an event, as the fund
-and raise paths do.
-
-## 6. The runner's docker volume passes its 50Gi limit
-
-Status: measured; the bound is the infra hand in
-docs/runner-volume-measurement-2026-11.md: the prune sidecar runs `docker
-volume prune -af` last, only when the volume is still over maxGiB after
-its other prunes, because main's test job keeps its Go caches in the named
-volumes ci-go-build and ci-go-mod that nothing trimmed. The infra commit
-is Sebastian's. Found 2026-11-02 on card #1473. At 14:43:34 the kubelet
-evicted the trusted runner's pod, up since 2026-10-28: "Usage of EmptyDir
-volume "docker-data" exceeds the limit "50Gi"". Main's run 2316 (2b9841c6)
-had run its test and its three image jobs from 14:20 to 14:38, and run
-2317's test job (b76459d9) started at 14:39 and died with the pod. The
-docker-prune sidecar prunes from 30 GiB (dind.prune.maxGiB), and the chart
-counts at most 13.3 GiB per run, so the volume should stay under 44 GiB.
-The new pod held 11.8 GiB at 17:20 during a test job. What filled the old
-volume past 50 GiB was not measured then. Each eviction kills the job it
-runs, and before code 321baaa7 rolls, such a job's run stalls main's CI
-lane until a person re-runs it.
-
-Fix direction: the bound, by the infra hand in
-docs/runner-volume-measurement-2026-11.md. The prune sidecar runs `docker
-volume prune -af` last, only when the volume is still over maxGiB after
-its other prunes. The fault leaves the list when a runner pod lives past
-five days with no eviction and a low point under 30 GiB.
-
-## 7. SigNoz's ClickHouse sits at its memory limit
-
-Status: candidate only. Found 2026-11-02 while measuring fault 6. SigNoz's
-ClickHouse (chi-signoz-clickhouse-cluster-0-0-0 in namespace platform) has
-a 3Gi memory limit and held 2.68 to 2.82 GiB of it from 21:30 UTC
-(`kubectl -n platform exec chi-signoz-clickhouse-cluster-0-0-0 -c
-clickhouse -- clickhouse-client -q "SELECT metric, value FROM
-system.asynchronous_metrics WHERE metric IN ('CGroupMemoryTotal',
-'CGroupMemoryUsed')"`). The server stops queries at 2.70 GiB, so most of
-them fail: "(total) memory limit exceeded: would use 1.79 GiB (attempt to
-allocate chunk of 8.25 MiB), current RSS: 2.88 GiB, maximum: 2.70 GiB.
-OvercommitTracker decision: Query was selected to stop by
-OvercommitTracker ... (MEMORY_LIMIT_EXCEEDED)". Even a count over
-system.processes failed so. A query over five days of one series went
-through on its 86th try. At 21:40:02 the kubelet killed the server for
-missing its liveness probe (/ping, a 1 second timeout, ten misses in a
-row), while those retried queries ran (`kubectl -n platform get events
---field-selector
-involvedObject.name=chi-signoz-clickhouse-cluster-0-0-0`). That was its
-fifth restart in eight days, and sf-0's kernel log
-(`TALOSCONFIG=~/repos/ai-software-factory-infra/talos/talosconfig talosctl
--e <API endpoint> -n 10.0.1.10 dmesg`) holds a memory cgroup kill of
-clickhouse-serv on 2026-10-30 at
-2.97 GB resident. SigNoz's own pages and alerts query the same server:
-whether they fail too is not checked.
-
-Fix direction: measure first what holds the memory (the caches, the
-merges, the buffer tables), then raise the limit or bound the query memory
-settings, so that a query fails before the server misses its probe.
-
-## 8. The gate check-in can read the agent's push token
-
-Status: candidate only. Found 2026-11-03 in the check-in records of
-#1474 (session s-ccd83748614e) and #1475 (session s-c787e5a4277c). The
-gate check-in's run tool read $TOKEN_FILE and called Forgejo with it.
-The check-in is a judge, and only its prompt says it never edits.
-
-Fix direction: run the check-in's commands without the token in their
-environment or on their file system, so no tool of a judge can write.
-
-## 9. The agent context map's loop pages are not byte-stable across runs
+## 2. The agent context map's loop pages are not byte-stable across runs
 
 Status: candidate only. Found 2026-11-03 while regenerating `docs/agents`
 after the card digest landed (code main 17376fb1). The map's own page,

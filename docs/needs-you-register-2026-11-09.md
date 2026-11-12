@@ -253,7 +253,7 @@ After the hand refusal of entry 55, factoryd opened plan #1578's criteria gap ag
 
 ## 59. The gate reserve card's merge call: five tests left on the old figures (#1641, PR #1644)
 
-The merge call came at 12:22 with the test job red and no criterion proven. The branch updated two budget tests to the reserve rule and left five that still expect the old figures (the manual table's 36 rows, four budget asks and refusals). The review had failed twice on the slow model (entry 56). Rung 2 did not answer in five minutes. Who decided: Claude, by returning the pull request at 12:28 with the five tests and the rule, code unchanged. Verdict: **works** (the return carries the fix). Why the agent's own run did not catch the five is not checked.
+The merge call came at 12:22 with the test job red and no criterion proven. The branch updated two budget tests to the reserve rule and left five that still expect the old figures (the manual table's 36 rows, four budget asks and refusals). The review had failed twice on the slow model (entry 56). Rung 2 did not answer in five minutes. Who decided: Claude, by returning the pull request at 12:28 with the five tests and the rule, code unchanged. Verdict: **works** (the return carries the fix). Why the agent's own run missed the five stale tests was not investigated.
 
 ## 60. The checks-wait stop's Keep waiting does nothing (#1652, #1633)
 
@@ -495,16 +495,18 @@ A plan's confirmation runs through the chat's answer tool into AnswerPlan, not t
 
 Still open
 
-## Decisions this register asks of Sebastian
+## Decisions this register asked of Sebastian
 
-1. Entry 2 and 3: does a plan's confirmation stay human at full auto, or does it confirm itself after a wait that a Request changes can interrupt?
-2. Entry 9: a daily list of cards waiting on a human for longer than a bound, in the inbox.
-3. Entry 10: a Job-failed alert card closes when its CronJob completes after the failure.
+Every decision is answered. The rebuild of 10 November built each answer that needs code.
+
+1. Entry 2 and 3: does a plan's confirmation stay human at full auto? Answered on 2026-11-11: at full auto rung 2 may confirm a revision that takes nothing off main, and a revision that takes merged work off main always waits for a human. One guard at the plan answer decides it, and the same guard decides who answers a plan's questions (entry 102).
+2. Entry 9: a daily list of cards waiting on a human for longer than a bound. Answered on 2026-11-11: yes. The routine `long-waits` lists every card that has waited on a human for more than 24 hours in the inbox each morning, built from the cases table with no model call. The card itself gets no clock.
+3. Entry 10: a Job-failed alert card closes when its CronJob completes after the failure. Answered on 2026-11-11: yes, for Job-failed alerts only. A run of the same CronJob that started after the failed run and completed closes the card, with no model call.
 4. Entry 12: done on 2026-11-10: Sebastian ruled that the controller merges the workflow pull requests it opens (#1582 and #1643 merged 10:00); the routine `weekly-bump` moves to `files: agent` in the infra project file, so the bump runs as an agent card whole.
-5. Entry 20: how long the factory's own deploy may hold on an open plan when many plans run at once.
+5. Entry 20: how long the factory's own deploy may hold on an open plan. Answered on 2026-11-11: six hours stay, and at full auto rung 2 may press Deploy now on the held roll, after reading each held plan's state.
 6. Entry 21: done on 2026-11-10: the image build runs on a cx33 build VM (entry 31) and #1598 merges on its own checks; #1603's card #1654 removes the hand copy of the bases.
-7. Entry 25: rung 2 approved a schema migration on the factory's own project (PR #1604) from the SQL, the review and the policy gate's facts, two minutes after the request. Does a migration stay with rung 2, or does the risk class `migration` need a human's read that rung 2 cannot give?
-8. Entry 36: the size of `budget.day_eur` for a day with twenty live cards, and whether the planners' spend counts against it.
-9. The month cap: at 11:40 on the 10th the board read 437.27 of 600.00 EUR this month (73 percent) and 41.27 of 50.00 EUR premium. At the month's average of 44 EUR a day, the 163 EUR left last until about the 14th, and every card stops then. Raise `budget.month_eur` in the infra repository's factory/policy.yaml, or keep it and let the board slow down.
-10. Entry 52: the chat's monthly budget (`chat.monthly_eur`, 50 EUR) ran out on the 10th, about 5 EUR a day. Claude raised November's by 10 EUR. Raise the policy value, knowing that plan #1541's revision 4 makes the same budget pay the check-in and rung 1, or keep it and let stops reach the human column when it runs out.
-11. Entry 56: z.ai's glm-5.3 answers in about 60 s on average today against 15 to 18 s yesterday. Move the `big` alias to its Alibaba twin (qwen3.8-max, paid per token, in k8s/platform/litellm/helmrelease.yaml of the infra repository) until z.ai recovers, or keep z.ai and accept that planners and sessions run out of time.
+7. Entry 25: does a schema migration stay with rung 2? Answered on 2026-11-11: no. Rung 2's approval of a merge in the risk classes `migration` and `runner` is refused, and a human reads the change.
+8. Entry 36: the size of `budget.day_eur`. Answered on 2026-11-11: it stays as it is until two days of Phase 6 at four sessions and a surge of two have run. A new size from those days' spend is money, and it comes back to Sebastian with the figures. The planners' spend still counts against it.
+9. The month cap. Answered on 2026-11-11: `budget.month_eur` rises from 600 to 1,500 EUR in modelled z.ai spend. `premium_month_eur` stays at 50 EUR.
+10. Entry 52: the chat's monthly budget. Answered on 2026-11-11: `chat.monthly_eur` becomes the one judgment budget per project, at 150 EUR a month. It pays rung 2, rung 1, the check-in's judgment, the brief writer and the human's own chat turns.
+11. Entry 56: move the `big` alias to its Alibaba twin while z.ai is slow. Rejected on 2026-11-11: the factory's models are z.ai, plus OpenAI for the premium class only. Infra #266 removed the twins and their fallbacks, so a call that z.ai fails after two retries fails, and the factory stops when z.ai's quota runs out.
