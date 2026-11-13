@@ -120,6 +120,20 @@ The ask-press rule (ask-press plan, 2026-10-31, unbuilt): a question that gates 
 - [ ] **Step 1: Write the failing test** `TestABoundAskAnswersByButtonAlone`: an ask with choices renders its buttons (chat.js already does); a typed message posted while the ask stands open stores as the turn's note and the ask stays open; the press alone resolves it.
 - [ ] **Step 2: Verify it fails**, enforce the bound state in the answer path, verify, commit "A bound ask answers by its button alone".
 
+### Task 6b: The criteria card asks one criterion at a time
+
+C45 settled the criterion row (claim, artifact, Met, Not met, Waive, the ended grey), and that row stands. What C45 did not settle is the all-at-once layout: a plan with six open criteria renders six rows with three buttons each on one long face — six decisions at once, the very thing the carousel exists to end. Sebastian, 2026-11-13, on the criteria gap card of plan #1837: "lots of actions on one long card."
+
+**Files:**
+- Modify: `internal/console/templates/board.html` (criteria template 308-317, criteria-rows 292-306), `internal/console/approvals.go`
+- Test: `internal/console/criteria_face_test.go`
+
+**Interfaces:**
+- Consumes: C44's carousel row (the count `1 of N`, the arrows) and C45's row markup unchanged.
+
+- [ ] **Step 1: Write the failing test** `TestCriteriaCardShowsOneCriterionAtATime`: a plan with three open human criteria renders the face holding ONE criterion's row (C45's row exactly), the carousel `1 of 3`, and the arrows; a press of next renders the second row alone; a settled criterion reads ended where it sits in the count but its buttons are gone (C42's ended rule); the gate rows (blind/open) stay on the face as one line each, for they ask nothing.
+- [ ] **Step 2: Verify it fails**, move the rows under the carousel (the slot machinery the plan questions already use), verify the new test and C45's existing tests pass, commit "The criteria card asks one criterion at a time".
+
 ### Task 7: The conformance test over every card kind
 
 One test renders every card kind from fixtures and asserts the face contract, so a new kind cannot drift.
@@ -139,4 +153,4 @@ One test renders every card kind from fixtures and asserts the face contract, so
 
 - The chat inbox backlog that delayed #1837 (a chat-triage fault, its own issue).
 - The pulse line and the status line's detail panel (proposal-v2 scope, already tracked).
-- The criteria card's rows (C45 confirmed them).
+- The criteria card's ROW (C45 confirmed it); task 6b carries the row into the carousel without changing it.
