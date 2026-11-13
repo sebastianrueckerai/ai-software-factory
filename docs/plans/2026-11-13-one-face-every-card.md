@@ -149,6 +149,29 @@ One test renders every card kind from fixtures and asserts the face contract, so
 - [ ] **Step 2: Run the whole console package.** A failure is either a drift this task fixes in the template or a missing kind in the fixture list; both get fixed, never the assertion.
 - [ ] **Step 3: Commit** "Every card follows the face".
 
+### Task 8: The census fixes
+
+The exhaustive census of every card face (the appendix below) found five violations the tasks above do not cover. Same shape each: a fold, a line, or a path guarantee, one test per fix.
+
+**Files:**
+- Modify: `internal/factoryd/caseface.go:46`, `internal/console/templates/board.html:296` and the extend block, `internal/console/approvals.go:347`, `internal/console/cases.go` and `board.go:2404-2417`
+- Test: `internal/console/census_fixes_test.go`
+
+- [ ] **Step 1: Delete the "Last answer processed" suffix** CaseFace appends to Info (caseface.go:46). It is a confirmation line; the case's state carries it. Test: a case answered and re-tripped renders no processed-at text.
+- [ ] **Step 2: Fold the gate artifact.** The merge and criteria faces print the first 8 KiB of the gate artifact as an inline `pre` (board.html:296, approvals.go:347). Behind a closed `details` whose summary names the artifact and its size. Test: the face holds no `pre`, the fold's summary does.
+- [ ] **Step 3: End the slotless plan face.** A plan case without revision and index facts renders every open question at once (board.go:2465-2470, Asks=true). Guarantee revision and index on every plan case so the one-question slot path is the only face; the slotless branch renders one question with the carousel. Test: a plan approval whose case lacks the facts still renders one question per face.
+- [ ] **Step 4: Move Extend off the asking face.** The extend form's four inputs ride the escalation and offerless faces (board.html:209-220). The drawer alone holds it, or a closed fold names it. Test: an asking face holds no extend inputs; the drawer does.
+- [ ] **Step 5: Fix the wide lane.** Ghosts render only in the five columns (a wide user sees no routines: board.html:37 vs 41), and a human task that asks renders twice (board.go:2404-2417). Ghosts render in the wide lane's queue group; the asking task renders once, with its actions. Test: the wide lane holds each card once, ghosts included.
+- [ ] **Step 6: Commit** "The census fixes: five faces brought under the contract".
+
+## Appendix: the census
+
+Every face a human can see, judged letter by letter (A one decision, B no dumps, C decision first, D whisper, E terms, F no confirmation lines, G refusals named). Built from origin/main at 1b615cb9f, 2026-11-13.
+
+**Passes as built:** the case face with the decide table (all cap, check-in, gate, dependency, provider, monitor and wait kinds), the plan-slot question and confirmation faces (one at a time on the carousel), the resource approval face, plain agent and human cards, final cards (one transition each), routine ghost cards, the status strip, the drawer (all kinds: the sanctioned depth layer), the routine drawer, the chat panel, the timeline page, load-more chrome.
+
+**Fails or partial, with the owning task:** the merge approval face (task 1: the deny box; task 8: the artifact fold), the criteria faces (task 6b: the carousel; task 8: the artifact fold), the slotless plan face (task 8), the extend form on asking faces (task 8), the wide lane's ghosts and double render (task 8), the "Last answer processed" line (task 8). The escalation face's choice buttons conform; task 1's decide partial covers its fund shape.
+
 ## Not this plan's work
 
 - The chat inbox backlog that delayed #1837 (a chat-triage fault, its own issue).
