@@ -3,7 +3,11 @@
 Written 2026-11-14. Status: written for Sebastian's review, nothing built. Revised the
 same day after his review: the freeze fires only after the fallback ladder and only when
 the error names a reset time, one card on the board speaks for the whole freeze and
-carries the retry switch, the chat stays live, and the parse is string work only. Code
+carries the retry switch, the chat stays live, and the parse is string work only. A
+second round: the freeze card files the moment the hold arms and closes itself five
+minutes after a self-resume, the chat agent may run the retry on its own as part of its
+card powers, and the parse reads a default pattern set from policy with an optional set
+per provider. Code
 references are to the code repository's origin/main at `7383789d1`; grep for the symbol
 before trusting a line. Infra references are to that repository's origin/main at
 `6e67d2f`. The incident figures come from the live cluster's gateway database, read the
@@ -67,19 +71,29 @@ freeze.
 
 1. A freeze fires only on an error that is final and dated. Final means it reached the
    gateway: LiteLLM has already run its two retries and its fallback walk, so whatever
-   the gateway sees is the ladder's last word. Dated means the body parses to an absolute
-   reset datetime. A bare 429 from short-term overload, a relative hint such as "try
-   again in 1 second", or an unreadable body changes nothing: the session keeps today's
-   backoff ladder. Only the clear case freezes.
-2. The parse is string work, no model call: regexes only, in the gateway. Two shapes
-   count. A datetime with its offset (`...Z`, `±HH:MM`) reads as is. A naive datetime
-   after the words "reset at" reads in the provider's time zone from policy. The zai body
-   is the second shape.
+   the gateway sees is the ladder's last word. Dated means a header or the body parses
+   to an absolute reset moment. A bare 429 from short-term overload, a relative hint
+   such as "try again in 1 second", or an unreadable error changes nothing: the session
+   keeps today's backoff ladder. Only the clear case freezes.
+2. The parse is string work, no model call: header reads and regexes, in the gateway.
+   There is no common standard for these messages (checked 2026-11-14). The IETF's
+   RateLimit header work counts seconds, not moments, and so does every relative hint.
+   Anthropic names absolute RFC 3339 resets in its `anthropic-ratelimit-*-reset`
+   headers. OpenAI and Google give relative delays only (`x-ratelimit-reset-*`,
+   `retryDelay`). zai puts a naive datetime in the body. The default set reads three
+   shapes, in order: a reset header in RFC 3339 or ISO 8601, offset included; a
+   `Retry-After` header in HTTP-date form; a datetime in the body after words such as
+   "reset at", read in the provider's time zone. Only an absolute moment freezes. A
+   relative hint, whatever its unit, keeps the ladder: a guess is not knowledge. Trace
+   in the build whether LiteLLM forwards a failing deployment's reset headers; if it
+   drops them, the body is the source and the provider's entry says what it writes.
 3. Policy gains `provider_limits`, one entry per provider, today one line:
-   `zai: {tz: Asia/Singapore}`. The default is UTC. The gateway learns a class's
-   provider from policy, which knows big and small route to zai (policy.go:1039). A new
-   entry needs no restart: `currentPolicy` re-reads the store on its 30-second TTL. The
-   next provider is one policy line.
+   `zai: {tz: Asia/Singapore}`. The default time zone is UTC. The pattern set is policy
+   too: a default list the gateway ships, and an optional `patterns` entry per provider
+   that replaces the default for that provider, so a new wording is a config change, not
+   code. The gateway learns a class's provider from policy, which knows big and small
+   route to zai (policy.go:1039). A new entry needs no restart: `currentPolicy` re-reads
+   the store on its 30-second TTL. The next provider is one policy line.
 4. A match becomes the named decision `refused_provider_limit`, status 429, body
    carrying the class, the reset and the provider's own words. The audit row records all
    three. The reset the factory uses is the parsed time plus one minute.
@@ -95,11 +109,13 @@ freeze.
 
 ### B. One card speaks for the freeze
 
-1. When a hold arms and the reset is more than five minutes out, factoryd files one
-   freeze card, in the month alarm's cap-card shape. It names the provider's words, the
-   class, the reset with its countdown, and how many cards wait. It holds no work slot
-   and asks nothing: it informs, and it carries one action, the retry switch.
-2. The card closes on `class_resumed`, with the held time on its face. A re-armed hold
+1. The moment a hold arms, factoryd files one freeze card, in the month alarm's
+   cap-card shape. It names the provider's words, the class, the reset with its
+   countdown, and how many cards wait. It holds no work slot and asks nothing: it
+   informs, and it carries one action, the retry switch.
+2. A class that resumes on its own at the reset leaves the card five minutes longer,
+   with the held time on its face, then the card closes on its own: the board shows the
+   freeze ended without a hand. The retry switch closes it at once. A re-armed hold
    with a later reset updates the same card, it files no second one.
 3. The frozen work cards stay quiet: no case, no flag, no question. The freeze card is
    the single human surface for the whole event, so a known block shows once on the
@@ -156,14 +172,16 @@ freeze.
 
 ### F. The chat stays live and carries the retry switch
 
-1. The human can end a freeze early, because a limit reset on the provider's side lifts
-   the block before the named time. Two entry points, one mechanism: a line in the
-   project chat ("retry the provider") and the retry button on the freeze card.
+1. A freeze can end before the named time, because a limit reset on the provider's side
+   lifts the block first. Two entry points, one mechanism: the retry action of the
+   project chat and the retry button on the freeze card. The chat's retry is one of its
+   card actions, in the set it already holds for managing the board for the human: the
+   chat agent runs it on a human's word or on its own judgment, with no extra grant.
 2. The mechanism: clear the gateway's hold, wake every frozen card. The woken cards'
    next sessions are the probes. If the provider answers, the freeze ends for all and
-   the freeze card closes on `class_resumed`. If the provider still refuses, the first
-   named refusal re-arms the hold and the cards re-freeze at the new reset with no ask.
-   The burst costs one call per card, then quiet again.
+   the freeze card closes on `class_resumed`, at once. If the provider still refuses,
+   the first named refusal re-arms the hold and the cards re-freeze at the new reset
+   with no ask. The burst costs one call per card, then quiet again.
 3. The chat keeps answering through a zai freeze: policy runs the chat on premium
   (policy.yaml `chat.model`), a different provider. Its tool calls on a frozen class get
    the named refusal with the reset in the body, so the chat can say why a tool stands
@@ -185,8 +203,9 @@ big (server.go:329) keeps its shape.
 - The freeze lives in the gateway, one place, not in every consumer.
 - The freeze fires only on a final, dated error: past the fallback ladder, with an
   absolute reset time the parse can read. Everything else keeps the ladder.
-- The parse is regex and string operations in the gateway. Policy carries the time zone
-  that turns a naive stamp into a moment. No model call parses a provider error.
+- The parse is header reads, regex and string operations in the gateway, over a default
+  pattern set in policy with an optional set per provider. Policy also carries the time
+  zone that turns a naive stamp into a moment. No model call parses a provider error.
 - One freeze card speaks for the whole class. The work cards never ask.
 - A freeze ends the session. The next session at the reset is the resume.
 - The freeze records its reset as `BackoffS`, reusing the one field the digest already
@@ -211,10 +230,15 @@ Hand-derived:
    is.
 4. The hold: a second call on big inside the freeze is answered locally, no upstream
    call, the same until. A call after the lapse probes once and re-arms on a new reset.
-5. The freeze card: one hold on big with nine frozen cards files one card that names
-   the words, the countdown and the count, holds no slot and asks nothing. A re-arm
-   updates it. `class_resumed` closes it.
-6. A hold whose reset is under five minutes out files no card.
+5. The freeze card: one hold on big with nine frozen cards files one card the moment the
+   hold arms, whatever the reset's distance. It names the words, the countdown and the
+   count, holds no slot and asks nothing. A re-arm updates it. A self-resume at the
+   reset leaves it five minutes and then it closes on its own. A retry press closes it
+   at once.
+6. The pattern sets: a provider entry with its own patterns replaces the default set,
+   an entry with none uses the default. An RFC 3339 reset header freezes with its
+   offset read as is. A relative hint in any unit never freezes, so OpenAI's
+   `x-ratelimit-reset-*` and Google's `retryDelay` keep the ladder.
 7. The retry switch, from the chat and from the card: the hold clears, every frozen card
    wakes, a first call that succeeds closes the freeze card, and a first refusal with a
    new reset re-freezes all with no ask.
@@ -241,7 +265,10 @@ Hand-derived:
   removed them. With them back, the freeze fires later, only when the chain is spent.
 - **Freeze on every 429.** A short-term overload from parallel sessions would freeze the
   class. Only a dated error freezes; the rest keeps the ladder.
-- **Trust `Retry-After` headers.** ZAI sends none. The body's words are the source.
+- **Freeze on relative delays.** OpenAI's `x-ratelimit-reset-*`, Google's `retryDelay`
+  and a seconds `Retry-After` name a wait, not a moment, and the big providers use them
+  for minute windows. Only an absolute reset freezes; the HTTP-date form of
+  `Retry-After` counts, the seconds form does not.
 - **A model call reads the provider's error.** The parse is regex work. A provider error
   must never need a model to be understood.
 - **The freeze state on the store.** In memory with the audit row as the record heals on
@@ -266,7 +293,9 @@ Hand-derived:
   zai at UTC+8: the failures stopped at 17:04:50 UTC against a stamp of 01:04:50. The
   retry switch covers a provider that lifts the limit early.
 - A parse that misses a provider's phrasing falls back to the ladder, which is today's
-  behaviour. Missing a freeze is safe; freezing without a date is impossible.
+  behaviour. Missing a freeze is safe; freezing without a date is impossible. A provider
+  whose reset reaches the gateway only in headers freezes only if LiteLLM forwards them;
+  the build's trace step answers that, and a body pattern covers the rest.
 - Compaction stops during a zai freeze, because small is zai too. Sessions start and run
   until a context needs compaction; a five-hour freeze at the observed pace does not
   reach it.
