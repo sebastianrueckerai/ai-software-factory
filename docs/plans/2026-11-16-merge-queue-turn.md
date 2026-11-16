@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** A card that waits for a human never blocks other cards' merges, the criteria gate never runs the whole test suite again, a card that waits its turn to merge neither raises a flag nor looks stale, and the policy gate counts a moved file by its changed lines.
+**Goal:** A card that waits for a human never blocks other cards' merges, the criteria gate never runs the whole test suite again, a card that waits its turn to merge neither raises a flag nor looks stale, the policy gate counts a moved file by its changed lines, and a session told that a host does not resolve also learns how it reaches one.
 
 **Architecture:** A card holds its project's merge-queue turn only while factoryd works on it. Every wait for a human leaves the queue, and every merge happens at a turn the card holds, taken again after such a wait (Task 1). An invariant criterion makes no gate run: its verdict is the head's required checks, whose test job already runs the packages the diff reaches (Task 2). One store query gives each card its place in the merge queue. The monitor flags a wait only for the card at the front, and the board names the card ahead (Task 3). The policy gate takes its paths and line count from the pull request's unified diff, which shows renames, not from Forgejo's file list, which does not (Task 5).
 
@@ -28,6 +28,7 @@ Nothing merged on the code repository from 08:46 to after 20:20 UTC. Five cards 
 2. The stop asked a human (case 5866, at the human from 09:27). `gateEscalated` (`workflow.go:3288`) waits through `awaitHuman` and does not leave the queue. Only an approval wait leaves it (`waitsOutOfQueue`, `queue.go:373`). #1949 held the turn through the whole wait, and no card behind it could merge.
 3. The monitor treated each card behind #1949 as owning a gate wait (`ownedWait`, `carddigest_flags.go:90`) and raised `wait_over_bound` on #1984, #2098 and #2097. The check-in settled each case with "the card merges on its own": its facts name the gate `merge-queue`, not the card ahead. The board showed all three as "verifying" and "stale".
 4. Card #2093 (PR #2105) moves eight test files into `internal/factoryd/pg`. Git's rename-aware diff against main is 473 lines in 12 files, and the session's push rule (`FitBound`, `pushrules.go:51`) accepted it. The policy gate (`GatePolicy`, `gates.go:540-562`) sums Forgejo's file list, which lists each moved file as added with its whole content and no previous name: 1961 lines, 961 over the 1000-line bound. The card spent three sessions on a finding no session could fix, then stopped at its session cap. The same list also drops a moved file's old path, so a move out of a guarded directory is not classed by that directory.
+5. Card #2091, the weekly bump of pinned outside inputs, stopped after 151 seconds and asked a human to open the upstream registries to its sandbox. The sandbox never reached them: the earlier bumps (#1540, #1574) rented a throwaway server with `commission_server` and ran the lookups there over SSH. The session held that tool, but its brief's sandbox line (`SandboxFacts`, `sandbox.go:61`) only says that every other name fails to resolve. It names `request_tool` for a missing tool and nothing for a missing host.
 
 ## Global Constraints
 
@@ -130,8 +131,8 @@ The rule: `pr / test` runs the packages the diff reaches, chosen by the base's `
 
 ### Task 4: Land and check on the live factory
 
-- [ ] Merge the pull requests of Tasks 1, 2, 3 and 5 in that order, each after green CI and a review with no blocker.
-- [ ] Roll. The production hold keeps main out of production while any plan is open on main (on 2026-11-16 seven were). If the roll-held card is on the board, answer it with Deploy now once all four pull requests are merged, and say in the note that these fixes free the merge queue.
+- [ ] Merge the pull requests of Tasks 1, 2, 3, 5 and 6 in that order, each after green CI and a review with no blocker.
+- [ ] Roll. The production hold keeps main out of production while any plan is open on main (on 2026-11-16 seven were). If the roll-held card is on the board, answer it with Deploy now once all five pull requests are merged, and say in the note that these fixes free the merge queue.
 - [ ] Check the roll: the factoryd deployment's image digest is the digest that main's last image build made.
 - [ ] Check Task 3 at once: no `wait_over_bound` case opens on a card behind another in the merge queue after the roll. Query: `SELECT id, task_id FROM cases WHERE kind='monitor_flag' AND opened_at > '<roll time>' AND problem LIKE '%wait_over_bound(gate%'`, and check each task against `merge_queue`. On the board, every card behind the front of the queue reads "waits to merge behind #N".
 - [ ] Check Tasks 1 and 2 on the first occurrence: the next acceptance card's `gate_criteria` event holds its invariants met from the checks, with no pod. The next human wait during a turn writes a `queue_left` event with `"why": "the card waits for a human"`, and the card behind it takes the turn within a minute.
@@ -155,4 +156,19 @@ The rule: `pr / test` runs the packages the diff reaches, chosen by the base's `
 - [ ] **Step 2: Run them and see the first two fail.** `go test -race -run 'TestGatePolicy' ./internal/factoryd/`.
 - [ ] **Step 3: Implement.** `GatePolicy` reads `PullRequestFileDiffs` before it classifies, and takes the paths (`Path`, and `OldPath` when set) and the lines (`Added + Removed`) from it. `Files` counts the file diffs. The file list stays only for a diff past `maxDiffRead`, which a human already reviews (`Unread`).
 - [ ] **Step 4: Run** `go test -race ./internal/factoryd/` and `bash check changed`. Expected: PASS.
+- [ ] **Step 5: Commit and open the pull request.**
+
+### Task 6: The sandbox line names the way to an outside host
+
+**Files:**
+- Modify: `sandbox.go:61-80` (`SandboxFacts`)
+- Test: `sandbox_test.go`
+
+**Interfaces:**
+- Consumes: `policy.ToolCommission` (`"commission_server"`, `internal/policy/policy.go:1116`).
+
+- [ ] **Step 1: Write the failing test** `TestSandboxFactsNameCommissionServerForOutsideHosts`: with `tools` holding `policy.ToolCommission`, the text holds `commission_server rents a throwaway server that reaches outside hosts over SSH: run the lookups there and release it when done`. Without the tool, the text holds no `commission_server`. Both for a nil manifest and for a project image's manifest.
+- [ ] **Step 2: Run it and see it fail.** `go test -race -run TestSandboxFacts ./internal/factoryd/`.
+- [ ] **Step 3: Implement.** `SandboxFacts` appends that sentence after the line that says every other name fails to resolve, when `tools` holds `policy.ToolCommission`, as it does for `request_tool`.
+- [ ] **Step 4: Run** `go test -race ./internal/factoryd/` and `bash check changed`. Expected: PASS, with `TestSandboxFactsFollowTheImage` and `TestSandboxFactsNameToolsNamesAndRequestTool` unchanged.
 - [ ] **Step 5: Commit and open the pull request.**
