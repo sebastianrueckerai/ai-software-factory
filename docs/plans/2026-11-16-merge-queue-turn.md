@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** A card that waits for a human never blocks other cards' merges, the criteria gate never runs the whole test suite again, and a card that waits its turn to merge neither raises a flag nor looks stale.
+**Goal:** A card that waits for a human never blocks other cards' merges, the criteria gate never runs the whole test suite again, a card that waits its turn to merge neither raises a flag nor looks stale, and the policy gate counts a moved file by its changed lines.
 
-**Architecture:** A card holds its project's merge-queue turn only while factoryd works on it. Every wait for a human leaves the queue, and every merge happens at a turn the card holds, taken again after such a wait (Task 1). An invariant criterion makes no gate run: its verdict is the head's required checks, whose test job already runs the packages the diff reaches (Task 2). One store query gives each card its place in the merge queue. The monitor flags a wait only for the card at the front, and the board names the card ahead (Task 3).
+**Architecture:** A card holds its project's merge-queue turn only while factoryd works on it. Every wait for a human leaves the queue, and every merge happens at a turn the card holds, taken again after such a wait (Task 1). An invariant criterion makes no gate run: its verdict is the head's required checks, whose test job already runs the packages the diff reaches (Task 2). One store query gives each card its place in the merge queue. The monitor flags a wait only for the card at the front, and the board names the card ahead (Task 3). The policy gate takes its paths and line count from the pull request's unified diff, which shows renames, not from Forgejo's file list, which does not (Task 5).
 
 **Tech Stack:** Go (`factoryd`, the console), Temporal workflows with version gates, Postgres.
 
@@ -27,6 +27,7 @@ Nothing merged on the code repository from 08:46 to after 20:20 UTC. Five cards 
 1. #1949 took the turn at 09:00. The turn merged main in (head 51278a82), and `approval` (`workflow_stages.go:336`) ran the criteria gate on that head inside the turn. The plan's invariant `existing_suites_stay_green` (suite `./...`) ran the whole suite in a gate pod. The gate supervisor stopped it at its bound of 15 minutes (`DefaultBounds["GateCriteria"] = 900`, `internal/policy/policy.go:819`, beside `REPRO_TIMEOUT=15m` on the factoryd deployment). The prior attempt stopped the same way, with no failing test. CI's `pr / test` job had passed the same head in 716 s.
 2. The stop asked a human (case 5866, at the human from 09:27). `gateEscalated` (`workflow.go:3288`) waits through `awaitHuman` and does not leave the queue. Only an approval wait leaves it (`waitsOutOfQueue`, `queue.go:373`). #1949 held the turn through the whole wait, and no card behind it could merge.
 3. The monitor treated each card behind #1949 as owning a gate wait (`ownedWait`, `carddigest_flags.go:90`) and raised `wait_over_bound` on #1984, #2098 and #2097. The check-in settled each case with "the card merges on its own": its facts name the gate `merge-queue`, not the card ahead. The board showed all three as "verifying" and "stale".
+4. Card #2093 (PR #2105) moves eight test files into `internal/factoryd/pg`. Git's rename-aware diff against main is 473 lines in 12 files, and the session's push rule (`FitBound`, `pushrules.go:51`) accepted it. The policy gate (`GatePolicy`, `gates.go:540-562`) sums Forgejo's file list, which lists each moved file as added with its whole content and no previous name: 1961 lines, 961 over the 1000-line bound. The card spent three sessions on a finding no session could fix, then stopped at its session cap. The same list also drops a moved file's old path, so a move out of a guarded directory is not classed by that directory.
 
 ## Global Constraints
 
@@ -129,8 +130,28 @@ The rule: `pr / test` runs the packages the diff reaches, chosen by the base's `
 
 ### Task 4: Land and check on the live factory
 
-- [ ] Merge the pull requests of Tasks 1, 2 and 3 in that order, each after green CI and a review with no blocker. The roller rolls each green main.
+- [ ] Merge the pull requests of Tasks 1, 2, 3 and 5 in that order, each after green CI and a review with no blocker.
+- [ ] Roll. The production hold keeps main out of production while any plan is open on main (on 2026-11-16 seven were). If the roll-held card is on the board, answer it with Deploy now once all four pull requests are merged, and say in the note that these fixes free the merge queue.
 - [ ] Check the roll: the factoryd deployment's image digest is the digest that main's last image build made.
 - [ ] Check Task 3 at once: no `wait_over_bound` case opens on a card behind another in the merge queue after the roll. Query: `SELECT id, task_id FROM cases WHERE kind='monitor_flag' AND opened_at > '<roll time>' AND problem LIKE '%wait_over_bound(gate%'`, and check each task against `merge_queue`. On the board, every card behind the front of the queue reads "waits to merge behind #N".
 - [ ] Check Tasks 1 and 2 on the first occurrence: the next acceptance card's `gate_criteria` event holds its invariants met from the checks, with no pod. The next human wait during a turn writes a `queue_left` event with `"why": "the card waits for a human"`, and the card behind it takes the turn within a minute.
+- [ ] Check Task 5 on the next policy gate of a card that moves files: its `policy_gate` event's line count equals `git diff --shortstat` between the merge base and the head.
 - [ ] Record the results, with the event ids, in this plan's progress ledger. Tick the boxes.
+
+### Task 5: The policy gate counts a moved file by its changed lines
+
+**Files:**
+- Modify: `gates.go:540-600` (`GatePolicy`)
+- Test: `gates_test.go` or the file that holds `GatePolicy`'s tests
+
+**Interfaces:**
+- Consumes: `func (f *Forgejo) PullRequestFileDiffs(ctx context.Context, owner, repo string, number int64) ([]fileDiff, error)` (`forgejo.go:2061`) and `fileDiff{Path, OldPath, Added, Removed}` (`reviewdiff.go`), which reads `rename from` and counts only the hunks' lines.
+
+- [ ] **Step 1: Write the failing tests.**
+  - `TestGatePolicyCountsAMoveByItsChangedLines`: a pull request whose diff renames `a/x_test.go` to `a/pg/x_test.go` with a hunk of 5 added and 5 removed lines, and adds `a/pg/pg.go` with 50 lines. Forgejo's file list reports both as added, with 300 and 50 additions and no previous name. Assert: `Lines` is 60, `Insertions` 55, `Deletions` 5, and `Paths` holds `a/x_test.go`, `a/pg/x_test.go` and `a/pg/pg.go`. With a bound of 100, `OverBound` is empty.
+  - `TestGatePolicyClassesAMoveOutOfAGuardedDirectory`: a rename from `.forgejo/workflows/x.yml` to `docs/x.yml` with no hunk. Assert: the class is the one `.forgejo/` gets, not the class of `docs/`.
+  - `TestGatePolicyOnAnUnreadDiffCountsTheFileList`: `PullRequestFileDiffs` answers `ErrDiffTooLong`. Assert: the count is the file list's sum, and `Unread` is set, as today.
+- [ ] **Step 2: Run them and see the first two fail.** `go test -race -run 'TestGatePolicy' ./internal/factoryd/`.
+- [ ] **Step 3: Implement.** `GatePolicy` reads `PullRequestFileDiffs` before it classifies, and takes the paths (`Path`, and `OldPath` when set) and the lines (`Added + Removed`) from it. `Files` counts the file diffs. The file list stays only for a diff past `maxDiffRead`, which a human already reviews (`Unread`).
+- [ ] **Step 4: Run** `go test -race ./internal/factoryd/` and `bash check changed`. Expected: PASS.
+- [ ] **Step 5: Commit and open the pull request.**
