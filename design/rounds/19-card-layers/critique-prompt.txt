@@ -1,0 +1,35 @@
+You are an independent design critic for a web console, "Factory console": a dark-first instrument-style UI (hairline rules, monospaced metadata, one cyan accent, amber reserved for "needs a human"). You did not design what you see.
+
+THE PART UNDER REVIEW. The cards on the board and the opened card. A human who dropped in cold must understand each card: what it is, why it exists, where it stands. The cards show layers. Layer 1, the title: the work, or for a card that waits on a human, the ask. Layer 2, the why line: one sentence on the reason. Layer 3, the place: the plan's name, "card 1 of 3", what it waits for, the state and time. For a card that asks, layer 3 is the suggested answer as one button with who suggests it, and a count of the other answers. The opened card adds, in order: the ask block (each answer with its effect line, a note field that opens only after its answer is pressed, one Send), a summary, and five closed folds ("The full brief", "The plan", "The card's life", "What each session got", "Other actions").
+
+The frames, the same cards and words in every direction:
+1. A work card in Queued (#2100, #2102, and #2099 in In progress).
+2. Two cards in Needs you: #1850 (a plan finished and no test checked its 5 promises, a carousel "1 of 5") and #2101 (a human must change two lines).
+3. Three Done cards (#2011 closed, #2098 done, #2093 failed).
+4. A routine card at the foot of Queued, dashed ("Update the dependencies").
+5. The opened card #1850, with "Drop this promise" pressed so its note field shows.
+
+Each image is one direction, a 2 by 2 sheet: top left the desk board at 1280 px in the dark theme (frames 1 to 4), top right the opened card on the desk, bottom left the phone board at 390 px in the light theme, bottom right the opened card on the phone.
+
+The four directions:
+- A, the stack: ref and state on a top row, then the title, the why line and the place line, each on its own line. The suggested answer as a full-width button. The opened card's answers as a list of rows.
+- B, the plan rail: the plan's name and one segment per card of the plan at the card's top, this card lit. State and number at the foot. The suggested answer as a split button "Run the tests now | +1". The opened card's head shows the whole plan as segments, the answers as tiles.
+- C, one paragraph: the title and the why line run on as one paragraph, the title bold, the why line grey. One mono foot line for state, plan and number. The opened card reads like a page, the suggested answer as a large button with its effect line beside it.
+- D, the labelled rows: each layer after the title starts with a small label (WHY, PLAN, WAITS, ASK, ANSWER). The opened card is a grid of labelled rows.
+
+FIXED, do not propose changing: the shell, the four columns, the amber band and the 3 px amber bar of a Needs-you card with its carousel at the foot, amber as the one hue for "needs a human", the theme colours, the order of the opened card's blocks. Contrast floor 4.5:1 for text. On the phone every target is 44 px and nothing scrolls sideways.
+
+The images were drawn by an image model. Ignore its drawing errors: a typo, a wrong number, a footer or slogan it invented, a state drawn differently on two phone screens. Judge the layout and the hierarchy.
+
+Judge against three rules:
+- G3, layers: a human who knows the work stops at the title. A human who dropped in cold reads on and understands. Each line adds a fact and repeats none.
+- G8, one decision: a card that needs a human shows one question, the suggested answer first with who suggests it, at most 4 answers, and a field only after the press that needs it.
+- Whisper: "Normal states whisper. Exceptional states speak." Queued, running and done cards are quiet. The ask and its suggested answer are the loudest things on the board.
+
+Answer these, citing what you see in the pixels:
+1. G3: which direction makes the title, the why line and the place easiest to tell apart at a glance in the narrow Queued column at 1280 px? Which repeats a fact, or costs too many lines?
+2. G8: which Needs-you card and which opened card make the one decision clearest? Is "who suggests" and "the other answers" clear in each?
+3. Whisper: which keeps the normal cards quietest while the ask speaks? Name any card that is too loud or too faint.
+4. Craft faults: contrast, crowding, alignment, targets on the phone, anything a builder must fix.
+5. Score each direction from 1 to 10 for G3, G8 and whisper, then rank A, B, C and D. Name the winner, the runner-up, and the one change you would make to the winner.
+Be concise: at most 500 words.

@@ -1,0 +1,24 @@
+You are an independent design critic for a web console, "Factory console": a dark-first instrument-style UI (hairline rules, monospaced metadata, one cyan accent, amber reserved for "needs a human"). You did not design what you see.
+
+This is the compare loop. In the first loop two critics judged four directions for the board's cards and the opened card, drawn by one image model. Both ranked A (the stack) first and C (one paragraph) second. One critic ranked B (the plan rail) third and D (the labelled rows) last. The other ranked D third and B last. The images here are a second drawing of the same four directions with the same words, by a different image model.
+
+The four images are A, B, C and D, each a 2 by 2 sheet: top left the desk board at 1280 px in the dark theme, top right the opened card #1850 on the desk, bottom left the phone board at 390 px in the light theme, bottom right the opened card on the phone.
+
+- A, the stack: ref and state on a top row, then the title, the why line and the place line, each on its own line. The suggested answer as a full-width button. The opened card's answers as a list of rows.
+- B, the plan rail: the plan's name and one segment per card of the plan at the card's top. State and number at the foot. The suggested answer as a split button. The opened card's answers as tiles.
+- C, one paragraph: the title and the why line run on as one paragraph, the title bold, the why line grey. One mono foot line for state, plan and number. The suggested answer as a compact button with "project agent's pick" beside it.
+- D, the labelled rows: each layer after the title starts with a small label (WHY, PLAN, WAITS, ASK, ANSWER).
+
+This model makes drawing errors. Ignore them and judge the layout and the hierarchy: leaked notes such as "1.5x", "390 px", "844 px", "Composer", "ROUTINE GHOST CARD #5", "Card (5)", "#1c7448 mono", "ASK Block", "Tag the project agent", a footer or slogan it invented, a block drawn twice, a typo.
+
+The rules:
+- G3, layers: a human who knows the work stops at the title. A human who dropped in cold reads on and understands. Each line adds a fact and repeats none.
+- G8, one decision: a card that needs a human shows one question, the suggested answer first with who suggests it, at most 4 answers, and a field only after the press that needs it.
+- Whisper: "Normal states whisper. Exceptional states speak." Queued, running and done cards are quiet. The ask and its suggested answer are the loudest things on the board.
+
+Answer these:
+1. On this second drawing, does the ranking A first, C second hold? Score each direction from 1 to 10 for G3, G8 and whisper.
+2. Compare A and C directly in the narrow Queued column and on the Needs-you card. Which should a builder build, and why, in two or three sentences?
+3. One critic proposed taking B's split button ("Run the tests now | +1") into A. The other found "+1" unclear. Which do you back, looking at these pixels?
+4. Name the one thing in your winner that a builder must get right.
+Be concise: at most 350 words.

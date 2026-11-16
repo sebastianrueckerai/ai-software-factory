@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Round 19: the card's layers</title>
+<style>
+:root { color-scheme: dark; --bg: #10151d; --line: #232b38; --text: #dfe7f1; --muted: #93a1b5; --faint: #7c8ba0; --accent: #53d6e2; --need: #f6bd5a; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.65 system-ui, sans-serif; }
+main { max-width: 84rem; margin: 0 auto; padding: 28px 22px 80px; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+h2 { font-size: 13px; font-variant-caps: all-small-caps; letter-spacing: .08em; color: var(--faint); margin: 38px 0 8px; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+h3 { font-size: 18px; margin: 30px 0 4px; }
+h3 .letter { color: var(--need); font-family: ui-monospace, Menlo, Consolas, monospace; margin-right: 6px; }
+p, li { max-width: 82ch; }
+p { margin: 8px 0; }
+code { font: 12.5px/1.6 ui-monospace, Menlo, Consolas, monospace; color: var(--accent); }
+a { color: var(--accent); }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 12px 0; align-items: start; }
+.take { color: var(--muted); font-size: 12.5px; margin: 16px 0 0; }
+figure { margin: 0; }
+figure img { max-width: 100%; border: 1px solid var(--line); display: block; }
+figcaption { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+table { border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+th, td { text-align: left; vertical-align: top; padding: 5px 14px 5px 0; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 600; }
+td.n { text-align: right; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.wide { overflow-x: auto; }
+.rec { padding: 10px 14px; border: 1px solid var(--line); border-left: 2px solid var(--need); }
+@media (max-width: 760px) { .pair { grid-template-columns: 1fr; } table { font-size: 12px; } }
+</style>
+</head>
+<body>
+<main>
+<h1>Round 19: the card's layers</h1>
+<p>This round designs the small card and the opened card for the plan <a href="../../../docs/plans/2026-11-16-every-card-readable.md">"Every card readable"</a>. A card must tell a human who dropped in cold what it is, why it exists and where it stands, in layers. The goals and the card model are in <a href="../../../docs/board-cards-problem-2026-11-16.md">the problem document</a>, sections 5 and 6.</p>
+<p>The round drew four directions, A to D, with the same cards and the same words. Each direction shows five frames: a work card in Queued, two cards in Needs you, three Done cards, a routine card, and the opened card #1850. Each frame shows at 1280 px in the dark theme and at 390 px in the light theme. Two image models drew every frame. Gemini 2.5 Pro and GLM 5V Turbo judged both drawings. The <a href="brief.md">brief</a> names what is fixed. The words are in <a href="prompts.py">prompts.py</a>. The director's notes are in <a href="notes.md">notes.md</a>.</p>
+
+<div class="rec">
+<p><strong>Pick by letter: A, B, C or D.</strong></p>
+<p><strong>The director recommends A, the stack.</strong> Both critics ranked A first in both loops. Each layer has its own line: the ref and the state on top, then the title, the why line and the place line. A human who knows the work reads the title and stops. A human who dropped in cold reads three more short lines. The suggested answer is a full-width amber button, the loudest thing on the board.</p>
+<p><strong>The runner-up is C, one paragraph.</strong> Both critics ranked C second in both loops. A work card in C is one line shorter, but its title runs into its why line, so a human must read into the paragraph to find where the title ends.</p>
+<p>Sebastian's pick becomes a C-entry that amends C11. <a href="../../ia.md">ia.md</a> is rewritten after the pick.</p>
+</div>
+
+<h2>How the directions differ</h2>
+<p>The table shows each direction's layout per card kind. The content is the same in all four.</p>
+<div class="wide"><table>
+<tr><th>Direction</th><th>Work card in Queued</th><th>Card in Needs you</th><th>Done card</th><th>Opened card</th></tr>
+<tr><td><strong>A</strong>, the stack</td><td>Ref and state on a top row. Then the title, the why line and the place line, each on its own line.</td><td>The ask, the why line, then a full-width amber button. "suggested by the project agent" and "1 other answer" under it.</td><td>Two lines: ref and title, then state and time.</td><td>Head, then the answers as a list of rows, each with a radio and its effect line under the label. Summary, then five folds.</td></tr>
+<tr><td><strong>B</strong>, the plan rail</td><td>A plan rail on top: the plan's name and one segment per card of the plan, this card lit. Then title and why line. State and number at the foot.</td><td>The ask, the why line, then a split button "Run the tests now | +1". "the project agent suggests this" under it.</td><td>Title, then state, time and ref.</td><td>The whole plan as five segments in the head. The answers as two tiles side by side. Summary, then five folds.</td></tr>
+<tr><td><strong>C</strong>, one paragraph</td><td>Title and why line as one paragraph, the title bold, the why line grey. One mono foot line for state, plan and number.</td><td>The ask and the why line as one paragraph. A compact button with "project agent's pick" and "or 1 other" beside it.</td><td>One paragraph: title, state, time, ref.</td><td>Reads like a page. The suggested answer as a large button with its effect line beside it. Summary, then five folds.</td></tr>
+<tr><td><strong>D</strong>, the labelled rows</td><td>Each line after the title starts with a small label: WHY, PLAN, WAITS.</td><td>Labelled rows: ASK, WHY, PROMISE, ANSWER.</td><td>Two lines, no labels.</td><td>A grid of labelled rows: WHY, WHERE, ASK, ANSWERS, SUMMARY. Then five folds.</td></tr>
+</table></div>
+
+<h2>The critics' ranking</h2>
+<p>A ranks first and C second in all four answers. Each critic scored G3 (layers), G8 (one decision) and the whisper rule from 1 to 10. The table shows the sum, at most 30. Loop 1 judged the gpt-image drawing. The compare loop judged the nano-banana drawing of the same directions.</p>
+<div class="wide"><table>
+<tr><th>Direction</th><th>Gemini loop 1</th><th>GLM loop 1</th><th>Gemini compare</th><th>GLM compare</th></tr>
+<tr><td>A, the stack</td><td class="n">26</td><td class="n">25</td><td class="n">28</td><td class="n">27</td></tr>
+<tr><td>B, the plan rail</td><td class="n">16</td><td class="n">22</td><td class="n">18</td><td class="n">18</td></tr>
+<tr><td>C, one paragraph</td><td class="n">25</td><td class="n">26</td><td class="n">19</td><td class="n">25</td></tr>
+<tr><td>D, the labelled rows</td><td class="n">18</td><td class="n">17</td><td class="n">13</td><td class="n">16</td></tr>
+</table></div>
+<p>The reasons, in short:</p>
+<ul>
+<li><strong>A wins</strong> because each layer has its own line, so a human can stop at the title or read on. Its full-width button makes the one decision clear. Both critics scored it 8 to 10 on every rule.</li>
+<li><strong>C is quiet on normal cards.</strong> Three of the four answers scored its whisper 9 or 10. Running the title into the why line makes the title harder to find at a glance. Its compact button is quieter than A's.</li>
+<li><strong>B's plan rail adds a line of chrome</strong> to every quiet card. In the compare loop both critics found "+1" on the split button unclear.</li>
+<li><strong>D's labels make every card speak</strong>, so the ask stands out less. The labels also take width from the narrow Queued column.</li>
+</ul>
+<p>The critics disagree on two points. In loop 1 GLM proposed B's split button for A. In the compare loop GLM backed A's single button, as Gemini did. Gemini put D third in loop 1 and B third in the compare loop. GLM put B third in both loops. GLM scored C one point above A in loop 1 and still named A the winner, for its mono place line and its hairlines.</p>
+<p>What a builder must get right in A, from the compare loop: the gap in weight between a normal card and a card that needs a human (Gemini), and "suggested by" in a small grey type that never competes with the button (GLM). The director checked one more point: in the light theme the amber text takes the theme's <code>#8a4f00</code>, which measures 6.5:1 on the card, not the lighter amber the image model drew.</p>
+<p>The director overruled eight claims, among them "C shows twice as many cards" and "B's rail shows on Done cards". The list is in <a href="notes.md">notes.md</a>. The critics' full answers: <a href="critique/loop1-gemini.json">Gemini loop 1</a>, <a href="critique/loop1-glm.json">GLM loop 1</a>, <a href="critique/compare-gemini.json">Gemini compare</a>, <a href="critique/compare-glm.json">GLM compare</a>.</p>
+
+<h2>The directions, frame by frame</h2>
+<p>Each direction shows its five frames twice: the gpt-image drawing first, the nano-banana drawing second. Frames 1 to 4 sit on the board, frame 5 is the opened card. The image models make drawing errors, such as a typo, a wrong number or an invented footer. <a href="notes.md">notes.md</a> lists them. Click an image for full size.</p>
+
+<h3><span class="letter">A</span>the stack</h3>
+<p>Each layer has its own line, in the order of the problem document's sketch. The opened card lists the answers as rows, each with its effect line.</p>
+<p class="take">gpt-image</p>
+<div class="pair">
+<figure><a href="A-desk-board-gpt.jpg"><img loading="lazy" src="A-desk-board-gpt.jpg" alt="A, the board at 1280 px, dark"></a><figcaption>Frames 1 to 4 at 1280 px, dark.</figcaption></figure>
+<figure><a href="A-desk-open-gpt.jpg"><img loading="lazy" src="A-desk-open-gpt.jpg" alt="A, the opened card at 1280 px, dark"></a><figcaption>Frame 5 at 1280 px, "Drop this promise" pressed.</figcaption></figure>
+<figure><a href="A-phone-board-gpt.jpg"><img loading="lazy" src="A-phone-board-gpt.jpg" alt="A, the board at 390 px, light"></a><figcaption>Frames 1 to 4 at 390 px, light.</figcaption></figure>
+<figure><a href="A-phone-open-gpt.jpg"><img loading="lazy" src="A-phone-open-gpt.jpg" alt="A, the opened card at 390 px, light"></a><figcaption>Frame 5 at 390 px.</figcaption></figure>
+</div>
+<p class="take">nano-banana</p>
+<div class="pair">
+<figure><a href="A-desk-board-nano.jpg"><img loading="lazy" src="A-desk-board-nano.jpg" alt="A, the board at 1280 px, dark, second drawing"></a><figcaption>Frames 1 to 4 at 1280 px. The model drew the Done cards with green and red fills, which A does not ask for.</figcaption></figure>
+<figure><a href="A-desk-open-nano.jpg"><img loading="lazy" src="A-desk-open-nano.jpg" alt="A, the opened card at 1280 px, dark, second drawing"></a><figcaption>Frame 5 at 1280 px.</figcaption></figure>
+<figure><a href="A-phone-board-nano.jpg"><img loading="lazy" src="A-phone-board-nano.jpg" alt="A, the board at 390 px, light, second drawing"></a><figcaption>Frames 1 to 4 at 390 px.</figcaption></figure>
+<figure><a href="A-phone-open-nano.jpg"><img loading="lazy" src="A-phone-open-nano.jpg" alt="A, the opened card at 390 px, light, second drawing"></a><figcaption>Frame 5 at 390 px.</figcaption></figure>
+</div>
+
+<h3><span class="letter">B</span>the plan rail</h3>
+<p>The card's place in its plan is a small instrument at the card's top. The suggested answer is a split button. The opened card shows the whole plan in its head and the answers as tiles.</p>
+<p class="take">gpt-image</p>
+<div class="pair">
+<figure><a href="B-desk-board-gpt.jpg"><img loading="lazy" src="B-desk-board-gpt.jpg" alt="B, the board at 1280 px, dark"></a><figcaption>Frames 1 to 4 at 1280 px. The model drew #2099's rail as "criteria gate 1/3", not "quiet inbox 2/4".</figcaption></figure>
+<figure><a href="B-desk-open-gpt.jpg"><img loading="lazy" src="B-desk-open-gpt.jpg" alt="B, the opened card at 1280 px, dark"></a><figcaption>Frame 5 at 1280 px. "5 cards, all ended" shows twice.</figcaption></figure>
+<figure><a href="B-phone-board-gpt.jpg"><img loading="lazy" src="B-phone-board-gpt.jpg" alt="B, the board at 390 px, light"></a><figcaption>Frames 1 to 4 at 390 px, light.</figcaption></figure>
+<figure><a href="B-phone-open-gpt.jpg"><img loading="lazy" src="B-phone-open-gpt.jpg" alt="B, the opened card at 390 px, light"></a><figcaption>Frame 5 at 390 px.</figcaption></figure>
+</div>
+<p class="take">nano-banana</p>
+<div class="pair">
+<figure><a href="B-desk-board-nano.jpg"><img loading="lazy" src="B-desk-board-nano.jpg" alt="B, the board at 1280 px, dark, second drawing"></a><figcaption>Frames 1 to 4 at 1280 px. The model stacked Done under In progress.</figcaption></figure>
+<figure><a href="B-desk-open-nano.jpg"><img loading="lazy" src="B-desk-open-nano.jpg" alt="B, the opened card at 1280 px, dark, second drawing"></a><figcaption>Frame 5 at 1280 px.</figcaption></figure>
+<figure><a href="B-phone-board-nano.jpg"><img loading="lazy" src="B-phone-board-nano.jpg" alt="B, the board at 390 px, light, second drawing"></a><figcaption>Frames 1 to 4 at 390 px. The model drew sizes and part names onto the screen.</figcaption></figure>
+<figure><a href="B-phone-open-nano.jpg"><img loading="lazy" src="B-phone-open-nano.jpg" alt="B, the opened card at 390 px, light, second drawing"></a><figcaption>Frame 5 at 390 px. The model drew the head twice.</figcaption></figure>
+</div>
+
+<h3><span class="letter">C</span>one paragraph</h3>
+<p>The title and the why line run on as one paragraph. One mono foot line holds state, plan and number. The opened card reads like a page, with the suggested answer as a large button.</p>
+<p class="take">gpt-image</p>
+<div class="pair">
+<figure><a href="C-desk-board-gpt.jpg"><img loading="lazy" src="C-desk-board-gpt.jpg" alt="C, the board at 1280 px, dark"></a><figcaption>Frames 1 to 4 at 1280 px. In Queued the model drew a top row and "queued 2 h" twice, which C does not ask for. The nano-banana drawing below follows C.</figcaption></figure>
+<figure><a href="C-desk-open-gpt.jpg"><img loading="lazy" src="C-desk-open-gpt.jpg" alt="C, the opened card at 1280 px, dark"></a><figcaption>Frame 5 at 1280 px.</figcaption></figure>
+<figure><a href="C-phone-board-gpt.jpg"><img loading="lazy" src="C-phone-board-gpt.jpg" alt="C, the board at 390 px, light"></a><figcaption>Frames 1 to 4 at 390 px, light.</figcaption></figure>
+<figure><a href="C-phone-open-gpt.jpg"><img loading="lazy" src="C-phone-open-gpt.jpg" alt="C, the opened card at 390 px, light"></a><figcaption>Frame 5 at 390 px. The two screens show different presses.</figcaption></figure>
+</div>
+<p class="take">nano-banana</p>
+<div class="pair">
+<figure><a href="C-desk-board-nano.jpg"><img loading="lazy" src="C-desk-board-nano.jpg" alt="C, the board at 1280 px, dark, second drawing"></a><figcaption>Frames 1 to 4 at 1280 px. The model stacked Done under In progress.</figcaption></figure>
+<figure><a href="C-desk-open-nano.jpg"><img loading="lazy" src="C-desk-open-nano.jpg" alt="C, the opened card at 1280 px, dark, second drawing"></a><figcaption>Frame 5 at 1280 px.</figcaption></figure>
+<figure><a href="C-phone-board-nano.jpg"><img loading="lazy" src="C-phone-board-nano.jpg" alt="C, the board at 390 px, light, second drawing"></a><figcaption>Frames 1 to 4 at 390 px.</figcaption></figure>
+<figure><a href="C-phone-open-nano.jpg"><img loading="lazy" src="C-phone-open-nano.jpg" alt="C, the opened card at 390 px, light, second drawing"></a><figcaption>Frame 5 at 390 px.</figcaption></figure>
+</div>
+
+<h3><span class="letter">D</span>the labelled rows</h3>
+<p>Each line after the title starts with a small faint label. The opened card is a grid of labelled rows.</p>
+<p class="take">gpt-image</p>
+<div class="pair">
+<figure><a href="D-desk-board-gpt.jpg"><img loading="lazy" src="D-desk-board-gpt.jpg" alt="D, the board at 1280 px, dark"></a><figcaption>Frames 1 to 4 at 1280 px, dark.</figcaption></figure>
+<figure><a href="D-desk-open-gpt.jpg"><img loading="lazy" src="D-desk-open-gpt.jpg" alt="D, the opened card at 1280 px, dark"></a><figcaption>Frame 5 at 1280 px. The model marked the wrong radio.</figcaption></figure>
+<figure><a href="D-phone-board-gpt.jpg"><img loading="lazy" src="D-phone-board-gpt.jpg" alt="D, the board at 390 px, light"></a><figcaption>Frames 1 to 4 at 390 px, light.</figcaption></figure>
+<figure><a href="D-phone-open-gpt.jpg"><img loading="lazy" src="D-phone-open-gpt.jpg" alt="D, the opened card at 390 px, light"></a><figcaption>Frame 5 at 390 px.</figcaption></figure>
+</div>
+<p class="take">nano-banana</p>
+<div class="pair">
+<figure><a href="D-desk-board-nano.jpg"><img loading="lazy" src="D-desk-board-nano.jpg" alt="D, the board at 1280 px, dark, second drawing"></a><figcaption>Frames 1 to 4 at 1280 px.</figcaption></figure>
+<figure><a href="D-desk-open-nano.jpg"><img loading="lazy" src="D-desk-open-nano.jpg" alt="D, the opened card at 1280 px, dark, second drawing"></a><figcaption>Frame 5 at 1280 px.</figcaption></figure>
+<figure><a href="D-phone-board-nano.jpg"><img loading="lazy" src="D-phone-board-nano.jpg" alt="D, the board at 390 px, light, second drawing"></a><figcaption>Frames 1 to 4 at 390 px. The model drew Done twice.</figcaption></figure>
+<figure><a href="D-phone-open-nano.jpg"><img loading="lazy" src="D-phone-open-nano.jpg" alt="D, the opened card at 390 px, light, second drawing"></a><figcaption>Frame 5 at 390 px.</figcaption></figure>
+</div>
+
+<h2>The four directions side by side</h2>
+<p>These sheets put A, B, C and D next to each other for one frame. The critics judged one sheet per direction: <a href="sheets/A-gpt.jpg">A</a>, <a href="sheets/B-gpt.jpg">B</a>, <a href="sheets/C-gpt.jpg">C</a> and <a href="sheets/D-gpt.jpg">D</a> in loop 1, <a href="sheets/A-nano.jpg">A</a>, <a href="sheets/B-nano.jpg">B</a>, <a href="sheets/C-nano.jpg">C</a> and <a href="sheets/D-nano.jpg">D</a> in the compare loop.</p>
+<div class="pair">
+<figure><a href="sheets/gpt-desk-board.jpg"><img loading="lazy" src="sheets/gpt-desk-board.jpg" alt="A to D, the board at 1280 px"></a><figcaption>The board at 1280 px, gpt-image.</figcaption></figure>
+<figure><a href="sheets/gpt-desk-open.jpg"><img loading="lazy" src="sheets/gpt-desk-open.jpg" alt="A to D, the opened card at 1280 px"></a><figcaption>The opened card at 1280 px, gpt-image.</figcaption></figure>
+<figure><a href="sheets/gpt-phone-board.jpg"><img loading="lazy" src="sheets/gpt-phone-board.jpg" alt="A to D, the board at 390 px"></a><figcaption>The board at 390 px, gpt-image.</figcaption></figure>
+<figure><a href="sheets/gpt-phone-open.jpg"><img loading="lazy" src="sheets/gpt-phone-open.jpg" alt="A to D, the opened card at 390 px"></a><figcaption>The opened card at 390 px, gpt-image.</figcaption></figure>
+</div>
+
+<h2>Method and cost</h2>
+<p>A probe drew A's board frame on four models. <code>google/nano-banana-2.1</code> at 2K and <code>openai/gpt-image-2.5</code> at 1536 by 1024 drew all 16 frames each. <code>blackforestlabs/flux-3</code> drew a legible probe in a grey theme, and <code>alibaba/qwen-image-3</code> refused a prompt over 5,000 characters. The probe is in <a href="probe/">probe/</a>. The first nano-banana pass of three A frames wrote part names onto the screen. They ran again with a fixed prompt, and the first pass is in <a href="first-pass/">first-pass/</a>. Each image has a sidecar JSON with its model, its exact prompt, its parameters and its cost. The prompt files beside the images hold the final prompt of each frame.</p>
+<div class="wide"><table>
+<tr><th>Item</th><th>Calls</th><th>USD</th></tr>
+<tr><td>nano-banana-2.1 at 2K</td><td class="n">20</td><td class="n">4.00</td></tr>
+<tr><td>gpt-image-2.5 at 1536 by 1024</td><td class="n">17</td><td class="n">4.25</td></tr>
+<tr><td>flux-3 at 2K, the probe</td><td class="n">1</td><td class="n">0.07</td></tr>
+<tr><td>Gemini 2.5 Pro and GLM 5V Turbo</td><td class="n">4</td><td class="n">0.12</td></tr>
+<tr><td><strong>Total, of a $10 cap</strong></td><td class="n">42</td><td class="n">8.44</td></tr>
+</table></div>
+<p>The figures are estimates by <code>tools/img.py</code>. The fal key cannot read the real spend, so the fal dashboard holds the true figure.</p>
+</main>
+</body>
+</html>
