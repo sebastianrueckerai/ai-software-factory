@@ -135,6 +135,7 @@ The rule: `pr / test` runs the packages the diff reaches, chosen by the base's `
 - [ ] Check the roll: the factoryd deployment's image digest is the digest that main's last image build made.
 - [ ] Check Task 3 at once: no `wait_over_bound` case opens on a card behind another in the merge queue after the roll. Query: `SELECT id, task_id FROM cases WHERE kind='monitor_flag' AND opened_at > '<roll time>' AND problem LIKE '%wait_over_bound(gate%'`, and check each task against `merge_queue`. On the board, every card behind the front of the queue reads "waits to merge behind #N".
 - [ ] Check Tasks 1 and 2 on the first occurrence: the next acceptance card's `gate_criteria` event holds its invariants met from the checks, with no pod. The next human wait during a turn writes a `queue_left` event with `"why": "the card waits for a human"`, and the card behind it takes the turn within a minute.
+- [ ] Land #1949's work. #1949 was closed on 2026-11-16 to free the queue. Its work is finished on branch `factory/t-e78c5fd4ef8a` (PR #2099, head 51278a82). Plan #1939's criteria request (approval 1313) stays pending for it. Once Task 2 is live, grant that request as one card that carries this branch. Its criteria gate then reads the invariant from the checks, and the card merges.
 - [ ] Check Task 5 on the next policy gate of a card that moves files: its `policy_gate` event's line count equals `git diff --shortstat` between the merge base and the head.
 - [ ] Record the results, with the event ids, in this plan's progress ledger. Tick the boxes.
 
