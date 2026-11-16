@@ -1,6 +1,20 @@
 # Round 19: notes
 
-The director recommends A, the stack. C, one paragraph, is the runner-up. Both critics ranked A first and C second in both loops. Sebastian's pick is open.
+Sebastian picked C, one paragraph, on 2026-11-16. The director recommended A, the stack, with C as the runner-up, and both critics ranked A first and C second in both loops. His pick stands. It is C46 in [design-decisions.md](../../design-decisions.md).
+
+## The pick: C46
+
+Sebastian's pick against the critics' scores: Gemini scored C one point under A in loop 1 and nine points under it in the compare loop. GLM scored C one point over A in loop 1 and two points under it in the compare loop.
+
+C46 settles what the frames left open or drew wrong:
+
+- gpt-image drew a top row on C's work cards in Queued. C has none, as the nano-banana drawing shows.
+- The frames dropped #2102's own number for its waits clause. The number stays, and the waits clause follows it.
+- The frames drew every `#N` as a bare number. Each reference names its target's title and state.
+- The frames drew the carousel in the middle of the card's foot. It stays at the right, as C44 sets.
+- The frames drew the ask on the small card and the why line on the opened card at 15 px. C46 takes the theme's 16 px for both.
+- The frames left the plan's name off the cards in Needs you. C40 stands, so the band holds the place after the number.
+- No frame showed a card whose suggested answer needs a field. Its label stands as a link that opens the card with that answer pressed, and the small card holds no button.
 
 ## The director's view
 
