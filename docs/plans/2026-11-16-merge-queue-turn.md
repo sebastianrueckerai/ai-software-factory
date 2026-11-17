@@ -131,12 +131,12 @@ The rule: `pr / test` runs the packages the diff reaches, chosen by the base's `
 
 ### Task 4: Land and check on the live factory
 
-- [ ] Merge the pull requests of Tasks 1, 2, 3, 5 and 6 in that order, each after green CI and a review with no blocker.
-- [ ] Roll. The production hold keeps main out of production while any plan is open on main (on 2026-11-16 seven were). If the roll-held card is on the board, answer it with Deploy now once all five pull requests are merged, and say in the note that these fixes free the merge queue.
+- [ ] Merge the pull requests of Tasks 1, 2, 3, 5, 6 and 7 in that order, each after green CI and a review with no blocker.
+- [ ] Roll. The production hold keeps main out of production while any plan is open on main (on 2026-11-16 seven were). If the roll-held card is on the board, answer it with Deploy now once all six pull requests are merged, and say in the note that these fixes free the merge queue.
 - [ ] Check the roll: the factoryd deployment's image digest is the digest that main's last image build made.
 - [ ] Check Task 3 at once: no `wait_over_bound` case opens on a card behind another in the merge queue after the roll. Query: `SELECT id, task_id FROM cases WHERE kind='monitor_flag' AND opened_at > '<roll time>' AND problem LIKE '%wait_over_bound(gate%'`, and check each task against `merge_queue`. On the board, every card behind the front of the queue reads "waits to merge behind #N".
 - [ ] Check Tasks 1 and 2 on the first occurrence: the next acceptance card's `gate_criteria` event holds its invariants met from the checks, with no pod. The next human wait during a turn writes a `queue_left` event with `"why": "the card waits for a human"`, and the card behind it takes the turn within a minute.
-- [ ] Land #1949's work. #1949 was closed on 2026-11-16 to free the queue. Its work is finished on branch `factory/t-e78c5fd4ef8a` (PR #2099, head 51278a82). Plan #1939's criteria request (approval 1313) stays pending for it. Once Task 2 is live, grant that request as one card that carries this branch. Its criteria gate then reads the invariant from the checks, and the card merges. #2004 (plan #1990) was closed the same night for the same reason. Its work is on branch `factory/t-e758758121d7` (PR #2085, head 955634ec): land it the same way through plan #1990's criteria request.
+- [ ] Land #1949's work. #1949 was closed on 2026-11-16 to free the queue. Its work is finished on branch `factory/t-e78c5fd4ef8a` (PR #2099, head 51278a82). Plan #1939's criteria request (approval 1313) stays pending for it. Once Task 2 is live, grant that request as one card that carries this branch. Its criteria gate then reads the invariant from the checks, and the card merges. #2004 (plan #1990) was closed the same night for the same reason. Its work is on branch `factory/t-e758758121d7` (PR #2085, head 955634ec): land it the same way through plan #1990's request (approval 1315). That request is a `criteria_rerun`, which the grant refuses until Task 7 is live.
 - [ ] Check Task 5 on the next policy gate of a card that moves files: its `policy_gate` event's line count equals `git diff --shortstat` between the merge base and the head.
 - [ ] Record the results, with the event ids, in this plan's progress ledger. Tick the boxes.
 
@@ -172,3 +172,21 @@ The rule: `pr / test` runs the packages the diff reaches, chosen by the base's `
 - [ ] **Step 3: Implement.** `SandboxFacts` appends that sentence after the line that says every other name fails to resolve, when `tools` holds `policy.ToolCommission`, as it does for `request_tool`.
 - [ ] **Step 4: Run** `go test -race ./internal/factoryd/` and `bash check changed`. Expected: PASS, with `TestSandboxFactsFollowTheImage` and `TestSandboxFactsNameToolsNamesAndRequestTool` unchanged.
 - [ ] **Step 5: Commit and open the pull request.**
+
+### Task 7: A plan whose criteria were never judged can be granted one card
+
+A plan's criteria gate runs only from its integration card's pull request (`workflow.go:3396`, `GateCriteria` in `criteria.go:529`). When that card ends without one, `askRerun` (`verdict.go:1722`) opens a `criteria_rerun` request, and `grant_criteria` refuses it (`actions.go:351`: "grants no card and runs no review"). Confirm refuses too while a card is closed. Only waivers remain, so the plan's work can never land through the factory. Plan #1850 ended that way on 2026-11-16, and plan #1990 waits that way now. `GrantCriteria` (`verdict.go:526`) already writes one delta due per open criterion, and `openCriteria` (`verdict.go:815`) counts never-judged criteria as open. The refusal is the only block.
+
+**Files:**
+- Modify: `internal/factoryd/actions.go:350-355` (the `ActGrantCriteria` rule)
+- Test: `internal/factoryd/actions_test.go` (the table at line ~1036) and `internal/console/actions_test.go`
+
+**Interfaces:**
+- Consumes: `criteriaRequestRefusal(f CaseFacts, action string) string` and `GrantCriteria(ctx, store, id, by string, approval int64) (int, error)`, unchanged.
+
+- [ ] **Step 1: Write the failing tests.** In the `actions_test.go` table, add `{"grant on a never-judged criteria case", ActGrantCriteria, CaseFacts{Kind: CasePlanCriteria, ApprovalKind: ApprovalCriteriaRerun}, Resolution{}, true}`. In `internal/console/actions_test.go`, add `TestGrantOnANeverJudgedPlanDraftsOneCard`: a done plan with two criteria and no verdict rows, a pending `criteria_rerun` request, and its case at the human. The grant press answers 200 with `Granted one more bounded card for 2 criteria`. The request is approved, and the plan holds two `delta` catch rows from `FinderApprover`.
+- [ ] **Step 2: Run them and see them fail.** `go test -race -run 'TestBoardRowsApplyOnTheirPreconditions|TestGrantOnANeverJudgedPlanDraftsOneCard' ./internal/factoryd/ ./internal/console/`.
+- [ ] **Step 3: Implement.** Delete the `ApprovalCriteriaRerun` branch of the `ActGrantCriteria` rule, so it returns `criteriaRequestRefusal(f, ActGrantCriteria)` for both request kinds. Remove the text "grant_criteria grants no card" wherever a test or a tool description still says it.
+- [ ] **Step 4: Run** `go test -race ./internal/factoryd/ ./internal/console/` and `bash check changed`. Expected: PASS.
+- [ ] **Step 5: Commit and open the pull request.**
+
