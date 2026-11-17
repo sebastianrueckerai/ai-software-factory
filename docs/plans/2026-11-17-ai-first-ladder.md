@@ -10,7 +10,7 @@
 
 **Spec:** This plan. It applies goal 1 of `docs/card-flow-redesign-2026-11-02.md` ("No problem reaches a human before AI judged it with the full picture") and Sebastian's rule of 2026-11-09 in `docs/needs-you-register-2026-11-09.md` ("the factory agent looks at every stop first and decides whenever it can").
 
-**Depends on:** the fixes of `factory-faults-2026-11-17.md` for faults 3, 4 and 5. Fault 4 makes the criteria gate judge main's head when a plan's cards are final. Task 1 of this plan builds on that gate.
+**Depends on:** the fixes of `factory-faults-2026-11-17.md` for faults 3, 4 and 5. Fault 4 makes the criteria gate judge main's head when a plan's cards are final. Task 1 of this plan builds on that gate. It also lands after `docs/plans/2026-11-17-work-loss-faults.md`, whose heal pass reads every live case of a card: without it, a plan case that Task 4 opens as `open` gets a second case from the heal pass after 5 minutes.
 
 ## Why this plan exists
 
@@ -96,7 +96,7 @@ The tasks run in this order. Each one lands on its own, leaves main working, and
 
 **Behaviour**
 - `openRequestCase` (`cases_events.go:355-403`) opens a `plan_criteria` case as `open`, with no rung 3 step and no poke.
-- Rung 0 gets a row for `plan_criteria`: when `gateDue` holds for the plan (fault 4's form, which takes main's head), queue the criteria gate and wait for its result. The case resolves when every criterion has a row. Rung 0 fires this row once per case.
+- Rung 0 gets a row for `plan_criteria`: when `gateDue` holds for the plan (fault 4's form, which takes main's head), queue the criteria gate and wait for its result. The case resolves when no criterion is open by the settle rule of the plan's close (`openCriteria(p, g.settling(rows))` is empty): a gate row on a head that never reached main settles nothing. Rung 0 fires this row once per case.
 - `Climb` no longer excludes `plan_criteria` at rung 2 (`ladder.go:586`). Rung 1 stays off it: the case is board-level, as the dependency stops are.
 - Rung 2 takes the actions that the decision above allows. The refusal of the others names the state and the action that fits.
 - The case sits on a final plan card. Two checks drop such a case today: the sweep skips a due case whose card is not open (`monitor.go:143-148`), and `Face` withdraws a case on a card that cannot wait (`ladder.go:841-845`). `plan_criteria` joins the kinds that sit beside a card (`ladder.go:1375-1379`), so both checks keep it.
@@ -117,7 +117,7 @@ The tasks run in this order. Each one lands on its own, leaves main working, and
 
 **Tests:** a trip asked again after a restart gets a rung 1 or rung 2 step before any face. A case that was `at_human` before the restart stays there and gets no second face.
 
-**Live check:** after the next factoryd restart, no case of kind `other` with the step "asked again after a restart" is `at_human` without a rung 2 step.
+**Live check:** after the next factoryd restart, no case of kind `other` with the step "asked again after a restart" is `at_human` without a rung 2 step. The same holds for a case the heal pass opened on a card with no live ask, which carries its own reason and step text after the work-loss faults plan.
 
 ### Task 3: a merge approval climbs
 
