@@ -35,23 +35,43 @@ Every criterion says who settles it. There are four kinds:
 | test | one test, written blind, stored outside every workspace until it ran once | the prover session | the runner, from the test's report | at the integration card's gate, and at a no-push session end |
 | invariant | a test suite the repository already has, for example every test under `./...`; the proof is that it stays green | nobody, the suite is there | the runner, from the suite's report | the same |
 | judgement | an artifact a blind test writes, and a pinned prompt | the prover writes the test, the planner the prompt | one model call over the artifact | at the integration card's gate |
-| human | an artifact a blind test writes, or the evidence the criterion names | the prover, or the planner's text | the approver, one row on the Needs you card | before the integration card's merge |
+| human | an artifact a blind test writes, or the evidence the criterion names | the prover, or the planner's text | the approver, one page of the merge's ask | before the integration card's merge |
 
-A test criterion carries a claim, inputs and expected numbers and no test name, and the prover decides how. An invariant carries its suite. A judgement carries its claim, what its artifact must show and a pinned prompt. A human criterion carries its claim and the evidence the approver reads. Validation refuses a criterion without a field of its kind.
+A test criterion carries a claim, inputs and expected numbers and no test name, and the prover decides how. An invariant carries its suite. A judgement carries its claim, what its artifact must show and a pinned prompt. A human criterion carries its claim and the evidence the approver reads. Every criterion also carries its promise: the claim in one plain sentence of at most 80 characters, which every ask shows in place of the claim. Validation refuses a criterion without a field of its kind or without a promise that passes the writing guide's check.
 
 The line between judgement and human is fuzzy and the human draws it. The planner drafts the cheap judgement by default, and the human can move a criterion between the two kinds at any time. A flip of kind alone keeps the criterion's id.
 
 ## A change, end to end
 
 1. A roadmap item becomes a plan-track card.
-2. The planning session, the planner, reads the repository and drafts the spec: the outcome, a glossary, the criteria. It then attacks its own draft once, looking for contradictions, ambiguity and missing edge cases, and turns each finding into a question.
-3. The confirmation question shows the spec and the criteria to the human. They answer, amend the wording, or comment and start another round. In the same form's second zone they okay or drop hold-out candidates, extra criteria the list misses, each a claim with inputs and expected numbers and no code. The criteria are fixed at the answered revision.
+2. The planning session, the planner, reads the repository and drafts the spec: the outcome, a glossary, the criteria. It then attacks its own draft once, looking for contradictions, ambiguity and missing edge cases, and turns each finding into a question. A question offers at most 3 choices, each with one line on what it changes, and "Answer in my words".
+3. The confirmation asks the human "Confirm plan “X” with N cards and N promises?" and shows the outcome, the cards and the promises. The human answers "Confirm the plan", or "Ask for changes" with a note that starts another round. Each hold-out candidate, an extra criterion the list misses, asks on a page of its own, "Keep it" or "Drop it": a claim with inputs and expected numbers and no code. The criteria are fixed at the answered revision.
 4. The planner files the plan: foundation cards first, the integration card last. A plan bigger than one round of cards (`max_cards`) files the first round and keeps the rest as an outline. When a round's cards are done, the planner plans the next on top of what they built, and the integration card comes in the last. Every criterion is cited by at least one card, every non-foundation card cites at least one, and the integration card's acceptance items cite every criterion by id. Validation refuses a broken or incomplete plan before any work starts.
 5. The children file as cards with their dependencies and the planning card closes itself.
 6. The prover runs once the foundation card merges, at the confirmation for a plan without one: one test per test, judgement and human criterion and per okayed hold-out, on main. The prover runs each with `bash check test` and files the set through `file_proofs`, three filings at most. factoryd runs every filed test on main: a test of kind test must be red there, a judgement or human test must write its artifact, and what stays green or unrunnable is stored flagged and opens without a blind try. The tests live in the database alone.
 7. The cards run their stages: sessions, policy, checks, review, approval, merge. After every card only cheap checks run. Nothing reads the whole repository, nothing calls a model. A card whose session ends without a push closes on the proofs of the criteria it cites, run at main.
 8. On the integration card the criteria gate runs every stored test and every invariant on the head, in one sandbox, through `bash check test`, and reads each JUnit report. A green stored test meets its criterion, blind. Any other outcome opens the test: the next session gets its code and its output, commits it at its path, and fixes the work or the test, or raises a question on the criterion. From then on the test in the repository is the proof. A model judges each judgement criterion's artifact with its pinned prompt, and the review reads the diff for the feature's behaviours alone, with the opened tests' original code.
-9. The human settles each human criterion on its row of the Needs you card: Met, Not met with words that go back to the builder, or Waive with a reason. Approve opens once every criterion has a verdict, the bot merges, and the plan closes with every criterion met or waived.
+9. The human settles each human criterion on its own page of the merge's ask: "It is met", "It is not met" with words that go back to the builder, or "Drop this promise" with a reason. "Merge it" opens once every criterion has a verdict, the bot merges, and the plan closes with every criterion met or waived.
+
+## The asks a human answers
+
+Each ask of the process is a card in Needs you. Its face comes from the one face register in the code ([architecture.md](architecture.md), section 5.9): one question, a why line that says what stays blocked until the ask is settled, a story of what the plan promised, what happened and what is left, and 2 to 4 answers whose labels come from one vocabulary. An ask about several promises shows one page per promise. The table gives each ask's question and answers.
+
+| Ask | Question | Answers |
+|---|---|---|
+| Plan question | the planner's question | the planner's choices, the recommended one first, each with its change line as its effect, and "Answer in my words" |
+| Plan confirmation | "Confirm plan “X” with N cards and N promises?" | "Confirm the plan", "Ask for changes" |
+| Confirmation that takes cards off main | "Confirm plan “X” with N cards and N promises, and take #A off main?" | "Confirm the plan", whose effect names the cards that leave main, and "Ask for changes" |
+| Hold-out candidate | "Keep this extra promise for plan “X”?" | "Keep it", "Drop it" |
+| Promises not met, one page each | "Plan “X” finished, but O of M promises are not met. Settle each one." | "Build the missing part" with its price, "Drop this promise", and "It is met" on a promise a human judges |
+| Promises no test checked, one page each | "Plan “X” finished, but no test checked its N promises. Settle each one." | "Run the tests now" where a run can check the promise, else "Build the missing part", and "Drop this promise". A promise a human judges takes "It is met", "It is not met" and "Drop this promise" |
+| Merge | "Merge “title”?" | "Merge it", "Send it back", "Reject and close it" |
+| Merge with red checks | "The checks of “title” are red. Send it back to its agent?" | "Send it back", "Reject and close it" |
+| Factory pull request with red checks | "The checks of “title” are red. Run them again, or close it?" | "Run the failed checks again", "Reject and close it" |
+| A promise a human judges, one page each before the merge | "Is this promise of the plan met?" | "It is met", "It is not met", "Drop this promise" |
+| Plan card closed with promises open | "Close plan “X” and drop its N open promises?" | "Drop them and close", "Keep the plan open" |
+
+The page of a promise no test checked says why no test ran, for example "The last card, #2011, closed without a merge, so the factory never ran the plan's tests." "Run the tests now" runs the plan's tests through the criteria gate's own path, with its money guard and its records, and only an approver may press it. No ask holds a colon, and no ask names an answer it does not offer.
 
 ## Blind proofs: one blind try, then the blindfold comes off
 
@@ -99,7 +119,7 @@ Other spec-driven tools leave the spec as text a model reads against the code, o
 
 Four smaller moves follow from the same shape:
 
-- The human confirms, never writes. The planner drafts because it sees the repository and costs a fraction of a human minute. The human answers one question, okays hold-outs, settles the human criteria one row each and approves merges. A human minute buys the most at the spec, before any code exists.
+- The human confirms, never writes. The planner drafts because it sees the repository and costs a fraction of a human minute. The human answers one question, okays hold-outs, settles the human criteria one page each and approves merges. A human minute buys the most at the spec, before any code exists.
 - Verdicts and catches are data. Every verdict is a row with its source: the gate's blind or open, the model's with its prompt's hash, the approver's. Every catch names its finder on the plan: the self-attack's findings, the confirmation edits, questions, revisions, the prover's refusals, the opened tests and delta cards. One query gives the share of met criteria the blind try settled, which says whether the prover earns its session.
 - No spec tax. A medium change takes the spec path as one card that is its own integration, and the small stuff pays nothing: a bug fix's spec is the report plus the reproduction gate, a dependency bump's spec is the test suite.
 - Construction over prompts. Every guarantee lives in the schema, the validation, the gate and the routing. Prompts draft, they never enforce. A step that is too large is split by rule, not by asking the agent to be careful.

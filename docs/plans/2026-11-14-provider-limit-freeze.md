@@ -109,10 +109,14 @@ freeze.
 
 ### B. One card speaks for the freeze
 
-1. The moment a hold arms, factoryd files one freeze card, in the month alarm's
-   cap-card shape. It names the provider's words, the class, the reset with its
-   countdown, and how many cards wait. It holds no work slot and asks nothing: it
-   informs, and it carries one action, the retry switch.
+1. The moment a hold arms, factoryd files one freeze card through the filing door.
+   Its source is a new constant in the kind lists, and its title, why line and
+   summary come from its entry in `SourceBriefs`. It names the provider's words, the
+   class, the reset with its countdown, and how many cards wait. It holds no work slot
+   and asks nothing: its face, from the face register, is a card that informs. The
+   title says what happened, the why line says what waits until the reset, and the
+   answers are "Noted", "Not now" and one more, the retry switch, a new vocabulary row
+   with its label and effect line.
 2. A class that resumes on its own at the reset leaves the card five minutes longer,
    with the held time on its face, then the card closes on its own: the board shows the
    freeze ended without a hand. The retry switch closes it at once. A re-armed hold
@@ -121,8 +125,9 @@ freeze.
    the single human surface for the whole event, so a known block shows once on the
    board instead of a storm of failing cards.
 4. If the freeze outgrows `waits.provider_limit` (new, default 24 hours), the freeze card
-   itself speaks up once: the options are add a fallback, switch the model, keep waiting.
-   The work cards still ask nothing.
+   itself asks once, through its register entry: add a fallback, switch the model, or
+   keep waiting ("Not now"), each answer a vocabulary row. The work cards still ask
+   nothing.
 
 ### C. The card freezes and resumes at the reset
 
@@ -232,7 +237,9 @@ Hand-derived:
    call, the same until. A call after the lapse probes once and re-arms on a new reset.
 5. The freeze card: one hold on big with nine frozen cards files one card the moment the
    hold arms, whatever the reset's distance. It names the words, the countdown and the
-   count, holds no slot and asks nothing. A re-arm updates it. A self-resume at the
+   count, holds no slot and asks nothing. Its brief passes the filing door, and its face
+   passes the face contract with "Noted", "Not now" and the retry switch. A re-arm
+   updates it. A self-resume at the
    reset leaves it five minutes and then it closes on its own. A retry press closes it
    at once.
 6. The pattern sets: a provider entry with its own patterns replaces the default set,

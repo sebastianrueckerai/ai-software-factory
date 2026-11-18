@@ -189,7 +189,7 @@ stays open). The count after the rebuild's Phase 5 roll found 199 ended
 human cards with an issue and every issue closed, so the entry leaves
 with no cause left to fix.
 
-Both faults that remained are fixed, and the register is empty.
+Both faults that remained are fixed.
 
 Gone on 2026-11-12: fault 1 of the 2026-11-03 numbering, an ended card's
 issue stays open (the count after the rebuild's Phase 5 roll found 199
@@ -198,3 +198,40 @@ heal paths that fixed it are on code main since the roll of c336498),
 and fault 2, the agent context map's loop pages are not byte-stable
 (code #1783: the capture masks the run's directory and the date, and
 names each loop's model from the policy tree).
+
+## 1. A card on the board does not say what it is, why it exists or where it stands
+
+Status: the fix is built on the code repository's branch `every-card-readable`
+and is not on main, by
+[plans/2026-11-16-every-card-readable.md](plans/2026-11-16-every-card-readable.md).
+Found on 2026-11-16 on the live board, which
+[board-cards-problem-2026-11-16.md](board-cards-problem-2026-11-16.md) records:
+78 of 81 cards gave no reason for their work, 44 titles named an outcome and not
+the work, and 29 titles were cut at 80 characters. #2100's title named a code
+identifier and a branch no reader can open. #2004 asked for money with 12 buttons
+and 8 review findings above the ask. #1850 offered "Confirm the delivered cards", a
+button it never showed, and never said why no test ran. The agent that built a
+card read the same weak text.
+
+The fix: each card stores one brief, its title, why line, summary and full text,
+behind one checked door, and the agent's session and the card read it through one
+function. One face register in the code holds the ask, the story and the answers of
+every kind, with every label from one vocabulary, and kind lists that a test holds
+against the code's constants make a kind without a face a build failure. Every
+model writer carries the guide form of its job.
+
+Left before this entry leaves:
+
+1. Before the release, remove the chat tool `set_summary` from the infra
+   repository's schema copies and from every live project file that names it in
+   `chat.confirm`: the policy load refuses an unknown tool.
+2. At the release, a case open at deploy whose kind's key changed opens a second
+   case at its next trip. Answer or close the open cases first, or accept the
+   duplicates.
+3. At the release, store the faces of the open asks once more: an ask stored
+   before the findings list joined the face shows no findings.
+4. Run the one-time rebrief of the open cards and `factoryd audit-board` against
+   the live board. The audit's count for open cards is 0, or each card it names is
+   a human's own issue.
+5. Sebastian reads the gallery of every kind's face and the live board. Record the
+   audit's count, the test counts and the gallery's date here.

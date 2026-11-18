@@ -1,5 +1,7 @@
 # The question format: how a card asks a human
 
+The current rule for every card's face, ask and answer label is [plans/2026-11-16-every-card-readable.md](plans/2026-11-16-every-card-readable.md): one brief per card behind one checked door, one face register in the code with an entry per kind, and one vocabulary of answer labels. Where this concept differs, the plan holds.
+
 Concept, 2026-10-17, from the overnight run's frozen-card episode. This note is the contract for every question the factory puts to a human, in the console or in chat. The build card for the code repo carries it.
 
 ## The problem

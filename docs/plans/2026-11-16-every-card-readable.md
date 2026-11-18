@@ -17,7 +17,7 @@
 - Scope has no exception list. A task that finds a card kind, case kind, approval kind, button, form field or inbox message kind that this plan does not name adds it to the register and brings it under the contract in the same task. "Not in the plan" is not a reason to leave a face as it is.
 - No assertion of a contract test is weakened to pass. A failure is a face to fix or a missing register entry.
 - One way only. A converted face deletes its older template, its older handler branch and their tests in the same task. No kind keeps a second render path.
-- Title: 1 to 70 runes, one line, the work with the verb first, or the ask for a card that asks. Never cut by code.
+- Title: 1 to 70 runes, one line, the work with the verb first. On a card that asks, the title is the ask: 1 to 110 runes, one line, no colon, one question or one instruction with at most one statement before it. Never cut by code.
 - Why line: one sentence, 1 to 160 runes. Summary: 1 to 600 runes. Small card: at most 300 characters of prose. Opened card above the folds: at most 900 characters of prose. Inbox message: at most 280 characters before its fold.
 - An asking face shows one question and at most 4 answers. Each answer has its label from the one vocabulary (appendix 1) and one effect line. The suggested answer is first and names who suggests it. A recommendation is always one of the face's answers.
 - A form field renders only after the press of the answer that needs it, with a default filled in. A required note has no default: it shows one line that says what to write.
@@ -98,10 +98,10 @@ The gallery is the proof surface of the whole plan. It is built first, so it sho
 
 | Rule | Applies to | Refusal |
 |---|---|---|
-| Title has 1 to 70 runes and one line | all jobs | "The title has N characters. Keep it under 70." |
+| Title has 1 to 70 runes and one line, an ask 1 to 110 | all jobs | "The title has N characters. Keep it under 70.", for an ask "The ask has N characters. Keep it under 110." |
 | Title holds no `#N`, no branch name, no hex id of 7 or more characters, no backtick, no camelCase or snake_case word, no colon | Work, Ask | "The title names X. A title uses plain words. Move X to the text." |
 | Title does not start with "The ", "A " or "An " | Work | "A work title starts with its verb, for example 'Narrow the close refusal to plans that hold criteria'." |
-| Ask title ends with a question mark or is a command | Ask | "An ask is one question or one instruction." |
+| Ask title is one question, or one instruction that starts with its verb, with at most one statement before it | Ask | "An ask is one question or one instruction." |
 | Why is one sentence of 1 to 160 runes and does not start with the title | Work, Ask | "The why line gives the reason in one sentence: who needs this, or which problem it removes." |
 | Summary has 1 to 600 runes | Work | "The summary says what gets built, what it changes and how it is checked, under 600 characters." |
 | Every `#N` in any field resolves | all jobs | "#N is no card or pull request of this project." |
@@ -257,9 +257,9 @@ This is a condensed round by [design/process.md](../../design/process.md). Read 
 - `Answers` names the answers to this kind's question, not every legal action. Appendix 2 gives them per kind.
 - When a rung or a writer recommends an action that is not in `Answers`, `FaceOf` puts it first and drops the last answer over four.
 - A card with several open cases shows one at a time on C44's carousel: the newest ask first, then the others, oldest first. Each page has its answers. When a newer case replaces an older one on the same matter, code withdraws the older one. The plan approval renders only through its cases, never a second time under them.
-- The project agent's analysis on an ask shows on the opened card as a closed fold "The agent's view", at most 600 runes.
+- The project agent's analysis on an ask shows on the opened card in the fold "The full brief", with the ask's evidence. The closed fold "The agent's view" holds the exact text the card's agent gets, `CardBrief.AgentText()`.
 - An answer whose predicate fails on `f` leaves the face. A face with one answer left adds "Not now" and "End the card", so no card has one button.
-- The ask is one sentence in the story's terms. For a card with findings and no money it names both: "The card is out of money with 8 review findings open: add 2.00 EUR, or end it?". Money is formatted with two decimals.
+- The ask is one sentence in the story's terms. For a card with findings and no money it names both: "Add 2.00 EUR to fix the 8 open review findings, or end the card?". The amount on a live face comes from the facts. Money is formatted with two decimals.
 - The story comes from facts by template. The case story writer (`brief_case.go:163`) fills `Happened` and `Left` only for the kinds appendix 2 marks "writer", bounded at 240 runes each, with the ask form of the guide. Its prompt forbids naming buttons.
 
 - [ ] **Step 1: Write the failing tests.** `TestEveryKindHasAFace` ranges over `CaseKinds()`, `ApprovalKinds()` and `MonitorFlags()` and asserts a register entry. `TestEveryActionHasOneLabel` ranges over `HumanActions()` and asserts one `Vocabulary` row without a variant, with a label, an effect line, and for each field a default or, for a required note, a hint. `TestAppendixAnswersApply`: for each kind's fixture, every answer that the register names has a predicate that holds on the fixture's facts, and a press on it is not refused. Where the test fails, change the predicate or the answer set, and record which. `TestFaceContract` builds `FaceOf` for each fixture of `facefixtures.All()` and asserts: the ask passes `CheckBrief` as `BriefAsk`, the why line has at most 160 runes, 2 to 4 answers, the suggested action is among them, no label appears twice, every text passes `Lint`. `TestBudgetFloorWithFindingsAsksOnce`: facts with 8 findings, 4.00 EUR spent of 4.00 and a shortfall of 2.00 give the ask quoted above, and no finding text is in `Ask`, `Why` or `Story`.
@@ -272,7 +272,7 @@ This is a condensed round by [design/process.md](../../design/process.md). Read 
 
 **Files:**
 - Create: `console/faceview.go`, `console/faceview_test.go`, `console/templates/face.html`
-- Modify: `console/board.go` (`card` at 482, `boardCard` at 1921, `boardOf` at 2256), `console/templates/board.html` (delete the templates `card`, `case`, `escalation`, `escalation-actions`, `extend-form`, `approval`, `plan`, `criteria`, `face-parts`, `case-decide`, `transitions`, `planclose`), `console/cases.go`, `console/decide.go`, `console/approvals.go`, `console/static/console.css`
+- Modify: `console/board.go` (`card` at 482, `boardCard` at 1921, `boardOf` at 2256), `console/templates/board.html` (delete the templates `card`, `case`, `escalation`, `transitions`, `planclose`), `console/cases.go`, `console/decide.go`, `console/approvals.go`, `console/static/console.css`. The drawer still renders `escalation-actions`, `extend-form`, `approval`, `plan`, `criteria`, `face-parts` and `case-decide`, so Task 12 deletes them with the drawer's forms.
 
 **Interfaces:**
 - Consumes: `Store.CardBrief`, `FaceOf`, `linkRefs`, `explainTerms`, the C-entry of Task 9.
@@ -290,7 +290,7 @@ Rules: `Title` is the card's title, or the ask when the card stands in Needs you
 
 **Files:**
 - Create: `console/templates/opened.html`, `console/opened.go`, `console/opened_test.go`
-- Modify: `console/templates/drawer.html` (the Overview tab becomes the opened card; delete the sections Objective, The agent's summary, Replan, Extend, Edit as standing forms. The tabs Session, Activity, Files and Receipt stay), `console/board.go:3809-3944`, `console/board.go:3162-3250` (`resolve`: one send posts the answer, its fields and the note together), `console/static/console.js:578-590`
+- Modify: `console/templates/drawer.html` (the Overview tab becomes the opened card; delete the sections Objective, The agent's summary, Replan, Extend, Edit as standing forms. The tabs Session, Activity, Files and Receipt stay), `console/templates/board.html` (delete the templates `escalation-actions`, `extend-form`, `approval`, `plan`, `criteria`, `face-parts` and `case-decide`, which Task 11 left for the drawer), `console/board.go:3809-3944`, `console/board.go:3162-3250` (`resolve`: one send posts the answer, its fields and the note together), `console/static/console.js:578-590`
 
 **Interfaces:**
 - Consumes: `faceView`, `AskFace`, `CardBrief`, `SessionBriefs`.
@@ -325,15 +325,16 @@ Covers plan question, plan confirmation, hold-outs, criteria gap, criteria never
 
 | Ask | Question | Story | Answers |
 |---|---|---|---|
-| Plan question | The planner's question | Planned: the plan's outcome in one line. Left: what each choice changes | The planner's choices, the recommended first |
-| Plan confirmation | "Confirm plan <name>: N cards, N promises?" | The outcome, the cards as titles, the promises as `Promise` lines | "Confirm the plan", "Ask for changes" |
+| Plan question | The planner's question | Planned: the plan's outcome in one line. Each choice's effect line says what it changes, from a line per choice the planner's question tool carries | The planner's choices, the recommended first |
+| Plan confirmation | "Confirm plan <name> with N cards and N promises?" | The outcome, the cards as titles, the promises as `Promise` lines | "Confirm the plan", "Ask for changes" |
 | Hold-out | "Keep this extra promise for plan <name>?" | One sentence on what a hold-out is. The promise in plain words. What keeping it costs | "Keep it", "Drop it" |
 | Criteria gap | "Plan <name> finished, but N of M promises are not met. Settle each one." | Per promise: "The plan promised: <Promise>." / "Its test ran and failed: <one line>." | "Build the missing part" (shows the card's price), "Drop this promise", "It is met" (human promises only) |
 | Criteria never judged | "Plan <name> finished, but no test checked its N promises. Settle each one." | Head: `NotRun` in words, for example "The last card, #2011, closed without a merge, so the factory never ran the plan's tests." Per promise: "The plan promised: <Promise>." / "No test checked it." | "Run the tests now", "Drop this promise" |
 | Plan question, own words | The same question | The same | The planner's choices, at most 3, and "Answer in my words" |
-| Plan confirmation that reverts cards | "Confirm plan <name>: N cards, N promises, and take #A and #B off main?" | As plan confirmation, plus why each card leaves main | "Confirm the plan" (its effect names the reverts), "Ask for changes" |
+| Plan confirmation that reverts cards | "Confirm plan <name> with N cards and N promises, and take #A and #B off main?" | As plan confirmation, plus why each card leaves main | "Confirm the plan" (its effect names the reverts), "Ask for changes" |
 | Merge | "Merge <card title>?" | What the card built, the review's verdict in one line, the checks | "Merge it", "Send it back", "Reject and close it" |
-| Merge with red checks | "The checks of <card title> are red. Run them again, or send it back?" | Which checks failed | "Run the failed checks again", "Send it back", "Reject and close it" |
+| Merge with red checks | "The checks of <card title> are red. Send it back to its agent?" | Which checks failed | "Send it back", "Reject and close it". The workflow re-runs the checks of factoryd's own pull requests only |
+| Merge of a factory pull request with red checks | "The checks of <card title> are red. Run them again, or close it?" | Which checks failed | "Run the failed checks again", "Reject and close it" |
 | Merge of a factory pull request | "Merge <what it updates>?" | What changes | "Merge it", "Reject and close it" |
 | Merge with promises for a human | One page per promise, then the merge page | "The plan promised: <Promise>." and what to look at | Per promise: "It is met", "It is not met", "Drop this promise". Then the merge answers |
 | Done plan, close | "Close plan <name> and drop its N open promises?" | The N promises | "Drop them and close", "Keep the plan open" |
@@ -602,22 +603,21 @@ Each row is the title form. The why line names what the factory saw and what the
 
 ## Appendix 4: the answers of each monitor flag
 
-Every flag offers "It is fine, go on" and "Not now" plus the one action below. Task 10's `TestAppendixAnswersApply` holds each against its predicate.
+A flag that asks offers "It is fine, go on" and "Not now" plus the one action below. A flag that is a notice states the fact, offers "Noted" and "Not now", and leaves the card's other actions under Other actions. Task 10's `TestAppendixAnswersApply` holds each against its predicate. The flag `money_ask_hides_findings` is no longer raised, because the money ask names the open findings itself.
 
-| Flag | Ask, in words | The fitting answer |
+| Flag | Ask or notice, in words | The fitting answer |
 |---|---|---|
-| answer_changed_nothing | Your last answer changed nothing on this card. Say more? | Go on with my note |
+| answer_changed_nothing | Notice: your last answer on this card changed nothing. | Noted |
 | budget_moved_no_event | This card's budget changed and no record says why. | none |
-| checkin_cut, checkin_refused | The check on this card did not finish. Run a session anyway? | Run one more session |
-| criterion_unproven | A promise of the plan has no test result. Run the tests? | Run the tests now |
+| checkin_cut, checkin_refused | Notice: this card's last session went unjudged because its check ended early, or was refused. | Noted |
+| criterion_unproven | A promise of the plan has no test result yet. Run the plan's tests now? Not raised for a promise a human judges. | Run the tests now |
 | dependency_failed | A card this one waits for failed. Try it again? | Try the failed card again |
-| finding_confirmed_twice | The review found the same fault twice. Start fresh? | Start a fresh card on this work |
-| grant_bought_nothing | The extra session you allowed changed nothing. Try another model? | Switch the model |
+| finding_confirmed_twice | The review found the same fault twice on this card. Start fresh? | Rescue the work into a new card |
+| grant_bought_nothing | Notice: this card's last session, which you allowed, changed nothing. | Noted |
 | issue_open_after_end | The card ended and its issue is still open. Close it? | End the card |
-| money_ask_hides_findings | This card asks for money and has open review findings. Check the work first? | Check the work again |
 | opened_proof_changed, opened_proof_red_twice | A test of the plan changed or failed twice. Plan this part again? | Send back to the planner |
 | proofs_missing, prover_refused_thrice | The plan has no tests for its promises. Plan this part again? | Send back to the planner |
 | queued_over_bound | This card waits in the queue for <time>. | none |
-| review_refused_not_run | The review did not run on this card. Run it? | Check the work again |
-| session_no_push | The last session changed no code. Try another model? | Switch the model |
+| review_refused_not_run | Notice: this card cannot merge yet because the review did not run on its newest work. | Noted |
+| session_no_push | Notice: this card's last sessions changed no code. | Noted |
 | wait_over_bound | This card waits for <what> for <time>. Go on without it? | Run one more session |

@@ -1089,8 +1089,9 @@ number. When its first revision files, factoryd asks the small model for
 one from the issue title, the spec's outcome and the summary. Code keeps
 the name to 3 to 24 characters on one line, unique among the project's
 open plans regardless of case. It asks again for a shorter or untaken
-name, three asks at most, and else takes a slug of the title, a number
-suffix only on a clash, so a model error never fails the filing. The plan keeps
+name, three asks at most. When no answer holds, the plan stays unnamed and
+shows its title, and the next start names it again, so a model error never
+fails the filing. The plan keeps
 its first name through later revisions. At each start factoryd names the
 open plans that filed without one, from their newest revision. The
 console shows the name beside the number (C40). Since roadmap 225 no
@@ -2418,18 +2419,18 @@ password field and no register button, since the reconcile registers
 is the answer that grants the extra session, and the one cap card is the
 only other card a cap opens (5.1). The card had no close button until Stage
 16: in the round the human closed #348, an alert answered as noise, through
-Forgejo's API. Since Stage 16 the face offers Close on backlog and
-waiting-human cards, and since the fix round after it on a failed card
-without an issue. The chat's `close` runs the same action (5.7).
+Forgejo's API. A card's close is "End the card", an answer on its opened
+card (5.9), and a finished card offers no button. The chat's `close` runs
+the same action (5.7).
 
-Changed by roadmap 225 (2026-10-29): the board shows status only. The
-default view keeps its four columns, Needs you, Queued, In progress and
-Done, and the wide view drops the lane columns. No card carries a lane
-badge, a move button or a drag target. The plan card has neither "Accept
-plan" nor "Reject": it shows only while a revision waits for answers, with
-the questions, the hold-outs and "Request changes", and a done plan lists
-its children without "Start plan". The card's stage word comes from its
-track and status: planning, building, verifying, queued or waiting on you.
+Changed by roadmap 225 (2026-10-29): the board shows status only, in
+four columns, Needs you, Queued, In progress and Done, and no other view.
+No card carries a lane badge, a move button or a drag target. The plan
+card has neither "Accept plan" nor "Reject": it asks only while a revision
+waits for answers, each question and each hold-out on a page of its own
+(5.9), and a done plan lists its children without "Start plan". The
+card's stage word comes from its track and status: planning, building,
+verifying, queued or waiting on you.
 Needs you holds every card whose next actor is a person, a card that waits
 on its author included, for every viewer. The new-task form's track select
 offers direct, the default, plan and human.
@@ -2512,8 +2513,8 @@ offers direct, the default, plan and human.
   API, so a refused login's tokens lapse within their hour.
 
 Stage 15's project screen (5.7, built) superseded this board's layout:
-the five columns beside the chat take the main view, and these columns
-stay as the full-width board, the wide view.
+the columns beside the chat are the one board, and no full-width view
+remains.
 [board/proposal-v2.md](board/proposal-v2.md) is the board's spec from then
 on, and [board/proposal-v1.md](board/proposal-v1.md) stays as the record
 the click dummy implemented. Since 2026-10-18 the card drawer carries the
@@ -2563,12 +2564,14 @@ sandbox becomes a card.
   Since Stage 17 the status line spans both columns, the board's and the
   chat's, and for a project in pull request mode it counts the open GitHub
   pull requests, live "GitHub: 0 open pull requests".
-- **Board**: what work exists and where it is. Five columns in the split
-  view (below), with proposal-v1's card face. The spend figure on a card
-  stays muted until 80 percent of its budget, then turns prominent with the
-  warning sign and the text, never colour alone. Built with one project at
-  a time, and the human lane (approvals, escalations with their answer
-  forms, human tasks) folds into Needs you.
+- **Board**: what work exists and where it is. Four columns in the split
+  view (below), each card the small card of C46: one paragraph of the
+  title and the why line, and one foot line with the state, the place and
+  the number (5.9). A card shows no spend until 80 percent of its budget,
+  then the mark "⚠ near its budget" in words, never colour alone. Built
+  with one project at a time, and the human lane (approvals, escalations,
+  human tasks) folds into Needs you, where every item is a card with one
+  ask.
 - **Chat**: ask or change anything. The right half of the screen holds the
   project agent's conversation: streaming replies, tool calls as collapsed
   blocks with their arguments and duration, proposals as a list of changes
@@ -2592,23 +2595,22 @@ sandbox becomes a card.
   Since 2026-10-18 a wake turn is one row with an expand, its fold the
   wake's first line, the whole turn behind the fold (below).
 - **Card drawer**: everything about one piece of work. It opens beside the
-  board at 40 to 50 percent of the width, with the tabs Overview, Activity,
-  Files and Chat. Chat is the default tab on a running card, as in the
-  dummy's fourth iteration, and the per-card chat and its steering box stay
-  as proposal-v1 designed them. Stage 15 built three tabs, Overview,
-  Activity and Files. Stage 17 built the Chat tab, the default on a
-  running card: the newest session's agent text and its steers, and a
-  steer box that posts to `POST /tasks/{id}/steer`, which runs `doSteer`
-  with the chat's token scrub. factoryd publishes a running session's
-  agent text as `session_said` on the event bus, to the project's writers
-  only, with a 16-event buffer that never blocks, and never stores it. The
-  tab reloads on a reconnect and when the session ends, and a steer being
-  typed survives the reload. Live, the drawer of a running card opened on
-  Chat with its session's messages and the steer box. Overview's top block
-  and collapsed sections are roadmap 177. Since 2026-10-18 the drawer also
-  carries the door to the card's own thread, the button "Talk about this
-  card" (below). The Chat tab keeps its meaning, the worker session's
-  transcript, not the conversation about the card.
+  board at 40 to 50 percent of the width, with the tabs Overview, Session,
+  Activity, Files and Receipt. Overview is the opened card of C46: the
+  head, the ask block, the summary and closed folds (5.9). Session is the
+  default tab on a running card: the newest session's agent text and the
+  messages a human sent it. factoryd publishes a running session's agent
+  text as `session_said` on the event bus, to the project's writers only,
+  with a 16-event buffer that never blocks, and never stores it. The tab
+  reloads on a reconnect and when the session ends. It has no message box:
+  a human writes to a running session through "Tell the running session"
+  under the opened card's Other actions, which posts the card's answer
+  route with the action `steer` and runs `doSteer` with the chat's token
+  scrub, as the chat's `steer` tool does. Other actions also holds the door
+  to the card's own thread, "Talk about this card" (below). The Session
+  tab keeps its meaning, the worker session's transcript, not the
+  conversation about the card. Receipt shows a merged card's stored
+  receipt.
 
 **One event per act.** Every console action records one event, with the
 field `via` saying whether a button or the chat made it. The project's
@@ -2652,61 +2654,58 @@ the task states the factory already has, not a new state machine:
 |---|---|
 | Needs you | waiting on a human (approvals, questions, plan acceptance), and waiting on the author when the viewer is the author |
 | Queued | backlog, queued, waiting on dependencies |
-| Working | running, closing |
-| Verifying | in review (checks, gates, model review, merge queue) |
+| In progress | running, closing, and in review (checks, gates, model review, merge queue) |
 | Done | done, failed, closed |
 
 The process's lanes (backlog, plan, ready, or whatever a process file
 composes) do not pick the column. A plan card whose planner runs is
-Working, and a plan that waits for acceptance is Needs you. The lane is a
-chip on the card, and so is the fine state (waiting on the author, failed,
-closed, retrying, stale) in proposal-v1's pill vocabulary. Processes stay
+In progress, and a plan that waits for acceptance is Needs you. The fine
+state (waiting on the author, failed, closed, retrying, stale) is a word in
+the card's foot line (C46). Processes stay
 configurable where they were: a process composes its lanes in YAML,
-the state machine stays the factory's, and the
-full-width board keeps today's columns, lanes first, for a member who wants
-a process's lanes as columns. If a process ever needs another grouping, the
-grouping becomes a block in its process file, with these five as the
-default. Buttons stay the state machine, and drag stays for lane starts
+and the state machine stays the factory's. If a process ever needs another
+grouping, the grouping becomes a block in its process file, with these four
+as the default. Buttons stay the state machine, and drag stays for lane starts
 only.
 
 Since roadmap 225 (2026-10-29) the lanes are gone (5.1). A plan with open
 questions is Needs you, and a plan with none files its cards without a
-wait. A card that waits on its author is Needs you for every viewer. The
-wide board keeps the state columns and no lane columns, and no drag
-remains.
+wait. A card that waits on its author is Needs you for every viewer. No
+drag remains.
 
-**Inline answers.** An agent's question carries structured choices, and a
-needs-you card renders them as buttons beside a text box, so most human
-input needs no drawer. The escalation gains a `choices` field, and the
-agent's tool schema gains it too. Built: the gateway's `escalate`
-tool takes 2 to 5 choices of 1 to 60 characters, which factoryd validates
-at its boundary. It drops invalid choices and keeps the question. The card
-renders one button per choice above the text box, posting the same answer
-endpoint, and every question records a `question_asked` event.
+**Inline answers.** An agent's question carries structured choices, and
+its card renders them through the face register (5.9): the suggested
+answer as the small card's one button, every answer with its effect line
+on the opened card. The gateway's `escalate` tool takes 2 to 5 choices of
+1 to 60 characters and an optional `choice`, the one the agent recommends.
+The gateway refuses a choice that the writing guide's check faults or that
+speaks in the first person, so the agent writes it again, and factoryd
+drops a list it cannot offer and keeps the question. Every question
+records a `question_asked` event.
 
-**Every human card asks** (Sebastian, 2026-10-20). A human card is filed
-from its five-part question by one of two filers, `EscalateToHuman` and
-`fileHumanTask`, and no other: alerts on a project without agents or with
-the capacity label, a refused roll, a lost runner, a rejected config
-commit, the month cap, a routine that files to a person, an issue filed
-into the human lane, and a queued card moved there because its project
-runs no agents each have a template in `question.go`. The ask is the
-card's title, one line of at most 200 bytes, its tail kept whole when
-the variable part is cut. The intake row and the `question_asked` row
-carry all five parts, so the board's face shows every human card's ask
-once, as its headline, with its buttons, the drawer the why, the info and
-the recommendation with its named source, and the inbox row the ask with
-its why. "End the card" closes an agent card from the board, the inbox
-and the chat alike, without a note: a posted note would answer the
-question if the close failed. One route
-answers a human card from the board, the inbox and the chat's `answer`
-tool. A chat or agent choice carries the value `say:` plus its label, so
-no label can fire a factory control value such as park, close or
-dismiss. "Have the factory do it" is a choice on a person's issue and on
-a routine's card where the project runs agents. The chat's `escalate`
-tool requires all five parts and refuses an ask over 200 bytes, a line
-break, a missing recommendation, fewer than 2 or more than 5 choices,
-and a repeated choice.
+**Every human card asks** (Sebastian, 2026-10-20). Every card that
+waits on a human holds an open case, and its face is its kind's entry in
+the face register (5.9). A human card is filed by one of two filers,
+`EscalateToHuman` and `fileHumanTask`, and no other, and the store files
+the card and its ask in one transaction, so the case opens at filing.
+Alerts on a project without agents or with the capacity label, a refused
+roll, a lost runner, a rejected config commit, the month cap, a routine
+that files to a human, an issue filed into the human lane, and a queued
+card moved there because its project runs no agents each have a question
+builder. It writes the ask, what the factory saw with its numbers, what
+waits on the card, and what the factory checks once a human says the work
+is done. A human's work card asks its instruction, such as "Change two
+lines in the runner's build files", and answers "I did it", "Have the
+factory do it" where the project runs agents, "Not now", and on a plan's
+card "I cannot do this", which returns the card to its planner with the
+human's note.
+A card that waits for its issue's author asks the agent's question with
+"Answer in my words", "Not now" and "End the card". One route answers a
+card from the board, the inbox and the chat's `answer` tool. A chat or
+agent choice carries the value `say:` plus its label, so no label can
+fire a factory control value. The chat's `escalate` tool takes the ask,
+its why line, the info, the recommendation, the recommended `choice` and 2
+to 5 choices, and its ask passes the brief's door as an ask (5.9).
 
 **Where the project agent runs**. Two shapes were weighed:
 
@@ -2764,10 +2763,10 @@ the month only (roadmap 158).
 | `steer` (message a running agent) | message | confirm |
 | `retry`, `request_changes` | decide | confirm |
 | `approve_merge`, `deny_merge` | merge decisions | confirm |
-| `set_summary`, `set_accent` | metadata | none |
+| `set_accent` | metadata | none |
 | `invite` (Stage 16) | add a member | confirm |
 | `github_export` (Stage 16) | mirror, or since Stage 17 pull requests | confirm |
-| `close`, `edit` (Stage 16) | close a card, edit its title or body | confirm |
+| `close`, `edit` (Stage 16) | close a card, edit its brief through the door of 5.9 | confirm |
 | `grant_session` (Stage 16) | one more session for a capped card | confirm |
 | `set_dependency` (Stage 16) | add or remove a dependency | confirm |
 | `replan` (roadmap 336) | send a card or a plan back to the planner | confirm |
@@ -3062,10 +3061,11 @@ the history and every depth come through a tool. What each part does:
   the round built `ci` the same evening.
 - **The writes.** `close`, `edit`, `grant_session` and `set_dependency` run
   the lifted actions the board's buttons run, record one event each and
-  confirm by default. The face offers Close on waiting-human cards, and a capped card's answer is a grant, which records
+  confirm by default. "End the card" closes a card from its opened card,
+  and a capped card's answer "Allow more sessions" is a grant, which records
   `session_granted` from either door. Since the fix round a card without an
   issue closes in the store alone, with one `card_closed` event and no
-  Forgejo call, and the face offers Close on a failed one too. A card
+  Forgejo call. A card
   without an issue shows no answer form, and its refusals name "close ends
   it" as the fitting action. A human's close ends a running card `closed`,
   "issue closed without merge", not `failed` (7). `set_dependency` refuses
@@ -3367,8 +3367,9 @@ reads the ask and the card's own records with the tools it has. It
 settles what the level's permissions allow, it names an ask obsolete
 when the card moved on, which settles the ask as answered no more, or it
 cannot settle, and then the ask reaches the human with the attempt's
-analysis attached inside the five parts: an `analysis_attached` event
-and the ask row rewritten, the attempt named as the source. Money,
+analysis attached to the card's ask: an `analysis_attached` event names
+the attempt as the source, and the opened card shows the analysis in "The
+full brief" with the ask's evidence. Money,
 direction and policy class stay the human's, the concept's boundary
 table, and first answer wins from wherever it lands.
 
@@ -3396,11 +3397,11 @@ characters and the red jobs, or `checks red at open, green since` when a
 re-run on the head passed.
 
 Every needs-you card gets a thread, the card door. Code writes the first
-message from the ask record, the five parts plus the attempt's analysis
+message from the ask record, the card's face plus the attempt's analysis
 if one ran, with no model call, one thread per card: a later ask on the
 same card appends to it as a new ask row, and a repeated ask bumps its
-row. The drawer carries the door, "Talk about this card", shown whenever
-the card is escalated and the chat exists, and an inbox ask row of a
+row. The opened card carries the door, "Talk about this card" under
+Other actions, and an inbox ask row of a
 card with a thread carries the link to it. An answer in the thread
 settles the card through the same machinery as the inbox buttons.
 
@@ -3421,15 +3422,25 @@ factory's thread. `say`, the one door every typed message takes, from
 the page, `chat_send`, `/compact` and the `owner` field, refuses a
 message to any inbox with 409, "The inbox is the factory's thread:
 answer with its buttons, and write in a thread of your own." A card
-answer in words lands in the human's own thread. The inbox's rows keep
-every button: the five-part ask, the inline answer, a proposal's Do it,
-undo, fund, the card door, and every choice button, which posts to
-`/chat/answer` since the typed path is closed. An `ask` from a turn in
+answer in words lands in the human's own thread. The inbox shows what the
+board does not, and repeats no card. A card's ask is one message of at
+most 280 characters, built from the card's face: "#2291 (Board export:
+import a snapshot back) needs you.", the why line, the suggested answer's
+label with who suggests it, and a link that opens the card. A notice
+(ended, merged, failed, plan done, a routine's report) is one line of at
+most 160 characters with its link. A wake note and the agent's reply to it
+fold into one quiet line, such as "Nothing for you. The agent looked at
+#2084 (Build the criteria gate).", which opens the full text on a click.
+An agent's message over 600 characters shows its first 280 and a fold,
+unless the human asked for a report. The rows keep their buttons, a
+proposal's Do it, undo and every choice button, which posts to
+`/chat/answer` since the typed path is closed, each labelled from the
+vocabulary (5.9). An `ask` from a turn in
 the inbox must carry choices. An unbound ask stands until a row answers
 it, a human's words or a pressed choice, since a poke or a wake's row
-answers nothing. A poke with choices, the failed card's Retry or Leave
-it, settles the same way, by a press or by its card moving on, never by
-the seen marker that settles an inform (Sebastian, 2026-11-04:
+answers nothing. A poke with choices, the failed card's "Try the failed
+card again" or "Not now", settles the same way, by a press or by its card
+moving on, never by the seen marker that settles an inform (Sebastian, 2026-11-04:
 out-of-date buttons vanish, a live one stays). A database check,
 `chat_conversations_inbox_never_current`, forbids an inbox that is
 current, and a read of the inbox never makes it current, so a human
@@ -3531,12 +3542,13 @@ screen (5.6 and 5.7): every routine of the project stands as a ghost card
 at the foot of the lane its card will land in, with its schedule and its
 next run in words, and a control in the board's head hides the ones beyond
 a period (a number of days or hours, 1 day at first) or all of them. The strip's cell names a run under an hour
-away or a held one. A filed card carries a chip naming its routine and
-run, and its drawer a provenance line. A ghost opens the routine's drawer
-with Overview, Runs and Config and two acts: Skip once, a pending skip
-the ghost shows with an undo, and Run now, which files at once and leaves
-the start to the autonomy level. The chat has five tools: list, write,
-delete, run and skip. A write or a delete is a commit on the
+away or a held one. A filed card names its routine in its foot line, and
+its drawer carries a provenance line. A ghost holds no button (C46). It
+opens the routine's drawer with Overview, Runs and Config and the acts:
+Skip once, a pending skip with an undo, Needs me or Runs on its own, which
+sets whether the routine's card goes to a human, and Run now, which files
+at once and leaves the start to the autonomy level. The chat has five
+tools: list, write, delete, run and skip. A write or a delete is a commit on the
 configuration tree after a confirm, through the path a level change
 takes. The cluster's own jobs, the CronJobs and CNPG's ScheduledBackup,
 list read-only on the infra project's Resources page and in the chat's
@@ -3544,6 +3556,103 @@ resources block, with their schedules in UTC.
 
 Rollback: revert the tree's commit and delete the `routine/` schedules in
 Temporal. The tables stay, as after every migration.
+
+### 5.9 The card brief and the face register
+
+Built by [plans/2026-11-16-every-card-readable.md](plans/2026-11-16-every-card-readable.md),
+from the goals of [board-cards-problem-2026-11-16.md](board-cards-problem-2026-11-16.md):
+every card, ask, button and inbox message tells a human who dropped in
+cold what it is, why it exists and where it stands, and the agent that
+builds a card reads the same text the human reads.
+
+**One brief per card.** A card stores its brief in fields (`BriefText`):
+the title, the why line, the summary and the full text. The title names
+the work in at most 70 characters, the verb first. On a card that asks,
+the title is the ask: at most 110 characters, no colon, one question or
+one instruction with at most one statement before it. The why line is one
+sentence of at most 160 characters on why the work exists. The summary
+says in at most 600 characters what gets built, what it changes and how it
+is checked. No code cuts a title.
+
+**One door.** Every writer files a card through `AdmitBrief`, which runs
+`CheckBrief` for the card's job: work, ask, or a human's own issue. It
+refuses a title that holds a `#N`, a branch name, a hex id, a backtick, a
+code identifier or a colon, a work title that starts with an article, a
+why line that starts with the title, a `#N` or a document link that resolves
+to nothing, a bare section label such as "Phase B", a branch name in any
+field, and a title, why line or summary that fails `writingguide.Lint`.
+Each refusal names the fault and the fitting action and goes back to the
+writer in its own channel, so the writer corrects itself. On the third
+refused try the door files the card with the writer's last text and marks
+it `brief_unchecked`, and the card shows "brief not checked". A human's own
+issue keeps its title: the door checks only its length and its
+references. The doors are the planner and the delta planner, `delegate`,
+the chat's `new_card` and `file_card`, both `escalate` tools, the routine
+file, the New task form, the successor, the retry, the hand-over, the
+restarted plan, the webhook and the API. A card that Go code files takes
+its brief from its source's entry in `SourceBriefs`. The chat's `edit` and
+the opened card's "Edit the brief" change a brief through `CheckEdit`,
+which checks only the fields the edit sets.
+
+**One reader.** `Store.CardBrief` reads a card's brief once for every
+reader: the brief, the acceptance items and criteria, the plan it belongs
+to with its outcome, glossary, cards and answered questions, the cards it
+depends on and what each of them delivered. `AgentText` renders it for the
+agent, the model review reads the same text, and the opened card shows it
+in "The agent's view". The worker reads it from the gateway's
+`GET /worker/brief` and builds the session's own parts around it (6.2).
+Before its first model call the worker posts the whole first message to
+`POST /worker/session-brief`, and the opened card shows it under "What
+each session got".
+
+**One face register.** `factoryd` holds the face of every case kind,
+approval kind and monitor flag (`CaseFaces`, `ApprovalFaces`,
+`FlagFaces`): its ask, why line, story and answers, and the answer it
+suggests with who suggests it and why. `FaceOf` builds the face a human
+reads: one question, a why line, a story of what was planned, what
+happened and what is left, each line at most 240 characters, and 2 to 4
+answers with the suggested one first. A suggestion is always one of the
+face's answers. Words that pick no answer show as a story line that names
+their writer. An answer whose predicate fails on the case's facts leaves
+the face, and every other answer that holds stands under "Other actions".
+A face left with one answer adds "Not now" and "End the card". A flag that
+asks nothing is a notice: it states the fact and answers "Noted" and "Not
+now". `Vocabulary` gives each action its one label, its effect line and
+its fields with their defaults, so the board, the opened card, the inbox,
+the issue comment and the chat's answer tool name an answer alike. No
+face shows a task id, a case number, a finding hash, a branch name or the
+factory's own words such as rung, premade or slot. `Terms` explains each
+factory word a face keeps, such as session or hold-out, in one sentence
+under "What these words mean". An ask's row stores its face, so the inbox
+message and the issue comment of an ask come from the same face as its
+card.
+
+**One renderer.** The console renders every board item through one
+builder, `faceOf`, and one template, and every opened card through
+`openedView`, as C46 of [design-decisions.md](../design/design-decisions.md)
+and [design/ia.md](../design/ia.md) describe: the small card is one
+paragraph and one foot line with at most one button, and the opened card
+holds the head, the ask block, the summary and closed folds. Every `#N`
+renders as a link with its target's title and state.
+
+**The kind lists.** `CaseKinds`, `CardSources`, `HumanActions`,
+`ApprovalKinds`, `MonitorFlags` and `BirthKinds` list every kind the
+factory has. A test parses the code's constants and fails when a list
+misses one, and another fails when a listed kind has no face, so a kind
+added without its face breaks the build. The one write of a chat row
+refuses a kind that `BirthKinds` lacks.
+
+**The guide's forms.** Every model call whose text a human reads is a
+writer in `factoryd.Writers`, and its prompt ends with the guide's forms
+for its jobs (`writingguide.For`). The planner carries the title, why,
+summary, brief, ask and line forms. The coding agent carries the summary
+and ask forms, and the title, why and brief forms when it holds
+`delegate`. The project agent and the message responder carry the whole
+guide with the chat form. The reviews, the audit and the gate supervisor
+carry the finding form, and the check-in the line and why forms. A test
+walks every model call from the transports and fails on a call that is
+neither a writer nor named as read by agents only.
+[writing-guide.md](writing-guide.md) says where the forms live.
 
 ## 6. Chunk 4: the worker plane
 
@@ -3595,13 +3704,19 @@ the adapter seam stays sharp.
 ```go
 type Harness interface {
         Prepare(ctx context.Context, env SandboxEnv, brief TaskBrief) error
-        Run(ctx context.Context, brief TaskBrief, emit func(Event)) Result
+        Text(brief TaskBrief) string
+        Run(ctx context.Context, text string, emit func(Event)) Result
         Message(ctx context.Context, text string) error
 }
 ```
 
 `TaskBrief` is the whole task as data: objective, repository and SHA, issue
-context, findings from parent sessions and artifact paths. Capabilities are
+context, findings from parent sessions and artifact paths. The card's own
+part is `CardBrief.AgentText`, which the worker reads from the gateway's
+`GET /worker/brief`, the same text the card renders (5.9). `Text` builds
+the session's first message from the brief once. The worker posts that
+text to the gateway's `POST /worker/session-brief` before its first model
+call, which stores it per session, and `Run` prompts it. Capabilities are
 policy, enforced by the gateway, not something the harness is told. Since
 Stage 10 the brief names the factory tools the task's classes may call, so
 the model is not tempted by tools it would be refused (5.3); the gateway
@@ -5564,7 +5679,8 @@ since Stage 6, but neither has run under load.
 | Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list. Servers and volumes, no buckets. SSH certificates bound to one server. Outbound tcp 53, 80 and 443. Deletion at the last tick before the lease ends | Built |
 | Collector safety | A pass that sees a cluster node's IPv4 or another project's label deletes nothing | Decided |
 | Task board | The console draws it from the task table; every task is a Forgejo issue; a Forgejo project mirror once its API lands | Built |
-| Project screen | One screen per project (5.7): status line, five columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export. Since Stage 16 the board's reads and actions are chat tools, the `system` tool is rendered from the code, refusals name the fitting action, and the planner asks its open questions before acceptance. Stage 17 built the drawer's Chat tab, the message queue, the status line across both columns, the event stream without a poll, the split, the approve warning and GitHub pull request mode | Built in Stage 15, exit test passed. Stage 16 built the chat as the window, members, approvers per project and GitHub import and export on 2026-10-11. Its exit test's chat-only run had one gap, main's CI result, which the `ci` read built after the run closed. A fix round the same evening built the fixes for seven of its findings. Stage 17 built its items on 2026-10-12, 4.11 last, live since roll #488. Its exit test's chat run had one gap, a pull request the factory opened outside a card (roadmap 187), and its lane criterion failed |
+| Card faces | One brief per card behind one checked door, read by the agent and the card through one function. One face register with an entry per kind, one vocabulary of answer labels, kind lists a test holds against the code, and the guide's form per writer (5.9) | Built |
+| Project screen | One screen per project (5.7): status line, four columns as a view over the task states, the project agent's chat and the card drawer. The project agent is a tool-calling loop inside factoryd that acts as the human through the console's own actions and runs no code, with the OK per tool as `chat.confirm`. Members are a project's Forgejo writers, approvers per project file, GitHub import and export. Since Stage 16 the board's reads and actions are chat tools, the `system` tool is rendered from the code, refusals name the fitting action, and the planner asks its open questions before acceptance. Stage 17 built the drawer's Chat tab, the message queue, the status line across both columns, the event stream without a poll, the split, the approve warning and GitHub pull request mode | Built in Stage 15, exit test passed. Stage 16 built the chat as the window, members, approvers per project and GitHub import and export on 2026-10-11. Its exit test's chat-only run had one gap, main's CI result, which the `ci` read built after the run closed. A fix round the same evening built the fixes for seven of its findings. Stage 17 built its items on 2026-10-12, 4.11 last, live since roll #488. Its exit test's chat run had one gap, a pull request the factory opened outside a card (roadmap 187), and its lane criterion failed |
 | Merge authority | The `factory-merge` bot merges after a whitelisted human's approval, enforced by Forgejo's branch protection. Merge retries are capped at six. A project on `auto` merges class `normal` without a card after a proven reproduction or a strict improvement and an approving review; the factory's repositories stay on `human` | Built. `auto` built |
 | Intake tracks | Whoever files a card sets its track, direct or plan, from the project's process (roadmap 225), and the schema refuses an agent card without one. Every bug from any account or alert starts a task. An improvement files no card until a writer's label commits it. A direct card that is not small goes to the planner. Outsiders' bug reports pass a screening stage. Outsiders' writer-only labels are stripped. The poster's text is untrusted information between random markers | Built |
 | Projects | Each project its own Forgejo organisation with a CI user, runner registration, deploy key and deploy branch. Flux tenancy through a namespaced account. A default-deny network policy with the file's outside hosts only and a quota per environment. Stricter wins: a project file only tightens the policy's defaults. Reconciled hourly. Settings from the project's file, `objects: factory \| seed` and `agents: coder \| none`, so the factory's two repositories are projects like any. Registered by the reconcile with the admin's login from OpenBao. A cache volume per project for agents and pull request CI. Hostnames are an infra commit. Since Stage 17 a Template update pull request per project keeps the template's files in step | Built |
@@ -5698,6 +5814,10 @@ works `factory` and `demo-app`.
 | Track | How a card's work runs, set by whoever files it: `direct` builds at once, `plan` plans first and files the plan's cards on the direct track. Replaced the lanes (roadmap 225) |
 | Planner | The capability class whose plan session answers a plan of cards from a spec, never code |
 | Plan card | The approval card of kind `plan` where approvers accept a plan revision, after which factoryd files one card per planned card |
+| Card brief | A card's title, why line, summary and full text, stored in fields behind one checked door and read by the agent and the card through one function (5.9) |
+| Why line | One sentence under a card's title on why its work exists, or on a card that asks, why the question came up and what waiting costs |
+| Face register | The code's one table of every kind's face: its ask, why line, story and answers (5.9) |
+| Vocabulary | The one label, effect line and fields of each action a human may pick, used on every face, in the inbox and in the chat (5.9) |
 | Merge queue | A project's order of pull requests at the approval stage: one at a time, each synced with `main` and re-checked when `main` moved |
 | Template | A directory `templates/<name>/` of files that registration renders into a new project's first commit: since Stage 12 a working app, its `check`, its Dockerfile and its Deployment |
 | on_findings | A stage's setting for what its findings do: `agent` (back to the next session), `human` (the card) or `fail` |
