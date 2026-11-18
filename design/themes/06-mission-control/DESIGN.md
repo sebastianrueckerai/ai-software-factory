@@ -46,7 +46,7 @@ Every state shows its word next to its hue; colour is never the only signal. In 
 ```
 top bar 44   home · project ▾ · Board New task Projects Resources Costs Policy Alerts      scenario · [☾]☼ · sebastian · Log out
 status panel  ⚠ pulse sentence, 20 px ......................................................... more
-              ● waiting on you | 3 working | 2 need you | €61.40 / €120.00 ▬▬▬▬▭▭ 51 % | GitHub: …
+              ● waiting on you | 3 working | 2 need you | 61.40 EUR / 120.00 EUR ▬▬▬▬▭▭ 51 % | GitHub: …
 main          CHAT 40 %, full height            | Board header: Board · find · ↻ routines ▾ · ?
               start line, then the log          | NEEDS YOU (lit) | Queued | In progress | Done
               > composer ................ Send  | 1.5             | 1      | 1.25        | 0.85
@@ -69,7 +69,7 @@ The strip expands (C7). A chevron cell at its right end is the disclosure button
 
 - In progress: each card as "#601 Console: the drawer's Overview top block · building · 23 min", the stage in its hue (planning, building, verifying; C8); a click opens the card's drawer.
 - Needs you: each item's headline ("Merge PR #612", "#603 Which store for the session table?"); a click scrolls to the item in the column and focuses it.
-- Spend: two small gauges, full column width, 4 px: today against the day cap ("€4.82 of €10.00 day cap") and this month against the month cap; amber from 80 percent, red past the cap with "the month cap is passed" under it.
+- Spend: two small gauges, full column width, 4 px: today against the day cap ("4.82 of 10.00 EUR day cap") and this month against the month cap; amber from 80 percent, red past the cap with "the month cap is passed" under it.
 - Provider, GitHub and configuration: "provider ok" or "2 waiting on the provider since 13:22" in amber; the GitHub line as a link to the pull requests, "none" when not exported; the configuration version and its infra commit as a link to the tree (item 221, C9).
 
 Empty lists say "none". On the phone the four columns stack.

@@ -12,7 +12,7 @@ Two regions in order of weight: the chat is where a human acts, and the board is
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │ Factory console  [ai-software-factory-code ▾]  New task  Costs Metrics …     │ top bar, quiet
 ├──────────────────────────────────────────────────────────────────────────────┤
-│ ● waiting on you │ 2 working │ 2 need you │ €61.40 / €120.00 │ GitHub 1 open │ status strip
+│ ● waiting on you │ 2 working │ 2 need you │ 61.40/120.00 EUR │ GitHub 1 open │ status strip
 ├─────────────────────────────────┬────────────────────────────────────────────┤
 │ CHAT  project agent · New       │ BOARD  find…  Documents  ↻ routines ▾  ?   │
 │                                 │ NEEDS YOU 2  QUEUED 3  IN PROGRESS 1  DONE │

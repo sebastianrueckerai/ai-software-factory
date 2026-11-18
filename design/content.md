@@ -4,7 +4,7 @@ Every round 01 image shows this one moment of the project `ai-software-factory-c
 
 Top bar: "Factory console", the project "ai-software-factory-code", the links "Board", "New task", "Projects", "Resources", "Costs", "Policy", "Alerts", a theme toggle, "sebastian", "Log out".
 
-Status: "● waiting on you", "3 working", "2 need you", "€61.40 / €120.00", "GitHub: 1 open pull request".
+Status: "● waiting on you", "3 working", "2 need you", "61.40 EUR / 120.00 EUR", "GitHub: 1 open pull request".
 
 Pulse: "⚠ Two cards need your decision; #612's merge carries a migration." with a "more" control.
 
@@ -14,7 +14,7 @@ Needs you (2):
 
 Queued (4): "#455 Live check: close (Stage 16, 3.4)" chip "backlog"; "#178 Console: show the configuration version" chip "backlog"; "#620 Costs read: a from and a to date" chip "blocked by 2"; "#558.3 Export in pull request mode" chip "part of plan #558".
 
-Working (3): "#601 Console: the drawer's Overview top block", "running · 23 min · 3/4 checks · €1.72 / €2.00 ⚠ near its budget", activity "Reading internal/console/board.go…"; "#598 GitHub sync pulls a card", "running · 41 min", activity "Running go test ./internal/console"; "#611 Acceptance: export as the human", "running · 8 min", activity "Writing acceptance/export_test.go".
+Working (3): "#601 Console: the drawer's Overview top block", "running · 23 min · 3/4 checks · 1.72 EUR / 2.00 EUR ⚠ near its budget", activity "Reading internal/console/board.go…"; "#598 GitHub sync pulls a card", "running · 41 min", activity "Running go test ./internal/console"; "#611 Acceptance: export as the human", "running · 8 min", activity "Writing acceptance/export_test.go".
 
 Verifying (2): "#612 Ledger: the month cap per project", "in review · 4/4 checks · PR #612"; "#609 Pulse: a provider budget alert", "merge queue".
 
