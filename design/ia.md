@@ -55,7 +55,7 @@ Every item in Needs you is such a card: a merge, a plan's question, a promise of
 
 A Done card (done, failed or closed) holds its title alone, then a foot line without a dot: the state word in its quiet hue, the total time of all runs (C10), the place and the number. A failed card's state word names the failure in one clause. On a done card the chain covered, C38's cover clause takes the time's place. A Done card has no why line and no button.
 
-The routine ghost (C16) stands at the foot of Queued: one paragraph with `↻`, the title and the why line from the routine file, and a foot line with the schedule, the next run and the last run. It holds no button. Skip once, Needs me and Run now stand on the routine's opened card (C46).
+The routine ghost (C16) stands at the foot of Queued: one paragraph with `↻`, the title and the why line from the routine file, and a foot line with the schedule, the next run and the last run. It holds no button. "Skip the next run", "Give it to me" and "Run it now" stand on the routine's opened card (C46).
 
 Every small card holds at most 300 characters of prose, no field and at most one button. Every `#N` on it, other than the card's own number, is a link that names its target's title and state.
 

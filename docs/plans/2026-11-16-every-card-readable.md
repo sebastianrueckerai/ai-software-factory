@@ -494,8 +494,8 @@ One label per action, on every face, in the chat's answer tool and in the inbox.
 | successor | Start a fresh card on this work | Ends this card. A new card goes on from its branch with a full budget. | none |
 | retry | Try the failed card again | Files the failed card again as a new card. | none |
 | replan | Send back to the planner | The planner cuts this work into cards again. | note, optional |
-| close | End the card | Ends the card and closes its issue. Nothing more runs. | note, optional |
-| approve_merge | Merge it | Merges the pull request. | none |
+| close | End the card | Ends the card and closes its issue. Nothing more runs. On a human card that other cards wait for, it ends the card as closed, not done, and adds: "The cards that wait for it ask you first." | note, optional |
+| approve_merge | Merge it | Merges the pull request. On a factory pull request's human card: "Merges <short head> as you. The card ends." The merge takes only the head the human saw, and a human must press it at every autonomy level. | none |
 | deny_merge (request_changes) | Send it back | Returns the pull request to its agent with your note. | note, required |
 | deny_merge (reject) | Reject and close it | Closes the pull request. The card ends. | note, required |
 | set_dependency | Make it wait for a card | The card starts after the card you name ends. | card, with the hint "a card number" |
@@ -513,8 +513,8 @@ One label per action, on every face, in the chat's answer tool and in the inbox.
 | salvage | Rescue the work into a new card | Ends the stuck run and starts a new card from its branch. | none |
 | note | Not now | The card stays as it is. The effect names what waits for it and, at a cap, when the cap resets. | note, optional |
 | wait_checks (keep_checking) | Wait for the checks | As above. | none |
-| hand_back | I cannot do this | Returns the card to the planner with your note. | note, required |
-| close on a human work card | I did it | Names the check that runs, or says that none runs. | none |
+| hand_back | I cannot do this | Only on a plan's human card: "This card ends, and the planner plans the whole plan again with your note. Its started cards stop." | note, required |
+| done on a human work card | I did it | Names the check that runs, or says that none runs. It ends the card as done, and the cards that wait for it start. It is refused while the card waits for another card. | none |
 | go | Have the factory do it | Files the work as a card for an agent. | none |
 | plan confirm | Confirm the plan | The plan's cards start. | none |
 | plan revise | Ask for changes | The planner revises the plan with your note. | note, required |
@@ -603,21 +603,21 @@ Each row is the title form. The why line names what the factory saw and what the
 
 ## Appendix 4: the answers of each monitor flag
 
-A flag that asks offers "It is fine, go on" and "Not now" plus the one action below. A flag that is a notice states the fact, offers "Noted" and "Not now", and leaves the card's other actions under Other actions. Task 10's `TestAppendixAnswersApply` holds each against its predicate. The flag `money_ask_hides_findings` is no longer raised, because the money ask names the open findings itself.
+A flag that asks offers its fitting action, "It is fine, go on" and "Not now". A flag that is a notice states the fact, offers "Noted" and "Not now", and leaves the card's other actions under Other actions. Task 10's `TestAppendixAnswersApply` holds each against its predicate. The flag `money_ask_hides_findings` is no longer raised, because the money ask names the open findings itself.
 
-| Flag | Ask or notice, in words | The fitting answer |
+| Flag | Ask or notice, in words | Answers |
 |---|---|---|
-| answer_changed_nothing | Notice: your last answer on this card changed nothing. | Noted |
-| budget_moved_no_event | This card's budget changed and no record says why. | none |
-| checkin_cut, checkin_refused | Notice: this card's last session went unjudged because its check ended early, or was refused. | Noted |
-| criterion_unproven | A promise of the plan has no test result yet. Run the plan's tests now? Not raised for a promise a human judges. | Run the tests now |
-| dependency_failed | A card this one waits for failed. Try it again? | Try the failed card again |
-| finding_confirmed_twice | The review found the same fault twice on this card. Start fresh? | Rescue the work into a new card |
-| grant_bought_nothing | Notice: this card's last session, which you allowed, changed nothing. | Noted |
-| issue_open_after_end | The card ended and its issue is still open. Close it? | End the card |
-| opened_proof_changed, opened_proof_red_twice | A test of the plan changed or failed twice. Plan this part again? | Send back to the planner |
-| proofs_missing, prover_refused_thrice | The plan has no tests for its promises. Plan this part again? | Send back to the planner |
-| queued_over_bound | This card waits in the queue for <time>. | none |
-| review_refused_not_run | Notice: this card cannot merge yet because the review did not run on its newest work. | Noted |
-| session_no_push | Notice: this card's last sessions changed no code. | Noted |
-| wait_over_bound | This card waits for <what> for <time>. Go on without it? | Run one more session |
+| answer_changed_nothing | Notice: your last answer on this card changed nothing. | Noted, Not now |
+| budget_moved_no_event | This card's budget reads <budget>, but its records add up to <sum>. Is that fine? | It is fine, go on, Not now |
+| checkin_cut, checkin_refused | Notice: this card's last session went unjudged because its check ended early, or was refused. | Noted, Not now |
+| criterion_unproven | A promise of the plan has no test result yet. Run the plan's tests now? Not raised for a promise a human judges. | Run the tests now, It is fine, go on, Not now |
+| dependency_failed | A card this one waits for failed. Is that fine? | It is fine, go on, Not now |
+| finding_confirmed_twice | The review found the same fault twice on this card. Rescue the work into a new card? | Rescue the work into a new card, It is fine, go on, Not now |
+| grant_bought_nothing | Notice: this card's last session, which you allowed, changed nothing. | Noted, Not now |
+| issue_open_after_end | This card ended, and its issue is still open. Close the issue? The card stands in Needs you with this ask. | Close the issue, It is fine, go on, Not now |
+| opened_proof_changed, opened_proof_red_twice | A test of the plan changed after the plan was confirmed, or failed on two versions of the work. Send the plan back to the planner? | Send back to the planner, It is fine, go on, Not now |
+| proofs_missing, prover_refused_thrice | The plan's promises have no tests yet, or no test could be written for one. Send the plan back to the planner? | Send back to the planner, It is fine, go on, Not now |
+| queued_over_bound | This card has waited more than <time> for a free place to run. Is that fine? | It is fine, go on, Not now |
+| review_refused_not_run | Notice: this card cannot merge yet because the review did not run on its newest work. | Noted, Not now |
+| session_no_push | Notice: this card's last sessions changed no code. | Noted, Not now |
+| wait_over_bound | This card's run has not moved or answered for more than <time>. Rescue the work into a new card? | Rescue the work into a new card, It is fine, go on, Not now |

@@ -83,6 +83,6 @@ The four secondary pages follow the readout grammar of C24: a small-caps section
 - Instrument strip: the cell "↻ bump in 20 min" or "↻ bump held", only when a run is under an hour away or held.
 - Card face: ↻ and the routine's name as the place in the foot line of a card a routine filed.
 - Drawer of such a card: the provenance line under the top block, the routine's name as a link.
-- The routine's drawer: title with ↻, the mono subtitle, tabs Overview (top block: schedule, next, last, while open, tells; the acts Skip once, Needs me and Run now, each with its effect line; the brief; the runs; the configuration), Runs (the rows as in the Time section), Config (the yaml, "ask the project agent to change this").
+- The routine's drawer: title with ↻, the mono subtitle, tabs Overview (top block: schedule, next, last, while open, tells; the acts "Skip the next run", "Give it to me" and "Run it now", each with its effect line; the brief; the runs; the configuration), Runs (the rows as in the Time section), Config (the yaml, "ask the project agent to change this").
 - Chat tools: `routines`, `routine_write` with a confirm, `routine_delete` with a confirm.
 - Resources page of the infra project: the cluster's jobs, read-only.
