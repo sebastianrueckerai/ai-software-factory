@@ -2,7 +2,7 @@
 .superpowers/
 terraform.tfstate*
 launch/revision/
-docs/pitch.md
+docs/pitch.*
 launch/concept.md
 __pycache__/
 demo/out/
