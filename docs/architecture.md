@@ -3568,8 +3568,8 @@ builds a card reads the same text the human reads.
 **One brief per card.** A card stores its brief in fields (`BriefText`):
 the title, the why line, the summary and the full text. The title names
 the work in at most 70 characters, the verb first. On a card that asks,
-the title is the ask: at most 110 characters, no colon, one question or
-one instruction with at most one statement before it. The why line is one
+the title is the ask: at most 110 characters, one question or one
+instruction with at most one statement before it. The why line is one
 sentence of at most 160 characters on why the work exists. The summary
 says in at most 600 characters what gets built, what it changes and how it
 is checked. No code cuts a title.
