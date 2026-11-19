@@ -55,3 +55,4 @@ The landing page, the claims page, the film and the README are public. Read the 
 - Security without half measures: no direct credentials to agents, predefined fine-grained roles, spend limits, sandboxes, controlled network egress.
 - Open source where possible, but best-of-breed tools over obscure ones. Be ready to swap a tool whose makers gate needed features behind an enterprise tier.
 - As few tools as possible, but only if they cover every constraint above.
+- Name model classes, never exact models. Code, policy and prompts name an alias (`small`, `big`, `premium`, `vision`). Only the gateway's model map, LiteLLM's configuration in the infra repository, names the exact model behind each alias, so a provider's change touches that map alone.
