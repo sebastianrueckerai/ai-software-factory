@@ -4,9 +4,9 @@ One page per agent: the first model request verbatim, every part pinned to the b
 
 ## The self-check
 
-- code SHA `c0df7ba24bef245b55976e99dd6967cd10b341fc`; every permalink points there.
-- policy `530c35f0c966`, the tree the captures read.
-- harness `opencode 1.18.32`, the pinned opencode the loop captures drove.
+- code SHA `ddcab0b3fe73a319912240ece674352387d01e83`; every permalink points there.
+- policy `04af66d391d7`, the tree the captures read.
+- harness `opencode 1.19.5`, the pinned opencode the loop captures drove.
 - unlabelled spans: 0 — the tool exits non-zero on any unlabelled byte, so an index that shipped means none.
 - 22 pages. Regenerate: `go run ./cmd/agentdoc -out docs/agents -policy <factory tree> -opencode <pinned binary>`; no LLM runs.
 
@@ -16,27 +16,27 @@ Fixture ids: `agentdoc-fixture` (coding, screening, sizing, planner, prover, mes
 
 | agent | family | job | model | purpose | runs | tools | request bytes |
 |---|---|---|---|---|---|---|---|
-| [coding](coding.md) | A | Implements the card: reads repo, edits, commits in sandbox | `small` | `session` | agent-worker, the opencode loop in a gVisor pod | 28 | 48583 |
-| [screening](screening.md) | A | Reads an issue pre-code, answers clear/suspect JSON | `small` | `session` | agent-worker, report mode | 17 | 45836 |
-| [sizing](sizing.md) | A | Sizes a card small/medium/large before first session | `small` | `session` | agent-worker, report mode | 17 | 45691 |
-| [planner](planner.md) | A | Reads repo, files a plan via the file_plan MCP tool | `big` | `session` | agent-worker, report mode | 17 | 45690 |
-| [prover](prover.md) | A | Writes one blind test per criterion on main, files them via file_proofs | `big` | `session` | agent-worker, report mode | 12 | 38919 |
-| [message-responder](message-responder.md) | A | Answers POST /message pushes mid-session | `small` | `session` | agent-worker, the session's next turn in the sandbox | 28 | 49516 |
+| [coding](coding.md) | A | Implements the card: reads repo, edits, commits in sandbox | `small` | `session` | agent-worker, the opencode loop in a gVisor pod | 28 | 55726 |
+| [screening](screening.md) | A | Reads an issue pre-code, answers clear/suspect JSON | `small` | `session` | agent-worker, report mode | 17 | 41115 |
+| [sizing](sizing.md) | A | Sizes a card small/medium/large before first session | `small` | `session` | agent-worker, report mode | 17 | 40970 |
+| [planner](planner.md) | A | Reads repo, files a plan via the file_plan MCP tool | `big` | `session` | agent-worker, report mode | 17 | 53632 |
+| [prover](prover.md) | A | Writes one blind test per criterion on main, files them via file_proofs | `big` | `session` | agent-worker, report mode | 12 | 38979 |
+| [message-responder](message-responder.md) | A | Answers POST /message pushes mid-session | `small` | `session` | agent-worker, the session's next turn in the sandbox | 28 | 64455 |
 | [opencode-subagents](opencode-subagents.md) | A | opencode-internal task and explore delegation | `—` | `config` | inside opencode, under the session config's agent block | 0 | — |
-| [checkin](checkin.md) | B | Decides continue, message, handover, human or replan on a session trip | `big` | `checkin` | factoryd, in-process loop, tools executed in the sandbox | 9 | 10072 |
-| [model-review](model-review.md) | B | Reviews a diff part against the card's objective | `big` | `review` | factoryd direct | 0 | 5420 |
-| [security-audit](security-audit.md) | B | Audits changes against the security checklist | `big` | `audit` | factoryd direct | 0 | 2662 |
-| [gate-supervisor](gate-supervisor.md) | B | Decides approve or escalate at the gates | `big` | `gate-supervisor` | factoryd direct | 0 | 2284 |
-| [judgement](judgement.md) | B | Judges a judgement criterion's artifact with its pinned prompt | `big` | `review` | factoryd direct | 0 | 601 |
-| [review-behaviours](review-behaviours.md) | B | Drafts the review behaviours text | `big` | `review` | factoryd direct | 0 | 1467 |
-| [delta-planner](delta-planner.md) | B | Plans delta work between reviews | `big` | `review` | factoryd direct | 0 | 1838 |
-| [holdout-proposer](holdout-proposer.md) | B | Proposes hold-out criteria | `big` | `review` | factoryd direct | 0 | 1278 |
-| [answer-screener](answer-screener.md) | B | Screens a late answer of the issue author | `big` | `review` | factoryd direct | 0 | 1261 |
-| [brief-writer](brief-writer.md) | B | Writes the brief of a resource request or a plan approval | `big` | `brief` | factoryd direct | 0 | 2304 |
-| [case-brief-writer](case-brief-writer.md) | B | Writes parts 3 and 4 of a Needs-you case | `big` | `brief` | factoryd direct | 0 | 3207 |
-| [title](title.md) | B | Names a chat thread from its first message | `small` | `title` | the console's naming call, a factoryd direct client | 0 | 348 |
-| [project-agent](project-agent.md) | B | The always-on repo chat agent; also answers escalations | `premium` | `operator` | console, own tool loop | 59 | 30161 |
-| [compact](compact.md) | B | Summarises a chat thread's older turns | `small` | `compact` | console | 0 | 921 |
+| [checkin](checkin.md) | B | Decides continue, message, handover, human or replan on a session trip | `big` | `checkin` | factoryd, in-process loop, tools executed in the sandbox | 9 | 6159 |
+| [model-review](model-review.md) | B | Reviews a diff part against the card's objective | `big` | `review` | factoryd direct | 0 | 6892 |
+| [security-audit](security-audit.md) | B | Audits changes against the security checklist | `big` | `audit` | factoryd direct | 0 | 3890 |
+| [gate-supervisor](gate-supervisor.md) | B | Decides approve or escalate at the gates | `big` | `gate-supervisor` | factoryd direct | 0 | 3605 |
+| [judgement](judgement.md) | B | Judges a judgement criterion's artifact with its pinned prompt | `big` | `review` | factoryd direct | 0 | 962 |
+| [review-behaviours](review-behaviours.md) | B | Drafts the review behaviours text | `big` | `review` | factoryd direct | 0 | 1890 |
+| [delta-planner](delta-planner.md) | B | Plans delta work between reviews | `big` | `review` | factoryd direct | 0 | 6414 |
+| [holdout-proposer](holdout-proposer.md) | B | Proposes hold-out criteria | `big` | `review` | factoryd direct | 0 | 1852 |
+| [answer-screener](answer-screener.md) | B | Screens a late answer of the issue author | `big` | `review` | factoryd direct | 0 | 1622 |
+| [brief-writer](brief-writer.md) | B | Writes the brief of a resource request or a plan approval | `big` | `brief` | factoryd direct | 0 | 4473 |
+| [case-brief-writer](case-brief-writer.md) | B | Writes parts 3 and 4 of a Needs-you case | `big` | `brief` | factoryd direct | 0 | 4606 |
+| [title](title.md) | B | Names a chat thread from its first message | `small` | `title` | the console's naming call, a factoryd direct client | 0 | 748 |
+| [project-agent](project-agent.md) | B | The always-on repo chat agent; also answers escalations | `premium` | `operator` | console, own tool loop | 60 | 45907 |
+| [compact](compact.md) | B | Summarises a chat thread's older turns | `small` | `compact` | console | 0 | 1282 |
 | [vision](vision.md) | B | Describes an image the human attached | `vision` | `vision` | console | 0 | 315 |
 
 ## The agents in one line each
@@ -71,9 +71,11 @@ The 6 loop pages are one session shape on the same trunk: the harness system pro
 - AGENTS.md — 245 bytes
 - the author's answers — 2692 bytes
 - the author's standing — 532 bytes
+- the brief's closing marker — 19 bytes
+- the brief's opening marker — 20 bytes
+- the card's brief — 108 bytes
 - the harness tail — 702 bytes
 - the issue link — 47 bytes
-- the issue's text — 89 bytes
 - the poster heading — 36 bytes
 - the repository line — 43 bytes
 - the tools line — 77 bytes
@@ -99,52 +101,54 @@ Blocks several agents carry byte for byte, by content hash:
 | block | bytes | carried by |
 |---|---|---|
 | `013651f42d38` · `gateway.Server.toolServer` | 259 | [coding](coding.md) — tool factory-tools_manual; [screening](screening.md) — tool factory-tools_manual; [sizing](sizing.md) — tool factory-tools_manual; [planner](planner.md) — tool factory-tools_manual; [prover](prover.md) — tool factory-tools_manual; [message-responder](message-responder.md) — tool factory-tools_manual |
-| `013abd8cfd2f` · `factoryd.chatInputLead` | 20 | [model-review](model-review.md) — the input heading; [security-audit](security-audit.md) — the input heading; [gate-supervisor](gate-supervisor.md) — the input heading; [judgement](judgement.md) — the input heading; [review-behaviours](review-behaviours.md) — the input heading; [delta-planner](delta-planner.md) — the input heading; [holdout-proposer](holdout-proposer.md) — the input heading; [answer-screener](answer-screener.md) — the input heading; [brief-writer](brief-writer.md) — the input heading; [case-brief-writer](case-brief-writer.md) — the input heading |
+| `013abd8cfd2f` · `factoryd.ChatInputLead` | 20 | [model-review](model-review.md) — the input heading; [security-audit](security-audit.md) — the input heading; [gate-supervisor](gate-supervisor.md) — the input heading; [judgement](judgement.md) — the input heading; [review-behaviours](review-behaviours.md) — the input heading; [delta-planner](delta-planner.md) — the input heading; [holdout-proposer](holdout-proposer.md) — the input heading; [answer-screener](answer-screener.md) — the input heading; [brief-writer](brief-writer.md) — the input heading; [case-brief-writer](case-brief-writer.md) — the input heading |
 | `060879eeeae2` · `gateway.Server.toolServer` | 594 | [coding](coding.md) — tool factory-tools_replicate_predict; [message-responder](message-responder.md) — tool factory-tools_replicate_predict |
-| `06325398a0c9` · `opencode 1.18.32` | 1293 | [coding](coding.md) — tool webfetch; [screening](screening.md) — tool webfetch; [sizing](sizing.md) — tool webfetch; [planner](planner.md) — tool webfetch; [prover](prover.md) — tool webfetch; [message-responder](message-responder.md) — tool webfetch |
+| `06325398a0c9` · `opencode 1.19.5` | 1293 | [coding](coding.md) — tool webfetch; [screening](screening.md) — tool webfetch; [sizing](sizing.md) — tool webfetch; [planner](planner.md) — tool webfetch; [prover](prover.md) — tool webfetch; [message-responder](message-responder.md) — tool webfetch |
 | `06c79377dbb1` · `gateway.Server.toolServer` | 722 | [coding](coding.md) — tool factory-tools_request_info; [screening](screening.md) — tool factory-tools_request_info; [sizing](sizing.md) — tool factory-tools_request_info; [message-responder](message-responder.md) — tool factory-tools_request_info |
 | `06f4764a6e6f` · `factoryd.joinFiles` | 206 | [model-review](model-review.md) — the diff; [security-audit](security-audit.md) — the diff |
-| `114ca728f473` · `opencode 1.18.32` | 5275 | [coding](coding.md) — tool bash; [screening](screening.md) — tool bash; [sizing](sizing.md) — tool bash; [planner](planner.md) — tool bash; [prover](prover.md) — tool bash; [message-responder](message-responder.md) — tool bash |
-| `11c16d62f117` · `opencode 1.18.32` | 8872 | [planner](planner.md) — the harness preamble; [prover](prover.md) — the harness preamble |
-| `12def14de5d4` · `gateway.Server.toolServer` | 795 | [coding](coding.md) — tool factory-tools_delegate; [message-responder](message-responder.md) — tool factory-tools_delegate |
-| `133d92f687e5` · `opencode 1.18.32` | 1734 | [coding](coding.md) — tool read; [screening](screening.md) — tool read; [sizing](sizing.md) — tool read; [planner](planner.md) — tool read; [prover](prover.md) — tool read; [message-responder](message-responder.md) — tool read |
+| `114ca728f473` · `opencode 1.19.5` | 5275 | [coding](coding.md) — tool bash; [screening](screening.md) — tool bash; [sizing](sizing.md) — tool bash; [planner](planner.md) — tool bash; [prover](prover.md) — tool bash; [message-responder](message-responder.md) — tool bash |
+| `11c16d62f117` · `opencode 1.19.5` | 8872 | [planner](planner.md) — the harness preamble; [prover](prover.md) — the harness preamble |
+| `133d92f687e5` · `opencode 1.19.5` | 1734 | [coding](coding.md) — tool read; [screening](screening.md) — tool read; [sizing](sizing.md) — tool read; [planner](planner.md) — tool read; [prover](prover.md) — tool read; [message-responder](message-responder.md) — tool read |
 | `174633074158` · `gateway.Server.toolServer` | 1357 | [coding](coding.md) — tool factory-tools_commission_server; [message-responder](message-responder.md) — tool factory-tools_commission_server |
 | `1b6554d12714` · `briefText` | 36 | [coding](coding.md) — the poster heading; [screening](screening.md) — the poster heading; [sizing](sizing.md) — the poster heading; [planner](planner.md) — the poster heading; [prover](prover.md) — the poster heading; [message-responder](message-responder.md) — the poster heading |
-| `1bc7989a269a` · `gateway.Server.toolServer` | 887 | [coding](coding.md) — tool factory-tools_escalate; [screening](screening.md) — tool factory-tools_escalate; [sizing](sizing.md) — tool factory-tools_escalate; [planner](planner.md) — tool factory-tools_escalate; [message-responder](message-responder.md) — tool factory-tools_escalate |
-| `1e04c1269968` · `opencode 1.18.32` | 8876 | [coding](coding.md) — the harness preamble; [screening](screening.md) — the harness preamble; [sizing](sizing.md) — the harness preamble; [message-responder](message-responder.md) — the harness preamble |
+| `1e04c1269968` · `opencode 1.19.5` | 8876 | [coding](coding.md) — the harness preamble; [screening](screening.md) — the harness preamble; [sizing](sizing.md) — the harness preamble; [message-responder](message-responder.md) — the harness preamble |
 | `223220ca36ce` · `briefText` | 47 | [coding](coding.md) — the issue link; [screening](screening.md) — the issue link; [sizing](sizing.md) — the issue link; [planner](planner.md) — the issue link; [prover](prover.md) — the issue link; [message-responder](message-responder.md) — the issue link |
+| `2727e60e944f` · `briefText` | 19 | [coding](coding.md) — the brief's closing marker; [screening](screening.md) — the brief's closing marker; [sizing](sizing.md) — the brief's closing marker; [planner](planner.md) — the brief's closing marker; [prover](prover.md) — the brief's closing marker; [message-responder](message-responder.md) — the brief's closing marker |
 | `280892ed6d59` · `briefText` | 43 | [coding](coding.md) — the repository line; [screening](screening.md) — the repository line; [sizing](sizing.md) — the repository line; [planner](planner.md) — the repository line; [prover](prover.md) — the repository line; [message-responder](message-responder.md) — the repository line |
 | `2830c46d1803` · `SessionFacts.Line` | 167 | [screening](screening.md) — the session's facts; [sizing](sizing.md) — the session's facts; [planner](planner.md) — the session's facts; [prover](prover.md) — the session's facts |
 | `2c5dec4a86d8` · `SessionFacts.Line` | 299 | [coding](coding.md) — the session's facts; [message-responder](message-responder.md) — the session's facts |
 | `30a0924a3360` · `factoryd.concurrencyBlock` | 6 | [model-review](model-review.md) — the concurrency summary; [security-audit](security-audit.md) — the concurrency summary |
-| `35c1e0318eca` · `opencode 1.18.32` | 2686 | [coding](coding.md) — tool todowrite; [screening](screening.md) — tool todowrite; [sizing](sizing.md) — tool todowrite; [planner](planner.md) — tool todowrite; [prover](prover.md) — tool todowrite; [message-responder](message-responder.md) — tool todowrite |
+| `35c1e0318eca` · `opencode 1.19.5` | 2686 | [coding](coding.md) — tool todowrite; [screening](screening.md) — tool todowrite; [sizing](sizing.md) — tool todowrite; [planner](planner.md) — tool todowrite; [prover](prover.md) — tool todowrite; [message-responder](message-responder.md) — tool todowrite |
 | `3d2434857657` · `factoryd.Spec` | 84 | [delta-planner](delta-planner.md) — the spec; [holdout-proposer](holdout-proposer.md) — the spec |
-| `43bd6a507812` · `opencode 1.18.32` | 676 | [coding](coding.md) — tool skill; [screening](screening.md) — tool skill; [sizing](sizing.md) — tool skill; [planner](planner.md) — tool skill; [prover](prover.md) — tool skill; [message-responder](message-responder.md) — tool skill |
-| `49d4a82f97ec` | 89 | [coding](coding.md) — the issue's text; [screening](screening.md) — the issue's text; [sizing](sizing.md) — the issue's text; [planner](planner.md) — the issue's text; [prover](prover.md) — the issue's text; [message-responder](message-responder.md) — the issue's text |
+| `43bd6a507812` · `opencode 1.19.5` | 676 | [coding](coding.md) — tool skill; [screening](screening.md) — tool skill; [sizing](sizing.md) — tool skill; [planner](planner.md) — tool skill; [prover](prover.md) — tool skill; [message-responder](message-responder.md) — tool skill |
 | `5b3a489dc91a` · `briefText` | 532 | [coding](coding.md) — the author's standing; [screening](screening.md) — the author's standing; [sizing](sizing.md) — the author's standing; [planner](planner.md) — the author's standing; [prover](prover.md) — the author's standing; [message-responder](message-responder.md) — the author's standing |
 | `5de95b2f2074` · `gateway.Server.toolServer` | 807 | [coding](coding.md) — tool factory-tools_digest; [screening](screening.md) — tool factory-tools_digest; [sizing](sizing.md) — tool factory-tools_digest; [planner](planner.md) — tool factory-tools_digest; [message-responder](message-responder.md) — tool factory-tools_digest |
 | `6635423d8d8b` · `factoryd.CardDigest.Render` | 253 | [brief-writer](brief-writer.md) — the card's life; [case-brief-writer](case-brief-writer.md) — the card's life |
-| `6a0b20546895` · `opencode 1.18.32` | 3856 | [coding](coding.md) — tool task; [screening](screening.md) — tool task; [sizing](sizing.md) — tool task; [planner](planner.md) — tool task; [prover](prover.md) — tool task; [message-responder](message-responder.md) — tool task |
+| `6a0b20546895` · `opencode 1.19.5` | 3856 | [coding](coding.md) — tool task; [screening](screening.md) — tool task; [sizing](sizing.md) — tool task; [planner](planner.md) — tool task; [prover](prover.md) — tool task; [message-responder](message-responder.md) — tool task |
+| `6edbc64a5dee` · `CardBrief.AgentText` | 108 | [coding](coding.md) — the card's brief; [screening](screening.md) — the card's brief; [sizing](sizing.md) — the card's brief; [planner](planner.md) — the card's brief; [prover](prover.md) — the card's brief; [message-responder](message-responder.md) — the card's brief |
 | `77678017d76d` · `gateway.Server.toolServer` | 731 | [coding](coding.md) — tool factory-tools_request_cut; [message-responder](message-responder.md) — tool factory-tools_request_cut |
 | `7f324fa86796` | 2692 | [coding](coding.md) — the author's answers; [screening](screening.md) — the author's answers; [sizing](sizing.md) — the author's answers; [planner](planner.md) — the author's answers; [prover](prover.md) — the author's answers; [message-responder](message-responder.md) — the author's answers |
 | `810c3ae894eb` · `briefText` | 146 | [coding](coding.md) — what the bounds left out; [screening](screening.md) — what the bounds left out; [sizing](sizing.md) — what the bounds left out; [planner](planner.md) — what the bounds left out; [prover](prover.md) — what the bounds left out; [message-responder](message-responder.md) — what the bounds left out |
-| `84ef7cfa1276` · `opencode 1.18.32` | 1026 | [coding](coding.md) — tool write; [screening](screening.md) — tool write; [sizing](sizing.md) — tool write; [planner](planner.md) — tool write; [prover](prover.md) — tool write; [message-responder](message-responder.md) — tool write |
+| `84ef7cfa1276` · `opencode 1.19.5` | 1026 | [coding](coding.md) — tool write; [screening](screening.md) — tool write; [sizing](sizing.md) — tool write; [planner](planner.md) — tool write; [prover](prover.md) — tool write; [message-responder](message-responder.md) — tool write |
+| `8c5908dab8fd` · `workGuide` | 8207 | [coding](coding.md) — the guide; [message-responder](message-responder.md) — the guide |
 | `9ac4732efa53` · `gateway.Server.toolServer` | 344 | [coding](coding.md) — tool factory-tools_cloud_prices; [message-responder](message-responder.md) — tool factory-tools_cloud_prices |
 | `9f8cd08df48a` · `gateway.Server.toolServer` | 478 | [coding](coding.md) — tool factory-tools_fal_run; [message-responder](message-responder.md) — tool factory-tools_fal_run |
+| `a08fbc9d3fbd` · `briefText` | 20 | [coding](coding.md) — the brief's opening marker; [screening](screening.md) — the brief's opening marker; [sizing](sizing.md) — the brief's opening marker; [planner](planner.md) — the brief's opening marker; [prover](prover.md) — the brief's opening marker; [message-responder](message-responder.md) — the brief's opening marker |
 | `a4aa66e1de25` · `gateway.Server.toolServer` | 262 | [coding](coding.md) — tool factory-tools_list_resources; [message-responder](message-responder.md) — tool factory-tools_list_resources |
 | `b08a8bb42600` · `AGENTS.md` | 245 | [coding](coding.md) — AGENTS.md; [screening](screening.md) — AGENTS.md; [sizing](sizing.md) — AGENTS.md; [planner](planner.md) — AGENTS.md; [prover](prover.md) — AGENTS.md; [message-responder](message-responder.md) — AGENTS.md |
-| `b2b628459017` · `SandboxFacts` | 523 | [coding](coding.md) — the sandbox facts; [message-responder](message-responder.md) — the sandbox facts |
-| `b76c74cc2034` · `opencode 1.18.32` | 1183 | [coding](coding.md) — tool grep; [screening](screening.md) — tool grep; [sizing](sizing.md) — tool grep; [planner](planner.md) — tool grep; [prover](prover.md) — tool grep; [message-responder](message-responder.md) — tool grep |
-| `b8c19126a68b` · `workGuide` | 1833 | [coding](coding.md) — the guide; [message-responder](message-responder.md) — the guide |
+| `b6136b83c4c9` · `gateway.Server.toolServer` | 1038 | [coding](coding.md) — tool factory-tools_escalate; [screening](screening.md) — tool factory-tools_escalate; [sizing](sizing.md) — tool factory-tools_escalate; [planner](planner.md) — tool factory-tools_escalate; [message-responder](message-responder.md) — tool factory-tools_escalate |
+| `b76c74cc2034` · `opencode 1.19.5` | 1183 | [coding](coding.md) — tool grep; [screening](screening.md) — tool grep; [sizing](sizing.md) — tool grep; [planner](planner.md) — tool grep; [prover](prover.md) — tool grep; [message-responder](message-responder.md) — tool grep |
 | `bb1776e0f232` · `gateway.Server.toolServer` | 797 | [coding](coding.md) — tool factory-tools_request_tool; [message-responder](message-responder.md) — tool factory-tools_request_tool |
-| `bf5a30b64649` · `opencode 1.18.32` | 1114 | [coding](coding.md) — tool glob; [screening](screening.md) — tool glob; [sizing](sizing.md) — tool glob; [planner](planner.md) — tool glob; [prover](prover.md) — tool glob; [message-responder](message-responder.md) — tool glob |
+| `bd98d65e6df0` · `SandboxFacts` | 651 | [coding](coding.md) — the sandbox facts; [message-responder](message-responder.md) — the sandbox facts |
+| `bf5a30b64649` · `opencode 1.19.5` | 1114 | [coding](coding.md) — tool glob; [screening](screening.md) — tool glob; [sizing](sizing.md) — tool glob; [planner](planner.md) — tool glob; [prover](prover.md) — tool glob; [message-responder](message-responder.md) — tool glob |
 | `c6655a98c002` · `SandboxFacts` | 414 | [screening](screening.md) — the sandbox facts; [sizing](sizing.md) — the sandbox facts; [planner](planner.md) — the sandbox facts; [prover](prover.md) — the sandbox facts |
 | `c990802944e9` · `gateway.Server.toolServer` | 433 | [coding](coding.md) — tool factory-tools_resource_request_status; [message-responder](message-responder.md) — tool factory-tools_resource_request_status |
+| `cc970982c6e9` · `gateway.Server.toolServer` | 1056 | [coding](coding.md) — tool factory-tools_delegate; [message-responder](message-responder.md) — tool factory-tools_delegate |
 | `ce141358da3a` · `gateway.Server.toolServer` | 626 | [coding](coding.md) — tool factory-tools_ssh_certificate; [message-responder](message-responder.md) — tool factory-tools_ssh_certificate |
 | `ced72aaaba4a` · `gateway.Server.toolServer` | 953 | [coding](coding.md) — tool factory-tools_analyze_image; [screening](screening.md) — tool factory-tools_analyze_image; [sizing](sizing.md) — tool factory-tools_analyze_image; [planner](planner.md) — tool factory-tools_analyze_image; [message-responder](message-responder.md) — tool factory-tools_analyze_image |
-| `d1931a294d76` · `opencode 1.18.32` | 1958 | [coding](coding.md) — tool edit; [screening](screening.md) — tool edit; [sizing](sizing.md) — tool edit; [planner](planner.md) — tool edit; [prover](prover.md) — tool edit; [message-responder](message-responder.md) — tool edit |
+| `d1931a294d76` · `opencode 1.19.5` | 1958 | [coding](coding.md) — tool edit; [screening](screening.md) — tool edit; [sizing](sizing.md) — tool edit; [planner](planner.md) — tool edit; [prover](prover.md) — tool edit; [message-responder](message-responder.md) — tool edit |
 | `dca87542f5b0` · `gateway.Server.toolServer` | 387 | [coding](coding.md) — tool factory-tools_release_resource; [message-responder](message-responder.md) — tool factory-tools_release_resource |
-| `e056c7eea798` · `opencode 1.18.32` | 702 | [coding](coding.md) — the harness tail; [screening](screening.md) — the harness tail; [sizing](sizing.md) — the harness tail; [planner](planner.md) — the harness tail; [prover](prover.md) — the harness tail; [message-responder](message-responder.md) — the harness tail |
+| `e056c7eea798` · `opencode 1.19.5` | 702 | [coding](coding.md) — the harness tail; [screening](screening.md) — the harness tail; [sizing](sizing.md) — the harness tail; [planner](planner.md) — the harness tail; [prover](prover.md) — the harness tail; [message-responder](message-responder.md) — the harness tail |
 | `e32e47cfb17a` · `toolsLine` | 77 | [coding](coding.md) — the tools line; [screening](screening.md) — the tools line; [sizing](sizing.md) — the tools line; [planner](planner.md) — the tools line; [prover](prover.md) — the tools line; [message-responder](message-responder.md) — the tools line |
 | `e3d1ce595400` · `gateway.Server.toolServer` | 337 | [coding](coding.md) — tool factory-tools_web_scrape; [screening](screening.md) — tool factory-tools_web_scrape; [sizing](sizing.md) — tool factory-tools_web_scrape; [planner](planner.md) — tool factory-tools_web_scrape; [message-responder](message-responder.md) — tool factory-tools_web_scrape |
 | `e3f0b8d6902d` · `gateway.Server.toolServer` | 441 | [coding](coding.md) — tool factory-tools_web_search; [screening](screening.md) — tool factory-tools_web_search; [sizing](sizing.md) — tool factory-tools_web_search; [planner](planner.md) — tool factory-tools_web_search; [message-responder](message-responder.md) — tool factory-tools_web_search |
