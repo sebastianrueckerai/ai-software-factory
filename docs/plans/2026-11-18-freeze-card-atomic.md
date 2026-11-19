@@ -60,16 +60,48 @@ The end state must equal the end state of the run without a fault, in every part
 
 A cell that cannot converge to the same state names its reason in the table, in one line, and asserts the state it reaches. A fault of a multi-write store method fails the whole method and changes nothing in the fake, as a transaction does.
 
-- [ ] The fault dimension runs every write and every call of every cell, and fails on main for the four gaps of the earlier plan: a reopen's failed face write, a press's failed row close with a restart, a reopen's failed forget with a restart and a human's console close, and a kept filing in a second repository over a restart.
+- [x] The fault dimension runs every write and every call of every cell, and fails on main for the four gaps of the earlier plan: a reopen's failed face write, a press's failed row close with a restart, a reopen's failed forget with a restart and a human's console close, and a kept filing in a second repository over a restart.
 
 ### Task 2: One transaction per state change, and Forgejo follows
 
 Build the model above: the store methods on `PGStore` with their Postgres tests in `internal/factoryd/pg` (each method's effects after a commit, and no effect at all when its guard does not hold), the fake's versions, the watcher's use of them, the owed reopens in each pass, and the deletions.
 
-- [ ] The whole state table with its fault dimension passes, with every exception named. `go test -race ./internal/factoryd/...` and `./acceptance` pass beside Postgres.
-- [ ] No store write of a freeze card's close or reopen runs outside `EndFreezeCard` and `ReopenFreezeCard`.
+- [x] The whole state table with its fault dimension passes, with every exception named. `go test -race ./internal/factoryd/...` and `./acceptance` pass beside Postgres.
+- [x] No store write of a freeze card's close or reopen runs outside `EndFreezeCard` and `ReopenFreezeCard`.
 
 ### Task 3: Land and roll
 
-- [ ] The pull request's CI checks pass, a review is clean, and the work is on main.
+- [x] The pull request's CI checks pass, a review is clean, and the work is on main.
 - [ ] The cluster runs the new main, and `node launch/site/evidence.js` passes in the docs repository with the pins moved.
+
+## Outcome
+
+The work landed on main of `ai-software-factory-code` with pull request #2250, merge 94c800580, after six fix rounds. Each review from the second round on passed, and each round's findings were smaller than the round's before.
+
+What the code does now:
+
+- `EndFreezeCard` and `ReopenFreezeCard` each write the row, the face and the close record in one transaction. No close or reopen of a freeze card is written outside them.
+- A reopen records its owed Forgejo call in the same transaction. Each pass of the watcher makes the owed reopens and the unconfirmed closes of freeze cards again until Forgejo took them. The heal pass lists no close of a freeze card. A human's close always wins.
+- The watcher keeps no state between passes. Each pass reads the standing freezes and the held resumes from the gateway's rows, so a restart equals a next pass.
+- The order of the gateway's rows alone tells which arms a press answered. The gateway changes a hold only together with its row, under the hold's lock: the arm, the lapse and the clear share `changeHold`. The hold-clear route always writes its `class_resumed` row.
+- The wake of the frozen cards after a resume that held five minutes is derived from the rows and recorded as a `class_woken` row.
+- The fault dimension of `TestFreezeCardStateTable` and its named scenarios fail every store write and every Forgejo call once, before and after its effect, with and without a restart, and compare the end state with the run without a fault. 155 fault runs failed on main before the change. About 1,800 pass now.
+
+Found on the live factory on 2026-11-18 and fixed in the same pull request:
+
+- The freeze was switched off in production: the policy named no provider. The four work classes now name `zai`, and `provider_limits` holds `zai` with `tz: Asia/Singapore`.
+- A count of one reads "1 card of the class waits."
+- A report task (sizing, screening, prover) outlived its closed card and stayed frozen to the provider's reset. The heal pass now ends each open report task whose card is gone, and a card that lives again gets its report run again.
+
+The live check on main 260024d66 passed: a test card met z.ai's dated limit, the freeze card filed itself nine seconds later with no case and no question, the Retry now press cleared the hold, closed the card and woke the frozen card, the next refusal opened the same card again, and a human's close stayed closed.
+
+What stays as it is, each named in the tests or accepted by the review:
+
+- The lost press. If the press's write fails and a pass reads the `class_resumed` row before the human presses again, the card takes the resumed face and closes itself five minutes later.
+- The lost close. A human's close that failed before its record, and was not made again, leaves the card as if no one closed it.
+- A filing that a failed cursor write makes again after its class resumed shows a card for a freeze that ended. The card closes itself five minutes later.
+- An issue that Forgejo made, whose answer was lost, and whose retry at the resume failed too, stands with no card until the class's next freeze in that repository.
+- While the events table refuses rows, each refused arm or lapse holds the gateway's hold lock for up to three seconds, which slows the calls of the other limited classes.
+- The three-second deadline can fire after Postgres committed the row. The next row repairs the hold.
+- A retry press that arrives while a frozen card's session still runs costs one more session start, which the hold answers locally.
+- The freeze is per work class. One provider limit can freeze four classes and file four cards, and a press clears one class.
