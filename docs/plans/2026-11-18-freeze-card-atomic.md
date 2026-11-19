@@ -72,7 +72,7 @@ Build the model above: the store methods on `PGStore` with their Postgres tests 
 ### Task 3: Land and roll
 
 - [x] The pull request's CI checks pass, a review is clean, and the work is on main.
-- [ ] The cluster runs the new main, and `node launch/site/evidence.js` passes in the docs repository with the pins moved.
+- [x] The cluster runs the new main, and `node launch/site/evidence.js` passes in the docs repository with the pins moved.
 
 ## Outcome
 
