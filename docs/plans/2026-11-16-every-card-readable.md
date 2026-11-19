@@ -476,6 +476,37 @@ A one-time pass. Its code does not stay in the repository after it ran.
 
 ---
 
+## Outcome
+
+The work landed on main of `ai-software-factory-code` with merge ddcab0b3f on 2026-11-19. Tasks 1 to 20, 23 and the first two steps of Task 24 are built. Each task, each merge of main and each fix round passed its review.
+
+What the code does now:
+
+- Each card holds one brief: title, why line, summary and full text. Every writer files it through one door, and the agent's session and the console read it through one function.
+- One register in `factoryd` writes the face of every case kind, request kind, card source and monitor flag: its question, its answers with their effect lines, and its story. The console builds every opened card from it, with no second render path.
+- An answer of a card's ask always shows in the ask block of the opened card. A fold holds only the card's actions that are no answer of the ask. The small card shows one answer to press and counts the others.
+- A refusal names the state and the answers that fit it. A text a human reads names a card by its title and never by a task id, a key, a hash or a branch. An agent's door adds the task id after the title.
+- A money card's question names its problem, not adding money. No answer leads the list a rung gets.
+
+Changed after the build, by the owner's rulings:
+
+- The factory checks no wording. `writingguide.Lint`, Task 20's test of every rendered string against it, and the brief door's three wording rules (a colon in a title, a work title that opens with an article, a why line that opens with the title) are gone. The writing guide stays a guide. The checks of what a reader cannot open stay: a `#N` that resolves to nothing, a branch name, a hex id, a backtick or code identifier in a title, a bare section label, the lengths, one question or one instruction per ask.
+- Task 21 (the pass that rewrote the open cards' briefs) and Task 22 (`factoryd audit-board`) are dropped, and their code is deleted. The live board was cleared instead on 2026-11-19: 26 failed cards ended with a note, an empty pull request closed, and a schema-copy pull request merged. Every new card passes the brief's door.
+
+Main moved by 53 commits while the work ran, among them rung 0, the one door to the human and the freeze card's single transaction. The branch took them in five merge steps, each reviewed. Main's behaviour runs, and every face it added goes through the register.
+
+Found on the live factory on 2026-11-19 and fixed:
+
+- A CI runner pod that could not pull its image held its 22 GiB of node storage until its 60-minute deadline, so no other runner pod fit and a roll's gate stopped. The spawner now tears such a pod down after 3 minutes of failed pulls, tries a job 3 times, then once every 15 minutes.
+- The seed script wrote the registry read token's copies long after it minted the token, so a run that stopped between them left every pull secret with a revoked token. It now writes them right after the mint.
+
+What stays open:
+
+- Task 24's third step: Sebastian reads the board as new cards come, and each card he does not understand is fixed at its register entry.
+- The chat tools for a merge, a plan and a criteria request still name the request. They answer through the case's Act, so they open no second door.
+
+---
+
 ## Appendix 1: the vocabulary
 
 One label per action, on every face, in the chat's answer tool and in the inbox. A row with a variant in brackets is a named variant of its action for one card class. No other label exists. The effect line states what happens next. A field's default may depend on the case's kind.
