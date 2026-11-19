@@ -3576,11 +3576,10 @@ is checked. No code cuts a title.
 
 **One door.** Every writer files a card through `AdmitBrief`, which runs
 `CheckBrief` for the card's job: work, ask, or a human's own issue. It
-refuses a title that holds a `#N`, a branch name, a hex id, a backtick, a
-code identifier or a colon, a work title that starts with an article, a
-why line that starts with the title, a `#N` or a document link that resolves
-to nothing, a bare section label such as "Phase B", a branch name in any
-field, and a title, why line or summary that fails `writingguide.Lint`.
+refuses a title that holds a `#N`, a branch name, a hex id, a backtick or
+a code identifier, a `#N` or a document link that resolves to nothing, a
+bare section label such as "Phase B", and a branch name in any field. It
+checks no wording: the guide's forms carry that.
 Each refusal names the fault and the fitting action and goes back to the
 writer in its own channel, so the writer corrects itself. On the third
 refused try the door files the card with the writer's last text and marks
