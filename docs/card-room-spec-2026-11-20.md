@@ -92,7 +92,7 @@ raiseLimit   = max(0, budget + raiseMoney − spend limit), in cents
 
 `RoomFor` has a pure part for the workflow, `SessionRoom(startsLeft int, timeLeft, T time.Duration, n int) (starts int, agentTime time.Duration)`, which leaves money out. `RoomFor` adds the money from `CaseFacts`.
 
-If the money is left out while the card cannot pay for a session to open (`CaseFacts.unfunded`, `factoryd/casefacts.go:280`), the press is refused, because time and starts alone would not let the card go on: "this card lacks the money to open a session: give the room with its money". With money left out on a card that can still open a session, the press raises the starts and the time it computes.
+If the money is left out while the card cannot pay for a session to open (`CaseFacts.unfunded`, `factoryd/casefacts.go:280`), the press is refused, because time and starts alone would not let the card go on: "this card lacks the money to open a session: give the room with its money". With money left out on a card that can still open a session, money does not limit `now` (as for a price of 0), so the press raises the starts and the time for the count asked, never nothing.
 
 **Worked examples (figures derived by hand).** Each card has T = 14 minutes and P = 1.20 EUR, from 42 minutes and 3.60 EUR over its 3 sessions.
 
