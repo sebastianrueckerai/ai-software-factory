@@ -40,8 +40,8 @@ Working notes of the director. Rebuild from here after a compaction.
 - Cost: 4 critic calls, about 0.12 USD of the 3 USD cap. No images generated.
 - What worked: injecting candidate markup into the real lab page (round 03's method) made each state cheap to draw; the critics split on the risky candidate, which is the point of two.
 
-## Open for Sebastian
+## Sebastian's pick (2026-11-20)
 
-1. The pick: A2 (recommended) or D2.
-2. The press on a hit cap only (the director's call), or from amber too, so a reset can come before the stop.
-3. The day and month caps once the press exists: the day cap went 150 to 300 only to keep going.
+A2, the press in the panel, with three changes: it reads "Reset", it stands on every cap's row at any time, and the strip always shows the day and the month, with any other limit only once it is hit. LiteLLM's backstop stays the absolute monthly limit and the panel shows it. The day cap went to 100 EUR (infra 8211676); the month cap goes to 800 EUR with the build. The decision is C47 in `design/design-decisions.md`.
+
+The spend on 2026-11-20 at 12:06 UTC: 0.00 EUR today, 1,238.61 EUR this month; LiteLLM's counter 1,238.59 of 1,875 USD.
