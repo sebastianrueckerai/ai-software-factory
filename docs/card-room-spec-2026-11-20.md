@@ -60,7 +60,8 @@ The human thinks in "a session's worth": the agent time and the money one sessio
 
 `SessionEstimate(f CaseFacts) (time time.Duration, eur float64, fromSessions int)` gives the agent time and the money of one session's worth on the card:
 
-- **After the card ran sessions:** the agent time is the card's agent time divided by its sessions. The money is its spend (`EnforcedSpent`) divided by its sessions. That spend holds the check-in, the review and the audit beside the sessions, so P is what the card spends per session with its gates, which is the money the room has to cover. `fromSessions` is the count of sessions, and the readout names it.
+- **After the card ran sessions:** "its sessions" is `Attempts`, which counts the sessions that got a model answer (`factoryd/workflow.go:1947-1956`). A session that ended without an answer adds its time and spend but no count, so the estimate then runs a little high, which errs towards more room. The workflow holds the same count, so `SessionRoom` needs no new read.
+- The agent time is the card's agent time divided by its sessions. The money is its spend (`EnforcedSpent`) divided by its sessions. That spend holds the check-in, the review and the audit beside the sessions, so P is what the card spends per session with its gates, which is the money the room has to cover. `fromSessions` is the count of sessions, and the readout names it.
 - **Before the first session:** the agent time is `AnswerSlice` of the card's sized agent-time cap, which is a quarter of the cap and at least 5 minutes. The money is the opening floor of the next session's model (`FloorEUR`). `fromSessions` is 0, and the readout calls these figures the policy's estimate.
 - **Floors:** the time is never below 5 minutes (`minSession`). The money is never below the opening floor of the next session's model, so a switch to a stronger model is priced at least at what its opening needs.
 
@@ -139,7 +140,7 @@ If the money is left out while the card cannot pay for a session to open (`CaseF
 
 ### 5.6 The line raise goes
 
-Delete the line raise end to end: the `lines` argument of `extend` and of the chat's `answer` tool, the form field, `TaskUsage.ExtraLines` and the column `tasks.extra_lines` (dropped by a migration), its copy into a successor (`factoryd/plan.go:4209`, `:4347`) and in `factoryd/activities.go:597`, its part in `EffectiveLineBound`, in `CheckinStopMark` and `RepeatAsk` (`factoryd/workflow.go:2732`) and in `watchLimits`' `/bound` post, and its words in `raisedWords` and the card digest. The bound is the size's bound (`cardLineBound`) and nothing else. Old event rows keep their `lines` key, and no reader shows it.
+Delete the line raise end to end: the `lines` argument of `extend` and of the chat's `answer` tool, the form field, `TaskUsage.ExtraLines` and the column `tasks.extra_lines` (dropped by a migration), its copy into a successor (`factoryd/plan.go:4209`, `:4347`) and in `factoryd/activities.go:597`, its part in `EffectiveLineBound`, in `CheckinStopMark` and `RepeatAsk` (`factoryd/workflow.go:2732`) and in `watchLimits`' `/bound` post, and its words in `raisedWords` and the card digest. The bound is the size's bound (`cardLineBound`) plus the lines of the plan's opened proofs (`TaskUsage.ProofLines`), which stay. Because the run sets the proof lines before the pod starts, no raise of the bound reaches a running session any more, and the `/bound` post in `watchLimits` and the worker's `/bound` handler (`cmd/agent-worker/message.go:102`) go too, unless another writer of the bound turns up. Old event rows keep their `lines` key, and no reader shows it.
 
 On 2026-11-20 no live card has a raised line bound: the 17 cards that got one are closed or done, and the last raise was on 2026-11-17. The plan checks this again before the migration runs.
 
@@ -159,7 +160,7 @@ On 2026-11-20 no live card has a raised line bound: the 17 cards that got one ar
   - as the answer on every ask about a card's resources: the session-cap and agent-time stops (`limit`), the money stop (`CaseBudgetFloor`), the check-in share stop, the repeated findings stop, the gate stop after a refused review, and a question of the agent's that waits at one of these caps (`atCap`).
 - **Its default** is 1. When a rung proposes room for a human to confirm, the control opens at the proposal's count and tick, marked with who proposes it.
 - **The chat's monthly budget** (`AnswerFundChat`) keeps its own action, because the chat has no sessions. It renders as the control's money line alone, in the same look, with the project's month readout.
-- **Facts:** the opened card and the press handler build the facts with the session estimate, the floor, the gate reserve and the project's money left. The press handler no longer passes empty facts (`console/actions.go:1345`). It builds the facts before it looks up the pressed key, because that lookup checks the key against `MoreOf`. The figures shown and the figures applied come from the same function.
+- **Facts:** `CardFacts` lacks the agent-time cap, the floor and the month's money (`factoryd/casefacts.go:423`). A new `Runner.RoomFacts(ctx, t Task) (CaseFacts, error)` adds them by the same readers `tripFacts` uses, plus a new field `CaseFacts.MonthLeftEUR`, and the console reads it through a new port wired in `cmd/factoryd/main.go`. Act's facts carry `MonthLeftEUR` too. The opened card and the press handler build the facts with it. The press handler no longer passes empty facts (`console/actions.go:1345`). It builds the facts before it looks up the pressed key, because that lookup checks the key against `MoreOf`. The figures shown and the figures applied come from the same function.
 - **Who may press:** an approver, as today (`console/actions.go:1316`).
 - **The rules of "Every card readable" hold:** the label comes from the one vocabulary, there is one effect line, the fields show only after the press, an asking face holds at most 4 answers, every text passes `writingguide.Lint`, and the face never shows the words rung, case or pool.
 
@@ -200,7 +201,6 @@ The control is one control, so it takes the condensed round of `design/process.m
 
 ## 8. Left to the builder
 
-- Whether `Attempts` counts the sessions the card ran, given refunds (`LastUncounted`, the refund of an attempt). If it does not, the estimate divides by the count of sessions that ran.
 - Where `SessionRoom`, `RoomFor` and `SessionEstimate` live inside `factoryd`, so the workflow can call `SessionRoom` deterministically.
 - How the runner moves the supervisor's wall-clock cap with a raise, following the check-in's `checkinExtra` (section 5.4).
 - The htmx route and the template shape of the readout, after the design round's pick.
