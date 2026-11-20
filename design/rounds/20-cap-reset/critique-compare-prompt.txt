@@ -1,0 +1,14 @@
+You compare two finalist designs for one control in a console that runs AI coding agents. Be concrete and critical.
+
+The situation. Spend caps per UTC day and per UTC month, in EUR. When the day cap is hit, every agent session waits until 00:00 UTC. The owner is one person. He keeps a sensible standing day cap (here 20.00 EUR) and wants one quick, safe press that restarts today's count from 0.00 EUR, so up to one more day cap may run today, without raising the standing cap. Only a human may press it. In the shots it is 14:02 UTC, the day cap is hit at 19.62 EUR, the month stands at 97.30 of 120.00 EUR. The top row is the thin status strip; clicking it opens the panel below.
+
+- A2: the press sits in the opened panel's Spend section, under the red "today" row ("Start today over"); the confirm opens inline there. The amber month row offers "Start the month over" the same way. After the press, the strip carries a quiet "↺ today from 14:02" cell and the panel a trace line.
+- D2: the press sits on the closed strip itself, right after the red day cell; the confirm opens as a box under the strip. After the press, the strip carries the same quiet cell.
+
+The images, in order: rest (desk, dark), confirm (desk, dark), after (desk, dark), confirm (desk, light), then phone (390 px, dark): A2 rest, A2 confirm, D2 rest, D2 confirm. In each desk sheet A2 is on top, D2 below.
+
+Judge on: speed from noticing the stop to work going again; safety (is the worst case plain before money moves?); how well each keeps the strip a calm read-only summary; the trace afterwards; craft (contrast, alignment, tap targets at 390 px, crowding). Check the pixels and name the place.
+
+Answer in JSON only:
+{"A2": {"speed": 1-10, "safety": 1-10, "calm": 1-10, "trace": 1-10, "craft": 1-10, "notes": "..."},
+ "D2": {...}, "pick": "A2|D2", "why": "...", "fixes": ["concrete fixes for the pick, each naming the place"]}

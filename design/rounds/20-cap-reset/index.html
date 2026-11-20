@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Round 20: start a cap's count over</title>
+<style>
+body { margin: 0 auto; max-width: 1480px; padding: 24px; font: 15px/1.55 system-ui, sans-serif; color: #1b2433; background: #fbfaf6; }
+h1 { font-size: 24px; margin: 0 0 6px; } h2 { font-size: 19px; margin: 36px 0 8px; } h3 { font-size: 16px; margin: 24px 0 6px; }
+p, li { max-width: 78ch; }
+img { display: block; max-width: 100%; border: 1px solid #d9d4c7; margin: 8px 0 16px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 12px; }
+table { border-collapse: collapse; margin: 8px 0 16px; font: 13px/1.4 ui-monospace, monospace; }
+td, th { border: 1px solid #d9d4c7; padding: 4px 8px; text-align: right; } th:first-child, td:first-child { text-align: left; }
+.rec { padding: 14px 18px; border-left: 4px solid #0a6a80; background: #eef5f6; }
+code { font-size: 13px; }
+</style>
+</head>
+<body>
+<h1>Round 20: a human starts a cap's count over</h1>
+<p>Condensed round, 2026-11-20. The <a href="brief.md">brief</a>, the <a href="references.md">references</a> (13 products), the <a href="notes.md">notes</a>. Candidates built in the console lab's fire scenario (<a href="candidates.js">candidates.js</a>, <a href="shoot.js">shoot.js</a>): the day cap of 20.00 EUR hit at 19.62 EUR, 14:02 UTC.</p>
+
+<div class="rec">
+<h2 style="margin-top:0">Recommendation: A2, "Start today over" in the panel. Runner-up: D2</h2>
+<ul>
+<li><b>The press.</b> The cap counts spend from the press on; the standing cap in policy.yaml stays. The worst case is one more cap's worth before the period turns. The same press serves the day cap ("Start today over"), the factory's month cap and a project's month cap ("Start the month over").</li>
+<li><b>Its place.</b> On a hit (red) row of the panel's Spend section, nowhere else. An amber row offers no press, so the month's far larger reset never sits next to the day's by accident. The red day cell on the closed strip is the way in: its click opens the panel, as today.</li>
+<li><b>The check.</b> One inline confirm that names the money, the period's end and what stays: "Today's count starts again from 0.00 EUR. Up to 20.00 EUR more may be spent before 00:00 UTC, in 9 h 58 min. The day cap stays 20.00 EUR; the month cap still holds." The primary button repeats the worst case: "Start over: up to 20.00 EUR more".</li>
+<li><b>The trace.</b> Until the period turns, the strip carries a quiet cell "↺ today from 14:02", and the panel says who pressed it when, what was spent before and what in all today. The costs page lists every reset.</li>
+<li><b>The waiting cards</b> name the press instead of a policy commit: "Start today over in the status panel to resume it sooner, or it resumes at 00:00 UTC."</li>
+<li><b>Human only.</b> A console form behind a human's session and CSRF token. The day and the factory month need a human who writes the factory; a project's month cap needs one of its approvers. No chat tool, no MCP tool, no rung of the ladder. Agents read resets; they cannot make one.</li>
+</ul>
+<p>The reference: rest, confirm and after, dark then light (<a href="shots/a3-reference/">shots/a3-reference/</a>).</p>
+<img src="reference.png" alt="the recommendation at rest, in confirm and after, both themes">
+<p>Why not the others: B (lift the day cap until 00:00) leaves only the month cap as a bound, today 1,500 EUR, so one press could let a loop spend most of a month in a day. C (allow an amount) asks for a number at the moment the owner wants none; its default is A anyway. D2 is one press faster but turns the read-only strip into a control panel, crowds it at 390 px, and its box covers the board.</p>
+</div>
+
+<h2>The compare pass: A2 against D2</h2>
+<table>
+<tr><th>critic</th><th>A2 speed</th><th>safety</th><th>calm</th><th>trace</th><th>craft</th><th>D2 speed</th><th>safety</th><th>calm</th><th>trace</th><th>craft</th><th>pick</th></tr>
+<tr><td>Gemini 2.5 Pro</td><td>6</td><td>7</td><td>10</td><td>10</td><td>8</td><td>9</td><td>9</td><td>3</td><td>5</td><td>4</td><td>A2</td></tr>
+<tr><td>GLM 5V Turbo</td><td>6</td><td>9</td><td>10</td><td>9</td><td>8</td><td>9</td><td>8</td><td>3</td><td>6</td><td>5</td><td>A2</td></tr>
+</table>
+<h3>Rest, confirm, after (desk, dark): A2 on top, D2 below</h3>
+<img src="compare-rest-desk-dark.png" alt="A2 and D2 at rest, the day cap hit">
+<img src="compare-confirm-desk-dark.png" alt="A2 and D2 after the first press">
+<img src="compare-after-desk-dark.png" alt="A2 and D2 after the press took effect">
+<img src="compare-confirm-desk-light.png" alt="A2 and D2 confirm, light theme">
+<h3>Phone, 390 px</h3>
+<img src="compare-phone-dark.png" alt="A2 and D2 at rest and confirm at phone width">
+
+<h2>Loop 1: four candidates</h2>
+<table>
+<tr><th>critic</th><th>A</th><th>B</th><th>C</th><th>D</th><th>pick</th><th>runner-up</th></tr>
+<tr><td>Gemini 2.5 Pro (speed/safety/model/trace/craft)</td><td>5/9/9/8/9</td><td>5/9/8/10/9</td><td>3/4/5/6/6</td><td>10/9/9/8/2</td><td>B</td><td>A</td></tr>
+<tr><td>GLM 5V Turbo</td><td>8/9/10/10/9</td><td>7/3/5/8/6</td><td>4/10/8/8/5</td><td>9/8/10/6/7</td><td>A</td><td>D</td></tr>
+</table>
+<p>Overruled: Gemini's pick of B and its safety 9 for it. Lifting the day cap removes the bound the owner keeps the cap for; GLM's 3 is right. Gemini's "D's phone confirm is broken, showing an unrelated panel": the box shows and works, but it covers the strip's second row, the month figure included; that part stood and D2 moved the box below the strip. GLM's amber "override active" banner: amber already means "close to the cap" here, and the trace text passes 4.5:1 in both themes. Kept: a confirm button that names the money (GLM), the risk of the month's press beside the day's (Gemini, compare pass).</p>
+<h3>Rest</h3><img src="contact-rest-desk-dark.png" alt="four candidates at rest">
+<h3>Confirm</h3><img src="contact-confirm-desk-dark.png" alt="four candidates after the first press">
+<img src="contact-confirm-phone-dark.png" alt="four candidates' confirm at phone width">
+<h3>After</h3><img src="contact-after-desk-dark.png" alt="four candidates after the press took effect">
+<img src="contact-after-desk-light.png" alt="four candidates after, light theme">
+
+<h2>Before: code main</h2>
+<div class="grid"><img src="shots/before/rest-desk-dark.png" alt="code main, panel open, dark"><img src="shots/before/rest-desk-light.png" alt="code main, panel open, light"></div>
+</body>
+</html>

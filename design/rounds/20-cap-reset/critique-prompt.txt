@@ -1,0 +1,29 @@
+You judge four candidate designs for one control in a console that runs AI coding agents. Be concrete and critical; do not flatter.
+
+The situation. The console has spend caps per UTC day and per UTC month, in EUR, set in a policy file. When the day cap is hit, every agent session waits until 00:00 UTC. The owner is one person. He wants a sensible standing day cap (here 20.00 EUR), and on a day when he wants work to go on, one quick, safe press that lets it go on today without raising the standing cap for good. Only a human may press it; no agent can. In the shots it is 14:02 UTC, the day cap is hit at 19.62 EUR (the gateway refuses calls before spend reaches the cap exactly), and the month stands at 97.30 of 120.00 EUR.
+
+The top row is the console's thin status strip; clicking it opens the panel below it (SPEND, PRODUCTION, FACTORY). Red is a hit cap, amber a cap close to its limit.
+
+The candidates:
+- A. "Start today over": in the panel's Spend row, a press that restarts today's count from 0.00 EUR. The cap stays 20.00 EUR, so up to another 20.00 EUR may run today.
+- B. "Lift until 00:00 UTC": in the panel, a press that switches the day cap off until the day turns. Only the month cap bounds spend for the rest of the day.
+- C. "Allow more today": in the panel, a press that opens an amount (default one day cap, chips 5 / 10 / 20) to add for today only.
+- D. Same effect as A, but the press sits on the closed strip, right after the red day cell, and its confirmation opens as a small box under it, without opening the panel.
+
+The images, in order:
+1. Rest state, the cap hit, desk width, dark theme: A, B, C, D from top to bottom.
+2. Confirm state after the first press, desk, dark.
+3. After state, the press took effect, desk, dark.
+4. Confirm state at phone width (390 px), dark: A, B, C, D from left to right.
+
+Judge each candidate on:
+1. Speed: how fast the owner gets work going again from the moment he notices the stop, in presses and in eye travel.
+2. Safety: does the confirm state make the worst case plain (how much more money, until when, what stays)?
+3. Mental model: does the wording match "start today's count over, the cap stays" without ambiguity?
+4. The trace: after the press, can the owner (and later a reader) see that an override is in force, who pressed it and when, and what was spent in all today?
+5. Craft: contrast, alignment, hierarchy, tap targets on the phone (44 px), cut or crowded text. Check the pixels; name the place.
+
+Answer in JSON only:
+{"scores": {"A": {"speed": 1-10, "safety": 1-10, "model": 1-10, "trace": 1-10, "craft": 1-10, "notes": "..."}, "B": {...}, "C": {...}, "D": {...}},
+ "pick": "A|B|C|D", "runner_up": "A|B|C|D", "why": "...",
+ "fixes": ["numbered, concrete fixes for the pick, each naming the place in the image"]}
