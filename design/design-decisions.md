@@ -469,7 +469,7 @@ From round 20 ([design/rounds/20-cap-reset/](rounds/20-cap-reset/index.html)), f
 
 **The strip.** The day cell and the month cell always show: amber from 80 percent, red once the cap is hit. A cap is hit when the gateway refused a call at it since the period began or since the newest reset, or when its count reaches the cap. Any other limit shows on the strip only once it is hit, as one alert cell in `--st-failed`: the premium cap, the judgment budget, the escalation pool drawn out, and LiteLLM's backstop. The pool's standing words leave the strip for the panel. The strip stays one slim row at the desk and wraps at 390 px as it does today.
 
-**The backstop.** LiteLLM's proxy-wide `max_budget` (1,875 USD a month on 2026-11-20) stays the absolute monthly limit, and no reset passes it. The panel shows it as its own row with its gauge, read from LiteLLM: "LiteLLM backstop 1,238.59 of 1,875.00 USD". A human raises it by a commit in the infrastructure repository.
+**The backstop.** LiteLLM's proxy-wide `max_budget` (1,875 USD a month on 2026-11-20) stays the absolute monthly limit, and no reset passes it. The panel shows it as its own row with its gauge, read from LiteLLM: "LiteLLM backstop 1238.59 of 1875.00 USD". A human raises it by a commit in the infrastructure repository.
 
 **The caps.** The day cap went to 100 EUR on 2026-11-20. The month cap goes to 800 EUR with the build of Reset, so the month's count of November can be reset at once.
 
