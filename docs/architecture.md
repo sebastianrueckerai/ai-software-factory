@@ -865,10 +865,13 @@ with backoff and ran no cooldown. The measurement gave 9 of 9 on each
 tier (p50 4.2, 5.2 and 4.3 s). DeepSeek, z.ai and Groq left the release,
 and their key secrets left the cluster. Until the switch at 00:56Z on
 2026-09-30, the Stage 10 run spent on all three providers. LiteLLM also
-holds a proxy-wide budget of 680 USD a month (`litellm_settings.max_budget`,
-reset on the 1st at 00:00 UTC), 1.25 times `budget.month_eur` and the
-backstop behind the factory's month cap (5.4); its refusal names no entity, and the gateway reads it as the month
-cap.
+holds a proxy-wide budget a month (`litellm_settings.max_budget`, 1,875 USD
+on 2026-11-20, reset on the 1st at 00:00 UTC), at least 1.25 times
+`budget.month_eur` and the backstop behind the factory's month cap (5.4).
+It counts the month's whole spend, so a human's reset of the month's count
+does not move it: it is the absolute monthly limit, which the status panel
+shows beside the caps. Its refusal names no entity, and the gateway reads it
+as the month cap.
 
 Since 2026-10-20 the router retries a failed call twice with backoff on the
 same deployment. Since 2026-11-01 a fallback list stands behind `big` and
@@ -2062,6 +2065,35 @@ missing value fails closed. Proven live with a window at 18 EUR against
 September's 18.26: a planted task parked at spend 0 with the card, and the
 infra issue was filed. The 50 and 80 percent alerts were not seen, since
 the window jumped past them.
+
+**A human's reset of a cap's count** (C47). A human restarts the count of
+the day cap, the factory's month cap or a project's month cap from the
+console's status panel, at any time, with one press and an inline confirm
+that names the most that may still run before the period turns. The cap in
+the policy does not change. The reset is a row in `cap_resets` (the cap, the
+project's repository for a project cap, the time, the human's login and the
+count at the press), and every expression that counts spend against a cap
+counts the ledger rows booked since the newest reset in the cap's UTC
+period, so the gateway, factoryd and the console count alike. A late
+settlement of a task that finished before the reset stays out of the new
+count, and so does a negative one of a task that booked spend before the
+reset, so the new count never falls below the spend since the press and a
+reset never gives more than one cap's worth. A reset names the newest reset
+its panel showed, and a press on a count that another human reset since is
+refused with the name and the time of that reset. The day cap and
+the factory's month cap need a human who writes the factory's code, a
+project's month cap one of the project's approvers. The press is a console
+form behind a human's session and its CSRF token: the chat, the MCP door and
+the ladder's rungs have no tool for it, and a test fails any agent tool
+whose name holds "reset" but the board filter's. A reset wakes every card
+that waits on a cap, as a policy load does, and a wait whose refusal came
+under the policy in force resumes once a reset of its cap followed the
+refusal. The month alarm counts from the reset too: a reset closes the
+month cap's card, and each count gets its own 50, 80 and 100 percent alerts.
+The strip shows ↺ on a cap whose count was reset, the panel names who reset
+it, when, and the spend before and in all, and the costs page lists the
+resets of its window. LiteLLM's backstop counts the whole month and no reset
+passes it.
 
 **The premium cap**. `budget.premium_month_eur` caps the calls on
 the `premium` class in the UTC calendar month: its ledger rows since the 1st
@@ -5835,4 +5867,5 @@ works `factory` and `demo-app`.
 | Protected files | Manifests, lockfiles, agent instruction files, `CODEOWNERS` and top-level dot files, which rank `high` in the policy gate |
 | Stricter wins | The rule that a project file may only tighten the policy's defaults and caps |
 | Month cap | `budget.month_eur`: the variable spend of every project and the factory in one UTC month; a task that meets it parks at a human card |
+| Cap reset | A human's restart of the day cap's, the month cap's or a project's month cap's count from the status panel; the cap stays, and no agent can press it (5.4) |
 | Premium cap | `budget.premium_month_eur`: the spend on the pay-per-token `premium` class in one UTC month; a premium call past it runs on `big` |
