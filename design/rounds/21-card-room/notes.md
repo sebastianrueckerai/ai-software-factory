@@ -32,7 +32,7 @@ At count 3 the ahead-of-time card shows every line: target 4 sessions' worth, so
 
 ## Recommendation
 
-D2, five buttons and the table. Runner-up A2, the stepper and labelled rows. The reasons are on the round page. Sebastian picks; no C-entry before his pick.
+D2, five buttons and the table. Runner-up A2, the stepper and labelled rows. The reasons are on the round page. Sebastian picks; no C-entry before his pick. On 2026-11-22 he said "carry on" without naming a pick, so D2 stands as the provisional pick, C48, and his own pick overrides it.
 
 What the build of D2 takes beyond the CSS: the readout becomes rows of left, adds and then plus the notes, rendered by the server's fragment; the fragment draws the tick with its state from the query; five radios named `extend.sessions` replace the number field; the chat's budget ask needs a readout of its own for its "then" figure. The field names, the guard, the route and the refusal of a moved readout stay.
 

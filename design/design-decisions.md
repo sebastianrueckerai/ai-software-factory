@@ -474,3 +474,23 @@ From round 20 ([design/rounds/20-cap-reset/](rounds/20-cap-reset/index.html)), f
 **The caps.** The day cap went to 100 EUR on 2026-11-20. The month cap goes to 800 EUR with the build of Reset, so the month's count of November can be reset at once.
 
 Not taken: B, lift the day cap until 00:00 UTC (only the month cap bounds the day), C, allow an amount (a number at the moment the owner wants none), and D2, the press on the strip (it makes the read-only strip a control and crowds it at 390 px).
+
+## C48. "Give more room" sets its count with five buttons and shows time and money as a table of left, adds and then (2026-11-22, the director, provisional)
+
+From round 21 ([design/rounds/21-card-room/](rounds/21-card-room/index.html)), four candidates built in the console lab, two critics in a first loop and a compare loop. The pick is D2, the round's recommendation. Sebastian named no pick and said "carry on" on 2026-11-22, so the recommendation stands as a provisional pick, and his own pick overrides it. The runner-up is A2: a stepper, and the readout as rows with a short label at their left.
+
+**The count.** Five buttons in one row, 1 to 5, under the label "Sessions' worth". One press sets any count. They are radios named `extend.sessions`, one of them always chosen, so the arrow keys move along them and a blank count cannot be sent. The chosen button takes C46's pressed outline in `--need` with a light amber fill, and a button in focus takes the 2 px ring in `--focus`. The buttons are 32 px high at the desk. At 390 px the row fills the width and each button is 44 px high. One session's worth stands beside them, from the server: "Each is about 14 min and 1.20 EUR, from its 3 sessions so far.", or before the first session "Each is about 15 min and 0.80 EUR, the policy's estimate before its first session."
+
+**The readout.** Agent time and money form a table with the columns left, adds and then. The headers are small capitals in `--text-faint`, 5.2:1 in the dark theme and 5.5:1 in the light theme on the drawer. The figures are mono and right-aligned. What is left reads in `--text-muted`, the add in bold `--text`, and what the card then has in `--text`. A figure of 0 or below reads "none". When the press adds nothing, the adds cell says why in the interface font: "enough", or "left out" for money the human leaves out. "Then" equals what is left in both cases. The server writes every cell, and it writes the readout again on every change of the count or the tick.
+
+**The tick.** The money row's first cell is the tick, labelled "Money", a 44 px target on the phone. It is set when the card lacks money for the count and clear when the money is enough. The server draws it in the readout with its state from the query, so a new readout keeps it, and the focus stays on it.
+
+**The spend limit and the starts.** The spend limit is not a row of the table, because its figure is a limit, not what is left. When it rises it is the first line under the table, in `--text`: "The spend limit rises from 8.00 to 8.70 EUR first." The starts follow in `--text-muted`, only when they rise: "It may also start 3 more sessions." The project's money left this month comes last, in `--text-faint`. A press that the card cannot take shows the refusal in place of the table, with the tick under it.
+
+**The chat's budget ask.** "Add money to the chat" opens the same table with one row, Money: what the chat has left, the EUR field in the adds column ("adds, EUR"), and what the chat then has, which the server writes again as the human types. The project's month line stands under it.
+
+**Where it shows.** Among the opened card's "Other actions" on every live agent card, and as the answer on every ask about a card's resources: the session cap, the agent time cap, the money stop, the check-in's share, the repeated findings, the gate stop after a refused review, and a question of the agent's that waits at one of these caps. A proposal opens the control at its count and its tick, marked with who proposes it.
+
+**What stays.** The answer's label, its effect line and the one amber Send. The fields only after the press. The guard of the room the readout showed, the readout's route and the refusal of a press whose readout moved.
+
+Not taken: A2, the stepper (5 takes four presses, and its figures stand inside sentences), B, the readout as sentences (its five buttons went into D2), C, one sentence with the count as a choice inside (its paragraph hides the figures), and D, a number field (B's buttons replaced it), with the spend limit as a table row (its "left" cell held a limit).
