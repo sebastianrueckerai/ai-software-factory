@@ -1,0 +1,34 @@
+You judge four candidate designs for one control in a console that runs AI coding agents. Be concrete and critical; do not flatter.
+
+The situation. Each piece of work is a card. A card has a cap on its sessions, a cap on its agent time and a money budget in EUR. The control "Give more room" gives a card more of all three at once, counted in "sessions' worth": one session's worth is this card's own average session so far (here about 14 min and 1.20 EUR, from its 3 sessions). The human picks a count from 1 to 5 (it opens at 1) and presses Send. The server works out what each resource lacks for that count and shows it as a readout, read again from the server on every change of the count or the tick; the browser computes no figure. Money comes with a tick: set when the card lacks money, and the human can clear it, so the press then gives time and starts but no money. When the money would pass the card's spend limit, the limit rises first. The human should accept the default without typing.
+
+The readout's lines, in order: one session's worth and its source; time (what the press adds, what is left, what the card then has, or "enough"); money with its tick (the same three figures, "enough", or left out); the spend limit, only when it rises; the starts, only when they rise; the project's money left this month.
+
+The control shows in three places: (1) ahead of time, among the opened card's "Other actions" on a running card; (2) at the money stop, as the first answer on the card's question; (3) on the chat's monthly budget question, which has no sessions: there only the money line shows, with an EUR field, and the month line. The button "Give more room", its effect line at its right, and the amber Send button are fixed; so are the theme colours.
+
+The candidates:
+- A. A stepper (minus, the count, plus) with "1 to 5". The readout as rows, each with a short small-caps label at its left (per session, time, money with its tick, spend limit, starts, this month).
+- B. Five buttons 1 to 5 as one segmented row, one session's worth beside them. The readout as sentences with what the press adds in bold; the tick sits in the gutter of the money sentence, and the whole sentence is the tick's label.
+- C. A sentence, "Give [3] sessions' worth, [tick] with its money.", the count a native choice inside it. The readout as one paragraph.
+- D. A small number field, one session's worth beside it. Time and money (and the spend limit when it rises) as a table with the columns left, adds, then; the starts and the month as notes under it.
+
+The images, in order:
+1. Ahead of time at count 3 (the fullest readout: the spend limit and the starts rise), desk width 1440 px, dark theme. A top left, B top right, C bottom left, D bottom right.
+2. The same, light theme.
+3. Ahead of time at count 2 with the money tick cleared, desk, dark. Same order.
+4. The money stop at count 1, desk, dark. Same order.
+5. The chat's budget question, desk, light. Same order.
+6. Phone width (390 px), ahead of time at count 3, dark: A, B, C, D from left to right.
+7. The count control alone at 3x, dark row on top, light row below: A, B, C, D from left to right.
+
+Judge each candidate on:
+1. Count: how fast and how safely a human sets 1 to 5, by mouse, keyboard and touch; is the range plain?
+2. Readout: does the eye find first what the press adds, then what the card then has? Do the spend limit line and the starts line read plainly, and does the control jump when they appear?
+3. Tick: does the tick read as "this money, on this line"? Does the cleared state read plainly?
+4. Places: does one look carry the three places, the chat's money line alone included?
+5. Craft: contrast, alignment, hierarchy, tap targets of 44 px on the phone, crowded or cut text. Check the pixels and name the place.
+
+Answer in JSON only:
+{"scores": {"A": {"count": 1-10, "readout": 1-10, "tick": 1-10, "places": 1-10, "craft": 1-10, "notes": "..."}, "B": {...}, "C": {...}, "D": {...}},
+ "pick": "A|B|C|D", "runner_up": "A|B|C|D", "why": "...",
+ "fixes": ["numbered, concrete fixes for the pick and the runner-up, each naming the candidate and the place in the image"]}
