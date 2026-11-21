@@ -147,19 +147,19 @@ On 2026-11-20 no live card has a raised line bound: the 17 cards that got one ar
 ### 5.7 The control on the console
 
 - **The vocabulary row** `ActExtend` (`factoryd/faces_copy.go:117`) becomes "Give more room", with a field `sessions` (a count from 1 to 5) and a field `money` (a tick). The rows of `ActFund` and `ActRaiseCeiling` go. The design round may change the label.
-- **The readout** is a fill of the face register, built from the card's facts, the count and the tick:
-  1. One session's worth: "About 14 min and 1.20 EUR per session, from its 3 sessions so far", or "About 15 min and 0.80 EUR per session, the policy's estimate before its first session".
-  2. Time: "Adds 24 min: 18 min left, then 42 min", or "Enough: 30 min left".
-  3. Money, with its tick: "Adds 1.50 EUR: 2.10 EUR left, then 3.60 EUR", or "Enough: 2.10 EUR left". When the spend limit must rise: "The spend limit rises from 7.00 to 7.50 EUR first."
-  4. Starts, only when they rise: "It may also start 2 more sessions."
+- **The readout** is the table that C48 picked, built from the card's facts, the count and the tick:
+  1. Above the table, beside the count, one session's worth with its source: "Each is about 14 min and 1.20 EUR, from its 3 sessions so far.", or "Each is about 15 min and 0.80 EUR, the policy's estimate before its first session."
+  2. The table has the rows Agent time and Money and the columns left, adds and then. Agent time: 18 min left, adds 24 min, then 42 min. Money: 2.10 EUR left, adds 1.50 EUR, then 3.60 EUR. When the press adds nothing, the adds cell says why: "enough" (30 min left, then 30 min), or "left out" for money the human leaves out. A figure of 0 or below reads "none". The money row carries the tick.
+  3. Under the table, the spend limit line, only when the limit rises: "The spend limit rises from 7.00 to 7.50 EUR first."
+  4. The starts line, only when they rise: "It may also start 2 more sessions."
   5. The project's money left this month: "The project has 41.20 EUR left this month."
-- **The tick** of the money line is set when `raiseMoney` is above 0, and clear when the money is enough.
+- **The tick** in the money row is set when `raiseMoney` is above 0, and clear when the money is enough.
 - **When the count or the tick changes,** htmx asks the server for the readout again, so no figure is worked out in the browser. The control needs JavaScript, as the drawer that holds it does.
 - **Where the control shows:**
   - among the opened card's other actions on every live agent card (`MoreOf`, `factoryd/faces.go:569`), in place of "Allow more sessions" and "Add money";
   - as the answer on every ask about a card's resources: the session-cap and agent-time stops (`limit`), the money stop (`CaseBudgetFloor`), the check-in share stop, the repeated findings stop, the gate stop after a refused review, and a question of the agent's that waits at one of these caps (`atCap`).
 - **Its default** is 1. When a rung proposes room for a human to confirm, the control opens at the proposal's count and tick, marked with who proposes it.
-- **The chat's monthly budget** (`AnswerFundChat`) keeps its own action, because the chat has no sessions. It renders as the control's money line alone, in the same look, with the project's month readout.
+- **The chat's monthly budget** (`AnswerFundChat`) keeps its own action, because the chat has no sessions. It renders as the table's Money row alone, in the same look, with its EUR field in the adds column and the project's month line under it.
 - **Facts:** `CardFacts` lacks the agent-time cap, the floor and the month's money (`factoryd/casefacts.go:423`). A new `Runner.RoomFacts(ctx, t Task) (CaseFacts, error)` adds them by the same readers `tripFacts` uses, plus a new field `CaseFacts.MonthLeftEUR`, and the console reads it through a new port wired in `cmd/factoryd/main.go`. Act's facts carry `MonthLeftEUR` too. The opened card and the press handler build the facts with it. The press handler no longer passes empty facts (`console/actions.go:1345`). It builds the facts before it looks up the pressed key, because that lookup checks the key against `MoreOf`. The figures shown and the figures applied come from the same function.
 - **Who may press:** an approver, as today (`console/actions.go:1316`).
 - **The rules of "Every card readable" hold:** the label comes from the one vocabulary, there is one effect line, the fields show only after the press, an asking face holds at most 4 answers, every text passes `writingguide.Lint`, and the face never shows the words rung, case or pool.

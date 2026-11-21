@@ -475,9 +475,9 @@ From round 20 ([design/rounds/20-cap-reset/](rounds/20-cap-reset/index.html)), f
 
 Not taken: B, lift the day cap until 00:00 UTC (only the month cap bounds the day), C, allow an amount (a number at the moment the owner wants none), and D2, the press on the strip (it makes the read-only strip a control and crowds it at 390 px).
 
-## C48. "Give more room" sets its count with five buttons and shows time and money as a table of left, adds and then (2026-11-22, the director, provisional)
+## C48. "Give more room" sets its count with five buttons and shows time and money as a table of left, adds and then (2026-11-21, the director, provisional)
 
-From round 21 ([design/rounds/21-card-room/](rounds/21-card-room/index.html)), four candidates built in the console lab, two critics in a first loop and a compare loop. The pick is D2, the round's recommendation. Sebastian named no pick and said "carry on" on 2026-11-22, so the recommendation stands as a provisional pick, and his own pick overrides it. The runner-up is A2: a stepper, and the readout as rows with a short label at their left.
+From round 21 ([design/rounds/21-card-room/](rounds/21-card-room/index.html)), four candidates built in the console lab, two critics in a first loop and a compare loop. The pick is D2, the round's recommendation. Sebastian named no pick and said "carry on" on 2026-11-21, so the recommendation stands as a provisional pick, and his own pick overrides it. The runner-up is A2: a stepper, and the readout as rows with a short label at their left.
 
 **The count.** Five buttons in one row, 1 to 5, under the label "Sessions' worth". One press sets any count. They are radios named `extend.sessions`, one of them always chosen, so the arrow keys move along them and a blank count cannot be sent. The chosen button takes C46's pressed outline in `--need` with a light amber fill, and a button in focus takes the 2 px ring in `--focus`. The buttons are 32 px high at the desk. At 390 px the row fills the width and each button is 44 px high. One session's worth stands beside them, from the server: "Each is about 14 min and 1.20 EUR, from its 3 sessions so far.", or before the first session "Each is about 15 min and 0.80 EUR, the policy's estimate before its first session."
 
