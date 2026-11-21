@@ -27,7 +27,12 @@ What already works and stays:
 - Once a minute, a pass reads every case with status `at_human` whose kind's `Rung0` list holds a row with `Fire` (`cases.go:114-162`, `ladder.go:102-171`). It skips every other case without reading its facts.
 - For each such case it reads the facts as `OpenTrip` reads them, then runs the same rung 0 checks as `rungZero` (`ladder.go:1049-1100`): facts read partly take nothing, a stop that came back takes nothing, and `Act` applies its own refusals (for example `WaitedOnHead`, `actions.go:867-868`). It runs only the `Fire` rows. A `Hold` row acts by itself and does not run again.
 - If a row fires, `Act` carries it out on rung 0, as it does when the case climbs. The case ends `resolved` by the factory on rung 0. The human's open rung 3 step ends. The card's run resumes as it does when rung 0 takes the case before the face.
-- The human gets the same record as a withdrawal: each inbox thread reads "<Card> needs you no more: <reason>." The Discord message of the ask is edited. The reason names the rule's finding in words, for example "every check on head 1a2b3c4 is green, so the factory resumed the checks wait".
+- The human gets the same record as a withdrawal. `Act` writes the answer as `question_withdrawn`, not `question_answered`, so:
+  - each inbox thread reads "<Card> needs you no more: <reason>.";
+  - the Discord message of the ask is edited to end "withdrawn · HH:MM".
+
+  The reason names the rule's finding in words, for example "every check on head 1a2b3c4 is green, so the factory resumed the checks wait". If the line passes the notice's 160 characters, the card keeps its number and drops its title. Only past that does the reason go.
+- The issue gets the note "This card withdraws its question above because <reason>. It needs no answer." The note goes exactly where the face posted the question as a comment (`facesByComment`, and the case has a face comment). All three withdrawals at the human post it this one way: rung 0's re-take, the monitor's withdrawal of a flag, and the run's `withdrawQuestion`.
 - A pass that takes nothing writes nothing: no step, no event, no log line per case.
 - Rungs 1 and 2 still never answer a case at the human.
 
@@ -52,9 +57,12 @@ It counts the cases rung 0 took from the human. Compare it with the checks' gree
 
 **Behaviour.**
 - Every path that ends a card `closed` stores a reason in `closing_reason`. The paths include `CloseTask` (`store.go:2545`), `CloseClearedCard` (`alerts.go:276-290`), the issue close in intake (`intake.go:874`), `activities.go:3107`, `act.go:336`, `act.go:1388`, `grouprevert.go:598` and `deps.go:444/510`. Find every other path that writes status `closed`.
-- If the factory closed the card's issue, the reason is the body of its `factory_closed` row, the first sentence. If a human closed the issue in Forgejo, the reason is "closed in Forgejo by <login>". A card with no issue that the heal ends on its `factory_closed` record takes that record's body.
-- A migration fills `closing_reason` for cards already closed with an empty reason or "issue closed without merge", from their `factory_closed` row where one exists. Old links then open cards that say why.
-- The card face of a `closed` card reads "closed: <reason>", as a `failed` card reads "failed: <reason>". The board reads the reason from the card's stored `closing_reason`, not from its newest event.
+- A card ends `closed` through `EndClosed` alone, and `TransitionTask` refuses `closed`. A path whose own reason is empty or starts with "issue closed" takes the reason from the card's records, in this order:
+  1. The newest close answer: "closed by <who>: <the first sentence of the note>", or "closed by <who>" with no note. Act's Close and the console's Close write it as a `close_answer` intake row before they close the issue or signal the run, so an end the close drives finds it. A close that fails deletes its row.
+  2. The first sentence of the factory's newest `factory_closed` body. An older body's lead "factoryd: task <id> closed: " is taken off. A body that only says "It no longer waits on #N." counts as none.
+  3. "closed in Forgejo by <login>" for a human's close of the issue.
+- A migration fills the reason of cards already closed with an empty reason or one that starts with "issue closed", from the same sources. Old cards have no `close_answer` rows, so the migration reads the `card_closed` and `question_answered` events for source 1. On 2026-11-20 it gave 296 cards a reason, and 83 had no source.
+- A closed card's face reads "closed: <reason>", or the reason alone when it starts with "closed " ("closed by sebastian: …"). The board reads the stored `closing_reason`. Failed cards stay as they are, because 5 of the 12 failed in the 14 days store no reason.
 
 **Tests (hand-derived).**
 - One table row per close path: the card ends `closed` with the expected reason.
@@ -62,12 +70,10 @@ It counts the cases rung 0 took from the human. Compare it with the checks' gree
 - The migration fills a closed card with an empty reason from its `factory_closed` row, and leaves a card with its own reason unchanged.
 - The drawer opened by `#card=<id>` for a closed card shows "closed: <reason>".
 
-**Live check.** After the roll, no card closed since the roll lacks a reason, and the migration filled the old ones:
+**Live check.** After the roll, no card closed since the roll lacks a reason:
 
 ```sql
-select count(*) from tasks where status = 'closed' and coalesce(closing_reason, '') = '' and closed_at > :rolled_at;
-select count(*) from tasks t where t.status = 'closed' and coalesce(t.closing_reason, '') in ('', 'issue closed without merge')
-  and exists (select 1 from intake_events e where e.task_id = t.id and e.kind = 'factory_closed');
+select count(*) from tasks where status = 'closed' and coalesce(closing_reason, '') = '' and finished_at > :rolled_at;
 ```
 
-Both read 0. If the tasks table has no `closed_at`, use the time of the card's `task_ended` event.
+It reads 0. The backfill's own SELECT, counted, also reads 0 after the migration; it read 296 before.
