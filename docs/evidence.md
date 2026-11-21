@@ -99,7 +99,7 @@ One dial sets what asks, and money beyond a budget always reaches a human.
 | Four autonomy levels, each removing named confirms | `internal/policy/policy.go` (ConfirmFor) | `internal/policy/autonomy_test.go`, `internal/console/autonomy_test.go` | Scene 25: the dial moved to full auto |
 | Forbidden paths and migrations stay human at every level | `internal/policy/risk.go`, `internal/factoryd/gates.go` | `internal/policy/risk_test.go`, `internal/factoryd/workflow_gates_test.go` | Every merge of every stage run (section 4) |
 | Every ask gets one model attempt, recorded, before a human sees it | `internal/console/analysis.go` (attach_analysis), `internal/console/chat_tools.go` (ask, escalate) | `internal/console/analysis_test.go` | not yet |
-| Money beyond a card's budget comes from a named pool or asks a human | `internal/policy/policy.go` (FundCard), `internal/console/chat_tools.go` (fund) | `internal/console/fund_test.go`, `internal/console/chat_fund_test.go` | Scene 24: three asks answered from the phone view |
+| Money beyond a card's budget comes from a named pool or asks a human | `internal/factoryd/actions.go` (ActExtend), `internal/console/chat_tools.go` (give_room) | `internal/console/fund_test.go`, `internal/console/chat_fund_test.go` | Scene 24: three asks answered from the phone view |
 
 ## 10. The sandbox is the guardrail
 

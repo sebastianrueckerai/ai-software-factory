@@ -1223,7 +1223,7 @@ activity `SessionAnswered` reads the gateway's ledger and writes the
 no number. A session starts only when `SessionFunded` finds its opening calls
 and the floor of its rung (`budget.session_floor_cheap_eur` and
 `budget.session_floor_frontier_eur`) free, and the question names the amount; the
-console's Fund posts its note as the answer, and every wait for a human adds the
+console's Give more room posts its note as the answer, and every wait for a human adds the
 change requests that answered it to the next session's findings. A card filed on
 the strong rung gets at least the medium budget. Answers carry their date and
 the question, and stand below the findings in the brief; a dead session leaves
@@ -1761,7 +1761,7 @@ Besides its `version`, `policy.yaml` holds eleven sections:
   wins, so the new-card form's size select beats a size word in the text.
   The sizing step sets the size of a card a person or the chat files. It
   also sets the budget to the size's, when the card still holds its
-  filing's budget, so a `Budget:` line or a fund keeps its value. A small
+  filing's budget, so a `Budget:` line or a room given keeps its value. A small
   card got 2 EUR until 2026-10-30, when decision 7 of roadmap 336 made it
   4. The maximum is 15 from Stage 16 on.
 - `classes`: per capability class, the allowed model aliases and tools, each
@@ -1857,13 +1857,13 @@ chat:
   monthly_eur: 5           # the project agent's own line
   confirm: [new_card, answer, steer, retry, request_changes,
             approve_merge, deny_merge, invite, github_export, close,
-            edit, grant_session, set_dependency, replan, github_sync]
+            edit, give_room, set_dependency, replan, github_sync]
 ```
 
 A tool in `confirm` renders a proposal with a Do-it button, a tool outside
 it applies at once, and an empty list lets the agent do everything it is
 told. Stage 16 added `invite`, `github_export`, `close`, `edit`,
-`grant_session` and `set_dependency` to the defaults, Stage 17
+`give_room` and `set_dependency` to the defaults, Stage 17
 `github_sync`, roadmap 336 `replan` in place of Stage 17's `split_card`, and no read tool is
 ever in them. `monthly_eur` is the budget of the project's
 chat task each month, which the agent's calls use (5.4). A raise of it
@@ -2006,9 +2006,9 @@ One factoryd call also runs on a card that waits on a person: its brief,
 the text the person reads first on a needs-you card, under its own purpose
 `brief` on the class's `supervisor_model` (2026-10-29). Before, the
 gateway refused the brief of every plan card with open questions, since the
-card moves to `waiting-human` before the brief is written. A brief the card's own budget
-refuses asks for the money on the card, and an approver's Fund there
-queues it again.
+card moves to `waiting-human` before the brief is written. The project's judgment budget
+pays for the brief, not the card, so a brief waits when that budget is spent,
+until it grows or the month turns.
 
 ### 5.4 Cost ledger
 
@@ -2799,7 +2799,7 @@ the month only (roadmap 158).
 | `invite` (Stage 16) | add a member | confirm |
 | `github_export` (Stage 16) | mirror, or since Stage 17 pull requests | confirm |
 | `close`, `edit` (Stage 16) | close a card, edit its brief through the door of 5.9 | confirm |
-| `grant_session` (Stage 16) | one more session for a capped card | confirm |
+| `give_room` | sessions' worth of time and money for a card, at a stop or ahead of it (`sessions` 1 to 5, `money`) | confirm |
 | `set_dependency` (Stage 16) | add or remove a dependency | confirm |
 | `replan` (roadmap 336) | send a card or a plan back to the planner | confirm |
 | `github_sync` (Stage 17) | Sync latest from GitHub | confirm |
@@ -2875,7 +2875,7 @@ Every event the console records under a token's session carries
 stamp, the `chat_token_made` and `chat_token_revoked` events included, and every chat row a token's turn writes carries the
 token's name. The actor stays the human's login. The stamp sits at three
 seams, so no call site can miss it: the events write, the chat row write and
-the card fund and extend writes. The thread shows a human message that came
+the card's room writes. The thread shows a human message that came
 through a token with a dashed avatar and the token's name (C43, provisional).
 Rows that factoryd writes on its own path afterwards, such as the workflow's
 merge, carry no stamp.
@@ -3091,10 +3091,10 @@ the history and every depth come through a tool. What each part does:
   commit's combined CI state and each job's state, through the member's
   token. The exit test's first run found that no tool read main's CI, and
   the round built `ci` the same evening.
-- **The writes.** `close`, `edit`, `grant_session` and `set_dependency` run
+- **The writes.** `close`, `edit`, `give_room` and `set_dependency` run
   the lifted actions the board's buttons run, record one event each and
   confirm by default. "End the card" closes a card from its opened card,
-  and a capped card's answer "Allow more sessions" is a grant, which records
+  and a capped card's answer "Give more room" is a grant, which records
   `session_granted` from either door. Since the fix round a card without an
   issue closes in the store alone, with one `card_closed` event and no
   Forgejo call. A card
@@ -4920,8 +4920,8 @@ sizing task, as it has one screening task.
   settled call on the ref it prices a token a byte and the whole limit.
   The note names the calls, the estimate and the headroom, and what the
   approval card offers: read the diff, then Approve the merge or Deny it.
-  An in-review card has no Fund, and nothing would run the review again
-  after one. A call
+  The approval card gives no room: nothing would run the review again
+  after it. A call
   the gateway refuses for headroom (the task's cap, the day's, the month's
   or the project's) is made again after the others, one at a time, so a
   budget that paid the parts one after the other still pays them; the note

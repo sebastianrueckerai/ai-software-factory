@@ -4,8 +4,8 @@ One page per agent: the first model request verbatim, every part pinned to the b
 
 ## The self-check
 
-- code SHA `ddcab0b3fe73a319912240ece674352387d01e83`; every permalink points there.
-- policy `04af66d391d7`, the tree the captures read.
+- code SHA `7f6141b43194b0dc585e047c06f1440e71caa852`; every permalink points there.
+- policy `4afd4974d9fd`, the tree the captures read.
 - harness `opencode 1.19.5`, the pinned opencode the loop captures drove.
 - unlabelled spans: 0 — the tool exits non-zero on any unlabelled byte, so an index that shipped means none.
 - 22 pages. Regenerate: `go run ./cmd/agentdoc -out docs/agents -policy <factory tree> -opencode <pinned binary>`; no LLM runs.
@@ -35,7 +35,7 @@ Fixture ids: `agentdoc-fixture` (coding, screening, sizing, planner, prover, mes
 | [brief-writer](brief-writer.md) | B | Writes the brief of a resource request or a plan approval | `big` | `brief` | factoryd direct | 0 | 4473 |
 | [case-brief-writer](case-brief-writer.md) | B | Writes parts 3 and 4 of a Needs-you case | `big` | `brief` | factoryd direct | 0 | 4606 |
 | [title](title.md) | B | Names a chat thread from its first message | `small` | `title` | the console's naming call, a factoryd direct client | 0 | 748 |
-| [project-agent](project-agent.md) | B | The always-on repo chat agent; also answers escalations | `premium` | `operator` | console, own tool loop | 60 | 45907 |
+| [project-agent](project-agent.md) | B | The always-on repo chat agent; also answers escalations | `premium` | `operator` | console, own tool loop | 60 | 45639 |
 | [compact](compact.md) | B | Summarises a chat thread's older turns | `small` | `compact` | console | 0 | 1282 |
 | [vision](vision.md) | B | Describes an image the human attached | `vision` | `vision` | console | 0 | 315 |
 
