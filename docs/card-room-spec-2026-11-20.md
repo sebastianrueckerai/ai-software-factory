@@ -115,7 +115,7 @@ If the money is left out while the card cannot pay for a session to open (`CaseF
 - **A refusal** past a bound names the largest count that fits: "the card's draw bound leaves room for 1 more session's worth, about 14 minutes and 1.20 EUR". Code finds it by trying the counts from the one asked down to 1.
 - **Apply:** one transaction writes the rows that `drawCase` writes today (`factoryd/cases.go:854`). It raises the spend limit first, then the session cap and the agent-time cap (`raised_sessions`, `raised_time_s`), then the budget. Each part keeps its own row, so the audit trail shows the money apart from the time. The rows record the count, the money flag and the estimate used.
 - **A draw beside another action** (`Resolution.Fund` today, for example a handover that buys its session) becomes a count and a money flag through the same `RoomFor`. Agent time and EUR are never asked for directly.
-- **Readout and press agree.** The console's form posts the count, the money flag and, as a guard, the raises its readout showed. Act works the raises out again from the facts at the press. If they differ, because the card ran on in between, the press is refused with the new figures, and the readout shows them: "The card ran on since this opened: 2 sessions' worth now add 28 min and 1.80 EUR. Press again to give them." The chat and the rungs send the count and the flag, and their result names the raises applied.
+- **Readout and press agree.** The console's form posts the count, the money flag and, as a guard, the room the card had (`now`) and the raises its readout showed. Act works them out again from the facts at the press. If they differ, because the card ran on or someone gave room in between, the press is refused with the new figures, and the readout shows them: "The room changed since this opened: 2 sessions' worth now add 28 min and 1.80 EUR. Press again to give them." Because any give raises `now`, a second press on the same readout is always refused. A count left empty is refused with the range text, never filled in. The chat and the rungs send the count and the flag, and their result names the raises applied.
 
 ### 5.4 A running session uses the room
 
@@ -154,7 +154,7 @@ On 2026-11-20 no live card has a raised line bound: the 17 cards that got one ar
   4. Starts, only when they rise: "It may also start 2 more sessions."
   5. The project's money left this month: "The project has 41.20 EUR left this month."
 - **The tick** of the money line is set when `raiseMoney` is above 0, and clear when the money is enough.
-- **When the count or the tick changes,** htmx asks the server for the readout again, so no figure is worked out in the browser. Without JavaScript the press still applies the count, and the readout shows the default.
+- **When the count or the tick changes,** htmx asks the server for the readout again, so no figure is worked out in the browser. The control needs JavaScript, as the drawer that holds it does.
 - **Where the control shows:**
   - among the opened card's other actions on every live agent card (`MoreOf`, `factoryd/faces.go:569`), in place of "Allow more sessions" and "Add money";
   - as the answer on every ask about a card's resources: the session-cap and agent-time stops (`limit`), the money stop (`CaseBudgetFloor`), the check-in share stop, the repeated findings stop, the gate stop after a refused review, and a question of the agent's that waits at one of these caps (`atCap`).
