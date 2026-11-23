@@ -88,7 +88,7 @@ Every record also takes `At = Ended`, `Node = Pod.Node`, `PodUID = Pod.UID`, `La
   - `node_pressure`: `The node <node> ran low on <resource> at <time> UTC, and Kubernetes evicted its pod.`
   - `node_rebooted`: `The node <node> restarted at about <time> UTC.`
   - `node_not_ready`: `The node <node> stopped answering at about <time> UTC.`
-  - `disruption`: `Kubernetes stopped its pod at <time> UTC (<condition>).`
+  - `disruption`: `Kubernetes stopped its pod at <time> UTC: <why>.` `<why>` comes from a fixed map of the condition's reason: `PreemptionByScheduler` a pod of higher priority took its place, `DeletionByTaintManager` its node was marked for eviction, `EvictionByEvictionAPI` an eviction request, `DeletionByPodGC` the cleanup of pods on a lost node, `TerminationByKubelet` the node's kubelet ended it. An unmapped reason gives `Kubernetes stopped its pod at <time> UTC.`
   - `gone_after_restart`: `Its pod was gone when the factory restarted at <time> UTC.`
   - `deleted`: `Something outside the factory deleted its pod at <time> UTC.`
 - An `own_limit` record gives one line:
