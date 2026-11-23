@@ -687,8 +687,10 @@ As built in Stage 8 (Task 69):
   logs. It mounts `/var/log` and the container log directory but not the
   host root, since kubelet stats already report node network and disk, and
   its ClusterRole reads pods, nodes, volumes and jobs plus `nodes/stats`
-  and `nodes/pods`, nothing more. It has no OTLP receiver and no host port,
-  so a sandbox cannot inject into it. A cluster collector adds the cluster
+  and `nodes/pods`, nothing more. It has no OTLP receiver. Since 2026-11-23
+  its one host port, 5170, takes the node's kernel log (below), and its
+  network policy admits only the node's own host on that port, so a
+  sandbox cannot inject into it. A cluster collector adds the cluster
   metrics and the Kubernetes events. Proven live: CPU and memory of all
   three nodes, a factoryd log line searchable, and no 403 in the agents'
   logs over 30 minutes.
@@ -760,6 +762,25 @@ Added in Stage 9 (Task 76):
   Since the bug lane's fix (#234) both roll rules need a full 10-minute
   window of points (`requireMinPoints`), and no false roll alert fired
   across the next six rolls.
+
+Added with cluster facts (2026-11-23):
+
+- **The nodes' kernel log.** A `KmsgLogConfig` document in
+  `talos/patches.yaml` makes each Talos node send its kernel log as JSON
+  lines over TCP to `127.0.0.1:5170`. The k8s-infra agent on that node
+  listens there with a `tcplog/kmsg` receiver. The agent's `hostPort` is
+  served on the loopback by Cilium's kube-proxy replacement. The receiver
+  takes the record's time from `talos-time`, moves `msg` to the body and
+  sets `service.name` to `talos-kmsg`, and the logs pipeline adds the
+  node's name. Talos's own lines are in the kernel log, so one stream
+  holds the kernel's OOM kills (`oom-kill:`) and the memory guard's kills
+  ("Sending SIGKILL to cgroup"). The memory guard is Talos's userspace OOM
+  controller. Before this, those lines existed only in each node's ring
+  buffer, which holds 4 to 9 days. Talos retries a line every second until
+  the agent takes it and keeps its place in the buffer, so a boot before
+  the agent runs loses nothing. The logs keep 30 days, as all logs do.
+  factoryd reads the stream with narrow queries (6.7), because ClickHouse
+  runs near its query memory cap and refuses wide ones.
 
 ### 4.3 Secrets: OpenBao versus Vault
 
@@ -1220,7 +1241,7 @@ Since the escalation ladder's plan A (change id `session-ladder`) the session
 cap counts the sessions that got a model answer: after every session the short
 activity `SessionAnswered` reads the gateway's ledger and writes the
 `session_started` record of one that did, so a starved or refused session takes
-no number. A session starts only when `SessionFunded` finds its opening calls
+no number. A session the platform ended takes none either (6.7). A session starts only when `SessionFunded` finds its opening calls
 and the floor of its rung (`budget.session_floor_cheap_eur` and
 `budget.session_floor_frontier_eur`) free, and the question names the amount; the
 console's Give more room posts its note as the answer, and every wait for a human adds the
@@ -2788,6 +2809,7 @@ the month only (roadmap 158).
 |---|---|---|
 | `board`, `card`, `history`, `card_history`, `costs`, `diff` | read | none |
 | `system`, `plan`, `pr`, `file`, `ci` (Stage 16) | read | none |
+| `cluster_facts` (2026-11-24) | read what the cluster did to a card's session, or the platform's incidents of a window | none |
 | `session`, `session_steps`, `session_step`, `session_search` (Stage 16) | read | none |
 | `new_card` (with its track since roadmap 225) | file | confirm |
 | `answer` (a needs-you question, and since Stage 16 a plan's question) | answer | confirm |
@@ -3091,6 +3113,15 @@ the history and every depth come through a tool. What each part does:
   commit's combined CI state and each job's state, through the member's
   token. The exit test's first run found that no tool read main's CI, and
   the round built `ci` the same evening.
+- **Cluster facts** (2026-11-24). `cluster_facts` reads what the cluster
+  did to a card's session (`task_id`, `n`), or the platform's incidents of
+  a window (`since`, `until`). The session form keeps the chat's project
+  scope. The window form is the incident log of every project, so it needs
+  factory access, as `alerts` does. A prover session's last command stays
+  out of the answer, as its transcript does. Its refusals carry the codes
+  of `deployment_health`: 400 for bad arguments, 404 for a session with no
+  record or an unknown one, 409 where the tool does not apply. 6.7 holds
+  the tool's shape.
 - **The writes.** `close`, `edit`, `give_room` and `set_dependency` run
   the lifted actions the board's buttons run, record one event each and
   confirm by default. "End the card" closes a card from its opened card,
@@ -4032,10 +4063,16 @@ Sandbox hardening:
   work in progress, factoryd reads a `no_push` session, and no line in the
   timeline said "evicted". Each eviction cost one of three sessions. Since
   Stage 12 an eviction is recorded as such (Task 114): when the log ends
-  without a result, factoryd reads the pod's status reason and message
-  before it deletes the pod, and an `Evicted` pod's session ends with the
-  summary `evicted: <message>`, which reaches the timeline and the next
-  session's findings. The round's exit test had no eviction.
+  without a result, factoryd reads the pod's status reason before it
+  deletes the pod, and an `Evicted` pod's session ends with the summary
+  `evicted`. Since 2026-11-23 the end also gets a death record that names
+  the cause and decides what the card pays (6.7). An eviction for the
+  node's low resources is a platform death and costs the card nothing. An
+  eviction for the pod's own `tmp` volume or ephemeral storage is an
+  `own_limit` death, and its record names the resource and the limit. The
+  summary carries neither the container's termination message nor the
+  kubelet's eviction message, because both are text the pod or the node
+  wrote. The round's exit test had no eviction.
 - **The per-project cache volume** (Tasks 113, 113b).
   Since Stage 12 every sandbox and CI pod mounts a claim on a cache
   directory that belongs to its project and outlives the pod: the agent's
@@ -4564,6 +4601,203 @@ without a file written in a task worktree, NO-COMMIT after 90 minutes
 without an implementer's commit, and LOOP when transcripts grow but nothing
 is written for 60 minutes.
 
+### 6.7 Cluster facts: what the platform did to a session
+
+Kubernetes and Talos kill pods. A session that the platform kills used to
+look like a session whose agent gave up: the card showed `no_push`, paid for
+the attempt and moved toward the stronger model, and no agent could see what
+the cluster had done. Between 2026-11-12 and 2026-11-18 Talos's memory guard
+killed 182 pods: 129 of ClickHouse, 39 of kube-apiserver and 14 of Forgejo.
+No session pod was among them, since the guard spared pods with a memory
+limit. The kills reached sessions through the services they use. Since
+2026-11-23 code records every such end, names its cause by fixed rules, and
+hands the facts on in two ways: a short gated line to the next session, and
+one tool for the agents that investigate. No model decides a class.
+
+**The death record.** Every session end without a push gets a death record,
+including the end of a report session. A worker that reported its own
+failure gets the class `unknown`, with any restarts of the services it uses.
+A session that ended with a push gets none. When the pod starts running,
+factoryd stores its UID, its node and the node's boot ID in `live_sessions`.
+At the end it reads the pod (its node, UID, deletion time, `lastState` and
+every condition), the events of the task namespace, the node's Ready
+condition and boot ID, the incident log's rows for the pod, its node and
+the services it uses, and the kernel kill lines that name the pod's UID. A
+pod that ended with exit code 137 and matched no rule gets up to 90 seconds
+for its kill line, because the memory guard's line reaches SigNoz some
+seconds after the kill. The record holds fixed fields: class, rule, time,
+node, pod UID, exit code, reason, container, condition, resource, limit,
+kill source, the session's last command, the service restarts and the
+events' time, type, reason and count. It keeps no event message and no raw
+log text. Both can hold text that a process or an agent chose. It lives in
+the table `pod_deaths`, keyed by task and session, and carries the lines
+the next session reads.
+
+**Classes and rules.** The class says who ended the session. The first rule
+that holds wins.
+
+| class | who ended the session | what the card pays |
+|---|---|---|
+| `platform` | the cluster | no attempt, no agent time, no step to the stronger model |
+| `own_limit` | the session's own use of its pod's limits | as before: an attempt |
+| `unknown` | no cluster cause found | as before: an attempt |
+
+1. `guard_kill` (`platform`): a memory-guard kill line names the pod's UID.
+2. `node_oom` (`platform`): a kernel OOM kill line names the pod's UID with
+   `constraint=CONSTRAINT_NONE`, which means the whole node ran out of
+   memory.
+3. `node_pressure` (`platform`): the pod was evicted with a message that
+   starts "The node was low on resource".
+4. `node_rebooted` (`platform`): the node's boot ID changed.
+5. `node_not_ready` (`platform`): the node is gone or not Ready at the end,
+   or the incident log holds a NotReady of the node in the last 15 minutes
+   before the end. An earlier short NotReady does not outrank the
+   session's own later kill.
+6. `disruption` (`platform`): the pod carries a `DisruptionTarget`
+   condition: a preemption, a taint eviction, an eviction request, a pod
+   cleanup or a kubelet stop.
+7. `gone_after_restart` (`platform`): the pod was gone when factoryd came
+   back from a restart.
+8. `deleted` (`platform`): the pod was gone or deleting, and factoryd did
+   not delete it. A stop that factoryd sent is recorded in
+   `live_sessions`, so it never reads as a platform death.
+9. `memory_limit` (`own_limit`): a container ended `OOMKilled`, or the
+   kernel line says `constraint=CONSTRAINT_MEMCG`, which means the pod
+   reached its own memory limit. With `OOMKilled` and no kernel line the
+   class is still `own_limit`, since the pod's own limit is the common
+   cause.
+10. `storage_limit` (`own_limit`): an eviction for an `EmptyDir` volume over
+    its limit, or for the pod's own ephemeral-storage limit.
+11. `none` (`unknown`): no rule above matched.
+
+A kernel or guard line counts only for a kill of this pod inside the
+session's life, plus one minute. A live read, and the read after a stop that
+factoryd sent, use end-state evidence alone: a node that went NotReady and
+answers again ended nothing, so a recovered blip never stops a session that
+may still work.
+
+**A whole-cluster cold start.** When every node booted within 10 minutes of
+the others, as after the human's factory-off and factory-on, that start
+explains `node_rebooted` and `gone_after_restart` deaths. They stay platform
+deaths and stay free, but they do not count toward the human's platform card
+below. The records and the tool still show them.
+
+**What a platform death does to the card.** The session's outcome is
+`platform_killed`, as `provider_refused` has its own. It costs no attempt
+and no agent time, and it is no step toward the stronger model. The card
+restarts at once from its last pushed commit on the session's model. Money
+the session spent stays spent, and the spend limits hold as policy
+enforces them. A check-in that ran in the session stays on the timeline,
+but its decision is dropped, since the platform's end is the operative
+fact. A `no_progress` trip whose pod shows end-state platform evidence ends
+the session at once with no check-in, so a lost node costs no paid model
+call. `own_limit` stays a normal attempt on purpose: its cause is the
+session's own command, and the next session's line names the limit it
+reached. When three sessions of one card in a row end as `platform`,
+factoryd opens the case `platform_fault`. The ladder takes it: no rung 1,
+rung 2 first, then the human, and its statement lists the three records.
+Three is the count of `pod_never_started`. No answer changes the platform.
+
+**The record's summary.** The session's end summary names what the pod did
+and nothing the pod wrote: "container worker terminated with OOMKilled
+(exit code 137)" or "evicted". For a `platform` or `own_limit` end the
+card's timeline and digest show the record's short phrase, for example
+"the node's memory guard killed the pod", in place of "no push". An
+`unknown` end stays "no push" there, and the record says "no cluster cause
+found".
+
+**What the next session reads.** At most three lines and 600 bytes, built
+from fixed templates that fill parsed fields and never raw text. The class
+line comes first for `platform` and `own_limit`. A `platform` line says the
+session did not fail on its own, names the cause and the node, names the
+work after the last push as lost, and says the session does not count
+against the card. An `own_limit` line names the limit and the command the
+session ran. Restarts of the services whose errors the agent sees follow
+while the bounds hold: the model gateway, LiteLLM and Forgejo, each with
+its time window and, if the log shows it, the kill that caused it. A
+restart of factoryd, OpenBao or kube-apiserver goes into the record and the
+tool and not into the line, because the agent sees no error from it. The
+lines reach the next session for every class: through the free path for
+`platform`, and through the handover for `own_limit` and `unknown`. Nothing
+else passes: no other pod, no other node, no ClickHouse or SigNoz kill.
+
+**The incident log.** The table `platform_incidents` holds the platform's
+own facts. A sweep each minute (`IncidentSweep`) fills it from three sources,
+and its rows keep 30 days:
+
+- The nodes' kernel lines in SigNoz (4.2), read for the last 15 minutes
+  with the filter `service.name = 'talos-kmsg'` and the two kill
+  patterns. The windows overlap, and a row's node, sequence number and
+  time make it unique, so a stall of up to 15 minutes loses no line. The
+  rows are `guard_kill` and `kernel_oom`. A kill's own death read names the
+  pod's UID in its query.
+- The restarts of six watched services, from each pod's `restartCount` and
+  `lastState` through the Kubernetes API: factoryd, factory-gateway, LiteLLM,
+  OpenBao, Forgejo and kube-apiserver. Only pods in the phase Running
+  count, so the pods of a retrying migration Job never read as restarts.
+  The row kind is `restart`.
+- The nodes: `node_boot` when a boot ID changes, and `node_not_ready` when
+  a Ready condition flips. The newest `node_boot` row of each node stays
+  past 30 days, so a node up for months shows no false boot.
+
+The log exists because the gate and the tool must answer within a second
+from data that does not expire after an hour, as Kubernetes events do, and
+does not depend on a ClickHouse near its memory cap. factoryd needs no new
+rights for it: it already lists pods and nodes in every namespace.
+Death rows of CI and gate pods in `pod_deaths` older than the retention are
+pruned. Session rows stay.
+
+**The tool `cluster_facts`.** One read tool with two forms.
+
+- `{session}` returns the session's death record, the events of its pod,
+  its node's facts and the incidents on its node inside the session's life.
+  An event shows its time, type, reason and count, never its message. For
+  the card's running session it reads live: the pod's phase, node,
+  containers and restarts, the node's Ready state, boot ID and
+  incidents since the session started.
+- `{since, until}` returns the incident log for a window. Both times are
+  RFC 3339, a window holds at most 24 hours, and its start is within the
+  30 days the log keeps.
+
+An answer holds fixed fields, at most 200 incident rows and at most 12 KiB.
+It reads factoryd's database and, for a running session, the Kubernetes
+API. It never sends an open query to SigNoz. A refusal names the state and
+the fitting action, for example that a session has no death record because
+it ended with a push, and tells the agent to read `card_step` for its end.
+The check-in, rung 1, rung 2 and the project chat have it. The check-in and
+rung 1 reach it through the `gates` case, which factoryd answers without a
+pod, and the chat through its own tool (5.7). Sandbox sessions do not: the
+next session's line holds every fact the gate passes about its predecessor,
+and the coder's job is the card.
+
+**CI and gate pods.** The platform kills the runner pods of CI and the pods
+of the gates as it kills sessions. The CI spawner reads a death when a CI
+pod ended `Failed`, was not found, or has kernel kills in its life, and
+stores it as kind `ci` under the runner's registration UUID. A pod that was
+not found counts only when its namespace's events name it, so a pod that was
+never created leaves no record. A pod that ended `Succeeded` with no kill
+leaves none. A reproduction or proofs pod that ended early gets a record of
+kind `gate`. How a killed CI job is re-run follows its class (7).
+
+**The human's card.** The platform's deaths reach the human on one card.
+When 3 platform deaths of sessions, CI jobs or gate pods fall within 24
+hours across all cards, factoryd files one card in the human's lane, case
+and source `platform_deaths`, on the repository of the newest death that
+has a card. A CI death alone files on the configuration repository. The
+title is fixed, "The platform keeps ending the factory's work. Check the
+nodes.", and holds no count, so a pass cannot change it and a stranded
+issue is found again. The face lists each death, newest first, at most 10,
+with its day and time, its card or its CI or gate kind, its short phrase and
+its node, then "and <k> more". While the card is open, a new death rewrites
+its face and files no second card. After a close, only deaths later than the
+end of that card count. The answers close the card as noted or park it. No
+agent works it, since a fix of the nodes needs a Talos apply with the
+nodes' admin key and no agent holds a direct credential. The pass runs each
+minute and files the card itself, not through a SigNoz alert, because the
+alert webhook routes by the namespace's project and factoryd's namespace
+would put a Talos problem on the code project's agents. Deaths that a cold
+start explains do not count.
+
 ## 7. Chunk 5: verification and delivery
 
 Evidence in order of strength. Cheap deterministic gates first, the expensive
@@ -4712,6 +4946,32 @@ findings only CI could run, until the human read the log and answered
 with the fix (backlog 85: the failing step's last lines in the finding,
 backlog 86: the checks' tools in the sandbox, or the brief naming which
 checks run in CI only).
+
+**Killed jobs and their cause** (2026-11-23). A red job is killed when its
+log holds a kill marker (`signal: killed`, `exit status 137`, `exit code
+137` or `OOMKilled`) or ends cut, with no closing line and no `FAIL` line.
+Such a job may not be the agent's defect, so the checks gate asks Forgejo
+to re-run that one job, with no commit. How often depends on the
+cause, which the death record of the job's runner pod names (6.7). The
+record is keyed by the runner's registration UUID, which the job log's
+opening line names ("Runner <uuid> (version:...) received task ..."). Only
+that first line counts, since the job's own output comes after it. Every
+CI pod registers its own runner, so a re-run never reads an earlier
+attempt's record. The checks gate waits up to 30 seconds for a record that
+the CI spawner has not yet written.
+
+| cause | re-runs | the finding's note |
+|---|---|---|
+| `platform` | up to 2, so the job runs at most 3 times | names how the platform ended the pod |
+| `own_limit` | none | names the limit and says it is the job's own use |
+| no record, or `unknown` | 1, at the job's first attempt only | names the kill |
+
+A job that fails again after its last re-run stays red, and its note says
+so. A kill of a child process inside a living pod leaves no pod death,
+only the marker, so it takes the single re-run. The gate pods of 7 get
+the same record. A reproduction or proofs pod that the platform ended
+reports that cause in its result text in place of the generic early-end
+text.
 
 **The failing job's log lines in the finding** (Task 115).
 Since Stage 12 factoryd reads the log of each failed job and appends its
