@@ -1,6 +1,6 @@
 # Cluster facts: what the platform did to a session, recorded by code
 
-**Status:** proposal, written 2026-11-21, read against the code by a second reviewer. Not yet approved. Code main at `f56249721`, infra main at `462f376`.
+**Status:** approved by Sebastian on 2026-11-23 with the four decisions in section 7 as proposed. Written 2026-11-21, read against the code by a second reviewer. Code main at `f56249721`, infra main at `462f376`.
 
 **Code:** `~/repos/ai-software-factory-code`. Paths below are relative to its `internal/` unless shown in full.
 
@@ -100,7 +100,7 @@ Two causes are already free for the card. `not_started` (a pod that stayed Pendi
 - No new rights for sandbox pods and no change to their egress.
 - No agent changes the platform's configuration. An agent may file a card about the platform, as it may today.
 - No change to past cards. The build's audit of the last 30 days only reports counts (section 9).
-- CI runner pods and gate pods wait for phase 2 (5.9). Phase 1 covers session pods.
+- Phase 1 covers session pods. Phase 2 (5.9) covers CI runner pods and gate pods, in the same build.
 
 **Anti-goals**
 
@@ -159,7 +159,7 @@ A `platform` class gives the session a new outcome in place of `no_push` or the 
   - `PodDiagnosis`, widened with the node, the UID, the deletion time, `lastState` and every condition.
   - The task namespace's events, which factoryd may list today.
   - The node's Ready condition and boot ID.
-  - The incident log's rows for this pod, this node and the services in 5.4, inside the session's life.
+  - The incident log's rows for this pod, this node and the services the incident log watches (5.3), inside the session's life.
 - A memory-guard kill reaches SigNoz some seconds after it happens. If the pod ended with exit code 137 and no rule matched, factoryd waits up to 90 seconds for a kill line about the pod's UID before it settles on a class.
 - The record holds fixed fields only: class, matched rule, time, node, pod UID, exit code, reason, condition type and reason, eviction resource, kill source, the session's last command, and the IDs of the incidents it matched. It never holds raw message text beyond the kubelet's eviction message, cut to 200 characters.
 - The class and a one-line summary go into `SessionEndFact` (`factoryd/metrics.go:216`) and its event row, so the card's timeline and digest show "no push: the node's memory guard killed the pod" instead of "no push".
@@ -168,7 +168,7 @@ A `platform` class gives the session a new outcome in place of `no_push` or the 
 
 One table in factoryd's database holds the platform facts. A sweep each minute fills it from these sources:
 
-- **Kernel and Talos lines in SigNoz** (needs 5.8): memory-guard kills, parsed to the pod UID and the node, and kernel OOM kills, parsed to the constraint and the cgroup. The query names the node log stream and the last two minutes only.
+- **Kernel and Talos lines in SigNoz** (needs 5.8): memory-guard kills, parsed to the pod UID and the node, and kernel OOM kills, parsed to the constraint and the cgroup. The query names the node log stream and the last 15 minutes. Windows overlap, and a row's node, sequence number and time make it unique, so a stall of the log path up to 15 minutes loses no line.
 - **Restarts of the services sessions use:** factory-gateway, factoryd, LiteLLM, Forgejo, OpenBao, kube-apiserver. factoryd reads each pod's `restartCount` and `lastState` through the Kubernetes API. factoryd may list pods in every namespace today (`k8s/factoryd.yaml`), `kube-system` included, so this needs no new rights.
 - **Nodes:** a Ready condition that flips, and a boot ID that changes.
 
@@ -182,7 +182,7 @@ A fact reaches the next session when it concerns its predecessor:
 
 1. A fact about the predecessor's own pod always passes. This is the class line.
 2. A fact about the predecessor's node passes when it falls inside the predecessor's life.
-3. A restart of a service the session uses passes when it overlaps the predecessor's life. The services are factory-gateway, LiteLLM, Forgejo, factoryd and kube-apiserver. Such a fact explains errors in the transcript but does not change the class.
+3. A restart of a service whose errors the agent sees passes when it overlaps the predecessor's life. The services are factory-gateway and LiteLLM (model calls) and Forgejo (git). Such a fact explains errors in the transcript but does not change the class. Restarts of factoryd and kube-apiserver go into the record and the tool, not into the line, because the agent sees no error from them.
 
 Nothing else passes: no other pod, no other node, no ClickHouse or SigNoz kill, no scheduling of another card.
 
@@ -238,8 +238,8 @@ Talos v1.14.1 has a `KmsgLogConfig` document that sends the kernel log as JSON l
 
 The platform kills CI runner pods (`factoryd/ci.go:807`) and gate pods (`factoryd/gates.go:1166`) as it kills sessions. A CI job that the platform kills comes back as a red check, and the next session pays to fix it. The 113 back-offs and 20 failed pulls of the `ci-runner` image in 2.1 show that CI pods meet platform faults too.
 
-- Phase 2 runs the same rules over these pods and writes the same death record.
-- A killed CI job gets one free re-run today when its log holds a kill marker (`factoryd/killedcheck.go:20`). Phase 2 replaces the log markers with the record's class, so one rule set names every kill.
+- Phase 2 runs the same rules over these pods and writes the same death record. A CI pod's record is keyed by its runner's name, which the job's log names in its opening line.
+- A killed CI job gets one free re-run today when its log holds a kill marker (`factoryd/killedcheck.go:20`). The marker stays the sign of a kill, and the record's class names its cause. A job whose pod the platform ended gets up to two re-runs. A job killed by its own pod's limit gets none, and its note names the limit. A killed job without a record keeps today's one re-run.
 - A gate finding from a pod with a `platform` record says so in its first line.
 
 ## 6. Constraints
@@ -251,14 +251,14 @@ The platform kills CI runner pods (`factoryd/ci.go:807`) and gate pods (`factory
 - A SigNoz query names a narrow key and runs at most once a minute.
 - Re-seeding works. The incident log and the death records are derived data. Losing them loses history, and nothing breaks.
 
-## 7. Decisions for Sebastian
+## 7. Decisions by Sebastian
 
-These are my calls. Each one changes how the factory behaves, so each needs your answer before the build.
+Sebastian took all four on 2026-11-23.
 
-1. **A platform death is free for the card** (5.6). The other choice is to charge it as today and only explain it. I pick free, because the agent did nothing wrong and `not_started` and `provider_refused` already work this way.
-2. **Three platform deaths in a row open a case for the ladder** (5.6). The other choice is a different count, or no bound at all. I pick three, as `not_started` does.
-3. **The platform card is for the human only** (5.7). The other choice lets an agent of the infra project work it, and a human applies its Talos change. I pick the human only for now. A node fix needs the nodes' admin key, and the security constraint gives no agent a direct credential.
-4. **Coder sessions get the line, not the tool** (5.5). The other choice adds `cluster_facts` to the gateway's tools, beside `deployment_health`. I pick the line, because it holds every fact the gate passes about the predecessor.
+1. **A platform death is free for the card** (5.6). The other choice was to charge it as today and only explain it. Free, because the agent did nothing wrong and `not_started` and `provider_refused` already work this way.
+2. **Three platform deaths in a row open a case for the ladder** (5.6). The other choice was a different count, or no bound at all. Three, as `not_started` does.
+3. **The platform card is for the human only** (5.7). The other choice let an agent of the infra project work it, and a human applies its Talos change. The human only for now: a node fix needs the nodes' admin key, and the security constraint gives no agent a direct credential.
+4. **Coder sessions get the line, not the tool** (5.5). The other choice added `cluster_facts` to the gateway's tools, beside `deployment_health`. The line, because it holds every fact the gate passes about the predecessor.
 
 ## 8. Left to the builder
 
