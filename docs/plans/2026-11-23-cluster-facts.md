@@ -60,7 +60,7 @@ A pure addition. Nothing calls it yet.
   - `type PodEvent struct { Reason, Type, Message string; At time.Time; Count int }`.
   - `type ServiceRestart struct { Service string; From, Until time.Time; Cause string }`. `Cause` is `"guard"`, `"kernel"` or `""`.
   - Service names: `ServiceFactoryd = "factoryd"`, `ServiceGateway = "factory-gateway"`, `ServiceLiteLLM = "litellm"`, `ServiceOpenBao = "openbao"`, `ServiceForgejo = "forgejo"`, `ServiceAPIServer = "kube-apiserver"`.
-  - `type DeathFacts struct { Pod PodDiagnosis; PodGone, StoppedByFactory, AfterRestart bool; BootAtStart string; Node *NodeState; NodeGone, NodeNotReadyDuring bool; Started, Ended time.Time; Kills []KernelKill; LastCommand string }`. `NodeNotReadyDuring` is a `node_not_ready` incident of the pod's node inside the session's life. `Node` nil means the node was not read.
+  - `type DeathFacts struct { Pod PodDiagnosis; PodGone, StoppedByFactory, AfterRestart bool; BootAtStart string; Node *NodeState; NodeGone, NodeNotReadyDuring bool; Started, Ended time.Time; Kills []KernelKill; LastCommand string }`. `NodeNotReadyDuring` is a `node_not_ready` incident of the pod's node in the last 15 minutes before the end (not before the start). `Node` nil means the node was not read.
   - `type DeathRecord struct` with JSON fields `class`, `rule`, `at`, `node`, `pod_uid`, `exit_code`, `reason`, `container`, `condition`, `resource`, `limit`, `kill_source`, `last_command`, `restarts []ServiceRestart`, `events []PodEvent`, `lines []string` (all but class, rule and at `omitempty`).
   - `func Classify(f DeathFacts) DeathRecord`. It leaves `Restarts`, `Events` and `Lines` empty.
   - `func GateLines(r DeathRecord, lastPush string) []string`.

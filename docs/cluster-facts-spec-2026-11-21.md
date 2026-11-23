@@ -134,7 +134,7 @@ The rules run in this order, and the first match wins.
 1. `platform`: a memory-guard kill line names the pod's cgroup.
 2. `platform`: a kernel OOM kill line names a process of the pod, with `constraint=CONSTRAINT_NONE`, which means the whole node ran out of memory.
 3. `platform`: an eviction whose message starts "The node was low on resource".
-4. `platform`: the node's boot ID changed, or the node went NotReady, during the session. NotReady counts when the node is not Ready at the end or when the incident log holds a NotReady of the node inside the session's life.
+4. `platform`: the node's boot ID changed, or the node went NotReady, during the session. NotReady counts when the node is not Ready at the end or when the incident log holds a NotReady of the node in the last 15 minutes before the end, so an early short NotReady does not outrank the session's own later kill.
 5. `platform`: the pod carries a `DisruptionTarget` condition: a preemption, a drain or a taint eviction.
 6. `platform`: anyone but factoryd deleted the pod, or the pod was gone after a factoryd restart.
 7. `own_limit`: a container ended `OOMKilled`, and the kernel line says `constraint=CONSTRAINT_MEMCG`, which means the pod reached its own memory limit.
