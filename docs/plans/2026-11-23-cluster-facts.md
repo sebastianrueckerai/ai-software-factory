@@ -317,8 +317,8 @@ The record replaces `SessionKill` in this task.
   - `const clusterFactsMax = 12 << 10`, cut as `deployment_health.go:406-412` does.
   - `console.Config.ClusterFacts func(ctx context.Context, taskID, sessionID string, since, until time.Time) (string, error)`, required by `New`.
 
-The session text holds `class`, `rule`, `at`, `node`, `pod`, `exit code` with reason, `kill` (memory guard or kernel), `last command`, the service restarts in the session's life, the pod's events, and the lines given to the next session, one fact per line. The window text holds one line per incident: time, kind, subject, node, and the detail fields. Refusals:
-- `session <id> has no death record: it ended with a push or before the factory recorded deaths. Read card_step for its end.`
+The session text holds `class`, `rule`, `at`, `node`, `pod`, `exit code` with reason, `kill` (memory guard or kernel), `last command`, the service restarts in the session's life, the incidents on its node inside the session's life (the record keeps `Started`), the pod's events as time, type, reason and count (never the message: no raw event text in a prompt), and the lines given to the next session, one fact per line. A session that still runs (the card's live session) gets a live read in place of a record: the pod's phase, node and containers, the node's Ready state and boot, and the incidents on that node since the session started. The window text holds one line per incident: time, kind, subject, node, and the detail fields. Refusals:
+- `session <id> has no death record: it ended with a push or before the factory recorded deaths. Read card_step for its end.` (a session that is neither recorded nor running)
 - `a window holds at most 24 hours: ask with since and until at most 24 hours apart.`
 - `until comes before since: ask with since before until.`
 - `the incident log keeps 30 days: ask for a window after <date>.`
