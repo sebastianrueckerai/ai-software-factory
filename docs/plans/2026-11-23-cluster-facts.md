@@ -27,7 +27,7 @@
 - Every text a human reads uses plain words, calls a human a human, and never shows the words rung, case or pool. `facefixtures.HumanFaults` and `TextFaults` pass.
 - Tests come first and derive their expectations by hand from the spec. No assertion is weakened to pass.
 - Verify with the full suite under `-race` with Postgres (the controller's brief gives the command for this machine) and `bash check static`.
-- No ruling number and no ledger path in a tracked file or a commit message. Commit messages end with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- No ruling number and no ledger path in a tracked file or a commit message. Commit messages end with a `Co-Authored-By` trailer that names the model writing the commit, for example `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
 - Comments stay minimal: only what the code cannot say.
 
 ## Review Focus
