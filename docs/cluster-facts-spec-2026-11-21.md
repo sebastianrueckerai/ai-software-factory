@@ -238,7 +238,7 @@ Talos v1.14.1 has a `KmsgLogConfig` document that sends the kernel log as JSON l
 
 The platform kills CI runner pods (`factoryd/ci.go:807`) and gate pods (`factoryd/gates.go:1166`) as it kills sessions. A CI job that the platform kills comes back as a red check, and the next session pays to fix it. The 113 back-offs and 20 failed pulls of the `ci-runner` image in 2.1 show that CI pods meet platform faults too.
 
-- Phase 2 runs the same rules over these pods and writes the same death record. A CI pod's record is keyed by its runner's name, which the job's log names in its opening line.
+- Phase 2 runs the same rules over these pods and writes the same death record. A CI pod's record is keyed by its runner's registration UUID, which the job's log names in its opening line (`Runner <uuid> (version:...) received task ...`). Every pod registers its own runner, so a re-run never reads an earlier attempt's record.
 - A killed CI job gets one free re-run today when its log holds a kill marker (`factoryd/killedcheck.go:20`). The marker stays the sign of a kill, and the record's class names its cause. A job whose pod the platform ended gets up to two re-runs. A job killed by its own pod's limit gets none, and its note names the limit. A killed job without a record keeps today's one re-run.
 - A gate finding from a pod with a `platform` record says so in its first line.
 

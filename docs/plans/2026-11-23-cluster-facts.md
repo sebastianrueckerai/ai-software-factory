@@ -382,12 +382,12 @@ The surfaces:
 - Consumes: `deathReader`, `deathInput` (Task 5), `ClusterStore.PutPodDeath`, `CIDeath` (Task 2), `DeathRecord.Short()` (Task 1).
 - Produces:
   - `CISpawner` gains a `deathReader` (`wait` 0: teardown never waits).
-  - `func runnerOfLog(log []byte) string`: the runner name from a job log's opening line `<name>(version:...) received task ...`, `""` when none.
+  - A reader of the runner's registration UUID from a job log's OPENING line only, in forgejo-runner 13's form `Runner <uuid> (version:...) received task ...`, `""` when none. Job output on later lines can never name the runner.
   - `const ciPlatformReruns = 2`.
 
 **How it runs:**
-- CI pods (`ci.go` reconcile, before `teardown`): when the pod ended `Failed`, was not found, or its kernel kills (`Kernel.KernelLines` over the pod's life, filtered to its UID) are not empty, read the death (`stoppedByFactory` false) and store it as kind `ci`, runner `ci-job-<id>`. A pod that ended `Succeeded` with no kill gets no record.
-- `killedJob` keeps the kill markers and `runnerDied` as the sign that a job was killed. The runner comes from `runnerOfLog`, and the record from `CIDeath`:
+- CI pods (`ci.go` reconcile, before `teardown`): when the pod ended `Failed`, was not found, or its kernel kills (`Kernel.KernelLines` over the pod's life, filtered to its UID) are not empty, read the death (`stoppedByFactory` false) and store it as kind `ci`, runner = the registration UUID from the secret `ci-runner-registration`. A pod not found counts only when its namespace's events name it: a pod never created gets no record. A pod that ended `Succeeded` with no kill gets no record.
+- `killedJob` keeps the kill markers and `runnerDied` as the sign that a job was killed. The runner comes from the log's opening line, and the record from `CIDeath`, waited for up to 30 seconds when the reconcile pass has not written it yet:
   - `platform`: the job re-runs while its attempt is at most `ciPlatformReruns`. Note: `job %q of CI run %d: the platform ended its pod (<Short>), so a re-run follows` and, past the bound, `job %q of CI run %d: the platform ended its pod again (<Short>) at attempt %d: no further re-run follows`.
   - `own_limit`: no re-run. Note: `job %q of CI run %d was killed (%s): <Short>, which is the job's own use, so no re-run follows`.
   - No record, or `unknown`: today's single re-run and notes.
@@ -395,7 +395,7 @@ The surfaces:
 
 - [ ] **Step 1: Write the failing tests** (templates: `TestCISpawnerReconcileTearsDownFailedPod` ci_test.go:364, `TestWaitChecksRerunsAKilledJobOnceAndPasses` activities_test.go:4535, `TestGateCriteriaKeepsTheRunsOfAPodThatEndedEarly` criteria_test.go:1711).
   - `TestCISpawnerRecordsAPlatformEnd`: a CI pod `Failed` with a guard kill for its UID. A `ci` death with runner `ci-job-<id>` and class `platform` is stored before the namespace goes. A `Succeeded` pod without kills stores nothing.
-  - `TestRunnerOfLog`: `ci-job-42(version:v12.7.3) received task 7 of job test, be triggered by event: push` gives `ci-job-42`. A log without that line gives `""`.
+  - `TestRunnerOfLog`: the recorded log `testdata/joblog-run3840-test.log` gives its runner's UUID. A v12-form line, a line not first, and a log without the line give `""`.
   - `TestWaitChecksRerunsAPlatformKillTwice`: attempts 1 and 2 re-run with the platform note, attempt 3 does not.
   - `TestWaitChecksNeverRerunsAnOwnLimitKill`: a kill marker and an `own_limit` record: no re-run, the note names the limit.
   - `TestWaitChecksWithoutARecordKeepsTheOneRerun`: today's tests stay green unchanged.
