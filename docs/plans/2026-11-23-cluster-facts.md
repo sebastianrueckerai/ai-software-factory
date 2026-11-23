@@ -356,7 +356,7 @@ The surfaces:
 **How it runs** (template: `MonthAlarm`, monthcap.go):
 - The deaths are `PlatformDeaths(now - 24h)`, less those at or before the end of the newest closed platform card.
 - An open platform card (`waiting-human` or `waiting-agent`) gets its face written again when it differs, and lists the deaths since 24 hours before its filing. No second card is filed. Before a filing, the card looks for its stranded issue on every repository the deaths touch and on `configRepo`, and reuses it.
-- With no open card and at least 3 deaths, `FileHumanCard` files one on the repository of the newest death that has a card. The title is fixed and holds no count, so it cannot drift between passes and a stranded issue is found again. The count lives in the face, and the face lists each death, newest first, at most 10, as `<day> <hh:mm> UTC, card #<issue>: <Short> on <node>` for a session, `<hh:mm> UTC, a gate of card #<issue>: ...` for a gate pod and `<hh:mm> UTC, CI job <runner>: ...` for a CI pod, then `and <k> more` if needed. A CI death alone files on the configuration repository (`configRepo`), as the month alarm does. The answers are close as noted and park, as the freeze card offers them without retry.
+- With no open card and at least 3 deaths, `FileHumanCard` files one on the repository of the newest death that has a card. The title is fixed and holds no count, so it cannot drift between passes and a stranded issue is found again. The count lives in the face, and the face lists each death, newest first, at most 10, as `<day> <hh:mm> UTC, card #<issue>: <Short> on <node>` for a session, `<hh:mm> UTC, a gate of card #<issue>: ...` for a gate pod and `<hh:mm> UTC, a CI job: ...` for a CI pod, then `and <k> more` if needed. A CI death alone files on the configuration repository (`configRepo`), as the month alarm does. The answers are close as noted and park, as the freeze card offers them without retry.
 - In `main.go`: `passes.Run(ctx, "platform_card", time.Minute, 2*time.Minute, card.Check)`.
 
 - [ ] **Step 1: Write the failing tests** (templates: `TestMonthAlarmFilesTheCapIssueOnce` monthcap_test.go:147, `TestFreezeCardOnePerClass` freezecard_test.go:296).
@@ -395,7 +395,7 @@ The surfaces:
 
 - [ ] **Step 1: Write the failing tests** (templates: `TestCISpawnerReconcileTearsDownFailedPod` ci_test.go:364, `TestWaitChecksRerunsAKilledJobOnceAndPasses` activities_test.go:4535, `TestGateCriteriaKeepsTheRunsOfAPodThatEndedEarly` criteria_test.go:1711).
   - `TestCISpawnerRecordsAPlatformEnd`: a CI pod `Failed` with a guard kill for its UID. A `ci` death with runner `ci-job-<id>` and class `platform` is stored before the namespace goes. A `Succeeded` pod without kills stores nothing.
-  - `TestRunnerOfLog`: the recorded log `testdata/joblog-run3840-test.log` gives its runner's UUID. A v12-form line, a line not first, and a log without the line give `""`.
+  - `TestRunnerUUIDOfLog`: the recorded log `testdata/joblog-run3840-test.log` gives its runner's UUID. A v12-form line, a line not first, and a log without the line give `""`.
   - `TestWaitChecksRerunsAPlatformKillTwice`: attempts 1 and 2 re-run with the platform note, attempt 3 does not.
   - `TestWaitChecksNeverRerunsAnOwnLimitKill`: a kill marker and an `own_limit` record: no re-run, the note names the limit.
   - `TestWaitChecksWithoutARecordKeepsTheOneRerun`: today's tests stay green unchanged.
