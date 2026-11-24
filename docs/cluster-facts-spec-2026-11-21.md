@@ -1,6 +1,6 @@
 # Cluster facts: what the platform did to a session, recorded by code
 
-**Status:** approved by Sebastian on 2026-11-23 with the four decisions in section 7 as proposed. Written 2026-11-21, read against the code by a second reviewer. Code main at `f56249721`, infra main at `462f376`.
+**Status:** built and live since 2026-11-24: code main `4a474c3d2` (factoryd and the gateway rolled at 05:54 UTC), infra main `dbfc6c2` (KmsgLogConfig applied to all three nodes). Approved by Sebastian on 2026-11-23 with the four decisions in section 7 as proposed; sections 5 and 6 carry the decisions taken while building. Written 2026-11-21 against code main `f56249721` and infra main `462f376`.
 
 **Code:** `~/repos/ai-software-factory-code`. Paths below are relative to its `internal/` unless shown in full.
 
