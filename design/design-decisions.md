@@ -475,6 +475,8 @@ From round 20 ([design/rounds/20-cap-reset/](rounds/20-cap-reset/index.html)), f
 
 Not taken: B, lift the day cap until 00:00 UTC (only the month cap bounds the day), C, allow an amount (a number at the moment the owner wants none), and D2, the press on the strip (it makes the read-only strip a control and crowds it at 390 px).
 
+Amended by C49 (2026-11-24): the premium cap has a Reset, each Reset stands left of its gauge on the gauge's line, and each row's label says when its count resets by itself.
+
 ## C48. "Give more room" sets its count with five buttons and shows time and money as a table of left, adds and then (2026-11-21, the director, provisional)
 
 From round 21 ([design/rounds/21-card-room/](rounds/21-card-room/index.html)), four candidates built in the console lab, two critics in a first loop and a compare loop. The pick is D2, the round's recommendation. Sebastian named no pick and said "carry on" on 2026-11-21, so the recommendation stands as a provisional pick, and his own pick overrides it. The runner-up is A2: a stepper, and the readout as rows with a short label at their left.
@@ -494,3 +496,17 @@ From round 21 ([design/rounds/21-card-room/](rounds/21-card-room/index.html)), f
 **What stays.** The answer's label, its effect line and the one amber Send. The fields only after the press. The guard of the room the readout showed, the readout's route and the refusal of a press whose readout moved.
 
 Not taken: A2, the stepper (5 takes four presses, and its figures stand inside sentences), B, the readout as sentences (its five buttons went into D2), C, one sentence with the count as a choice inside (its paragraph hides the figures), and D, a number field (B's buttons replaced it), with the spend limit as a table row (its "left" cell held a limit).
+
+## C49. The premium cap has a Reset, each Reset stands left of its gauge, and each Spend row says when its count resets by itself (2026-11-24, Sebastian)
+
+Sebastian asked for these three changes on 2026-11-24, in words, with no round. The entry amends C47's parts "The press", "Its place" and "Who may press". The rest of C47 holds.
+
+**The press.** The premium cap (`budget.premium_month_eur`) has a Reset as the day cap and the month cap have. The gateway counts the premium spend since the newest premium reset in the UTC month. The premium cap stops no card: at the cap a premium call runs on `big`, so a reset brings premium calls back and wakes no card. The judgment budget and the escalation pool still have no Reset.
+
+**Its place.** On each cap's row the button "Reset" stands at the start of the gauge's line, with the gauge right beside it, at the desk and on the phone. It keeps its 24 px height at the desk and 44 px on the phone, and its colours. The confirm opens under the row, above the reset's trace line.
+
+**Who may press.** The premium cap: a human who writes the factory's code, as for the day cap.
+
+**The time.** The labels "today", "this month", "premium this month", "LiteLLM backstop" and a project's month row end in the moment their count resets by itself, to the minute, in `--text-muted`: "today (resets 25 November at 00:00 UTC)". The day and the months turn where the gateway turns them. The backstop's time is LiteLLM's own `budget_reset_at`, and the row shows no time when LiteLLM gives none. Where the label, the time and the figure do not fit one line, the time goes under the label.
+
+Why: the button on the gauge's line saves a line per cap and shows which count it resets. The time answers "how long must I wait" without a press on Reset.

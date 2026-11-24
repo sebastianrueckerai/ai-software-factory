@@ -2087,8 +2087,8 @@ September's 18.26: a planted task parked at spend 0 with the card, and the
 infra issue was filed. The 50 and 80 percent alerts were not seen, since
 the window jumped past them.
 
-**A human's reset of a cap's count** (C47). A human restarts the count of
-the day cap, the factory's month cap or a project's month cap from the
+**A human's reset of a cap's count** (C47, C49). A human restarts the count of
+the day cap, the factory's month cap, the premium cap or a project's month cap from the
 console's status panel, at any time, with one press and an inline confirm
 that names the most that may still run before the period turns. The cap in
 the policy does not change. The reset is a row in `cap_resets` (the cap, the
@@ -2101,8 +2101,8 @@ count, and so does a negative one of a task that booked spend before the
 reset, so the new count never falls below the spend since the press and a
 reset never gives more than one cap's worth. A reset names the newest reset
 its panel showed, and a press on a count that another human reset since is
-refused with the name and the time of that reset. The day cap and
-the factory's month cap need a human who writes the factory's code, a
+refused with the name and the time of that reset. The day cap, the premium
+cap and the factory's month cap need a human who writes the factory's code, a
 project's month cap one of the project's approvers. The press is a console
 form behind a human's session and its CSRF token: the chat, the MCP door and
 the ladder's rungs have no tool for it, and a test fails any agent tool
@@ -2117,7 +2117,10 @@ month cap's card, and each count gets its own 50, 80 and 100 percent alerts.
 The strip shows ↺ on a cap whose count was reset, the panel names who reset
 it, when, and the spend before and in all, and the costs page lists the
 resets of its window. LiteLLM's backstop counts the whole month and no reset
-passes it.
+passes it. The premium cap stops no card, so its reset wakes none:
+premium calls ran on `big` at the cap and run on premium again after it. Each
+row of the panel's Spend section names the moment its count resets by itself,
+and the backstop's row takes that moment from LiteLLM.
 
 **The premium cap**. `budget.premium_month_eur` caps the calls on
 the `premium` class in the UTC calendar month: its ledger rows since the 1st
