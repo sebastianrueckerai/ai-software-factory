@@ -4625,9 +4625,10 @@ hands the facts on in two ways: a short gated line to the next session, and
 one tool for the agents that investigate. No model decides a class.
 
 **The death record.** Every session end without a push gets a death record,
-including the end of a report session. A worker that reported its own
-failure gets the class `unknown`, with any restarts of the services it uses.
-A session that ended with a push gets none. When the pod starts running,
+including the end of a report session; a report session's record holds no
+lines, since no session follows it. A worker that reported its own failure
+gets the class `unknown`, with any restarts of the services it uses. A
+session that ended with a push gets none. When the pod starts running,
 factoryd stores its UID, its node and the node's boot ID in `live_sessions`.
 At the end it reads the pod (its node, UID, deletion time, `lastState` and
 every condition), the events of the task namespace, the node's Ready

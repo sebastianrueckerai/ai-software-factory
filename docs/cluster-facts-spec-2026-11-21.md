@@ -138,7 +138,7 @@ The rules run in this order, and the first match wins.
 3. `platform`: an eviction whose message starts "The node was low on resource".
 4. `platform`: the node's boot ID changed, or the node went NotReady, during the session. NotReady counts when the node is not Ready at the end or when the incident log holds a NotReady of the node in the last 15 minutes before the end, so an early short NotReady does not outrank the session's own later kill.
 5. `platform`: the pod carries a `DisruptionTarget` condition: a preemption, a drain or a taint eviction.
-6. `platform`: anyone but factoryd deleted the pod, or the pod was gone after a factoryd restart.
+6. `platform`: anyone but factoryd deleted the pod, or the pod was gone after a factoryd restart. After a stop that factoryd sent, by this factoryd or an earlier one, the pod's deletion or absence is factoryd's own and matches no rule.
 7. `own_limit`: a container ended `OOMKilled`, and the kernel line says `constraint=CONSTRAINT_MEMCG`, which means the pod reached its own memory limit.
 8. `own_limit`: an eviction "Usage of EmptyDir volume ... exceeds the limit", or an eviction for the pod's own ephemeral-storage limit.
 9. `unknown`: no rule above matched.
