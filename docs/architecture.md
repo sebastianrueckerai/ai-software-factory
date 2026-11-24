@@ -4628,10 +4628,10 @@ for its kill line, because the memory guard's line reaches SigNoz some
 seconds after the kill. The record holds fixed fields: class, rule, time,
 node, pod UID, exit code, reason, container, condition, resource, limit,
 kill source, the session's last command, the service restarts and the
-events' time, type, reason and count. It keeps no event message and no raw
-log text. Both can hold text that a process or an agent chose. It lives in
-the table `pod_deaths`, keyed by task and session, and carries the lines
-the next session reads.
+events' time, type, reason and count. It keeps no event message, no
+eviction message and no raw log text, since such text can hold what a
+process or an agent wrote. It lives in the table `pod_deaths`, keyed by
+task and session, and carries the lines the next session reads.
 
 **Classes and rules.** The class says who ended the session. The first rule
 that holds wins.
