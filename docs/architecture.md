@@ -4621,18 +4621,20 @@ A session that ended with a push gets none. When the pod starts running,
 factoryd stores its UID, its node and the node's boot ID in `live_sessions`.
 At the end it reads the pod (its node, UID, deletion time, `lastState` and
 every condition), the events of the task namespace, the node's Ready
-condition and boot ID, the incident log's rows for the pod, its node and
-the services it uses, and the kernel kill lines that name the pod's UID. A
-pod that ended with exit code 137, or 128 as gVisor reports a killed
-sandbox, and matched no rule gets up to 90 seconds for its kill line,
-because the memory guard's line reaches SigNoz some seconds after the kill.
-An end that the worker reported reads no kernel line and no node. The record holds fixed fields: class, rule, time,
-node, pod UID, exit code, reason, container, condition, resource, limit,
-kill source, the session's last command, the service restarts and the
-events' time, type, reason and count. It keeps no event message, no
-eviction message and no raw log text, since such text can hold what a
-process or an agent wrote. It lives in the table `pod_deaths`, keyed by
-task and session, and carries the lines the next session reads.
+condition and boot ID, the incident log's rows for the pod, its node and the
+services it uses, and the kernel kill lines that name the pod's UID. A pod
+that ended with exit code 137, or 128 as gVisor reports a sandbox whose
+status it cannot read, and matched no rule gets up to 90 seconds for its
+kill line, because the memory guard's line reaches SigNoz some seconds after
+the kill. A container that failed to start (`StartError`, also 128) does not
+wait. An end that the worker reported reads no kernel line and no node. The
+record holds fixed fields: class, rule, time, node, pod UID, exit code,
+reason, container, condition, resource, limit, kill source, the session's
+last command, the service restarts and the events' time, type, reason and
+count. It keeps no event message, no eviction message and no raw log text,
+since such text can hold what a process or an agent wrote. It lives in the
+table `pod_deaths`, keyed by task and session, and carries the lines the
+next session reads.
 
 **Classes and rules.** The class says who ended the session. The first rule
 that holds wins.
@@ -4700,14 +4702,15 @@ rung 2 first, then the human, and its statement lists the three records.
 Three is the count of `pod_never_started`. No answer changes the platform.
 
 **The record's summary.** The session's end summary names what the pod did
-and nothing the pod wrote: "container worker terminated with OOMKilled
-(exit code 128)" or "evicted". Under gVisor a container that reaches its
-memory limit ends `OOMKilled` with exit code 128, not 137, and the kernel's
-`CONSTRAINT_MEMCG` line names the pod's cgroup. For a `platform` or `own_limit` end the
-card's timeline and digest show the record's short phrase, for example
-"the node's memory guard killed the pod", in place of "no push". An
-`unknown` end stays "no push" there, and the record says "no cluster cause
-found".
+and nothing the pod wrote: "container worker terminated with OOMKilled (exit
+code 128)" or "evicted". With the gVisor version of 2026-11-24, a container
+that reaches its memory limit ends `OOMKilled` with exit code 128, and the
+kernel's `CONSTRAINT_MEMCG` line names the pod's cgroup. The `memory_limit`
+rule reads the reason, so a later gVisor that reports 137 classes the same.
+For a `platform` or `own_limit` end the card's timeline and digest show the
+record's short phrase, for example "the node's memory guard killed the pod",
+in place of "no push". An `unknown` end stays "no push" there, and the
+record says "no cluster cause found".
 
 **What the next session reads.** At most three lines and 600 bytes, built
 from fixed templates that fill parsed fields and never raw text. The class
