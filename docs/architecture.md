@@ -4623,9 +4623,10 @@ At the end it reads the pod (its node, UID, deletion time, `lastState` and
 every condition), the events of the task namespace, the node's Ready
 condition and boot ID, the incident log's rows for the pod, its node and
 the services it uses, and the kernel kill lines that name the pod's UID. A
-pod that ended with exit code 137 and matched no rule gets up to 90 seconds
-for its kill line, because the memory guard's line reaches SigNoz some
-seconds after the kill. The record holds fixed fields: class, rule, time,
+pod that ended with exit code 137, or 128 as gVisor reports a killed
+sandbox, and matched no rule gets up to 90 seconds for its kill line,
+because the memory guard's line reaches SigNoz some seconds after the kill.
+An end that the worker reported reads no kernel line and no node. The record holds fixed fields: class, rule, time,
 node, pod UID, exit code, reason, container, condition, resource, limit,
 kill source, the session's last command, the service restarts and the
 events' time, type, reason and count. It keeps no event message, no

@@ -162,7 +162,7 @@ A `platform` class gives the session a new outcome in place of `no_push` or the 
   - The task namespace's events, which factoryd may list today.
   - The node's Ready condition and boot ID.
   - The incident log's rows for this pod, this node and the services the incident log watches (5.3), inside the session's life.
-- A memory-guard kill reaches SigNoz some seconds after it happens. If the pod ended with exit code 137 and no rule matched, factoryd waits up to 90 seconds for a kill line about the pod's UID before it settles on a class.
+- A memory-guard kill reaches SigNoz some seconds after it happens. If the pod ended with exit code 137, or 128 as gVisor reports a killed sandbox, and no rule matched, factoryd waits up to 90 seconds for a kill line about the pod's UID before it settles on a class.
 - The record holds fixed fields only: class, matched rule, time, node, pod UID, exit code, reason, condition type and reason, eviction resource, kill source, the session's last command, and the IDs of the incidents it matched. It holds no raw message text: an eviction keeps its parsed resource and limit, not the kubelet's message.
 - The class and a one-line summary go into `SessionEndFact` (`factoryd/metrics.go:216`) and its event row, so the card's timeline and digest show "no push: the node's memory guard killed the pod" instead of "no push".
 
