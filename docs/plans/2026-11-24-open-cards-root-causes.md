@@ -1,6 +1,6 @@
 # The open cards of 2026-11-24: root causes and plan
 
-**Status:** plan, written 2026-11-24. Nothing is built and nothing is pressed. Code main at `d5f0078ae`, infra main at `dbfc6c2c`.
+**Status:** built on 2026-11-24 and 2026-11-25. Section 9 holds what was done and what is still owed. The sections 1 to 8 are the plan as written before the build. Code main at `4f4380891`, infra main at `9dc57ff`.
 
 **Read with:** [the weekly bump spec](../weekly-bump-lands-alone-spec-2026-11-24.md), which holds the store and the gate faults in full.
 
@@ -131,3 +131,47 @@ B1 and B2 are small and unblock every other card, so they go first and in parall
 - That `grep` fails on the live Forgejo for the reason given. The reason was read from the code: the archive's entries start with the repository's name, and the tests use entries without it.
 - What `TestInterimPushRefusesTooLargeWorkBeforeReadingIt` fails on.
 - That a replan closes the predecessor's pull request by design. The four closed pull requests of 2026-11-24 show that it happens.
+
+## 9. What was done
+
+Sebastian decided all three points on 2026-11-24: build the lookup program now, the project agent settles extra promises at full auto, and the factory merges its own schema copy.
+
+### 9.1 The board
+
+| Card | What was done |
+|---|---|
+| Infra #343 | Pull request #342 is merged |
+| #2273 | Its fix is on code main as `09b799592`, taken from the head of the closed pull request #2287. The card is closed |
+| #2305, #2306 | The store got the week's files by the two scripts, run by hand. Pull request #2309 went green on all six checks and merged as `0d2ead278` |
+| Ended infra card | Its notice asks to close an issue, and the card has no issue. The fix of B6 withdraws the notice once it is rolled out |
+
+### 9.2 The builds
+
+All are on code main. `d2be5d7b2` holds B1 to B9, and `4f4380891` adds the lookup program. Main's CI is green on `d2be5d7b2`.
+
+| Step | Built | Changed against the plan |
+|---|---|---|
+| B1 | A cut answer names its cause, and the call once more runs at low thinking depth | Twice the room was not possible: the gateway caps the alias `big` at 24576 tokens. The bump spec's section 5.3 has the probe |
+| B2 | The size-refusal test builds its tree of 100,000 entries before the timed part, and the worker's start tests pin every variable a session's start reads | The cause was slow git on a loaded CI runner against a 30-second bound, not an ambient variable |
+| B3 | A monitor case opens on the head of the card's branch, a replan is refused on the check-in and on the project agent while the head's checks run, and the check-in's file read and search name the commit they read | The cause of the false reading: the case was opened on the head the gates judged last, an older commit, and the read did not say which commit it showed. A successor that keeps the old pull request is not built: it needs five changes and a migration, and the two causes are gone |
+| B4 | The copy pod runs the CI runner image with main's two scripts over the head's files, for every kind of input | The check that names a missing copy is in the `changes` job and waits for the copy |
+| B5 | Each extra promise's small card quotes its claim, and the project agent keeps or drops a promise at full auto | The agent's reason is in the card's event, not on the issue, since the building agents read the issue |
+| B6 | The factory merges its schema copy as its bot when the pull request holds only the build's copies, and files the human card with the refusal when the merge fails. The notice `issue_open_after_end` no longer fires on a card without an issue | A card closed for a cleared alert already closed its own issue |
+| B7 | The tool `escalate` takes the act as its own field and names the card it is about. A card that would ask a second time waits on the open ask and resumes with its answer | The board says "waits for #N", the wording of every dependency wait |
+| B8 | `grep` strips the archive's leading directory, `file` names near matches, `card` names its successor and the cards its text names | A replanned card has no stored link to its successor, so the successor is found by the plan |
+| B9 | The pins live in the two lists and the Dockerfiles. Go sources read them with `go:embed`, through one parser in `pins.go` | None |
+| Lookup program | `upstream-bump` and the pass `bump`. The bump spec's section 6 describes it | Built now, by decision |
+
+Infra main got the routine's corrected brief and the merge setup's comment as `87c6843`, and the image test that reads a word after `bootstrap` as `9dc57ff`.
+
+### 9.3 Still owed
+
+1. **A human's press.** Plan #2272 is open on main and holds every roll. Its criterion `store_serves_the_weeks_files` is a human's. The store serves all five files at their pinned sha256, checked on 2026-11-24.
+2. **After the roll, in this order:** the schema copy with the pass `bump` merges by itself, then the routine's project file moves to `files: pull-request` with `pass: bump`, and its brief shrinks to what a session needs when a check fails.
+3. **Checks on the cluster,** none of which could run before the roll: the copy pod with a pull request that moves one file pin, the bump pod with one run of the routine, the schema copy's own merge, the withdrawal of the notice on the ended infra card, and a cut gate call that answers at low thinking depth.
+
+### 9.4 Found and not built
+
+- The deployed LiteLLM drops `response_format` for the provider behind `big`, so JSON mode never reaches the model. A newer LiteLLM passes it, and it comes with the infra repository's move to the bumped image.
+- `escalate` can still file a second card when the card it names already has an ask open.
+- The infra repository's references do not follow a bump by themselves. The bump spec's section 9 says why this is separate work.

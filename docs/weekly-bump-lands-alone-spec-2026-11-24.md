@@ -1,6 +1,6 @@
 # The weekly bump lands without a human
 
-**Status:** design, written 2026-11-24. Code main at `d5f0078ae`, infra main at `dbfc6c2c`.
+**Status:** built on 2026-11-24 and 2026-11-25. The code is on main at `4f4380891`, the infra changes at `9dc57ff`. Section 11 says what is live and what is not checked on the cluster yet. The sections 5.2, 5.3 and 6 say what was built where the build changed the first design.
 
 **Code:** `~/repos/ai-software-factory-code`. Paths below are relative to that repository.
 
@@ -124,22 +124,31 @@ The store keeps the first upload of a path. A pull request can therefore put the
 
 ### 5.2 A missing copy names itself
 
-`image-build` gets a first step that asks the store for each line of both lists that the changed Dockerfiles read. For each line the store lacks, the step prints `the store lacks <package> <version> <file>: the copy before the checks did not make it` and fails the job. The step runs before the build VM is made, so a miss costs seconds and no VM.
+The `changes` job of `.forgejo/workflows/pr.yml` runs `.forgejo/store-holds.sh` over the Dockerfiles the pull request builds. The script asks the store for each image line and file line those Dockerfiles read, and for the two tarballs. For each input the store lacks it prints `the store lacks <package> <version> <file>: the copy before the checks did not make it` and fails the job.
+
+Two facts of the build moved the step from `image-build` to `changes`:
+
+- factoryd makes the build VM before the first step of `image-build` runs. `image-build` needs `changes`, so only a step there fails before a VM exists.
+- Forgejo starts the checks of a pushed head at the push, at the same time as the copy. The script therefore waits for the copy, 30 seconds between rounds and at most 30 minutes, which is longer than the copy pod may run.
 
 After 5.1 the step fails only when the copy itself failed, and the card then holds the copy's finding too. The step is there because a refusal must name the state: the digest mismatch of 4.2 cost three wrong diagnoses.
 
 ### 5.3 A gate call that runs out of answer room says so and asks once more
 
-`SupervisorModel.Chat` reads the answer's finish reason. When the reason is `length`:
+`SupervisorModel.Chat` reads the answer's finish reason. The check-in's call shares this path. When the reason is `length`:
 
-1. The gate calls once more with twice the answer limit, inside the card's free budget.
-2. When the second call ends at its limit too, the gate records "no verdict" with the cause in plain words: `the model used its whole answer limit of <n> tokens before it answered`. The cause stands on the card and in the chat's tools, where `unexpected EOF (an answer of 2 bytes)` stands today.
+1. The gate calls once more with the same answer limit at low thinking depth: the request carries `reasoning_effort: low` and `allowed_openai_params: ["reasoning_effort"]`. The gateway forwards that list only as exactly this value.
+2. When the second call ends at its limit too, the gate records "no verdict" with the cause in plain words: `the model used its whole answer limit of <n> tokens before it answered`. The gateway names the limit it gave in the response header `X-Gateway-Output-Limit`. The cause stands on the card and in the chat's tools, where `unexpected EOF (an answer of 2 bytes)` stood.
+3. A call that times out at the caller reports `the model did not answer within <d>`.
 
-The same holds for the brief writer, which failed three times in run 6 with `the model's answer is no brief: {"`.
+The audit and the review record `thinking: low` on their step when their verdict came from the second call. The brief writer, the answer screening and the delta round take the same path.
 
-The plan for this part measures two things first, on the 76 calls of 4.3: how many would pass at twice the limit, and whether the gateway's model map can cap the thinking of the `big` alias for JSON-mode calls. When a cap is possible, it is the better fix, since it costs nothing per call.
+The first design asked for twice the answer limit. Two facts ruled it out:
 
-The 31 calls that timed out at the caller after about 404 seconds are the same fault in most cases: the model was still thinking. The measurement covers them.
+- The gateway gives the alias `big` at most 24576 output tokens, so a second call got 1.33 times the room. At the measured 55 to 140 tokens a second, such a call meets the 6-minute timeout at the slow end.
+- A probe through the model gateway on 2026-11-24, three calls for each setting, shows what bounds the thinking: with no setting the model thought 2273, 4766 and 5004 tokens, with `reasoning_effort: high` 4429, 6187 and 4962, and with `low` 32, 43 and 45.
+
+A second fault stands beside this one: the deployed LiteLLM drops `response_format` for the provider behind `big`, so the gates' JSON mode never reaches the model. A newer LiteLLM passes it. The image list holds that version since the bump of 2026-11-24, and it takes effect when the infra repository moves its reference.
 
 ### 5.4 A pin lives in the lists
 
@@ -171,29 +180,35 @@ Run 6 put two cards in Needs you for one act, and the first named a workflow tha
 
 Section 5.1 removes this ask. The two changes are for the next act that only a human can do.
 
-## 6. Not built now: a program that looks up the new versions
+## 6. A program looks up the new versions
 
-The lookup of a bump is deterministic: the newest tag of a line, its digest, a file's sha256. A program could do it in the copy pod, which has the egress, and file the result as a pull request card, as the template pass does. The agent would then work only when a check fails.
+Sebastian decided on 2026-11-24: "Build it now, a program is the way to go."
 
-This spec does not build it. Run 6's first session did the whole lookup correctly, and every loss after it came from 4.1 to 4.6. The program needs about eight resolvers (registry tags, GitHub and Forgejo releases, nodejs.org, go.dev, the vulnerability database, the Debian snapshot, the PGDG archive, chart indexes) and their upkeep.
+The routine `weekly-bump` runs a pass, `pass: bump`, and files a pull request. No model takes part until a check fails.
 
-**The decision for Sebastian:** build the lookup program now, or measure first. The recommendation is to measure. When two of the four runs after 5.1 to 5.5 need a human or cost more than 3 EUR, build it.
+1. factoryd reads the eleven files of a bump at main: the two lists, the three Dockerfiles, `go.mod`, `go.sum`, `factory/images.yaml` and the plugin's two package files.
+2. A pod runs `upstream-bump`, which the CI runner image carries, with the release hosts in its fixed egress and with no store login. The program looks up each line, hashes each file it downloads, runs `go get -tool` for govulncheck and `npm install --package-lock-only --ignore-scripts`, and hands the changed files and a text back.
+3. factoryd commits the files on the bot's fork, copies the new inputs into the store with the pod of 5.1, opens the pull request and files the routine's card with the pull request on its row.
+4. The card is an ordinary agent card. When a check of the pull request fails, a session gets the failing check as its finding.
 
-## 7. Run 6: the acts that land it by hand
+**The rule for the newest release of a line** is one function with a table test:
 
-1. Check out the head of pull request #2309 of the code repository.
-2. Export the store's login as `REGISTRY_USER` and `REGISTRY_PASSWORD`.
-3. Run `scripts/upstream-files` inside the CI runner image, as the `upstream` job of `ci.yml` does. Each upload prints `uploaded <package> <version> <file>`.
-4. If the script prints `its URL does not serve the pinned sha256` for `vulndb.zip`, the database moved since the pin. Answer #2306 with that line, and the session pins the new sum.
-5. Answer #2305 with "the store holds the files", and re-run the checks on #2306.
-6. The audit has a verdict on no head of run 6. When it has none on the green head either, merge #2309 by hand: the review approved the heads `57c84a87` and `e89590bb`.
+- A tag that starts with a version moves to the newest stable version with the same first number, the same suffix and the same number of parts.
+- A tag that is no version keeps its tag and takes its digest of today.
+- A word after a line's kind in `upstream-images.txt` refines it. `patch` keeps the line in its minor. `hold` never moves it. `with <name>` gives it the version of another line. `hold with <name>` holds it and names the line it follows.
+- A newer major that the rule leaves is named in the pull request's text. So is each line the rule holds, and each pin the program could not resolve. An unresolved pin stays as it was and does not stop the bump.
+
+A file's sha256 is always the program's own hash of its own download.
+
+**The proof.** A dry run against the real hosts on the tree of the week before reproduced `go.mod`, `go.sum`, both package files and `factory/images.yaml` of pull request #2309 byte for byte. It differs in 7 other places, each explained: 4 releases or digests that came out after #2309's lookup, the Debian snapshot date, which the rule takes from the image's own date, the held cilium-envoy, and the barman plugin's v0.16.0.
+
+## 7. Run 6: how it landed
+
+Run 6 landed on 2026-11-24. `scripts/upstream-copy` and `scripts/upstream-files` ran by hand over the head of pull request #2309, inside the CI runner image, and uploaded the SigNoz chart, four files and the two tarballs. The script refused the Go vulnerability database, which had moved since its pin. The pin went to `20261124T155600Z` on the branch. All six checks went green, `image-build` among them, and the pull request merged as `0d2ead278`.
 
 ## 8. Order of work
 
-1. **5.3, the gates.** It hit 28 cards in two weeks, the bump among them. It is a plan of its own.
-2. **5.1 with 5.2 and 5.5, the copy.** One plan. Its proof is a pull request that moves one file pin and goes green with no human act.
-3. **5.4, the pins.** One card, a refactoring with no change in behaviour.
-4. **5.7, the ask.** One card.
+All parts are built. The plan [2026-11-24-open-cards-root-causes.md](plans/2026-11-24-open-cards-root-causes.md) holds the order, the commits and the state of each.
 
 ## 9. Not in this spec
 
@@ -201,7 +216,17 @@ This spec does not build it. Run 6's first session did the whole lookup correctl
 
 ## 10. Not verified
 
-- The log of `image-build` was not read. That the build hashes the 404 body comes from the cards' quotes of the log and from the matching sha256.
-- How the sessions read the makers' checksums is not known. The sandbox's egress for these cards is `proxy.golang.org`, `sum.golang.org`, `storage.googleapis.com` and `registry.npmjs.org`.
-- Whether the CI runner image runs as the copy pod under the pod's security rules was not tried.
-- The share of the 76 calls that would pass at twice the answer limit is not measured.
+- The log of `image-build` was not read. That the build hashed the 404 body comes from the cards' quotes of the log and from the matching sha256.
+- Whether a gate's verdict at low thinking depth is as good as one at full depth is not measured.
+
+## 11. Live state on 2026-11-25
+
+The code is on main and main's CI built its images. It is not rolled out: the roller holds every roll while plan #2272 is open on main, and that plan waits on a human's verdict on its criterion `store_serves_the_weeks_files`.
+
+Not run on the cluster yet:
+
+- the copy pod as the CI runner image under gVisor, its uploads through the edge gateway, and a cold Go module download inside its 25 minutes,
+- the bump pod with its egress, and a whole run of the routine against the forge,
+- a gate call that is cut and answers at low thinking depth.
+
+The routine's project file still says `files: agent`. It moves to `files: pull-request` with `pass: bump` after the roll, since a factoryd without the pass refuses that file.

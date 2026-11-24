@@ -49,7 +49,7 @@ Run the tool from the code repository. It refuses a dirty tree, so commit first:
    rm -rf /tmp/policy-fresh && mkdir -p /tmp/policy-fresh
    git -C ~/repos/ai-software-factory-infra archive origin/main factory | tar -x -C /tmp/policy-fresh
    ```
-3. Get the pinned opencode binary, the release `AgentDocOpencodeVersion` names (`1.19.5`), from the factory's package registry (`api/packages/upstream/generic/opencode/v1.19.5/opencode-linux-x64.tar.gz`), and check it against the checksum in `Dockerfile.sandbox`. The tool runs `<binary> --version` and refuses anything else.
+3. Get the pinned opencode binary, the release the `opencode` line of `upstream-files.txt` names, from the factory's package registry (`api/packages/upstream/generic/opencode/<version>/opencode-linux-x64.tar.gz`), and check it against the checksum in `Dockerfile.sandbox`. The tool runs `<binary> --version` and refuses anything else.
 4. Regenerate:
    ```sh
    cd ~/repos/ai-software-factory-code
