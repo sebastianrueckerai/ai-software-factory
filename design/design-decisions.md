@@ -475,7 +475,7 @@ From round 20 ([design/rounds/20-cap-reset/](rounds/20-cap-reset/index.html)), f
 
 Not taken: B, lift the day cap until 00:00 UTC (only the month cap bounds the day), C, allow an amount (a number at the moment the owner wants none), and D2, the press on the strip (it makes the read-only strip a control and crowds it at 390 px).
 
-Amended by C49 (2026-11-24): the premium cap has a Reset, each Reset stands left of its gauge on the gauge's line, and each row's label says when its count resets by itself.
+Amended by C49 (2026-11-24): the premium cap has a Reset, each Reset stands left of its gauge on the gauge's line, and each row's label says when its count resets by itself. The times in this entry's examples read in the human's own zone, as C49 sets: "before 01:00 CET", "counted since 15:02 CET".
 
 ## C48. "Give more room" sets its count with five buttons and shows time and money as a table of left, adds and then (2026-11-21, the director, provisional)
 
@@ -507,6 +507,8 @@ Sebastian asked for these three changes on 2026-11-24, in words, with no round. 
 
 **Who may press.** The premium cap: a human who writes the factory's code, as for the day cap.
 
-**The time.** The labels "today", "this month", "premium this month", "LiteLLM backstop" and a project's month row end in the moment their count resets by itself, to the minute, in `--text-muted`: "today (resets 25 November at 00:00 UTC)". The day and the months turn where the gateway turns them. The backstop's time is LiteLLM's own `budget_reset_at`, and the row shows no time when LiteLLM gives none. Where the label, the time and the figure do not fit one line, the time goes under the label.
+**The time.** The labels "today", "this month", "premium this month", "LiteLLM backstop" and a project's month row end in the moment their count resets by itself, to the minute, in `--text-muted`: "today (resets 25 November at 01:00 CET)". The day and the months turn where the gateway turns them. The backstop's time is LiteLLM's own `budget_reset_at`, and the row shows no time when LiteLLM gives none. Where the label, the time and the figure do not fit one line, the time goes under the label.
+
+**The zone.** Every time a console screen shows a human reads in the zone of the human's browser, and in Europe/Berlin (CET, CEST in summer) where the browser's zone is not known. The text names the zone by its short name. The periods still turn at 00:00 UTC, so the day's count resets at 01:00 CET. Text that no browser shows stays in UTC: issue comments, commit statuses, logs and the text that agents read.
 
 Why: the button on the gauge's line saves a line per cap and shows which count it resets. The time answers "how long must I wait" without a press on Reset.
