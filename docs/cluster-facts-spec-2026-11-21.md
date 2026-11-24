@@ -246,7 +246,7 @@ The platform kills CI runner pods (`factoryd/ci.go:807`) and gate pods (`factory
 
 - The class comes from code. No model decides it.
 - Policy code keeps every bound: the attempt count, agent time and the spend limit.
-- No prompt gets raw cluster text. Fields are parsed first.
+- No prompt gets raw cluster text. Fields are parsed first. One exception stays as it was before this spec: a session whose container never ran keeps the kubelet's or the scheduler's message in its start failure, because it holds no process output and names the fix. It reaches the human and the stronger model of a `pod_never_started` case.
 - No new Kubernetes rights. factoryd already lists pods and nodes in every namespace and lists events in each task namespace. Sandbox pods get nothing new.
 - A SigNoz query names a narrow key. The pass queries once a minute over the last 15 minutes. A death's query names its pod's UID.
 - Re-seeding works. The incident log and the death records are derived data. Losing them loses history, and nothing breaks.
