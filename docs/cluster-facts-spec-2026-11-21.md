@@ -129,6 +129,8 @@ A death record has one of three classes. Each class says who ended the session. 
 | `own_limit` | the session's own use of its pod's limits | as today: an attempt, with the fact line |
 | `unknown` | no cluster cause found | as today. The record says "no cluster cause found", and the next session gets no line |
 
+An end that the worker reported itself is `unknown` before any rule runs: a success or failure it reported, or its stop after factoryd's own stop, including a stop sent by an earlier factoryd. A worker that reported was not killed. Its record keeps the service-restart lines of 5.4 and gets no class line, and it reads no kernel line. A stop that factoryd did not send, such as the SIGTERM of an eviction or a drain, goes through the rules.
+
 The rules run in this order, and the first match wins.
 
 1. `platform`: a memory-guard kill line names the pod's cgroup.
