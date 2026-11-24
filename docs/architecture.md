@@ -2107,7 +2107,10 @@ project's month cap one of the project's approvers. The press is a console
 form behind a human's session and its CSRF token: the chat, the MCP door and
 the ladder's rungs have no tool for it, and a test fails any agent tool
 whose name holds "reset" but the board filter's. A reset wakes every card
-that waits on a cap, as a policy load does, and a wait whose refusal came
+that waits on a cap, as a policy load does: every card that has not ended
+and has a live day, month or project cap case, whichever rung holds the
+case, so a wait a rung holds ends at the reset and never reaches the human
+with a cap that no longer binds. A wait whose refusal came
 under the policy in force resumes once a reset of its cap followed the
 refusal. The month alarm counts from the reset too: a reset closes the
 month cap's card, and each count gets its own 50, 80 and 100 percent alerts.

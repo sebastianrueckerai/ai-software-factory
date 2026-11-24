@@ -202,4 +202,28 @@ The exact copy (§5.2, §5.9):
 
 ## Outcome
 
-(Written when Task 6 ends.)
+The work landed on main of `ai-software-factory-code` as `15d8ec3ef` on 2026-11-24, pushed to both remotes after the full suite passed on the merged head. Before the landing it was merged twice with main, once for the death reader and once for the rule that a stop factoryd sent for a decision keeps its outcome. The roll `01e8a1350` (pull request #2285) merged on its own, and the commit status `factory/roll` on `15d8ec3ef` reads that the change runs live.
+
+What the factory does now:
+
+- "Put on hold" takes a running card, and a card that waits to resume, beside the queued and waiting-deps cards it took before. The chat's `hold_card` takes the same set, on the human's word only.
+- A press on a running card stops its session through factoryd's own stop. The worker pushes its work, the session ends `held`, its start is given back, and the card waits in Queued with "on hold: reason". It frees its slot and is not counted ahead of other cards.
+- "Release the hold" sends the card on from its saved work, ahead of the cards that have not started. A release card that ends merged or done releases it too.
+- A session that starts on a held card stops as soon as it registers. A hold during a platform kill of the pod stays a hold: the death record keeps its platform class, and the next session is not told that the end did not count.
+- The monitor keeps watching a held card that still runs or is in review, and goes quiet only while the card is parked. The heal pass does not wake a parked held card until its hold no longer stands.
+
+The live check ran on a probe card, #2286 on the code project, on 2026-11-24:
+
+- The hold was pressed at 08:06:28 UTC while the card's first session ran. The press answered in 2.6 s.
+- factoryd recorded its stop at 08:06:31. The worker pushed its work to `factory/t-de370c5cd6f4` at `27fbde66`, and the session ended `held` at 08:06:41.
+- By 08:06:43 the pod was gone, and the card was in Queued with "on hold: …" and no longer held a slot. Its starts left were the same as before the press.
+- The drawer offered "Release the hold" with "The card goes on from its saved work, ahead of the cards that have not started."
+- The release at 08:08:38 started the next session at once, cloned at `27fbde66`. The probe card was then closed unmerged.
+
+Each task passed a task review and its fix rounds. A whole-branch review on Fable followed, then one fix wave, a re-review, and a scoped review of each merge with main.
+
+Not seen live: "the next queued card starts" after the hold. No other card of the project waited in Queued at the time. The slot count showed the held card left out.
+
+Found during the live check: the probe's sizing session waited on the month cap at a rung below the human. A reset of the month's count at 07:30 woke only the cap waits that already stood at the human, so at 07:38 this one asked the human about a cap that no longer bound. Fixed on main as `7f9b7642f`: a reset or a policy load now wakes every card that has not ended and has a live day, month or project cap case, whichever rung holds it. Two gaps stay open, waiting on Sebastian's answer to a broader design: a cap case that climbs gets no new check of the cap first, and a cap case waits 35 minutes at a rung whose chat cannot run under the cap.
+
+Found at that fix's roll: the roll's pull request failed its tests because `internal/factoryd` lost its test database mid-run. A test in `internal/factoryd/pg` used the same database name, and CI runs the two packages in parallel, so one dropped the other's database. The same fault failed two other pull requests that day. Fixed on main as `030e7da6e`: a test database's name now carries its package, so two packages can no longer share one.
