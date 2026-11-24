@@ -4700,7 +4700,9 @@ Three is the count of `pod_never_started`. No answer changes the platform.
 
 **The record's summary.** The session's end summary names what the pod did
 and nothing the pod wrote: "container worker terminated with OOMKilled
-(exit code 137)" or "evicted". For a `platform` or `own_limit` end the
+(exit code 128)" or "evicted". Under gVisor a container that reaches its
+memory limit ends `OOMKilled` with exit code 128, not 137, and the kernel's
+`CONSTRAINT_MEMCG` line names the pod's cgroup. For a `platform` or `own_limit` end the
 card's timeline and digest show the record's short phrase, for example
 "the node's memory guard killed the pod", in place of "no push". An
 `unknown` end stays "no push" there, and the record says "no cluster cause
