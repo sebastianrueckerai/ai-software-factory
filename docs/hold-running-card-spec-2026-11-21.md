@@ -71,7 +71,7 @@ A card takes a hold when it is a bound agent card on the coding loop and one of 
 
 `Task.Holdable` (`factoryd/cardhold.go:37`) and `SetCardHold` (`factoryd/store.go:2600`) take the same set.
 
-A stored hold stands on every status that is not final (D6). `Task.Held` (`factoryd/cardhold.go:30`), `EndCardHold` (`factoryd/store.go:2615`) and `HeldOn` (`factoryd/store.go:2625`) read a hold on every status that is not final, not only on queued and waiting-deps. A card's end clears its hold already (`transitionSet`, `factoryd/store.go:2494`). The monitor's skip of a held card (`carddigest.go:327`, `carddigest_flags.go:89`) follows `Held`.
+A stored hold stands on every status that is not final (D6). `Task.Held` (`factoryd/cardhold.go:30`), `EndCardHold` (`factoryd/store.go:2615`) and `HeldOn` (`factoryd/store.go:2625`) read a hold on every status that is not final, not only on queued and waiting-deps. A card's end clears its hold already (`transitionSet`, `factoryd/store.go:2494`). The monitor skips a held card only while it is parked, in queued or waiting-deps (`carddigest_flags.go:89`). A held card that still runs or is in review keeps every monitor flag, since such a card can hang while it holds a slot.
 
 The press is refused on every other card, and the refusal names its state and what fits it (`unholdable`, `console/actions.go:2825`):
 
@@ -89,7 +89,7 @@ The press is refused on every other card, and the refusal names its state and wh
 - If no session runs (`ErrNoLiveSession`), the card is between sessions. The console answers "#N waits in Queued before its next session until a human releases it." The loop meets the hold at its next `awaitSlot` (section 5.4).
 - A card that is queued to resume gets the same answer as a card that has not started.
 
-A session registers for asks only after its start check-in (`runSession`, `factoryd/runner.go:1164`), so a press during the start check-in finds no live session. When the session registers, it reads its card's hold. If a hold stands, it stops at once with `TripHold`. A press therefore never misses a session that starts after it.
+A session registers for asks only after its start check-in (`runSession`, `factoryd/runner.go:1164`), so a press during the start check-in finds no live session. When the session registers, it reads its card's hold. If a hold stands, it stops at once with `TripHold`. A press therefore never misses a session that starts after it. The same holds while the session's pod waits to start, for up to 10 minutes: the press finds no live session, the card keeps its slot, and the session stops when it registers. A pod that never starts ends the session as not started, and the card parks at its next `awaitSlot`.
 
 The press records `EventCardHeld`, as today, with a detail `stopped: true` when a session took the ask.
 
@@ -109,6 +109,8 @@ The session ends with a new outcome `OutcomeHeld`, carrying the pushed head in `
 
 No gate, no check-in and no review runs on a held stop. The code behind the new outcome sits behind a new workflow version, as every change to the workflow's commands does.
 
+A held stop is a stop factoryd sends for a decision it holds, so its death record is decided. If the platform kills the pod inside the stop, the session still ends `OutcomeHeld`: the record keeps its platform class and counts toward the human's card on the platform, and the next session's handover carries no line that the end did not count.
+
 ### 5.4 The park before the next session
 
 Every session start passes `awaitSlot` (`factoryd/workflow.go:1851`), which calls `AdmitResume` (`factoryd/surge.go:58`). The hold is enforced there and nowhere else. A re-verification runs no session and skips `awaitSlot` (`if t.reverify { continue }`), and it needs no park: a hold keeps a card from its next session.
@@ -123,7 +125,7 @@ Every session start passes `awaitSlot` (`factoryd/workflow.go:1851`), which call
 A card queued to resume blocks every card that has not started (`factoryd/bounded.go:135`), and it counts as ahead of the later resumed cards (`factoryd/surge.go:87`). A held card must do neither:
 
 - The count of resumed cards that admission and `admitResume` read leaves held cards out.
-- `wakeResumed` (`factoryd/bounded.go:170`) still wakes held cards. Each wake runs `AdmitResume`, which runs `cardHoldWait`. A release card that is merged or done ends the hold there, as admission ends it for a card that has not started.
+- `wakeResumed` (`factoryd/bounded.go:170`) wakes a held card only when its hold no longer stands: its release card ended merged or done. The wake runs `AdmitResume`, which runs `cardHoldWait`, and the hold ends there, as admission ends it for a card that has not started. A held card whose hold stands gets no wake. The heal pass pulls every project with a queued card each minute, and a wake per pass would grow the card's workflow history to Temporal's limit within days. A human's release ends the hold before it pulls the queue, so that wake still reaches the card.
 - The board's "N ahead" line (`setSlotWaits`, `factoryd/console_store.go:362`) leaves held cards out.
 
 ### 5.6 Waits inside running end at a hold
@@ -131,6 +133,8 @@ A card queued to resume blocks every card that has not started (`factoryd/bounde
 A running card can wait between sessions while it holds its slot: the provider freeze waits to the reset with the card running (`waitOnLimit`, `factoryd/workflow.go:2508`). That wait takes a new signal `SignalHeld`, which the press sends to a running card with no live session. On the signal, the wait ends and the loop goes to `awaitSlot`, which parks the card. When the hold is released, the next session starts at once, and a provider that still refuses freezes the card again.
 
 The builder lists the other waits a running card can hold its slot in and gives each the same signal.
+
+One wait does not end at a hold: a rung that judges the card's case while the card runs (`awaitAnswer`, up to 35 minutes per rung). Ending it would leave the case without its answer. The hold refuses every rung's resume, continue, handover, successor and close of the card (section 5.10), so the rung settles the case or hands it up to the human. A settled case sends the card to its next `awaitSlot`, which parks it. A case at the human moves the card to waiting-human, which frees its slot. The slot frees after the rung's answer, not at the press.
 
 ### 5.7 Runs from before the roll
 
@@ -163,7 +167,7 @@ The face copy (`factoryd/faces_copy.go:190-194`) gets one variant per started ca
 
 `MoreOf` (`factoryd/faces.go:571`) offers "Put on hold" on every card `Holdable` names, so the running card's drawer offers it beside "Tell the running session" and "End the card".
 
-The chat's `hold_card` describes itself as "Hold a queued or running card, on the human's word, until it is released: a running card stops its session and keeps its work." `release_hold` keeps its text. `doReleaseHold`'s refusal names the new set: "`hold_card` puts a queued or running card on hold."
+The chat's `hold_card` describes itself as "Hold a queued or running card on the human's word: a running one stops and keeps its work." A tool's description holds at most 100 characters. `release_hold` keeps its text. `doReleaseHold`'s refusal names the new set: "`hold_card` puts a queued or running card on hold."
 
 ### 5.10 What leaves a held card alone
 
@@ -171,7 +175,7 @@ These already respect a hold and need no change once `Held` covers the new statu
 
 - The rungs below the human take no resume, continue, handover, successor, close or replan of a held card (`holdRefusal`, `factoryd/cardhold.go:168`).
 - A plan revision keeps a held card's key (`heldFindings`).
-- The monitor's `ownedWait` skips a card with a hold (`factoryd/carddigest_flags.go:89`), so a held card raises no `queued_over_bound`.
+- The monitor's `ownedWait` skips a held card while it is parked (`factoryd/carddigest_flags.go:89`), so a parked held card raises no `queued_over_bound`. A held card that still runs or is in review keeps every monitor flag (section 5.1).
 - The heal pass restarts a dead run of a queued card with `resumed_at` set (`factoryd/temporal.go:358-368`). The restarted run reaches `awaitSlot` and parks again.
 
 ## 6. Constraints
@@ -187,7 +191,7 @@ These already respect a hold and need no change once `Held` covers the new statu
 
 - The name of the new workflow version and where `OutcomeHeld` sits in the session switch.
 - The list of waits inside running that hold a slot (section 5.6), and how each takes `SignalHeld`.
-- Whether `ResumeWaiters` takes a flag or the callers filter held cards, as long as `wakeResumed` still wakes them.
+- Whether `ResumeWaiters` takes a flag or the callers filter held cards, as long as `wakeResumed` wakes a held card once its hold no longer stands.
 - The exact refusal words, within the meaning of section 5.1 and the writing guide.
 
 ## 8. How the build proves itself
