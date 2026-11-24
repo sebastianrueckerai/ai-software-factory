@@ -4034,7 +4034,16 @@ Sandbox hardening:
   could not see or reproduce (backlog 85, 86). Since Stage 12 gosec comes
   through `go run` at a pinned version in the repository's `check`, over
   the module proxy, and the checks finding carries the failing job's log
-  lines (7).
+  lines (7). Since 2026-11-24 `scripts/gosec.sh` is the one way gosec
+  runs, for `bash check` and both CI workflows; the pull request job runs
+  the base's copy, so a change cannot edit what scans it. go/packages
+  splits a file list longer than 16,383 characters into separate `go list`
+  calls, and gosec passes a package as absolute file paths, so from CI's
+  long checkout path `internal/factoryd` (200 files) type-checked in
+  pieces and gosec skipped its SSA rules there. The script runs gosec from
+  a short link to the checkout, refuses a package whose list would pass
+  the budget and names the action (split the package), and runs without
+  `-quiet`, which had hidden those type errors locally while CI failed.
   Since Stage 17 the sandbox and runner images carry the PostgreSQL 17
   server from PGDG, its key pinned by fingerprint. `scripts/pg-test.sh
   <command>` in the factory's code repository starts a throwaway cluster
@@ -4689,17 +4698,22 @@ below. The records and the tool still show them.
 `platform_killed`, as `provider_refused` has its own. It costs no attempt
 and no agent time, and it is no step toward the stronger model. The card
 restarts at once from its last pushed commit on the session's model. Money
-the session spent stays spent, and the spend limits hold as policy
-enforces them. A check-in that ran in the session stays on the timeline,
-but its decision is dropped, since the platform's end is the operative
-fact. A `no_progress` trip whose pod shows end-state platform evidence ends
-the session at once with no check-in, so a lost node costs no paid model
-call. `own_limit` stays a normal attempt on purpose: its cause is the
-session's own command, and the next session's line names the limit it
-reached. When three sessions of one card in a row end as `platform`,
-factoryd opens the case `platform_fault`. The ladder takes it: no rung 1,
-rung 2 first, then the human, and its statement lists the three records.
-Three is the count of `pod_never_started`. No answer changes the platform.
+the session spent stays spent, and the spend limits hold as policy enforces
+them. The end goes free only when factoryd had not sent the pod its stop. A
+stop that factoryd sent for a decision (a person's replan, the agent's
+escalate, a hold, the wall clock, a check-in's outcome) keeps that
+decision's outcome when the platform kills the pod inside it: the record is
+marked stopped, keeps class `platform` for the tool and the human's card,
+and gives the next session no class line, so it never reads "does not count"
+for an end that counted. A `no_progress` trip whose pod shows end-state
+platform evidence ends the session at once with no check-in, so a lost node
+costs no paid model call. `own_limit` stays a normal attempt on purpose: its
+cause is the session's own command, and the next session's line names the
+limit it reached. When three sessions of one card in a row end as
+`platform`, factoryd opens the case `platform_fault`. The ladder takes it:
+no rung 1, rung 2 first, then the human, and its statement lists the three
+records. Three is the count of `pod_never_started`. No answer changes the
+platform.
 
 **The record's summary.** The session's end summary names what the pod did
 and nothing the pod wrote: "container worker terminated with OOMKilled (exit

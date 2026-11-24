@@ -211,6 +211,8 @@ The check-in, rung 1, rung 2 and the project chat get it. Sandbox sessions do no
 
 ### 5.6 What a platform death does to the card
 
+A platform death goes free only when factoryd had not sent the pod its stop. A stop that factoryd sent for a decision (a person's replan, the agent's escalate, a hold, the wall clock, a check-in's outcome) keeps that decision's outcome when the platform kills the pod inside it. The record marks the end as stopped, keeps class `platform` with its facts for the tool, and still counts toward the human's card (5.7). The next session gets no class line for it, so it never reads "does not count" for an end that counted. A `no_progress` trip reads the death before it stops the pod, so its platform end still goes free.
+
 - It costs no attempt and no agent time, and it is no step toward the stronger model. This follows `not_started` and `provider_refused`.
 - The card restarts at once from its last pushed commit.
 - Money the session spent stays spent. Its model calls were real, and the spend limit stays as policy enforces it.
