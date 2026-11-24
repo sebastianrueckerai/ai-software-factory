@@ -2656,7 +2656,8 @@ sandbox becomes a card.
 - **Card drawer**: everything about one piece of work. It opens beside the
   board at 40 to 50 percent of the width, with the tabs Overview, Session,
   Activity, Files and Receipt. Overview is the opened card of C46: the
-  head, the ask block, the summary and closed folds (5.9). Session is the
+  head, the ask block, the hold's acts (C50), the summary and closed
+  folds (5.9). Session is the
   default tab on a running card: the newest session's agent text and the
   messages a human sent it. factoryd publishes a running session's agent
   text as `session_said` on the event bus, to the project's writers only,
@@ -3700,7 +3701,8 @@ builder, `faceOf`, and one template, and every opened card through
 `openedView`, as C46 of [design-decisions.md](../design/design-decisions.md)
 and [design/ia.md](../design/ia.md) describe: the small card is one
 paragraph and one foot line with at most one button, and the opened card
-holds the head, the ask block, the summary and closed folds. Every `#N`
+holds the head, the ask block, the hold's acts, the summary and closed
+folds. Every `#N`
 renders as a link with its target's title and state.
 
 **The kind lists.** `CaseKinds`, `CardSources`, `HumanActions`,

@@ -512,3 +512,16 @@ Sebastian asked for these three changes on 2026-11-24, in words, with no round. 
 **The zone.** Every time a console screen shows a human reads in the zone of the human's browser, and in Europe/Berlin (CET, CEST in summer) where the browser's zone is not known. The text names the zone by its short name. The periods still turn at 00:00 UTC, so the day's count resets at 01:00 CET. Text that no browser shows stays in UTC: issue comments, commit statuses, logs and the text that agents read.
 
 Why: the button on the gauge's line saves a line per cap and shows which count it resets. The time answers "how long must I wait" without a press on Reset.
+
+## C50. The hold's acts stand on the opened card under its head, outside the folds (2026-11-24, Sebastian)
+
+Sebastian asked for this on 2026-11-24, in words, with no round: "It does not need to be on the card, but I want to see it on the expanded section without further digging for it." The entry amends C46's opened card. The rest of C46 holds.
+
+**The part.** The opened card gets a part between the ask block and the summary: the hold. It holds the hold's acts the card offers, each a quiet button with its effect line in the ask block's shape: "Put on hold" on a card that takes a hold, and on a held card "Release the hold" first, then "Hold again". A hairline in `--line` stands above it, as above every part. A card that takes no hold and has none shows no hold part.
+
+**The fold.** "Other actions" no longer holds the hold's acts, and its hint no longer counts them. A running card's hint reads "Send back to the planner, and 6 more" where it read "and 7 more".
+
+**The small card** on the board stays as C46 sets it: it offers no hold.
+
+Why: the hold is the act a human reaches for while sorting the board, and C46 closed it inside a fold whose hint named only its first act, so a human who looked for it did not find it.
+
