@@ -2500,7 +2500,10 @@ waits for answers, each question and each hold-out on a page of its own
 card's stage word comes from its track and status: planning, building,
 verifying, queued or waiting on you.
 Needs you holds every card whose next actor is a person, a card that waits
-on its author included, for every viewer. The new-task form's track select
+on its author included, for every viewer. Done holds the cards that ended
+in the last seven days, newest first, the human lane's cards beside the
+agents' cards, so a card that leaves Needs you stands at the top of Done
+with why it ended (C51). The new-task form's track select
 offers direct, the default, plan and human.
 
 - **Login.** Forgejo OAuth2, the authorisation code flow with PKCE (S256), a

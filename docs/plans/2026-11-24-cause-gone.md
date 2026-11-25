@@ -598,6 +598,25 @@ What the build changed against the text above:
 - SigNoz's reason reads "the alert cleared at 07:30 UTC" on the day of the clear and "the alert cleared at 28 Sep 20:40 UTC" on another day, each with its moment, not an RFC 3339 time. The issue's note and the card's closing reason keep the RFC 3339 time.
 - The factory's own close of a pull request's card (`WithdrawPRCard`) builds its row with `WithdrawnRow`, so it names the case. Task 1's live query found this path on the baseline of 2026-11-24: cases 7469 and 7515.
 - On the settled row's fold line a reason too long for the row ends in an ellipsis. Before, it ran past the row's edge and was cut mid-word.
-- The lab scene `closed-asks` builds on the threads scene, not the busy scene, so the inbox holds #640's ask, settled with its reason. `check.js` also checks that row in New York's zone. A card of the human's lane in Done never shows on the board, so the check reads rule (b) on the opened card's head.
+- The lab scene `closed-asks` builds on the threads scene, not the busy scene, so the inbox holds #640's ask, settled with its reason. `check.js` also checks that row in New York's zone. Task 12 below puts these cards in Done, and the check reads rule (b) there too.
 - The design entry is C51. C50 went to the hold's acts on the same day.
 
+### Task 12: Done holds the human lane's ended cards
+
+Rule (b) of Task 10 showed only on the opened card, because Done left out every card of the human lane. Sebastian's request of 2026-11-24 asks for the card in Done: "The closed card on the 'done' pile should say why it closed … if the human was reading the card while it disappeared he can easily look at it on the done pile and see why it vanished."
+
+**Why Done left them out.** No recorded decision chose it. The console's first board (`22e157db8`, 2026-09-28) had a lane of its own for the human, which listed a human card only while it was open. The four columns (`7d9813e91`, 2026-10-11, and C8 of 2026-10-14) kept that rule in code: an ended human card took no column. C8 itself says only that Done holds done, failed and closed. The paged read of finished cards (`897f449cc`, 2026-10-15) wrote the rule into SQL as `kind NOT IN (chat, 'human')`.
+
+**What changed** (`e0ec82161`):
+
+- `FinishedTasks` and its in-memory twin `FinishedPage` list the human lane's ended cards in the same seven days and the same order of finish as the agents' cards. Done's count is the read's count, so it takes them in: one rule for every card in the lane.
+- The board places an ended human card in Done, and the page after a card, a find and its filters (such as `status:closed`) list it. The status line's counts do not change.
+- A card the factory closed because its cause went reads "needed you no more: <reason>", a card a human answered reads "done", and a card a human closed reads its own words.
+- The project agent's `board` read and `find_cards` list these cards with the same words in UTC, for example `#2 t-cap "…" done (is done), needed you no more: the month cap's count was reset at 07:30 UTC by sebastian`.
+- Two tests pinned the old rule and now pin the new one: `TestPGStoreFinishedPages` (its human card `h` now follows `a`) and `TestBoardRendersColumnsFromTheStore` (its finished human card now stands in Done).
+
+**Volume, read-only on the live database on 2026-11-25.** In the last 7 days 19 human-lane cards ended: 5 on the code project and 14 on the infrastructure project, 8 of them closed alert cards. In the last 60 days the busiest 7 days held 55, all on the infrastructure project during the alert storms of October and early November. In 67 days no agent card ended on the infrastructure project, so these cards push no agent card down there. On the code project the busiest week held 18 human-lane cards against about 95 agent cards a week.
+
+**Bound: none.** Done lists the newest card first, so the card a human just saw leave Needs you stands at its top however many cards are below it, and Done loads 50 at a time as before. Two bounds were measured and not built. Folding the alert cards that the factory closed by itself into one line would cut the busiest week from 55 cards to 34 and add a new element to the order menu, the filters, the find, the pages and the phone. A 24-hour window for those alert cards would leave 42.
+
+**Checked:** `TestPGStoreDoneHoldsTheHumanLane` on PostgreSQL and `TestDoneHoldsTheHumanLanesEndedCards` in the console. In the lab's `closed-asks` scene in New York, Done reads #643 done, then #641 "needed you no more: the month cap's count was reset at <time> EST by sebastian", then #642 done, and its count rises from 11 to 14. The third new card is the busy scene's ended human card of a routine. The race suite, `bash check static` and the lab's full run with its New York walk passed before the push. CI passed on `e0ec82161`: `ci / test` in 18 minutes and the three images. `factory/roll` held it for plan #2272 as it held the batches, and factoryd still ran `d5f0078ae` at 05:10 UTC on 2026-11-25, so this change is not live either.

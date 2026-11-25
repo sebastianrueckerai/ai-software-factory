@@ -534,7 +534,9 @@ Sebastian picked this in words on 2026-11-24, with no round. The entry adds a li
 
 **The running card.** A card that runs on after such a close reads "Needed you no more: <reason>." under its paragraph, in 13 px in `--text-muted`. The opened card shows the same line under the lead of its head. The line stays until the card's next ask or answer, or until the card's second status after the close.
 
-**A factory card in Done.** A card of the human's lane that the factory closed this way reads "needed you no more: <reason>" as its state word, in place of "done" or "closed: <reason>". Agent cards keep "done". The board's Done lane holds no card of the human's lane, so this state word shows on the opened card.
+**A factory card in Done.** A card of the human's lane that the factory closed this way reads "needed you no more: <reason>" as its state word, in place of "done" or "closed: <reason>". Agent cards keep "done". A card a human answered reads "done", and one a human closed reads its own words. Done holds the human lane's cards that ended in the last seven days beside the agents' cards, newest first, and its count takes them in. The state word shows on the card in Done and on the opened card. A human who saw a card leave Needs you finds it at the top of Done with the reason. The project agent's board read and its find list these cards with the same words, in UTC.
+
+Until 2026-11-25 Done left the human lane's cards out. No decision chose that: the console's first board of 2026-09-28 had a human lane of its own, which listed a human card only while it was open, and the four columns of C8 kept the rule in code.
 
 **The chat and the card's life.** The inbox's settled ask reads "withdrawn: <reason> · 07:31", where it read "withdrawn · 07:31". On the fold line a reason too long for the row ends in an ellipsis, and the opened row shows it whole. The card's life reads "withdrawn because <reason>: <question>".
 
