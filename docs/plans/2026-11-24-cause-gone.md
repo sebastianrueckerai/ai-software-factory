@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task by task. Steps use checkbox (`- [ ]`) syntax for tracking. Line numbers are from the code repository's main at `535256ea0` (2026-11-24). Main moved to `0d2ead278` while this plan was written, and no file this plan touches changed. Check each line before you edit it.
 
-**Status:** built and landed on the code repository's main on 2026-11-25, in three batches. The section "Outcome" at the end says what landed and what was checked live.
+**Status:** built and landed on the code repository's main on 2026-11-25, in three batches and Task 12. Live since 2026-11-25 06:10 UTC as `e0ec8216`. The section "Outcome" at the end says what landed and what was checked live.
 
 **Goal:** When the reason for a "needs you" ask is gone, the ask closes by itself and says why, and a human who was reading the ask sees where it went.
 
@@ -615,8 +615,41 @@ Rule (b) of Task 10 showed only on the opened card, because Done left out every 
 - The project agent's `board` read and `find_cards` list these cards with the same words in UTC, for example `#2 t-cap "…" done (is done), needed you no more: the month cap's count was reset at 07:30 UTC by sebastian`.
 - Two tests pinned the old rule and now pin the new one: `TestPGStoreFinishedPages` (its human card `h` now follows `a`) and `TestBoardRendersColumnsFromTheStore` (its finished human card now stands in Done).
 
-**Volume, read-only on the live database on 2026-11-25.** In the last 7 days 19 human-lane cards ended: 5 on the code project and 14 on the infrastructure project, 8 of them closed alert cards. In the last 60 days the busiest 7 days held 55, all on the infrastructure project during the alert storms of October and early November. In 67 days no agent card ended on the infrastructure project, so these cards push no agent card down there. On the code project the busiest week held 18 human-lane cards against about 95 agent cards a week.
+**Volume, read-only on the live database on 2026-11-25.** In the last 7 days 19 human-lane cards ended: 5 on the code project and 14 on the infrastructure project, 8 of them closed alert cards. In the last 60 days the busiest 7 days held 55, all on the infrastructure project during the alert storms of October and early November. The infrastructure project runs no agents, so it has no board: `GET /?project=ai-software-factory-infra` answers 404, and its human cards stand in no Done lane. Only the code project's human cards reach Done. Its busiest week held 18 of them against about 95 agent cards a week. On 2026-11-25 its Done window held 6, and 4 of them stood on the first page of 50.
 
-**Bound: none.** Done lists the newest card first, so the card a human just saw leave Needs you stands at its top however many cards are below it, and Done loads 50 at a time as before. Two bounds were measured and not built. Folding the alert cards that the factory closed by itself into one line would cut the busiest week from 55 cards to 34 and add a new element to the order menu, the filters, the find, the pages and the phone. A 24-hour window for those alert cards would leave 42.
+**Bound: none.** The busy weeks of 55 cards fell on the infrastructure project, which has no board. On the code project the human cards are a small part of Done. Done lists the newest card first, so the card a human just saw leave Needs you stands at its top, and Done loads 50 at a time as before. Two bounds were measured on the infrastructure project's numbers and not built: a fold of the alert cards the factory closed by itself (55 cards down to 34) and a 24-hour window for them (down to 42).
 
-**Checked:** `TestPGStoreDoneHoldsTheHumanLane` on PostgreSQL and `TestDoneHoldsTheHumanLanesEndedCards` in the console. In the lab's `closed-asks` scene in New York, Done reads #643 done, then #641 "needed you no more: the month cap's count was reset at <time> EST by sebastian", then #642 done, and its count rises from 11 to 14. The third new card is the busy scene's ended human card of a routine. The race suite, `bash check static` and the lab's full run with its New York walk passed before the push. CI passed on `e0ec82161`: `ci / test` in 18 minutes and the three images. `factory/roll` held it for plan #2272 as it held the batches, and factoryd still ran `d5f0078ae` at 05:10 UTC on 2026-11-25, so this change is not live either.
+**Checked:** `TestPGStoreDoneHoldsTheHumanLane` on PostgreSQL and `TestDoneHoldsTheHumanLanesEndedCards` in the console. In the lab's `closed-asks` scene in New York, Done reads #643 done, then #641 "needed you no more: the month cap's count was reset at <time> EST by sebastian", then #642 done, and its count rises from 11 to 14. The third new card is the busy scene's ended human card of a routine. The race suite, `bash check static` and the lab's full run with its New York walk passed before the push. CI passed on `e0ec82161`: `ci / test` in 18 minutes and the three images. `factory/roll` held it for plan #2272 as it held the batches, and factoryd still ran `d5f0078ae` at 05:10 UTC on 2026-11-25. Production rolled at 06:10 UTC, as the next section says.
+
+### Checked live after the roll
+
+Production rolled on 2026-11-25 at 06:10 UTC, after a human settled plan #2272's human criterion and the plan closed, which lifted the hold. The factoryd pod `factoryd-575f679545-rxz2j` started at 06:10:49 UTC with `FACTORY_COMMIT` `e0ec82161`. Every check below was read-only: the store, the logs, Temporal, and GET requests to the console as the controller.
+
+**Replay.** One workflow was open across the roll: the roll's own card, `task-t-9e0c87415c06`, started at 06:07:03 and completed at 06:11:20 UTC. Its workflow tasks at 06:11:17 and 06:11:20 ran on the new pod and replayed its history with no failure. That history holds no `EndCase` and no `CapResume`, so no workflow replayed the changed inputs. No other workflow was open. factoryd's log from 06:10 to 06:15 UTC holds 47 lines with no nondeterminism error, no panic and no failed workflow task. Temporal counts 0 workflows with a reported problem, 0 running and 0 closed otherwise than completed since the roll.
+
+**The live checks** ran at 06:14:54 UTC with `:rolled_at` = '2026-11-25 06:10:49+00'. The queries of tasks 1 to 8 returned no row. Task 10's `ClosedAsks` query returned one card, #349 below. One human card ended since the roll, the same #349. Most of these queries prove something only a day or a week later.
+
+**Two closes since the roll ran the new paths.**
+
+- Alert card #349 (`t-88ee1a1750bf`, infrastructure project, case 7732, kind `human_card`). The case reached the human at 06:12:37 UTC. SigNoz cleared the alert at 06:12:58. At 06:13:58 factoryd wrote one `question_withdrawn` row with case 7732, kind `human_card`, the question, the reason "the alert cleared at 06:12 UTC" and the moment `{2026-11-25T06:12:58Z, "15:04"}`. The case resolved by factoryd on rung 0 with action `withdraw` and the same reason, and the card ended closed. The issue's note keeps "The alert cleared at 2026-11-25T06:12:58Z. Nobody touched the card, so it closes." The card's face and its opened card's head read `needed you no more: the alert cleared at <time datetime="2026-11-25T06:12:58Z" data-layout="15:04 MST">07:12 CET</time>`. The project has no board, so this card stands in no Done lane.
+- Monitor flag case 7476 on alert card `t-240b3ce869ba`. factoryd withdrew it at 06:11:00 UTC with a row that names case 7476, kind `monitor_flag`, the question, the problem and the reason "the flag no longer holds", in the row shape of Task 1.
+
+**The production-held card** (#2315, `t-3cc430a7ebea`, case 7730) did not take the new path. The hold lifted before the roll, so the release keeper of `d5f0078ae` closed the card at 06:07:54 UTC. That keeper wrote its comment and ended the card, and the heal pass withdrew case 7730 as "card ended done" with no `question_withdrawn` row. The card reads "done" in Done. The keeper always closes this card before the roll that the hold held back, so the new path runs for it when the next hold lifts.
+
+**The live board.** `GET /` as the controller shows Done with 94 cards. Its first page of 50 holds 4 human cards: #2315 "done", #2305 "done", #2257 "done" and #2281 "closed by controller". The other 2 of the window's 6 stand on later pages. The live `console.css` holds the rule for the line on a running card (`.gone, .o-gone`) and the settled row's ellipsis, and `chat.js` renders a reason's times. No running card held a closed ask, so the line "Needed you no more:" on a running card was not seen live.
+
+**What looks wrong.** The Done state of `t-240b3ce869ba` changed from "closed: The alert cleared at 2026-11-24T01:33:35Z." to "needed you no more: the flag no longer holds". Rule (b) takes the card's newest ask. Here that is the monitor's flag "issue open after the end", raised after the card ended and withdrawn 29 hours later. That close does not say why the card ended, and "the flag no longer holds" means nothing to a human. Two changes would fix it. Rule (b) should take the withdrawal that ended the card, not a later flag's. The monitor's reason should say what changed, for example that the card's issue is closed now. This card is on the infrastructure project, so no board shows it. The same can happen on the code project.
+
+**Context for Task 5.** At 06:11:13 UTC the code project's chat stood at its judgment budget of 350.00 EUR. Rung 2 cannot run there until the budget grows or the month turns, so Task 5's query returns no row in that time whatever the code does.
+
+**The checks still owed.** Each runs read-only with `:rolled_at` = '2026-11-25 06:10:49+00', with the query in its task's "Live check" above:
+
+- Tasks 1 and 2, from 2026-11-26 06:10 UTC: no row.
+- Task 3, from 2026-11-26: list the cap cases that ended. No reason reads "the wait ended on its own", and each one that reached the human has its row.
+- Task 4, both queries, from 2026-11-26: no row.
+- Task 5, from 2026-11-26, once the chat's judgment budget leaves room: no row.
+- Task 6, at any time: no row.
+- Task 7, from 2026-12-02: no row.
+- Task 8, after each quiet-day close of a platform card: no counted death in its window.
+- Task 10, after the next close on a running card of the code project: `ClosedAsks` lists the card, and its face shows the line with a `<time>`.
+- Task 12, after the next human card of the code project ends: it stands in Done with its end words. It is listed by `select id, status, finished_at from tasks where repository = 'sf/ai-software-factory-code' and kind = 'human' and finished_at > :rolled_at;`.
