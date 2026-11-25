@@ -164,14 +164,32 @@ All are on code main. `d2be5d7b2` holds B1 to B9, and `4f4380891` adds the looku
 
 Infra main got the routine's corrected brief and the merge setup's comment as `87c6843`, and the image test that reads a word after `bootstrap` as `9dc57ff`.
 
-### 9.3 Still owed
+### 9.3 The checks on the cluster
 
-1. **A human's press.** Plan #2272 is open on main and holds every roll. Its criterion `store_serves_the_weeks_files` is a human's. The store serves all five files at their pinned sha256, checked on 2026-11-24.
-2. **After the roll, in this order:** the schema copy with the pass `bump` merges by itself, then the routine's project file moves to `files: pull-request` with `pass: bump`, and its brief shrinks to what a session needs when a check fails.
-3. **Checks on the cluster,** none of which could run before the roll: the copy pod with a pull request that moves one file pin, the bump pod with one run of the routine, the schema copy's own merge, the withdrawal of the notice on the ended infra card, and a cut gate call that answers at low thinking depth.
+All ran on 2026-11-25, after the roll.
 
-### 9.4 Found and not built
+| Check | Result |
+|---|---|
+| The schema copy merges by itself | Infra pull request #348 merged as the bot |
+| The notice on the ended infra card | The case withdrew |
+| The routine's project file | Infra `572c667`: `files: pull-request` with `pass: bump`, and the short brief |
+| One whole run of the routine | Run 9 filed pull request #2332 at 18:38 UTC. The copy pod filled the store, all six checks went green, the review approved, the project agent approved the merge, and the pull request merged at 18:57 UTC as `2a70352fa`. No session started and no card went to a human |
 
-- The deployed LiteLLM drops `response_format` for the provider behind `big`, so JSON mode never reaches the model. A newer LiteLLM passes it, and it comes with the infra repository's move to the bumped image.
-- `escalate` can still file a second card when the card it names already has an ask open.
-- The infra repository's references do not follow a bump by themselves. [The follow spec](../infra-follows-bump-spec-2026-11-25.md) holds the design: a program moves one part at a time, a check judges each move, and the parts the factory cannot live without wait for a human's merge.
+Runs 7 and 8 failed first, each on a fault that only the cluster showed. All three are fixed on code main:
+
+- The copy pod's egress list named `registry-1.docker.io` where the tools call `index.docker.io`, and it lacked the forge's port. A test now runs the real scripts through a recording proxy and compares the hosts they call with the list.
+- A card with its pull request on its row stayed `queued`, and the move into review refused it. The move now starts the card.
+- The Go vulnerability database's makers build its zip again with other bytes under one `modified` time. The lookup then wrote a new sha256 under the version the store already held. An unchanged `modified` now keeps the pin, a new version's label carries the first 12 hex digits of its sha256, and the copy script fails with both sums when the store's copy differs from the line.
+
+Not seen on the cluster: a gate call that is cut and answers at low thinking depth, the refusal of `escalate`, and a failed check that an agent's session then repairs to a merge.
+
+### 9.4 Found after the builds
+
+Fixed on code main on 2026-11-25:
+
+- LiteLLM dropped `response_format` and `reasoning_effort` for the provider behind `big`. A newer LiteLLM drops them too, so the gateway now names both in `allowed_openai_params` on every call and refuses that field from a caller.
+- `escalate` could file a second card when the card it names already had an ask open. It now refuses with the open ask's words and names `watch_card`.
+
+Not built:
+
+- The infra repository's references do not follow a bump by themselves. [The follow spec](../infra-follows-bump-spec-2026-11-25.md) holds the design: a program moves one part at a time, a check judges each move, and the parts the factory cannot live without wait for a human's merge. It waits for Sebastian's go.

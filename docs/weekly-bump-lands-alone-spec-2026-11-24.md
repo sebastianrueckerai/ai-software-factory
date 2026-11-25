@@ -148,7 +148,7 @@ The first design asked for twice the answer limit. Two facts ruled it out:
 - The gateway gives the alias `big` at most 24576 output tokens, so a second call got 1.33 times the room. At the measured 55 to 140 tokens a second, such a call meets the 6-minute timeout at the slow end.
 - A probe through the model gateway on 2026-11-24, three calls for each setting, shows what bounds the thinking: with no setting the model thought 2273, 4766 and 5004 tokens, with `reasoning_effort: high` 4429, 6187 and 4962, and with `low` 32, 43 and 45.
 
-A second fault stands beside this one: the deployed LiteLLM drops `response_format` for the provider behind `big`, so the gates' JSON mode never reaches the model. A newer LiteLLM passes it. The image list holds that version since the bump of 2026-11-24, and it takes effect when the infra repository moves its reference.
+A second fault stood beside this one: LiteLLM dropped `response_format` and `reasoning_effort` for the provider behind `big`, so the gates' JSON mode and the low thinking depth never reached the model. LiteLLM's list of that provider's parameters names neither, in the deployed version and in the newer one, so an upgrade does not fix it. The gateway fixes it: it names both parameters in `allowed_openai_params` on every call, which makes LiteLLM pass them, and it refuses that field from a caller.
 
 ### 5.4 A pin lives in the lists
 
@@ -221,12 +221,15 @@ All parts are built. The plan [2026-11-24-open-cards-root-causes.md](plans/2026-
 
 ## 11. Live state on 2026-11-25
 
-The code is on main and main's CI built its images. It is not rolled out: the roller holds every roll while plan #2272 is open on main, and that plan waits on a human's verdict on its criterion `store_serves_the_weeks_files`.
+All of it runs on the cluster. The routine's project file says `files: pull-request` with `pass: bump`.
 
-Not run on the cluster yet:
+Run 9 is the first bump that landed with no human and no session. The routine filed pull request #2332 at 18:38 UTC. The copy pod filled the store, all six checks went green, the review approved, and the audit made one finding on the new cosign sha256. The project agent checked that finding and approved the merge, and the pull request merged at 18:57 UTC, 19 minutes after it was filed.
 
-- the copy pod as the CI runner image under gVisor, its uploads through the edge gateway, and a cold Go module download inside its 25 minutes,
-- the bump pod with its egress, and a whole run of the routine against the forge,
-- a gate call that is cut and answers at low thinking depth.
+Runs 7 and 8 failed on three faults that only the cluster showed: the copy pod's egress list, a queued card that could not enter review, and a new sha256 for the Go vulnerability database under an unchanged version. The plan's section 9.3 names each fix.
 
-The routine's project file still says `files: agent`. It moves to `files: pull-request` with `pass: bump` after the roll, since a factoryd without the pass refuses that file.
+Not seen on the cluster:
+
+- a gate call that is cut and answers at low thinking depth,
+- a bump whose check fails and whose session repairs it to a merge. Run 8's session started on the failed check, and that check could not pass.
+
+The run moved the lines of Kubernetes and Talos again, and the cluster does not follow them. [The follow spec](infra-follows-bump-spec-2026-11-25.md) holds those lines by a word, and it is not built.
