@@ -212,7 +212,7 @@ All parts are built. The plan [2026-11-24-open-cards-root-causes.md](plans/2026-
 
 ## 9. Not in this spec
 
-- **The infra repository's references.** A code bump moves the lists and fills the store. The manifests of the infra repository keep the old digests until someone moves them, and no routine does. Run 6's list moves Forgejo, CloudNativePG, Talos, Cilium and Flux, and each of these is an upgrade of the running cluster. That work needs its own design.
+- **The infra repository's references.** A code bump moves the lists and fills the store. The manifests of the infra repository keep the old digests until someone moves them, and no routine does. Run 6's list moves Forgejo, CloudNativePG, Talos, Cilium and Flux, and each of these is an upgrade of the running cluster. [The follow spec](infra-follows-bump-spec-2026-11-25.md) holds the design for that work.
 
 ## 10. Not verified
 

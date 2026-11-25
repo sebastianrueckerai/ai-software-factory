@@ -174,4 +174,4 @@ Infra main got the routine's corrected brief and the merge setup's comment as `8
 
 - The deployed LiteLLM drops `response_format` for the provider behind `big`, so JSON mode never reaches the model. A newer LiteLLM passes it, and it comes with the infra repository's move to the bumped image.
 - `escalate` can still file a second card when the card it names already has an ask open.
-- The infra repository's references do not follow a bump by themselves. The bump spec's section 9 says why this is separate work.
+- The infra repository's references do not follow a bump by themselves. [The follow spec](../infra-follows-bump-spec-2026-11-25.md) holds the design: a program moves one part at a time, a check judges each move, and the parts the factory cannot live without wait for a human's merge.
