@@ -525,3 +525,21 @@ Sebastian asked for this on 2026-11-24, in words, with no round: "It does not ne
 
 Why: the hold is the act a human reaches for while sorting the board, and C46 closed it inside a fold whose hint named only its first act, so a human who looked for it did not find it.
 
+
+## C51. An ask whose cause is gone closes by itself and says why: one line on the running card until its next step, the state word of a factory card in Done (2026-11-24, Sebastian)
+
+Sebastian picked this in words on 2026-11-24, with no round. The entry adds a line to C46's card and opened card, a state word to C46's foot line, and a reason to C18's settled row. The rest of C18 and C46 holds.
+
+**The rule.** When the reason for an ask at the human is gone, the factory closes the ask by itself, and the closed ask says why. This covers a cap that no longer binds, a provider stop once a call on the card's model answers again, the platform's card after a quiet day, and each card a watcher files once the watcher's cause is gone. The reason is a clause with a lower-case start and no full stop, such as "the month cap's count was reset at 07:30 UTC by sebastian".
+
+**The running card.** A card that runs on after such a close reads "Needed you no more: <reason>." under its paragraph, in 13 px in `--text-muted`. The opened card shows the same line under the lead of its head. The line stays until the card's next ask or answer, or until the card's second status after the close.
+
+**A factory card in Done.** A card of the human's lane that the factory closed this way reads "needed you no more: <reason>" as its state word, in place of "done" or "closed: <reason>". Agent cards keep "done". The board's Done lane holds no card of the human's lane, so this state word shows on the opened card.
+
+**The chat and the card's life.** The inbox's settled ask reads "withdrawn: <reason> · 07:31", where it read "withdrawn · 07:31". On the fold line a reason too long for the row ends in an ellipsis, and the opened row shows it whole. The card's life reads "withdrawn because <reason>: <question>".
+
+**The times.** A time in a reason reads in the human's zone, as C49 sets: "the month cap's count was reset at 08:30 CET by sebastian". Issue comments and the text that agents read keep the UTC words.
+
+**No pile.** The console keeps no separate list of closed asks. The card's history is the lasting record.
+
+Why: on 2026-11-24 the console asked a human for 25 minutes about a month cap whose count a human had reset eight minutes before the ask, and the ask then closed as "the wait ended on its own" with no reason a human could use.

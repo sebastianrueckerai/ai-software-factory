@@ -2069,13 +2069,19 @@ every outstanding hold, read under the same advisory lock as the task and
 day headroom. Model calls, paid tools and commissioned servers take the
 smallest of the three headrooms, and a call that finds the month spent is
 refused with `refused_month_cap`. The task then waits on its card, as it
-does at the day cap. The card says the cap is reached, that a commit raises
-it, and that the card resumes on its own. The wait ends at the first of three
-things: an answer, a check that finds the session floor funded under the cap
-in force, and the turn of the UTC month. The check runs every hour. A policy
-load wakes every waiting card, and its check then runs 30 seconds later, when
-the gateway enforces the new version. Before a card asks, it runs the check
-once: a refusal that a raise already lifted asks nothing. A project's month
+does at the day cap. The card says the cap is reached, that a reset of the
+month's count in the status panel or a commit lifts it, and that the card
+resumes on its own. The wait ends at the first of three things: an answer, a
+check that finds the session floor funded under the cap in force, and the
+turn of the UTC month. The run's check runs every hour, and factoryd runs
+the same check each minute on an ask that waits at the human. A policy load wakes every
+waiting card, and its check then runs 30 seconds later, when the gateway
+enforces the new version. Before a card asks, it runs the check once: a
+refusal that a raise already lifted asks nothing. Once the cap no longer
+binds, the ask closes by itself and names why: who reset the count and when
+("the month cap's count was reset at 07:30 UTC by sebastian"), the cap in
+force ("the month cap of 900.00 EUR in policy version 973 leaves room for a
+session") or the turn ("the UTC month turned"). A project's month
 cap waits the same way. factoryd raises a `month_cap` alert once a month at
 50 and 80 percent, and at 100 percent once for each cap the month reaches.
 The 100 percent alert files an issue in the infra repository's human lane
@@ -2110,7 +2116,10 @@ whose name holds "reset" but the board filter's. A reset wakes every card
 that waits on a cap, as a policy load does: every card that has not ended
 and has a live day, month or project cap case, whichever rung holds the
 case, so a wait a rung holds ends at the reset and never reaches the human
-with a cap that no longer binds. A wait whose refusal came
+with a cap that no longer binds. Before a case reaches the human, and before
+the ask attempt (5.7) starts on it, factoryd checks the case's cause once
+more with the rules that need no model, so a case whose cause went while a
+rung held it closes there with its reason. A wait whose refusal came
 under the policy in force resumes once a reset of its cap followed the
 refusal. The month alarm counts from the reset too: a reset closes the
 month cap's card, and each count gets its own 50, 80 and 100 percent alerts.
@@ -3441,7 +3450,14 @@ analysis attached to the card's ask: an `analysis_attached` event names
 the attempt as the source, and the opened card shows the analysis in "The
 full brief" with the ask's evidence. Money,
 direction and policy class stay the human's, the concept's boundary
-table, and first answer wins from wherever it lands.
+table, and first answer wins from wherever it lands. The attempt runs only
+when the caps leave room for its own call. The chat's calls run on the
+project's chat task, so the day cap, the factory's month cap and the
+project's month cap bind them as they bind a card. When a cap would refuse
+the attempt's call, the ask reaches the human at once, marked "not judged: a
+cap refuses the rungs' calls", with the line "The factory agent did not
+judge it: the month cap refuses its model calls too." The same check holds
+back rung 1, the check-in's judgment of the case.
 
 **The merge attempt** (Sebastian, 2026-11-03). A pull request that
 misses an auto-merge condition writes an approval row, and until
@@ -4461,6 +4477,13 @@ session counts no attempt, and a refused report session no longer fails its
 card. A report task has no issue, so after its sixth refusal it waits on a
 human with no comment, and Close ends it (5.7). Since Stage 17 the
 provider's repetition refusal ends a session with its work pushed (below).
+The provider's ask closes by itself once a call on the card's model answers
+again. Each minute factoryd reads the gateway's audit for an allowed model call
+on the same alias, by any card, after the ask opened, resumes the card and
+names the call: "a call on big answered at 05:43 UTC, so the provider
+answers again". This happens once per card and model: a second stop on the
+same model stays with the human. If no other card calls the model, no call
+answers, and the ask waits for the human.
 
 **The loop nudge** (Task 88). factoryd counts identical
 calls in a row from the session's event stream: a call is the tool plus
@@ -4822,7 +4845,13 @@ issue is found again. The face lists each death, newest first, at most 10,
 with its day and time, its card or its CI or gate kind, its short phrase and
 its node, then "and <k> more". While the card is open, a new death rewrites
 its face and files no second card. After a close, only deaths later than the
-end of that card count. The answers close the card as noted or park it. No
+end of that card count. The card closes itself after a quiet day: when no
+counted death fell in the 24 hours after the newest one, and at least 3
+sessions started since it, the pass closes the card with "No platform death
+since 23 November at 14:02 UTC, while 7 sessions started, so the card
+closes." If the card before it closed this way, the new card stays with the
+human, so a platform that keeps failing in bursts does not close its card by
+itself each time. The answers close the card as noted or park it. No
 agent works it, since a fix of the nodes needs a Talos apply with the
 nodes' admin key and no agent holds a direct credential. The pass runs each
 minute and files the card itself, not through a SigNoz alert, because the

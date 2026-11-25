@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task by task. Steps use checkbox (`- [ ]`) syntax for tracking. Line numbers are from the code repository's main at `535256ea0` (2026-11-24). Main moved to `0d2ead278` while this plan was written, and no file this plan touches changed. Check each line before you edit it.
 
-**Status:** plan, written 2026-11-24. Nothing is built.
+**Status:** built and landed on the code repository's main on 2026-11-25, in three batches. The section "Outcome" at the end says what landed and what was checked live.
 
 **Goal:** When the reason for a "needs you" ask is gone, the ask closes by itself and says why, and a human who was reading the ask sees where it went.
 
@@ -556,3 +556,48 @@ Take the column names of `pod_deaths` from migration `20261129100000_cluster_fac
 - **Asks reach the human sooner.** A cap ask that a cap refuses for the chat goes to the human at once, not after 35 minutes of a rung that cannot run. Each such ask is real: the cap still binds when it is asked.
 - **Reads.** `Climb` reads the case's facts once more before each face or rung 2 start, a few dozen times a day. The board reads `ClosedAsks` once per load. `ModelAnsweredSince` scans `audit` (140,711 rows on 2026-11-24) once a minute per open provider ask.
 - **Replay.** `EndCase` gains a trailing argument, and `endCase` passes it. Temporal's replay compares commands, not activity inputs, and an activity scheduled before the change decodes the missing argument as nil. A `CapResumed` recorded before the change carries no `Why`, and its wait keeps today's words.
+
+## Outcome
+
+Built on 2026-11-24 and 2026-11-25 and landed on the code repository's main in three batches, each a fast-forward push to Forgejo and GitHub. Before each push the race suite (`scripts/pg-test.sh go test -race -p 1 ./...`) and `bash check static` passed on the batch's head. Main moved under batches 2 and 3, so both were rebased and their suites ran again before the push. The console lab's full run passed on the last head, its New York walk included: "ok: every control present, the mechanics work".
+
+This table lists each commit and its batch.
+
+| Batch | Commit | Task |
+|---|---|---|
+| 1 | `0333af0a6` | 1: every close of an ask at the human writes one row |
+| 1 | `00a3008e9` | 2: the heal pass writes the row for a card that moved on |
+| 1 | `503f2343e` | 3: one cap check serves the run's wait, the cap row and the words |
+| 1 | `6c56562f6` | 4: `Climb` checks the cause before it hands a case up |
+| 1 | `8258d42ab` | 5: rungs 1 and 2 run only when the caps leave room for their call |
+| 2 | `c1157b704` | 6: a provider stop closes once another call on its model answers |
+| 2 | `5327a01b9` | 7: the watchers' reasons reach the case |
+| 2 | `aa0cc0547` | 8: a platform card closes after a quiet day |
+| 2 | `544c3a986` | none: the factory's close of a pull request's card names its case |
+| 3 | `0da019045` | 9: every reader names the reason |
+| 3 | `e6350a14a` | 10: the card shows why it needed you no more |
+
+What was checked live:
+
+- CI passed on each batch's head: `ci / test` in about 18 minutes, and the three images.
+- `factory/roll` held each batch: "held: plan “Land the weekly bump” (#2272) is open on main; the roll follows once no plan is open on main". Production had been held since 2026-11-24 21:04 UTC. At the end of each batch's 90 minutes, the last at 03:55 UTC on 2026-11-25, factoryd still ran commit `d5f0078ae`, started 2026-11-24 20:15:48 UTC. No batch ran live.
+- The live checks ran read-only on the live database, with `:rolled_at` set to the push of the batch that holds the task (batch 1 2026-11-24 23:22 UTC, batch 2 2026-11-25 00:53 UTC, batch 3 02:25 UTC), last at 03:55 UTC. Every query ran and returned no row. That proves the queries run, and nothing about the code, since no batch ran live.
+- The same queries on the record of 2026-11-24 before any push show the old faults they look for. Task 1's query listed the month-cap case 7517 of the incident and the pull request cards' cases 7469 and 7515. Task 3's query listed the four month-cap cases 7471 to 7473 and 7517, each with "the wait ended on its own: the cap no longer binds a session". Task 4's first query listed case 7517. Task 5's query listed 7 rung 2 steps that expired while a cap refused the chat. Task 7's query listed 6 human cards. Task 10's query, `ClosedAsks` on the open cards and on the cards finished since, listed the two pull request cards and a card whose run ended with its pull request merged. Task 6's and Task 8's queries listed none.
+- factoryd's logs since the first push hold no nondeterminism error, and Temporal reports no workflow with a problem. No card's workflow was running: only the two projects' chat tasks were open.
+
+What the build changed against the text above:
+
+- `EndCase` closes every case at the human through `withdrawQuestion`, also a case whose face posted no comment. That card too moves from waiting-human to in-review, and its issue gets the in-review label.
+- The `cap_wait` row fires only for a case whose facts name a model. A case with no model never resumes by this row, because `SessionFunded` needs the model.
+- `EndCase` passes its moments only when the reason names a time. The recorded inputs of the workflow replay tests stay equal, because the project's replay tests compare activity inputs as well as commands.
+- A cap wait whose check names no `Why` ends with "the UTC <period> turned" after a turn, else with "the <cap> no longer binds a session".
+- The retake tests of Task 3 run on the rig's day, 2026-11-03, not on 2026-11-24. `TestRungZeroRowsFireOnTheirFacts` no longer lists the day cap, because the row now reads the store and the retake tests pin it.
+- The tests of Task 4 are unit tests in `monitor_test.go` (`TestClimbAfterAnExpiredRungTakesALiftedCap`, `TestClimbUnderTheCasesLockSkipsTheCheck`), not tests on PostgreSQL. When the cause check fails in `Climb`, factoryd logs the error and climbs on, so a failed `Act` never stops a face.
+- When `Free` fails, `capRefusesJudgment` logs the error and lets the rung run.
+- `clause` keeps an initialism such as "CI" in upper case.
+- SigNoz's reason reads "the alert cleared at 07:30 UTC" on the day of the clear and "the alert cleared at 28 Sep 20:40 UTC" on another day, each with its moment, not an RFC 3339 time. The issue's note and the card's closing reason keep the RFC 3339 time.
+- The factory's own close of a pull request's card (`WithdrawPRCard`) builds its row with `WithdrawnRow`, so it names the case. Task 1's live query found this path on the baseline of 2026-11-24: cases 7469 and 7515.
+- On the settled row's fold line a reason too long for the row ends in an ellipsis. Before, it ran past the row's edge and was cut mid-word.
+- The lab scene `closed-asks` builds on the threads scene, not the busy scene, so the inbox holds #640's ask, settled with its reason. `check.js` also checks that row in New York's zone. A card of the human's lane in Done never shows on the board, so the check reads rule (b) on the opened card's head.
+- The design entry is C51. C50 went to the hold's acts on the same day.
+
