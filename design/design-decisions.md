@@ -513,6 +513,8 @@ Sebastian asked for these three changes on 2026-11-24, in words, with no round. 
 
 Why: the button on the gauge's line saves a line per cap and shows which count it resets. The time answers "how long must I wait" without a press on Reset.
 
+Amended by C52 (2026-11-25): the judgment budget and the escalation pool have a row and a Reset too.
+
 ## C50. The hold's acts stand on the opened card under its head, outside the folds (2026-11-24, Sebastian)
 
 Sebastian asked for this on 2026-11-24, in words, with no round: "It does not need to be on the card, but I want to see it on the expanded section without further digging for it." The entry amends C46's opened card. The rest of C46 holds.
@@ -545,3 +547,19 @@ Until 2026-11-25 Done left the human lane's cards out. No decision chose that: t
 **No pile.** The console keeps no separate list of closed asks. The card's history is the lasting record.
 
 Why: on 2026-11-24 the console asked a human for 25 minutes about a month cap whose count a human had reset eight minutes before the ask, and the ask then closed as "the wait ended on its own" with no reason a human could use.
+
+## C52. The judgment budget and the escalation pool each have a row and a Reset in the Spend section (2026-11-25, Sebastian)
+
+Sebastian asked for this in words on 2026-11-25, with no round. The entry amends C49's sentence "The judgment budget and the escalation pool still have no Reset" and adds two rows to C47's Spend section. The rest of C47 and C49 holds.
+
+**The rows.** Under the backstop's row stands "judgment budget this month" and under it "escalation pool this month". Each row has the label with the time its count resets by itself, the figure, the gauge and the Reset, as a cap's row has. The judgment budget's figure is the spend of the month's chat task against its budget, "14.96 of 15.00 EUR", and before the month's first chat turn "0.00" against `chat.monthly_eur`. The pool's figure is its money, "6.00 of 60.00 EUR". Its gauge shows the fullest of its three parts: sessions, agent time and money. The pool's words stand under its row as before, and they name a reset: "drawn since the reset 14:02 UTC by sebastian, 12.00 EUR before".
+
+**The pool's Reset.** The pool's draws count from the press on, in the UTC month. The pool in the policy does not change. A card's own draw bound still counts the card's whole life. The confirm reads "The pool's count starts again from nothing. Up to 30 sessions, 30 h of agent time and 60.00 EUR more may be drawn before 1 December at 01:00 CET. The pool stays as the policy sets it; the caps still hold."
+
+**The judgment budget's Reset.** The Reset is a fund. It raises the chat task's budget until `chat.monthly_eur` is free again, and every turn the budget stopped goes on. The confirm names the sum: "The judgment budget rises by 9.96 EUR to 24.96 EUR, so the chat has 10.00 EUR again before 1 December at 01:00 CET." The row shows no Reset while that much is free. The form "Raise the judgment budget by" stays under the note of a spent budget, for a raise by another sum.
+
+**Who may press.** Both: an approver of the project, as for a project's month cap.
+
+**No Reset.** LiteLLM's backstop keeps its row without a Reset. It is the limit under every cap, and LiteLLM counts it.
+
+Why: on 2026-11-25 a card asked Sebastian to add money to the chat's budget of November, and the status panel showed no figure for that budget. The pool showed as one line of words with no press.
