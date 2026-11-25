@@ -552,7 +552,7 @@ Why: on 2026-11-24 the console asked a human for 25 minutes about a month cap wh
 
 Sebastian asked for this in words on 2026-11-25, with no round. The entry amends C49's sentence "The judgment budget and the escalation pool still have no Reset" and adds two rows to C47's Spend section. The rest of C47 and C49 holds.
 
-**The rows.** Under the backstop's row stands "judgment budget this month" and under it "escalation pool this month". Each row has the label with the time its count resets by itself, the figure, the gauge and the Reset, as a cap's row has. The judgment budget's figure is the spend of the month's chat task against its budget, "14.96 of 15.00 EUR", and before the month's first chat turn "0.00" against `chat.monthly_eur`. The pool's figure is its money, "6.00 of 60.00 EUR". Its gauge shows the fullest of its three parts: sessions, agent time and money. The pool's words stand under its row as before, and they name a reset: "drawn since the reset 14:02 UTC by sebastian, 12.00 EUR before".
+**The rows.** Under the caps' rows stands "judgment budget this month" and under it "escalation pool this month". Each row has the label with the time its count resets by itself, the figure, the gauge and the Reset, as a cap's row has. The judgment budget's figure is the spend of the month's chat task against its budget, "14.96 of 15.00 EUR", and before the month's first chat turn "0.00" against `chat.monthly_eur`. The pool's figure is its money, "6.00 of 60.00 EUR". Its gauge shows the fullest of its three parts: sessions, agent time and money. The pool's words stand under its row as before, and they name a reset: "drawn since the reset 14:02 UTC by sebastian, 12.00 EUR before".
 
 **The pool's Reset.** The pool's draws count from the press on, in the UTC month. The pool in the policy does not change. A card's own draw bound still counts the card's whole life. The confirm reads "The pool's count starts again from nothing. Up to 30 sessions, 30 h of agent time and 60.00 EUR more may be drawn before 1 December at 01:00 CET. The pool stays as the policy sets it; the caps still hold."
 
@@ -560,6 +560,6 @@ Sebastian asked for this in words on 2026-11-25, with no round. The entry amends
 
 **Who may press.** Both: an approver of the project, as for a project's month cap.
 
-**No Reset.** LiteLLM's backstop keeps its row without a Reset. It is the limit under every cap, and LiteLLM counts it.
+**No Reset.** LiteLLM's backstop keeps its row without a Reset. It is the limit under every cap, and LiteLLM counts it. Its row stands last, under the escalation pool: Sebastian asked for this in words on 2026-11-25, since it is the one limit no human resets. Before that day it stood between the premium row and the judgment budget.
 
 Why: on 2026-11-25 a card asked Sebastian to add money to the chat's budget of November, and the status panel showed no figure for that budget. The pool showed as one line of words with no press.
