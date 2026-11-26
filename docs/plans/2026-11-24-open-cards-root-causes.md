@@ -190,6 +190,6 @@ Fixed on code main on 2026-11-25:
 - LiteLLM dropped `response_format` and `reasoning_effort` for the provider behind `big`. A newer LiteLLM drops them too, so the gateway now names both in `allowed_openai_params` on every call and refuses that field from a caller.
 - `escalate` could file a second card when the card it names already had an ask open. It now refuses with the open ask's words and names `watch_card`.
 
-Not built:
+Built on 2026-11-26:
 
-- The infra repository's references do not follow a bump by themselves. [The follow spec](../infra-follows-bump-spec-2026-11-25.md) holds the design: a program moves one part at a time, a check judges each move, and the parts the factory cannot live without wait for a human's merge. It waits for Sebastian's go.
+- The infra repository's references did not follow a bump by themselves. The infra project's routine `follow-bump` moves them now: a program moves one part at a time, the factory judges each move, and the parts the factory cannot live without wait for a human's merge. [The follow spec](../infra-follows-bump-spec-2026-11-25.md) holds the design and the first runs.

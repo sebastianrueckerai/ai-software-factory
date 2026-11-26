@@ -212,7 +212,7 @@ All parts are built. The plan [2026-11-24-open-cards-root-causes.md](plans/2026-
 
 ## 9. Not in this spec
 
-- **The infra repository's references.** A code bump moves the lists and fills the store. The manifests of the infra repository keep the old digests until someone moves them, and no routine does. Run 6's list moves Forgejo, CloudNativePG, Talos, Cilium and Flux, and each of these is an upgrade of the running cluster. [The follow spec](infra-follows-bump-spec-2026-11-25.md) holds the design for that work.
+- **The infra repository's references.** A code bump moves the lists and fills the store. The infra project's routine `follow-bump` then moves the cluster to the lists, one part for each run. [The follow spec](infra-follows-bump-spec-2026-11-25.md) holds that design and its live state.
 
 ## 10. Not verified
 
@@ -232,4 +232,4 @@ Not seen on the cluster:
 - a gate call that is cut and answers at low thinking depth,
 - a bump whose check fails and whose session repairs it to a merge. Run 8's session started on the failed check, and that check could not pass.
 
-The run moved the lines of Kubernetes and Talos again, and the cluster does not follow them. [The follow spec](infra-follows-bump-spec-2026-11-25.md) holds those lines by a word, and it is not built.
+The run moved the lines of Kubernetes and Talos again, and the cluster does not follow them. Since 2026-11-26 those lines are back at the versions that run and carry `hold`, and the bump's text names the newer version. [The follow spec](infra-follows-bump-spec-2026-11-25.md) has the detail.
