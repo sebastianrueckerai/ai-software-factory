@@ -3743,6 +3743,59 @@ walks every model call from the transports and fails on a call that is
 neither a writer nor named as read by agents only.
 [writing-guide.md](writing-guide.md) says where the forms live.
 
+**A card retires itself when its reason goes away.** A card in Needs you
+stands for a reason: a state of the world that needs a human. When that
+state ends, a deterministic step closes the card and the work goes on with
+no human. No model call stands between the fact and the close. Every case
+kind states this in the kind table (`caseKinds`): the fact that says its
+reason is gone and what ends its case then, or why only an answer ends it.
+A test walks the table and fails on a kind that states neither.
+
+The steps that close a card:
+
+- **Rung 0.** One table of rows, each tried on the kinds that name it. A
+  row fires on a fact: the checks of a stopped checks wait are green, a
+  runner took the jobs that none had taken, a cap no longer binds, a call
+  on the card's model answered again, sessions run again after pods did
+  not start or the platform ended them, a failed dependency was filed
+  again. The rows run when a stop opens, before each climb, and every
+  minute on each case that is with the human.
+- **Each row names the facts it reads.** A read that fails keeps only the
+  rows that need it from the case. On 2026-11-26 a roll card waited ten
+  hours with green checks, because the model gateway could price no model
+  and the price read was unrelated to the checks. That cannot happen now:
+  a row that needs no price is not held by one.
+- **A refused close leaves a trace.** When a row's fact holds and a guard
+  refuses it, or a read it needs failed, rung 0 writes one step on the
+  case for each cause. The card's life shows why the card still stands.
+- **The loop bounds.** A row takes a stop once. A stop that comes back
+  after rung 0 took it stays with the human, with its step. A checks wait
+  that a runner's start resumed may still end on green checks.
+- **A case that no rung judged is judged again.** A case reaches the human
+  unjudged when the provider refused the rungs' calls, or the judgment
+  budget or a cap left them no room. Once a call on `big` answers again,
+  or the room is back, the same pass gives the case to the factory agent
+  once more. Its answer ends the case. Its hand-up asks the human again,
+  with its recommendation.
+- **The factory's own cards** close in their own passes: an alert card
+  when the alert clears, or when its claim is bound, its HelmRelease is
+  Ready or its CronJob ran again; the merge queue's pause card when main
+  is green, and the pause ends only after the card closed; the roll
+  cards of failed rolls when a later roll merged; the freeze card when its
+  class answers again, also after a gateway restart; the cap cards on a
+  reset, a raise, the month's turn, or an answered call for LiteLLM's
+  backstop; the follow routine's failure card when its target is gone.
+- **A card names what the factory saw.** A checks wait that stopped while
+  every job waited for a runner says that no runner started the checks.
+  The spawner files one card for each cause that keeps runner pods from
+  starting: a volume claim that is not bound, a node that takes no pod, an
+  image that cannot be pulled, no node with room. That card closes once a
+  runner pod runs again.
+
+A card that asks for a real decision has no such fact: the merge of a
+change that policy keeps with a human, a plan's question, a promise to
+drop. It ends by its answer.
+
 ## 6. Chunk 4: the worker plane
 
 One task, one namespace, one ServiceAccount `task-<id>`, one pod.

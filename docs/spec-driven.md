@@ -73,6 +73,10 @@ Each ask of the process is a card in Needs you. Its face comes from the one face
 
 The page of a promise no test checked says why no test ran, for example "The last card, #2011, closed without a merge, so the factory never ran the plan's tests." "Run the tests now" runs the plan's tests through the criteria gate's own path, with its money guard and its records, and only an approver may press it. No ask holds a colon, and no ask names an answer it does not offer.
 
+### An ask closes itself when its reason goes away
+
+An ask stands for a reason. When the reason ends, the factory closes the ask and the work goes on, with no human. A stopped checks wait goes on once its checks are green. A cap's ask closes once the cap no longer binds. A card that the model provider stopped goes on once a call on its model answers again. The step that closes an ask reads facts and calls no model, and it runs every minute on each open ask. When a guard refuses the close, one line in the card's life says why. An ask that no agent could judge, because the provider refused its calls, goes back to the factory agent once the provider answers. Only an ask that needs a real decision waits for its answer. [architecture.md](architecture.md), section 5.9, lists the facts.
+
 ## Blind proofs: one blind try, then the blindfold comes off
 
 A hold-out is a criterion the spec's list missed. It is kept out of the plan, the briefs and the cards until its test ran once, and it is public after.
