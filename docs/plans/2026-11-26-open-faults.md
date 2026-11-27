@@ -34,9 +34,13 @@ The table answers which faults were read in the code at main `c2dddcd67`, and wh
 
 | No. | Fault | Evidence | Cost when it occurs | Seen live |
 |---|---|---|---|---|
-| 1 | Every follow judgment raises a false `gate_bound` alert that nothing resolves | `ActivityFollowJudge` and `ActivityRoutineRun` take the default bound of 120 s (`internal/factoryd/gatewatch.go:89-97`, `internal/policy/policy.go:866-868`). The judgment waits 10 minutes by design (`rolloutSettle`). | A false alert row for each run | Yes: 5 open rows from `FollowJudge` and 3 from `RoutineRun` in `alerts`, 11-25 and 11-26 |
+| 1 | Every follow judgment raises a false `gate_bound` alert that nothing resolves | `ActivityFollowJudge` and `ActivityRoutineRun` take the default bound of 120 s (`internal/factoryd/gatewatch.go:89-97`, `internal/policy/policy.go:866-868`). The judgment waits 10 minutes by design (`rolloutSettle`). | A false alert row for each run | Yes: 5 open rows from `FollowJudge` and 3 from `RoutineRun` in `alerts`, 11-25 and 11-26, and one more `RoutineRun` row at 11-26 23:00. The same fault holds for `FollowChecks`, `FollowLand` and `FollowReturn`, which take the default too, and `CopyUpstreamImages`, whose bound equals its timeout |
 | 2 | A close comment is lost when its call fails after the close | `closeRevertPR` closes, then comments (`internal/factoryd/mainfix.go:540-543`). The template update does the same (`internal/factoryd/templateupdate.go:416-419`). The retry reads the pull request as closed and returns. | One comment that says why the factory closed a pull request | No |
 | 3 | A retry refusal prints a task id to a human | `internal/factoryd/deps.go:587`: "was cut into successor #%d (%s)" with `succ.ID` | A wording rule broken | No |
+| 4 | A case at a human on a project with no agents shows on no screen | `projectsOf` reads `coderProjects` (`internal/console/board.go:1760`, `:2933`), so the board never shows a project with `agents: none`. The case read itself has no such filter (`CaseDesk`, `CardCases`) | A case that waits for a human who cannot see it | Yes: case 7747 (infra #361) shows on no page, and the status line reads "Needs you 0". Case 7629 waited 9 h 19 min the same way |
+| 5 | The check-in offers `repeats` with no earlier findings | `checkinSystemFor(ask *CheckInAsk)` (`internal/factoryd/checkin.go:530`) shows `"repeats":"<id>"` always (`:543`), and the check-in's conversation sets no `RepairPastCap` (`:907-920`). Task 1 of [2026-11-17-needs-you-faults.md](2026-11-17-needs-you-faults.md) was never built | A refused check-in answer and a case | Yes: card #2098 on 11-16 |
+| 6 | Each CI runner pod requests 22Gi of node storage, a smoke pod 14Gi | The volume limits of `internal/factoryd/ci.go:1430-1436` and `kube.go:1049` date from 10-01. The measurement `scripts/ci-volume-use.sh` runs at every PR job's end since 11-12, and no limit was set from it | CI runs wait in Forgejo's queue for storage | Yes: runs of the rebuild waited (register entry 82). Measured in 1510 PR jobs from 11-12 to 11-27: `/workspace` held at most 1 MiB. Only the image build writes there |
+| 7 | The docs describe live replay histories that do not exist | `internal/factoryd/testdata/` holds 15 `devserver-*.json` and no `history-*.json` since 11-11 (`e7e95613e`). `testdata/README.md` and [../architecture.md](../architecture.md) section 7 still describe live histories | A reader trusts a replay guard that does not exist | No |
 
 ## Claims of the first version of this plan that did not hold
 
@@ -58,6 +62,9 @@ Each line was read in the code today.
 - **A carry card is measured from main.** By design: `FitBound` (`internal/factoryd/pushrules.go:55`) bills every branch against its merge base with main, a continued branch too. The bound caps one pull request's size.
 - **CI runs over the 40-minute checks bound.** Real and frequent: 11 of 304 runs since 11-17, the median run takes 14 to 29 minutes. The stop goes to the ladder, and the fix of the first row above retires it once the checks are green. No change until Task 4 shows that fix failing.
 - **Node data partition.** Each node reports 83.5 GiB allocatable. No eviction and no pending pod. [../roadmap-by-hand.md](../roadmap-by-hand.md) item 252 holds the resize for the next rebuild.
+- **The Forgejo harness tests 17.0.2, production runs 17.0.1.** By design for now: the weekly bump of 11-24 moved the harness's pin, and the follow routine moves the parts one at a time (infra #353 to #357 on 11-26). It holds at part signoz (#360, case 7747), and Forgejo follows after. Task 4 watches it.
+- **Two flakes no run reproduced.** `TestReconcileReportsWhetherTheScreeningPassed` (500 of 500 runs pass under load) and one console test that no record names (five race runs pass). Neither has a line to fix. Task 4 watches for them.
+- **No live history guards the workflows.** Fault 7 makes the docs say so. An export of live histories is a feature, and this plan adds none.
 - **Not checked today, taken from one earlier read of the code:** the seven freeze-card cases, the lost webhook on a failed card, `halt`'s order, the merge with no file overlap, the factory month cap at admission. None was ever seen live. No task builds on them.
 
 ## Global Constraints
@@ -77,7 +84,10 @@ Each line was read in the code today.
 
 ---
 
-### Task 1: Three small faults in one pull request
+### Task 1: The faults in one pull request
+
+Pull request #2354 carries all seven faults of the table. A bound equal to its activity's timeout loses to the activity's own context deadline, so each long bound sits one minute under its timeout. The workspace volume goes to 1Gi for plain and smoke pods and stays 8Gi for build pods. On a project with no agents, the board shows the cases, and the controls that need an agent are absent.
+
 
 **Files (code repository):**
 - Modify: `internal/policy/policy.go:866-868` (`DefaultBounds`)
@@ -85,14 +95,14 @@ Each line was read in the code today.
 - Modify: `internal/factoryd/deps.go:587`
 - Test: `internal/factoryd/gatewatch_test.go`, `internal/factoryd/mainfix_test.go`, the test file of `templateupdate.go`, the test that asserts "was cut into successor"
 
-- [ ] **Step 1: Write the failing test** `TestLongActivitiesAreBoundAtTheirOwnTimeout` in `gatewatch_test.go`. For a policy document with no `bounds`: `Bound(ActivityFollowJudge)` equals `rolloutCap+rolloutSettle+followJudgeSlack` (50 minutes), and `Bound(ActivityRoutineRun)` equals the start-to-close timeout that the routine workflow sets for that activity. Read that timeout where the workflow schedules `ActivityRoutineRun`, and name its constant in the test.
-- [ ] **Step 2: Write the failing test** `TestRollerCommentsBeforeItClosesTheRevert` beside `TestRollerEndsTheRevertWhenMainTurnsGreenWithoutIt`: a human-lane revert card, main green without it, and a Forgejo fake whose `CreateIssueComment` fails once. After the first pass the pull request is open with 0 comments. After the second pass it is closed with exactly 1 comment.
-- [ ] **Step 3: Write the same test for the template update's close:** a comment that fails once leaves the pull request open, and the next call ends with 1 comment and a closed pull request.
-- [ ] **Step 4: Change the expected text** of the cut refusal's test to `Card #<old> was cut into successor #<new>, which carries its work and its dependents: answer that card instead.` with the fixture's numbers.
-- [ ] **Step 5: Run the four tests and see them fail.** `go test -race -run 'TestLongActivitiesAreBoundAtTheirOwnTimeout|TestRollerCommentsBeforeItClosesTheRevert' ./internal/factoryd/` plus the two others by name.
-- [ ] **Step 6: Implement.** Add `"FollowJudge": 3000` and `"RoutineRun": <its timeout in seconds>` to `DefaultBounds`. In `closeRevertPR` and at `templateupdate.go:416-421`, call `CreateIssueComment` before `ClosePullRequest`. A close that fails after the comment gets a second comment at the next pass: accepted, no guard. In `deps.go:587` drop ` (%s)` and `succ.ID`.
-- [ ] **Step 7: Run** `go test -race ./internal/factoryd/ ./internal/policy/` and `bash check changed`. Expected: PASS.
-- [ ] **Step 8: Commit, open the pull request, merge after CI and review.**
+- [x] **Step 1: Write the failing test** `TestLongActivitiesAreBoundAtTheirOwnTimeout` in `gatewatch_test.go`. For a policy document with no `bounds`: `Bound(ActivityFollowJudge)` equals `rolloutCap+rolloutSettle+followJudgeSlack` (50 minutes), and `Bound(ActivityRoutineRun)` equals the start-to-close timeout that the routine workflow sets for that activity. Read that timeout where the workflow schedules `ActivityRoutineRun`, and name its constant in the test.
+- [x] **Step 2: Write the failing test** `TestRollerCommentsBeforeItClosesTheRevert` beside `TestRollerEndsTheRevertWhenMainTurnsGreenWithoutIt`: a human-lane revert card, main green without it, and a Forgejo fake whose `CreateIssueComment` fails once. After the first pass the pull request is open with 0 comments. After the second pass it is closed with exactly 1 comment.
+- [x] **Step 3: Write the same test for the template update's close:** a comment that fails once leaves the pull request open, and the next call ends with 1 comment and a closed pull request.
+- [x] **Step 4: Change the expected text** of the cut refusal's test to `Card #<old> was cut into successor #<new>, which carries its work and its dependents: answer that card instead.` with the fixture's numbers.
+- [x] **Step 5: Run the four tests and see them fail.** `go test -race -run 'TestLongActivitiesAreBoundAtTheirOwnTimeout|TestRollerCommentsBeforeItClosesTheRevert' ./internal/factoryd/` plus the two others by name.
+- [x] **Step 6: Implement.** Add `"FollowJudge": 3000` and `"RoutineRun": <its timeout in seconds>` to `DefaultBounds`. In `closeRevertPR` and at `templateupdate.go:416-421`, call `CreateIssueComment` before `ClosePullRequest`. A close that fails after the comment gets a second comment at the next pass: accepted, no guard. In `deps.go:587` drop ` (%s)` and `succ.ID`.
+- [x] **Step 7: Run** `go test -race ./internal/factoryd/ ./internal/policy/` and `bash check changed`. Expected: PASS.
+- [x] **Step 8: Commit, open the pull request, merge after CI and review.** Pull request #2354, merged as `fc92cc9fd`.
 - [ ] **Step 9: Roll** with Sebastian's go: Deploy now on the roll-held card. Check that the `rolls` table shows main's head live for all four images. The eight open alert rows of today stay as they are.
 
 ### Task 2: The docs say what is closed
@@ -100,16 +110,16 @@ Each line was read in the code today.
 **Files (this repository):**
 - Modify: `docs/needed-fixes.md`, `docs/needs-you-register-2026-11-09.md`, `docs/plans/2026-11-17-needs-you-faults.md`
 
-- [ ] **Step 1: Cut `docs/needed-fixes.md`** to its title, the rule that a fixed fault leaves the list, and one line: no fault is open on 2026-11-26, and this plan holds the three that the code showed. Twenty documents link the file, so it stays.
-- [ ] **Step 2: Check the needs-you register before it is closed.** An earlier read found each of its 22 "Still open" entries closed or by design. That read is one agent's and is not confirmed here. For each entry, find the test or the code line that closes it at main, and run the test. Then add one paragraph under the title that names the closed entries and the commit. An entry that is still open becomes a row of this plan's fault table, with its evidence.
-- [ ] **Step 3: In the needs-you faults plan,** tick Tasks 1 and 5 after a check that `checkinSystemFor` takes `priors` and that `BriefModel` exists at main. Write under Task 2 that it is dropped for the reason in this plan, under Task 3 that `ProofsAtMain` covers it, and under Task 4 that the brief writer was rebuilt and that the fault caused one mislabelled sentence.
+- [x] **Step 1: Cut `docs/needed-fixes.md`** to its title, the rule that a fixed fault leaves the list, and one line: no fault is open on 2026-11-26, and this plan holds the three that the code showed. Twenty documents link the file, so it stays.
+- [x] **Step 2: Check the needs-you register before it is closed.** An earlier read found each of its 22 "Still open" entries closed or by design. That read is one agent's and is not confirmed here. For each entry, find the test or the code line that closes it at main, and run the test. Then add one paragraph under the title that names the closed entries and the commit. An entry that is still open becomes a row of this plan's fault table, with its evidence.
+- [x] **Step 3: In the needs-you faults plan,** tick Tasks 1 and 5 after a check that `checkinSystemFor` takes `priors` and that `BriefModel` exists at main. Write under Task 2 that it is dropped for the reason in this plan, under Task 3 that `ProofsAtMain` covers it, and under Task 4 that the brief writer was rebuilt and that the fault caused one mislabelled sentence.
 - [ ] **Step 4: Commit** to `master` and push.
 - [ ] **Step 5: The local root notes stay** until Sebastian says which may go. They are untracked, so a delete cannot be undone.
 
 ### Task 3: Hand work
 
-- [ ] **Step 1: Case 7747.** The database holds one case at a human: 7747, `human_card`, on `sf/ai-software-factory-infra`, card infra #361, pull request #360, opened 2026-11-26 14:15. Open the infra project's screen. If the card shows, Sebastian answers it with Merge it or Reject and close it. If the screen shows nothing, that is a fault: a case at a human that no screen shows. Then trace the board's read for a `human` card whose case carries `"held": true` in its facts, and add the fault to this plan's table with its evidence.
-- [ ] **Step 2: The code repository's checkout.** The main tree sits on `factory/t-59bab833d3ef`, 1 commit ahead of main. The worktrees are `criteria-human-verdict` (4 uncommitted files), `t4-n104-pod-memory` (1 commit, `3b0bb8c7e`), `done-reason`, `roll-2044` and `roll-b5d`. For each, read `git log origin/main..HEAD --oneline` and `git status`. Remove a worktree or a branch whose change main holds. Show a change that main lacks to Sebastian in one line before its delete. Then check out `main` and pull.
+- [ ] **Step 1: Case 7747.** The screen showed nothing: that is fault 4, fixed in pull request #2354. After the roll, the infra project's board shows card #361. Sebastian answers it there, or on pull request #360 in Forgejo. The database holds one case at a human: 7747, `human_card`, on `sf/ai-software-factory-infra`, card infra #361, pull request #360, opened 2026-11-26 14:15. Open the infra project's screen. If the card shows, Sebastian answers it with Merge it or Reject and close it. If the screen shows nothing, that is a fault: a case at a human that no screen shows. Then trace the board's read for a `human` card whose case carries `"held": true` in its facts, and add the fault to this plan's table with its evidence.
+- [x] **Step 2: The code repository's checkout.** The main tree sits on `factory/t-59bab833d3ef`, 1 commit ahead of main. The worktrees are `criteria-human-verdict` (4 uncommitted files), `t4-n104-pod-memory` (1 commit, `3b0bb8c7e`), `done-reason`, `roll-2044` and `roll-b5d`. For each, read `git log origin/main..HEAD --oneline` and `git status`. Remove a worktree or a branch whose change main holds. Show a change that main lacks to Sebastian in one line before its delete. Then check out `main` and pull.
 
 ### Task 4: The next run is watched
 
@@ -119,4 +129,6 @@ No session ran since the roll of 2026-11-26 19:58, so the fix for the week's lon
 - [ ] **Step 2: Watch the checks stop.** `SELECT id, opened_at, resolved_at, resolution FROM cases WHERE kind='gate_stop' AND opened_at > '<roll time>'`. The fix holds when a case whose checks turned green is resolved by `factoryd` within minutes. It fails when such a case waits at a human: then read the case's `case_steps` for the refused step, which the fix writes.
 - [ ] **Step 3: Watch the false alerts.** After Task 1's roll and the next follow run: `SELECT count(*) FROM alerts WHERE kind='gate_bound' AND source IN ('FollowJudge','RoutineRun') AND raised_at > '<roll time>'`. Expected: 0.
 - [ ] **Step 4: Watch the follow routine's return.** It is proven only when a move fails. On the first failed move, check that the revert merged, that Flux's statuses on it are success, and that one "Try again" card stands.
-- [ ] **Step 5: The plan ends** when one piece of filed work ran from its first card to its roll with no hand fix, and every fault that Steps 1 to 4 found is fixed and rolled.
+- [ ] **Step 5: Watch the Forgejo move.** After case 7747's answer, the follow routine moves the next parts. Check that infra's Forgejo reaches the harness's pin (`upstream-images.txt`), so the harness tests the version production runs.
+- [ ] **Step 6: Watch the two flakes.** A red CI run of `TestReconcileReportsWhetherTheScreeningPassed` names its stray supervisor call (the guard `unexpectedSupervisor` prints it). A red run of the console package names its test. Either becomes a row of the fault table and gets its fix.
+- [ ] **Step 7: The plan ends** when one piece of filed work ran from its first card to its roll with no hand fix, and every fault that Steps 1 to 6 found is fixed and rolled.

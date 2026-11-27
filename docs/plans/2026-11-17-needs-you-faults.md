@@ -42,6 +42,8 @@ Two more faults of that night are in other plans. The plan-criteria case that re
 
 ### Task 1: The check-in offers `repeats` only when earlier findings exist
 
+**Built on 2026-11-27 in pull request #2354 (`fc92cc9fd`),** keeping today's signature `checkinSystemFor(ask *CheckInAsk)`, which reads the priors from the ask.
+
 **Files:**
 - Modify: `internal/factoryd/checkin.go:516-530` (`checkinSystem`, `checkinSystemFor`), `:595-620` (`momentAnswerSchema`), `:884` (the caller), and the `conversation` that `runCheckin` builds
 - Test: `internal/factoryd/checkin_test.go`
@@ -49,15 +51,17 @@ Two more faults of that night are in other plans. The plan-criteria case that re
 **Interfaces:**
 - Produces: `func checkinSystemFor(moment string, replan, priors bool) string`
 
-- [ ] **Step 1: Write the failing tests.**
+- [x] **Step 1: Write the failing tests.**
   - `TestCheckinSystemOffersRepeatsOnlyWithPriors`: `checkinSystemFor(<the gate moment>, false, false)` holds neither `"repeats"` nor `repeats is optional`. `checkinSystemFor(<the gate moment>, false, true)` holds `"repeats":"<id>"`. With no priors, `momentAnswerSchema`'s finding item has `"additionalProperties": false`.
   - `TestCheckinRepairsALastCallRefusal`: an ask with one finding (`f1`), no priors, and a call cap of 1. The scripted model answers first `{"findings":[{"id":"f1","verdict":"confirmed","evidence":"e","repeats":"f2"}],"decision":"handover","handover":"n"}`, then the same answer without `repeats`. The check-in ends with decision `handover` after exactly 2 model calls.
-- [ ] **Step 2: Run them and see them fail.** `go test -race -run 'TestCheckinSystemOffersRepeatsOnlyWithPriors|TestCheckinRepairsALastCallRefusal' ./internal/factoryd/`
-- [ ] **Step 3: Implement.** `checkinSystemFor` builds the answer example and the `repeats` sentence only when `priors` is true. The caller at line 884 passes `len(ask.Priors) > 0`. The finding item of `momentAnswerSchema` gets `"additionalProperties": false`. `runCheckin`'s `conversation` sets `RepairPastCap: true`, as `rungconv.go:59` does.
-- [ ] **Step 4: Run** `go test -race ./internal/factoryd/` and `bash check changed`. Expected: PASS.
-- [ ] **Step 5: Commit and open the pull request.**
+- [x] **Step 2: Run them and see them fail.** `go test -race -run 'TestCheckinSystemOffersRepeatsOnlyWithPriors|TestCheckinRepairsALastCallRefusal' ./internal/factoryd/`
+- [x] **Step 3: Implement.** `checkinSystemFor` builds the answer example and the `repeats` sentence only when `priors` is true. The caller at line 884 passes `len(ask.Priors) > 0`. The finding item of `momentAnswerSchema` gets `"additionalProperties": false`. `runCheckin`'s `conversation` sets `RepairPastCap: true`, as `rungconv.go:59` does.
+- [x] **Step 4: Run** `go test -race ./internal/factoryd/` and `bash check changed`. Expected: PASS.
+- [x] **Step 5: Commit and open the pull request.**
 
 ### Task 2: The runner image reads every Go tree with no list
+
+**Dropped on 2026-11-26.** One card stopped on the list in six weeks (#2100 on 11-16). That does not pay for a change to `Dockerfile.runner`, its cache and the image epoch.
 
 **Files:**
 - Modify: `Dockerfile.runner:164-187` (the warm step and its comment), `.forgejo/workflows/ci.yml:28`, `:101`, `:218`
@@ -83,6 +87,8 @@ Two more faults of that night are in other plans. The plan-criteria case that re
 
 ### Task 3: A plan cannot cite as new a test that main already has
 
+**Covered on 2026-11-26 by `ProofsAtMain`** (`internal/factoryd/proofsatmain.go`): a card whose branch holds no work and whose cited tests pass at main closes done. The filing check below was not built.
+
 **Files:**
 - Modify: `internal/factoryd/plan.go:2907` (`FilePlan`) and `:2684` (`RunPlan`)
 - Test: `internal/factoryd/plan_test.go`
@@ -105,6 +111,8 @@ Two more faults of that night are in other plans. The plan-criteria case that re
 
 ### Task 4: A case brief carries the plan revision and the cards it names
 
+**Not built; superseded on 2026-11-26.** The brief writer was rebuilt after 11-17 (code commits `01900c99b` and `d2d846523` of 11-19). The fault caused one mislabelled sentence in a brief.
+
 **Files:**
 - Modify: `internal/factoryd/brief_case.go` (`caseFacts`), `internal/factoryd/carddigest_timeline.go:125-135` (the replan step's label)
 - Test: `internal/factoryd/brief_test.go`
@@ -126,6 +134,8 @@ Two more faults of that night are in other plans. The plan-criteria case that re
 
 ### Task 5: A human card's case gets a brief
 
+**Done on 2026-11-19 in code commit `73811a1db`, by another shape:** `BriefClasses` (`internal/policy/policy.go`) writes a human card's brief under every class of the policy. `BriefModel` was not built.
+
 **Files:**
 - Modify: `internal/policy/policy.go` (next to `FactoryModel`), `internal/factoryd/brief.go:296`, `internal/factoryd/brief_case.go:46`
 - Test: `internal/policy/policy_test.go`, `internal/factoryd/brief_test.go`
@@ -133,13 +143,13 @@ Two more faults of that night are in other plans. The plan-criteria case that re
 **Interfaces:**
 - Produces: `func (d Document) BriefModel(classes []string) string`
 
-- [ ] **Step 1: Write the failing tests.**
+- [x] **Step 1: Write the failing tests.**
   - `TestBriefModelFallsBackForACardWithNoClasses`: with class `coder` whose `SupervisorModel` is `mid`, `BriefModel(nil)` returns `mid`, and `BriefModel([]string{"coder"})` returns `mid`.
   - `TestBriefWriterBriefsAHumanCard`: a task of kind `human` with nil `RequiredCapabilities`. The case brief is written with no error, by alias `mid`.
-- [ ] **Step 2: Run them and see them fail.** `go test -race -run 'TestBriefModelFallsBackForACardWithNoClasses' ./internal/policy/` and `go test -race -run TestBriefWriterBriefsAHumanCard ./internal/factoryd/`
-- [ ] **Step 3: Implement.** `BriefModel` returns `FactoryModel(classes, PurposeBrief)`, and when that is "", the first alias of `classModels(PurposeBrief)`. The gateway already allows these aliases on the chat task that the brief is billed to (`PurposeModels`, `policy.go:1624`). Both brief calls use `BriefModel`.
-- [ ] **Step 4: Run** `go test -race ./internal/policy/ ./internal/factoryd/` and `bash check changed`. Expected: PASS.
-- [ ] **Step 5: Commit and open the pull request.**
+- [x] **Step 2: Run them and see them fail.** `go test -race -run 'TestBriefModelFallsBackForACardWithNoClasses' ./internal/policy/` and `go test -race -run TestBriefWriterBriefsAHumanCard ./internal/factoryd/`
+- [x] **Step 3: Implement.** `BriefModel` returns `FactoryModel(classes, PurposeBrief)`, and when that is "", the first alias of `classModels(PurposeBrief)`. The gateway already allows these aliases on the chat task that the brief is billed to (`PurposeModels`, `policy.go:1624`). Both brief calls use `BriefModel`.
+- [x] **Step 4: Run** `go test -race ./internal/policy/ ./internal/factoryd/` and `bash check changed`. Expected: PASS.
+- [x] **Step 5: Commit and open the pull request.**
 
 ### Task 6: Land and check on the live factory
 

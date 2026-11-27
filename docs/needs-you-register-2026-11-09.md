@@ -1,5 +1,7 @@
 # Needs you on full auto: what stopped, who decided, and why the factory did not
 
+**Checked on 2026-11-27 at code main `c2dddcd67`.** Of the 22 entries marked "Still open", 13 are closed, and each closing test passes: 80 (`d31a7db1c`), 81 (`3cd146417`), 83 (`f8bc4c994`), 84 (`bfecb944a`, `9778292d6`), 86 (`9ef3aac61`), 87 (`083d3698d`), 93 (`6af119cdb`, `30de5eb68`), 95 (`c9346fb83`), 96 (`e8dcbff4c`), 97 (`6b3c9f5f9`), 98 (`c8d826883`, infra `c60f65d`), 101 (`7af3ec699`) and 102 (`b2c3e9c8b`, `cb6e84e45`). Entry 85 is closed on the cluster by infra `2e446b0`, with no test, because the fix is a Cilium setting. Three are by design: 77, 92 and 104. Five are open, and [plans/2026-11-26-open-faults.md](plans/2026-11-26-open-faults.md) carries them: 82 and 91 as faults it fixes, 99 until infra follows Forgejo to the harness's 17.0.2, and 88 and 100 as flakes that no run reproduced.
+
 Started 2026-11-09. The rule (Sebastian, 2026-11-09): on full auto the factory agent looks at every stop first and decides whenever it can. A human decides only what the factory cannot. This register records every stop that reached Needs you, who decided it in the end, what full auto should have done, and why it did not. It is the list of what to fix. Each entry carries one of four verdicts:
 
 - **not built**: the step that should decide exists in the design and not in the code. The entry names the phase or card that builds it.

@@ -5572,8 +5572,11 @@ repeat or an old-style name, and `TestKindChecksAccept` inserts every alert
 and approval kind after all migrations, since two migrations that each
 rewrite one check list keep only the last. The work guide and the
 template's checks carry the naming rule into every project. A
-replay test runs every recorded live history in the code repository's
-testdata. Live: PR #100 merged by `factory-merge` after the human's approval
+replay test runs every history recorded on a Temporal dev server under
+stub activities (`testdata/devserver-*.json` in the code repository). No
+live history is recorded: the old ones left on 2026-11-11 with the old
+records change, so a branch that only a live run takes has no replay
+guard. Live: PR #100 merged by `factory-merge` after the human's approval
 and a 405 before it, and PR #126 went through every gate, the review, the
 console approval and the merge.
 
