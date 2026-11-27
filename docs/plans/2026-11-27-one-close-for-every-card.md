@@ -231,6 +231,7 @@ The cause-gone plan refused a rung 0 row for `pod_never_started` and `platform_f
 - The plan "The factory's own repository is a project like any" owns the roll task and `mainfix`. This plan turns the close of their human cards into rows. If that plan moves red main into the chain poller for every project, the row `main_green` goes with the roller and `chain_settled` serves every project.
 - The plan "Collapse the workflow's history" owns the hand-written periodic loops and the drain step for old version branches. Where this plan deletes a closer's close half, the filing half and its loop stay, and that plan takes the loop. Task 15 waits for its drain rule.
 - The open faults plan (`docs/plans/2026-11-26-open-faults.md`, design repository) reorders the template update's close at templateupdate.go:416-421. Task 8 touches the same function, and whichever lands second rebases.
+- The plan "A routine's run shows while it works and says why it failed" adds the kind `routine_failed` and the row `routine_ran` to this registry after Task 9, and its run calls `Runner.Retire`.
 
 ## The proposal
 

@@ -1,6 +1,8 @@
 # A routine's run shows while it works and says why it failed: implementation plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task by task. Steps use checkbox (`- [ ]`) syntax for tracking. Line numbers are from the code repository's main at `306caad7a` (2026-11-26). Check each line before you edit it.
+> **For agentic workers:** REQUIRED SUB-SKILL: use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task by task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+This plan is the ninth of the drift review's set ([the overview](2026-11-27-drift-review.md)). Its Task 3 follows the shapes of "One close for every card" and "One door for every answer" and builds after them. Line numbers are from the code repository's main at `306caad7a` (2026-11-26). Main moved to `2af2e0ed2` on 2026-11-27, when the open faults merged and rolled, so check each line before you edit it.
 
 **Goal:** Every routine stands in In progress while one of its runs works, and a run that fails puts its error on a card that the factory agent reads first and a human sees in Needs you only when the agent cannot settle it, until a later run of the routine ends well.
 
@@ -37,9 +39,9 @@ A failure would show even less:
 ## What already works and stays
 
 - `RoutineRunWorkflow` with its ID `<project>/<routine>/<due time>`. `BeginRoutineRun` and its `began` flag, and `RoutineRunFailed` as the one writer of a failed run.
-- The case ladder for factoryd's held human cards: `HumanCardStatus` files a source outside `askAtOnce` as `waiting-agent` with no issue, rung 2 (the factory agent) takes it first, and `Face` files the issue and moves it to Needs you on a hand-up. This plan adds no rung and no case kind. The new source maps to `CaseHumanCard` through `HumanCardKind`.
-- The follow routine's failure card (`FollowFail`, `followfail.go:70`) is the pattern: one standing card per routine, found by a marker in its objective, a retry choice, and a close by the routine's own pass. It stays as it is for a failed move, which is not a failed run.
-- `Timeline.WithdrawAsk` and `closeIssueAsFactory` as the close of a factoryd card, with the reason as C51 words it.
+- The case ladder for factoryd's held human cards: `HumanCardStatus` files a source outside `askAtOnce` as `waiting-agent` with no issue, rung 2 (the factory agent) takes it first, and `Face` files the issue and moves it to Needs you on a hand-up. This plan adds no rung. The new source maps to a kind of its own, `routine_failed`, through `cardKinds` of "One close for every card".
+- The follow routine's failure card (`FollowFail`, `followfail.go:70`) is the pattern: one standing card per routine, found by a marker in its objective, a retry choice, and a close by rung 0's row `follow_target_gone` once "One close for every card" built it. It stays as it is for a failed move, which is not a failed run.
+- `Act`'s end of a human card that rung 0 withdraws (`EndHumanCard`, "One close for every card"), with the reason as C51 words it.
 - The board's stream: an event row with no task swaps the board (`static/console.js:465-477`), and a heartbeat compares `boardData.faces()` every 25 s.
 
 ## Decisions this plan makes
@@ -61,7 +63,7 @@ These are execution defaults. Sebastian may change any of them before the build.
 - Tests first. Expectations are derived by hand. Never change an assertion to make a test pass.
 - Each test that reads time runs on a fixed clock.
 - Screens show times in the human's zone (C49). Agents, issue comments, Discord and logs read the UTC words.
-- A change to workflow code takes a `workflow.GetVersion` change id and a replay test against a recorded history.
+- A change to workflow code needs a `workflow.GetVersion` change id only when a history recorded before it would make today's code issue other commands, so a change to an activity's input or options needs none.
 - An error's words pass `Runner.scrub` (`checkin.go:1139`) before they reach a row, a card, an issue or a screen.
 - A human is a human: never a member, an operator or a resource, in copy or in docs.
 - No ruling number and no ledger path appears in a tracked file or a commit message. Both repositories' pre-commit hooks refuse them.
@@ -71,7 +73,7 @@ These are execution defaults. Sebastian may change any of them before the build.
 ## Review Focus
 
 1. **Two runs work at once**, a cron run and a Run now with different due times. The routine shows once in In progress and names the newest run. Task 1's contract test pins it.
-2. **The routine is deleted while its failure card stands.** No later run comes. `conditionGone` reads the routine as gone, so the factory agent may end the card. Task 3 pins it.
+2. **The routine is deleted while its failure card stands.** No later run comes. The row `routine_ran` reads the routine as gone, so the retake pass closes the card within a minute, and the factory agent's `close` passes before that. Task 3 pins it.
 3. **A run held by `while_open` after a failure** must leave the failure card open. Task 3 pins it.
 4. **An error with a secret in it** reaches the row, the card and the face scrubbed. Task 2 pins the row and Task 3 the card.
 5. **A retry from the card while a Skip once is pending** must not use up the skip, which is meant for the next scheduled run. Task 3 pins it.
@@ -108,7 +110,7 @@ These are execution defaults. Sebastian may change any of them before the build.
 
 **Files (code repository):**
 - Modify: `internal/factoryd/routine_run.go` (`RoutineRun` at `:26-167`, `routineRan` at `:309-333`)
-- Modify: `internal/factoryd/routine_workflow.go` (`:52-57`)
+- Modify: `internal/factoryd/routine_workflow.go` (the run's `RetryPolicy` at `:56`)
 - Modify: `internal/factoryd/event_store.go` (the routine events at `:84-103`)
 - Test: `internal/factoryd/routine_run_test.go`, `internal/factoryd/routine_workflow_test.go`
 
@@ -124,42 +126,52 @@ These are execution defaults. Sebastian may change any of them before the build.
   - One `routine_working` row carries that note.
   - An error before the row exists (no project in the store) writes no note and no row.
 - [ ] **Step 3: Write the failing test** `TestRoutineRunWorkflowStopsAfterThreeAttempts` in the workflow test suite: `ActivityRoutineRun` always fails with `boom`. It runs exactly 3 times. `ActivityRoutineRunFailed` runs once with the words `boom`, and the workflow fails.
-- [ ] **Step 4: Write the replay test** `TestRoutineRunWorkflowReplaysBeforeTheAttemptBound` in `internal/factoryd/workflow_replay_prechange_test.go`. It builds a `RoutineRunWorkflow` history as main writes it before this change, the way `replaySplice` builds its history there, and replays it with the change in place. Expected: no nondeterminism error.
-- [ ] **Step 5: Run and see them fail.** `go test -race -run 'TestRoutineRunRecordsItsStart|TestRoutineRunNotesAFailedAttempt|TestRoutineRunWorkflowStopsAfterThreeAttempts|TestRoutineRunWorkflowReplaysBeforeTheAttemptBound' ./internal/factoryd/`
-- [ ] **Step 6: Implement:**
+- [ ] **Step 4: Run and see them fail.** `go test -race -run 'TestRoutineRunRecordsItsStart|TestRoutineRunNotesAFailedAttempt|TestRoutineRunWorkflowStopsAfterThreeAttempts' ./internal/factoryd/`
+- [ ] **Step 5: Implement:**
   - `RoutineRun` records `routine_working` when `began` and the row's outcome is `""`, through the same writer as `routineRan`, which writes nothing for a repository `""`.
   - On an error returned after `run.Run > 0`, it calls `NoteRoutineAttempt` with `attemptNote(attempt, routineAttempts, r.scrub(failureWords(err)))` and records `routine_working` with that note. The attempt comes from `activity.GetInfo(ctx).Attempt` when `activity.IsActivity(ctx)` (`go.temporal.io/sdk@v1.44.0/activity/activity.go:108`), else 1.
-  - In the workflow, behind `workflow.GetVersion(ctx, "routine-run-attempts", workflow.DefaultVersion, 1)`, version 1 sets `RetryPolicy.MaximumAttempts = routineAttempts`.
+  - In the workflow, the run's activity options set `RetryPolicy.MaximumAttempts = routineAttempts` (`routine_workflow.go:56`). A change to an activity's input or options needs no `workflow.GetVersion` change id, and `RoutineRunWorkflow` has no change id today.
   - `RoutineRunFailed` scrubs its words the same way.
   - Update the doc comment of `EventRoutineRunNow` for Task 5's detail.
-- [ ] **Step 7: Run** `go test -race ./internal/factoryd/`. Expected: PASS.
-- [ ] **Step 8: Commit.**
+- [ ] **Step 6: Run** `go test -race ./internal/factoryd/`. Expected: PASS.
+- [ ] **Step 7: Commit.**
 
 ### Task 3: A failed run files one held card, the factory agent retries once, and a later run closes it
 
+This task builds after Tasks 2, 3, 4, 7 and 9 of "One close for every card" and Tasks 5, 6 and 9 of "One door for every answer". Tasks 1, 2, 4 and 5 of this plan build before it. This task adds the failed card's row to the board's foot and to the drawer's Last row, which Tasks 4 and 5 leave out. Until it lands, a failed run reads on both as today's last run.
+
 **Files (code repository):**
 - Create: `internal/factoryd/routinefail.go`, `internal/factoryd/routinefail_test.go`
-- Modify: `internal/factoryd/intake.go` (the sources near `:1297`), `internal/factoryd/source_briefs.go` (near `:103`)
-- Modify: `internal/factoryd/routine_run.go` (`RoutineRunFailed` at `:278-302`, the `end` and `filed` helpers at `:55-68`, the early return at `:50-52`, the skip flag at `:45-46`)
-- Modify: `internal/factoryd/routine_store.go` (`TriggerRetry` beside `TriggerRunNow` at `:19`)
-- Modify: `internal/factoryd/act.go` (`heldRefusal` at `:1182`, `conditionGone` at `:1210`)
-- Modify: `internal/factoryd/faces_copy.go` (the answers near `:128` and `:2391`), `internal/factoryd/chat_escalation.go` (near `:330`)
-- Modify: `internal/factoryd/store.go` (the `Store` interface), `internal/factoryd/followpass.go` and `followfail.go` (the two `Follow.Cards.StandingQuestion` calls)
-- Modify: `internal/factoryd/runner.go` (`RunnerConfig` at `:46`), `cmd/factoryd/main.go`
-- Modify: `internal/console/console.go` (`Config` near `:319` and its check near `:763`), `internal/console/actions.go` (beside `AnswerRetryFollow` at `:1755`)
-- Test: `internal/factoryd/routinefail_test.go`, `internal/console/actions_test.go` or the file that tests `AnswerRetryFollow`
+- Create: `internal/schema/migrations/factoryd/20261202100000_routine_failed_kind.sql` (the name is the next free timestamp after the set's migrations, inferred)
+- Modify: `internal/factoryd/intake.go` (the sources near `:1297`), `internal/factoryd/source_briefs.go` (near `:103`), `internal/factoryd/kinds.go` (`CaseKinds`, `CardSources`)
+- Modify: `internal/factoryd/cases.go` (the `CaseKind` constants and the kind table `caseKinds`), `internal/factoryd/cases_events.go` (`cardKinds`), `internal/factoryd/ladder.go` (the row `routine_ran` in `rung0`)
+- Modify: `internal/factoryd/routine_run.go` (`RoutineRunFailed` at `:278-302`, the `end` and `filed` helpers at `:55-68`, the skip flag at `:45-46`)
+- Modify: `internal/factoryd/routine_store.go` (`TriggerRetry` beside `TriggerRunNow` at `:19`, `StandingQuestion` in the `RoutineStore` interface at `:54-89`), `internal/factoryd/routines.go` (`Routines.RunNow` at `:307-313`)
+- Modify: `internal/factoryd/act.go` (`heldRefusal`), `internal/factoryd/faces_copy.go` (the variants at `:50-72`, the vocabulary near `:128`, the key constants, `CaseFaces`)
+- Modify: `internal/factoryd/followpass.go` and `followfail.go` (the two `Follow.Cards.StandingQuestion` calls)
+- Modify: `internal/factoryd/runner.go` (`RunnerConfig` at `:46`), `cmd/factoryd/main.go` (`configRepo` at `:90`)
+- Modify: `internal/console/board_actions.go` (`choiceWork`), `internal/console/access.go` (`accessTable`), `internal/console/ports.go` (`Routines.RunNow` at `:311`), `internal/console/routines.go` (the call in `doRoutineRun` at `:127`)
+- Modify: `internal/factoryd/routines.go` (`RoutineView`, `Views`), `internal/console/board.go` (`routineFace`), `internal/console/faceview.go` (`routineFoot`), `internal/console/routine_drawer.go` (the Last row)
+- Test: `internal/factoryd/routinefail_test.go`, `internal/console/actions_test.go` or the file that tests the `KeyRetryFollow` arm of `choiceWork`, `internal/console/ghost_test.go`, `internal/console/routine_drawer_test.go`
 
 **Interfaces:**
-- Consumes: `RoutineRun`, `EndRoutineRun`, `RoutineRuns` and `StartRoutineRun`.
+- Consumes: `RoutineRun`, `EndRoutineRun`, `RoutineRunFiled` and `RoutineRuns`.
+- Consumes, from "One close for every card": `cardKinds` (Task 2), `Act`'s end of a human card that rung 0 withdraws, `EndHumanCard` (Task 3), `Runner.Retire` and the retake pass's read of every factory card kind (Task 4), the fact method shape of `Runner.followGone` (Task 7), and `heldRefusal` reading `firing` (Task 9).
+- Consumes, from "One door for every answer": `Resolution.Key` (Task 4), a human card's stored keys and `choiceWork` (Task 5), `answerRule` (Task 6), and `doResolve` behind `POST /tasks/{id}/resolve` (Task 9).
 - Produces: `SourceRoutineFailed = "routine-failed"`, held, outside `askAtOnce`.
+- Produces: `CaseRoutineFailed CaseKind = "routine_failed"`, the entry `SourceRoutineFailed` to `CaseRoutineFailed` in `cardKinds`, and its kind table row: `Words: "failed routine run"`, `Rung0: []string{"routine_ran"}`, `NoRung1: choicesAnswer` (rung 1 does not judge it), `Rung2: rung2Decides` (the factory agent takes it first), `Choices: true` (its question's choices answer it, at rung 3 the human's), and `Retires: "a later run of the routine filed its card or ended “no change” or “reported”, or the routine left the configuration: rung 0 closes the card (routine_ran)"`.
+- Produces: the row `routine_ran` of `rung0` and `func (r *Runner) routineFailGone(ctx context.Context, t Task) (string, Moments, error)` in `routinefail.go`. The name `routineRan` is taken: it is the event writer at `routine_run.go:309`.
 - Produces: `TriggerRetry = "retry"`, the trigger of a run that a failure card's Run it again starts.
-- Produces: `AnswerRetryRoutine = "retry_routine"` with `variantRoutine = "routine"`, label "Run it again", effect "Runs the routine now and closes this card. If the run fails again, a new card says why."
+- Produces: the vocabulary row `{Action: ActRetry, Variant: variantRoutine, Label: "Run it again", Effect: "Runs the routine now and closes this card. If the run fails again, a new card says why."}`, with `variantRoutine = "routine"` in the variant block and `KeyRetryRoutine = ActRetry + "/" + variantRoutine` beside `KeyRetryFollow`. The card stores the key `retry/routine`.
+- Produces: the arm `case factoryd.KeyRetryRoutine:` of `choiceWork`.
+- Produces: the entry `"answer retry/routine": rCard` in `accessTable`.
+- Changes: `Routines.RunNow(ctx context.Context, project, routine, trigger string) error`, in factoryd and in the console's port.
 - Produces: the facts `routine_project`, `routine_name`, `routine_run` and `routine_trigger` on the card's ask.
 - Produces: `routineFailedMarker(project, routine string) string`, unique per routine. A project `""` reads as "the factory".
 - Produces: `RoutineFailedQuestion(rt policy.Routine, run RoutineRun, words string) HumanQuestion`.
-- Produces: `(*Runner).RetryRoutine(ctx context.Context, card Task) error` and `console.Config.RetryRoutine func(ctx context.Context, card factoryd.Task) error`.
 - Produces: `RunnerConfig.ConfigRepo Repo`, set from `configRepo` in `cmd/factoryd/main.go:90`.
-- Moves: `StandingQuestion` joins the `Store` interface. The follow routine calls `r.store.StandingQuestion`, and `Follow.Cards` goes.
+- Moves: `StandingQuestion` joins the `RoutineStore` interface, which `Runner.Routines` embeds and `Routines.Views` reads. The follow routine calls `r.Routines.StandingQuestion`, and `Follow.Cards` goes.
+- Produces: `RoutineView.Failure *Task`, which `Views` fills with `StandingQuestion(repository, routineFailedMarker(..))`. The board's foot reads `run 10 failed · #2360` for a failed run whose card stands, with no dot, the class `it held` and #2360 linked as every reference is. The drawer's Last row reads `failed: <words>` with the link to the card.
 
 The card's copy, which the tests pin word for word:
 
@@ -176,33 +188,47 @@ The card's copy, which the tests pin word for word:
 The trigger words are "on its schedule" for `cron`, "on Run it now" for `run-now`, "on Run it again" for `retry`, and the trigger's name for any other.
 
 - [ ] **Step 1: Write the failing test** `TestAFailedRunFilesOneHeldCard` with project `ai-software-factory-code`, routine `weekly-bump`, run 10, trigger `run-now`, started 22:58 UTC, words `the bump pod: image pull failed`:
-  - `RoutineRunFailed` files one task with source `routine-failed`, status `waiting-agent` and no issue.
-  - Its ask carries the copy above and the four facts.
+  - `RoutineRunFailed` files one task with source `routine-failed`, status `waiting-agent` and no issue. Its case has the kind `routine_failed`.
+  - Its ask carries the copy above, the four facts, and the stored offers `retry/routine` and `close`.
+  - With the words `boom token=s3cr3t`, the Info and the Happened line carry the scrubbed form that Task 2 derives (Review Focus 4).
   - The run's row ends `failed` with the words.
   - A second call for the same run files nothing. A failed run 11 while the card stands files nothing and still ends its row `failed`.
 - [ ] **Step 2: Write the failing test** `TestAFailedFactoryRoutineFilesOnTheConfigRepository`: a failed run of `template-pass` (project `""`) files its card on `RunnerConfig.ConfigRepo`.
 - [ ] **Step 3: Write the failing test** `TestALaterRunClosesTheFailureCard`:
-  - With run 10's card standing, run 11 ends `no change` at 06:00 UTC. The card has one `question_withdrawn` row with the close reason above, and its issue, when it has one, is closed as factoryd's.
-  - For outcomes `filed` and `reported`, the card closes the same way. For `held` and `skipped`, it stays.
-  - A retry of run 11's activity, after the row ended but before the close, closes the card. The early return at `routine_run.go:50-52` runs the close.
-- [ ] **Step 4: Write the failing test** `TestConditionGoneForAFailedRoutine`:
-  - Gone when a run numbered above the card's run fact ended `filed`, `no change` or `reported`.
-  - Gone when the routine is no longer in the configuration, with why `the routine is no longer in the configuration`.
-  - Otherwise it stands, with why `card #N's condition stands: no run of the routine ended since run 10 failed`. Take `N` from the fixture.
-- [ ] **Step 5: Write the failing test** `TestTheFactoryAgentRetriesAFailedRoutineOnce`. Rung 2's `retry_routine` on a card whose run fact's trigger is `cron` passes `heldRefusal`. On a card whose run's trigger is `retry`, it is refused with: `run 10 was itself a retry from a failure card and failed again, so the factory agent tries no more: hand the case up (` + "`hand_up`" + `) with ` + "`retry_routine`" + ` as the recommendation`. The human (rung 3) may always retry.
-- [ ] **Step 6: Write the failing test** `TestRetryRoutineStartsARunAndKeepsTheSkip`:
-  - `RetryRoutine` starts one run of the card's routine with trigger `retry` and due equal to the fixed clock's now.
-  - With a pending Skip once, the retry's run does not consume it: the routine's state still has `SkipNext`.
-- [ ] **Step 7: Write the failing console test** `TestTheRetryRoutineAnswerRunsTheRoutine`. A press of `retry_routine` on the card calls `Config.RetryRoutine` once with the card. The answer's note is `Answered #N: the routine runs again now and the card is closed.` A `RetryRoutine` that fails refuses with `The routine's retry failed: <error>. Try again in a moment.`
-- [ ] **Step 8: Run and see them fail.** `go test -race -run 'FailedRun|FailedFactoryRoutine|LaterRunCloses|ConditionGoneForAFailedRoutine|RetriesAFailedRoutineOnce|RetryRoutineStarts' ./internal/factoryd/` and `go test -race -run TestTheRetryRoutineAnswerRunsTheRoutine ./internal/console/`.
+  - With run 10's card standing in `waiting-agent`, run 11 ends `no change` at 06:00 UTC. The run's call of `Retire` ends the card before `RoutineRun` returns. The card is `closed` with the closing reason `run 11 of the routine ended “no change” at 06:00 UTC`, its case is `withdrawn`, and one `question_withdrawn` row carries that reason, the moment of 06:00 UTC and `held: true`.
+  - With an issue on the card, `closeIssueAsFactory` closes it with the one comment `Run 11 of the routine ended “no change” at 06:00 UTC.`
+  - For the outcome `reported`, and for a run 11 that filed card #2360, the card closes the same way, the second with the reason `run 11 of the routine filed #2360 at 06:00 UTC`. For `held` (Review Focus 3) and `skipped`, it stays.
+  - A retry of run 11's activity, after the row ended but before the close, returns at the early return (`routine_run.go:50-52`) and calls no `Retire`. The card stands until one `Monitor.Retake`, which closes it with the same reason.
+- [ ] **Step 4: Write the failing test** `TestTheRoutineRanRowEndsAFailureCard`, through `Monitor.Retake`:
+  - The row fires when a run numbered above the card's `routine_run` fact ended `no change` or `reported`, or filed its card, and its clause is the reason of Step 3.
+  - The row fires when the routine is no longer in the configuration, with the clause `the routine is no longer in the configuration` (Review Focus 2). The factory agent's `close` passes `heldRefusal` on that card before the sweep.
+  - Otherwise the row does not fire and the card stays. The factory agent's `close` is refused with `card #N's reason stands: ` followed by the `Retires` words of `routine_failed` and the hand-up advice. Take `N` from the fixture.
+- [ ] **Step 5: Write the failing test** `TestTheFactoryAgentRetriesAFailedRoutineOnce`. Rung 2's `retry/routine` on a card whose `routine_trigger` fact is `cron` passes `heldRefusal`. On a card whose `routine_trigger` is `retry`, it is refused with: `run 10 was itself a retry from a failure card and failed again, so the factory agent tries no more: hand the case up (` + "`hand_up`" + `) with ` + "`retry/routine`" + ` as the recommendation`. The human (rung 3) may always retry.
+- [ ] **Step 6: Write the failing test** `TestARetryRunStartsNowAndKeepsTheSkip`:
+  - `Routines.RunNow(ctx, "ai-software-factory-code", "weekly-bump", TriggerRetry)` starts one run of the routine with trigger `retry` and due equal to the fixed clock's now.
+  - With a pending Skip once, the retry's run does not consume it: the run's outcome is not `skipped`, and the routine's state still has `SkipNext` (Review Focus 5).
+- [ ] **Step 7: Write the failing console test** `TestRunItAgainStartsARetryRunThroughTheOneDoor`. A writer of the project who is no approver posts `POST /tasks/{id}/resolve` with the card's `case_id` and the key `retry/routine`:
+  - The `Routines` fake's `RunNow` is called once, with `ai-software-factory-code`, `weekly-bump` and `retry`.
+  - The answer's note is `Answered #N: the routine runs again now and the card is closed.`
+  - A `RunNow` that fails refuses with `The routine's retry failed: <error>. Try again in a moment.`
+  - The writer's press is not refused, because `answerRule` finds `"answer retry/routine"` before it falls back to `"answer retry"`, which needs an approver.
+  - `TestAFailedRoutineNamesItsCard` in `ghost_test.go`: a bump whose run 10 failed and whose card #2360 stands has the foot `run 10 failed · #2360`, no dot, the class `it held`, and #2360 linked. The drawer's Last row for the same routine reads `failed: <words>` with the link to #2360 (`routine_drawer_test.go`).
+- [ ] **Step 8: Run and see them fail.** `go test -race -run 'FailedRun|FailedFactoryRoutine|LaterRunCloses|RoutineRanRow|RetriesAFailedRoutineOnce|RetryRunStarts' ./internal/factoryd/` and `go test -race -run 'TestRunItAgainStartsARetryRunThroughTheOneDoor|TestAFailedRoutineNamesItsCard' ./internal/console/`. Expected: compile errors on `CaseRoutineFailed`, `KeyRetryRoutine` and `TriggerRetry`.
 - [ ] **Step 9: Implement:**
   - In `RoutineRunFailed`, file the card before `EndRoutineRun`, so a retry of the activity after a filing finds the standing card. Only an outcome `failed` files: a pre-set outcome such as `skipped` does not.
   - Do not file the card with `Source: SourceRoutine`, and do not call `RoutineRunFiled` for it. `OpenRoutineTask` would then hold every later run, and `RoutineRunFailed` returns early on a row with a task.
   - The skip flag at `:45-46` becomes true only for triggers other than `run-now` and `retry`.
   - The start time in Info carries a `factoryd.Moment` in the question's `Moments`, as `humanquestion.go:123` does for an alert, so a screen shows it in the human's zone.
-  - The console's answer case follows `AnswerRetryFollow`'s.
-  - Add `AnswerRetryRoutine` to the source brief and to the vocabulary test that lists every answer.
-- [ ] **Step 10: Run** `go test -race ./internal/factoryd/ ./internal/console/`. Expected: PASS, including `TestTheKindTableHoldsEveryKind` with no change to the kind table.
+  - The kind: add `CaseRoutineFailed` to the constants, `CaseKinds` and the kind table, `SourceRoutineFailed` to `CardSources` and `cardKinds`, and the kind to `CaseFaces` with `humanFace`, as "One close for every card" Task 2 does for its kinds. The migration drops `cases_kind_check` and adds it with `routine_failed`. No live case needs a new label, because no card of the source exists before this task.
+  - The row `routine_ran` has no `Needs` and no `Back`. Its `Fire` calls `r.routineFailGone(ctx, t)` and, for a clause that is not `""`, answers `rungZeroMay(f, Resolution{Action: ActWithdraw, Note: note, Moments: said})`. Its `Took` answers `res.Note`.
+  - `routineFailGone` reads the facts of the card's newest ask case. With no routine of `routine_project` and `routine_name` in the configuration, it answers `the routine is no longer in the configuration`. Else it reads `RoutineRuns` and answers for the newest run numbered above `routine_run` that ended `no change` or `reported`, with the moment of its end (`LayoutClock`), or that filed its card. A run with a card answers `run 11 of the routine filed #2360 at 06:00 UTC` at its start, because its row stays open until the card ends and then takes the card's end as its outcome. With no such run it answers `""`.
+  - The run's good end: `end` after `EndRoutineRun` and `filed` after `RoutineRunFiled`, for an outcome `filed`, `no change` or `reported`, find the routine's standing card with `r.Routines.StandingQuestion(ctx, repository, routineFailedMarker(in.Project, in.Routine))` and call `r.Retire(ctx, card.ID)`. The repository is the project's, or `RunnerConfig.ConfigRepo.String()` for a factory routine. A failed `Retire` is logged. The early return at `:50-52` needs no close of its own, because the retake pass sweeps the row every minute.
+  - The retry: `RoutineFailedQuestion` stores `choices(KeyRetryRoutine, ActClose)`. The arm of `KeyRetryRoutine` in `choiceWork` reads `routine_project` and `routine_name` from the case's facts and calls `c.cfg.Routines.RunNow(ctx, project, name, factoryd.TriggerRetry)`, with the note and the refusal of Step 7, as the arm of `KeyRetryFollow` does. `Routines.RunNow` starts the run with the trigger it takes, and `doRoutineRun` passes `factoryd.TriggerRunNow`. No factoryd function of its own starts the retry, because the console starts a run through the port it already holds.
+  - The role: `"answer retry/routine": rCard` in `accessTable`. It is the need of a routine's Run it now, `"POST /routines/{project}/{name}/run": rProject` (a writer of the project), judged on the card's project.
+  - The guard: `heldRefusal` refuses rung 2's `retry/routine` (`in.Res.Key() == KeyRetryRoutine`) when the case's `routine_trigger` fact is `retry`, with the words of Step 5.
+  - Add `SourceRoutineFailed` to `SourceBriefs`, and `retry/routine` to the vocabulary test that lists every answer.
+  - The screens: `Views` fills `RoutineView.Failure`. `routineFace` builds the failed row of Task 4's table from it, and the drawer's Last row reads `failed: <words>` with the card's link.
+- [ ] **Step 10: Run** `go test -race ./internal/factoryd/ ./internal/console/` and `scripts/pg-test.sh go test -race -p 1 ./internal/factoryd/pg/`. Expected: PASS, including `TestTheKindTableHoldsEveryKind` with the row of `routine_failed`, whose `Retires` names `routine_ran`, `TestEveryFactoryHumanCardSourceHasAKind` with `routine-failed` added to its list, and `TestEveryHumanCardChoiceIsAVocabularyKey` with `RoutineFailedQuestion` added to its builders.
 - [ ] **Step 11: Commit.**
 
 ### Task 4: The board stands a working routine in In progress
@@ -214,29 +240,29 @@ The trigger words are "on its schedule" for `cron`, "on Run it now" for `run-now
 - Test: `internal/console/ghost_test.go`, `internal/console/proof_ghosts_wide_lane_once_test.go`, `internal/console/census_fixes_test.go`
 
 **Interfaces:**
-- Consumes: `RoutineView.Working` (Task 1), the run's note (Task 2), and the standing failure card (Task 3) through a new `RoutineView.Failure *Task`, which `Views` fills with `StandingQuestion(repository, routineFailedMarker(..))`.
+- Consumes: `RoutineView.Working` (Task 1) and the run's note (Task 2).
 - Produces: `routineFoot.Retrying bool`, which renders the foot's last part in the amber class `it held`, as `Held` does.
 
-The foot's last part, which the tests pin, with times in the human's zone:
+The foot's last part, which the tests pin, with times in the human's zone. Task 3 adds the third row, a failed run whose card stands. Until then a failed run reads as today's last run.
 
 | State | Words | Dot | Class |
 |---|---|---|---|
 | Working | `run 10 running since 23:58` | yes | `it run` |
 | Retrying | `attempt 1 of 3 failed: <note cut to 100 runes>` | yes | `it held` |
-| Failed, card standing | `run 10 failed · #2360`, with #2360 linked as every reference is | no | `it held` |
+| Failed, card standing (Task 3) | `run 10 failed · #2360`, with #2360 linked as every reference is | no | `it held` |
 
 - [ ] **Step 1: Write the failing test** `TestBoardStandsAWorkingRoutineInProgress`:
   - A bump with a working run 10 started at 22:58 UTC stands once in `colProgress`'s ghosts and not in Queued's.
   - Its foot reads `run 10 running since 23:58` for a human in Europe/Berlin, with the dot.
   - Queued's count and In progress's count are unchanged.
 - [ ] **Step 2: Write the failing test** `TestAWorkingRoutineShowsUnderEveryRoutinesChoice`: under `routines=none` and under `within` 1 hour with a next run in 6 days, the working routine still stands in In progress, and `GhostsHidden` does not count it.
-- [ ] **Step 3: Write the failing tests** `TestARetryingRoutineSaysItsError` and `TestAFailedRoutineNamesItsCard`, with the words and classes of the table.
+- [ ] **Step 3: Write the failing test** `TestARetryingRoutineSaysItsError`, with the words and class of the table's second row.
 - [ ] **Step 4: Write the failing test** `TestFacesChangeWhenARunStartsAndEnds`: `faces()` differs between no working run, a working run, the same run with a note, and the run ended. The heartbeat's refresh then carries a template-pass run, which records no event.
 - [ ] **Step 5: Change the console lab check.** Replace "a ghost stands in X, not only Queued" (`check.js:1775-1780`) with two checks:
   - Every ghost outside Queued stands in In progress and carries `.dot`.
   - The lab's working bump stands in In progress with `running since`.
   - `addRoutines` gains the working bump and a retrying audit routine.
-- [ ] **Step 6: Run and see them fail.** `go test -race -run 'WorkingRoutine|RetryingRoutine|FailedRoutineNames|FacesChangeWhenARun' ./internal/console/`
+- [ ] **Step 6: Run and see them fail.** `go test -race -run 'WorkingRoutine|RetryingRoutine|FacesChangeWhenARun' ./internal/console/`
 - [ ] **Step 7: Implement.** `placeGhosts` puts a routine with `Working != nil` into `colProgress`, ahead of the routines choice. `routineFace` builds the foot by the table. `faces()` adds the working run's number and note and the last run's outcome to each ghost's line.
 - [ ] **Step 8: Run** `go test -race ./internal/console/` and the console lab (`scripts/console-lab/`, its README's run command). Expected: PASS. Compare same-region crops of the lab's In progress column before and after at 2× zoom.
 - [ ] **Step 9: Commit.**
@@ -250,14 +276,13 @@ The foot's last part, which the tests pin, with times in the human's zone:
 - Test: `internal/console/routine_drawer_test.go`, `internal/console/routines_test.go` (`TestRoutineRunNowAnswersHeld` at `:313`), `internal/console/routine_tools_test.go`, `acceptance/write_tools_stream_test.go`
 
 **Interfaces:**
-- Consumes: `RoutineView.Working` and `RoutineView.Failure`.
+- Consumes: `RoutineView.Working`.
 - Produces: `EventRoutineRunNow` detail `{"project", "routine", "run", "outcome"}`. The outcome is `started` while the run works.
 
 - [ ] **Step 1: Write the failing drawer tests.**
   - The Last row reads `running since 23:58` (class `running`) for a working run.
   - It reads the note with class `warn` for a retrying run.
-  - It reads `failed: <words>` with the card link to the failure card for a failed run whose card stands.
-  - `runWords` returns `running` for a run with no outcome.
+  - `runWords` returns `running` for a run with no outcome. The failed run's line with its card link is Task 3's.
 - [ ] **Step 2: Write the failing test** `TestTheDrawerRefreshesWhileARunWorks`:
   - With a working run, the drawer's root carries `hx-get` of its own URL with its tab, `hx-trigger="every 3s"` and `hx-swap="outerHTML"`.
   - With no working run, it carries no `hx-trigger`.
