@@ -1,0 +1,1 @@
+{"max_tokens":2048,"messages":[{"role":"user","content":"Summarise this page.\n\nRelease notes 4.2\n\nThe staging deploy now waits for its budget's OK before it starts.\n"}],"model":"small","stream":true}

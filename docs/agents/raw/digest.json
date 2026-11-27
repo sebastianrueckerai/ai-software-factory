@@ -1,0 +1,1 @@
+{"max_tokens":2048,"messages":[{"role":"user","content":"Summarise this file.\n\n# The nightly job\n\nThe job counts the day's rows and writes the report at 02:00 UTC.\nA batch that fails is requeued once, and a second failure pages the human on call.\n"}],"model":"small","stream":true}

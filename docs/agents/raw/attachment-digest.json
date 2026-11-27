@@ -1,0 +1,1 @@
+{"max_tokens":2048,"messages":[{"role":"user","content":"Summarise this document.\n\nStaging budget: 40 EUR a month, raised from 30 on 2026-11-02.\nThe deploy waits on the budget's OK.\n"}],"model":"small","stream":true}

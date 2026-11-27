@@ -1,0 +1,1 @@
+{"max_tokens":18432,"messages":[{"content":"Answer with a JSON object {\"ok\": true}.","role":"system"},{"content":"The input, as JSON:\n{\"say\":\"ok\"}","role":"user"}],"model":"small","response_format":{"type":"json_object"}}

@@ -82,9 +82,10 @@ The tool exits non-zero and ships nothing. Each message names the rot:
 Work in the code repository, `cmd/agentdoc`.
 
 1. Write the capture driver next to the agent's code: drive the real assembly, return the spans with each part's name, symbol, place and exact bytes.
-2. Add the registry entry in `registry.go`: id, package, family, job, run location, and the driver. One driver per entry.
+2. Add the registry entry in `registry.go`: id, package, family, job, run location, the driver, and `Calls`, the functions that make the agent's model call as the model-call walk names them (`internal/agentdoc/calls.go`). One driver per entry.
 3. Add the blurb line to `blurbs.md` and a node to `master.mmd`. Two tests hold the authored layer to a blurb and a diagram node per registry agent, so a missing one fails the suite.
-4. Gate with two runs. `OPENCODE_RECORD_BIN` re-records committed fixtures, so the full suite runs without it and the loop e2e runs filtered with it:
+4. Run `TestRegistryHoldsEveryModelCall`. The walk reads the module's source for every function that sends a request to a model, and the test fails on each one that no registry entry's `Calls` names and `noPage` (`registry_test.go`) gives no reason for. A model call with no page of its own, such as a message into a running session, gets its reason there. So a new model call cannot stay off the map by being forgotten.
+5. Gate with two runs. `OPENCODE_RECORD_BIN` re-records committed fixtures, so the full suite runs without it and the loop e2e runs filtered with it:
    ```sh
    go test -race ./...
    OPENCODE_RECORD_BIN=<pinned binary> go test -race ./internal/factoryd/ \
