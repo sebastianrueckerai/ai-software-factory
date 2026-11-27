@@ -1,5 +1,7 @@
 # Finish the General Fix: Implementation Plan
 
+**Status:** decided, not built. It waits for Sebastian's go.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Move each fault fix that patched one path into the shared function that every sibling path passes, and build the faults still open at main there, so that the 40 items of the table below close where all callers meet.
@@ -103,7 +105,7 @@ Each row below was read at main `c2dddcd67`. The table answers one question: whe
 | OF-3 | branch `open-faults` drops one task id (`deps.go:587`) | four human texts still print a task id or a plan key (`mainfix.go:823`, `toolpark.go:282`, `:290`, `deps.go:344`) | `ShownName` (`act.go:1756`), with a test over the rendered texts | 34 |
 | FF-10 | 15792bf81 to c35db4672 (2026-11-17): a human's hold with a release card instead of a dependency across plans | a release card that ends failed or closed strands the hold, and the Poker's notice tells the human outside the ladder (`strandedHolds`, `cardhold.go:102-125`) | the dependency cases `dependency_failed` and `dependency_closed` (`cases.go:158-160`) | 35 |
 | Handover 6a | none needed: the gateway's own hold under policy version 971 refused the calls | `docs/card-flow-redesign-2026-11-02.md:35` still says "The month cap of 544 lived in a LiteLLM backstop that only a pod restart could move." | the record | 36 |
-| FF-7 | 073dd8ce5 built a case-rename filter for the audit, 569bb1818 deleted it the same day (2026-11-17) | no document records the choice between a rename check in a sandbox pod and none | the audit's section of `docs/architecture.md` | 36 |
+| FF-7 | 073dd8ce5 built a case-rename filter for the audit, 569bb1818 deleted it the same day (2026-11-17) | no document records that the audit reads the raw diff and that a rename costs one confirmation per item and file | the audit's section of `docs/architecture.md` | 36 |
 | OF-4, OF-6, OF-7 | e9f9a9d7e on branch `open-faults` fixes OF-4. OF-6 and OF-7 have briefs and no commit | open at main: `internal/console/board.go:1756`, `ci.go:1430-1436`, `testdata/README.md` | the open-faults pull request | 36 |
 
 ### Items checked at main and not kept
@@ -224,38 +226,33 @@ Deletions, with sizes read at main (inferred where marked):
 
 Additions: `postChat`'s once more (about 20 lines), a purpose on `converse`'s call (about 5), the repair call in the direct-call client (about 25), a schema for the case brief's answer if the prompts plan has none (about 10), the workflow-only route in `fileEntry` (about 15), the held-test check in `FilePlan` (about 50), the evidence filter (about 12), a migration (about 5), the moved-head heal (about 25), the frozen mark on a digest step (about 10), the retire table (about 20), the origin field (about 10), the shared held-spend term (about 15), the boot read of holds (about 30), a policy refusal (about 6), the heal of a failed card's close (about 8), the scrub in two writers (about 10), one header function (about 10), the failing tests in `checksResult` (about 10), one pod-start verdict (about 25), the guard on checkpoints (about 15), the test-path walk (about 12), one format script (about 10), the bound from an activity's timeout (about 5), one close-with-comment call (about 12), a task-id test (about 15).
 
-## Decisions for Sebastian
+## Decisions
+
+Sebastian decided three points. No backward compatibility holds in dev mode, so no task keeps a reader for the old shape.
 
 ### 1. The check-in loses the policy reason
 
-Today a check-in at any moment may hand a card up with the reason kind `policy_class`. At the gate's return with green checks, rung 0 routes it to the approval. At any other moment, nothing routes it: rung 1 does not run on the kind, rung 2 only analyses it, and it reaches you with no approval card behind it (`cases.go:189-192`). That is the shape of card #1347, a policy question asked before an approval could exist.
+Decided: the check-in drops `policy_class` on every moment. Today a check-in at any moment may hand a card up with that reason kind. At the gate's return with green checks, rung 0 routes it to the approval. At any other moment, nothing routes it: rung 1 does not run on the kind, rung 2 only analyses it, and it reaches a human with no approval card behind it (`cases.go:189-192`). That is the shape of card #1347, a policy question asked before an approval could exist.
 
-On 2026-11-01 you leaned to the hard version of handover 1's question 4: on a full-auto project the check-in never preempts the flow on a policy matter, and the gate stays the only router of policy. The build of 2026-11-11 (#1748, #1755) kept the power and added a route for one moment.
+A check-in that sees a policy matter answers `reverify` or `handover`, and the merge gate's risk-class table routes policy on every autonomy level. The merge gate is the only router of policy, as Sebastian leaned on 2026-11-01. On a manual project a human approves every merge anyway.
 
-- (a) Drop `policy_class` from every moment's answer. A check-in that sees a policy matter answers `reverify` or `handover`, and the merge gate's risk-class table routes policy on every autonomy level. On a manual project you approve every merge anyway. **Recommended.**
-- (b) Drop it on full-auto projects only. That adds a branch on autonomy to the check-in's schema.
-- (c) Keep it.
-
-Task 7 builds (a). Stored cases of kind `policy_class` need a data step, inferred: the task closes any open one as withdrawn before the kind leaves the table.
+Task 7 builds it. Open cases of kind `policy_class` are withdrawn in a data step before the kind leaves the table. No reader of the old kind stays.
 
 ### 2. A stranded hold climbs the ladder
 
-On 2026-11-17 you chose a human's hold with a release card over a dependency that crosses plans (fault 10). When the release card ends failed or closed, the hold releases nothing. Today `strandedHolds` writes a row, and the Poker tells you by a notice (`cardhold.go:102-125`, `pokes.go:354`). No rung sees it, so neither rung 0's retry nor the factory agent can act first.
+Decided: the hold stays, and a release card's failed or closed end opens the dependency case on each held card. On 2026-11-17 Sebastian chose a human's hold with a release card over a dependency that crosses plans (fault 10). When the release card ends failed or closed, the hold releases nothing. Today `strandedHolds` writes a row, and the Poker tells a human by a notice (`cardhold.go:102-125`, `pokes.go:354`). No rung sees it, so neither rung 0's retry nor the factory agent can act first.
 
-- (a) Keep the hold. A release card's failed or closed end opens `dependency_failed` or `dependency_closed` on each held card, the cases a dependency's end opens today, whose rungs already exist (`retry_dependency`, `impasse`, rung 2). The notice goes. **Recommended:** it keeps your choice and puts the stranded hold on the one ladder.
-- (b) Let a dependency cross plans (drop the `GroupOf` refusal, `internal/console/actions.go:2741`) and delete the hold's release half. This deletes more and reopens your choice.
-- (c) Keep the notice.
+The release card's end opens `dependency_failed` or `dependency_closed` on each held card, the cases a dependency's end opens today, whose rungs already exist (`retry_dependency`, `impasse`, rung 2). The notice goes.
 
-Task 35 builds (a).
+Task 35 builds it.
 
 ### 3. The audit and pure renames
 
-The audit flagged pure case renames as changes (FF-7). A filter was built and deleted the same day, because its type check could neither be bounded nor stopped (569bb1818). The audit reads the raw diff today. Since FF-6 gave a confirmed finding a stable identity, a rename costs one confirmation per checklist item and file. The build ledger asked you to choose, and no document records an answer.
+Default: the audit reads the raw diff, a rename costs one confirmation per checklist item and file, and the architecture document records that rule. No rename check pod is built. The audit flagged pure case renames as changes (FF-7). A filter was built and deleted the same day, because its type check could neither be bounded nor stopped (569bb1818). Since FF-6 gave a confirmed finding a stable identity, a rename costs one confirmation per item and file. No live fault has come of it since 2026-11-17.
 
-- (a) Record that the audit reads the raw diff and that a rename costs one confirmation per item and file. **Recommended:** no live fault since 2026-11-17.
-- (b) Build a rename check that runs in a sandbox pod with its own time bound.
+Veto line: build the rename check in a sandbox pod with its own time bound.
 
-Task 36 writes your choice into the audit's section of `docs/architecture.md`.
+Task 36 writes the rule into the audit's section of `docs/architecture.md`.
 
 ## Global Constraints
 
@@ -579,7 +576,7 @@ func TestCaseBriefReadsThePlanRevisionThroughATool(t *testing.T) {
 
 ### Group C: the check-in's reasons (one pull request)
 
-### Task 7: The check-in names no policy reason (on decision 1)
+### Task 7: The check-in names no policy reason (on the check-in decision)
 
 **Closes:** Handover 1b.
 
@@ -1238,7 +1235,7 @@ Keep `TestDigestQuietInsideFreeze` and `TestCheckinRefusedBeforeTheFreezeFlags` 
 
 - [ ] **Step 5: Commit.** `factoryd: every text a human reads names a card by its issue or its title, and a test refuses a task id in any of them`
 
-### Group O: the hold (one pull request, on decision 2)
+### Group O: the hold (one pull request, on the hold decision)
 
 ### Task 35: A stranded hold opens a dependency case
 
@@ -1274,7 +1271,7 @@ Keep `TestDigestQuietInsideFreeze` and `TestCheckinRefusedBeforeTheFreezeFlags` 
 - Modify: `docs/plans/2026-11-27-finish-the-general-fix.md` (this plan's table)
 
 - [ ] **Step 1: Correct the month-cap sentence.** Replace "The month cap of 544 lived in a LiteLLM backstop that only a pod restart could move." with "On 2026-11-01 the gateway's own hold refused 20 calls under policy version 971 from 23:19 to 23:31, until version 972 activated. LiteLLM's backstop held 680 USD and refused none. The cards' cap wait, which only an answer ended, kept them stopped."
-- [ ] **Step 2: Write decision 3 into the audit's section** of `docs/architecture.md` as one sentence that states the choice Sebastian made.
+- [ ] **Step 2: Write the rename rule into the audit's section** of `docs/architecture.md` as one sentence: the audit reads the raw diff, and a rename costs one confirmation per item and file.
 - [ ] **Step 3: Read main for the open-faults pull request.** Run `git -C ~/repos/ai-software-factory-code log origin/main --oneline -- internal/console/board.go internal/factoryd/ci.go testdata/README.md`. For each of OF-4, OF-6 and OF-7, mark its row in this plan's table as closed with the commit, or as open with the line that still shows it.
 - [ ] **Step 4: Run the repository's checks.** Run `git diff --check` and the pre-commit hook. Expected: no output.
 - [ ] **Step 5: Commit and push.** `docs: the month-cap record names the gateway's hold, the audit's section states the choice on renames, and this plan marks the open-faults rows by what main holds`

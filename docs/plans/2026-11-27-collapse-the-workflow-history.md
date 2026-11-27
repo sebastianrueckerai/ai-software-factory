@@ -1,10 +1,12 @@
 # Collapse the Workflow's History: Implementation Plan
 
+**Status:** decided, not built. It waits for Sebastian's go.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** The task workflow keeps one path per behaviour: 40 of its 41 change ids go with their old branches, a drain in the heal pass keeps every later change id short-lived, and a card's end, the over-bound push and the periodic loops each take one typed and bounded form.
 
-**Architecture:** The factory already rebuilds a run from Postgres when its workflow dies. This plan uses that path on purpose: after a roll, the heal pass ends every parked run that started on older workflow code, and its next pass starts the run again on today's code, so an old branch can go within a day instead of waiting for a human to answer. The same restart path carries the ends a card takes from outside its run, and the store writes every end with a typed kind in one transaction.
+**Architecture:** The factory already rebuilds a run from Postgres when its workflow dies. This plan uses that path on purpose: after a roll, the heal pass ends every run that started on older workflow code and has no live session, a run in review and a frozen run included, and its next pass starts the run again on today's code, so an old branch can go within a day instead of waiting for a human to answer. The same restart path carries the ends a card takes from outside its run, and the store writes every end with a typed kind in one transaction.
 
 **Tech Stack:** Go (factoryd, agent-worker, console), Postgres, Temporal (Go SDK v1.44.0, server 1.32.0), Markdown.
 
@@ -96,7 +98,7 @@ Totals: 15 ids go in Task 1, with about 185 non-test lines (old branches and gat
 
 ### What a restarted run rebuilds and what it loses
 
-The drain in this plan restarts parked runs. Each wait has its own restart arm:
+The drain in this plan restarts every run with no live session. Each wait has its own restart arm:
 
 | Wait | Card status | Restart arm | Rebuilt from the store |
 |---|---|---|---|
@@ -108,13 +110,14 @@ The drain in this plan restarts parked runs. Each wait has its own restart arm:
 | Its dependencies | `waiting-deps` | `workflow.go:1540-1547`: `awaitDependencies` (`deps.go:440`) | `task_deps` |
 | A report's open stop | `waiting-human` | `workflow.go:1573-1588` | the open case |
 | A plan's questions or cap | `waiting-human` | `plan.go:2241-2275` | the plan's revision and the cap |
+| A pull request in review | `in-review` | `workflow.go:1740-1748`: the head goes through every stage again | the pull request, its head and the stage memory |
 
 `Reconcile` also rebuilds the stage memory from the timeline (`stageMemoryOf`, `activities.go:2596-2653`) and the mark of the newest check-in stop (`CheckinMarkOf`, `activities.go:2558`). The run keeps the rest in memory alone, in `taskRun` (`workflow.go:1092-1231`) and in `lifecycle`'s locals (`workflow.go:1291-1325`):
 
 - **The session chain.** `parent`, `parentStop`, `parentOutcome`, `parentTrip`, `parentDeadEnd` and `handoverNote` are locals. `gateFindings` and `deadFrom` are fields whose own comments say "not rebuilt by Reconcile" (`workflow.go:1099-1100`). After a restart the next session gets no `ParentSessionID` (`workflow.go:1915`), so its brief carries no parent record and its check-in reads no parent (`runner.go:956-975`). This matters after every wait. Task 2 rebuilds it.
 - **Counters of sessions in a row.** `pendingPods` and `platformDeaths` (fields), `refusals` and `unanswered` (locals) start at zero after a restart, so a card gets one more run of tries before the same ask. `holds` and `heldHeads` count moved-head restarts against `maxHeadHolds = 3` (`workflow_stages.go:664`). A restart gives up to three more. These are bounded and accepted, as for any run the heal pass restarts today.
 - **Answers held in memory.** `resolvedQueue` holds the answers to cases the run did not wait on (`workflow.go:1190-1193`). `kept` with `inCaseWait` holds replies read before the face was known (`workflow.go:1194-1197`). `planTaken` holds the answer comments the plan loop took (`workflow.go:1170-1173`). Each needs a check before the drain ships: a restarted run must not ask its human again or count an answer twice. Task 4 tests each.
-- **The rest.** `screened` (how many of the author's answers the screening read) makes a restarted `waiting-poster` card screen its answers again, which is one more screening call. `death` rides the next stop, and after a parked wait the next stop follows a new session that records its own. `copiedHeads`, `gateRuns`, `lastGates`, `syncedHead`, `checkedHead`, `inTurn`, `turnLost`, `asked` and `askedCard` belong to the review and the merge, and the drain leaves runs in review alone.
+- **The rest.** `screened` (how many of the author's answers the screening read) makes a restarted `waiting-poster` card screen its answers again, which is one more screening call. `death` rides the next stop, and after a parked wait the next stop follows a new session that records its own. `copiedHeads`, `gateRuns`, `lastGates`, `syncedHead`, `checkedHead`, `inTurn`, `turnLost`, `asked` and `askedCard` belong to the review and the merge. A restarted run in review takes its head through every stage again, which costs one review and one audit model call and can give another verdict. A restarted frozen run (status `running`, waiting on a provider limit) starts a session the provider refuses again, and the card freezes again.
 
 ### The replay corpus
 
@@ -223,7 +226,7 @@ The first column is the drift review's measurement at `2d71c80aca`. `lifecycle` 
 
 **What it costs and risks.**
 
-- The drain ends live runs on purpose. A fault in it ends runs that should go on. It ends only a run whose card is parked, with nothing under way and with a status read twice, and the heal pass starts the run again within a minute. Each end leaves a `run_drained` step on the card's timeline.
+- The drain ends live runs on purpose. A fault in it ends runs that should go on. It ends only a run with no live session, meaning no pending activity, child workflow or workflow task, with its card read twice, and the heal pass starts the run again within a minute. A run in review and a frozen run are included: each drain costs one review and audit call for every run in review, and a frozen run that freezes again. Each end leaves a `run_drained` step on the card's timeline.
 - A restart loses what the run kept in memory. Task 2 rebuilds the session chain. Task 4 tests the three answer fields before the drain ships. The counters and the rest are bounded and accepted above.
 - A human's answer can reach a run in the gap between the drain's read and its terminate. The drain skips a run with a workflow task pending, which a delivered signal creates. The gap left is one call to Temporal, the same gap a run that dies has today.
 - Deleting the old branches deletes the tests of runs from before. That is the purpose: no run can take them.
@@ -253,11 +256,11 @@ The first column is the drift review's measurement at `2d71c80aca`. `lifecycle` 
 
 ## The proposal
 
-**The target shape.** The workflow reads at most two change ids, both at the start of `Run`: the floor and the newest. Today's 41 become one, `hold-stop` as the floor, and Task 10 adds `over-bound` as the newest. The heal pass drains: every minute it ends a parked run that lacks the newest marker, and every idle run that lacks the floor, and its next pass starts each again on today's code. `Reconcile` rebuilds the session chain, so the first session after a restart continues its parent. A committed recorder records the replay corpus on today's code at each floor raise. The over-bound push is a typed field from the worker to the workflow. A card ends one way: an `End` with a kind from a closed set, one store function in one transaction, one routine after the end, and ends from outside a run go through the heal pass. Every periodic loop runs through `Passes`. The six waits share one builder, and `lifecycle` splits at its restart switch.
+**The target shape.** The workflow reads at most two change ids, both at the start of `Run`: the floor and the newest. Today's 41 become one, `hold-stop` as the floor, and Task 10 adds `over-bound` as the newest. The heal pass drains: every minute it ends a run that lacks the newest marker and has no live session, and every idle run that lacks the floor, and its next pass starts each again on today's code. `Reconcile` rebuilds the session chain, so the first session after a restart continues its parent. A committed recorder records the replay corpus on today's code at each floor raise. The over-bound push is a typed field from the worker to the workflow. A card ends one way: an `End` with a kind from a closed set, one store function in one transaction, one routine after the end, and ends from outside a run go through the heal pass. Every periodic loop runs through `Passes`. The six waits share one builder, and `lifecycle` splits at its restart switch.
 
 **The rule that replaces `workflow.go:716-720` and the Global Constraint on change ids.**
 
-> A change needs a `workflow.GetVersion` change id when a history recorded before it would make today's code issue other commands. A change to an activity's input or options, or to code around the same commands, needs none, and the replay of the corpus proves it. Every change id is read at the start of `Run`, and `Run` reads at most two: the floor and the newest. The pull request that adds a change id first raises the floor to the newest id, once `/readyz` shows `runs_without_<newest> 0`, deletes every older branch and records the corpus again. The heal pass ends every parked run that lacks the newest marker, so that count falls within minutes of the roll for every card that waits on someone.
+> A change needs a `workflow.GetVersion` change id when a history recorded before it would make today's code issue other commands. A change to an activity's input or options, or to code around the same commands, needs none, and the replay of the corpus proves it. Every change id is read at the start of `Run`, and `Run` reads at most two: the floor and the newest. The pull request that adds a change id first raises the floor to the newest id, once `/readyz` shows `runs_without_<newest> 0`, deletes every older branch and records the corpus again. The heal pass ends every run that lacks the newest marker and has no live session, so that count falls within minutes of the roll for every card that is not in the middle of a session.
 
 **The drain.**
 
@@ -265,7 +268,7 @@ The first column is the drift review's measurement at `2d71c80aca`. `lifecycle` 
 flowchart TD
     roll["roll: factoryd on new workflow code"] --> heal["heal pass, every minute"]
     heal --> list["one list of running TaskWorkflow runs with their markers"]
-    list --> parked{"lacks the newest marker, card parked, nothing under way?"}
+    list --> parked{"lacks the newest marker, no live session, nothing under way?"}
     list --> stuck{"lacks the floor marker, no activity under way?"}
     parked -- yes --> term["terminate the run, record run_drained"]
     stuck -- yes --> term
@@ -276,7 +279,7 @@ flowchart TD
     rec --> arm["restart arm: the same wait, the same case, no new face"]
 ```
 
-A run counts as parked when its card's status is `waiting-human`, `waiting-poster`, `waiting-image` or `waiting-deps`, and Temporal shows no pending activity, no pending child workflow and no pending workflow task. The drain reads the card again after Temporal's answer and ends the run only if the status still holds. A run that lacks the floor's marker cannot replay on today's code at all. The drain ends it in any open status once no activity is under way, so a floor raised too early costs a restart, not a run stuck on the version error. The heal pass also counts the open runs that lack each marker, and `/readyz` prints `runs_without_<id> <count>` for the floor and the newest.
+A run has no live session when Temporal shows no pending activity, no pending child workflow and no pending workflow task. The card's status does not matter: a run in review and a frozen run restart like a run in a wait. The drain reads the card again after Temporal's answer and ends the run only if the card is still open and the status still holds. A run that lacks the floor's marker cannot replay on today's code at all. The drain ends it in any open status once no activity is under way, so a floor raised too early costs a restart, not a run stuck on the version error. The heal pass also counts the open runs that lack each marker, and `/readyz` prints `runs_without_<id> <count>` for the floor and the newest. After a drain only runs with a live session hold the count, and they fall out of it at the next pass that finds them idle.
 
 **An end from outside a run.**
 
@@ -297,7 +300,7 @@ A decider outside the card's run stores the end and ends the run. The restart ar
 |---|---|---|---|---|
 | Old paths no history can take | 1 | about 185 | 0 | 17 pins and 76 helper lines out |
 | The drain and the session chain | 2 to 4 | 0 | about 120, inferred | 14 tests in |
-| One floor | 5, 6 | about 365 | about 10 | 25 pins, five pre-change tests (344 lines) and 15 recordings (3.2 MB) out, a recorder (about 250 lines, inferred) and 10 recordings in |
+| One floor | 5, 6 | about 365 | about 10 | 25 pins, five pre-change tests (344 lines) and 15 recordings (3.2 MB) out, a recorder (about 250 lines, inferred) and 11 recordings in |
 | One end | 7 to 9 | about 270 | about 155 | the drift review's estimate, not diffed |
 | The over-bound field | 10, 11 | about 15 | about 25 | inferred |
 | Passes | 12 | about 300 | about 30 | inferred |
@@ -312,11 +315,11 @@ The net change is about −940 non-test lines. About 550 of them are counted by 
 - **"The factory's own repository is a project like any"** deletes the roll's `t.rolling` branches and may delete `RollWatcher.Run` and `Roller.Run`. Task 9 types the roll's ends as they are, and Task 12 moves the two loops only if they still exist.
 - **"The config says it once"** owns the process-file entries. Nothing here touches them.
 
-## Decisions for Sebastian
+## Decisions
 
-1. **Which waits the drain restarts.** The drain restarts a run whose card waits on a human, the issue's author, an image or its dependencies. Two other waits can hold a run for days. A card in review waits for a human's approval when its project's merge rule asks for one. A card frozen on a provider limit waits in status `running` until the reset, four days for case 7458 in the open faults plan. A restarted run in review takes its head through every stage again (`workflow.go:1740-1748`), which costs a review and an audit model call and can give another verdict. A restarted frozen run starts a session the provider refuses again. **Recommendation:** the four parked statuses only. A floor then waits for runs in review and frozen runs, and `/readyz` shows how many hold it. If one holds it for long, a roll of the floor raise is still safe: the drain's floor arm restarts that run, at that cost.
-2. **What the replay corpus is.** Option A: histories that a committed recorder takes on a Temporal dev server under stub activities, one for each wait and each restart arm, recorded again at each floor raise. Option B: histories exported from live runs at each drain, as the 24 files were until 2026-11-11. B covers the paths production takes, with real activity results. It carries card text, human answers and findings into the code repository, which GitHub mirrors in public, and its coverage depends on which runs happen to be open. A covers every wait by construction and holds no card text, but its activity results are stubs. The activity inputs, which the decode check reads, are real in both, since the workflow builds them. **Recommendation:** A. Tasks 5, 6 and 9 assume it.
-3. **A test that bounds the workflow at two change ids.** With the bound, the pull request of every workflow change first collapses the change before it, at the cost of a precondition on `/readyz` and a recording of the corpus in that pull request. Without it, collapses happen when someone remembers, as in the six weeks before this plan. **Recommendation:** the bound, as Task 6's test.
+1. **The drain restarts every run with no live session.** It restarts a run in review and a frozen run too, because the factory is in dev mode and keeps no backward compatibility. The cost is one review and audit call for every run in review at each drain, and a frozen run that freezes again. Veto line: the four parked waits only (`waiting-human`, `waiting-poster`, `waiting-image`, `waiting-deps`), as this plan first recommended. A floor then waits for runs in review and frozen runs.
+2. **A committed recorder records the replay corpus** on a Temporal dev server under stub activities, one history for each wait and each restart arm, recorded again at each floor raise. Histories exported from live runs would carry card text, human answers and findings into the code repository, which GitHub mirrors in public. The stubs cost real activity results. The activity inputs, which the decode check reads, are real, since the workflow builds them. Tasks 5, 6 and 9 build this.
+3. **A test caps the workflow at two change ids,** the floor and the newest. Default: the cap stands. Veto line: none stated, so it stands unless Sebastian vetoes it. The pull request of every workflow change first collapses the change before it, at the cost of a precondition on `/readyz` and a recording of the corpus in that pull request. Task 6 holds the test.
 
 ## Global Constraints
 
@@ -475,10 +478,10 @@ func runningRunOf(e *workflowpb.WorkflowExecutionInfo) (RunningRun, error)
 - [ ] **Step 4: Run and see it pass.** `go test -race ./internal/factoryd/ ./internal/console/ ./cmd/factoryd/` and `bash check changed`. Expected: PASS.
 - [ ] **Step 5: Commit.** "The run list says which change markers each running workflow carries, and a run's pending work can be read".
 
-### Task 4: The heal pass drains parked runs
+### Task 4: The heal pass drains runs with no live session
 
 **Files (code repository):**
-- Create: `internal/factoryd/drain.go` (`drainRuns`, `drainable`)
+- Create: `internal/factoryd/drain.go` (`drainRuns`)
 - Modify: `internal/factoryd/workflow.go` beside `Run` (the constants `floorChange` and `newestChange`), `temporal.go:339-438` (`HealPass` lists the runs once after its start loop, hands them to `endStrayRuns` and `drainRuns`, and returns the counts), `temporal.go:565-596` (`endStrayRuns` takes the list)
 - Modify: `cmd/factoryd/main.go:431-436` (the heal pass keeps the counts), `main.go:1140-1154` (`readyz` prints them)
 - Create: `internal/factoryd/drain_test.go`, `internal/factoryd/pg/drain_pg_test.go`
@@ -494,11 +497,9 @@ const (
 	newestChange = "hold-stop"
 )
 
-var drainable = []string{"waiting-human", "waiting-poster", "waiting-image", "waiting-deps"}
-
 // drainRuns ends each run that started on older workflow code, so the
-// heal pass's next Start runs it on today's: a parked run without the
-// newest marker, and an idle run of any open card without the floor's,
+// heal pass's next Start runs it on today's: a run without the
+// newest marker and with no live session, whatever its card's status, and an idle run of any open card without the floor's,
 // which cannot replay. It answers how many open runs lack each marker.
 func drainRuns(ctx context.Context, store Store, wf Workflows, tl *Timeline, runs []RunningRun) map[string]int
 
@@ -511,12 +512,12 @@ func readyz(ping func(context.Context) error, ages func(time.Time) map[string]ti
 The `run_drained` step carries `run` and `change`, and its sentence is human-read copy: "The run started again on the factory's new code. The card waits where it waited."
 
 - [ ] **Step 1: Write the failing tests.** In `drain_test.go`, with `fakeWorkflows` (`intake_test.go:144`) gaining a `pending map[string]RunWork` and a store fake holding the cards:
-  - `TestDrainEndsAParkedRunWithoutTheNewestMarker`: card `t-a` in `waiting-human`, run `{TaskID: "t-a", RunID: "r1", Changes: []string{"checkin-judgment-1"}}`, nothing pending. Want `terminated == []string{"t-a the run started on workflow code older than change hold-stop: the heal pass starts it again on today's code"}` and one `run_drained` step on `t-a`.
+  - `TestDrainEndsAnIdleRunWithoutTheNewestMarker`: card `t-a` in `waiting-human`, run `{TaskID: "t-a", RunID: "r1", Changes: []string{"checkin-judgment-1"}}`, nothing pending. Want `terminated == []string{"t-a the run started on workflow code older than change hold-stop: the heal pass starts it again on today's code"}` and one `run_drained` step on `t-a`.
   - `TestDrainLeavesARunThatCarriesTheNewestMarker`: the same with `Changes: []string{"checkin-judgment-1", "hold-stop-1"}`. Want no terminate.
   - `TestDrainLeavesARunWhoseWorkflowTaskIsPending`: the first case with `RunWork{WorkflowTask: true}`, and again with `RunWork{Activities: 1}`. Want no terminate.
-  - `TestDrainLeavesACardInReview`: the first case with the card in `in-review`. Want no terminate.
+  - `TestDrainEndsARunInReviewOrFrozen`: the first case with the card in `in-review`, and again with the card in `running` and nothing pending. Want one terminate each, and one `run_drained` step each.
   - `TestDrainEndsAnIdleRunWithoutTheFloor`: a card in `in-review`, `Changes: nil`, `RunWork{WorkflowTask: true}`. Want one terminate.
-  - `TestDrainRereadsTheCardBeforeItEndsTheRun`: the store answers `waiting-human` on the first read and `running` on the second. Want no terminate.
+  - `TestDrainRereadsTheCardBeforeItEndsTheRun`: the store answers `in-review` on the first read and `done` on the second. Want no terminate.
   - `TestDrainCountsTheRunsBehind`: three open runs, one with both markers, one with the floor's alone, one with none. Want `map[string]int{"checkin-judgment": 1, "hold-stop": 2}`.
 
   In `pg/drain_pg_test.go`, `TestADrainedRunWaitsOnItsCaseWithNoNewFace`: a card in `waiting-human` with one case at the human. After `drainRuns` and `OpenTrip(TripInput{TaskID: card, Reason: HealedReason})`, want the outcome's `CaseID` equal to that case, one new step `asked again after a restart`, and no comment on the Forgejo fake.
@@ -526,10 +527,10 @@ The `run_drained` step carries `run` and `change`, and its sentence is human-rea
   - `TestARestartedRunKeepsTheRepliesBeforeTheFace` (`kept`): replies on the issue before the face. Want them among the run's answers once.
   - `TestARestartedPlanCountsATakenAnswerOnce` (`planTaken`): the webhook's copy of an answer the old plan run took. Want one answer, not two.
 - [ ] **Step 2: Run the tests and see them fail.** `go test -race -run 'TestDrain|TestARestarted' ./internal/factoryd/` and `scripts/pg-test.sh go test -race -run TestADrainedRunWaitsOnItsCaseWithNoNewFace ./internal/factoryd/pg/`. Expected: a compile error on `drainRuns`, then the assertions.
-- [ ] **Step 3: Implement.** `drainRuns` reads each run's card, counts the markers it lacks, and for a run that lacks the newest marker on a `drainable` card, or the floor's on any open card, reads `Pending`, reads the card again, terminates the run and appends the step. When one of the three restart tests fails, the fix goes into `Reconcile`: it returns the missing answers in `RunState` and the run seeds the field from it, so the drain ships with no exception per wait.
+- [ ] **Step 3: Implement.** `drainRuns` reads each run's card, counts the markers it lacks, and for a run that lacks the newest marker on any open card, or the floor's on any open card, reads `Pending`, reads the card again, terminates the run and appends the step. When one of the three restart tests fails, the fix goes into `Reconcile`: it returns the missing answers in `RunState` and the run seeds the field from it, so the drain ships with no exception per wait.
 - [ ] **Step 4: Run and see them pass.** `go test -race ./internal/factoryd/ ./cmd/factoryd/`, the Postgres test, and `bash check changed`. Expected: PASS.
-- [ ] **Step 5: Commit.** "The heal pass ends a parked run that started on older workflow code, and starts it again on today's".
-- [ ] **Step 6: Roll with Sebastian's go.** After the roll, watch `/readyz` until `runs_without_hold-stop` stops falling. Record its value and each card that holds it, with its status, in the plan's progress ledger. Check that every drained card shows its `run_drained` step and waits on the same case it waited on before.
+- [ ] **Step 5: Commit.** "The heal pass ends a run with no live session that started on older workflow code, and starts it again on today's".
+- [ ] **Step 6: Roll with Sebastian's go.** After the roll, watch `/readyz` until `runs_without_hold-stop` stops falling. Record its value and each card that holds it, with its status, in the plan's progress ledger. Check that every drained card shows its `run_drained` step, that a drained card in a wait waits on the same case it waited on before, and note each run in review that took its stages again and each frozen run that froze again.
 
 ### Task 5: A committed recorder records the replay corpus
 
@@ -537,7 +538,7 @@ The `run_drained` step carries `run` and `change`, and its sentence is human-rea
 - Create: `internal/factoryd/record_scenarios_test.go` (the scenario table, no build tag), `internal/factoryd/record_histories_test.go` (build tag `record`, the recorder)
 - Modify: `internal/factoryd/workflow_test.go:170-260` (the harness's stub map moves into `harnessActivities(h *workflowHarness) map[string]any`, which `newWorkflowHarness` and the recorder share), `workflow_test.go:1843-1855` (the replay test's comment, and the dead glob of `history-*.json` goes), `workflow_test.go:2006-2013` (the comment of `retyped` names the recorder instead of a live export)
 - Modify: `internal/factoryd/testdata/README.md`
-- Create: 10 files `internal/factoryd/testdata/devserver-<scenario>.json`, written by the recorder
+- Create: 11 files `internal/factoryd/testdata/devserver-<scenario>.json`, written by the recorder
 - Test: `internal/factoryd/record_scenarios_test.go`
 
 **Interfaces:**
@@ -559,7 +560,7 @@ var recordings []recording
 func TestRecordHistories(t *testing.T) // build tag record
 ```
 
-The ten scenarios are `merge-at-turn`, `approval-by-human`, `restart-at-stop`, `restart-at-cap`, `restart-at-screening`, `restart-at-image`, `restart-at-poster`, `restart-at-dependencies`, `restart-report-stop` and `restart-plan-questions`.
+The eleven scenarios are `merge-at-turn`, `approval-by-human`, `restart-at-stop`, `restart-at-cap`, `restart-at-screening`, `restart-at-image`, `restart-at-poster`, `restart-at-dependencies`, `restart-report-stop`, `restart-plan-questions` and `restart-in-review`.
 
 The README says, in this order: what `devserver-*.json` holds and which scenario table writes it, what the replay test checks with it, what the `unmarked-*` file pins, when to record again (in the pull request that raises the floor, and in one that changes an activity's parameters), the command, and that the recorder replaces the machine's identity with `recorder@devserver`.
 
@@ -569,7 +570,7 @@ The README says, in this order: what `devserver-*.json` holds and which scenario
 func TestRecordingScenariosCoverEveryWaitAndRestartArm(t *testing.T) {
 	want := []string{"awaitAnswer", "awaitApproval", "waitPoster", "awaitPlan", "awaitDependencies", "turn",
 		"resume:waiting-human", "resume:cap", "resume:screening", "resume:waiting-image", "resume:waiting-poster",
-		"resume:waiting-deps", "resume:report", "resume:plan"}
+		"resume:waiting-deps", "resume:report", "resume:plan", "resume:in-review"}
 	covered := map[string]bool{}
 	for _, r := range recordings {
 		for _, c := range r.covers {
@@ -586,12 +587,12 @@ func TestRecordingScenariosCoverEveryWaitAndRestartArm(t *testing.T) {
 
 - [ ] **Step 2: Run it and see it fail.** `go test -race -run TestRecordingScenariosCoverEveryWaitAndRestartArm ./internal/factoryd/`. Expected: a compile error on `recordings`.
 - [ ] **Step 3: Implement.** The recorder starts the dev server with `ExistingPath` from `TEMPORAL_CLI`, registers `TaskWorkflow` and `harnessActivities` with each scenario's stubs on task queue `factory`, starts `task-t1` with input `"t1"`, sends the signals, waits for the result, reads `GetWorkflowHistory`, marshals it with `protojson`, replaces the identity and writes the file. Then record: `TEMPORAL_CLI=$(command -v temporal) go test -tags record -run TestRecordHistories ./internal/factoryd/`.
-- [ ] **Step 4: Run and see it pass.** `go test -race ./internal/factoryd/` and `bash check changed`. Expected: PASS, the 15 old and the 10 new recordings replaying.
+- [ ] **Step 4: Run and see it pass.** `go test -race ./internal/factoryd/` and `bash check changed`. Expected: PASS, the 15 old and the 11 new recordings replaying.
 - [ ] **Step 5: Commit.** "A committed recorder takes one history for each wait and each restart arm".
 
 ### Task 6: One floor, and the 25 change ids that waited on the drain go
 
-Precondition: `/readyz` shows `runs_without_hold-stop 0`. If it stays above 0 for two days, list the cards that hold it, and Sebastian decides to roll anyway or to wait.
+Precondition: `/readyz` shows `runs_without_hold-stop 0`. If it stays above 0 for two days, list the cards that hold it, and Sebastian decides to roll anyway or to wait. Only a run with a live session holds it, so a long hold means a session that has run for two days.
 
 **Files (code repository):**
 - Modify: `internal/factoryd/workflow.go:633-670` (`Run` reads one call, `workflow.GetVersion(ctx, "hold-stop", versionHoldStop, versionHoldStop)`), `workflow.go:716-1016` (the rule's comment, below, and the one constant), `workflow.go:1092-1231` (drop the fields `lastRoundFindings`, `agentDraw`, `autoMovedHead`, `checkinDecision`, `providerFreeze`, `noTypedSuccessor`, `retryPressDrop`, `humanWaitQueue`, `roomWindow`, `holdStop`), `workflow.go:1020-1034` (`keysCard` and `askedAgainCase` lose their calls), `workflow.go:2968-2970` (`marksKept`), `workflow.go:4531-4533` (`caseHeld`), and every branch of the 25 ids (`git grep -n 't\.\(lastRoundFindings\|agentDraw\|autoMovedHead\|checkinDecision\|providerFreeze\|noTypedSuccessor\|retryPressDrop\|humanWaitQueue\|roomWindow\|holdStop\) [<>]'` and the inline calls of the table)
@@ -907,7 +908,7 @@ func (l *cardLoop) resume(st RunState) (e End, ended bool)
 func (l *cardLoop) sessions() (string, error)
 ```
 
-The restart switch is the seam: the drain makes it the path every parked run takes after a roll, and "One close for every card" rewrites its arms on the typed stop kind. The plan loop keeps its own loop, which already calls the shared cap and grant steps.
+The restart switch is the seam: the drain makes it the path every run without a live session takes after a roll, and "One close for every card" rewrites its arms on the typed stop kind. The plan loop keeps its own loop, which already calls the shared cap and grant steps.
 
 - [ ] **Step 1: Write the failing test.** `TestResumeTakesEveryParkedStatusToItsArm`: one harness run per row of the restart-arm table, each `Reconcile` answering that row's state. Want the arm's first activity: `OpenTrip` with `HealedReason` for the human waits, `ImagePark` reads for the image, `RecordStep` of the poster's wait, `DependencyState` for the dependencies.
 - [ ] **Step 2: Run it and see it fail.** `go test -race -run TestResumeTakesEveryParkedStatusToItsArm ./internal/factoryd/`. Expected: a compile error on `cardLoop`, as the test calls `resume` directly for the table's rows.
@@ -928,4 +929,4 @@ The restart switch is the seam: the drain makes it the path every parked run tak
 - [ ] **Step 3: At 6058,** replace "replay-safe markers like our 18 `GetVersion` calls" with "replay-safe markers, which the workflow keeps at two `GetVersion` calls: the floor and the newest".
 - [ ] **Step 4: On the 20 lines,** drop the change id and its parenthesis, and keep the sentence's fact.
 - [ ] **Step 5: Check.** `grep -nE 'change id|GetVersion' docs/architecture.md`. Expected: only the lines of Steps 1 to 3. Then `node launch/site/evidence.js` passes.
-- [ ] **Step 6: Commit** to `master` and push: "docs: the workflow keeps a floor and the newest change id, and the heal pass restarts parked runs on new code".
+- [ ] **Step 6: Commit** to `master` and push: "docs: the workflow keeps a floor and the newest change id, and the heal pass restarts runs with no live session on new code".

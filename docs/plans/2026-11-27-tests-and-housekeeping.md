@@ -1,10 +1,12 @@
 # Tests Share One Fake, and the Repositories Lose Their Leftovers: Implementation Plan
 
+**Status:** decided, not built. It waits for Sebastian's go.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** The code repository's tests keep one copy of each test and one fake Forgejo, production files carry no code that only tests reach, and both repositories drop the files, notes and rules that no longer say what is true.
 
-**Architecture:** The Postgres-backed tests return to package `factoryd`, which deletes the 888-line export shim and the 132 copied test functions and helpers. One in-memory Forgejo in a new test-support package replaces 37 hand-written fakes. Everything else is deletion, and each deletion that could come back gets a check that refuses it: staticcheck in CI, a test that every console `Config` field is wired, a test that no refusal row accepts two status codes, a test that every exported function has an outside caller, and a pre-commit check that every plan carries a status line.
+**Architecture:** The Postgres-backed tests return to package `factoryd`, where they skip when no database is present, and this deletes the 888-line export shim and the 132 copied test functions and helpers. One in-memory Forgejo in a new test-support package replaces 37 hand-written fakes. Everything else is deletion, and each deletion that could come back gets a check that refuses it: staticcheck in CI, a test that every console `Config` field is wired, a test that no refusal row accepts two status codes, a test that every exported function has an outside caller, and a pre-commit check that every plan carries a status line.
 
 **Tech Stack:** Go (factoryd, console, acceptance, cmd/factoryd), Postgres through `scripts/pg-test.sh`, `net/http/httptest` with the method patterns of `http.ServeMux`, staticcheck, Markdown and a shell pre-commit hook in the design repository.
 
@@ -199,7 +201,7 @@ The design repository holds 92 plans in three places: 65 in `docs/plans/`, 22 da
 
 `docs/` holds 78 documents. 57 are dated, 21 are not. No other file names 14 of the dated documents (2,121 lines): 9 of them are plans and 5 are notes.
 
-The root holds 27 untracked entries: 25 notes, the folder `card-flow-2026-11-02/` and `.vscode/`. Tracked documents link two of them, so GitHub shows broken links: `docs/card-flow-redesign-2026-11-02.md:7` links `card-flow-2026-11-02/README.md`, and `docs/stuck-card-faults-spec-2026-11-01.md:95` links `needs-you-analysis-2026-11-01.md`. Decision 4 below lists every entry.
+The root holds 27 untracked entries: 25 notes, the folder `card-flow-2026-11-02/` and `.vscode/`. Tracked documents link two of them, and a plan of this review names a third, so GitHub shows broken links: `docs/card-flow-redesign-2026-11-02.md:7` links `card-flow-2026-11-02/README.md`, and `docs/stuck-card-faults-spec-2026-11-01.md:95` links `needs-you-analysis-2026-11-01.md`. The decisions below list every entry.
 
 ## Why this is drift
 
@@ -272,18 +274,18 @@ The table answers what goes and what comes, by task. Sizes marked inferred are e
 | 10. Stale artefacts | 6 notes 387, testdata 1, `pulse_test.go` 15, two scripts 68, a dead glob 2 | none | about -473 |
 | 11. The console's rules become tests or go | `AGENTS.md` 18, `Config.HTTP` 4, copied assertions about 6 | two tests, about 70 | about +40 |
 | Code repository | | | about -5,200 (inferred) |
-| 12. The design repository | up to 346 lines of absorbed notes, the root notes Sebastian lets go | about 88 status lines, about 10 hook lines | about -250, plus the notes kept |
+| 12. The design repository | up to 346 lines of absorbed notes, the 23 root entries deleted | about 88 status lines, about 10 hook lines | about -250, plus the four notes kept |
 
 No compatibility path stays: no alias for a moved name, no second fake beside the shared one, no flag that keeps an old fake.
 
-## Decisions for Sebastian
+## Decisions
 
-1. **Do the Postgres tests return to package `factoryd`?** The split was made so a gate entry over the whole package fit 15 minutes. Since `1e49892ea` no gate entry runs a whole package. A deletes the 888-line shim and about 1,400 lines of copies and costs about 90 seconds on CI's longest package. B keeps the 90 seconds and the shim, and Go's import cycle rule keeps 122 helper copies. **Recommendation: A.** If B, Task 1 is replaced by the short Task 1B and Task 9 covers only the names no package uses.
-2. **Does CI run staticcheck?** Yes means a pinned binary in the runner image (as `gosec` is pinned in `upstream-files.txt:30`), a step in `pr.yml` and `ci.yml`, 46 seconds cold and 2.7 GB peak, not in `bash check`. No means Task 7's fixes are one-time and the findings grow again. **Recommendation: yes.**
-3. **How does a reader tell a built plan?** A status line under the title (`open`, `built, code main <hash>, <date>`, or `dropped, <reason>`), refused by the pre-commit hook when missing, or a move of built plans into an archive directory. **Recommendation: the status line.** It keeps 171 references and needs no move of the 27 plans outside `docs/plans/`.
-4. **Which of the 27 untracked root entries stay?** A note that stays is committed under `docs/notes/` with its name unchanged. The rest are deleted, which cannot be undone because git never held them. One line each, with the recommendation:
+1. **The Postgres tests return to package `factoryd`.** Tests share fixtures, and the split's cause is gone: it was made so a gate entry over the whole package fit 15 minutes, and since `1e49892ea` no gate entry runs a whole package. The move deletes the 888-line shim and about 1,400 lines of copies and costs about 90 seconds on CI's longest package. Go's import cycle rule would keep 122 helper copies if the split stayed. The tests skip when no database is present, as `schematest.DSN` already does.
+2. **staticcheck runs in CI only.** Default: a pinned binary in the runner image (as `gosec` is pinned in `upstream-files.txt:30`) and a step in `pr.yml` and `ci.yml`, 46 seconds cold and 2.7 GB peak. It is not in `bash check`, which runs in a 4 GiB sandbox. Veto line: also in `bash check`.
+3. **A built plan gets a status line under its title.** Default: the line reads `open`, `built, code main <hash>, <date>` or `dropped, <reason>`, and the pre-commit hook refuses a plan without one. It keeps 171 references and needs no move of the 27 plans outside `docs/plans/`. Veto line: an archive directory for built plans.
+4. **Four of the 27 untracked root entries are committed and 23 are deleted.** The four go under `docs/notes/` with their names unchanged: `card-flow-2026-11-02/`, `factory-faults-2026-11-17.md`, `needs-you-analysis-2026-11-01.md` and `prompt-cards-retire-2026-11-26.md`. A plan of this review cites the last one, so it joins the three that tracked documents link or name. The 23 deletions cannot be undone because git never held them. The board-loop note of 2026-11-09 is among them, since it names where the credential files live and the repository is pushed to GitHub. Its two citations, in `docs/needs-you-register-2026-11-09.md` and `docs/superpowers/plans/2026-11-10-local-rebuild.md`, become one sentence each. The table gives each entry's fate:
 
-   | Entry | What it holds | Recommendation |
+   | Entry | What it holds | Decision |
    |---|---|---|
    | `.vscode/` | an editor settings file holding `{}` | delete |
    | `card-flow-2026-11-02/` | seven files, 1,440 lines: the card flow of 2026-11-02 and every place a card or the board can stop | commit, `docs/card-flow-redesign-2026-11-02.md:7` links it |
@@ -302,14 +304,14 @@ No compatibility path stays: no alias for a moved name, no second fake beside th
    | `handover-fault10-scripted-chat-door-2026-11-01.md` | handover: no scripted door into the chat | delete |
    | `handover-fault11-rename-policy-tree-2026-11-01.md` | handover: the rename the running factoryd cannot load | delete |
    | `needs-you-analysis-2026-11-01.md` | 499 lines: nine needs-you complaints sorted, each code claim checked | commit, `docs/stuck-card-faults-spec-2026-11-01.md:95` links it |
-   | `prompt-cards-retire-2026-11-26.md` | the prompt for the session that made a needs-you card retire itself, built in design commit `5b0fd4b` | delete |
+   | `prompt-cards-retire-2026-11-26.md` | the prompt for the session that made a needs-you card retire itself, built in design commit `5b0fd4b` | commit, `docs/plans/2026-11-27-finish-the-general-fix.md:61` cites it |
    | `prompt-fund-cards-ahead-2026-11-19.md` | the prompt for the design of a card's room, which `docs/plans/2026-11-21-card-room.md` holds | delete |
    | `session-notes-2026-11-01-pool1426.md` | card #1426 landed, the replan watch of #1399 | delete |
    | `session-notes-2026-11-02-card1472.md` | card #1472 and the six faults behind it | delete |
    | `session-notes-2026-11-03-blind-proofs.md` | the build session of the blind proofs plan | delete |
    | `session-notes-2026-11-03-board-clear.md` | clearing the board and putting every off-factory commit live | delete |
    | `session-notes-2026-11-03-checkin-roll.md` | the check-in timeout and the stalled roll | delete |
-   | `session-notes-2026-11-09-board-loop.md` | the board loop of 2026-11-09, which names where the credential files live | delete, and do not commit it: the repository is pushed to GitHub |
+   | `session-notes-2026-11-09-board-loop.md` | the board loop of 2026-11-09, which names where the credential files live | delete, and do not commit it: the repository is pushed to GitHub. Its two citations become one sentence each |
    | `session-notes-2026-11-16-needs-you.md` | root causes of the needs-you cards of 2026-11-16 | delete |
    | `session-notes-2026-11-17-disk.md` | disk evictions of agent sessions, fixed by pull request #2157 | delete |
 
@@ -323,7 +325,7 @@ No compatibility path stays: no alias for a moved name, no second fake beside th
 - A fix reaches production only through a roll, and a roll needs Sebastian's go. No task changes behaviour in production, so the changes ride the next roll.
 - No task id in a text a human reads. A human is a human, never a member or an operator.
 - No comments that narrate the change. Tests state hand-derived expectations, and a migrated test keeps its assertions as they are.
-- Design repository work commits to `master` and pushes. No ruling number and no ledger path in a tracked file. The untracked root notes are touched only after Sebastian's answer to decision 4.
+- Design repository work commits to `master` and pushes. No ruling number and no ledger path in a tracked file. Of the untracked root notes, four are committed and 23 deleted,, as the decisions say.
 
 ## Review Focus
 
@@ -355,12 +357,8 @@ No compatibility path stays: no alias for a moved name, no second fake beside th
 - [ ] **Step 5: Merge the store contract.** `store_contract_test.go` holds `TestCountAdmittedFreesTheApprovalAndDependencyWaits`, `TestResumeWaitHoldsNoSlotAndListsOldestFirst`, `TestTaskByIssuePrefersTheLiveCard` and `TestACardEndsClosedWithWhy` once each, each ranging over `fakeStores` and then `pgStores`. Take each body from the side edited last (`git log -1` of each file), and keep every assertion of both sides. `TestSetQueueReasonKeepsTheFirstRefusalTime` gets the same treatment in `queue_reason_test.go`.
 - [ ] **Step 6: The registers name the package's own tests.** The seven `replayCoverage` rows that read `"internal/factoryd/pg TestX"` become `"TestX"`, the form of every in-package row (`fixture_replay_test.go:1153`). The `driveIn` entry at `checkin_failed_test.go:579` names a drive in another package and goes, since the drive is in the package again.
 - [ ] **Step 7: Run and compare.** `grep -h -o -E '^func Test[A-Za-z0-9_]+' internal/factoryd/*_test.go | sort > /tmp/tests-after.txt`, then `diff /tmp/tests-before.txt /tmp/tests-after.txt` prints nothing and `sort -u /tmp/tests-after.txt | wc -l` equals `wc -l < /tmp/tests-after.txt`, 5,032. `scripts/pg-test.sh go test -race -count=1 ./internal/factoryd/ > /tmp/pg-after.log 2>&1` in the background: `ok`, and the time near the sum of Step 1's two (about 530 s, inferred). Record the compile's maximum resident size again. With the cache emptied and two CPUs, `taskset -c 0,1 env GOCACHE=$(mktemp -d) CHECK_REPORT=/tmp/r.xml bash check test ./internal/factoryd TestExpireStepsHandsUp` finishes: record its time. If it passes 600 seconds, two thirds of the gate's cap, stop and report.
-- [ ] **Step 8: Commit and open the pull request,** with the four measured times and the two resident sizes in its description. Message: `factoryd's Postgres tests run in package factoryd again, each once, and no name is exported for them`.
-
-### Task 1B: The split stays (only if Sebastian picks B in decision 1)
-
-- [ ] **Step 1:** Delete the factoryd copy of the five tests both packages run with identical bodies (`TestExpireStepsHandsUp`, `TestSetCaseWakeAndDueCases`, `TestAnOpenedCaseIsRungZerosWithItsOpenersWake` in `case_waits_test.go`, `TestMonitorPlantsTheCursorAtTheNewestEvent`, `TestNewestAskCaseLeavesAMonitorCaseOut` in `monitor_fixtures_test.go`). Before: each name appears in both packages' `go test -list`. After: in `./internal/factoryd/pg` alone.
-- [ ] **Step 2:** Delete the 15 dead test helpers of `deadcode -test`. Tasks 3 to 5 then replace both copies of the four fake pairs with the shared fake. Message: `each Postgres test runs once, in internal/factoryd/pg`.
+- [ ] **Step 8: The skip holds.** With `FACTORYD_TEST_DATABASE_URL` unset, `go test -race -count=1 ./internal/factoryd/` skips every moved test and fails none. `go test -race -count=1 -v -run TestACardEndsClosedWithWhy ./internal/factoryd/` prints `SKIP` for its `pgStores` run. Expected: no `FAIL`.
+- [ ] **Step 9: Commit and open the pull request,** with the four measured times and the two resident sizes in its description. Message: `factoryd's Postgres tests run in package factoryd again, each once, and no name is exported for them`.
 
 ### Task 2: One in-memory Forgejo for every test
 
@@ -477,14 +475,14 @@ func MemBoardTask(tasks []BoardTask, id string) (BoardTask, bool)
 - Modify: the files of the findings that remain after Tasks 1 and 6 (`staticcheck ./...` lists them). At `c2dddcd67` they are the 25 U1000 and 9 SA4006 lines of the scan, `internal/console/console_test.go:1692` (S1011), `internal/console/metrics.go:239` (S1017), `internal/factoryd/workflow.go:4474` (S1023), `internal/console/chat_tokens_test.go:162` (S1024), `internal/factoryd/upstream_pod_test.go:971` (SA1019), `internal/factoryd/namer_test.go:215` (ST1018, the literal U+202E becomes `‮`)
 - Delete: `OpenCriteria` (`internal/factoryd/verdict.go:1247`), `acceptTasks.add` (`acceptance/costs_date_window_test.go:384`), `accWholeCents` (`acceptance/console_rig_test.go:1316`), the field `redChecks` (`acceptance/write_seams_test.go:35`)
 - Create: `staticcheck.conf` at the repository root: `checks = ["inherit", "-ST1005"]`. The refusal at `internal/console/mcp.go:478` is a sentence the agent reads, so a capital and a full stop are right there.
-- Modify (with decision 2): `upstream-files.txt` (one line for the staticcheck release, as `gosec` at `:30`), `Dockerfile.runner` (`ARG STATICCHECK_VERSION` and its `ADD`, as `GOSEC_VERSION` at `:4`, `:25`), `.forgejo/workflows/pr.yml` and `ci.yml` (a step `staticcheck ./...` before the tests)
+- Modify: `upstream-files.txt` (one line for the staticcheck release, as `gosec` at `:30`), `Dockerfile.runner` (`ARG STATICCHECK_VERSION` and its `ADD`, as `GOSEC_VERSION` at `:4`, `:25`), `.forgejo/workflows/pr.yml` and `ci.yml` (a step `staticcheck ./...` before the tests)
 
 **Interfaces:** Consumes the staticcheck binary of the runner image. Produces none.
 
 - [ ] **Step 1: The failing check.** `staticcheck ./...`. Expected: exit 1 and the remaining findings, each with its file and line.
 - [ ] **Step 2: Fix each finding.** An unused declaration goes. A value never used becomes `_` or its line goes. The deprecated `runtime.GOROOT()` becomes `go env GOROOT` read once in the test.
 - [ ] **Step 3: Run.** `staticcheck ./...` exits 0. `deadcode -test ./...` prints nothing. `scripts/pg-test.sh go test -race ./...` in the background ends `ok` for every package, and `TestWorkflowReplaysDevServerHistories` passes after the S1023 edit.
-- [ ] **Step 4: With decision 2, add the CI step.** Open the pull request with one deliberate unused function in a scratch commit, see `pr / test` fail on its U1000 line, then drop the commit.
+- [ ] **Step 4: Add the CI step.** Open the pull request with one deliberate unused function in a scratch commit, see `pr / test` fail on its U1000 line, then drop the commit.
 - [ ] **Step 5: Commit.** `CI refuses dead and unused code, and the tree holds none`.
 
 ### Task 8: Copied helpers go, and eleven row loops read through `queryAll`
@@ -560,11 +558,12 @@ func MemBoardTask(tasks []BoardTask, id string) (BoardTask, bool)
 - Modify: `.githooks/pre-commit`
 - Modify: the 88 plans without a status line in `docs/plans/`, `docs/*-plan-*.md` and `docs/superpowers/plans/`
 - Delete: those of the 5 unlinked dated notes (`docs/phase-2a-known-gaps-2026-11-04.md`, `docs/architecture-health-seeds-2026-11-04.md`, `docs/human-not-member-card-2026-10-31.md`, `docs/planfilingfact-and-criteria-closeout-spec-2026-10-31.md`, `docs/intake-hold-spec-2026-10-31.md`) whose decisions an undated document or a plan states
-- After decision 4: commit the kept root notes under `docs/notes/`, delete the rest, and modify `docs/card-flow-redesign-2026-11-02.md:7`, `docs/stuck-card-faults-spec-2026-11-01.md:95`, `docs/press-returns-fast-plan-2026-11-01.md:22`, `docs/needs-you-register-2026-11-09.md:10`, `docs/superpowers/plans/2026-11-10-local-rebuild.md:229`, `docs/plans/2026-11-17-ai-first-ladder.md:13`, `docs/plans/2026-11-17-work-loss-faults.md:11`
+- Create: `docs/notes/`, holding the four committed root notes: `card-flow-2026-11-02/`, `factory-faults-2026-11-17.md`, `needs-you-analysis-2026-11-01.md` and `prompt-cards-retire-2026-11-26.md`. The other 23 root entries are deleted.
+- Modify: `docs/card-flow-redesign-2026-11-02.md:7`, `docs/stuck-card-faults-spec-2026-11-01.md:95`, `docs/press-returns-fast-plan-2026-11-01.md:22`, `docs/needs-you-register-2026-11-09.md:12`, `docs/superpowers/plans/2026-11-10-local-rebuild.md:229`, `docs/plans/2026-11-17-ai-first-ladder.md:13`, `docs/plans/2026-11-17-work-loss-faults.md:11`, `docs/plans/2026-11-27-finish-the-general-fix.md:61`
 
 - [ ] **Step 1: Write the failing check.** In a scratch clone, stage a new `docs/plans/x.md` with a title and no status line, and run `.githooks/pre-commit`. Expected today: exit 0, which is the gap.
 - [ ] **Step 2: Implement.** The hook refuses a staged file under `docs/plans/` or `docs/superpowers/plans/`, or named `docs/*-plan-*.md`, without a line starting `**Status:** ` in its first 15 lines. Its refusal names the file and the three forms: `**Status:** open.`, `**Status:** built, code main <hash>, <date>.`, `**Status:** dropped, <reason>.` Run Step 1 again. Expected: exit 1 and that message. With a status line: exit 0.
 - [ ] **Step 3: Give every plan its line.** For each plan, read its Goal and find the commit on code main that built it (`git log --grep`, the plan's named files). Write `built` with the commit and date when it holds, `dropped` with the plan that replaced it when one did, else `open`. The drift-review plans of 2026-11-27 are `open`.
 - [ ] **Step 4: Delete the absorbed notes.** For each of the five, name the undated document or plan that states its decisions, in the commit message. A note that nothing absorbed stays.
-- [ ] **Step 5: The root notes, after Sebastian's answer to decision 4.** Commit the kept ones under `docs/notes/` and point the links above at the new paths. Delete the others. For `session-notes-2026-11-09-board-loop.md`, drop the sentence that names it at `docs/needs-you-register-2026-11-09.md:10` and `docs/superpowers/plans/2026-11-10-local-rebuild.md:229`. Then `git status --short | grep '^??'` prints nothing.
+- [ ] **Step 5: The root notes.** Commit the four under `docs/notes/` with their names unchanged and point the links above at the new paths. Delete the other 23. At `docs/needs-you-register-2026-11-09.md:12` and `docs/superpowers/plans/2026-11-10-local-rebuild.md:229`, replace the citation of `session-notes-2026-11-09-board-loop.md` with one sentence each that says the board loop of 2026-11-09 produced the entries, without naming the file. Then `git status --short | grep '^??'` prints nothing, `ls docs/notes` lists the four, and `grep -rn 'board-loop' docs` prints nothing but this plan.
 - [ ] **Step 6: Commit** to `master` and push, one commit per step: `plans: each plan says under its title whether it is open, built or dropped, and the hook refuses one that does not`.

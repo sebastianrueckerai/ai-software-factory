@@ -1,10 +1,12 @@
 # The Factory's Own Repository Is a Project Like Any: Implementation Plan
 
+**Status:** decided, not built. It waits for Sebastian's go.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** The factory's code repository deploys itself and heals a red main through the same primitives as every other project, and the second deploy engine, the second red-main engine and the checks that name the code repository go.
 
-**Architecture:** The code repository's main CI writes its live state onto a branch `deploy` with a deploy key, as a template project's CI does, and Flux applies that branch instead of `main`. The chain poller runs the red-main ladder that `mainfix.go` runs today for one repository, for every project. Then the roller, the roll task, the roll watcher, the Flux switch and the own-repository branches of the release keeper and the metrics are deleted, and four smaller pieces that hold the code repository by name or by layout follow: the bump pass's file list, the unused companions, one table for the factory's pull-request sources, and the host and namespace literals.
+**Architecture:** The code repository's main CI writes its live state onto a branch `deploy` with a deploy key, as a template project's CI does, and Flux applies that branch instead of `main`. The chain poller runs the red-main ladder that `mainfix.go` runs today for one repository, for every project. Then the roller, the roll task, the roll watcher, the Flux switch and the own-repository branches of the release keeper and the metrics are deleted, and four smaller pieces that hold the code repository by name or by layout follow: the bump pass's file list, the unused companions, one table for the factory's pull-request sources, and the host and namespace literals. The shared deploy contract names no stack: a project's CI writes its live state to its `deploy` branch and Flux applies it. Nothing in it names Go, a Dockerfile layout or the ts-go template's jobs.
 
 **Tech Stack:** Go (factoryd, console, policy), Postgres, Temporal, Forgejo Actions YAML and shell, Flux, YAML config.
 
@@ -158,7 +160,7 @@ The smaller pieces show the same drift. `pass: bump` looks general and fits one 
 
 - The code repository becomes the first live user of the deploy-branch path since 2026-10-15. The cutover therefore keeps the roll task running until the deploy branch carries production, and each step checks the live state before the next (Tasks 7 to 13).
 - The cutover needs four infra commits by hand (Tasks 6, 8, 12 and the infra half of Task 16). Task 8 must land during one CI run, so Sebastian is at the keyboard for it.
-- Lost: the per-deploy card and pull request, the push-to-apply split of `factory.roll.*`, the `rolls` history table (saved before the drop), the "self-deploys / week" line on other projects' pages, the roll's signature check (Decision 3) and the per-deploy approval below full auto (Decision 1).
+- Lost: the per-deploy card and pull request, the push-to-apply split of `factory.roll.*`, the `rolls` history table (saved before the drop), the "self-deploys / week" line on other projects' pages, the per-deploy approval below full auto.
 - The images lose buildx's provenance attestation, so that an unchanged build keeps its digest (Task 7). No code reads the attestation (`git grep -i attestation` finds no reader).
 
 **What it buys.**
@@ -166,7 +168,7 @@ The smaller pieces show the same drift. `pass: bump` looks general and fits one 
 - About 3,300 non-test and 8,050 test lines go, about 2,900 and 7,300 net of what the tasks add (estimate, table below).
 - factoryd loses its patch right on the Kustomization that deploys it (`k8s/factoryd.yaml:231-258`).
 - The waiter moves out of factoryd. Today `AwaitRollout` dies with the factoryd it restarts and resumes in the next one. The CI job keeps polling through the restart.
-- A broken factoryd no longer blocks the next deploy. Main CI writes `deploy` on the platform's runner, so a human's revert on main reaches production with no factoryd step except the `/release` ask (Decision 2). Today the revert needs a working roller or a hand edit of `main`'s pins.
+- A broken factoryd no longer blocks the next deploy. Main CI writes `deploy` on the platform's runner, so a human's revert on main reaches production with no factoryd step except the `/release` ask. Today the revert needs a working roller or a hand edit of `main`'s pins.
 - Every project gets the queue pause, the re-run of failed jobs, the fix card's log lines and the revert.
 - The Flux paragraph of the operations manual goes.
 
@@ -192,7 +194,7 @@ The smaller pieces show the same drift. `pass: bump` looks general and fits one 
 
 ### The target shape
 
-Every project deploys the same way. Main CI builds, asks `/release`, writes its live state onto `deploy` with the deploy key, and waits on `/alerts` until the namespace runs the digests. Flux applies `deploy`. The chain poller judges main's head for every project. On a red head it runs one ladder: pause the merge queue, re-run each failed job once, file one fix card, revert the red commit after 2 hours, and ask a human when a remedy merged and main stays red. factoryd writes no deploy commit and keeps no deploy state of its own.
+Every project that deploys does so the same way, and the contract names no stack. Main CI builds, asks `/release`, writes its live state onto `deploy` with the deploy key, and waits on `/alerts` until the namespace runs the digests. Flux applies `deploy`. The chain poller judges main's head for every project. On a red head it runs one ladder: pause the merge queue, re-run each failed job once, file one fix card, revert the red commit after 2 hours, and ask a human when a remedy merged and main stays red. factoryd writes no deploy commit and keeps no deploy state of its own.
 
 ```mermaid
 flowchart LR
@@ -211,7 +213,7 @@ flowchart LR
 | The roll task does | Carried by | New piece |
 |---|---|---|
 | Writes the digests onto the branch Flux reads, as a pull request on `main` (`RollCommit`) | the promote job of main CI writes `deploy` with `.forgejo/roll.sh` | the code repository's own `roll.sh` and `pins.sh` (Task 7), about 90 shell lines |
-| A human approves each deploy below full auto (the roll card's approval) | the merge rule gates the change. The plan hold with Deploy now gates production through `/release` | none (Decision 1) |
+| A human approves each deploy below full auto (the roll card's approval) | the merge rule gates the change. The plan hold with Deploy now gates production through `/release` | none |
 | Deploy now while a plan is open (`markHeld`) | `/release` answers held, the promote job ends green, and the release keeper runs `promote` again after the hold or Deploy now (`releasekeeper.go:442-487`) | the own-repository branches of the release keeper go (Task 10) |
 | Keeps a merged plan card's `k8s/` change out of production (`setFlux`) | Flux reads `deploy`, which only the promote job writes, after `/release` | none. The suspend and its Role go |
 | Waits for a session gap | gone since `20261120110000_drop_roll_holds.sql` | none |
@@ -222,7 +224,7 @@ flowchart LR
 | Reverts a red main | the same ladder | Task 1 |
 | Skips a commit that changed no image | reproducible digests and `roll.sh`'s "already runs" | `--provenance=false` on the four builds (Task 7) |
 | Folds newer commits into one open roll | `roll.sh`'s supersede check (`roll.sh:51-54`) and main CI's `concurrency: ci-main` | none |
-| Refuses an unsigned image | no step resolves a tag: the digest is the build step's own output | Decision 3 |
+| Refuses an unsigned image | the promote job verifies each digest against main CI's cosign key before its push | about 4 shell lines in the promote job (Task 7) |
 | Sets `FACTORY_COMMIT` | `pins.sh` sets it when a digest moved | Task 7 |
 | Each card tracks its own deploy | the chain poller's carried rows (`chainpoll.go:1140-1187`) | none |
 | The deploy key, `FACTORY_READ_TOKEN`, `FACTORY_SSH_HOST_KEY` | registration, for factory projects | the reconcile keeps the read token for every project (Task 4), the seed keeps the rest for the code repository (Task 6) |
@@ -252,7 +254,7 @@ sequenceDiagram
 
 ### The red-main ladder for every project
 
-`mainfix.go`'s methods move from `Roller` to `ChainPoller` with their behaviour unchanged. The chain poller already reads each project's main runs (`chainpoll.go:1051-1066`). It calls the ladder from `watch` on every verdict, where it calls `repair` today. The trigger becomes the chain's verdict, so a red required status with green runs (infra's Flux statuses) files a card at once with no re-run. The repair card and the fix-forward card become one card of source `mainfix`: an agent card where the project has agents, a human card (`RepairQuestion`) where it has none. It carries the failed jobs' log lines and the cards whose change the head carried. `SourceChainRepair` goes.
+`mainfix.go`'s methods move from `Roller` to `ChainPoller` with their behaviour unchanged. The chain poller already reads each project's main runs (`chainpoll.go:1051-1066`). It calls the ladder from `watch` on every verdict, where it calls `repair` today. The trigger becomes the chain's verdict, so a red required status with green runs (infra's Flux statuses) files a card at once with no re-run. The repair card and the fix-forward card become one card of source `mainfix`: an agent card where the project has agents, a human card (`RepairQuestion`) where it has none. It carries the failed jobs' log lines and the cards whose change the head carried. `SourceChainRepair` goes. On a project with `agents: none`, such as infra, each rung files a human card and the revert is a pull request that a human merges or closes. The ladder names no language, Dockerfile layout or CI job: it reads the chain's verdict and the failed jobs' names. A project that deploys nothing has no deploy and no red-main ladder beyond its checks.
 
 ### The bump routine names its files
 
@@ -260,7 +262,7 @@ A pull-request routine of `pass: bump` lists the files it reads and writes under
 
 ### Companions go
 
-The feature is deleted, recommended in Decision 5. The workflow's call of `GateCompanion` sits behind a new change id, `companions-gone`, because every card's gate pass schedules it today.
+The feature is deleted. No project file sets it and the factory is the only project today. The workflow's call of `GateCompanion` sits behind a new change id, `companions-gone`, because every card's gate pass schedules it today.
 
 ### Smaller pieces
 
@@ -286,13 +288,14 @@ The feature is deleted, recommended in Decision 5. The workflow's call of `GateC
 
 Net: about −2,900 non-test lines and −7,300 test lines. The sizes are inferred from the files' lengths and the functions each task moves or deletes.
 
-## Decisions for Sebastian
+## Decisions
 
-1. **The factory's own deploy gate.** Today, at full auto, the gate bot merges each roll card. Below full auto, a human approves each roll card. While a plan is open on main, production holds until a human or rung 2 presses Deploy now. In the target, the merge rule gates the change, and the plan hold with Deploy now gates production, at every autonomy level, as for any project. No card asks for each deploy. **Recommendation:** accept. At today's full auto this changes nothing. If a gate on every deploy is wanted, build it as a general project key instead of a card: `release: approve` makes `/release` answer held for every commit until an approver presses Deploy now, about 20 lines, usable by any project.
-2. **A factoryd that does not answer `/release`.** A template project's promote job fails closed: no answer means no promotion (`ci.yml:182-186`). For the factory itself, a silent factoryd is most often the factoryd that the next deploy must fix, and the hold has no keeper while it is down. **Recommendation:** the code repository's promote job retries the ask for 5 minutes. With no answer it goes ahead and writes "factoryd did not answer for 5 minutes, so no hold is in force" in the job's log. A 401 or a 400 is an answer and stops the deploy. A 200 with `held: true` holds.
-3. **The signature check of the factory's own images.** Today the roller refuses an image that main CI's cosign key did not sign. It guards against a registry writer who swaps the tag the roller resolves. In the target, no step resolves a tag: the promote job pins the digest that the build step computed, and only main CI holds the deploy key that may push `deploy`. **Recommendation:** drop the check with the roller, and keep main CI's signing step as it is. The deploy key takes the signature's role as the proof that main CI made the change. If the rule "no unsigned image goes live" must hold as written, the promote job runs `cosign verify --key k8s/cosign.pub` on each digest before its push, about 4 lines.
-4. **One red-main ladder for every project.** Template projects and the infra repository get the queue pause, one re-run of each failed job, the fix card with log lines, and a revert pull request after 2 hours. On infra (`agents: none`, `merge_rule: human`) each rung files a human card, and the revert is a pull request that a human merges or closes. **Recommendation:** yes. One ladder is the tenet. A human closes an unwanted revert card.
-5. **Companions: declare or delete.** Declaring takes 3 YAML lines in the code project's file. Its pin gate would then read infra live at every gate pass of every plan card, and it cannot fail on a branch that only moves forward. An unreadable infra would hold cards. Its sandbox clone would give agents the live config tree, a need no card has shown in 26 days. Deleting removes about 600 non-test and 700 test lines and adds one change id, `companions-gone`, whose old branch stays until the drain that the plan "Collapse the workflow's history" builds. **Recommendation:** delete. The docs clone (`chat.doc_repo`) shows the pattern if a read-only clone is needed later.
+1. **The shared deploy contract is stack-free.** Not every project is Go or has the same CI. A project's CI writes its live state to its `deploy` branch and Flux applies it. Nothing in the contract names Go, a Dockerfile layout or the ts-go template's jobs. A project that deploys nothing has no deploy and no red-main ladder beyond its checks. The code repository's own `roll.sh`, `pins.sh` and image list (Task 7) are its own files, not part of the contract.
+2. **The per-deploy roll card goes.** The merge rule gates the change, and the plan hold with Deploy now gates production, at every autonomy level, as for any project. No card asks for each deploy. At today's full auto this changes nothing.
+3. **A factoryd that does not answer `/release`.** Default: the code repository's promote job asks `/release` for 5 minutes. With no answer it goes ahead and writes "factoryd did not answer for 5 minutes, so no hold is in force" in the job's log. A 400 or a 401 is an answer and stops the deploy. A 200 with `held: true` holds. The reason: a silent factoryd is most often the factoryd that the next deploy must fix, and the hold has no keeper while it is down. Veto line: fail closed as a template project does (`ci.yml:182-186`).
+4. **The roller goes with its check.** The promote job verifies each digest against main CI's cosign key with `cosign verify --key k8s/cosign.pub` before its push, about 4 lines, so no unsigned image goes live. Main CI's signing step stays. Security has no half measures.
+5. **One red-main ladder for every project, infra included.** Template projects and the infra repository get the queue pause, one re-run of each failed job, the fix card with log lines, and a revert pull request after 2 hours. On infra (`agents: none`, `merge_rule: human`) each rung files a human card, and the revert is a pull request that a human merges or closes.
+6. **Companions are deleted.** The factory is the only project today, no project file sets `companions`, and dev mode keeps no backward compatibility. This removes about 600 non-test and 700 test lines and adds one change id, `companions-gone`, whose old branch stays until the drain that the plan "Collapse the workflow's history" builds. The docs clone (`chat.doc_repo`) shows the pattern if a read-only clone is needed later.
 
 ## Global Constraints
 
@@ -330,10 +333,10 @@ Net: about −2,900 non-test lines and −7,300 test lines. The sizes are inferr
 - Consumes: `func (p *ChainPoller) mainRuns(ctx context.Context, proj Project) ([]ActionRun, error)` (oldest first), `func (p *ChainPoller) headVerdict(...) (verdict string, findings []string, stuck []ActionRun, err error)`.
 - Produces: `func (p *ChainPoller) mainState(ctx context.Context, proj Project, head ActionRun, verdict string, findings []string, runs []ActionRun) error` (runs newest first), `ChainPoller.Scrub *redact.Scrubber`, `func MainFixCard(index int64, sha, failed, runURL string, since time.Time, carried []int64) (BriefText, Moments)`.
 
-- [ ] **Step 1: Write the failing tests** in `chainpoll_test.go`. `TestChainPollerPausesAndRerunsARedProject`: project `sf/linkshort` with agents, head run red with job `test` failed at attempt 1. After one tick: one `queue_pauses` row for `sf/linkshort` with the run's id, one `RerunActionJob` call for `test`, no card. After a second tick with `test` failed at attempt 2: one card of source `mainfix` whose body holds the job's last log line. `TestChainPollerRerunsEachFailedJobOnce`: three ticks and two `Nudge` calls on one red head with jobs `test` and `image` failed at attempt 1, expected exactly one re-run call each and no card. `TestChainPollerFilesAHumanCardOnARedRequiredStatus`: project with `agents: none` and `requires: [flux/platform]`, runs green, status `flux/platform` failure, expected one human card of source `mainfix` at the first tick and zero re-run calls. `TestChainPollerRevertsAfterTheBound`: a pause since 2 h 1 min with a fix card, expected one card of source `revert`. `TestChainPollerServesTheOwnRepository`: the poller's own repository red, expected a pause and a re-run.
+- [ ] **Step 1: Write the failing tests** in `chainpoll_test.go`. `TestChainPollerPausesAndRerunsARedProject`: project `sf/linkshort` with agents, head run red with job `test` failed at attempt 1. After one tick: one `queue_pauses` row for `sf/linkshort` with the run's id, one `RerunActionJob` call for `test`, no card. After a second tick with `test` failed at attempt 2: one card of source `mainfix` whose body holds the job's last log line. `TestChainPollerRerunsEachFailedJobOnce`: three ticks and two `Nudge` calls on one red head with jobs `test` and `image` failed at attempt 1, expected exactly one re-run call each and no card. `TestChainPollerFilesAHumanCardOnARedRequiredStatus`: project with `agents: none` and `requires: [flux/platform]`, runs green, status `flux/platform` failure, expected one human card of source `mainfix` at the first tick and zero re-run calls. `TestChainPollerRevertsAfterTheBound`: a pause since 2 h 1 min with a fix card, expected one card of source `revert`. A second case on a project with `agents: none`: the revert is a pull request and its card is a human card. `TestChainPollerServesTheOwnRepository`: the poller's own repository red, expected a pause and a re-run.
 - [ ] **Step 2: Adapt `mainfix_test.go`** so each test builds a `ChainPoller` with the same fakes. Keep every expected value as it is.
 - [ ] **Step 3: Run and see the new tests fail.** `go test -race -run 'TestChainPoller(PausesAndReruns|RerunsEachFailedJob|FilesAHumanCard|RevertsAfter|ServesTheOwn)' ./internal/factoryd/`. Expected: FAIL, for example "no queue pause for sf/linkshort".
-- [ ] **Step 4: Implement.** Move the methods with the receiver change. In `mainState`, read the head's state from `verdict` (`success`, `failure`, `pending`) instead of the newest run's status, and keep `stalledMain` on the runs. Where the project has no agents, `pause` files `RepairQuestion` as a human card of source `mainfix` instead of the agent card.
+- [ ] **Step 4: Implement.** Move the methods with the receiver change. In `mainState`, read the head's state from `verdict` (`success`, `failure`, `pending`) instead of the newest run's status, and keep `stalledMain` on the runs. Where the project has no agents, `pause` files `RepairQuestion` as a human card of source `mainfix` instead of the agent card, and `revert` opens a pull request that a human merges or closes. Nothing in the ladder names a language, a Dockerfile layout or a job of the ts-go template.
 - [ ] **Step 5: Run and see them pass.** `go test -race ./internal/factoryd/` and `scripts/pg-test.sh ./internal/factoryd/pg/`. Expected: PASS.
 - [ ] **Step 6: Commit.** "The chain poller runs the red-main ladder for every project: a red head pauses its merge queue, re-runs each failed job once, files one fix card and reverts after two hours".
 
@@ -423,12 +426,13 @@ Net: about −2,900 non-test lines and −7,300 test lines. The sizes are inferr
 - [ ] **Step 1: Write the failing tests** in `internal/reproducible/pins_test.go`, each on a temporary copy of `k8s/`. `TestPinsKeepAnUnchangedBuild`: the four digests the copy pins, expected no file change and no `moved` line. `TestPinsMoveOneImage`: a new `opencode-worker` digest, expected exactly two changed lines, `WORKER_IMAGE`'s value and `FACTORY_COMMIT`, and the output `moved opencode-worker`. `TestPinsRefuseTwoReferences`: a file with two references to `ci-runner`, expected exit 1 and "2 digest-pinned references to ci-runner, want exactly 1".
 - [ ] **Step 2: Run and see them fail.** `go test -race -run TestPins ./internal/reproducible/`. Expected: FAIL, no such file `.forgejo/pins.sh`.
 - [ ] **Step 3: Write `pins.sh` and `roll.sh`.**
-- [ ] **Step 4: Write the job `promote`** in `ci.yml`: `needs: [image, image-sandbox, image-runner]`, `runs-on: ubuntu-latest`, checkout with `fetch-depth: 0`. First it asks `$FACTORY_URL/projects/ai-software-factory-code/release?commit=$GITHUB_SHA` with `FACTORY_READ_TOKEN`, every 10 seconds for up to 5 minutes, by Decision 2. Held: it ends green. Not held: it runs `bash .forgejo/roll.sh` with the four `name=digest` pairs. Unless superseded, it then waits on `/projects/ai-software-factory-code/alerts?namespace=factory&digest=<each>&commit=$GITHUB_SHA` for 10 minutes, as the template's loop does. The job is named `promote`, the name the release keeper runs again (`releasekeeper.go:49`).
-- [ ] **Step 5: Run.** `go test -race ./internal/reproducible/` and `bash check changed`. Expected: PASS.
-- [ ] **Step 6: Commit.** "Main CI pins its images on the branch deploy with the deploy key, after it asks whether production is held, and waits until factory runs them".
-- [ ] **Step 7: Merge with Sebastian at hand for Task 8.** The pull request's own main run is the first. When its `promote` job has pushed `deploy`, Task 8 runs within its 10-minute wait.
-- [ ] **Step 8: Check the reproducible digests.** Re-run the image jobs of the same run. Expected: the four digests equal the first run's. If they differ, stop: every deploy would restart factoryd. Find what still varies in the build before Task 9.
-- [ ] **Step 9: Check the mirror.** `git ls-remote github deploy` in the code repository shows the same commit as `origin`.
+- [ ] **Step 4: Write the job `promote`** in `ci.yml`: `needs: [image, image-sandbox, image-runner]`, `runs-on: ubuntu-latest`, checkout with `fetch-depth: 0`. First it asks `$FACTORY_URL/projects/ai-software-factory-code/release?commit=$GITHUB_SHA` with `FACTORY_READ_TOKEN`, every 10 seconds for up to 5 minutes. With no answer it goes ahead and writes "factoryd did not answer for 5 minutes, so no hold is in force" in the log. A 400 or a 401 stops the job. Held: it ends green. Not held: it verifies each digest as Step 5 says, then runs `bash .forgejo/roll.sh` with the four `name=digest` pairs. Unless superseded, it then waits on `/projects/ai-software-factory-code/alerts?namespace=factory&digest=<each>&commit=$GITHUB_SHA` for 10 minutes, as the template's loop does. The job is named `promote`, the name the release keeper runs again (`releasekeeper.go:49`).
+- [ ] **Step 5: Check the signature line.** The promote job runs `cosign verify --key k8s/cosign.pub` on each of the four digests before `roll.sh` pushes, with the cosign binary that the signing step already builds. About 4 lines. A digest that fails stops the job red before any push. Run the line on a digest that main CI did not sign. Expected: the job fails and `deploy` is unchanged.
+- [ ] **Step 6: Run.** `go test -race ./internal/reproducible/` and `bash check changed`. Expected: PASS.
+- [ ] **Step 7: Commit.** "Main CI pins its images on the branch deploy with the deploy key, after it asks whether production is held and verifies each digest's signature, and waits until factory runs them".
+- [ ] **Step 8: Merge with Sebastian at hand for Task 8.** The pull request's own main run is the first. When its `promote` job has pushed `deploy`, Task 8 runs within its 10-minute wait.
+- [ ] **Step 9: Check the reproducible digests.** Re-run the image jobs of the same run. Expected: the four digests equal the first run's. If they differ, stop: every deploy would restart factoryd. Find what still varies in the build before Task 9.
+- [ ] **Step 10: Check the mirror.** `git ls-remote github deploy` in the code repository shows the same commit as `origin`.
 
 ### Task 8: Flux applies the deploy branch (infra, by hand)
 
@@ -445,7 +449,7 @@ Net: about −2,900 non-test lines and −7,300 test lines. The sizes are inferr
 **Files (code repository):**
 - Delete: in `internal/factoryd/rolltask.go`, the `Roller` and its methods (`:436-1585`), `RetryRoll` (`:1053-1097`), the sources `roll-refused` and `roll-failed` (`:35`, `:40`) and the store methods only the roller calls. Keep `ShortSHA` (`:1895`), `runsPage` (`:570`) and `StandingQuestion` (`:347`) by moving them to the files of their callers.
 - Delete: `internal/factoryd/roll.go:144-387` (`RollWatcher`, `Roll`, `RollStore`). Move `Deployment`, `DeploymentReader` and the methods `carries`, `applied` and `live` (`roll.go:53-134`) to `kube.go`, since the gateway and the SigNoz intake read them.
-- Delete: `internal/factoryd/kube.go:1344-1362` (`SuspendKustomization`, `fluxNamespace`, `factoryKustomization`), `k8s/factoryd.yaml:231-258` (Role and RoleBinding `factoryd-flux`), the env `COSIGN_PUB` and the configMap `image-signing` (`k8s/factoryd.yaml`, `k8s/kustomization.yaml`), `cmd/factoryd/main.go:500-509`, `:1190` (`COSIGN_PUB`)
+- Delete: `internal/factoryd/kube.go:1344-1362` (`SuspendKustomization`, `fluxNamespace`, `factoryKustomization`), `k8s/factoryd.yaml:231-258` (Role and RoleBinding `factoryd-flux`), the env `COSIGN_PUB` and the configMap `image-signing` (`k8s/factoryd.yaml`, `k8s/kustomization.yaml`), while the file `k8s/cosign.pub` stays for the promote job, `cmd/factoryd/main.go:500-509`, `:1190` (`COSIGN_PUB`)
 - Delete: the retry answer of the failed-roll card (`internal/factoryd/chat_escalation.go:325-326`, `faces_copy.go:2334`, `:2390`, `internal/console/actions.go:1617`, `:1746-1748`, `internal/console/console.go:315-318`, `:761-762`), the face fixtures of `roll-refused` and `roll-failed`
 - Modify: `internal/factoryd/signozwebhook.go:1026-1045` (the restart window reads the Deployments of its namespace through `Deployments(ctx, ns)`)
 - Test: `internal/factoryd/signozwebhook_test.go`

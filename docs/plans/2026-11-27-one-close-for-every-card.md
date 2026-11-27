@@ -1,5 +1,7 @@
 # One Close for Every Card: Implementation Plan
 
+**Status:** decided, not built. It waits for Sebastian's go.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** An ask whose reason is gone closes through one registry of facts, one sweep and one door, and every close leaves one record in one wording.
@@ -240,7 +242,7 @@ The cause-gone plan refused a rung 0 row for `pod_never_started` and `platform_f
 1. **The registry.** Each cause of a factory card is one row in `rung0`. Its `Fire` asks the domain that knows the fact, through one method of that domain, and answers `Resolution{Action: ActWithdraw, Note: clause, Moments: said}`. The kind table names each kind's rows, and its `Retires` text names them too.
 2. **One kind per cause.** A human card's case takes its kind from the card's source through one map, `cardKinds`. Seven causes that fall to `human_card` today get a kind of their own: `alert`, `chain_stall`, `chain_repair`, `roll_failed`, `roll_refused`, `follow_failed` and `factory_pr`. A re-run's card becomes `red_main`. `human_card` keeps only the cards a human question asks, with a `Decision`.
 3. **The one door.** Rung 0's withdrawal is no choice (act.go:258). `Act` ends a human card that rung 0 withdraws in one store transaction, `EndHumanCard`: the case ends withdrawn with its step, the card ends with the clause as its closing reason, the `factory_closed` outbox row holds the comment, the `question_withdrawn` row holds the clause and its moments, and the card's open alerts are judged `unjudged` by factoryd, as an agent card's other end judges them (activities.go:3403). After the commit, the outcome is counted, the issue's state is mirrored, and Forgejo follows through `closeIssueAsFactory`. `HealFactoryCloses` retries what Forgejo did not take.
-4. **The trigger first, the sweep as backstop.** Every place that learns a row's fact first calls `Runner.Retire(ctx, taskID)` on the cards the fact concerns, so the card closes at the moment. `Retire` runs the same `retake` on one card. The sites are the roller on a green main and after a roll merged, the policy loader after a load, the console's reset of a cap's count and its budget raise, a plan's close and a group revert's end, the alert intake on a resolve, the follow routine before its next run, the chain poller and the factory's own close of a pull request. A site whose next step must wait for the end calls `Retire` before that step: the roller before the queue goes on, the follow routine before its next move. The release keeper calls it before the promote as well, so the promote waits for the end even when the plan's close did not retire the card. The retake pass sweeps every live case of a factory card kind every minute, at the human or out of sight, in any repository. It carries the rows that have no trigger, and it closes a card whose event was lost.
+4. **Every row runs on its trigger.** Every place that learns a row's fact first calls `Runner.Retire(ctx, taskID)` on the cards the fact concerns, so the card closes at the moment. `Retire` runs the same `retake` on one card. The sites are the roller on a green main and after a roll merged, the policy loader after a load, the console's reset of a cap's count and its budget raise, a plan's close and a group revert's end, the alert intake on a resolve, the follow routine before its next run, the chain poller and the factory's own close of a pull request. A site whose next step must wait for the end calls `Retire` before that step: the roller before the queue goes on, the follow routine before its next move. The release keeper calls it before the promote as well, so the promote waits for the end even when the plan's close did not retire the card. The retake pass sweeps every live case of a factory card kind every minute, at the human or out of sight, in any repository. It carries four facts that have no trigger (a platform gone quiet, a class that answers again, a cluster object ready and a CronJob that ran), the month's turn, and a retire that did not run. It is not a general backstop for the rows that have triggers. Beyond a retire that did not run, a row with a trigger waits for its trigger.
 
    The table answers which code learns each row's fact first. Ten rows have a trigger, and four have none. Two rows with a trigger also hold a fact that has none: the third column names it, and the sweep carries it.
 
@@ -310,18 +312,16 @@ The cause-gone plan refused a rung 0 row for `pod_never_started` and `platform_f
 
 The net change is about −600 non-test lines, inferred from the function sizes above. Tests are not counted. The tests of each deleted close half go with it, among them 13 reopen tests in freezecard_test.go, and each row gets its own tests.
 
-## Decisions for Sebastian
+## Decisions
 
-1. **Does rung 0 resume a card stopped by `pod_never_started` or `platform_fault` once sessions run again?** Commit `63b54a95c` says yes, once per card and key. The cause-gone plan said no, because another card's started session proves nothing about this card's pod or node.
-   - A, keep the row `sessions_run` and record it. A false resume of `pod_never_started` costs one pod start and no model money. A false resume of `platform_fault` costs at most one session's model spend, since the stop that comes back stays with the human (`firing`'s bound). A human's answer cannot change the platform either (design repository, `docs/architecture.md:4807`), and the platform card still tells the human about a node that keeps killing work.
-   - B, remove the row until the factory records each session's node and end and each pod's requests and pending reason. Every such stop then waits for rung 2 or the human.
-   - Recommendation: A. Task 1 records either answer and, for B, removes the row.
-2. **A freeze that comes back after a human's retry press: reopen the pressed card, or file a new one?** Today the same card reopens, so one class keeps one card and one history across the press. The reopen costs about 180 lines, its own outbox, its own close retry and the source exception in the shared heal query, and no other human card reopens. A new card per episode names the earlier card in its first line, so the history stays one click away. Recommendation: a new card. Tasks 11 and 12 depend on this answer.
-3. **How does a card end that the factory withdrew because its reason went: `closed` or `done`?** Today 10 closers end it `done`, and the 3 alert closers and the pull request closer end it `closed` with a reason. One end needs one status. `closed` says that the card's work was not done, stores the reason in `closing_reason`, and makes the cards that depend on it ask first. Done shows "needed you no more: <reason>" for both statuses. Recommendation: `closed`. It changes the outcome metric and the `status:` filter for the month cap, budget, freeze, platform, configuration, red main, held production, roll, follow and chain cards.
+1. **Rung 0 resumes a card stopped by `pod_never_started` or `platform_fault` once sessions run again.** Default: the row `sessions_run` from commit `63b54a95c` stays, once per card and key, and Task 1 records it in the design documents. A false resume of `pod_never_started` costs one pod start and no model money. A false resume of `platform_fault` costs at most one session's model spend, since the stop that comes back stays with the human (`firing`'s bound). A human's answer cannot change the platform either (design repository, `docs/architecture.md:4807`), and the platform card still tells the human about a node that keeps killing work. Veto line: refuse the resume as the cause-gone plan did, because another card's started session proves nothing about this card's pod or node.
+2. **A freeze that comes back after a human's retry press files a new card that names the earlier one.** The factory is in dev mode and keeps no backward compatibility, so the reopen code goes: about 180 lines, its own outbox, its own close retry and the source exception in the shared heal query. No other human card reopens. The new card names the earlier card in its first line, so the history stays one click away. Tasks 11 and 12 build this.
+3. **A card the factory withdrew because its reason went ends `closed` with its reason.** Default: one end needs one status. `closed` says that the card's work was not done, stores the reason in `closing_reason`, and makes the cards that depend on it ask first. Done shows "needed you no more: <reason>" for both statuses. It changes the outcome metric and the `status:` filter for the month cap, budget, freeze, platform, configuration, red main, held production, roll, follow and chain cards. Veto line: `done`.
+4. **Every row runs on its trigger, and the one-minute sweep is not a general backstop.** Where a clear trigger exists, a trigger beats a periodic check. The sweep stays for the four facts with no trigger (a platform gone quiet, a class that answers again, a cluster object ready and a CronJob that ran), the month's turn, and a retire that did not run. For a row that has a trigger, the sweep does not cover a lost event beyond a retire that did not run.
 
 ## Global Constraints
 
-- Code work runs in a git worktree off `origin/main` of `~/repos/ai-software-factory-code`. One pull request per task group, from `controller/ai-software-factory-code`, merged as `sebastian` after green CI and an independent review on the most capable model. The groups are: Tasks 2 and 3, Tasks 4 to 9, Tasks 10 to 12, Task 13, Task 14, Task 15, and for decision B the code part of Task 1.
+- Code work runs in a git worktree off `origin/main` of `~/repos/ai-software-factory-code`. One pull request per task group, from `controller/ai-software-factory-code`, merged as `sebastian` after green CI and an independent review on the most capable model. The groups are: Tasks 2 and 3, Tasks 4 to 9, Tasks 10 to 12, Task 13, Task 14, and Task 15.
 - Tasks 1 and 16 change the design repository. They commit to `master` and push. Its `.githooks/pre-commit` refuses a ledger path or a cited ruling number.
 - `bash check changed` passes before each commit. Go tests run with `go test -race`. PostgreSQL-backed tests run through `scripts/pg-test.sh`.
 - A change to workflow code needs a `workflow.GetVersion` change id and a replay test. Only Tasks 14 and 15 change workflow code.
@@ -330,7 +330,7 @@ The net change is about −600 non-test lines, inferred from the function sizes 
 - No task id in a text a human reads. A human is a human, never a member or an operator.
 - No comments that narrate the change. Tests state hand-derived expectations.
 - Every sentence a row writes is human-read product copy. It passes the writing guide's check in `internal/writingguide`.
-- Where a clear trigger exists, a card action runs on the trigger, not on a periodic check, and a periodic sweep stays only for a fact with no trigger and as the backstop for a lost event.
+- Where a clear trigger exists, a card action runs on the trigger, not on a periodic check, and a periodic sweep stays only for a fact with no trigger, the month's turn and a retire that did not run.
 
 ## Review Focus
 
@@ -349,16 +349,13 @@ The net change is about −600 non-test lines, inferred from the function sizes 
 - Modify: `docs/architecture.md:4803-4807` (the `platform_fault` paragraph)
 - Modify: `docs/architecture.md:3755-3760` (the rung 0 bullet)
 - Modify: `docs/plans/2026-11-24-cause-gone.md`, section "Not built and why", the bullets `platform_fault` and `pod_never_started`
-- Code, only for decision B: `internal/factoryd/ladder.go:192-208`, `internal/factoryd/cases.go:128`, `:165`, `:206`
-- Test, only for decision B: `internal/factoryd/monitor_test.go`
 
 **Interfaces:** none.
 
 - [ ] **Step 1: Read the record.** Run read-only on the live database: `SELECT kind, count(*), count(*) FILTER (WHERE resolution->>'by' = 'factoryd' AND (resolution->>'rung')::int = 0) FROM cases WHERE kind IN ('pod_never_started', 'platform_fault') AND opened_at > '2026-11-26 17:30+00' GROUP BY kind`. Write the counts into the architecture paragraph of Step 2.
-- [ ] **Step 2 (decision A): Write the decision.** In `docs/architecture.md:4803-4807`, replace "The ladder takes it: no rung 1, rung 2 first, then the human, and its statement lists the three records." with the rule as built: rung 0 resumes the card once a session of any card started since the stop and the platform ended none since, once per card and key, and a stop that comes back goes to rung 2 and then to the human. Name the date 2026-11-26, the commit `63b54a95c`, the two costs of a false resume from decision 1, and the counts of Step 1. Keep "No answer changes the platform." In the cause-gone plan, add one sentence under each of the two bullets: "Built on 2026-11-26 as the row `sessions_run`, bounded to one try per card and key: see architecture.md sections 5.9 and 6.7."
-- [ ] **Step 2 (decision B): Remove the row instead.** Write the failing test `TestAPodStopAtTheHumanStaysAfterSessionsRan` in monitor_test.go: a `pod_never_started` case at the human, 3 `session_started` rows after it and no platform death. After `Monitor.Retake` the case is still `at_human` and no `question_withdrawn` row exists. Run `go test -race -run TestAPodStopAtTheHumanStaysAfterSessionsRan ./internal/factoryd/` and see it fail with the case `resolved`. Delete the row `sessions_run` (ladder.go:192-208) and `sessionsRetire` (cases.go:128), give both kinds a `Decision`, run the test and `TestTheKindTableHoldsEveryKind` and see them pass. Commit in the code repository: "A card stopped by pods that never started or by the platform's ends waits for the factory agent or the human, as rung 0 holds no fact that proves this card's pods run again". Then write the architecture paragraph as it was and add the dated reversal to the cause-gone plan.
+- [ ] **Step 2: Write the decision.** In `docs/architecture.md:4803-4807`, replace "The ladder takes it: no rung 1, rung 2 first, then the human, and its statement lists the three records." with the rule as built: rung 0 resumes the card once a session of any card started since the stop and the platform ended none since, once per card and key, and a stop that comes back goes to rung 2 and then to the human. Name the date 2026-11-26, the commit `63b54a95c`, the two costs of a false resume named in the Decisions section, and the counts of Step 1. Keep "No answer changes the platform." In the cause-gone plan, add one sentence under each of the two bullets: "Built on 2026-11-26 as the row `sessions_run`, bounded to one try per card and key: see architecture.md sections 5.9 and 6.7."
 - [ ] **Step 3: Check** that `git grep -n "sessions run again" docs/` and the paragraph at :4803 say the same rule, and that `git diff --cached` names no ledger path.
-- [ ] **Step 4: Commit** "architecture: a card stopped by pods that never started or by the platform's ends resumes once sessions run again, once per card and stop" (decision A), or "architecture: a stop of pods or of the platform waits for the factory agent or the human, and the row that resumed it is gone" (decision B). Push.
+- [ ] **Step 4: Commit** "architecture: a card stopped by pods that never started or by the platform's ends resumes once sessions run again, once per card and stop". Push.
 
 ### Task 2: A factory card's case takes its kind from the card's source
 
@@ -418,7 +415,7 @@ The net change is about −600 non-test lines, inferred from the function sizes 
   ```go
   type HumanCardEnd struct {
   	Task       Task
-  	Status     string // "closed" for a withdrawal (decision 3), "done" for the freeze card's press
+  	Status     string // "closed" for a withdrawal, "done" for the freeze card's press
   	Reason     string // the closing reason and the withdrawal's reason, a clause
   	Comment    string // the factory_closed row's body, the issue's closing comment
   	Face       string // the card's objective after the end, "" keeps it
@@ -640,8 +637,6 @@ The net change is about −600 non-test lines, inferred from the function sizes 
 
 ### Task 11: A freeze that comes back after a retry press files a new card, and the heal pass retries every close
 
-Build this task only for decision 2's recommendation. For the other answer, skip it and keep `closeOwed` and the heal query's exception.
-
 **Files:**
 - Modify: `freezecard.go:991-1060` (`frozen`: the branch for a press-closed card files a new card), `freezecard.go:295-305` (`freezeClass.closed` goes), `freezecard.go:918-940` (`countHumanEnd` becomes `countOutcome` at its callers)
 - Delete: `freezecard.go:280-287`, `:504-606`, `:1523-1537`, `:1746-1793`, `:1837-1852`, `:1876-1879`
@@ -751,11 +746,11 @@ Build this task only for decision 2's recommendation. For the other answer, skip
 **Files (design repository):**
 - Modify: `docs/architecture.md:3745-3797` (section "A card retires itself when its reason goes away": the bullet "The factory's own cards close in their own passes" becomes one paragraph on the one registry, the one sweep and the one end)
 - Modify: `docs/spec-driven.md:76-78` when its words no longer match
-- Modify: `docs/plans/2026-11-18-freeze-card-atomic.md`, a dated line under its title that the reopen was replaced by a new card per episode, for decision 2's recommendation
+- Modify: `docs/plans/2026-11-18-freeze-card-atomic.md`, a dated line under its title that the reopen was replaced by a new card per episode
 
 **Interfaces:** none.
 
-- [ ] **Step 1: Write** the paragraph after Tasks 2 to 12 are on main: every factory card's cause is one row of rung 0, the kind table names it, the retake pass runs it every minute on every factory card, the event that knows first runs it at once, and the store ends the case and the card and writes the record in one transaction with one sentence. Name the end status of decision 3.
-- [ ] **Step 2: Record the rule** in section 5.9, in the bullet **Rung 0** (`docs/architecture.md:3756-3762`): where a clear trigger exists, a card action runs on the trigger, not on a periodic check, and the retake pass's minute sweep stays only for a fact with no trigger and as the backstop for a lost event. Name the rows that have no trigger and why, from the table in "The proposal", point 4.
+- [ ] **Step 1: Write** the paragraph after Tasks 2 to 12 are on main: every factory card's cause is one row of rung 0, the kind table names it, the retake pass runs it every minute on every factory card, the event that knows first runs it at once, and the store ends the case and the card and writes the record in one transaction with one sentence. Name the end status: `closed` with its reason.
+- [ ] **Step 2: Record the rule** in section 5.9, in the bullet **Rung 0** (`docs/architecture.md:3756-3762`): where a clear trigger exists, a card action runs on the trigger, not on a periodic check, and the retake pass's minute sweep stays only for the four facts with no trigger, the month's turn and a retire that did not run. State that the sweep is not a general backstop for rows with triggers. Name the rows that have no trigger and why, from the table in "The proposal", point 4.
 - [ ] **Step 3: Check** `git grep -n -i 'own pass\|own passes\|reopen' docs/architecture.md docs/spec-driven.md` and fix each line that still describes a closer of its own.
 - [ ] **Step 4: Commit** "architecture: every card whose reason is gone closes through rung 0's rows, one sweep and one end, with one record" and push.

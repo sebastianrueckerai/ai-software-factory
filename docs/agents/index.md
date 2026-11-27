@@ -4,7 +4,7 @@ One page per agent: the first model request verbatim, every part pinned to the b
 
 ## The self-check
 
-- code SHA `0b0b049c3d8156cbfe82aadaf4c997006dc56128`; every permalink points there.
+- code SHA `9e84a5260c9ad70e15572ee79bcf9d3bcf0f6ce1`; every permalink points there.
 - policy `090da06f7c4b`, the tree the captures read.
 - harness `opencode 1.19.6`, the pinned opencode the loop captures drove.
 - unlabelled spans: 0 — the tool exits non-zero on any unlabelled byte, so an index that shipped means none.

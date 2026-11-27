@@ -1,5 +1,7 @@
 # A routine's run shows while it works and says why it failed: implementation plan
 
+**Status:** decided, not built. It waits for Sebastian's go.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task by task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 This plan is the ninth of the drift review's set ([the overview](2026-11-27-drift-review.md)). Its Task 3 follows the shapes of "One close for every card" and "One door for every answer" and builds after them. Line numbers are from the code repository's main at `306caad7a` (2026-11-26). Main moved to `2af2e0ed2` on 2026-11-27, when the open faults merged and rolled, so check each line before you edit it.
@@ -44,9 +46,9 @@ A failure would show even less:
 - `Act`'s end of a human card that rung 0 withdraws (`EndHumanCard`, "One close for every card"), with the reason as C51 words it.
 - The board's stream: an event row with no task swaps the board (`static/console.js:465-477`), and a heartbeat compares `boardData.faces()` every 25 s.
 
-## Decisions this plan makes
+## Decisions
 
-These are execution defaults. Sebastian may change any of them before the build.
+Default: the seven decisions below stand as written, as a set. Veto line: any one of the seven, named singly.
 
 1. **The working routine keeps its ghost look.** It moves from the foot of Queued to the foot of In progress, with the breathing cyan dot that C16 already gave a running run. The lane's count stays the count of its cards.
 2. **Three attempts, then the run fails.** Attempts 2 and 3 come 10 s and 20 s after the one before. A blind retry for 24 hours is gone. The factory agent's retry on the card takes its place.
@@ -306,7 +308,7 @@ The foot's last part, which the tests pin, with times in the human's zone. Task 
 
 - [ ] **Step 1: Write the C-entry** "A routine stands in In progress while its run works, and a failed run asks the factory agent first, then a human (2026-11-27, Sebastian)". It amends C16 and states:
   - Sebastian's rule as quoted in this plan's Spec.
-  - The seven decisions above. Mark any that Sebastian did not confirm as the director's, provisional.
+  - The seven decisions above, as a set.
   - The foot words of Task 4's table, and the drawer's Last words.
 - [ ] **Step 2: Change `docs/routines.md`.** Rule 1 says where a working routine stands. The run workflow paragraph names three attempts, the attempt note and the failure card with its close.
 - [ ] **Step 3: Change the two other docs** to say In progress for a working run.
