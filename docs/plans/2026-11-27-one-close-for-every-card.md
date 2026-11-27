@@ -240,7 +240,28 @@ The cause-gone plan refused a rung 0 row for `pod_never_started` and `platform_f
 1. **The registry.** Each cause of a factory card is one row in `rung0`. Its `Fire` asks the domain that knows the fact, through one method of that domain, and answers `Resolution{Action: ActWithdraw, Note: clause, Moments: said}`. The kind table names each kind's rows, and its `Retires` text names them too.
 2. **One kind per cause.** A human card's case takes its kind from the card's source through one map, `cardKinds`. Seven causes that fall to `human_card` today get a kind of their own: `alert`, `chain_stall`, `chain_repair`, `roll_failed`, `roll_refused`, `follow_failed` and `factory_pr`. A re-run's card becomes `red_main`. `human_card` keeps only the cards a human question asks, with a `Decision`.
 3. **The one door.** Rung 0's withdrawal is no choice (act.go:258). `Act` ends a human card that rung 0 withdraws in one store transaction, `EndHumanCard`: the case ends withdrawn with its step, the card ends with the clause as its closing reason, the `factory_closed` outbox row holds the comment, the `question_withdrawn` row holds the clause and its moments, and the card's open alerts are judged `unjudged` by factoryd, as an agent card's other end judges them (activities.go:3403). After the commit, the outcome is counted, the issue's state is mirrored, and Forgejo follows through `closeIssueAsFactory`. `HealFactoryCloses` retries what Forgejo did not take.
-4. **The one sweep.** The retake pass runs the rows on every live case of a factory card kind, at the human or out of sight, in any repository. `Runner.Retire(ctx, taskID)` runs the same `retake` on one card at once, for the closers whose trigger is an event and whose order matters: the roller before the queue goes on, the release keeper before the promote, the policy loader after a load, the follow routine before its next run, the chain poller, the console's budget raise and the factory's own close of a pull request.
+4. **The trigger first, the sweep as backstop.** Every place that learns a row's fact first calls `Runner.Retire(ctx, taskID)` on the cards the fact concerns, so the card closes at the moment. `Retire` runs the same `retake` on one card. The sites are the roller on a green main and after a roll merged, the policy loader after a load, the console's reset of a cap's count and its budget raise, a plan's close and a group revert's end, the alert intake on a resolve, the follow routine before its next run, the chain poller and the factory's own close of a pull request. A site whose next step must wait for the end calls `Retire` before that step: the roller before the queue goes on, the follow routine before its next move. The release keeper calls it before the promote as well, so the promote waits for the end even when the plan's close did not retire the card. The retake pass sweeps every live case of a factory card kind every minute, at the human or out of sight, in any repository. It carries the rows that have no trigger, and it closes a card whose event was lost.
+
+   The table answers which code learns each row's fact first. Ten rows have a trigger, and four have none. Two rows with a trigger also hold a fact that has none: the third column names it, and the sweep carries it.
+
+   | Row | Trigger site | No trigger because |
+   |---|---|---|
+   | `month_lifted` | `CapWaits.Wake` (monthcap.go:426) | the month's turn is a time, and factoryd reads the outer guard's lift only from the gateway's audit rows |
+   | `budget_raised` | `Console.closeRaised` (internal/console/chat_budget.go:274) | the month's end is a time |
+   | `platform_quiet` | the sweep | its fact is 24 hours with no counted death, an absence |
+   | `class_answers` | the sweep | the row fires 5 minutes after the class resumed, a time |
+   | `alert_cleared` | `AlertIntake.take` (signozwebhook.go:329) | |
+   | `object_ready` | the sweep | factoryd reads claims and HelmReleases only by polling the cluster |
+   | `cronjob_ran` | the sweep | factoryd reads Jobs only by polling the cluster |
+   | `main_green` | `Roller.mainState` (mainfix.go:168) | |
+   | `roll_merged` | `Roller.retireRolls` (rolltask.go:983) | |
+   | `no_open_plan` | `Runner.wakeHeld` (queue.go:391) | |
+   | `config_loaded` | `ConfigAlarm.Resolve` (policy.go:918) | |
+   | `follow_target_gone` | `Runner.followPass` (followpass.go:110) | |
+   | `chain_settled` | `ChainPoller.settleChainCards` (chainpoll.go:1571) | |
+   | `pr_closed` | the factory's own close of the pull request | |
+
+   Three trigger sites are reads of Forgejo that exist already: the roller's poll of main's push runs and the chain poller's tick, each every 15 seconds, and the follow routine's read of main's tree and the follow store. Forgejo's workflow run webhook nudges the chain poller's tick (`handleWorkflowRun`, intake.go:776). A row there runs on that read and needs no poll of its own. Forgejo's pull request webhook serves no row: it skips a close by the bot (intake.go:1848).
 5. **One guard.** `heldRefusal` runs the card's rows (`firing`) instead of `conditionGone`, and refuses with the kind table's own `Retires` words when no row fires.
 6. **The freeze card.** Its state lives in its case's facts. A freeze that comes back after a retry press files a new card that names the earlier one. Its close is the row `class_answers` and the shared end. Its own retry, its reopen outbox, its text parsing and the heal query's source exception go.
 7. **The typed stop.** The run names each stop's kind in `TripInput.Kind` and reads the open case's kind from `RunState.Kind` on a restart, behind one version gate. Once no run older than the gate is open, `EscalationSource`, `CaseKindOf`'s prefix ladder and the kind predicates go.
@@ -309,6 +330,7 @@ The net change is about −600 non-test lines, inferred from the function sizes 
 - No task id in a text a human reads. A human is a human, never a member or an operator.
 - No comments that narrate the change. Tests state hand-derived expectations.
 - Every sentence a row writes is human-read product copy. It passes the writing guide's check in `internal/writingguide`.
+- Where a clear trigger exists, a card action runs on the trigger, not on a periodic check, and a periodic sweep stays only for a fact with no trigger and as the backstop for a lost event.
 
 ## Review Focus
 
@@ -317,6 +339,7 @@ The net change is about −600 non-test lines, inferred from the function sizes 
 3. **A live case of a factory card keeps the kind `human_card` across the roll.** No row would ever fire on it and no closer would remain. The migration relabels every live case by its card's source. Pinned by the PostgreSQL test `TestTheFactoryCardKindsMigrationRelabelsLiveCases`, added to Task 2, and by the live query in Task 9's last step.
 4. **A factory card stands on a repository that no project names.** The per-project loop of the retake pass would never read it. The second read covers every repository. Pinned by `TestRetakeSweepsAFactoryCardOnARepositoryNoProjectNames`, added to Task 4.
 5. **A run that started before Task 14's version gate stops after the roll.** Its trip carries no kind, so `OpenTrip` takes the kind from the reason until Task 15. Pinned by `TestOpenTripWithNoKindTakesTheReasonsKind` and the replay test `TestReplayATripRecordedBeforeTheTripKind`, both added to Task 14.
+6. **The factory closed a card's pull request, and its `Retire` did not run.** factoryd stopped between Forgejo's close and the call, or the call failed. No webhook brings the close back, since Forgejo's pull request webhook skips a close by the bot (intake.go:1848). The retake pass reads the pull request within a minute, and the row `pr_closed` closes the card with its record. Pinned by `TestAFactoryPullRequestCardWhoseRetireWasLostClosesByTheSweep`, added to Task 8.
 
 ---
 
@@ -433,7 +456,7 @@ The net change is about −600 non-test lines, inferred from the function sizes 
 **Files:**
 - Modify: `ladder.go:114-273` (row `month_lifted`), `ladder.go:1417-1455` (new `Runner.Retire` after `retake`)
 - Modify: `monitor.go:166-200` (`Retake`, its second read)
-- Modify: `monthcap.go:243-365` (`Check` stops closing, `closeLifted` becomes `MonthAlarm.Gone`)
+- Modify: `monthcap.go:243-365` (`Check` stops closing, `closeLifted` becomes `MonthAlarm.Gone`), `monthcap.go:412-447` (`CapWaits.Wake` calls `Retire` on the cap cards)
 - Modify: `runner.go:149` (field `MonthCap *MonthAlarm`), `cmd/factoryd/main.go` (wiring beside :228)
 - Modify: `cases.go:145-146` (`Rung0` and `Retires` of `CaseFactoryMonthCap`)
 - Test: `monthcap_test.go`, `monitor_test.go`
@@ -448,8 +471,10 @@ The net change is about −600 non-test lines, inferred from the function sizes 
   - `TestTheMonthAlarmFilesAndClosesNothing`. After `MonthAlarm.Check` on a turned month, the old card still waits and the alarm files the new month's card at 100 percent as today.
   - `TestRetakeSweepsAFactoryCardOnARepositoryNoProjectNames` (Review Focus 4). A month cap card on a repository that no project of the tree names closes in one `Retake`.
   - `TestRetireEndsTheCardsLiveCaseAtOnce`. `Retire` on the card of a turned month answers true, and on the card of the current month answers false with the card waiting.
-- [ ] **Step 2: Run** `go test -race -run 'TestTheMonthCapCardClosesWhenItsMonthEnded|TestTheMonthAlarmFilesAndClosesNothing|TestRetakeSweepsAFactoryCardOnARepositoryNoProjectNames|TestRetireEndsTheCardsLiveCaseAtOnce' ./internal/factoryd/`. Expected: the cards stay `waiting-human` after `Retake`, and `Check` closes the old card.
+  - `TestARaiseOrAResetRetiresTheMonthCapCardAtOnce`. `CapWaits.Wake` after the load of version 974 with a cap of 1200 EUR, and in a second case after sebastian's reset at 07:30:32 UTC, closes the card before it returns, with no `Retake`.
+- [ ] **Step 2: Run** `go test -race -run 'TestTheMonthCapCardClosesWhenItsMonthEnded|TestTheMonthAlarmFilesAndClosesNothing|TestRetakeSweepsAFactoryCardOnARepositoryNoProjectNames|TestRetireEndsTheCardsLiveCaseAtOnce|TestARaiseOrAResetRetiresTheMonthCapCardAtOnce' ./internal/factoryd/`. Expected: the cards stay `waiting-human` after `Retake`, and `Check` closes the old card.
 - [ ] **Step 3: Implement.** The row `month_lifted` has no `Needs` and no `Back`. Its `Fire` calls `r.MonthCap.Gone` and answers `rungZeroMay(f, Resolution{Action: ActWithdraw, Note: note, Moments: said})`, and its `Took` answers `res.Note`. `CaseFactoryMonthCap` names it in `Rung0` and `Retires`. `Retake` keeps its per-project loop over cases at the human, then reads `OpenCasesOfKinds(ctx, factoryCardKinds()...)` and runs `m.Runner.retake` on each case its first loop did not take, with no `judgeAgain`. `Check` stops calling `closeLifted`.
+  - The trigger: `CapWaits.Wake` (monthcap.go:426) runs after a policy load (`PolicyLoader.settle`, policy.go:250) and after a reset of a cap's count (the console's `resetCap`, internal/console/capreset.go:126). It also reads the live `factory_month_cap` cases and calls `Retire` on each card. The month's turn and the outer guard's lift have no trigger: the first is a time, and factoryd reads the second only from the gateway's audit rows (`ModelAnsweredSince`, store.go:2012). The sweep carries both.
 - [ ] **Step 4: Run** the tests of Step 2 and `go test -race ./internal/factoryd/`. Expected: PASS.
 - [ ] **Step 5: Commit** "The month cap card closes by rung 0's row once its month ended, a raise or a reset lifted it, or calls answer again, through the retake pass, which sweeps every factory card".
 
@@ -477,6 +502,7 @@ The net change is about −600 non-test lines, inferred from the function sizes 
   - `TestThePlatformCardsCloseIsCounted`: one outcome `closed` is counted.
 - [ ] **Step 2: Run** `go test -race -run 'TestTheBudgetCard|TestThePlatformCard|TestAPlatformCardAfterAQuietClose' ./internal/factoryd/` and the console test. Expected: the cards stay after `Retake`.
 - [ ] **Step 3: Implement** the two rows as in Task 4. `ChatBudgetCards.Check` and `PlatformCard.Check` lose their close parts. The console's hook calls `ChatBudgetCards.Retire`. The two kind table rows name the rows.
+  - The trigger: the console's `closeRaised` (internal/console/chat_budget.go:274) calls `ChatBudgetCards.Retire` after the `doChatFund` of each raise: the board's fund, the panel's reset, the chat's fund and go, and the chat's fund tool. The card's own fund answer ends its card through `Act`. `TestTheConsolesRaiseClosesTheBudgetCardAtOnce` pins the trigger. The month's end and `platform_quiet` have no trigger: the first is a time, and the second is 24 hours with no counted death. The sweep carries both.
 - [ ] **Step 4: Run** the tests of Step 2, `go test -race ./internal/factoryd/ ./internal/console/`. Expected: PASS.
 - [ ] **Step 5: Commit** "The judgment budget card and the platform card close by rung 0's rows, the platform's loop bounded by its last card's case and not by a comment's words".
 
@@ -484,7 +510,7 @@ The net change is about −600 non-test lines, inferred from the function sizes 
 
 **Files:**
 - Modify: `ladder.go:114-273` (rows `alert_cleared`, `object_ready`, `cronjob_ran`)
-- Modify: `signozwebhook.go:590-845` (`Cleared`, `ObjectReady`, `CronJobRan` keep the reads and the touch check, the closes go)
+- Modify: `signozwebhook.go:590-845` (`Cleared`, `ObjectReady`, `CronJobRan` keep the reads and the touch check, the closes go), `signozwebhook.go:329-385` (`take` calls `Retire` on a resolve)
 - Delete: `alerts.go:273-305` (`CloseClearedCard`)
 - Modify: `cmd/factoryd/main.go:480-481` (the passes `cleared_alerts` and `event_alerts` go), `runner.go` (field `Alerts *AlertIntake`)
 - Modify: `cases.go` (the row of `CaseAlert`)
@@ -498,9 +524,11 @@ The net change is about −600 non-test lines, inferred from the function sizes 
   - `TestAClearedAlertsCardClosesWithOneWording`: after `Retake`, the row's reason, the closing reason and the comment's first sentence are the same words, "the alert cleared at 06:12 UTC", the comment "The alert cleared at 06:12 UTC."
   - `TestATouchedAlertCardStays`: a person's comment on the issue keeps the card waiting and marks the row touched. A second `Retake` reads no comment.
   - `TestTheCronJobCardWritesItsRecord`: a later Job of the same CronJob completed. After `Retake` one `question_withdrawn` row names the case with reason "the CronJob backup ran again after the failed Job backup-29012345: Job backup-29012400 completed at 2026-11-25T06:00:00Z", and a touched CronJob card stays.
-  - `TestARunnerCardClosesOnceARunnerPodRuns` in ci_test.go: after `RunnerPass` resolves the alert row, the next `Retake` closes the card.
-- [ ] **Step 2: Run** `go test -race -run 'TestAClearedAlertsCard|TestATouchedAlertCard|TestTheCronJobCard|TestARunnerCard' ./internal/factoryd/`. Expected: the cards stay after `Retake`.
+  - `TestARunnerCardClosesOnceARunnerPodRuns` in ci_test.go: the `RunnerPass` that resolves the alert row closes the card before it returns.
+  - `TestTheResolvedWebhookRetiresTheAlertCardAtOnce`: SigNoz's delivery of the resolve at 06:12 UTC closes the card with the reason "the alert cleared at 06:12 UTC" before `ServeHTTP` answers, with no `Retake`.
+- [ ] **Step 2: Run** `go test -race -run 'TestAClearedAlertsCard|TestATouchedAlertCard|TestTheCronJobCard|TestARunnerCard|TestTheResolvedWebhook' ./internal/factoryd/`. Expected: the cards stay after `Retake`.
 - [ ] **Step 3: Implement** the three rows, each calling its method on `r.Alerts`. Delete the close functions, `CloseClearedCard` and the two passes.
+  - The trigger: `AlertIntake.take` (signozwebhook.go:329) calls `Retire` on the card in its resolved branch, after it wrote `resolved_at` (`MergeAlertDetail`, :384). `take` serves SigNoz's webhook (`ServeHTTP`, :256) and the passes that raise and resolve alerts of their own: `FluxPass`, `SweepSigNoz`, `RolloutPass` and `RunnerPass`. Each caller of `take` holds `in.mu`, so `Cleared`, `ObjectReady` and `CronJobRan` take no lock of the intake's. `object_ready` and `cronjob_ran` have no trigger: factoryd has no informer on the cluster and reads claims, HelmReleases and Jobs only by polling it, as `CloseGoneEvents` (:704) does each minute today. The sweep carries both.
 - [ ] **Step 4: Run** the tests of Step 2 and `go test -race ./internal/factoryd/`. Expected: PASS.
 - [ ] **Step 5: Commit** "An alert card closes by rung 0's rows once its alert cleared, its object is ready or its CronJob ran again, with one record in one wording, and the two passes that only closed cards are gone".
 
@@ -513,6 +541,7 @@ The net change is about −600 non-test lines, inferred from the function sizes 
 - Modify: `releasekeeper.go:138-165`, delete `:588-617` (the keeper calls `Retire` before `EndReleaseHold` and the promote)
 - Modify: `policy.go:915-952` (`Resolve` judges the alert real, then calls `Retire` on each open config card)
 - Modify: `followfail.go:95-128` (`followTargetGone` becomes `Runner.followGone`, and the routine calls `Retire`)
+- Modify: `queue.go:385-406` (`wakeHeld` calls `Retire` on the repository's held production card)
 - Modify: `rolltask.go:495`, `releasekeeper.go:92`, `policy.go:857` (a `Retire func(ctx context.Context, taskID string) (bool, error)` field each), `cmd/factoryd/main.go` (wiring)
 - Modify: `cases.go:192-198` and the rows of `CaseRollFailed`, `CaseRollRefused`, `CaseFollowFailed`
 - Test: `mainfix_test.go`, `rolltask_test.go`, `releasekeeper_test.go`, `policy_test.go`, `followfail_test.go`, `monitor_test.go`
@@ -530,8 +559,10 @@ The net change is about −600 non-test lines, inferred from the function sizes 
   - `TestALoadedCommitResolvesTheRefusedConfigCard`: the alert row is judged real by factoryd with `fixed_by`, then the card is `closed`.
   - `TestAFollowCardWhoseTargetIsGoneClosesAndTheRoutineGoesOn`.
   - `TestRetakeWithdrawsAFactoryCardThatWaitsOutOfSight` in monitor_test.go: a roll-failed card in `waiting-agent` with its case `open` and rung 2's step in progress closes in one `Retake`, its row carries `held: true`, and rung 2's later answer meets `ErrCaseEnded`.
-- [ ] **Step 2: Run** `go test -race -run 'TestMainTurningGreen|TestAMergedRoll|TestTheKeeperPromotes|TestALoadedCommit|TestAFollowCard|TestRetakeWithdrawsAFactoryCard' ./internal/factoryd/`. Expected: the closes happen through the old closers or the cards stay.
+  - `TestAPlansCloseRetiresTheHeldProductionCardAtOnce`: `closePlan` records `plan_closed` for the last open plan of the repository, and the held card is `closed` with "no plan is open on main any more, so production goes ahead" before `closePlan` returns, with no keeper pass and no `Retake`.
+- [ ] **Step 2: Run** `go test -race -run 'TestMainTurningGreen|TestAMergedRoll|TestTheKeeperPromotes|TestALoadedCommit|TestAFollowCard|TestRetakeWithdrawsAFactoryCard|TestAPlansCloseRetires' ./internal/factoryd/`. Expected: the closes happen through the old closers or the cards stay.
 - [ ] **Step 3: Implement** the five rows and the callers. Each caller keeps its trigger and its order, and its close body becomes one call of `Retire`. The release keeper's `forgejoTerminal` branch goes, because the store ends the card before any Forgejo call.
+  - The triggers: `Roller.mainState` (mainfix.go:168) on a green push run, before `ClearQueuePause` (:199), for `main_green`. `Roller.retireRolls` (rolltask.go:983), after `SettleRollRequests` in `Roller.poll` (rolltask.go:573) wrote the merge, for `roll_merged`. `Runner.wakeHeld` (queue.go:391) for `no_open_plan`: a plan's close (`closePlan`, verdict.go:2547, and `CloseHeldPlan`, verdict.go:640) and a group revert's end (grouprevert.go:497) call it. A hand revert that the revert pass marks (revert.go:170) calls no `wakeHeld`, and the sweep carries it. `ConfigAlarm.Resolve` (policy.go:918), which `PolicyLoader.settle` (policy.go:250) calls after a load, for `config_loaded`. `Runner.followPass` (followpass.go:110), before it moves a part, for `follow_target_gone`. The roller's 15-second poll of main's push runs and the follow routine's read of main's tree and the follow store exist already, and their rows run on that read.
 - [ ] **Step 4: Run** the tests of Step 2 and `go test -race ./internal/factoryd/`. Expected: PASS.
 - [ ] **Step 5: Commit** "The red main, roll, held production, refused configuration and follow cards close by rung 0's rows, and each event that knows first retires its card at once and in order".
 
@@ -556,8 +587,11 @@ The net change is about −600 non-test lines, inferred from the function sizes 
   - `TestTheFactorysCloseOfAPullRequestEndsItsCard`: after `forgetBuildCard` the card is `closed` with "the factory closed pull request #412: a newer copy replaces it".
   - `TestAReplacedTemplateCardWritesItsRecord` and `TestAClosedTemplateUpdateEndsItsCardWithARecord`.
   - `TestAHumansCloseOfAFactoryPullRequestIsTheirAnswer`: a person closed the pull request on the forge. The row does not fire, and `prDecided` ends the card with the person's answer as today.
-- [ ] **Step 2: Run** `go test -race -run 'TestAChainStallCard|TestAHumanRepairCard|TestAnAgentRepairCard|TestTheFactorysCloseOfAPullRequest|TestAReplacedTemplateCard|TestAClosedTemplateUpdate|TestAHumansCloseOfAFactoryPullRequest' ./internal/factoryd/`. Expected: no `question_withdrawn` row for the chain and template cards.
+  - `TestTheChainPollersTickRetiresTheStallCardAtOnce`: the tick that reads the stalled head concluded green closes the stall card before the tick ends, with no `Retake`.
+  - `TestAFactoryPullRequestCardWhoseRetireWasLostClosesByTheSweep` (Review Focus 6): `forgetBuildCard` closed pull request #412 and its `Retire` failed. The next `Retake` closes the card with "the factory closed pull request #412: a newer copy replaces it" and one `question_withdrawn` row.
+- [ ] **Step 2: Run** `go test -race -run 'TestAChainStallCard|TestAHumanRepairCard|TestAnAgentRepairCard|TestTheFactorysCloseOfAPullRequest|TestAReplacedTemplateCard|TestAClosedTemplateUpdate|TestAHumansCloseOfAFactoryPullRequest|TestTheChainPollersTick|TestAFactoryPullRequestCardWhoseRetireWasLost' ./internal/factoryd/`. Expected: no `question_withdrawn` row for the chain and template cards.
 - [ ] **Step 3: Implement** the two rows and the callers.
+  - The triggers: `ChainPoller.settleChainCards` (chainpoll.go:1571) calls `Retire` on the human cards at the chain poller's tick, a 15-second poll of Forgejo that exists already and that the workflow run webhook nudges (`handleWorkflowRun`, intake.go:776). For `pr_closed`, each factory close of a card's pull request calls `Retire` right after the close: `SchemaCopier.forgetBuildCard` (schemasync.go:362), `Registrar.closeTemplateUpdate` (templateupdate.go:404) and the bot's branch of `resyncPRCard` (intake.go:1812). Forgejo's pull request webhook brings no `pr_closed`, since it skips a close by the bot (intake.go:1848).
 - [ ] **Step 4: Run** the tests of Step 2 and `go test -race ./internal/factoryd/`. Expected: PASS.
 - [ ] **Step 5: Commit** "The chain cards and the factory's pull request cards close by rung 0's rows, each with its record, and a person's close of the pull request stays their answer".
 
@@ -646,6 +680,7 @@ Build this task only for decision 2's recommendation. For the other answer, skip
   - `TestThePressEndsTheFreezeCardDone`: after the retry press the card is `done` with the pressed face, its `factory_closed` row holds the press's sentence, and no `question_withdrawn` row exists.
 - [ ] **Step 3: Run** `go test -race -run 'TestTheFreezeCardClosesFiveMinutes|TestAReArmBeforeTheFiveMinutes|TestThePressEndsTheFreezeCardDone' ./internal/factoryd/`. Expected: the card stays after `Retake`.
 - [ ] **Step 4: Implement** the row and the deletions.
+  - The row has no trigger, and the sweep carries it: it fires 5 minutes after the class resumed, a time. factoryd learns the resume only from the gateway's `class_resumed` row on the events table, which `FreezeCard.Check` (freezecard.go:338) polls each minute. No trigger exists inside factoryd today.
 - [ ] **Step 5: Run** `go test -race ./internal/factoryd/` and `scripts/pg-test.sh go test -race -p 1 ./internal/factoryd/pg/`. Expected: PASS.
 - [ ] **Step 6: Commit** "The freeze card closes by rung 0's row five minutes after its class answers again, and its press ends it through the store's one end of a human card".
 
@@ -721,5 +756,6 @@ Build this task only for decision 2's recommendation. For the other answer, skip
 **Interfaces:** none.
 
 - [ ] **Step 1: Write** the paragraph after Tasks 2 to 12 are on main: every factory card's cause is one row of rung 0, the kind table names it, the retake pass runs it every minute on every factory card, the event that knows first runs it at once, and the store ends the case and the card and writes the record in one transaction with one sentence. Name the end status of decision 3.
-- [ ] **Step 2: Check** `git grep -n -i 'own pass\|own passes\|reopen' docs/architecture.md docs/spec-driven.md` and fix each line that still describes a closer of its own.
-- [ ] **Step 3: Commit** "architecture: every card whose reason is gone closes through rung 0's rows, one sweep and one end, with one record" and push.
+- [ ] **Step 2: Record the rule** in section 5.9, in the bullet **Rung 0** (`docs/architecture.md:3756-3762`): where a clear trigger exists, a card action runs on the trigger, not on a periodic check, and the retake pass's minute sweep stays only for a fact with no trigger and as the backstop for a lost event. Name the rows that have no trigger and why, from the table in "The proposal", point 4.
+- [ ] **Step 3: Check** `git grep -n -i 'own pass\|own passes\|reopen' docs/architecture.md docs/spec-driven.md` and fix each line that still describes a closer of its own.
+- [ ] **Step 4: Commit** "architecture: every card whose reason is gone closes through rung 0's rows, one sweep and one end, with one record" and push.

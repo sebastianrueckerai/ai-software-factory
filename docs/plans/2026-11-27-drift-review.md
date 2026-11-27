@@ -1,6 +1,6 @@
 # Drift review after six weeks of bug fixing: the findings and the decisions
 
-**Status:** open. It waits for Sebastian's go on the 26 decisions below.
+**Status:** open. It waits for Sebastian's go on the 27 decisions below.
 
 ## The question and the answer
 
@@ -37,13 +37,14 @@ The tenets hold where they matter most, and the plans leave these alone. No non-
 
 **Today.** The factory files a card for a human when something stops it: the month cap is reached, a provider froze a model class, main is red, a roll failed. When the reason goes away, the card should close by itself with a record of why. Agent cards get this from one table, rung 0, read every minute. Factoryd's own human cards do not. A guard in `Act` refuses rung 0's withdrawal of a human card, so each cause got its own closer: 14 functions in 12 files, each with its own schedule, its own way to end the card out of six, and its own record. One close is written in up to 7 places in 3 wordings, and two closers write no record at all. A third copy of the facts decides whether the factory agent may close such a card, and it has drifted: the agent cannot end a roll card, a follow card or an alert card whose cause is gone. The freeze card alone grew from 464 to 1,879 lines in ten days, with its own retry, its own outbox and a parser that reads its state back from the card's text.
 
-**The change.** Every cause becomes a row of rung 0's table, 14 new rows. The retake pass is the one sweep. `Act` ends the human card in one store transaction with one record, and Forgejo follows through the outbox that exists today. The 14 closers lose their close halves, the third copy of the facts goes, and the freeze card keeps its state in its case's facts. A stop's kind travels as a typed field instead of the first words of its reason, which 28 places parse today. The risk: every factory card's close path changes in one plan. The plan rolls in groups and reads the record a week after each roll.
+**The change.** Every cause becomes a row of rung 0's table, 14 new rows. A row runs on its trigger: the place that learns the fact first, a webhook, a store write, a human's press, calls one retire on the cards the fact concerns, so the card closes at that moment. That is your rule of 2026-11-27, a trigger over a periodic check wherever a trigger exists. Ten of the 14 rows have a trigger, and the plan names each site. Four have none, because their fact is a time or an absence, or factoryd learns it only by polling the cluster: a platform gone quiet, a class that answers again, a cluster object ready, a CronJob that ran. The retake pass sweeps every minute for those four, for the month's turn, and as the backstop for a trigger whose retire did not run. `Act` ends the human card in one store transaction with one record, and Forgejo follows through the outbox that exists today. The 14 closers lose their close halves, the third copy of the facts goes, and the freeze card keeps its state in its case's facts. A stop's kind travels as a typed field instead of the first words of its reason, which 28 places parse today. The risk: every factory card's close path changes in one plan. The plan rolls in groups and reads the record a week after each roll.
 
 **You decide.**
 
 1. **A card stopped by a pod that never started, or by a platform fault, resumes once any session ran since.** A commit of 2026-11-26 added this row, the earlier cause-gone plan had refused it, and no decision records the change. A false resume costs one pod start, or at most one session's model spend, since a stop that comes back stays with the human. Recommendation: keep the row and record it.
 2. **A provider freeze that comes back after your retry press: reopen the pressed card, or file a new one?** Reopening costs about 180 lines that only the freeze card has, and no other card reopens. Recommendation: a new card, whose first line names the earlier one.
 3. **A card the factory withdrew because its reason went: does it end `closed` or `done`?** Today 10 closers say done and 4 say closed. `closed` says the card's work was not done and stores the reason. Recommendation: `closed`. The outcome metric then counts those cards as closed, not done.
+4. **The one-minute sweep stays as the backstop.** With every row on its trigger, the sweep closes a card only when its fact has no trigger, or when the trigger's retire did not run, a webhook that never arrived or a crash between the event and the close. Without the backstop such a card waits for a human. The pass exists today for agent cards and reads tens of rows. Recommendation: keep it, at one minute.
 
 ## Plan 2: One door for every answer
 
@@ -55,9 +56,9 @@ The tenets hold where they matter most, and the plans leave these alone. No non-
 
 **You decide.**
 
-4. **Does a human's role bound the factory agent's own answer?** Since 2026-11-18 the human's role is checked on one of the agent's answers, the retry. Checking every approver action that way would refuse the agent's merges in a project whose first notified human is a writer. Recommendation: check none. The agent's authority stays in the policy files: the action table, the project's autonomy and its draw bounds.
-5. **As whom does the chat's document write commit?** Today as a service token, so Forgejo names no human. Recommendation: as every other chat write, the human's session when the human's word carries it, the agent's token when the agent decided it.
-6. **Does the intake switch get a chat tool?** The switch decides whether the project agent files its own cards. A tool would let the agent open its own intake. Recommendation: no tool, with the reason stated in the route table.
+5. **Does a human's role bound the factory agent's own answer?** Since 2026-11-18 the human's role is checked on one of the agent's answers, the retry. Checking every approver action that way would refuse the agent's merges in a project whose first notified human is a writer. Recommendation: check none. The agent's authority stays in the policy files: the action table, the project's autonomy and its draw bounds.
+6. **As whom does the chat's document write commit?** Today as a service token, so Forgejo names no human. Recommendation: as every other chat write, the human's session when the human's word carries it, the agent's token when the agent decided it.
+7. **Does the intake switch get a chat tool?** The switch decides whether the project agent files its own cards. A tool would let the agent open its own intake. Recommendation: no tool, with the reason stated in the route table.
 
 ## Plan 3: The factory's own repository is a project like any
 
@@ -69,11 +70,11 @@ The tenets hold where they matter most, and the plans leave these alone. No non-
 
 **You decide.**
 
-7. **The per-deploy roll card goes.** At full auto the gate bot merges it today, so nothing changes there. Below full auto a human approves each roll today. In the target the merge rule gates each change and the plan hold with Deploy now gates production, as for any project. Recommendation: yes. If a gate on every deploy is wanted later, it is a general project key, about 20 lines, not a card.
-8. **When factoryd does not answer `/release`, the factory's own deploy goes ahead after 5 minutes.** A template project fails closed. For the factory itself, a silent factoryd is most often the factoryd that the next deploy must fix. A 400 or 401 is an answer and still stops the deploy. Recommendation: yes, with a line in the job's log.
-9. **The roller's signature check of its own images goes, and main CI's signing stays.** In the target no step resolves a tag, and only main CI holds the deploy key. Recommendation: yes. If "no unsigned image goes live" must hold as written, the promote job verifies each digest in 4 lines.
-10. **Every project gets the red-main ladder, the infra repository included.** On infra, which has no agents and a human merge rule, each rung files a human card and the revert is a pull request a human merges or closes. Recommendation: yes.
-11. **Companions: declare in 3 YAML lines, or delete 1,300 lines no configuration switches on?** Recommendation: delete. The docs clone shows the pattern if a read-only clone is needed later.
+8. **The per-deploy roll card goes.** At full auto the gate bot merges it today, so nothing changes there. Below full auto a human approves each roll today. In the target the merge rule gates each change and the plan hold with Deploy now gates production, as for any project. Recommendation: yes. If a gate on every deploy is wanted later, it is a general project key, about 20 lines, not a card.
+9. **When factoryd does not answer `/release`, the factory's own deploy goes ahead after 5 minutes.** A template project fails closed. For the factory itself, a silent factoryd is most often the factoryd that the next deploy must fix. A 400 or 401 is an answer and still stops the deploy. Recommendation: yes, with a line in the job's log.
+10. **The roller's signature check of its own images goes, and main CI's signing stays.** In the target no step resolves a tag, and only main CI holds the deploy key. Recommendation: yes. If "no unsigned image goes live" must hold as written, the promote job verifies each digest in 4 lines.
+11. **Every project gets the red-main ladder, the infra repository included.** On infra, which has no agents and a human merge rule, each rung files a human card and the revert is a pull request a human merges or closes. Recommendation: yes.
+12. **Companions: declare in 3 YAML lines, or delete 1,300 lines no configuration switches on?** Recommendation: delete. The docs clone shows the pattern if a read-only clone is needed later.
 
 ## Plan 4: The config says it once
 
@@ -85,9 +86,9 @@ The tenets hold where they matter most, and the plans leave these alone. No non-
 
 **You decide.**
 
-12. **Delete `maintenance.yaml`, so the factory ships one process, `spec`.** Recommendation: delete.
-13. **Keep the 21 never-set keys that have a reader.** They are knobs a human turns without a release, and the console writes one of them. Recommendation: keep.
-14. **The stage list stays a list in one fixed order**, not a mapping keyed by stage name. Recommendation: the list. It reads as the run order.
+13. **Delete `maintenance.yaml`, so the factory ships one process, `spec`.** Recommendation: delete.
+14. **Keep the 21 never-set keys that have a reader.** They are knobs a human turns without a release, and the console writes one of them. Recommendation: keep.
+15. **The stage list stays a list in one fixed order**, not a mapping keyed by stage name. Recommendation: the list. It reads as the run order.
 
 ## Plan 5: Collapse the workflow's history
 
@@ -99,9 +100,9 @@ The tenets hold where they matter most, and the plans leave these alone. No non-
 
 **You decide.**
 
-15. **Which parked runs the drain restarts.** The plan restarts a run whose card waits on a human, the issue's author, an image or its dependencies. A run in review would take its head through every stage again, a review and an audit call with maybe another verdict. A run frozen on a provider limit would start a session the provider refuses again. Recommendation: the four parked waits only. `/readyz` shows how many runs hold the floor.
-16. **What the replay corpus is.** A recorder on a dev server under stub activities covers every wait by construction and holds no card text. Exports from live runs carry real results, and also card text and human answers into a repository GitHub mirrors in public. Recommendation: the recorder.
-17. **A test caps the workflow at two change ids, the floor and the newest.** Each workflow change then first collapses the one before it. Without the test, collapses happen when someone remembers, as in the last six weeks. Recommendation: yes.
+16. **Which parked runs the drain restarts.** The plan restarts a run whose card waits on a human, the issue's author, an image or its dependencies. A run in review would take its head through every stage again, a review and an audit call with maybe another verdict. A run frozen on a provider limit would start a session the provider refuses again. Recommendation: the four parked waits only. `/readyz` shows how many runs hold the floor.
+17. **What the replay corpus is.** A recorder on a dev server under stub activities covers every wait by construction and holds no card text. Exports from live runs carry real results, and also card text and human answers into a repository GitHub mirrors in public. Recommendation: the recorder.
+18. **A test caps the workflow at two change ids, the floor and the newest.** Each workflow change then first collapses the one before it. Without the test, collapses happen when someone remembers, as in the last six weeks. Recommendation: yes.
 
 ## Plan 6: Prompts carried by construction
 
@@ -113,7 +114,7 @@ The tenets hold where they matter most, and the plans leave these alone. No non-
 
 **You decide.**
 
-18. **Where the guide's forms load.** A: as today. B: every long form on demand, which saves 2,406 words per chat call and leaves the chat's replies with no carrier of the style rules, since no door checks them. C: each writer keeps the forms of its main text and gets the others on demand, which saves 1,182 words per chat call and keeps a carrier for every style rule. C reverses part of the 2026-11-16 decision. Recommendation: C. A task measures the share of cards that file unchecked before and after.
+19. **Where the guide's forms load.** A: as today. B: every long form on demand, which saves 2,406 words per chat call and leaves the chat's replies with no carrier of the style rules, since no door checks them. C: each writer keeps the forms of its main text and gets the others on demand, which saves 1,182 words per chat call and keeps a carrier for every style rule. C reverses part of the 2026-11-16 decision. Recommendation: C. A task measures the share of cards that file unchecked before and after.
 
 ## Plan 7: Tests share one fake, and the repositories lose their leftovers
 
@@ -125,10 +126,10 @@ The tenets hold where they matter most, and the plans leave these alone. No non-
 
 **You decide.**
 
-19. **The Postgres tests return to package `factoryd`**, behind a skip when no database is present. It costs about 90 seconds on CI's longest package. Recommendation: yes.
-20. **`staticcheck` runs in CI only**, a pinned binary at 46 seconds cold and 2.7 GB, not in `bash check`. Recommendation: yes.
-21. **A built plan gets one status line under its title**, refused by the pre-commit hook when missing. An archive directory would break 171 references. Recommendation: the status line. This document carries one.
-22. **The 27 untracked root entries.** Commit three that tracked documents link or name: the card-flow directory of 2026-11-02, the faults of 2026-11-17 and the needs-you analysis of 2026-11-01. Delete the other 24. The board-loop notes of 2026-11-09 name where the credential files live and must never reach the public mirror. Recommendation: the plan's table, one line per entry.
+20. **The Postgres tests return to package `factoryd`**, behind a skip when no database is present. It costs about 90 seconds on CI's longest package. Recommendation: yes.
+21. **`staticcheck` runs in CI only**, a pinned binary at 46 seconds cold and 2.7 GB, not in `bash check`. Recommendation: yes.
+22. **A built plan gets one status line under its title**, refused by the pre-commit hook when missing. An archive directory would break 171 references. Recommendation: the status line. This document carries one.
+23. **The 27 untracked root entries.** Commit three that tracked documents link or name: the card-flow directory of 2026-11-02, the faults of 2026-11-17 and the needs-you analysis of 2026-11-01. Delete the other 24. The board-loop notes of 2026-11-09 name where the credential files live and must never reach the public mirror. Recommendation: the plan's table, one line per entry.
 
 ## Plan 8: Finish the general fix
 
@@ -140,9 +141,9 @@ The tenets hold where they matter most, and the plans leave these alone. No non-
 
 **You decide.**
 
-23. **The check-in loses the `policy_class` reason on every moment**, so the merge gate is the only router of policy, as you leant on 2026-11-01. Today one moment routes it and every other moment reaches you with no approval card behind it. Recommendation: yes. Open cases of that kind are withdrawn in a data step.
-24. **A hold whose release card ended failed or closed.** Today a notice outside the ladder tells you, and no rung can act first. The plan opens the dependency case that exists today on each held card. Recommendation: the dependency case.
-25. **The audit flags pure renames as changes.** A filter was built and deleted the same day, since its type check could not be bounded. Recommendation: record that the audit reads the raw diff and a rename costs one confirmation per item. No live fault since 2026-11-17. The alternative is a rename check pod with its own time bound.
+24. **The check-in loses the `policy_class` reason on every moment**, so the merge gate is the only router of policy, as you leant on 2026-11-01. Today one moment routes it and every other moment reaches you with no approval card behind it. Recommendation: yes. Open cases of that kind are withdrawn in a data step.
+25. **A hold whose release card ended failed or closed.** Today a notice outside the ladder tells you, and no rung can act first. The plan opens the dependency case that exists today on each held card. Recommendation: the dependency case.
+26. **The audit flags pure renames as changes.** A filter was built and deleted the same day, since its type check could not be bounded. Recommendation: record that the audit reads the raw diff and a rename costs one confirmation per item. No live fault since 2026-11-17. The alternative is a rename check pod with its own time bound.
 
 ## Plan 9: A routine's run shows while it works and says why it failed
 
@@ -156,7 +157,7 @@ The tenets hold where they matter most, and the plans leave these alone. No non-
 
 **You decide.**
 
-26. **The plan's seven defaults stand as a set.** The working routine keeps its ghost look, at the foot of In progress. Three attempts, 10 and 20 seconds apart. The factory agent retries once per failure and hands up a failed retry. One standing card per routine. A run that ends `filed`, `no change` or `reported` closes the card, and `held`, `skipped` or `gone` leaves it open. A factory routine's card files on the configuration repository. The press answers on the board within 5 seconds. Recommendation: accept as a set.
+27. **The plan's seven defaults stand as a set.** The working routine keeps its ghost look, at the foot of In progress. Three attempts, 10 and 20 seconds apart. The factory agent retries once per failure and hands up a failed retry. One standing card per routine. A run that ends `filed`, `no change` or `reported` closes the card, and `held`, `skipped` or `gone` leaves it open. A factory routine's card files on the configuration repository. The press answers on the board within 5 seconds. Recommendation: accept as a set.
 
 ## The order to build
 
@@ -167,7 +168,7 @@ The tenets hold where they matter most, and the plans leave these alone. No non-
 5. **Plan 2 and Plan 4**, independent of each other and of the three before.
 6. **Plan 9, Task 3**, the failure card, on the shapes Plans 1 and 2 built.
 7. **Plan 3.** The largest deletion, after the chain poller carries the red-main ladder, which its own tasks build.
-8. **Plan 6.** Decision 18 comes first. The deletion of the 22 redundant rules can land any time.
+8. **Plan 6.** Decision 19 comes first. The deletion of the 22 redundant rules can land any time.
 9. **Plan 7** runs beside any of the above. Its stale-artefact tasks can run today, and the shared fake makes every later plan's tests cheaper.
 
 ## The state of main, and what is not verified
