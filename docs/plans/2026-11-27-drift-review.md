@@ -1,6 +1,6 @@
 # Drift review after six weeks of bug fixing: the findings and the decisions
 
-**Status:** decided, apart from the three open points of Plan 6. Every other point below carries Sebastian's decision. It waits for his go to build, in the order at the end.
+**Status:** decided. Every point below carries Sebastian's decision. It waits for his go to build, in the order at the end.
 
 ## The question and the answer
 
@@ -110,17 +110,18 @@ The change lands as one code pull request that reads the new keys only, one roll
 
 ## Plan 6: Prompts carried by construction
 
-[2026-11-27-prompts-carried-by-construction.md](2026-11-27-prompts-carried-by-construction.md). A suggestion with nine builds and no tasks yet. About 3,200 words of our text and 10,500 of opencode's go, and about 1,500 code lines come.
+[2026-11-27-prompt-profiles.md](2026-11-27-prompt-profiles.md), [2026-11-27-tools-per-agent.md](2026-11-27-tools-per-agent.md) and [2026-11-27-each-agent-gets-its-job.md](2026-11-27-each-agent-gets-its-job.md). Three plans, built on [the suggestion](2026-11-27-prompts-carried-by-construction.md). About 3,200 words of our text and 10,500 of opencode's go, and about 1,500 code lines come.
 
 **Today.** The first request of the 30 agents of the agent map holds 49,631 words. 26,636 of them are opencode's own text, which the six session agents each carry at 4,379 words: its preamble, its skill list and its ten built-in tools. Ours is 22,995. The per-job writing forms are 9,050 of ours and stay. The tool descriptions are 7,102 and stay. 934 orient a step to its job and the factory, and 2,723 are the card's facts. 3,186 are rules and shapes that a schema, a door check, a clamp, a conditional render or a tool description carries or could carry, and the code copy's additions to Sebastian's guide. Three numbers in prompts disagree with the code: the review summary 500 against 1,000, the audit's why 300 against 500, the gate supervisor 1,000 against 2,000. Any commit can add a prompt line today, and nothing checks what it added.
 
-**The change.** One builder in a new package makes every prompt from the guide file, the forms `Writers` lists, one capped paragraph per step and typed facts, and returns a type that only it can make, so the transports take no other string. A test pins the hash of the guide and of each form. A merge class routes every change under the prompt and guide directories to a human card that only Sebastian approves, which needs one new policy key. Sixteen steps answer through a forced tool with a schema from a Go type. opencode's preamble is replaced by the step's paragraph, its skill list and title call switched off, and the edit tools switched off for screening and sizing. The agent map prints each prompt's words by part at every regeneration.
+**The change.** opencode stays as the harness and is made sleek. Plan A builds one closed builder and one profile file per step: the guide, the forms, reusable chunks, one capped paragraph and typed facts, with the harness's preamble, skill list, title call and tools switched from the same profile. A test pins the hash of every text and the size of every prompt. A merge class routes every change under the prompt and guide directories to a human card that only Sebastian approves, which needs one new policy key. Plan B sets each job's built-in and gateway tools, with no tool twice. Plan C gives each agent its job: its orientation paragraph, the forms that go and the mechanic that takes each rule, with the planner split into five steps.
 
 **Decided.**
 
 19. **The forms stay, as `Writers` lists them today.** They are Sebastian's streamlined guide, cut to each job on purpose, and they are a guide, not rules. The two chat writers carry his guide as he wrote it, byte for byte his skill file, and the code copy's additions go. No form is shortened and no prompt is trimmed in general. Rules go where a code mechanic takes them, and a step whose paragraph does not fit 250 words splits, as the planner does into five steps.
-
-**Open.** The document's last section asks three things: whether the project agent keeps its five forms beside the whole guide (recommended yes), whether opencode's preamble goes from the six session agents (recommended yes, screening and sizing first), and where the cold-reader section lives (recommended: his guide stays his, and its two reference bullets join the chat form).
+19a. **opencode's preamble goes from the six session agents.** The skill list and the title call go with it. It saves 1,610 words per request and a title call per session.
+19b. **The project agent and the coding agent keep their forms in the prompt, as `Writers` lists them.** Moving a form into a tool's field descriptions saves no words while the tool is offered on every turn, and the card tools are. Default. Veto line: move the forms into the card tools' field descriptions.
+19c. **The two reference bullets of the cold-reader section join the chat form.** His guide stays byte for byte his. Default. Veto line: they stay out.
 
 ## Plan 7: Tests share one fake, and the repositories lose their leftovers
 
@@ -174,7 +175,7 @@ The change lands as one code pull request that reads the new keys only, one roll
 5. **Plan 2 and Plan 4**, independent of each other and of the three before.
 6. **Plan 9, Task 3**, the failure card, on the shapes Plans 1 and 2 built.
 7. **Plan 3.** The largest deletion, after the chain poller carries the red-main ladder, which its own tasks build.
-8. **Plan 6.** Its three open points first. The closed builder and the merge class build before any word goes, so nothing grows back while the rest lands.
+8. **Plan 6**, as three plans: the profiles first, then the tool sets, then each agent's content. Nothing grows back while the rest lands, because the profiles and the merge class come first.
 9. **Plan 7** runs beside any of the above. Its stale-artefact tasks can run today, and the shared fake makes every later plan's tests cheaper.
 
 ## The state of main, and what is not verified

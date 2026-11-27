@@ -1,6 +1,6 @@
 # Prompts carried by construction
 
-**Status:** suggestion. It waits for Sebastian's go.
+**Status:** decided. opencode stays and is made sleek. Three plans build it.
 
 ## The answer
 
@@ -169,22 +169,16 @@ A direct push to main skips the class. The hash and budget tests still run in CI
 
 **Every fault fix lands as a check, a clamp, a schema field or a refusal that names the state and the fitting action.** A fix that needs a prompt line must edit a file under the two guarded directories. That makes it a human card. The test and the merge rule make this true, not a sentence in a document. One gap stays: a refusal is text the model reads, and it can hold a rule. No test sees that.
 
-## Open for you
+## The plans
 
-1. **Does the project agent keep its five forms beside the whole guide?** I recommend yes. The guide alone is 948 words. The title, why, summary, brief and ask forms are 1,182 words more, and they carry the per-job shapes and examples the guide lacks. The brief door refuses a card's mechanical faults. No door checks wording, so the forms alone carry the prose half. Dropping them saves about 1,570 tokens per chat call, or 0.0031 EUR at the premium class's uncached price.
-2. **Does opencode's preamble go from the six session agents?** I recommend yes, with the skill list and the title call. It saves 1,610 words per request and a title call per session, and it removes the preamble's contradictions with the factory's flow. The key works on 1.19.6. I did not measure card quality: opencode tuned the preamble for tool habits, and the factory has never run a card without it. Start with screening and sizing, which are cheap and read-only.
-3. **Where does the cold-reader section live?** You asked on 2026-11-16 to keep it. The code copy holds it as 225 words in four bullets. The title, brief and ask forms carry its lines. The chat form carries the cold-reader lines but not the two about references (91 words): explain each reference at first use and link it, and name nothing a reader cannot open. I recommend the guide stays byte for byte yours and those two bullets join the chat form. A change to a form needs your OK too.
+Three plans build this, in this order: A first, then B and C in parallel. C's per-agent content lands after B's tool sets.
 
-## What builds
+- [A, prompt profiles](2026-11-27-prompt-profiles.md): the profile files, the chunks, the closed builder, the harness switches generated from each profile, the hash pins, the budgets, the merge class and the agent map's words by part.
+- [B, tools per agent](2026-11-27-tools-per-agent.md): the built-in and gateway tool sets per job, no tool twice, a two-tier tool list for the project agent and slim gateway descriptions.
+- [C, each agent gets its job](2026-11-27-each-agent-gets-its-job.md): the profile content of all 30 agents, the forms that go, the orientation paragraphs, the mechanics that take each rule and the planner's split.
 
-1. The closed builder, the `Prompt` type, the hash pins, the paragraph cap and the budget file. About 300 code lines. No words go. Every prompt moves into a step file.
-2. The merge class and the `approvers` key. About 60 code lines and two lines of policy. No words go.
-3. The guide file as his body, and the design copy as a link. About 20 lines. 602 words go, and the two guide readers gain his 25 lines.
-4. Answer tools with schemas for 16 prompts, `file_plan` included. About 350 lines. 1,105 words go and 542 come back as field text.
-5. The missing door checks and the clamps from constants. About 200 lines. 547 words go.
-6. The conditional renders. About 150 lines. 583 words go.
-7. The tool-restating lines and the planner's split into five steps. About 330 lines. 349 words go.
-8. The opencode switches. About 25 lines. 10,506 words go.
-9. Words by part in the agent map. About 80 lines.
+## Decided
 
-The line counts are my estimates, about 1,500 in all.
+1. **The preamble goes.** opencode's preamble is replaced by the step's own text, with the skill list and the title call. It saves 1,610 words per request and a title call per session, and it removes the preamble's contradictions with the factory's flow.
+2. **The project agent and the coding agent keep their forms in the prompt, as `Writers` lists them.** Moving a form into a tool's field descriptions saves no words while the tool is offered on every turn, and the card tools are. Default. Veto line: move the forms into the card tools' field descriptions.
+3. **The two reference bullets join the chat form.** The guide stays byte for byte his. Default. Veto line: they stay out.
