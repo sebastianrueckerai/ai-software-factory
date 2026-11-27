@@ -10,7 +10,7 @@ The tool that builds the map is `cmd/agentdoc` in the `ai-software-factory-code`
 
 The tool captures, locates, renders.
 
-1. **Capture.** Each registered agent is driven through its real assembly. Direct clients run against an in-process fake gateway. The six loop modes run the pinned opencode binary (`1.19.5`) on a scripted model. The first request that crosses the wire is recorded raw. Nothing is reconstructed from the code's intent: if a part is not in the recorded bytes, it is not on the page.
+1. **Capture.** Each registered agent is driven through its real assembly. Direct clients run against an in-process fake gateway. The six loop modes run the pinned opencode binary, the release `upstream-files.txt` names, on a scripted model. The first request that crosses the wire is recorded raw. Nothing is reconstructed from the code's intent: if a part is not in the recorded bytes, it is not on the page.
 2. **Locate.** Every Go builder registers the exact bytes it produced. The tool searches for each builder's bytes inside the captured request, longest first, and accepts a match only when it appears exactly once. A part covered by no builder is unlabelled. A registered builder whose bytes are absent, present twice, or overlapping another span is an error.
 3. **Render.** The page shows the request top to bottom: each message, each part, its size, and its provenance line. A part's provenance is a permalink to the builder's declaration at the recorded code SHA, or a plain label for the harness's own parts and files the harness read.
 
