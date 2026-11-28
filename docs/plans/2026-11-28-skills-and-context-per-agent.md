@@ -201,6 +201,19 @@ Part A is done: 87 replays, 0.79 EUR. Every forced answer tool is called on `sma
 
 Default from Sebastian's rule that a step never fails on its answer's shape: one answer ladder for every typed answer. The decode checks every cap and enum. A value inside 10 per cent slack over its cap passes as it is. Beyond that, one retry with the refusal as the next message, "left: 98 characters, at most 87". Then one call on the stronger model. Then the value is cut at the cap, which is better than no name. A missing tool call or an unknown key takes the same ladder. A shape failure counts as no review round. To check: whether the providers behind `big`, `small` and `premium` enforce a JSON schema at generation (structured outputs), which would make the ladder's first rungs rare.
 
+Parts B, C and D are done: 60 session runs on real issues of the factory's own repositories, 9 skill runs, 3 project agent runs, 6.47 EUR for the whole battery with the runs spent building it. On `small`, confirmed in every run: `escalate`, `file_map`, `file_spec`, `file_criteria`, `file_cards`, and 11 answer tools. Passed in some runs: `analyze_image`, `deployment_health`, `file_screening`, `file_size`, `request_cut`, `request_tool`, the ask-human skill. No pass: `delegate`, `digest`, `file_proofs`, `manual`, `request_info`, `web_search`, `web_scrape`, the delegate-card and request-tool skills, and on `big` the three planner steps. Every call that came, 25 of 25, came before the session's first own edit. The project agent on `premium` fetched every rare tool through `tool_schema` first and answered all three questions.
+
+The causes, in order of weight:
+
+- The battery's 20-step cap ended every `delegate`, `digest`, `request_info` and `file_proofs` run, and every planner run on `big`, before the tool was called. Production allows 1,500 steps, so these cells say nothing yet. A re-run with 60 steps is in progress.
+- `small` skipped a tool when the issue already held the fact, `analyze_image` and `manual`, or when grep served as well as `digest` on a 3,426-line file. That is the right call, not a fault.
+- On the weekly bump issue `small` escalated about refused registries instead of searching the web, twice.
+- Real faults: the four of Part A, and the model review on `big` spent its whole 18,432-token output on reasoning once in three runs, so no answer came.
+- `small` read the ask-human skill first in 2 of 3 runs and the request-tool skill never, with the skill lines in the guide tool's description.
+- One session fetched Chrome for Testing from storage.googleapis.com, which the egress list admits for Go modules. The sandbox was bwrap on the workstation, not the gVisor pod, so the pod's egress may differ.
+
+Not tested: `file_replan` and `file_revert`, which need a plan with merged cards, `task_costs`, `fal_run`, `replicate_predict` and the cloud tools, which no session profile offers, and the message responder, which runs the coding tools under the same config. The battery lives under the gitignored ledger with a README and re-runs after a prompt change.
+
 Order Sebastian set on 2026-11-28: fix every tool or skill fault the battery shows first, then run item 2.13.
 
 ### 2.13 The complete prompts tested on realistic examples
