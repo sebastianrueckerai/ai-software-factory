@@ -258,8 +258,7 @@ Two rules, Sebastian's (2026-11-28). A description is short and names the situat
 
 The texts are model-facing, so articles go where the meaning holds and a hyphen joins two halves (Sebastian, 2026-11-28).
 
-Each lands only after the battery ran it on `small` against today's text, three runs each. The refusals that take the limits: `digest` over 128 KiB or not UTF-8, `analyze_image` wrong type or over 8 MiB, `web_search` and `web_scrape` at the card's cap, `delegate` without an acceptance list, `escalate` with fewer than 2 or more than 5 choices. Veto line: keep today's texts and drop the tools the sessions do not use.
-
+Decided by Sebastian on 2026-11-28: the eleven texts land as written. The battery's Part E runs each against today's text on `small`, three runs each, to see whether usage follows, and the result goes into the build plan, not into the decision. The refusals that take the limits: `digest` over 128 KiB or not UTF-8, `analyze_image` wrong type or over 8 MiB, `web_search` and `web_scrape` at the card's cap, `delegate` without an acceptance list, `escalate` with fewer than 2 or more than 5 choices. 
 ## 3. The skills to write, with their sources
 
 ### The catalogue

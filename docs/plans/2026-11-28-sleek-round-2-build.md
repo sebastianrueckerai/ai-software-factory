@@ -11,14 +11,15 @@
 1. The typed answer ladder (work list 2.12, Part A). First, since every direct step on `small` depends on it.
 2. Jev for the label steps (2.15), each use case tested first, with the ladder as the net.
 3. The battery's session fixes (2.12, Parts B and C), once the report is in.
-4. The guide tool and the per-agent skills (2.8, 2.1), with the trigger lines in the tool's description.
-5. The coding guide and the caveman narration (2.2, 2.3), the test-writing rules standing.
-6. Human-facing text only in a human-facing turn (2.4).
-7. The paragraphs per agent (section 1 of the work list), each a pinned text Sebastian reads before it ships.
-8. The model line (2.5).
-9. The map: fixed against example, whole-request files from real cards (2.6, 2.7).
-10. The four faults (2.9) where not fixed before, and the harness skills stay denied (2.10).
-11. The whole prompts on realistic examples (2.13), with the battery as the harness.
+4. The session tools' descriptions (2.16), decided.
+5. The guide tool and the per-agent skills (2.8, 2.1), with the trigger lines in the tool's description.
+6. The coding guide and the caveman narration (2.2, 2.3), the test-writing rules standing.
+7. Human-facing text only in a human-facing turn (2.4).
+8. The paragraphs per agent (section 1 of the work list), each a pinned text Sebastian reads before it ships.
+9. The model line (2.5).
+10. The map: fixed against example, whole-request files from real cards (2.6, 2.7).
+11. The four faults (2.9) where not fixed before, and the harness skills stay denied (2.10).
+12. The whole prompts on realistic examples (2.13), with the battery as the harness.
 
 ## Tasks
 
@@ -73,6 +74,15 @@ The battery's finding: on `small` a coding session guesses instead of asking (`r
 - **The review's reasoning cannot eat its answer.** A reply cut at the output limit with no tool call joins the answer ladder's first retry, with thinking off for that call.
 - Tests, hand-derived: a brief with an image carries the description under its heading. A sizing answer with `needs_info` files the question and starts no session. A plan whose card brief names out-of-scope work yields a second card. A reply with `finish_reason: length` and no tool call retries once with thinking off.
 
-### Tasks 4 to 11
+### Task 4: The session tools' descriptions
+
+Decided (Sebastian, 2026-11-28): the eleven descriptions of work list item 2.16 replace today's texts in `internal/gateway/tools.go`, and every limit a description carried moves into the tool's refusal, checked before the tool does anything.
+
+- The eleven texts land byte for byte from the work list's table. The descriptions test (`internal/gateway/descriptions_test.go`, the 45-word cap) pins each one.
+- The refusals: `digest` over 128 KiB or not UTF-8 ("digest: <path> is <n> KiB, at most 128 KiB: read a part with grep"), `analyze_image` of the wrong type or over 8 MiB, `web_search` and `web_scrape` at the card's cap with the count ("web_scrape: 30 of 30 calls used on this card"), `delegate` without an acceptance list, `escalate` with fewer than 2 or more than 5 choices. Each refusal names the state and the fitting action, and each has a test with the exact text.
+- The agent map's pages and the index regenerate with the new texts.
+- The battery's Part E result, old against new on `small`, is recorded in the task's commit message as the measure, whatever it shows.
+
+### Tasks 5 to 12
 
 Written when their rounds finish.
