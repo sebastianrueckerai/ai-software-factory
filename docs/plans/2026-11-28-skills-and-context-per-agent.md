@@ -158,7 +158,7 @@ Default: the `guide` tool, one line on the wire: "Read a skill of your job befor
 ### 2.9 Four faults the sweep found
 
 - **The brief form and the `delegate` door disagree.** The form's example heads the checks "Check:", the door demands "Acceptance:", as `ready.go`, the planner and the imager write it everywhere else. Default: `delegate` takes an `acceptance` list field, as the planner's cards already do, so the brief needs no heading and the form's text stays as it is. Veto line: the form's example says "Acceptance:", one word in a pinned text of Sebastian's.
-- **The `escalate` reason field** carried "the reason this work exists", copied from `delegate`. Fixed in code in this round: "why the question comes up now and what waiting for the answer costs". The chat tools of the console reuse one `WhyLine` sentence in several tools, and whether it fits each is not yet checked.
+- **The `escalate` reason field** carried "the reason this work exists", copied from `delegate`. Fixed on code main 97fb718bd: "why the question comes up now and what waiting for the answer costs". The chat tools of the console reuse one `WhyLine` sentence in several tools, and whether it fits each is not yet checked.
 - **The audit routine's card says "Run the skill audit."** Sessions deny `skill`, and no audit skill body exists, so no session can follow the line. Default: the routine's card text says what to do, or an audit skill joins that card's `guide` enum.
 - **"Changes to this guide need the user's OK"** is the guide's first line. It is right in Sebastian's own skill and wrong in an agent's context. Default: the code copy drops that one line, and the test that keeps the copy byte for byte allows this one named difference. Veto line: keep it.
 
@@ -168,7 +168,23 @@ opencode 1.19.6 ships one built-in skill, `customize-opencode`: the bundled sour
 
 ### 2.11 Do agents fetch a guide as they would a skill?
 
-Pending: a small experiment with the real `small` and `big` models in the pinned harness, three scenarios (a follow-up card, a question to a human, a bug fix with a test), the body behind opencode's skill tool against the same body behind a `guide` tool, three repeats each, at most 3 EUR. The result decides item 2.8's default.
+Measured on 2026-11-28 with the real `small` and `big` models in the pinned harness: three scenarios (a follow-up card through `delegate`, a question through `escalate`, a bug fix with a test), the same 100 to 150 word bodies behind opencode's skill tool and behind a `guide` tool, three runs per cell, 41 runs, 0.98 USD in total. The tables count runs in which the model read the body before the action it governs.
+
+| scenario | skill, small | guide, small | skill, big | guide, big |
+|---|---|---|---|---|
+| delegate | 3 of 3 | 1 of 3 | 3 of 3 | 3 of 3 |
+| escalate | 3 of 3 | 2 of 3 | 3 of 3 | 3 of 3 |
+| tests | 0 of 3 | 0 of 3 | 3 of 3 | 3 of 3 |
+
+What it says:
+
+- `big` treats the guide like a skill: 9 of 9 reads with each mechanism, and it followed every body rule.
+- `small` read the skill in 7 of 9 runs and the guide in 3 of 9. The cause is placement, not the mechanism: the skill list puts each one-line trigger into the system prompt, while the test's guide tool kept the triggers in its `name` parameter and carried only the one line "Read a skill of your job before you act on it". Three runs per cell is a signal, not proof.
+- `small` never wrote the test first, with either mechanism, and read the test skill only after the fix. Test writing cannot sit behind a fetch for the small model.
+- Three `small` runs overwrote an existing test file with `write` and lost its two tests. That is a hazard for a door or a check, not for a prompt.
+- The schemas already enforce the "Acceptance:" section and the two to five choices: every call met them, read or not. Only the body rules and the test order depended on the fetched text.
+
+Defaults from the measurement: the `guide` tool's description lists the agent's skills as one trigger line each, the same lines the skill list would carry, so `small` sees them where it looks. The test-writing rules join the coding guide as standing text instead of a skill. A door refuses a `write` that drops existing tests from a test file. Open question 1 of the walk-through is settled by this.
 
 ## 3. The skills to write, with their sources
 
@@ -177,7 +193,7 @@ Pending: a small experiment with the real `small` and `big` models in the pinned
 | skill | trigger | words | sources |
 |---|---|---|---|
 | coding/guide | standing | 180 | 1, 7, the section 4 draft without its verify sentence |
-| coding/test-writing | before you write or change a test | 150 | 2, 3, 4 |
+| coding/test-writing | standing, folded into the coding guide after item 2.11 | 150 | 2, 3, 4 |
 | coding/debugging | a check fails and the first error does not name the cause, or the fault does not reproduce | 160 | 5, 6, 7 |
 | coding/delegate-card | before `delegate` | 140 | the four card forms, 10 |
 | coding/ask-human | before `escalate` | 140 | the ask form, 11 |
@@ -235,7 +251,7 @@ Narration: terse, like a smart caveman. Write nothing before a routine call. Oth
 
 The order Sebastian and Claude go through: section 1's tables agent by agent, then items 2.1 to 2.11, then section 3 for the skills to write. Open questions the proposal leaves to the walk-through:
 
-1. Test writing, skill or standing: nearly every coding run writes a test, and a loaded skill stays in the transcript. Default: a skill, with fetches counted over 20 sessions. Above 80 per cent, fold it into the guide.
+1. Test writing: settled by item 2.11, standing text in the coding guide, since `small` never fetched it before the fix.
 2. The responder answering a human: the 948-word guide for a one-line reply, or the chat form's three rules.
 3. case-checkin: one line of meaning beside each offered action, rendered from the code's action table.
 4. `delegate`: an `acceptance` list field, which ends the refusal of the form's "Check:" example.
@@ -244,4 +260,4 @@ The order Sebastian and Claude go through: section 1's tables agent by agent, th
 
 Not verified: no proposed text ran on a model, and fetch rates are unmeasured.
 
-Not verified: no proposed text ran on a model yet. Item 2.11 measures whether an agent fetches a guide at all.
+Not verified: the proposed paragraphs and skill bodies have not run on a model. Item 2.11 measured only the fetch itself.
