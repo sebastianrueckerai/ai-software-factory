@@ -1,6 +1,6 @@
 # Each agent gets its job: the content of every profile
 
-**Status:** open. It waits for Sebastian's go.
+**Status:** built, Tasks 1 to 18. Merged on code main 5b2dce616 on 2026-11-28, with the infra policy granting the filing tools. Task 19, the week of cards, is the measurement that follows.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to build this plan task by task. Steps use checkbox (`- [ ]`) syntax.
 

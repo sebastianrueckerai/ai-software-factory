@@ -1,6 +1,6 @@
 # Prompt profiles: one place that decides what enters an agent's context
 
-**Status:** open. It waits for Sebastian's go.
+**Status:** built. Merged on code main f2b10b1f1 on 2026-11-27, with the infra policy class `prompts`.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to build this plan task by task. Steps use checkbox (`- [ ]`) syntax.
 
@@ -448,7 +448,7 @@ The index inventory table gains the columns `profile`, `harness words`, `guide w
 - [ ] **Step 3: Check the guards.** Edit one byte of `internal/prompts/steps/` in a scratch branch and push it: the CI test `TestTextsArePinned` fails. Open a pull request that touches `internal/prompts/profiles/sizing.yaml` against a scratch project of the factory and read its class on the card: `prompts`, with `human: true`. Then press approve as `controller` through the console and expect the refusal of Task 7. Delete the scratch branch.
 - [ ] **Step 4: Commit** the regenerated map: "agents: regenerated with each agent's profile and words by part on code main <sha>".
 
-The project agent keeps its five card forms in this plan. Plan C moves them into the card tools' field descriptions, as decided in the suggestion, and drops them from the profile in the same step.
+The project agent keeps its five card forms in this plan and in Plan C: a human reads its card texts.
 
 ## Not verified
 

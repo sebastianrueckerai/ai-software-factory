@@ -107,8 +107,9 @@ The fixed principles from the design conversation (see
 - No agent is asked for a fact that a tool or an injected input can carry.
   factoryd puts a card's budget, spend, model calls, tokens and state into
   the session supervisor's and the gate supervisor's inputs from its own
-  store, and the gateway's task_costs tool answers the same figures to a
-  session that asks (roadmap 199).
+  store, and a session's brief states its budget left and its agent time
+  left (roadmap 199). The gateway's task_costs tool holds the same figures,
+  and no step is offered it.
 
 ## 2. Three ways to build it
 
@@ -848,9 +849,10 @@ real money, and `budget.premium_month_eur` caps it apart (5.4). One step
 runs on it: a member's own chat turn, through `chat.model` (Sebastian,
 2026-11-03). A turn an MCP client asks for on a chat token runs on
 `chat.mcp_model` and a turn the chat starts itself, a wake or a fund's
-resume, on `chat.wake_model`, both `big`. The planner's session, through the
+resume, on `chat.wake_model`, both `big`. The planner's steps, through the
 planner class's `session_model`, and the coder review, through
-`review_model`, run on `big`, each a key away from premium. The check-in
+`review_model`, run on `big`, each a key away from premium. The planner's
+repository map step runs on `small` (5.1). The check-in
 names `checkin_model: big`, since without it the check-in would read the
 review's alias. No premium call stops (Sebastian, 2026-11-03). A call OpenAI
 fails, its credits spent or the API down, is retried twice and then answered
@@ -1096,10 +1098,20 @@ no plan is a group of one. The machine edges (a delegated card, the tool
 park) cross groups by design.
 
 **The planner and the plan card** (Task 101). A card in
-lane `plan` starts a task of class `planner`, whose session mode is `plan`:
-a report session on the stronger rung that reads the repository and the
-spec, writes nothing, and ends with one JSON block of `min_cards` to
-`max_cards` cards of one round, each with a key, a role (`foundation`,
+lane `plan` starts a task of class `planner`, whose session mode is `plan`.
+Since 2026-11-28 the planner runs as steps inside one activity, each a
+session of its own that reads the repository, writes no code and files
+its part through a gateway tool of its own. A map step on `small` maps the
+repository once per head and files the map through `file_map`. A first
+plan then runs the spec step (`file_spec`), the criteria step
+(`file_criteria`) where the project's plan shape has an integration card,
+and the cards step (`file_cards`), each on the stronger rung. A later round
+runs the map and the cards step. A human's comment, an answer or a cut
+runs the map and the replan step (`file_replan`), and an off-main replan
+runs the revert step (`file_revert`) before them. A step files only its
+own part, the plan draft keeps it between the steps, and the last step
+stores the revision. A round holds `min_cards` to
+`max_cards` cards, each with a key, a role (`foundation`,
 `feature`, `integration`), a brief of at most 1500 characters, guidance
 directories, dependencies, acceptance items and a size of `small` or
 `medium`, and since Stage 16
@@ -1128,8 +1140,8 @@ revision with open questions waits in Needs you, recorded as an approval
 request of kind `plan`, and the answer that leaves no question open sends
 the planner back. A writer's comment sends the planner round again too,
 and closing the issue ends the card. A child's brief carries the spec and
-the plan's summary and the `featureGuide`, which asks for a test per
-acceptance item. Each child starts under the work bound and waits in the
+the plan's summary, and its session runs the step `coding-card`, whose
+paragraph asks for tests of the acceptance items (5.9). Each child starts under the work bound and waits in the
 queue, holding no work slot, until the cards it depends on are done.
 Before roadmap 225 an approver's "Accept plan" filed the children in the
 backlog and "Start plan" moved them to ready. Live, the planner answered 9 cards in 58
@@ -1303,8 +1315,8 @@ The next session's brief carries a working-state section, copied from the
 record of the last session that left one. A session stopped by its start
 check-in, a start that failed, and a dead session with no events never
 become the parent. The section holds the parent's last todo list, cut at
-1 KB, its own subagent calls as excerpts of 4 KB in all, and the files it
-changed. It opens with one heading line of values factoryd owns: the
+1 KB, and the files it changed. No session runs a subagent (6.6), so no
+subagent report rides it. It opens with one heading line of values factoryd owns: the
 parent's id, the time it stopped, its outcome and trip, and the branch's
 commit. The stop reason is often the agent's own last message, so it
 stands inside the section's fence as its first line, cut to one line of
@@ -1314,11 +1326,9 @@ judged the approach wrong, the heading says the todo list is the dead
 end's. Today that is a check-in's handover on a stuck trip, which climbs
 (`retry_stronger`). A cheap-cap climb, a message that could not be
 delivered, the loop's fixed redirect and a climb no model judged get no
-label, since their todo list is still a plan. The full subagent reports
-are files at `/workspace/.factory/prior/<session>/`, outside the
-repository, and the brief names them. The copy is skipped after a pushed
+label, since their todo list is still a plan. The copy is skipped after a pushed
 session, which finished its work, and for report and plan sessions. The
-body, the report files and the handover pass the inbound sanitiser for
+body and the handover pass the inbound sanitiser for
 every author, because agents wrote them.
 Since Stage 12 finished work survives every cap (Task 112, change id
 `keep-work`). The agent time is the task's own, hours by default (5.3),
@@ -1845,7 +1855,8 @@ Besides its `version`, `policy.yaml` holds eleven sections:
   Roadmap 199's facts and detectors (escalation ladder plan B) added four
   `limits` keys: `warn_at` (80) and `plan_warn_at` (67), the percent of a
   card's budget or a session's agent time at which factoryd sends the running
-  agent a wrap-up message (the planner's says to file the plan), `no_push_spend`
+  agent a wrap-up message (a planner step's says to file its answer with
+  its step's filing tool), `no_push_spend`
   (60), the percent of the card's budget spent with nothing pushed at which
   the session's check-in is asked (`spend_no_push`), and `context_tokens`
   (100000), the size at which opencode compacts the conversation, set in the
@@ -1876,7 +1887,7 @@ its monthly euros and the tools that need a human's OK. The defaults
 chat:
   model: big               # LiteLLM alias, tier-high
   monthly_eur: 5           # the project agent's own line
-  confirm: [new_card, answer, steer, retry, request_changes,
+  confirm: [new_card, answer, tell_card, retry, request_changes,
             approve_merge, deny_merge, invite, github_export, close,
             edit, give_room, set_dependency, replan, github_sync]
 ```
@@ -1961,6 +1972,18 @@ brief names the same tools, and a hidden tool called anyway is refused
 with `refused_capability` and audited. Live, a coder session's list held
 its class's 12 tools; the hiding itself is proven by test only, since no
 narrower class ran a session.
+Since 2026-11-27 the class is the ceiling and the step's profile is the
+offer (5.9). `prompts.Offered` keeps the class's tools that the step's
+profile names, the harness denies every other gateway tool by name (6.2),
+and the brief and the sandbox facts read the same list. A coding session
+is offered `analyze_image`, `delegate`, `deployment_health`, `digest`,
+`escalate`, `manual`, `request_cut`, `request_info`, `request_tool`,
+`web_scrape` and `web_search`. A planner step gets `analyze_image`,
+`digest`, `manual`, `web_scrape`, `web_search` and its own filing tool.
+The prover gets `file_proofs` and `manual`, the map step `file_map` and
+`manual`, and screening and sizing `analyze_image`, `manual` and their
+filing tool. A test fails a profile tool that no shipped class lists, and
+another fails a gateway tool description over 45 words.
 A model call whose caller has gone is the caller's act, not a fault
 upstream. Since Stage 12 (Task 122) the gateway answers 499 with the audit
 decision `client_canceled` when the request's own context is cancelled,
@@ -2230,7 +2253,10 @@ line's figure.
 Tool calls reach the gateway's `/mcp` endpoint, an MCP server over stateless
 streamable HTTP. It offers `web_scrape` and `web_search` (Firecrawl),
 `replicate_predict`, `fal_run`, `escalate` (6.6) and the
-commissioning tools (5.5). A paid call takes a hold for its worst case, calls
+commissioning tools (5.5). Since 2026-11-27 no step's profile names
+`replicate_predict`, `fal_run` or the six commissioning tools, so no
+session is offered them (5.3). They stay in the gateway, and a step that
+needs them lists them in its profile. A paid call takes a hold for its worst case, calls
 the provider without the agent's cancel, so a disconnect cannot cut a billed
 call, and books the real cost: Firecrawl's `creditsUsed` times the credit
 price, Replicate's `predict_time` times the hardware rate, and fal's price per
@@ -2248,7 +2274,7 @@ They get it through gateway tools, never through a provider key. As built in
 Stage 7, the tools are `cloud_prices`, `commission_server`, `list_resources`,
 `release_resource`, `ssh_certificate` and `resource_request_status`, and
 Hetzner is the first provider. A sandbox commissioned a cx23 and logged in to
-it over SSH in the live proof.
+it over SSH in the live proof. No step is offered these tools today (5.4).
 
 - **A separate provider project.** Agent resources live in their own Hetzner
   project. Only the gateway holds its API token, and factoryd never gets it.
@@ -2575,6 +2601,10 @@ offers direct, the default, plan and human.
   the two disagree, Forgejo refuses the merge and the card shows why. Since
   Stage 16 a project file's `approvers:` replaces the policy's list for that
   project, and registration sets the project's whitelist from it (5.7).
+  Since 2026-11-27 a risk class may name approvers of its own. A pull
+  request of such a class merges only on the approval of a human on both
+  lists, whichever door the approval takes. Class `prompts` names
+  Sebastian alone (7).
 - **Actions run as the human.** A new task, an escalation answer, a review
   and a rejection go to Forgejo through the human's own token, so Forgejo
   records the human as their author.
@@ -2678,7 +2708,7 @@ sandbox becomes a card.
   a human writes to a running session through "Tell the running session"
   under the opened card's Other actions, which posts the card's answer
   route with the action `steer` and runs `doSteer` with the chat's token
-  scrub, as the chat's `steer` tool does. Other actions also holds the door
+  scrub, as the chat's `tell_card` does for a running card. Other actions also holds the door
   to the card's own thread, "Talk about this card" (below). The Session
   tab keeps its meaning, the worker session's transcript, not the
   conversation about the card. Receipt shows a merged card's stored
@@ -2826,14 +2856,14 @@ the month only (roadmap 158).
 
 | Tool | Does | Default OK |
 |---|---|---|
-| `board`, `card`, `history`, `card_history`, `costs`, `diff` | read | none |
+| `board`, `card`, `history` (the project's, or one card's with `task_id`), `costs`, `diff` | read | none |
 | `system`, `plan`, `pr`, `file`, `ci` (Stage 16) | read | none |
 | `cluster_facts` (2026-11-24) | read what the cluster did to a card's session, or the platform's incidents of a window | none |
 | `session`, `session_steps`, `session_step`, `session_search` (Stage 16) | read | none |
 | `new_card` (with its track since roadmap 225) | file | confirm |
 | `answer` (a needs-you question, and since Stage 16 a plan's question) | answer | confirm |
 | `comment` | comment | none |
-| `steer` (message a running agent) | message | confirm |
+| `tell_card` (a text to a card, routed by its state: a running session, the approval gate or an open question) | message | confirm |
 | `retry`, `request_changes` | decide | confirm |
 | `approve_merge`, `deny_merge` | merge decisions | confirm |
 | `set_accent` | metadata | none |
@@ -2849,7 +2879,7 @@ the month only (roadmap 158).
 | `watch_card`, `unwatch_card`, `set_timer` (2026-10-18) | the thread's own watches and timers | none |
 | `inbox` (2026-11-03) | read the factory's thread: open asks first, then the newest rows, by word and by page | none |
 
-`answer` and `steer` confirm by default, because the text the
+`answer` and `tell_card` confirm by default, because the text the
 agent reads from cards and events is untrusted and could ask for either. A
 project file may loosen it. Whether a tool needs a human's OK is a setting,
 not a rule baked into the agent: the OK column is the `chat` block of the
@@ -2870,8 +2900,12 @@ merge authority. A steer reaches the running session as a human message on
 the existing path (6.2, 6.6).
 
 **Context.** Each turn gets the status line's figures, the human's
-conversation so far and the tools the member's role may use, each tool one
-sentence (roadmap 200, 201). The board, the history and every detail come
+conversation so far and the tools the human's role may use (roadmap 200,
+201). Each chat tool's description holds at most 20 words, by test. The
+standing prompt comes from the project agent's profile (5.9): Sebastian's
+whole guide, the chat, title, why, summary, brief and ask forms, the
+`factory` chunk and the agent's paragraph, then the facts of the project,
+the human and the autonomy. The board, the history and every detail come
 through the read tools, never restated in the context, and an earlier
 turn's read is never replayed as data. A card is named by its issue number
 or its task id alike. Agent output that a tool returns (summaries, messages,
@@ -2884,6 +2918,24 @@ Stage 16 the replay drops an assistant turn that claims an action, matched
 as whole words, without a tool call, and the stored Do-it row leaves out
 the proposal's description, so card text is never replayed as the agent's
 own words.
+
+**Two tiers of tools** (2026-11-27). The project agent's profile splits
+the chat's 79 tools into three lists. The 46 core tools carry their full
+schemas on every turn. The 30 rare tools, such as `board`, `ci`,
+`settings`, `write_doc` and the routine tools, sit behind `tool_schema`,
+whose description holds one line for each rare tool the human may use and
+has not fetched. A
+call `tool_schema {"name": "board"}` returns that tool's schema, and the
+next model call of the same turn holds it. The fetches are read from the
+thread's live rows, so no store of their own can drift, and a later turn
+holds the schema too. A rare tool called before its fetch runs nothing and
+answers "Refused: board is a rare tool and its schema is not in this
+thread. Call tool_schema with name "board", then call board." The three
+attachment tools, `analyze_image`, `read_attachment` and
+`summarize_attachment`, are core while a row of the thread carries an
+attachment and absent otherwise. The chat's `steer` is gone, since
+`tell_card` routes a text to a running session by the card's state, and
+`card_history` became `history` with a `task_id`.
 
 **A token's turns.** A chat token (5.6) drives the same turn path as the
 browser, as the human, through five tools. Each runs on the token's project
@@ -3096,8 +3148,8 @@ the history and every depth come through a tool. What each part does:
   the project's process, the policy's confirm list and limits, and one
   written paragraph on the overall flow. Nothing in it can drift from the
   code. Workers read the same source: the gateway's `manual` tool serves
-  it to a session, and a card's first human message opens with its loop
-  sentence. The `card` and `board` reads give a card's state as a
+  it to a session, and each session step's paragraph names that tool
+  (5.9). The `card` and `board` reads give a card's state as a
   sentence. In its first live turn the agent opened the manual in 17 ms
   and named `answer` as the tool for a card at its session cap.
 - **Refusals.** A card action on the wrong state answers "Card #N
@@ -3173,7 +3225,8 @@ the history and every depth come through a tool. What each part does:
   The member answers on the card or through the chat's `answer`, which
   takes the revision. After the last answer the plan's approval is
   superseded, and the planner runs once more with the answers in its brief.
-  The planner's guide holds the format key and one sentence.
+  Since 2026-11-28 the questions are a field of the filing tools of the
+  spec, cards and replan steps (5.1), whose schema carries their shape.
   Since the fix round `accept_plan` without a revision took the newest at
   proposal time, and its proposal named the revision and sha it accepted, so
   a revision added after the proposal was refused as stale. Since roadmap
@@ -3677,7 +3730,9 @@ issue keeps its title: the door checks only its length and its
 references. The doors are the planner and the delta planner, `delegate`,
 the chat's `new_card` and `file_card`, both `escalate` tools, the routine
 file, the New task form, the successor, the retry, the hand-over, the
-restarted plan, the webhook and the API. A card that Go code files takes
+restarted plan, the webhook and the API. Since 2026-11-28 the gateway's
+`request_info` passes `CheckBrief` as an ask too, so the agent's question
+to an issue's author is one question. A card that Go code files takes
 its brief from its source's entry in `SourceBriefs`. The chat's `edit` and
 the opened card's "Edit the brief" change a brief through `CheckEdit`,
 which checks only the fields the edit sets.
@@ -3731,17 +3786,71 @@ misses one, and another fails when a listed kind has no face, so a kind
 added without its face breaks the build. The one write of a chat row
 refuses a kind that `BirthKinds` lacks.
 
-**The guide's forms.** Every model call whose text a human reads is a
-writer in `factoryd.Writers`, and its prompt ends with the guide's forms
-for its jobs (`writingguide.For`). The planner carries the title, why,
-summary, brief, ask and line forms. The coding agent carries the summary
-and ask forms, and the title, why and brief forms when it holds
-`delegate`. The project agent and the message responder carry the whole
-guide with the chat form. The reviews, the audit and the gate supervisor
-carry the finding form, and the check-in the line and why forms. A test
-walks every model call from the transports and fails on a call that is
-neither a writer nor named as read by agents only.
+**One builder for every prompt** (built by
+[plans/2026-11-27-prompts-carried-by-construction.md](plans/2026-11-27-prompts-carried-by-construction.md)).
+Every text that enters an agent's context comes from one closed builder in
+`internal/prompts`. Each step has one profile,
+`internal/prompts/profiles/<step>.yaml`, decoded strictly. A step is one
+agent in one job: the check-in's three moments are three steps, and the
+planner is six. The profile names the step's reader (a human, a model or
+code), Sebastian's whole guide or the forms of its job, its chunks, its
+paragraph, its facts renderer, its answer type, its tools, whether the
+harness loads the repository's `AGENTS.md`, and its word budgets. The
+chunk `factory` says what the factory is, and `narration` says how a
+session writes between tool calls. A paragraph holds the step's job in at
+most 250 words. `Build(step, facts)` joins the guide, the forms, the
+chunks, the paragraph and the rendered facts in that order and returns a
+`Prompt`. Its fields are unexported, so only `Build` makes one, and every
+transport takes a `Prompt`. A session carries the guide, forms, chunks and
+paragraph as its system prompt and the facts as its first turn (6.2). A
+direct call sends both as its system text. A facts renderer prints values
+and conditions, and a note renders only when its field is set. The guide,
+the eight forms, the chunks, the paragraphs, the built-in tool texts and
+the plugin that hands those to the harness have their sha256 in
+`internal/prompts/texts.sha256`. A changed text fails `TestTextsArePinned`
+until its new sum is written, so review sees the change. A built prompt
+over its step's budget, or under 90 percent of it, fails a test. The risk
+class `prompts` covers `internal/prompts/**` and `internal/writingguide/**`,
+and only Sebastian approves its merges (7). A test walks every model call
+from the transports and fails on a call that is neither a registered step
+nor named as one that sends no text of the factory's.
+
+**The guide's forms.** A form stays where a human reads the text and goes
+where a model or code reads it. The loader refuses a human reader with
+neither the guide nor a form, and a model or code reader with either. The
+project agent carries the whole guide with the chat, title, why, summary,
+brief and ask forms, and the message responder the whole guide with the
+chat form. The coding agent carries the title, why, summary, brief and ask
+forms. Each planner step carries the forms of the part it writes: the spec
+the line, summary and ask forms, the cards the title, why, summary, brief
+and ask forms, the replan all six, and the criteria and the revert the
+line form. The delta planner carries the title, why, summary and brief
+forms, and the approval brief writer the ask form. The model review keeps
+the finding form, and the check-in's three moments carry the why form. The
+audit, the gate supervisor, the case check-in, the case brief writer, the
+hold-out proposer, the judgement, the answer screener, chat compaction,
+screening and sizing carry the line form. The plan namer and the thread
+title carry the title form. The prover, the map step and research carry
+none. `TestEveryStepCarriesItsForms` builds each step and fails on a form
+it lacks or on a form a model or code reader carries.
 [writing-guide.md](writing-guide.md) says where the forms live.
+
+**Typed answers** (2026-11-28). Every direct step of factoryd answers
+through a forced tool. `prompts.AnswerTool` derives the tool `answer` from
+a tagged Go struct: each field with its description, its closed set and
+its bound. A bound is one constant that the schema and the parser both
+read: 500 characters for a review summary, 300 for an audit finding's why
+and 1,000 for the gate supervisor's texts. The call sends the tool with
+`tool_choice`, and JSON mode is gone. A reply in text instead of the tool
+is an error that names the step, and a field outside the type is refused.
+The check-in builds its tool from the same generator. The sessions file
+through gateway tools: screening through `file_screening`, sizing through
+`file_size`, the prover through `file_proofs` and the planner's steps
+through their own (5.1). A rule that code can check is a door check, not a
+prompt line: an information request holds one question, a case brief's
+story names no amount of money, a hold-out claim of two sentences is
+dropped, and a card brief's shell timeout over 600000 ms is clamped at
+filing.
 
 **A card retires itself when its reason goes away.** A card in Needs you
 stands for a reason: a state of the world that needs a human. When that
@@ -3846,9 +3955,9 @@ the adapter seam stays sharp.
 ```go
 type Harness interface {
         Prepare(ctx context.Context, env SandboxEnv, brief TaskBrief) error
-        Text(brief TaskBrief) string
-        Run(ctx context.Context, text string, emit func(Event)) Result
-        Message(ctx context.Context, text string) error
+        Text(brief TaskBrief) (prompts.Prompt, error)
+        Run(ctx context.Context, p prompts.Prompt, emit func(Event)) Result
+        Message(ctx context.Context, p prompts.Prompt) error
 }
 ```
 
@@ -3856,13 +3965,36 @@ type Harness interface {
 context, findings from parent sessions and artifact paths. The card's own
 part is `CardBrief.AgentText`, which the worker reads from the gateway's
 `GET /worker/brief`, the same text the card renders (5.9). `Text` builds
-the session's first message from the brief once. The worker posts that
-text to the gateway's `POST /worker/session-brief` before its first model
-call, which stores it per session, and `Run` prompts it. Capabilities are
+the session's `Prompt` from the brief once, through the step's profile
+(5.9): its standing text is the system prompt, and its facts are the first
+message. The worker posts the first message to the gateway's
+`POST /worker/session-brief` before its first model call, which stores it
+per session, and `Run` starts the session on the `Prompt`. Capabilities are
 policy, enforced by the gateway, not something the harness is told. Since
-Stage 10 the brief names the factory tools the task's classes may call, so
-the model is not tempted by tools it would be refused (5.3); the gateway
-still decides every call.
+2026-11-27 a session is offered only the gateway tools its step's profile
+names within what its classes grant (5.3), so the model is not tempted by
+tools it would be refused. The gateway still decides every call.
+
+Since 2026-11-27 opencode adds little text of its own. The pinned opencode
+1.19.6 keeps only the 49-word environment block of its system prompt
+(directory, platform, date and model), and the step's standing text, set
+as `agent.build.prompt`, replaces the rest. `task`, `webfetch` and `skill`
+are off for every session, so no subagent runs and no skill list rides
+the prompt, and the title call is off. Each step keeps the built-in tools
+of its job. Coding sessions get `bash`, `edit`, `write`, `glob`, `grep`,
+`read` and `todowrite`, the prover the same without `todowrite`, the
+planner steps `bash`, `glob`, `grep` and `read`, and screening, sizing and
+the map step `glob`, `grep` and `read` only, so a step that changes no
+code cannot write. The harness loads the repository's `AGENTS.md` only
+where the profile says so: for coding and the map step. Elsewhere the
+worker starts opencode with `OPENCODE_DISABLE_PROJECT_CONFIG=1`, which
+also skips the repository's `opencode.json` and plugins. A nested
+`AGENTS.md` still enters after a `read` in its directory, and no switch
+stops that. A plugin in the baked opencode home,
+`opencode-plugin/plugins/tool-text.js`, replaces each built-in tool's
+description with the factory's own short text from
+`internal/prompts/tools/<name>.md`, which the image copies beside it. The
+plugin refuses a baked home without those texts.
 
 Since Stage 17 a code session's brief carries a repository
 map, a deterministic step in place of reading calls. factoryd
@@ -3872,9 +4004,9 @@ map from its clone after the checkout and before the harness starts, with
 no Forgejo or model call: for each directory each file's first doc line,
 at most 4 KiB in all, every line with its control characters dropped and
 cut at 120 characters, `.git` refused. A card without directories gets no
-map. The brief also tells the agent to run `bash check` when the
-repository has a `check` file, and the factory's own code has one since
-Stage 17 (6.4).
+map. The coding paragraph tells the agent to run `bash check changed`
+when the repository has a `check` file, and the factory's own code has
+one since Stage 17 (6.4).
 
 A session of a project that names a document repository (`chat.doc_repo`)
 reads its text files at `/workspace/docs`, a shallow, sparse clone the
@@ -3894,10 +4026,11 @@ outside author or from telemetry gets no section, since each line repeats
 the author's link text outside the issue's markers. The rule
 lives in `InboundBrief`, which enforces it for the whole brief.
 
-`Message` (Task 88) puts text into the running session as the
-next user turn. The first human-sourced message opens with the factory
-basics from `internal/manual`, the manual's one source; later messages
-and the check-in's guidance go in bare. A harness without such a mode answers `ErrNotSupported`,
+`Message` (Task 88) puts a `Prompt` into the running session as the
+next user turn. A human's first message to a session carries the message
+responder's standing text, Sebastian's whole guide and the chat form,
+since a human reads the reply. Later messages carry the text alone, and
+the check-in's guidance and the nudge go in bare. A harness without such a mode answers `ErrNotSupported`,
 and factoryd then redirects to a fresh session with the text as its
 finding, the restart it used before; `ErrNotRunning` means no session
 runs. opencode supports it by running as a server: the worker starts
@@ -4045,7 +4178,7 @@ fix a review flagged main's own change as out of scope).
 
 **Report sessions** (Task 74). An `analyzer` task runs in
 report mode: the worker gets the upstream read token only, no fork token
-and no push, the brief asks for a write-up and no code, the repetition and
+and no push, a step that writes no code has no `edit` or `write` tool (6.2), the repetition and
 `no_write` detectors are off, and factoryd posts the
 session's last message as a comment on the parent issue. The task ends
 `done` at the comment. A report task is a task row of its own with a parent
@@ -4319,9 +4452,8 @@ context and its work), handover (a note for the next work) or human. The
 progress digest rides the recorded decision and its issue comment. It
 holds what a human reviewer would read to see a circle that the detectors
 cannot name: the commands run with their outcomes over time, the files
-touched with edit counts, the other tool calls with the number the
-subagents made ("5 other tool calls (2 by subagents)"), the last error
-signatures and the diff so far.
+touched with edit counts, the count of other tool calls ("5 other tool
+calls"), the last error signatures and the diff so far.
 Until plan E the trip called the session supervisor, which since Stage 12
 (Task 111) picked continue, message or escalate, and
 before that among continue, redirect (the session ended and a new pod
@@ -4359,14 +4491,11 @@ As built (Stage 6), with the defaults that tuning starts from:
   stuck rule moved the card to the frontier tier. A message comes at 60
   reads, and a stuck trip at 120, which the check-in judges (below).
   **Stall** is five minutes without an event.
-- **Subagents.** opencode's research subagents run as child sessions of
-  its `task` tool, and the adapter marks their events. Their tool calls
-  and commands do not count toward reading without writing: the parent's
-  `task` call counts once, when it returns. They feed no trace detector
-  either, so no `same_call` nudge reaches a main agent that did not make
-  the call and cannot read a message until its subagents return. Their
-  writes count as writes. Before the mark, a research subagent's calls
-  tripped reading without writing within a minute.
+- **No subagents.** Since 2026-11-27 no session has opencode's `task`
+  tool (6.2), so no subagent runs, and every event the detectors read is
+  the session's own. The tool's `general` subagent ran opencode's default
+  preamble with every gateway tool, and the gates could not see its work.
+  `digest` and `delegate` cover what it did.
 - The **check-in** trips at every `check_in` interval (45 minutes by
   default, 5.3) counted from the task's anchor, the deadline minus the
   agent time, so it continues across sessions without a stored flag; a
@@ -4409,7 +4538,7 @@ answers that the session already ended, every progress detector starts
 afresh from the message's time, and the session reads on. A message the
 worker cannot take (a harness without messages, a network error) falls
 back to the old redirect: the session stops with the guidance as a
-finding. The project agent's `steer` (5.7, Stage 15) reaches a session
+finding. The project agent's `tell_card` on a running card (5.7) reaches a session
 the same way (`Runner.MessageSession`), as a human message on this path
 under the human's name, and does not arm the stuck rule.
 
@@ -4649,7 +4778,8 @@ bound, the elapsed time, Temporal's last failure, and per gate the commit
 statuses and the CI queue, the sandbox pod's state and its last 100 log
 lines, the pull request's merge state, or the last review result. The
 whole bundle passes through `internal/redact` (5.1). The model answers
-strict JSON with an action, a diagnosis and a recommendation:
+through its forced answer tool (5.9) with an action, a diagnosis and a
+recommendation, each text at most 1,000 characters:
 
 - `wait` re-arms the bound once, to twice the bound. Not for RunSession.
 - `retry` ends the attempt, and Temporal's retry policy runs it again. Not
@@ -5114,8 +5244,11 @@ and every pull request merged green.
 
 **Screening** (Task 74). Before the first session of a
 fresh task filed by an outside account, an `analyzer` task in report mode
-(6.3) reads the issue and answers a verdict, `clear` or `suspect`, with
-reasons; any other answer counts as suspect. The session runs on the
+(6.3) reads the issue and files a verdict, `clear` or `suspect`, with
+reasons through `file_screening`. The tool refuses any other verdict and a
+suspect verdict without a reason, and a session that files none counts as
+suspect. It reads with `glob`, `grep` and `read` alone, since the issue may
+be an attack, and loads no `AGENTS.md` (6.2). The session runs on the
 stronger rung, since its verdict guards the coder against a report written
 to steer it. `clear` lets the coder start. `suspect` writes an alerts row of
 kind `screening` and waits on a human before any coding session: a human's
@@ -5128,8 +5261,10 @@ closed as real.
 **Sizing** (piece A, roadmap 336, change id `sizing`). Before the first
 session of a card a person or the chat filed (issue, `new_card`, the form,
 the API) in a process with a plan track, an `analyzer` task in report mode
-(6.3) on the start rung reads the issue and the code and answers a size,
-a reason and the files the change touches. The session writes no code. A
+(6.3) on the start rung reads the issue and the code and files a size,
+a reason and the files the change touches through `file_size`, which
+refuses an unknown size. The session has `glob`, `grep` and `read` alone,
+so it writes no code. A
 writer's filed size is a floor, and none counts as small: a writer's filed
 `medium` or `large` runs no session and goes to the planner. An outsider's
 filed size is no floor, so the session sizes the card. The step is
@@ -5153,7 +5288,11 @@ sizing task, as it has one screening task.
   runner's entry point, `high` for `k8s/**`, `**/Dockerfile*`, `go.mod` and
   `go.sum`, and `normal` by default. The `runner` class ranks above `high`
   and always needs a person: a passed audit merges a `high` change at full
-  auto, never a `runner` one. A forbidden class fails an agent's task and closes the pull
+  auto, never a `runner` one. Since 2026-11-27 class `prompts` covers
+  `internal/prompts/**` and `internal/writingguide/**`, every text that
+  enters an agent's context (5.9). It ranks above `high`, keeps a person on
+  the merge at any autonomy, so rung 2 cannot approve it, and names its
+  own approvers: only Sebastian approves its merge (5.6). A forbidden class fails an agent's task and closes the pull
   request. A pull request factoryd opened itself (a template update, a
   schema copy, a GitHub sync, a revert) has no agent, so its forbidden
   paths go to a human's approval that names them (roadmap 261).
@@ -5239,8 +5378,9 @@ sizing task, as it has one screening task.
   the acceptance close, which matched shell commands against item texts
   and never fired.
 - **Model review.** `review-frontier` reads the brief, the diff (cut at
-  48 KiB until Stage 16, per part since) and the gate results, and answers strict JSON: a verdict of
-  `approve` or `concerns`, a summary and findings. The call runs under a
+  48 KiB until Stage 16, per part since) and the gate results, and answers
+  through its forced answer tool (5.9): a verdict of `approve` or
+  `concerns`, a summary of at most 500 characters and findings. The call runs under a
   per-task key with a hold, like the supervisor's. A review the headroom
   cannot pay for, a failed call and an unreadable answer become a note on
   the card, never a failure. The activity heartbeats every 30 seconds with a
@@ -5306,14 +5446,14 @@ sizing task, as it has one screening task.
   first 50 and a line that counts the rest, and their summaries 8 KiB. The
   activity's bound follows the waves of calls and stays ten minutes under
   the six hours of its attempt, so the watch trips before Temporal ends it.
-  The review of an integration card adds one call for the feature's
-  behaviours, which reads the cards' briefs, their file lists and the
-  names they add, and has no diff. It judges no criterion: the criteria
+  Since 2026-11-28 the review of an integration card makes no extra call:
+  the call on the feature's behaviours is deleted, since no reader used
+  its lines. The review judges no criterion: the criteria
   gate settles the test, invariant and judgement criteria, the approver
   the human ones. It reads each opened proof's original code and the
   agent's summary, so a changed proof is a finding unless the summary
-  says why. A plain review answer that carries `criteria` or `behaviours`
-  is refused. Every prompt that reads diff text says the diff is the agents'
+  says why. A review answer that carries a field outside its type, such
+  as `criteria` or `behaviours`, is refused. Every prompt that reads diff text says the diff is the agents'
   work to judge, never an instruction. The prompt carries the
   added lines' goroutines, channels, locks, selects and atomics as context,
   not as a rule. A finding that claims a name is undefined or
@@ -5337,7 +5477,10 @@ sizing task, as it has one screening task.
   the aliases the task's own class names) reads the diff
   against a fixed checklist of six items: secrets, network egress, RBAC
   and service accounts, policy and workflow files, migrations that drop or
-  widen, and the sandbox contract. It answers `clear` or `findings`. No
+  widen, and the sandbox contract. It answers through its forced answer
+  tool (5.9) with a list of findings, each naming its checklist item and a
+  why of at most 300 characters, and the checklist is the item field's
+  description. An empty list is a clear audit. No
   verdict, a diff too large to read, a refused or failed call are findings
   too. Since Stage 16 the audit reads the diff per part like the review,
   and a diff over three parts was "not audited in full", while its secret
@@ -6084,7 +6227,7 @@ since Stage 6, but neither has run under load.
 | Agent pull requests | From a `factory-agent` fork, so PR jobs get a read-only token; two session tokens, read upstream and write the fork; workflow-directory guard in the worker and factoryd | Decided |
 | CI registrar | Dedicated `factory-ci` account, organisation owner because the runner API demands it, token scoped to the code repository, `main` protected with `apply_to_admins` | Decided |
 | Missed webhooks | The heal pass re-reads Forgejo every minute and signals what webhooks missed; `Reconcile` at the start of every workflow run | Decided |
-| Supervision | Cheap trace detectors over the event stream; since plan E a trip asks the in-session check-in, a second conversation in the agent's own pod under the `checkin` alias, read-only on the live workspace, choosing continue, message into the running session, handover or human, paid from the task's remaining budget under a call cap per conversation, whose last call carries no tools, and a per-card share for the gate, session and dead moments together. Since the 2026-10-28 amendment every trip asks the check-in: a stuck trip after an ignored message carries the stuck rule's line, and the check-in's handover on it climbs a rung. A subagent's calls count once and feed no trace detector, and calls made before the last answer took effect count for no detector. Agent time and check-in per class, process and project. Human answers are kept across attempts in their own brief section. A `no_write` progress detector, and a gate supervisor for the six long gates with wait, retry, cancel or escalate. A 6-minute supervisor timeout, every exhausted task to the card, a repeated trip to the stronger rung. A nudge into the running session before the same-call trip. Since Stage 17 three nudges without new content end the session, the provider's repetition refusal ends it the same way, and the reading threshold is 60 | Built |
+| Supervision | Cheap trace detectors over the event stream; since plan E a trip asks the in-session check-in, a second conversation in the agent's own pod under the `checkin` alias, read-only on the live workspace, choosing continue, message into the running session, handover or human, paid from the task's remaining budget under a call cap per conversation, whose last call carries no tools, and a per-card share for the gate, session and dead moments together. Since the 2026-10-28 amendment every trip asks the check-in: a stuck trip after an ignored message carries the stuck rule's line, and the check-in's handover on it climbs a rung. No session runs a subagent, and calls made before the last answer took effect count for no detector. Agent time and check-in per class, process and project. Human answers are kept across attempts in their own brief section. A `no_write` progress detector, and a gate supervisor for the six long gates with wait, retry, cancel or escalate. A 6-minute supervisor timeout, every exhausted task to the card, a repeated trip to the stronger rung. A nudge into the running session before the same-call trip. Since Stage 17 three nudges without new content end the session, the provider's repetition refusal ends it the same way, and the reading threshold is 60 | Built |
 | Alerts | An `alerts` table with a verdict per alert, counted in SigNoz, with a precision panel. Alerts on the factory's own namespaces route by the namespace label like a project's | Built |
 | Factory model calls | The review and both supervisors call through the gateway with factoryd's token and purpose headers, audited and booked like an agent's | Built (Task 71) |
 | Cloud-resource commissioning | A separate Hetzner agent project with a gateway-only token, envelopes, leases and a garbage collector, prices from the provider's price list. Servers and volumes, no buckets. SSH certificates bound to one server. Outbound tcp 53, 80 and 443. Deletion at the last tick before the lease ends | Built |
@@ -6223,7 +6366,7 @@ works `factory` and `demo-app`.
 | Stage | One step of the `stages` block of a process file, from screening to merge, with one `on_findings` setting |
 | Process | A file `processes/<name>.yaml` of four blocks, tracks, dependencies, stages and merge, that a project names. The loader and `config check` refuse one that cannot work |
 | Track | How a card's work runs, set by whoever files it: `direct` builds at once, `plan` plans first and files the plan's cards on the direct track. Replaced the lanes (roadmap 225) |
-| Planner | The capability class whose plan session answers a plan of cards from a spec, never code |
+| Planner | The capability class whose plan steps (a repository map, the spec, the criteria, the cards, a replan, a revert) each file their part of a plan of cards from a spec through a tool of their own, never code |
 | Plan card | The approval card of kind `plan` where approvers accept a plan revision, after which factoryd files one card per planned card |
 | Card brief | A card's title, why line, summary and full text, stored in fields behind one checked door and read by the agent and the card through one function (5.9) |
 | Why line | One sentence under a card's title on why its work exists, or on a card that asks, why the question came up and what waiting costs |

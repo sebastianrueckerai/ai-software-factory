@@ -1,6 +1,6 @@
 # Tools per agent: each job gets only the tools it uses, in few words
 
-**Status:** open. It waits for Sebastian's go.
+**Status:** built. Merged on code main 8843575df on 2026-11-27.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to build this plan task by task. Steps use checkbox (`- [ ]`) syntax.
 
