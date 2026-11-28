@@ -46,15 +46,15 @@ Sebastian's decision (2026-11-28): use Jev, TypeSafe AI's model, where it makes 
 
 | step | agreement | p on agreements | flips over repeats | verdict |
 |---|---|---|---|---|
-| sizing | 21 of 21 | 0.54 to 0.97 | 0 | Jev for the label if nobody reads `reason` and `files`, else a model that fills the text too |
-| judgement | 14 of 14 | 0.62 to 0.99 | 0 | Jev for the label if nobody reads `reason`, else a model that fills the text too |
-| answer-screener | 7 of 7 | 0.97 | 0 | Jev for the label if nobody reads `reasons`, else a model that fills the text too |
-| gate-supervisor | 7 of 7 | 0.72 to 0.92 | 0 | Jev for the label if nobody reads `diagnosis` and `recommendation`, else a model that fills the text too |
+| sizing | 21 of 21 | 0.54 to 0.97 | 0 | moves to Jev: `reason` goes, code writes the card's line "sized medium, p 0.54", `files` goes and the planner reads the repository as it does |
+| judgement | 14 of 14 | 0.62 to 0.99 | 0 | stays on the chat model with the ladder: the next coding session reads `reason` on unmet and the merge receipt on met |
+| answer-screener | 7 of 7 | 0.97 | 0 | moves to Jev: `reasons` goes, and on suspect code quotes the whole answer for the human, not the first 80 characters as today |
+| gate-supervisor | 7 of 7 | 0.72 to 0.92 | 0 | stays on the chat model with the ladder: a human reads `diagnosis` and `recommendation` on cancel and escalate |
 | screening | 22 of 35 | 0.50 to 1.00 | 1 | stays a session: both real suspect verdicts rested on reading the repository, which Jev cannot |
 | model-review | 8 of 13 | 0.50 to 0.95 | 1 | does not fit: on a real pull request it sat at 0.50 to 0.54 |
 | follow-liveness | 7 of 7 | 0.89 | 0 | stays on `small`: it exists to prove that route answers |
 
-Sebastian's rule (2026-11-28): no second model writes a sentence after the fact. A step whose text field nobody reads drops the field and takes Jev for the label. A step whose text someone reads takes a typed model that fills the label and the text in one answer, Needle by Cactus is under evaluation for that, or stays on the chat model with the answer ladder. Who reads each field is being traced in the code.
+Sebastian's rule (2026-11-28): no second model writes a sentence after the fact. The trace of the code settled who reads each text field. Sizing's `reason` is read by a human on every card, and `files` by the planner when the card is not small: both go, since the card's line can come from code and the planner reads the repository itself. The answer screener's `reasons` are read by a human on suspect: the quoted answer replaces them. Judgement's `reason` feeds the next coding session and the merge receipt, and the gate supervisor's text is read by a human on cancel and escalate: those two stay on the chat model. No typed model writes text: Jev has no text mode by its own documentation, and Needle 3 by Cactus Compute, a free 29 to 121 million parameter extractor under Apache 2.0, fills a field only with a span copied from the input, matched the production label in 13 of 20 runs and held back all 20 as below its own confidence floor.
 
 Facts the build relies on. The question is built from the step's role text and the input, not from the whole system text, which lowered the probabilities and flipped 2 of 5 judgement calls. Identical calls return probabilities up to 0.14 apart, and reversing the options lowered the gate supervisor from 0.87 to 0.72, so the options keep one fixed order and the bound has slack. The medium card scored 0.54 against 0.40 for small, so the sizing bound is 0.9 for a `small` size and 0.7 otherwise. Latency 0.2 s under 4,000 tokens, 0.5 s at 32,000. Limits: 32k tokens per question by default, 64k per request, 0.042 USD per million input tokens, output free. The endpoint is `POST /v1/systemone` with `noul` for yes or no and `choice` for 1 to 255 options, returning a probability or a choice with confidence.
 
@@ -64,7 +64,7 @@ Facts the build relies on. The question is built from the step's role text and t
 
 - Tests, hand-derived: a judgement `unmet` at p 0.91 stands. A label at p 0.55 runs on the chat model instead and the timeline step says `label p 0.55 below 0.70`. Follow-liveness `ok false` at p 0.98 ends the follow with `not live`. The alias list gains `label`. The policy refuses `label` for a purpose whose answer type keeps a text field someone reads.
 
-The four steps move one at a time, each after the battery's Part A ran on it with Jev in place. DeepSeek V4.1 Flash on Model Studio stays the option in the work list for the schema-shaped steps the ladder alone does not settle.
+The two steps move one at a time, each after the battery's Part A ran on it with Jev in place. DeepSeek V4.1 Flash on Model Studio stays the option in the work list for the schema-shaped steps the ladder alone does not settle.
 
 ### Task 3: The session tools the small model does not reach
 
