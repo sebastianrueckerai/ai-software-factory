@@ -188,6 +188,16 @@ What it says:
 
 Defaults from the measurement: the `guide` tool's description lists the agent's skills with their one-line descriptions. The test-writing rules join the coding guide as standing text instead of a skill. The check before the pull request, or the write tool, refuses a change that removes existing tests from a test file. Open question 1 of the walk-through is settled by this.
 
+### 2.12 Every tool and skill confirmed usable on the small model
+
+In progress: a battery under realistic conditions, re-runnable after a prompt change. Part A replays each direct step's exact first request, with its forced answer tool, on `small` and on its production model, and checks that the reply comes through the tool and decodes strictly against the schema. Part B runs every session step in the real harness on `small`, with real repositories at a commit before a real issue was fixed and the issue as the brief, one scenario per gateway tool the step offers, and checks the call and its arguments. Part C runs the three coding skills through the guide tool in those repositories. Part D replays the project agent's request on `premium` three times. Each tool and skill ends confirmed, failing or untested, with the reason.
+
+Order Sebastian set on 2026-11-28: fix every tool or skill fault the battery shows first, then run item 2.13.
+
+### 2.13 The complete prompts tested on realistic examples
+
+After 2.12's fixes: each agent's whole context, the standing text with its skills and tools as the walk-through decides them, runs on realistic cards and issues on the production model and on `small`. The measure per agent is the job done to its door's rules, not a feel: the filed answer accepted, the test written before the fix, the right tool called with valid arguments, the human-facing text in its form. The battery of 2.12 is the harness for this run, extended with the new texts.
+
 ## 3. The skills to write, with their sources
 
 ### The catalogue
@@ -251,7 +261,7 @@ Narration: terse, like a smart caveman. Write nothing before a routine call. Oth
 
 ## 6. The walk-through
 
-The order Sebastian and Claude go through: section 1's tables agent by agent, then items 2.1 to 2.11, then section 3 for the skills to write. Open questions the proposal leaves to the walk-through:
+The order Sebastian and Claude go through: section 1's tables agent by agent, then items 2.1 to 2.13, then section 3 for the skills to write. Open questions the proposal leaves to the walk-through:
 
 1. Test writing: settled by item 2.11, standing text in the coding guide, since `small` never fetched it before the fix.
 2. The responder answering a human: the 948-word guide for a one-line reply, or the chat form's three rules.
