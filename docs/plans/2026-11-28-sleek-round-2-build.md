@@ -49,6 +49,17 @@ Open: whether `big`, `small` or `premium` enforce a JSON schema at generation th
 
 Open: whether Sebastian's provider is Jev. If so, the label steps screening, sizing, judgement and answer-screener may take it later as a second step. Nothing else fits it.
 
-### Tasks 3 to 11
+### Task 3: The session tools the small model does not reach
+
+The battery's finding: on `small` a coding session guesses instead of asking (`request_info` 0 of 3), does everything itself instead of delegating (`delegate` 0 of 3), ignores the issue's image (`analyze_image` 0 of 3), reads with grep instead of `digest`, and takes versions from the module proxy instead of `web_search`. The last two are the right calls. The first three need construction, not a prompt rule.
+
+- **Images are described before the session.** When an issue or a message carries an image, factoryd calls the vision alias and puts the description into the brief, as the `telemetry` facts already are. The session's `analyze_image` stays for a screenshot the agent takes itself. Files: the brief renderer in `internal/factoryd` (grep `codingFacts`, `telemetry`), a test with an issue that holds one image and the brief that carries its description.
+- **A thin issue is asked about before the session.** The sizer's answer gains `needs_info` with the question, and factoryd asks the author through the existing request flow, so no session starts on an issue it cannot reproduce. The session's `request_info` stays for what the agent finds later. Files: `answers.go` (the sizing answer), the sizing door, the intake flow that today handles `request_info` from a session.
+- **Planned follow-up work is filed by the plan, not by the session.** A card's brief that names work as out of scope comes from the planner's cards, and the planner files the follow-up card itself. The session's `delegate` stays for the agent's own finds, with its skill line, and is measured again after the coding guide lands.
+- **The planner's model is measured, not assumed.** On `big` each step read 35 to 37 steps for 0.48 EUR without filing, where `small` filed in 4 to 10 steps for cents. Three real plan issues run on each, and Sebastian judges the six plans blind before the policy keeps `big`.
+- **The review's reasoning cannot eat its answer.** A reply cut at the output limit with no tool call joins the answer ladder's first retry, with thinking off for that call.
+- Tests, hand-derived: a brief with an image carries the description under its heading. A sizing answer with `needs_info` files the question and starts no session. A plan whose card brief names out-of-scope work yields a second card. A reply with `finish_reason: length` and no tool call retries once with thinking off.
+
+### Tasks 4 to 11
 
 Written when their rounds finish.
