@@ -224,6 +224,10 @@ After 2.12's fixes: each agent's whole context, the standing text with its skill
 
 Found by the battery: a coding session on `small` fetched Chrome for Testing from storage.googleapis.com, a host the sandbox's egress list admits for Go module downloads. The host serves any file, so the admission is wider than its purpose. The run was in the workstation's sandbox, not the gVisor pod, and the pod's egress rules may differ, so the first step is to check them. Default: the sandbox reaches Go modules through the factory's own module proxy or mirror, and storage.googleapis.com leaves the list. Veto line: keep the host and let the gates catch a foreign binary in the diff.
 
+### 2.15 A `typed` model class for schema-shaped answers
+
+Sebastian has a key for a proprietary provider strong at typed output and would rather not add it. Two reports are in progress: which of his existing providers (z.ai, Alibaba, OpenAI, Groq, fal, Replicate) serve an open-weight model strong at structured output, tool calls and labelling, with a JSON schema enforced at generation where possible, and which of the factory's model calls fit such a model. The rule: a step that generates much text is the wrong fit, a step that answers a schema, a tool call, a verdict or a label is the right one. Default: a new alias `typed` in LiteLLM's map behind an open-weight model on a provider already there, and the fitting steps move to it in the policy's purposes. Veto line: the proprietary provider, as the worst case.
+
 ## 3. The skills to write, with their sources
 
 ### The catalogue
@@ -287,7 +291,7 @@ Narration: terse, like a smart caveman. Write nothing before a routine call. Oth
 
 ## 6. The walk-through
 
-The order Sebastian and Claude go through: section 1's tables agent by agent, then items 2.1 to 2.14, then section 3 for the skills to write. Open questions the proposal leaves to the walk-through:
+The order Sebastian and Claude go through: section 1's tables agent by agent, then items 2.1 to 2.15, then section 3 for the skills to write. Open questions the proposal leaves to the walk-through:
 
 1. Test writing: settled by item 2.11, standing text in the coding guide, since `small` never fetched it before the fix.
 2. The responder answering a human: the 948-word guide for a one-line reply, or the chat form's three rules.
