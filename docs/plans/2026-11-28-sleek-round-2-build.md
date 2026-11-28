@@ -9,7 +9,7 @@
 ## Order
 
 1. The typed answer ladder (work list 2.12, Part A). First, since every direct step on `small` depends on it.
-2. The `typed` model class (2.15), with the ladder as its net.
+2. Jev for the label steps (2.15), each use case tested first, with the ladder as the net.
 3. The battery's session fixes (2.12, Parts B and C), once the report is in.
 4. The guide tool and the per-agent skills (2.8, 2.1), with the trigger lines in the tool's description.
 5. The coding guide and the caveman narration (2.2, 2.3), the test-writing rules standing.
@@ -24,30 +24,43 @@
 
 ### Task 1: The typed answer ladder
 
-**Files:** `internal/factoryd/answer.go` (`answerWith`), `internal/prompts/answer.go` (the limits the `max`, `item` and `enum` tags register), the callers that handle `badAnswerError` (`brief.go`, `brief_case.go`, `gatesupervisor.go`, `namer.go`) and the review's round accounting.
+Sebastian's rule (2026-11-28): the decode checks the schema so a fault shows at once, then every typed answer takes the same ladder: retry with the old result and the error, retry on the bigger model, escalate to the biggest model, and when no quick fix exists, escalate to a human.
 
-- The decode checks every `max`, `item` and `enum` tag after the strict JSON decode, with one refusal line per fault: `<field>: <n> characters, at most <cap>`, `<field>: <n> items, at most <cap>`, `<field>: <value> is not one of <enum>`.
-- Rung 0, repair without a call, where the fault is unambiguous. A string or list at most 10 per cent over its cap passes unchanged. An unknown key within one letter of exactly one missing required key is renamed. A prose answer that holds the tool's JSON, fenced or bare, is taken as the answer.
-- Rung 1: one retry on the same model. The conversation continues: the model's answer stays as its assistant message and the refusal lines follow as the next message, so the model corrects its own answer instead of thinking again.
-- Rung 2: one call on the class's stronger model, with the same two messages.
-- Rung 3: the value is cut at its cap at a word boundary and the answer stands. Each rung is one timeline step.
-- The model review counts a shape failure as no round.
-- Tests, hand-derived. 98 of 87 is over the 10 per cent slack (95.7), so it retries. 93 of 87 passes. A retry that fits ends the ladder. Two misses reach the stronger model. Three misses cut `left` to 87 characters at a word boundary. `reasones` is renamed to `reasons` without a call, and `reasns` with two candidates retries with `unknown field "reasns"`. A prose answer retries with `answered in text, not through the answer tool`.
+**Files:** `internal/factoryd/answer.go` (`answerWith`), `internal/prompts/answer.go` (the limits the `max`, `item` and `enum` tags register), the callers that handle `badAnswerError` (`brief.go`, `brief_case.go`, `gatesupervisor.go`, `namer.go`), the review's round accounting, the human card filing (`CreateHumanCard`).
 
-Open: whether `big`, `small` or `premium` enforce a JSON schema at generation through LiteLLM (structured outputs), to be checked before the task is cut.
+- **The check.** After the strict JSON decode, every `max`, `item` and `enum` tag and every required field is checked, and an empty string or list where the schema requires one is a fault. One refusal line per fault: `<field>: <n> characters, at most <cap>`, `<field>: <n> items, at most <cap>`, `<field>: <value> is not one of <enum>`, `<field>: empty`, `unknown field "<key>"`, `answered in text, not through the answer tool`, `cut at the output limit`.
+- **Rung 0, a repair without a call, only where no judgement is involved.** A string or list at most 10 per cent over its cap passes unchanged. An unknown key within one letter of exactly one missing required key is renamed. A prose answer that holds the tool's JSON, fenced or bare, is taken as the answer.
+- **Rung 1, the same model again.** The conversation continues: the model's own answer stays as its assistant message and the refusal lines follow as the next message, so the model corrects instead of thinking again. A reply cut at the output limit retries with thinking off.
+- **Rung 2, the class's bigger model**, with the same two messages.
+- **Rung 3, the biggest model**, `premium`, with the same two messages.
+- **Rung 4, a human**, when no quick fix exists: a human card with the step, the input's card and the last refusal, and the step waits for the answer. The quick fix exists for one fault only, a text over its cap, which is cut at the cap at a word boundary after rung 3, so a plan always gets a name.
+- Each rung is one timeline step with its refusal, and the model review counts a shape failure as no round.
+- Tests, hand-derived. 98 of 87 is over the 10 per cent slack (95.7), so it goes to rung 1. 93 of 87 passes. A retry that fits ends the ladder. Rungs 1 and 2 missing reach `premium`. Three misses on `left` cut it to 87 characters at a word boundary. Three misses on `verdict` file a human card whose text names the step and the last refusal. `reasones` is renamed to `reasons` without a call, and `reasns` with two candidates goes to rung 1 with `unknown field "reasns"`. A prose answer goes to rung 1 with `answered in text, not through the answer tool`. `finish_reason: length` with no tool call goes to rung 1 with thinking off. An empty `reasons` list on a suspect verdict is `reasons: empty`.
 
-### Task 2: The `typed` model class
+### Task 2: Jev for the label steps
 
-**Files:** infra `k8s/platform/litellm/helmrelease.yaml` (the model map), infra `factory/policy.yaml` (the purposes of the ten steps), the code's alias list where a new class name must be known (`internal/policy`, grep `small`, `big`, `premium`, `vision`), the agent map's registry job line for the gate supervisor.
+Sebastian's decision (2026-11-28): use Jev, TypeSafe AI's model, where it makes sense, and test each use case first. It answers Boolean, Choice and Score questions with a calibrated probability, fast and almost free, and returns no text and no tool call. The key `TYPESAFE_AI_KEY` exists with 30 EUR of credits.
 
-- One map entry `typed` behind `dashscope/deepseek-v4.1-flash-1017` on Alibaba Model Studio, thinking off, strict `json_schema` on. The Singapore caveat is checked first with one call through LiteLLM.
-- The ten fitting steps run on `typed`: checkin, screening, sizing, security-audit, gate-supervisor, judgement, answer-screener, plan-namer, title. Follow-liveness stays on `small`.
-- The five borderline steps stay until their replay: case-checkin and model-review need a read of the code, not of the transcript, in 3 of 3 runs on `typed` before they move.
-- The battery's Part A runs on `typed` for the ten steps before the policy changes, 3 runs each, and every answer must come through the tool and decode.
-- The gate supervisor's job line in the map says what it decides: wait, retry, cancel or escalate for an activity past its bound.
-- Tests, hand-derived: the policy test that lists the known aliases gains `typed`. The map's registry test pins the new job line.
+**Where it makes sense.** A step whose answer is a label, or a label with a text that only one branch needs:
 
-Open: whether Sebastian's provider is Jev. If so, the label steps screening, sizing, judgement and answer-screener may take it later as a second step. Nothing else fits it.
+| step | label | the text beside it |
+|---|---|---|
+| screening | clear or suspect | reasons, only for suspect, from `small` in a second call on that branch |
+| sizing | small, medium or large | the reason and the files, from `small` in a second call, or dropped if no reader needs them |
+| judgement | met or unmet | the reason, which the delta planner reads, from `small` on unmet |
+| answer-screener | yes or no | the reasons, from `small` on no |
+| gate-supervisor | wait, retry, cancel or escalate | the diagnosis and recommendation, which a human reads only on escalate and cancel, from `small` on those |
+| follow-liveness | ok true or false | none |
+
+The model review and the check-ins do not fit: their answers are findings and guidance, not a label.
+
+**How Jev enters.** It is no chat model, so it does not go through LiteLLM's map. The gateway gets one client for it, `internal/gateway/label.go`, with `Label(ctx, question, choices, input) (choice string, p float64, err error)`, the key seeded as a cluster secret like the other provider keys (`seed-secrets`, the infra `README` list), and the policy names it by one alias, `label`, in the purposes of the steps that use it. The probability is kept on the timeline step. A probability below a bound the policy sets, default 0.7, sends the call to the class's bigger chat model instead, so a doubtful label never stands alone. This is the one exception to "only LiteLLM names a model", written into the architecture document with its reason.
+
+**The tests, before any step moves.** The use-case test under the gitignored ledger replays each step's captured inputs and real issues through Jev: agreement with the production model's label, probability on agreements and disagreements, stability over repeats, latency, the largest input accepted. A step moves only when its agreement with `big` is at least as high as `small`'s and its disagreements carry low probabilities. The battery's Part A then runs on the moved steps.
+
+- Tests, hand-derived: a screening verdict `suspect` at p 0.91 files through `file_screening` with reasons from `small`. A verdict at p 0.55 runs on `big` instead and the timeline step says `label p 0.55 below 0.70`. Follow-liveness `ok false` at p 0.98 ends the follow with `not live`. The alias list gains `label`. The policy refuses `label` for a purpose whose answer type has a text field without a second call.
+
+Open: the use-case test's result, which decides the table above step by step. DeepSeek V4.1 Flash on Model Studio stays the option in the work list for the schema-shaped steps the ladder alone does not settle.
 
 ### Task 3: The session tools the small model does not reach
 

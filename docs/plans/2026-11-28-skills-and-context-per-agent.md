@@ -234,7 +234,7 @@ The provider report is in. The best candidate on a provider already in the map i
 
 No provider named Jeff was found. The nearest match is Jev by TypeSafe AI, proprietary and in early access since September 2026: it answers Boolean, Choice and Score questions with calibrated probabilities, fast and almost free, and returns no schema object and no tool call. If that is the provider meant, it fits the pure label steps, screening's clear or suspect, sizing's three sizes, judgement's met or unmet, the answer screener's yes or no, and none of the steps that answer a schema with text fields, the check-in first among them.
 
-Default: a new alias `typed` in LiteLLM's map behind DeepSeek V4.1 Flash on Model Studio, the ten fitting steps move to it in the policy's purposes, the borderline five after their replays, and the answer ladder of 2.12 stays as the net. Veto line: the proprietary provider for the label steps only.
+Decided by Sebastian on 2026-11-28, after the key arrived with 30 EUR of credits: Jev for the steps whose answer is a label, screening, sizing, judgement, answer-screener, gate-supervisor and follow-liveness, each tested on its own inputs before it moves, with the text beside the label from `small` on the branch that needs it. For every other typed answer the decode checks the schema so a fault shows at once, and the same ladder applies each time: retry with the old result and the error, retry on the bigger model, escalate to the biggest, then to a human when no quick fix exists. The build plan's Tasks 1 and 2 carry both. DeepSeek V4.1 Flash on Model Studio stays the option for the schema-shaped steps if the ladder alone proves too costly.
 
 ## 3. The skills to write, with their sources
 
