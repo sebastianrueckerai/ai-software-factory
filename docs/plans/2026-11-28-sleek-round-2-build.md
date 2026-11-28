@@ -26,10 +26,12 @@
 **Files:** `internal/factoryd/answer.go` (`answerWith`), `internal/prompts/answer.go` (the limits the `max`, `item` and `enum` tags register), the callers that handle `badAnswerError` (`brief.go`, `brief_case.go`, `gatesupervisor.go`, `namer.go`) and the review's round accounting.
 
 - The decode checks every `max`, `item` and `enum` tag after the strict JSON decode, with one refusal line per fault: `<field>: <n> characters, at most <cap>`, `<field>: <n> items, at most <cap>`, `<field>: <value> is not one of <enum>`.
-- A string or list inside 10 per cent over its cap passes unchanged.
-- Beyond that, or on a missing tool call or an unknown key: one retry on the same model with the refusal lines as the next message. Then one call on the class's stronger model. Then the value is cut at its cap and the answer stands. Each rung is one timeline step.
+- Rung 0, repair without a call, where the fault is unambiguous. A string or list at most 10 per cent over its cap passes unchanged. An unknown key within one letter of exactly one missing required key is renamed. A prose answer that holds the tool's JSON, fenced or bare, is taken as the answer.
+- Rung 1: one retry on the same model. The conversation continues: the model's answer stays as its assistant message and the refusal lines follow as the next message, so the model corrects its own answer instead of thinking again.
+- Rung 2: one call on the class's stronger model, with the same two messages.
+- Rung 3: the value is cut at its cap at a word boundary and the answer stands. Each rung is one timeline step.
 - The model review counts a shape failure as no round.
-- Tests, hand-derived. 98 of 87 is over the 10 per cent slack (95.7), so it retries. 93 of 87 passes. A retry that fits ends the ladder. Two misses reach the stronger model. Three misses cut `left` to 87 characters at a word boundary. `reasones` retries with `unknown field "reasones"`. A prose answer retries with `answered in text, not through the answer tool`.
+- Tests, hand-derived. 98 of 87 is over the 10 per cent slack (95.7), so it retries. 93 of 87 passes. A retry that fits ends the ladder. Two misses reach the stronger model. Three misses cut `left` to 87 characters at a word boundary. `reasones` is renamed to `reasons` without a call, and `reasns` with two candidates retries with `unknown field "reasns"`. A prose answer retries with `answered in text, not through the answer tool`.
 
 Open: whether `big`, `small` or `premium` enforce a JSON schema at generation through LiteLLM (structured outputs), to be checked before the task is cut.
 
