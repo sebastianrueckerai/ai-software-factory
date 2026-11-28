@@ -168,23 +168,25 @@ opencode 1.19.6 ships one built-in skill, `customize-opencode`: the bundled sour
 
 ### 2.11 Do agents fetch a guide as they would a skill?
 
-Measured on 2026-11-28 with the real `small` and `big` models in the pinned harness: three scenarios (a follow-up card through `delegate`, a question through `escalate`, a bug fix with a test), the same 100 to 150 word bodies behind opencode's skill tool and behind a `guide` tool, three runs per cell, 41 runs, 0.98 USD in total. The tables count runs in which the model read the body before the action it governs.
+Measured on 2026-11-28 with the real `small` and `big` models in the pinned harness: three scenarios (a follow-up card through `delegate`, a question through `escalate`, a bug fix with a test), the same 100 to 150 word bodies behind opencode's skill tool and behind a `guide` tool, three runs per cell, 53 runs, 1.01 USD in total. The tables count runs in which the model read the body before the action it governs.
 
-| scenario | skill, small | guide, small | skill, big | guide, big |
-|---|---|---|---|---|
-| delegate | 3 of 3 | 1 of 3 | 3 of 3 | 3 of 3 |
-| escalate | 3 of 3 | 2 of 3 | 3 of 3 | 3 of 3 |
-| tests | 0 of 3 | 0 of 3 | 3 of 3 | 3 of 3 |
+The first run put only the line "Read a skill of your job before you act on it" into the guide tool's description, with each skill's one-line description, which says when to read it, only inside the `name` parameter. The second run put those lines into the tool's description, where the skill list puts them in the system prompt.
+
+| scenario | skill, small | guide, small, lines in the parameter | guide, small, lines in the description | skill, big | guide, big |
+|---|---|---|---|---|---|
+| delegate | 3 of 3 | 1 of 3 | 5 of 6 | 3 of 3 | 3 of 3 |
+| escalate | 3 of 3 | 2 of 3 | 3 of 3 | 3 of 3 | 3 of 3 |
+| tests | 0 of 3 | 0 of 3 | 0 of 3 | 3 of 3 | 3 of 3 |
 
 What it says:
 
 - `big` treats the guide like a skill: 9 of 9 reads with each mechanism, and it followed every body rule.
-- `small` read the skill in 7 of 9 runs and the guide in 3 of 9. The cause is placement, not the mechanism: the skill list puts each one-line trigger into the system prompt, while the test's guide tool kept the triggers in its `name` parameter and carried only the one line "Read a skill of your job before you act on it". Three runs per cell is a signal, not proof.
-- `small` never wrote the test first, with either mechanism, and read the test skill only after the fix. Test writing cannot sit behind a fetch for the small model.
-- Three `small` runs overwrote an existing test file with `write` and lost its two tests. That is a hazard for a door or a check, not for a prompt.
+- `small` reads the guide as often as the skill once the tool's description carries each skill's one line: 8 of 9 against 6 of 6 for skills on delegate and escalate. With the lines hidden in the parameter it read 3 of 6.
+- `small` never wrote the test first, with either mechanism, in 9 of 9 runs, and read the test skill only after the fix. Test writing cannot sit behind a fetch for the small model.
+- Three `small` runs overwrote an existing test file with `write` and lost its two tests. A sentence in the prompt does not stop that reliably. Code should refuse a change that removes existing tests from a test file.
 - The schemas already enforce the "Acceptance:" section and the two to five choices: every call met them, read or not. Only the body rules and the test order depended on the fetched text.
 
-Defaults from the measurement: the `guide` tool's description lists the agent's skills as one trigger line each, the same lines the skill list would carry, so `small` sees them where it looks. The test-writing rules join the coding guide as standing text instead of a skill. A door refuses a `write` that drops existing tests from a test file. Open question 1 of the walk-through is settled by this.
+Defaults from the measurement: the `guide` tool's description lists the agent's skills with their one-line descriptions. The test-writing rules join the coding guide as standing text instead of a skill. The check before the pull request, or the write tool, refuses a change that removes existing tests from a test file. Open question 1 of the walk-through is settled by this.
 
 ## 3. The skills to write, with their sources
 
