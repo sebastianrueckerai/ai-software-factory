@@ -15,29 +15,59 @@ For every agent two explicit choices, each of which may be "none":
 
 The table is filled from the map and the sweep. "today" is the standing text as the map shows it. "proposed" is the default for the walk-through.
 
-Words are from the map. "chunk" is the 55-word factory chunk. A skill named here is fetched on call, not standing.
+Only two agents need skills behind the `guide` tool: the coding agent, five, and the project agent, three. Every other job fits its paragraph, the planner steps included. Targets count the paragraph alone. The cuts of item 2.1 apply to every row. "keep" marks a sentence of today's paragraph that stays. The sweep's words per agent are in item 2.1.
 
-| agent | factory knowledge today | proposed | work instructions today | proposed | human-facing text today | proposed |
-|---|---|---|---|---|---|---|
-| coding, coding-card | chunk + 6 sentences of the paragraph | 2 sentences: the sandbox and that the gates judge the pushed tree | paragraph 173, no coding guide | coding guide 190 standing; skills test-writing, debugging, delegate-card, ask-human, request-tool | 5 forms, 1,182 | none standing; the last message's shape is one sentence of the paragraph |
-| message-responder | as coding | none of its own | none | none: it is the same session | guide + chat form, 1,176, every turn | guide + chat form only in the turn that answers a human; none for a model's message |
-| screening | chunk | none: "you screen issues" | paragraph 105 | paragraph, told what its repository read is for | line form 71 | none; one sentence in the reason field |
-| sizing | chunk | none | paragraph 102 | paragraph | line form 71 | none; the reason field says it |
-| repo-map | chunk + the issue frame | none; no issue frame: one map serves every card | paragraph 63 | paragraph + the check convention + a stop rule | none | none |
-| planner, 6 steps | chunk + paragraph sentences | 1 sentence: the cards run as sessions and the gates judge them | paragraph 106 each | a planning skill in each step's paragraph, from superpowers writing-plans cut to the step | title, why, summary, brief, ask forms, 1,253 | the card fields' descriptions; one rule in the questions field; no forms |
-| prover | chunk | none | paragraph 148 | paragraph | none | none |
-| checkin | chunk | 1 sentence on rungs and the handover | paragraph 70 + statement | paragraph + how to write guidance for a model and what separates continue from handover | why form 157 | none; one sentence in the reason field for a hand-up |
-| case-checkin | chunk | chunk + the manual tool: it judges cases of every kind | paragraph 66 | paragraph that says what each offered action and verdict means, not what is not offered | line form 71 | none; one sentence in the grounds field |
-| model-review | none | none | paragraph 73 + review prompt | paragraph; alert-only clauses as notes keyed on their flags | 202 | none: a model and code read it |
-| security-audit | none | none | paragraph 38 | paragraph | line form 71 | none; one sentence in the why field |
-| gate-supervisor | none | none | paragraph 44 + 123-word prompt | paragraph; the enum carries the allowed actions | line form 71 | none; escalate and cancel reasons: one sentence in the field |
-| judgement, delta-planner, holdout-proposer, answer-screener | none | none | paragraphs 39 to 60 | paragraphs; delta-planner gets the repository map; answer-screener gets the question asked | 71 to 748 | none |
-| brief-writer, case-brief-writer | none | none | paragraphs 41, 43 | paragraphs | brief + why + ask forms 434; line form 71 | brief-writer keeps a 60-word brief rule; case-brief-writer keeps the line form |
-| plan-namer, title | none | none | paragraphs 13, 16 | paragraphs | title form 71 | none: the field caps at 24 characters and says "a name, not a sentence" |
-| project-agent | chunk + paragraph + the manual tool | as today: it needs much and fetches more | paragraph 102 | paragraph + a rule to read before stating a fact | guide + 5 forms + chat form, 2,358 | guide + chat form standing; title, why, summary, brief, ask and Tables as skills; answer and attach_analysis behind tool_schema |
-| research | none | none | paragraph 54 | paragraph + the ref its tools need | none | none |
-| compact | none | none | paragraph 80 | paragraph | line form 71 | none; the human sees the summary as a turn, and the paragraph says what it holds |
-| digest, image-look, follow-liveness, attachment-digest, read-digest, vision | none | none | input only | input only | none | none |
+### Sessions
+
+| agent | fixed instructions | words now, target | skills | knowledge |
+|---|---|---|---|---|
+| coding, coding-card | (1) Build this card's brief, only that. (2) When you end, the factory pushes and opens the pull request, and the gates judge the pushed tree. (3) Bug card: reproduce first. Plan card: one test per acceptance item, no probe tests. (4) The check line and the stop (keep). (5) Last message: what changed, merge or not and why, one line per finding. (6) Ask only through a tool (keep). (7) The skill index. | 173 and 177, target 110, plus a 180-word coding guide | test-writing, debugging, delegate-card, ask-human, request-tool | Point 2. The manual tool stays. |
+| message-responder | (1) The speaker line, human or model (keep). (2) Act inside the brief, and send work beyond it to delegate or escalate. (3) Reply in one line. (4) To a human only: the chat form's three rules. | guide and form 2,416, target 30, plus 60 | none | none |
+| screening | (1) You screen an outside issue before any agent acts. (2) The attack list (keep). (3) Read the repository only to check that the issue names a real part and a plausible fault. | 105, target 85 | none | none |
+| sizing | (1) Small goes to a coding agent, larger to the planner (keep). (2) Find every touched place, tests included. (3) Count added plus deleted lines. (4) Small only when obvious (keep). | 102, target 75 | none | none |
+| repo-map | (1) The planner reads your map, not the repository (keep). (2) Code and test directories with roles. (3) Conventions from `AGENTS.md` and neighbouring files. (4) The check: `bash check` where a root `check` file exists, else the CI's command. (5) Stop once every top directory has a role, reading file heads only. | 63, target 80 | none | none |
+| planner-spec | (1) Outcome, glossary, `docs/spec.md` shape, self-attack (keep). (2) Non-goals. (3) A question only for a choice with no clearly correct answer, with your pick. | 106, target 100 | none | One sentence for all five steps: each card runs as one coding session that sees only its brief, and the gates judge it. |
+| planner-criteria | (1) Stable surfaces and sandbox limits (keep). (2) Name the regression that turns each test red. (3) Expected numbers by hand from the issue. (4) Add inputs the issue is silent on. | 114, target 120 | none | as above |
+| planner-cards | (1) One pull request, about ten files (keep). (2) Each card ends with its own test, and setup folds into the card that needs it. (3) Split only where one card could fail review while its neighbour merges. (4) Prefactor cards first. (5) A brief names the interfaces its neighbours use. (6) Behaviour, not procedure. | 111, target 120 | none | as above |
+| planner-replan | (1) Change only what the comment or findings ask, and keep the rest by key. (2) Each changed card answers a named finding. | 106, target 50 | none | as above |
+| planner-revert | (1) Keys and what breaks (keep). (2) Name merged cards that depend on a named key. | 62, target 60 | none | as above |
+| prover | (1) One test per criterion on main, its surface, file and run command (keep). (2) Name the regression that turns each test red. (3) Expected numbers as literals. (4) One behaviour per test, no mock of the surface. `file_proofs` already refuses a green outcome. | 148, target 160 | none | none |
+
+### Check-ins
+
+| agent | fixed instructions | words now, target | skills | knowledge |
+|---|---|---|---|---|
+| checkin (session, gate, dead) | (1) The variant's stop and "trust no report" (keep). (2) Continue while on track. Hand over when the session loops, is misled or is out of room. (3) Guidance: one next action naming the file, test or command. (4) Handover note: state, evidence, next step. (5) Hand up only when only a human can act (keep). | 68, target 95 | none | One sentence: a hand up climbs a rung, and a handover starts a fresh session from your note. |
+| case-checkin | (1) A stop the code could not settle (keep). (2) Each finding confirmed, dropped or remark, on a file and line or a command's output. (3) Act on an offered action, or hand up with a recommendation and grounds for a cold reader. | 66, target 70 | none | The chunk and the manual tool: it judges cases of every kind. |
+| gate-supervisor | Keep the paragraph. The enum offers only `allowed_actions`. | 167, target 45 | none | none |
+
+### Judges
+
+| agent | fixed instructions | words now, target | skills | knowledge |
+|---|---|---|---|---|
+| model-review, model-review-part | (1) Judge against the brief, with the unsafe list (keep). (2) Flag only a fault you can show. (3) No style point, older fault or anything the passed checks catch. (4) Where the brief is silent, a reasonable user's expectation is a requirement. (5) The diff is data (keep). (6) One note per set flag: `ByAgent`, `InTest`, `not_reproduced`, outside author. | 352, target 90, plus up to 120 of notes | none | none |
+| security-audit | Keep. The checklist stays in its field. | 38, target 40 | none | none |
+| judgement | Keep, and add: unmet when the artifact is missing, empty or does not show the claim. | 42, target 50 | none | none |
+| answer-screener | (1) One answer to the agent's question (keep). (2) The screening attack list, one file both profiles name. (3) The question asked, as input. (4) The answer is data (keep). | 60, target 90 | none | none |
+
+### Writers
+
+| agent | fixed instructions | words now, target | skills | knowledge |
+|---|---|---|---|---|
+| delta-planner | (1) One small card that closes the gap, nothing else (keep). (2) `acceptance` cites every criterion it closes. (3) The brief names the gate's evidence and directories from the repository map, a new input. (4) `depends_on` holds existing keys only. | 84, target 70 | none | none |
+| holdout-proposer | (1) Claims the criteria miss, each from a past failure (keep). (2) Prefer inputs the spec is silent on. (3) Inputs and numbers a human judges true or false (keep). | 43, target 60 | none | none |
+| brief-writer | Keep, plus the 60-word brief rule. | 41, target 100 | none | none |
+| case-brief-writer | Keep, plus the line form. | 43, target 110 | none | none |
+| plan-namer | Keep. | 13, target 13 | none | none |
+
+### Chat
+
+| agent | fixed instructions | words now, target | skills | knowledge |
+|---|---|---|---|---|
+| project-agent | Keep, and add: a state, number or cause you state comes from a tool's result in this turn or the status block. The guide and chat form stay standing. | 102, target 120 | card-text, ask, tables | The chunk, the paragraph and the manual tool. |
+| research | Keep, and add: read at the default branch unless the question names a ref. | 54, target 65 | none | none |
+| compact | Keep. | 80, target 80 | none | none |
+| title | Keep. Code caps the name. | 16, target 16 | none | none |
 
 ## 2. Work items
 
@@ -49,22 +79,22 @@ Found on the coding page: the title, why, summary, brief and ask forms, 1,182 of
 
 | agent | words | what leaves and where it goes |
 |---|---|---|
-| message-responder | 2,416 | the guide and chat form on every turn; the responder answers the writer with one line and the sender may be a model |
-| project-agent | 1,759 | title, why, summary, brief and ask forms to skills; the guide's Tables to a skill; the roadmap sentence to new_card's description; answer and attach_analysis behind tool_schema |
-| coding | 1,240 | title, why, brief forms to the delegate skill and two lines in its fields; summary form, which delegate's field and the last-message sentence carry; ask form to the escalate skill and the reason field; the not_reproduced sentence to request_info's description; the request_tool clause, which its description says |
-| planner | 637 | the ask form to one rule in the questions field; the ask-card sentences and "after a session" that planner cards never reach; 35 words on keys that the fields say |
-| brief-writer | 374 | the ask form, whose shape fits neither field; a 60-word rule stays |
-| case-checkin | 259 | the "not offered" lines, which the enum already leaves out; the reason_kind enum, which code can set from the case kind |
+| message-responder | 2,416 | the guide and chat form on every turn. the responder answers the writer with one line and the sender may be a model |
+| project-agent | 1,759 | title, why, summary, brief and ask forms to skills. the guide's Tables to a skill. the roadmap sentence to new_card's description. answer and attach_analysis behind tool_schema |
+| coding | 1,240 | title, why, brief forms to the delegate skill and two lines in its fields. summary form, which delegate's field and the last-message sentence carry. ask form to the escalate skill and the reason field. the not_reproduced sentence to request_info's description. the request_tool clause, which its description says |
+| planner | 637 | the ask form to one rule in the questions field. the ask-card sentences and "after a session" that planner cards never reach. 35 words on keys that the fields say |
+| brief-writer | 374 | the ask form, whose shape fits neither field. a 60-word rule stays |
+| case-checkin | 259 | the "not offered" lines, which the enum already leaves out. the reason_kind enum, which code can set from the case kind |
 | repo-map | 211 | the issue frame: one map serves every card at the commit |
-| checkin | 186 | the why form, which no field takes; the last-message sentence of a session that has none yet; the handover cap that cutHandover enforces |
-| screening, sizing | 171 each | the sandbox facts of a step without bash; the author's standing that none of them acts on; the review's share of the budget; the line form |
-| gate-supervisor | 166 | the prompt's repeat of the bundle's keys; the enum offers retry that allowed_actions leaves out |
-| model-review | 148 | the cost sentence no rule uses; the checks sentence shown only when the field is present; the alert-only clauses as notes on their flags |
-| holdout-proposer, answer-screener, case-brief-writer | 90, 86, 20 | a sentence that repeats the paragraph; the line form |
+| checkin | 186 | the why form, which no field takes. the last-message sentence of a session that has none yet. the handover cap that cutHandover enforces |
+| screening, sizing | 171 each | the sandbox facts of a step without bash. the author's standing that none of them acts on. the review's share of the budget. the line form |
+| gate-supervisor | 166 | the prompt's repeat of the bundle's keys. the enum offers retry that allowed_actions leaves out |
+| model-review | 148 | the cost sentence no rule uses. the checks sentence shown only when the field is present. the alert-only clauses as notes on their flags |
+| holdout-proposer, answer-screener, case-brief-writer | 90, 86, 20 | a sentence that repeats the paragraph. the line form |
 | security-audit, judgement, plan-namer, title, compact | 71 each | the line or title form, whose one useful sentence goes into the field it governs |
-| delta-planner, prover | 61, 52 | the ask-card sentences; the narration's forms sentence where there are no forms |
+| delta-planner, prover | 61, 52 | the ask-card sentences. the narration's forms sentence where there are no forms |
 
-Three passages are wrong rather than long: delegate refuses a brief that follows the brief form's "Check:" example, since it demands "Acceptance:"; escalate's reason field reads "the reason this work exists", copied from delegate; the guide tells the responder and the project agent that changes need "the user's OK" where no user exists.
+Three passages are wrong rather than long. The delegate door refuses a brief that follows the brief form's "Check:" example, since it demands "Acceptance:". The escalate reason field read "the reason this work exists", copied from delegate. The guide tells the responder and the project agent that changes need "the user's OK" where no user exists. Item 2.9 carries them.
 
 Default: a skill per action and per agent (the coding agent's `delegate-card`, `ask-human`, `request-tool`), reached through the `guide` tool of item 2.8, the body pinned in `internal/prompts/skills/<step>/<name>.md` by the sums file. Where a tool has fields, the field descriptions carry the essentials and the skill the examples. Veto line: the forms inside the tool's field descriptions alone, no skills.
 
@@ -86,11 +116,11 @@ Default: a profile's guide and forms render only in a turn whose output a human 
 
 opencode's environment block says "You are powered by the model named small. The exact model ID is factory/small". The sentence reads the model id, and the id must stay the alias: the gateway refuses any other, and opencode changes its tools on some ids. The model's `name` never reaches the wire, so it is free to carry the real name. Measured with the pinned binary: the `experimental.chat.system.transform` hook can rewrite the sentence from the model's name, 15 words to 6, "You are powered by zai/glm-5.3-flash.", one regex per request and no call.
 
-Default: the gateway's window answer, which the worker already fetches per alias at session start, gains `model` from LiteLLM's `litellm_params.model` in the price book's `/model/info` poll; the worker writes it into the model's `name`; the pinned plugin rewrites the line. Only LiteLLM's configuration names the model, resolved at run time. The two fake gateways in the tests answer the field too. Veto line: leave the alias in the line.
+Default: the gateway's window answer, which the worker already fetches per alias at session start, gains `model` from LiteLLM's `litellm_params.model` in the price book's `/model/info` poll. The worker writes it into the model's `name`, and the pinned plugin rewrites the line. Only LiteLLM's configuration names the model, resolved at run time. The two fake gateways in the tests answer the field too. Veto line: leave the alias in the line.
 
 ### 2.6 The map tells fixed text from example input
 
-Default: every span is fixed (same bytes in every run under one code SHA, policy and harness: guide, forms, chunks, paragraphs, tool texts, the environment block, the sandbox facts line) or per card (rendered from the card or drawn per run: facts, brief, issue, findings, `AGENTS.md`, transcript). `agentdoc.Span` gains `PerCard bool`, set by the capture from the builder's provenance. On the page a per-card part's heading is wrapped in `<mark>`, which renders yellow on GitHub, in VS Code and on Forgejo (its sanitizer keeps `mark`), with the legend "Yellow headings are example input, rendered from the card; plain parts are fixed text every run carries", and the provenance line names the card. The index gains a section with fixed bytes, example bytes and the example parts per agent. Design settled; the fallback marker is a blockquote if `<mark>` ever fails.
+Default: every span is fixed (same bytes in every run under one code SHA, policy and harness: guide, forms, chunks, paragraphs, tool texts, the environment block, the sandbox facts line) or per card (rendered from the card or drawn per run: facts, brief, issue, findings, `AGENTS.md`, transcript). `agentdoc.Span` gains `PerCard bool`, set by the capture from the builder's provenance. On the page a per-card part's heading is wrapped in `<mark>`, which renders yellow on GitHub, in VS Code and on Forgejo (its sanitizer keeps `mark`), with the legend "Yellow headings are example input, rendered from the card. Plain parts are fixed text every run carries", and the provenance line names the card. The index gains a section with fixed bytes, example bytes and the example parts per agent. Design settled. The fallback marker is a blockquote if `<mark>` ever fails.
 
 ### 2.7 Whole example contexts per agent from real cards
 
@@ -100,7 +130,7 @@ Default: beside each page, whole-request files `docs/agents/<agent>/<moment>.md`
 |---|---|---|
 | coding | `start`, `after-checkin` | after the check-in the request holds the transcript so far and the guidance |
 | message-responder | `turn` | the session after a writer's message |
-| planner | `spec` | the page shows the replan step; the spec step reads the real issue and the map |
+| planner | `spec` | the page shows the replan step. the spec step reads the real issue and the map |
 | screening | `issue` | a real outsider issue |
 | checkin | `session-trip` | a real tail of a session |
 | project-agent | `card-thread` | a real card-bound thread with its tool rows |
@@ -125,16 +155,64 @@ How a session reaches a skill, measured with the pinned binary against a capture
 
 Default: the `guide` tool, one line on the wire: "Read a skill of your job before you act on it", with the agent's skill names as its enum. It costs a third of the words, no repository can replace a skill, and it follows the manual tool's pattern. Veto line: opencode's own skills, with `skills.paths` and the external switch set.
 
-## 3. Public skills to start from
+### 2.9 Four faults the sweep found
 
-| need | source | words | what to take |
+- **The brief form and the `delegate` door disagree.** The form's example heads the checks "Check:", the door demands "Acceptance:", as `ready.go`, the planner and the imager write it everywhere else. Default: `delegate` takes an `acceptance` list field, as the planner's cards already do, so the brief needs no heading and the form's text stays as it is. Veto line: the form's example says "Acceptance:", one word in a pinned text of Sebastian's.
+- **The `escalate` reason field** carried "the reason this work exists", copied from `delegate`. Fixed in code in this round: "why the question comes up now and what waiting for the answer costs". The chat tools of the console reuse one `WhyLine` sentence in several tools, and whether it fits each is not yet checked.
+- **The audit routine's card says "Run the skill audit."** Sessions deny `skill`, and no audit skill body exists, so no session can follow the line. Default: the routine's card text says what to do, or an audit skill joins that card's `guide` enum.
+- **"Changes to this guide need the user's OK"** is the guide's first line. It is right in Sebastian's own skill and wrong in an agent's context. Default: the code copy drops that one line, and the test that keeps the copy byte for byte allows this one named difference. Veto line: keep it.
+
+### 2.10 The harness's own skills
+
+opencode 1.19.6 ships one built-in skill, `customize-opencode`: the bundled source seeds its skill state with it alone, and a run of the pinned binary with a throwaway home and `skill: allow` confirmed it. Its listing adds 85 words to the system prompt, and a load returns 2,008 words on opencode's own configuration, agents, plugins, MCP servers and permissions. Nothing in it serves the factory: no agent configures opencode, and the audit flags an `opencode.json` edit. Default: `skill` stays denied for every session, which also hides `~/.claude/skills`, `~/.agents/skills`, the project's skill folders, `skills.paths` and the network-pulled `skills.urls`. The profile's skills come through the `guide` tool of item 2.8.
+
+### 2.11 Do agents fetch a guide as they would a skill?
+
+Pending: a small experiment with the real `small` and `big` models in the pinned harness, three scenarios (a follow-up card, a question to a human, a bug fix with a test), the body behind opencode's skill tool against the same body behind a `guide` tool, three repeats each, at most 3 EUR. The result decides item 2.8's default.
+
+## 3. The skills to write, with their sources
+
+### The catalogue
+
+| skill | trigger | words | sources |
 |---|---|---|---|
-| coding guide | Sebastian's global coding guide (ponytail) | about 600 | the ladder, root cause, no unrequested abstractions, one way only, what never to cut, hand-derived tests, verify by running |
-| test writing | superpowers `test-driven-development`, Sebastian's `test-audit` | 1,475 and 1,145 | red first, one assertion per behaviour, expected values by hand, no assertion bent to pass |
-| debugging | superpowers `systematic-debugging` | 1,454 | reproduce first, one hypothesis at a time, read the error, change one thing, prove the fix |
-| planning | superpowers `writing-plans`, `brainstorming` | 1,639 and 2,658 | the spec first, each task its test, exact names, what the implementer cannot know |
-| narration | caveman `SKILL.md` | 744 | the nine rules, cut to a paragraph |
-| finishing | superpowers `verification-before-completion` | 580 | run the check, read the output, then stop |
+| coding/guide | standing | 180 | 1, 7, the section 4 draft without its verify sentence |
+| coding/test-writing | before you write or change a test | 150 | 2, 3, 4 |
+| coding/debugging | a check fails and the first error does not name the cause, or the fault does not reproduce | 160 | 5, 6, 7 |
+| coding/delegate-card | before `delegate` | 140 | the four card forms, 10 |
+| coding/ask-human | before `escalate` | 140 | the ask form, 11 |
+| coding/request-tool | the check needs a binary the sandbox lacks | 80 | the manual's images section, no public source |
+| project-agent/card-text | before `new_card` or `edit` | 180 | the four card forms, 748 words |
+| project-agent/ask | before `escalate` or `ask` | 150 | the ask form, 434 words |
+| project-agent/tables | before a reply with a table | 105 | the guide's Tables section |
+
+- **test-writing:** watch the test fail for the reason the brief names. Name the change that turns it red. Expected values are hand-derived literals. Assert behaviour at the public seam, never a mock. Extend a table case before adding a near-duplicate. Fix the code, never the assertion.
+- **debugging:** make a command that goes red on this fault, and ship it as the regression test. Read the whole error. Test one hypothesis at a time. Fix at the source every caller passes. After three failed fixes, call `request_cut` or `escalate`. A fault you cannot reproduce goes to `request_info`, or the fix carries the `not_reproduced:` line. Remove tagged debug output.
+- **delegate-card:** delegate only work this card's acceptance does not need. Give current and desired behaviour, interfaces by name, acceptance items with numbers, and what is out of scope. No line numbers or procedure.
+- **ask-human:** ask only what the brief, repository, issue and manual cannot answer. One question a cold reader answers, the story's three lines, a recommendation with its reason, two to five choices with what each changes.
+- **request-tool:** check `command -v` and the sandbox facts first. Prefer `go install` or `npm`. Name the exact Debian package. Ask before long work, since the card restarts.
+
+### Public sources
+
+| # | source | licence | words | rules kept |
+|---|---|---|---|---|
+| 1 | Sebastian's coding guide | his own | 600 | the ladder, root cause, no unrequested abstraction, one way only, what never to cut |
+| 2 | superpowers `test-driven-development` and `writing-good-tests.md` | MIT | 2,785 | red for the expected reason, name the break, literal expectations, no mock assertions |
+| 3 | Sebastian's `test-audit` | none stated | 1,145 | four authoring questions, extend a table case, red on pre-fix code |
+| 4 | mattpocock/skills `tdd` | MIT | 574 | public seams, no tautological assertion, one slice per cycle |
+| 5 | superpowers `systematic-debugging` | MIT | 1,454 | read the error, reproduce, one change, stop after three fixes |
+| 6 | mattpocock/skills `diagnosing-bugs` | MIT | 1,427 | red-capable command first, minimise, falsifiable hypotheses, tagged debug output |
+| 7 | caveman `investigate-first`, `surgical-patch`, `verify-and-stop`, `lean-build` | Apache-2.0 | 92 to 152 each | symptom apart from cause, narrowest layer, keep unrelated behaviour, stop at proof |
+| 8 | superpowers `verification-before-completion` | MIT | 580 | none: the check line and the gates carry it |
+| 9 | superpowers `writing-plans` | MIT | 1,639 | right-sized tasks, exact interfaces, decisions only, Review Focus. For the planner and hold-out paragraphs. |
+| 10 | mattpocock/skills `to-tickets`, `triage/AGENT-BRIEF.md` | MIT | 908, 1,232 | vertical slices, blocking edges, current and desired behaviour, out of scope |
+| 11 | superpowers `brainstorming`, Sebastian's "When to ask" | MIT, his own | 2,658 | recommend one choice and say why |
+| 12 | anthropics/claude-plugins-official `code-review` | Apache-2.0 | 1,179 | flag only what fails, no older fault, nit or linter catch |
+| 13 | superpowers `code-reviewer.md` | MIT | 915 | a reasonable user's expectation is a requirement |
+| 14 | addyosmani/agent-skills, four skills | MIT | 1,743 to 3,453 | repeats 2, 5 and 9 |
+| 15 | anthropics/skills, openai/skills | Apache-2.0 per skill, none stated | 18 and 45 skills | nothing: documents, art, integrations |
+
+Each source's talk with a human partner becomes `escalate`.
 
 ## 4. Drafts
 
@@ -150,9 +228,20 @@ Narration: terse, like a smart caveman. Write nothing before a routine call. Oth
 
 - A forced tool choice is not verified per provider.
 - The tool-text plugin is not verified in a real gVisor pod.
-- The chain poller never greens a head after a re-run of the same run; it needed a new commit.
+- The chain poller never greens a head after a re-run of the same run. It needed a new commit.
 - The sweep's numbers come from the map's fixture captures, not from live cards.
 
 ## 6. The walk-through
 
-The order Sebastian and Claude go through: section 1's table agent by agent, then items 2.1 to 2.8, then section 3 for the skills to write.
+The order Sebastian and Claude go through: section 1's tables agent by agent, then items 2.1 to 2.11, then section 3 for the skills to write. Open questions the proposal leaves to the walk-through:
+
+1. Test writing, skill or standing: nearly every coding run writes a test, and a loaded skill stays in the transcript. Default: a skill, with fetches counted over 20 sessions. Above 80 per cent, fold it into the guide.
+2. The responder answering a human: the 948-word guide for a one-line reply, or the chat form's three rules.
+3. case-checkin: one line of meaning beside each offered action, rendered from the code's action table.
+4. `delegate`: an `acceptance` list field, which ends the refusal of the form's "Check:" example.
+5. The audit routine writes "Run the skill audit." into its card, but sessions deny `skill` and no audit body exists. Should a routine's skill join that card's `guide` enum?
+6. request-tool: a skill, or three clauses in its description.
+
+Not verified: no proposed text ran on a model, and fetch rates are unmeasured.
+
+Not verified: no proposed text ran on a model yet. Item 2.11 measures whether an agent fetches a guide at all.
