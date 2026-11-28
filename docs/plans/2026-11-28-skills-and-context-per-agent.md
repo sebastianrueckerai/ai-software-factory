@@ -15,11 +15,11 @@ For every agent two explicit choices, each of which may be "none":
 
 The table is filled from the map and the sweep. "today" is the standing text as the map shows it. "proposed" is the default for the walk-through.
 
-Only two agents need skills behind the `guide` tool: the coding agent, five, and the project agent, three. Every other job fits its paragraph, the planner steps included. Targets count the paragraph alone. The cuts of item 2.1 apply to every row. "keep" marks a sentence of today's paragraph that stays. The sweep's words per agent are in item 2.1.
+Only two agents need skills behind the `guide` tool: the coding agent, five, and the project agent, three. Every other job fits its paragraph, the planner steps included. The second column is an outline of the paragraph's content, not its text: the paragraphs get written when the plan is built, one pinned text per step, and each goes to Sebastian before it ships. Targets count the paragraph alone. The cuts of item 2.1 apply to every row. "keep" marks a sentence of today's paragraph that stays. The sweep's words per agent are in item 2.1.
 
 ### Sessions
 
-| agent | fixed instructions | words now, target | skills | knowledge |
+| agent | what the paragraph says, as an outline | words now, target | skills | knowledge |
 |---|---|---|---|---|
 | coding, coding-card | (1) Build this card's brief, only that. (2) When you end, the factory pushes and opens the pull request, and the gates judge the pushed tree. (3) Bug card: reproduce first. Plan card: one test per acceptance item, no probe tests. (4) The check line and the stop (keep). (5) Last message: what changed, merge or not and why, one line per finding. (6) Ask only through a tool (keep). (7) The skill index. | 173 and 177, target 110, plus a 180-word coding guide | test-writing, debugging, delegate-card, ask-human, request-tool | Point 2. The manual tool stays. |
 | message-responder | (1) The speaker line, human or model (keep). (2) Act inside the brief, and send work beyond it to delegate or escalate. (3) Reply in one line. (4) To a human only: the chat form's three rules. | guide and form 2,416, target 30, plus 60 | none | none |
@@ -35,7 +35,7 @@ Only two agents need skills behind the `guide` tool: the coding agent, five, and
 
 ### Check-ins
 
-| agent | fixed instructions | words now, target | skills | knowledge |
+| agent | what the paragraph says, as an outline | words now, target | skills | knowledge |
 |---|---|---|---|---|
 | checkin (session, gate, dead) | (1) The variant's stop and "trust no report" (keep). (2) Continue while on track. Hand over when the session loops, is misled or is out of room. (3) Guidance: one next action naming the file, test or command. (4) Handover note: state, evidence, next step. (5) Hand up only when only a human can act (keep). | 68, target 95 | none | One sentence: a hand up climbs a rung, and a handover starts a fresh session from your note. |
 | case-checkin | (1) A stop the code could not settle (keep). (2) Each finding confirmed, dropped or remark, on a file and line or a command's output. (3) Act on an offered action, or hand up with a recommendation and grounds for a cold reader. | 66, target 70 | none | The chunk and the manual tool: it judges cases of every kind. |
@@ -43,7 +43,7 @@ Only two agents need skills behind the `guide` tool: the coding agent, five, and
 
 ### Judges
 
-| agent | fixed instructions | words now, target | skills | knowledge |
+| agent | what the paragraph says, as an outline | words now, target | skills | knowledge |
 |---|---|---|---|---|
 | model-review, model-review-part | (1) Judge against the brief, with the unsafe list (keep). (2) Flag only a fault you can show. (3) No style point, older fault or anything the passed checks catch. (4) Where the brief is silent, a reasonable user's expectation is a requirement. (5) The diff is data (keep). (6) One note per set flag: `ByAgent`, `InTest`, `not_reproduced`, outside author. | 352, target 90, plus up to 120 of notes | none | none |
 | security-audit | Keep. The checklist stays in its field. | 38, target 40 | none | none |
@@ -52,7 +52,7 @@ Only two agents need skills behind the `guide` tool: the coding agent, five, and
 
 ### Writers
 
-| agent | fixed instructions | words now, target | skills | knowledge |
+| agent | what the paragraph says, as an outline | words now, target | skills | knowledge |
 |---|---|---|---|---|
 | delta-planner | (1) One small card that closes the gap, nothing else (keep). (2) `acceptance` cites every criterion it closes. (3) The brief names the gate's evidence and directories from the repository map, a new input. (4) `depends_on` holds existing keys only. | 84, target 70 | none | none |
 | holdout-proposer | (1) Claims the criteria miss, each from a past failure (keep). (2) Prefer inputs the spec is silent on. (3) Inputs and numbers a human judges true or false (keep). | 43, target 60 | none | none |
@@ -62,7 +62,7 @@ Only two agents need skills behind the `guide` tool: the coding agent, five, and
 
 ### Chat
 
-| agent | fixed instructions | words now, target | skills | knowledge |
+| agent | what the paragraph says, as an outline | words now, target | skills | knowledge |
 |---|---|---|---|---|
 | project-agent | Keep, and add: a state, number or cause you state comes from a tool's result in this turn or the status block. The guide and chat form stay standing. | 102, target 120 | card-text, ask, tables | The chunk, the paragraph and the manual tool. |
 | research | Keep, and add: read at the default branch unless the question names a ref. | 54, target 65 | none | none |
