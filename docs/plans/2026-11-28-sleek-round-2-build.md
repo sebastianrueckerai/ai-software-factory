@@ -9,15 +9,16 @@
 ## Order
 
 1. The typed answer ladder (work list 2.12, Part A). First, since every direct step on `small` depends on it.
-2. The battery's session fixes (2.12, Parts B and C), once the report is in.
-3. The guide tool and the per-agent skills (2.8, 2.1), with the trigger lines in the tool's description.
-4. The coding guide and the caveman narration (2.2, 2.3), the test-writing rules standing.
-5. Human-facing text only in a human-facing turn (2.4).
-6. The paragraphs per agent (section 1 of the work list), each a pinned text Sebastian reads before it ships.
-7. The model line (2.5).
-8. The map: fixed against example, whole-request files from real cards (2.6, 2.7).
-9. The four faults (2.9) where not fixed before, and the harness skills stay denied (2.10).
-10. The whole prompts on realistic examples (2.13), with the battery as the harness.
+2. The `typed` model class (2.15), with the ladder as its net.
+3. The battery's session fixes (2.12, Parts B and C), once the report is in.
+4. The guide tool and the per-agent skills (2.8, 2.1), with the trigger lines in the tool's description.
+5. The coding guide and the caveman narration (2.2, 2.3), the test-writing rules standing.
+6. Human-facing text only in a human-facing turn (2.4).
+7. The paragraphs per agent (section 1 of the work list), each a pinned text Sebastian reads before it ships.
+8. The model line (2.5).
+9. The map: fixed against example, whole-request files from real cards (2.6, 2.7).
+10. The four faults (2.9) where not fixed before, and the harness skills stay denied (2.10).
+11. The whole prompts on realistic examples (2.13), with the battery as the harness.
 
 ## Tasks
 
@@ -35,6 +36,19 @@
 
 Open: whether `big`, `small` or `premium` enforce a JSON schema at generation through LiteLLM (structured outputs), to be checked before the task is cut.
 
-### Tasks 2 to 10
+### Task 2: The `typed` model class
+
+**Files:** infra `k8s/platform/litellm/helmrelease.yaml` (the model map), infra `factory/policy.yaml` (the purposes of the ten steps), the code's alias list where a new class name must be known (`internal/policy`, grep `small`, `big`, `premium`, `vision`), the agent map's registry job line for the gate supervisor.
+
+- One map entry `typed` behind `dashscope/deepseek-v4.1-flash-1017` on Alibaba Model Studio, thinking off, strict `json_schema` on. The Singapore caveat is checked first with one call through LiteLLM.
+- The ten fitting steps run on `typed`: checkin, screening, sizing, security-audit, gate-supervisor, judgement, answer-screener, plan-namer, title. Follow-liveness stays on `small`.
+- The five borderline steps stay until their replay: case-checkin and model-review need a read of the code, not of the transcript, in 3 of 3 runs on `typed` before they move.
+- The battery's Part A runs on `typed` for the ten steps before the policy changes, 3 runs each, and every answer must come through the tool and decode.
+- The gate supervisor's job line in the map says what it decides: wait, retry, cancel or escalate for an activity past its bound.
+- Tests, hand-derived: the policy test that lists the known aliases gains `typed`. The map's registry test pins the new job line.
+
+Open: whether Sebastian's provider is Jev. If so, the label steps screening, sizing, judgement and answer-screener may take it later as a second step. Nothing else fits it.
+
+### Tasks 3 to 11
 
 Written when their rounds finish.
