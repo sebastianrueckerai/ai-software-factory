@@ -236,6 +236,21 @@ No provider named Jeff was found. The nearest match is Jev by TypeSafe AI, propr
 
 Decided by Sebastian on 2026-11-28, after the key arrived with 30 EUR of credits: Jev for the steps whose answer is a label, screening, sizing, judgement, answer-screener, gate-supervisor and follow-liveness, each tested on its own inputs before it moves, with the text beside the label from `small` on the branch that needs it. For every other typed answer the decode checks the schema so a fault shows at once, and the same ladder applies each time: retry with the old result and the error, retry on the bigger model, escalate to the biggest, then to a human when no quick fix exists. The build plan's Tasks 1 and 2 carry both. DeepSeek V4.1 Flash on Model Studio stays the option for the schema-shaped steps if the ladder alone proves too costly.
 
+### 2.16 A seldom-used tool's description names the situation first
+
+The descriptions of the tools `small` skipped in the battery say what the tool does and what it costs, and name the situation that calls for it vaguely or last. `delegate` opens with "File a follow-up card for routine work this card need not do", `digest` with "Have a small model read one UTF-8 text file", `web_scrape` with "Fetch one web page as markdown (Firecrawl). Paid and capped per task". A model deciding its next step reads the first words. Default: every gateway tool's description has the same shape within the 45-word cap, the situation that calls for it, then what it gives, then its cost, and the six below are rewritten and tested on `small` against today's text in the battery, three runs each, before any lands:
+
+| tool | today, first words | proposed |
+|---|---|---|
+| delegate | File a follow-up card for routine work this card need not do | When you find work outside this card's acceptance that should still happen, a cleanup, a rename across files, a missing doc, do not do it: file it here and go on. A cheaper card does it after this one lands. Free. |
+| digest | Have a small model read one UTF-8 text file of your workspace | When a file is too long to read whole, over about 500 lines, ask a question about it here instead: a small model reads it and only the answer enters your context. Free. |
+| request_info | Ask the issue's author for information instead of guessing, when you could not reproduce the problem | When the issue lacks what you need to reproduce the fault, ask its author here instead of guessing: a wrong guess costs a review round, a question costs one message. Say what you tried and what you need. The card waits for the answer. |
+| analyze_image | Have a vision model describe one image | When the issue or your work holds an image, a screenshot, a diagram, a rendering, have a vision model describe it here, with what to look for. PNG, JPEG, WebP or GIF, at most 8 MiB. |
+| web_search | Search the web: url, title and description per result (Firecrawl). Paid and capped | When the repository and the module proxy do not settle a library's current behaviour, search here: url, title and description per result. 30 calls a card. |
+| web_scrape | Fetch one web page as markdown (Firecrawl). Paid and capped | When a page holds the answer, a changelog, a library's docs, an error's explanation, fetch it here as markdown. 30 calls a card. |
+
+Veto line: keep today's texts and drop the tools the sessions do not use.
+
 ## 3. The skills to write, with their sources
 
 ### The catalogue
@@ -299,7 +314,7 @@ Narration: terse, like a smart caveman. Write nothing before a routine call. Oth
 
 ## 6. The walk-through
 
-The order Sebastian and Claude go through: section 1's tables agent by agent, then items 2.1 to 2.15, then section 3 for the skills to write. Open questions the proposal leaves to the walk-through:
+The order Sebastian and Claude go through: section 1's tables agent by agent, then items 2.1 to 2.16, then section 3 for the skills to write. Open questions the proposal leaves to the walk-through:
 
 1. Test writing: settled by item 2.11, standing text in the coding guide, since `small` never fetched it before the fix.
 2. The responder answering a human: the 948-word guide for a one-line reply, or the chat form's three rules.
