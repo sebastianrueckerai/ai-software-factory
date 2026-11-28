@@ -244,17 +244,19 @@ Two rules, Sebastian's (2026-11-28). A description is short and names the situat
 
 | tool | words | proposed description |
 |---|---|---|
-| delegate | 24 | Found work this card does not need but someone should do? File it here and go on. A cheaper card does it after this one lands. |
-| digest | 23 | A file too long to read whole? Ask one question about it here. A small model reads it, and only the answer enters your context. |
-| request_info | 24 | The issue lacks what you need to reproduce the fault? Ask its author here instead of guessing. Say what you tried and what you need. |
-| analyze_image | 18 | An image in the issue or in your work? Have a vision model describe it, with what to look for. |
-| web_search | 16 | The repository and the module proxy do not settle a library's current behaviour? Search the web here. |
-| web_scrape | 17 | A page holds the answer, a changelog, a library's docs, an error's explanation? Fetch it here as markdown. |
-| escalate | 26 | A decision, access or information only a human can give? Ask here with 2 to 5 choices. The session ends, and the card resumes with the answer. |
-| request_cut | 26 | The card is bigger than one card should be? Say why and name 2 to 5 parts. Your work is pushed, and the planner plans the rest. |
-| request_tool | 24 | The check needs a binary the sandbox lacks? Name its Debian package and why. Your work is pushed, the image gains it, the card restarts. |
-| deployment_health | 20 | A pod of this project crashing or restarting? Read its deployment's state here: pods, restarts, last terminations, the hour's events. |
-| manual | 14 | The factory, the card states, the gates your pull request passes: read it here. |
+| delegate | 21 | Found work this card does not need, but someone should? File here, move on. Cheaper card does it after this one lands. |
+| digest | 20 | File too long to read whole? Ask one question about it here. Small model reads it - only the answer enters your context. |
+| request_info | 21 | Issue lacks what you need to reproduce the fault? Ask its author here, do not guess. Say what you tried, what you need. |
+| analyze_image | 15 | Image in the issue or your work? Vision model describes it - say what to look for. |
+| web_search | 15 | Repository and module proxy do not settle a library's current behaviour? Search the web here. |
+| web_scrape | 14 | A page holds the answer - changelog, docs, an error's explanation? Fetch it as markdown. |
+| escalate | 22 | Decision, access or information only a human can give? Ask here with 2 to 5 choices. Session ends, card resumes with the answer. |
+| request_cut | 21 | Card bigger than one card should be? Say why, name 2 to 5 parts. Your work is pushed, the planner plans the rest. |
+| request_tool | 19 | Check needs a binary the sandbox lacks? Name its Debian package and why. Work pushed, image gains it, card restarts. |
+| deployment_health | 17 | Pod of this project crashing or restarting? Read the deployment's state: pods, restarts, last terminations, the hour's events. |
+| manual | 12 | The factory, card states, the gates your pull request passes - read here. |
+
+The texts are model-facing, so articles go where the meaning holds and a hyphen joins two halves (Sebastian, 2026-11-28).
 
 Each lands only after the battery ran it on `small` against today's text, three runs each. The refusals that take the limits: `digest` over 128 KiB or not UTF-8, `analyze_image` wrong type or over 8 MiB, `web_search` and `web_scrape` at the card's cap, `delegate` without an acceptance list, `escalate` with fewer than 2 or more than 5 choices. Veto line: keep today's texts and drop the tools the sessions do not use.
 
