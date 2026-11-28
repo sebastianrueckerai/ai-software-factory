@@ -1,6 +1,6 @@
 # Each agent gets its job: the content of every profile
 
-**Status:** built, Tasks 1 to 18. Merged on code main 5b2dce616 on 2026-11-28, with the infra policy granting the filing tools. Task 19, the week of cards, is the measurement that follows.
+**Status:** built, Tasks 1 to 18. Merged on code main 5b2dce616 on 2026-11-28, with the infra policy granting the filing tools. Task 19 does not run: Sebastian struck the week-of-cards measurement on 2026-11-28.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to build this plan task by task. Steps use checkbox (`- [ ]`) syntax.
 
@@ -472,6 +472,8 @@ The coding prompt keeps its forms: summary, ask, title, why and brief.
 - [ ] **Step 5: Commit** the map: "agents: regenerated with every step's paragraph, forms and answer tool on code main <sha>".
 
 ## Task 19: The week of cards
+
+Struck by Sebastian on 2026-11-28. It compared the next week's normal cards with the two weeks before and does not run.
 
 The baseline is the 14 days before Task 11 lands. The last measure found about 300 sessions and 128 merged cards in 14 days. A sample of 27 sessions (21 `big`, 6 `small`, 730 calls, 18 to 25 November) showed a first request of 14,937 tokens on average and 96.8 percent of prompt tokens cached.
 

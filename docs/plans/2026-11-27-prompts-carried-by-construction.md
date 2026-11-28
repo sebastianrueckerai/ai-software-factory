@@ -67,15 +67,14 @@ How I counted:
 
 ## Measured after the build
 
-The map at code main 5b2dce616 counts 23,113 words over 29 agents, against 49,631 before the three plans. The table compares the first request's parts, summed over all agents.
+The map counts 23,113 words over 29 agents, against 49,631 before the three plans. The table compares the first request's words by origin, summed over all agents, in the columns the map's index uses.
 
 | part | before | built | change |
 |---|---|---|---|
 | harness | 26,636 | 3,318 | -23,318 |
 | guide and forms | 9,050 | 9,544 | +494 |
-| tools | 7,102 | 6,177 | -925 |
-| job, chunks and paragraphs, with the rules that went | 4,120 | 2,712 | -1,408 |
-| facts | 2,723 | 1,362 | -1,361 |
+| job: the chunks, the paragraphs and the facts, with the rules that went | 6,843 | 4,074 | -2,769 |
+| tool text | 7,102 | 6,177 | -925 |
 | total | 49,631 | 23,113 | -26,518 |
 
 The harness column fell further than the target planned, because Plan B's tool sets and tool texts cut it where the plan counted only the preamble. The guide and forms rose by one chat form and the two reference bullets, as decided. Each agent's row is in [the map](../agents/index.md), with its profile and its words by part.

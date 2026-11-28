@@ -4,7 +4,7 @@ One page per agent: the first model request verbatim, every part pinned to the b
 
 ## The self-check
 
-- code SHA `5b2dce616e5008006b1c98e0cd17ede8cc01ace0`; every permalink points there.
+- code SHA `7afdbe69cc2686777d807fb3bd06efb4311b4acd`; every permalink points there.
 - policy `249822ac88a1`, the tree the captures read.
 - harness `opencode 1.19.6`, the pinned opencode the loop captures drove.
 - unlabelled spans: 0 — the tool exits non-zero on any unlabelled byte, so an index that shipped means none.
@@ -14,37 +14,39 @@ Fixture ids: `agentdoc-fixture` (coding, screening, sizing, repo-map, planner, p
 
 ## The inventory
 
-| agent | family | job | model | purpose | runs | tools on the wire | tools behind tool_schema | request bytes | profile | harness words | guide words | forms words | chunks words | paragraph words | facts words | tool words |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| [coding](coding.md) | A | Implements the card: reads repo, edits, commits in sandbox | `small` | `session` | agent-worker, the opencode loop in a gVisor pod | 17 | 0 | 26300 | coding | 703 | 0 | 1182 | 114 | 173 | 111 | 642 |
-| [screening](screening.md) | A | Reads an issue pre-code, answers clear/suspect JSON | `small` | `session` | agent-worker, report mode | 6 | 0 | 10705 | screening | 300 | 0 | 71 | 114 | 105 | 82 | 165 |
-| [sizing](sizing.md) | A | Sizes a card small/medium/large before first session | `small` | `session` | agent-worker, report mode | 6 | 0 | 10721 | sizing | 300 | 0 | 71 | 114 | 102 | 98 | 157 |
-| [repo-map](repo-map.md) | A | Maps the repository for the planner and files the map via the file_map MCP tool | `small` | `session` | agent-worker, report mode, on the small alias | 5 | 0 | 10106 | repo-map | 348 | 0 | 0 | 114 | 63 | 109 | 80 |
-| [planner](planner.md) | A | Files a plan in steps: a spec, criteria and cards, a round, or a replan with the cards that come off main, each by its own MCP tool; the page captures the replan step, the largest | `big` | `session` | agent-worker, report mode | 10 | 0 | 24009 | planner-replan | 403 | 0 | 1253 | 114 | 106 | 132 | 639 |
-| [prover](prover.md) | A | Writes one blind test per criterion on main, files them via file_proofs | `big` | `session` | agent-worker, report mode | 8 | 0 | 13469 | prover | 561 | 0 | 0 | 114 | 148 | 124 | 133 |
-| [message-responder](message-responder.md) | A | Answers POST /message pushes mid-session | `small` | `session` | agent-worker, the session's next turn in the sandbox | 17 | 0 | 33203 | coding, message-responder | 703 | 948 | 1410 | 114 | 173 | 125 | 642 |
-| [checkin](checkin.md) | B | Decides continue, message, handover, human or replan on a session trip | `big` | `checkin` | factoryd, in-process loop, tools executed in the sandbox | 10 | 0 | 6067 | checkin-session | 0 | 0 | 157 | 55 | 70 | 0 | 264 |
-| [case-checkin](case-checkin.md) | B | Judges a case at rung 1: acts on it, or hands it up with a recommendation | `big` | `checkin` | factoryd, in-process loop on the project's chat task, tools read by factoryd | 9 | 0 | 8363 | case-checkin | 0 | 0 | 71 | 55 | 66 | 0 | 378 |
-| [model-review](model-review.md) | B | Reviews a diff part against the card's objective | `big` | `review` | factoryd direct | 1 | 0 | 6478 | model-review | 0 | 0 | 202 | 0 | 73 | 129 | 217 |
-| [security-audit](security-audit.md) | B | Audits changes against the security checklist | `big` | `audit` | factoryd direct | 1 | 0 | 3085 | security-audit | 0 | 0 | 71 | 0 | 38 | 0 | 218 |
-| [gate-supervisor](gate-supervisor.md) | B | Decides approve or escalate at the gates | `big` | `gate-supervisor` | factoryd direct | 1 | 0 | 3158 | gate-supervisor | 0 | 0 | 71 | 0 | 44 | 123 | 125 |
-| [judgement](judgement.md) | B | Judges a judgement criterion's artifact with its pinned prompt | `big` | `review` | factoryd direct | 1 | 0 | 1347 | judgement | 0 | 0 | 71 | 0 | 42 | 5 | 16 |
-| [delta-planner](delta-planner.md) | B | Plans delta work between reviews | `big` | `review` | factoryd direct | 1 | 0 | 7090 | delta-planner | 0 | 0 | 748 | 55 | 39 | 45 | 50 |
-| [holdout-proposer](holdout-proposer.md) | B | Proposes hold-out criteria | `big` | `review` | factoryd direct | 1 | 0 | 2364 | holdout-proposer | 0 | 0 | 71 | 0 | 43 | 84 | 41 |
-| [answer-screener](answer-screener.md) | B | Screens a late answer of the issue author | `big` | `review` | factoryd direct | 1 | 0 | 1966 | answer-screener | 0 | 0 | 71 | 0 | 60 | 59 | 31 |
-| [brief-writer](brief-writer.md) | B | Writes the brief of a resource request or a plan approval | `big` | `brief` | factoryd direct | 1 | 0 | 4689 | brief-writer | 0 | 0 | 434 | 0 | 41 | 41 | 90 |
-| [case-brief-writer](case-brief-writer.md) | B | Writes parts 3 and 4 of a Needs-you case | `big` | `brief` | factoryd direct | 1 | 0 | 2517 | case-brief-writer | 0 | 0 | 71 | 0 | 43 | 38 | 54 |
-| [plan-namer](plan-namer.md) | B | Names a plan from its first revision | `small` | `title` | factoryd direct | 1 | 0 | 1247 | plan-namer | 0 | 0 | 71 | 0 | 13 | 0 | 26 |
-| [digest](digest.md) | B | Summarises one big read under an ask | `small` | `digest` | factoryd direct, behind a session's digest tool | 0 | 0 | 287 | none | 0 | — | — | — | — | — | 0 |
-| [image-look](image-look.md) | B | Looks at one image a session names | `vision` | `vision` | factoryd direct, behind a session's analyze_image tool | 0 | 0 | 304 | none | 0 | — | — | — | — | — | 0 |
-| [follow-liveness](follow-liveness.md) | B | Asks the small model for one word after a move rolls out | `small` | `digest` | factoryd direct, in the follow judgment | 1 | 0 | 485 | follow-liveness | 0 | 0 | 0 | 0 | 0 | 6 | 10 |
-| [project-agent](project-agent.md) | B | The always-on repo chat agent; also answers escalations | `premium` | `operator` | console, own tool loop | 44 | 21 | 40158 | project-agent | 0 | 948 | 1410 | 55 | 102 | 33 | 1990 |
-| [research](research.md) | B | Researches one question for the project agent | `big` | `research` | console, own tool loop behind the chat's research tool | 6 | 0 | 3277 | research | 0 | 0 | 0 | 0 | 54 | 0 | 209 |
-| [compact](compact.md) | B | Summarises a chat thread's older turns | `small` | `compact` | console | 0 | 0 | 1074 | compact | 0 | 0 | 71 | 0 | 80 | 0 | 0 |
-| [title](title.md) | B | Names a chat thread from its first message | `small` | `title` | console, the naming call | 0 | 0 | 743 | title | 0 | 0 | 71 | 0 | 16 | 18 | 0 |
-| [attachment-digest](attachment-digest.md) | B | Summarises a document the human attached | `small` | `digest` | console, behind the chat's summarize_attachment tool | 0 | 0 | 220 | none | 0 | — | — | — | — | — | 0 |
-| [read-digest](read-digest.md) | B | Summarises one big read of the chat under an ask | `small` | `digest` | console, behind the chat's reads that take an ask | 0 | 0 | 204 | none | 0 | — | — | — | — | — | 0 |
-| [vision](vision.md) | B | Describes an image the human attached | `vision` | `vision` | console | 0 | 0 | 315 | none | 0 | — | — | — | — | — | 0 |
+The table counts each agent's first request: every word the model reads before its first answer. `tools` is the number of tools offered, and for the project agent also the rare tools that come on request through tool_schema. `words` is the total. `harness` is opencode's own text, which a direct call has none of. `guide and forms` is the writing guide and the forms of the job. `job` is the two factory chunks, the step's paragraph and the card's facts. `tool text` is the descriptions of the offered tools. Each agent's page shows every part with the code that wrote it.
+
+| agent | model | tools | words | harness | guide and forms | job | tool text |
+|---|---|---|---|---|---|---|---|
+| [coding](coding.md) | `small` | 17 | 2925 | 703 | 1182 | 398 | 642 |
+| [screening](screening.md) | `small` | 6 | 837 | 300 | 71 | 301 | 165 |
+| [sizing](sizing.md) | `small` | 6 | 842 | 300 | 71 | 314 | 157 |
+| [repo-map](repo-map.md) | `small` | 5 | 714 | 348 | 0 | 286 | 80 |
+| [planner](planner.md) | `big` | 10 | 2647 | 403 | 1253 | 352 | 639 |
+| [prover](prover.md) | `big` | 8 | 1080 | 561 | 0 | 386 | 133 |
+| [message-responder](message-responder.md) | `small` | 17 | 4115 | 703 | 2358 | 412 | 642 |
+| [checkin](checkin.md) | `big` | 10 | 546 | 0 | 157 | 125 | 264 |
+| [case-checkin](case-checkin.md) | `big` | 9 | 570 | 0 | 71 | 121 | 378 |
+| [model-review](model-review.md) | `big` | 1 | 621 | 0 | 202 | 202 | 217 |
+| [security-audit](security-audit.md) | `big` | 1 | 327 | 0 | 71 | 38 | 218 |
+| [gate-supervisor](gate-supervisor.md) | `big` | 1 | 363 | 0 | 71 | 167 | 125 |
+| [judgement](judgement.md) | `big` | 1 | 134 | 0 | 71 | 47 | 16 |
+| [delta-planner](delta-planner.md) | `big` | 1 | 937 | 0 | 748 | 139 | 50 |
+| [holdout-proposer](holdout-proposer.md) | `big` | 1 | 239 | 0 | 71 | 127 | 41 |
+| [answer-screener](answer-screener.md) | `big` | 1 | 221 | 0 | 71 | 119 | 31 |
+| [brief-writer](brief-writer.md) | `big` | 1 | 606 | 0 | 434 | 82 | 90 |
+| [case-brief-writer](case-brief-writer.md) | `big` | 1 | 206 | 0 | 71 | 81 | 54 |
+| [plan-namer](plan-namer.md) | `small` | 1 | 110 | 0 | 71 | 13 | 26 |
+| [digest](digest.md) | `small` | 0 | 0 | 0 | 0 | 0 | 0 |
+| [image-look](image-look.md) | `vision` | 0 | 0 | 0 | 0 | 0 | 0 |
+| [follow-liveness](follow-liveness.md) | `small` | 1 | 16 | 0 | 0 | 6 | 10 |
+| [project-agent](project-agent.md) | `premium` | 44 + 21 on request | 4538 | 0 | 2358 | 190 | 1990 |
+| [research](research.md) | `big` | 6 | 263 | 0 | 0 | 54 | 209 |
+| [compact](compact.md) | `small` | 0 | 151 | 0 | 71 | 80 | 0 |
+| [title](title.md) | `small` | 0 | 105 | 0 | 71 | 34 | 0 |
+| [attachment-digest](attachment-digest.md) | `small` | 0 | 0 | 0 | 0 | 0 | 0 |
+| [read-digest](read-digest.md) | `small` | 0 | 0 | 0 | 0 | 0 | 0 |
+| [vision](vision.md) | `vision` | 0 | 0 | 0 | 0 | 0 | 0 |
 
 ## The agents in one line each
 
