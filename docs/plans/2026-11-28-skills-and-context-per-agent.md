@@ -192,6 +192,15 @@ Defaults from the measurement: the `guide` tool's description lists the agent's 
 
 In progress: a battery under realistic conditions, re-runnable after a prompt change. Part A replays each direct step's exact first request, with its forced answer tool, on `small` and on its production model, and checks that the reply comes through the tool and decodes strictly against the schema. Part B runs every session step in the real harness on `small`, with real repositories at a commit before a real issue was fixed and the issue as the brief, one scenario per gateway tool the step offers, and checks the call and its arguments. Part C runs the three coding skills through the guide tool in those repositories. Part D replays the project agent's request on `premium` three times. Each tool and skill ends confirmed, failing or untested, with the reason.
 
+Part A is done: 87 replays, 0.79 EUR. Every forced answer tool is called on `small` in 3 of 3 runs for 13 of the 14 forced steps, and the check-in loops, research, compact and title pass. Four faults:
+
+- `small` overflows tight character caps by about 10 per cent: the case brief writer in 3 of 3 runs (`left` 98 of 87, `happened` 166 of 160), the plan namer in 2 of 3 (29 and 35 of 24). Today the step fails: the case brief falls back to its template and the plan gets no name.
+- The decode checks field names and unknown keys, not the caps the schema states. The schema is advice to the model, which the provider does not enforce at generation. Only two steps check their caps in a door of their own.
+- `big` wrote the key `reasones` for `reasons` in 2 of 3 answer-screener runs, so the strict decode refused the answer. `small` passed 3 of 3.
+- A forced tool was not honoured twice in 90 runs: the model review on `big` and the plan namer on `small` answered in prose. A review round fails for that and counts towards the stronger rung.
+
+Default from Sebastian's rule that a step never fails on its answer's shape: one answer ladder for every typed answer. The decode checks every cap and enum. A value inside 10 per cent slack over its cap passes as it is. Beyond that, one retry with the refusal as the next message, "left: 98 characters, at most 87". Then one call on the stronger model. Then the value is cut at the cap, which is better than no name. A missing tool call or an unknown key takes the same ladder. A shape failure counts as no review round. To check: whether the providers behind `big`, `small` and `premium` enforce a JSON schema at generation (structured outputs), which would make the ladder's first rungs rare.
+
 Order Sebastian set on 2026-11-28: fix every tool or skill fault the battery shows first, then run item 2.13.
 
 ### 2.13 The complete prompts tested on realistic examples
