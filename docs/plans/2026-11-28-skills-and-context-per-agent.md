@@ -220,6 +220,10 @@ Order Sebastian set on 2026-11-28: fix every tool or skill fault the battery sho
 
 After 2.12's fixes: each agent's whole context, the standing text with its skills and tools as the walk-through decides them, runs on realistic cards and issues on the production model and on `small`. The measure per agent is the job done to its door's rules, not a feel: the filed answer accepted, the test written before the fix, the right tool called with valid arguments, the human-facing text in its form. The battery of 2.12 is the harness for this run, extended with the new texts.
 
+### 2.14 The egress list admits more than Go modules
+
+Found by the battery: a coding session on `small` fetched Chrome for Testing from storage.googleapis.com, a host the sandbox's egress list admits for Go module downloads. The host serves any file, so the admission is wider than its purpose. The run was in the workstation's sandbox, not the gVisor pod, and the pod's egress rules may differ, so the first step is to check them. Default: the sandbox reaches Go modules through the factory's own module proxy or mirror, and storage.googleapis.com leaves the list. Veto line: keep the host and let the gates catch a foreign binary in the diff.
+
 ## 3. The skills to write, with their sources
 
 ### The catalogue
@@ -283,7 +287,7 @@ Narration: terse, like a smart caveman. Write nothing before a routine call. Oth
 
 ## 6. The walk-through
 
-The order Sebastian and Claude go through: section 1's tables agent by agent, then items 2.1 to 2.13, then section 3 for the skills to write. Open questions the proposal leaves to the walk-through:
+The order Sebastian and Claude go through: section 1's tables agent by agent, then items 2.1 to 2.14, then section 3 for the skills to write. Open questions the proposal leaves to the walk-through:
 
 1. Test writing: settled by item 2.11, standing text in the coding guide, since `small` never fetched it before the fix.
 2. The responder answering a human: the 948-word guide for a one-line reply, or the chat form's three rules.
