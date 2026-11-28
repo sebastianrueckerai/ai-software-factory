@@ -42,26 +42,27 @@ Sebastian's rule (2026-11-28): the decode checks the schema so a fault shows at 
 
 Sebastian's decision (2026-11-28): use Jev, TypeSafe AI's model, where it makes sense, and test each use case first. It answers Boolean, Choice and Score questions with a calibrated probability, fast and almost free, and returns no text and no tool call. The key `TYPESAFE_AI_KEY` exists with 30 EUR of credits.
 
-**Where it makes sense.** A step whose answer is a label, or a label with a text that only one branch needs:
+**Where it makes sense, measured** (2026-11-28, 207 Jev calls for 0.05 USD, records under the gitignored ledger). Jev's label against the production model's on the captured inputs and on real issues, five repeats in the given option order and two reversed:
 
-| step | label | the text beside it |
-|---|---|---|
-| screening | clear or suspect | reasons, only for suspect, from `small` in a second call on that branch |
-| sizing | small, medium or large | the reason and the files, from `small` in a second call, or dropped if no reader needs them |
-| judgement | met or unmet | the reason, which the delta planner reads, from `small` on unmet |
-| answer-screener | yes or no | the reasons, from `small` on no |
-| gate-supervisor | wait, retry, cancel or escalate | the diagnosis and recommendation, which a human reads only on escalate and cancel, from `small` on those |
-| follow-liveness | ok true or false | none |
+| step | agreement | p on agreements | flips over repeats | verdict |
+|---|---|---|---|---|
+| sizing | 21 of 21 | 0.54 to 0.97 | 0 | label from Jev, reason and files from `small` when the size is not small |
+| judgement | 14 of 14 | 0.62 to 0.99 | 0 | label from Jev, reason from `small` on unmet |
+| answer-screener | 7 of 7 | 0.97 | 0 | label from Jev, reasons from `small` on suspect |
+| gate-supervisor | 7 of 7 | 0.72 to 0.92 | 0 | label from Jev, diagnosis and recommendation from `small` on escalate and cancel |
+| screening | 22 of 35 | 0.50 to 1.00 | 1 | stays a session: both real suspect verdicts rested on reading the repository, which Jev cannot |
+| model-review | 8 of 13 | 0.50 to 0.95 | 1 | does not fit: on a real pull request it sat at 0.50 to 0.54 |
+| follow-liveness | 7 of 7 | 0.89 | 0 | stays on `small`: it exists to prove that route answers |
 
-The model review and the check-ins do not fit: their answers are findings and guidance, not a label.
+Facts the build relies on. The question is built from the step's role text and the input, not from the whole system text, which lowered the probabilities and flipped 2 of 5 judgement calls. Identical calls return probabilities up to 0.14 apart, and reversing the options lowered the gate supervisor from 0.87 to 0.72, so the options keep one fixed order and the bound has slack. The medium card scored 0.54 against 0.40 for small, so the sizing bound is 0.9 for a `small` size and 0.7 otherwise. Latency 0.2 s under 4,000 tokens, 0.5 s at 32,000. Limits: 32k tokens per question by default, 64k per request, 0.042 USD per million input tokens, output free. The endpoint is `POST /v1/systemone` with `noul` for yes or no and `choice` for 1 to 255 options, returning a probability or a choice with confidence.
 
-**How Jev enters.** It is no chat model, so it does not go through LiteLLM's map. The gateway gets one client for it, `internal/gateway/label.go`, with `Label(ctx, question, choices, input) (choice string, p float64, err error)`, the key seeded as a cluster secret like the other provider keys (`seed-secrets`, the infra `README` list), and the policy names it by one alias, `label`, in the purposes of the steps that use it. The probability is kept on the timeline step. A probability below a bound the policy sets, default 0.7, sends the call to the class's bigger chat model instead, so a doubtful label never stands alone. This is the one exception to "only LiteLLM names a model", written into the architecture document with its reason.
+**How Jev enters.** It is no chat model, so it does not go through LiteLLM's map. The gateway gets one client for it, `internal/gateway/label.go`, with `Label(ctx, question, choices, input) (choice string, p float64, err error)`, the key seeded as a cluster secret like the other provider keys (`seed-secrets`, the infra `README` list), and the policy names it by one alias, `label`, in the purposes of the steps that use it. The probability is kept on the timeline step. A probability below the step's bound in the policy, 0.7 by default and 0.9 for sizing's `small`, sends the call to the class's chat model instead, so a doubtful label never stands alone. This is the one exception to "only LiteLLM names a model", written into the architecture document with its reason.
 
 **The tests, before any step moves.** The use-case test under the gitignored ledger replays each step's captured inputs and real issues through Jev: agreement with the production model's label, probability on agreements and disagreements, stability over repeats, latency, the largest input accepted. A step moves only when its agreement with `big` is at least as high as `small`'s and its disagreements carry low probabilities. The battery's Part A then runs on the moved steps.
 
 - Tests, hand-derived: a screening verdict `suspect` at p 0.91 files through `file_screening` with reasons from `small`. A verdict at p 0.55 runs on `big` instead and the timeline step says `label p 0.55 below 0.70`. Follow-liveness `ok false` at p 0.98 ends the follow with `not live`. The alias list gains `label`. The policy refuses `label` for a purpose whose answer type has a text field without a second call.
 
-Open: the use-case test's result, which decides the table above step by step. DeepSeek V4.1 Flash on Model Studio stays the option in the work list for the schema-shaped steps the ladder alone does not settle.
+The four steps move one at a time, each after the battery's Part A ran on it with Jev in place. DeepSeek V4.1 Flash on Model Studio stays the option in the work list for the schema-shaped steps the ladder alone does not settle.
 
 ### Task 3: The session tools the small model does not reach
 
