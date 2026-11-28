@@ -236,20 +236,27 @@ No provider named Jeff was found. The nearest match is Jev by TypeSafe AI, propr
 
 Decided by Sebastian on 2026-11-28, after the key arrived with 30 EUR of credits: Jev for the steps whose answer is a label, screening, sizing, judgement, answer-screener, gate-supervisor and follow-liveness, each tested on its own inputs before it moves, with the text beside the label from `small` on the branch that needs it. For every other typed answer the decode checks the schema so a fault shows at once, and the same ladder applies each time: retry with the old result and the error, retry on the bigger model, escalate to the biggest, then to a human when no quick fix exists. The build plan's Tasks 1 and 2 carry both. DeepSeek V4.1 Flash on Model Studio stays the option for the schema-shaped steps if the ladder alone proves too costly.
 
-### 2.16 A seldom-used tool's description names the situation first
+### 2.16 A tool's description names the situation and the gain, and its limits live in the refusal
 
-The descriptions of the tools `small` skipped in the battery say what the tool does and what it costs, and name the situation that calls for it vaguely or last. `delegate` opens with "File a follow-up card for routine work this card need not do", `digest` with "Have a small model read one UTF-8 text file", `web_scrape` with "Fetch one web page as markdown (Firecrawl). Paid and capped per task". A model deciding its next step reads the first words. Default: every gateway tool's description has the same shape within the 45-word cap, the situation that calls for it, then what it gives, then its cost, and the six below are rewritten and tested on `small` against today's text in the battery, three runs each, before any lands:
+The descriptions of the tools `small` skipped in the battery say what the tool does and what it costs, and name the situation that calls for it vaguely or last. `delegate` opens with "File a follow-up card for routine work this card need not do", `digest` with "Have a small model read one UTF-8 text file", `web_scrape` with "Fetch one web page as markdown (Firecrawl). Paid and capped per task". A model deciding its next step reads the first words.
 
-| tool | today, first words | proposed |
+Two rules, Sebastian's (2026-11-28). A description is short and names the situation first and the gain second. A limit, "at most 128 KiB", "PNG, JPEG, WebP or GIF", "30 calls a card", is not in the description: the tool checks it before it does anything and refuses with the limit and the fitting action, "digest: board.go is 310 KiB, at most 128 KiB: read a part with grep". The refusal reaches the model only when it matters, and the gateway checks each limit before the call today in any case.
+
+| tool | words | proposed description |
 |---|---|---|
-| delegate | File a follow-up card for routine work this card need not do | When you find work outside this card's acceptance that should still happen, a cleanup, a rename across files, a missing doc, do not do it: file it here and go on. A cheaper card does it after this one lands. Free. |
-| digest | Have a small model read one UTF-8 text file of your workspace | When a file is too long to read whole, over about 500 lines, ask a question about it here instead: a small model reads it and only the answer enters your context. Free. |
-| request_info | Ask the issue's author for information instead of guessing, when you could not reproduce the problem | When the issue lacks what you need to reproduce the fault, ask its author here instead of guessing: a wrong guess costs a review round, a question costs one message. Say what you tried and what you need. The card waits for the answer. |
-| analyze_image | Have a vision model describe one image | When the issue or your work holds an image, a screenshot, a diagram, a rendering, have a vision model describe it here, with what to look for. PNG, JPEG, WebP or GIF, at most 8 MiB. |
-| web_search | Search the web: url, title and description per result (Firecrawl). Paid and capped | When the repository and the module proxy do not settle a library's current behaviour, search here: url, title and description per result. 30 calls a card. |
-| web_scrape | Fetch one web page as markdown (Firecrawl). Paid and capped | When a page holds the answer, a changelog, a library's docs, an error's explanation, fetch it here as markdown. 30 calls a card. |
+| delegate | 24 | Found work this card does not need but someone should do? File it here and go on. A cheaper card does it after this one lands. |
+| digest | 23 | A file too long to read whole? Ask one question about it here. A small model reads it, and only the answer enters your context. |
+| request_info | 24 | The issue lacks what you need to reproduce the fault? Ask its author here instead of guessing. Say what you tried and what you need. |
+| analyze_image | 18 | An image in the issue or in your work? Have a vision model describe it, with what to look for. |
+| web_search | 16 | The repository and the module proxy do not settle a library's current behaviour? Search the web here. |
+| web_scrape | 17 | A page holds the answer, a changelog, a library's docs, an error's explanation? Fetch it here as markdown. |
+| escalate | 26 | A decision, access or information only a human can give? Ask here with 2 to 5 choices. The session ends, and the card resumes with the answer. |
+| request_cut | 26 | The card is bigger than one card should be? Say why and name 2 to 5 parts. Your work is pushed, and the planner plans the rest. |
+| request_tool | 24 | The check needs a binary the sandbox lacks? Name its Debian package and why. Your work is pushed, the image gains it, the card restarts. |
+| deployment_health | 20 | A pod of this project crashing or restarting? Read its deployment's state here: pods, restarts, last terminations, the hour's events. |
+| manual | 14 | The factory, the card states, the gates your pull request passes: read it here. |
 
-Veto line: keep today's texts and drop the tools the sessions do not use.
+Each lands only after the battery ran it on `small` against today's text, three runs each. The refusals that take the limits: `digest` over 128 KiB or not UTF-8, `analyze_image` wrong type or over 8 MiB, `web_search` and `web_scrape` at the card's cap, `delegate` without an acceptance list, `escalate` with fewer than 2 or more than 5 choices. Veto line: keep today's texts and drop the tools the sessions do not use.
 
 ## 3. The skills to write, with their sources
 
